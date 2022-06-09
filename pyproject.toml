@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "geo-activity-playground"
+version = "0.1.0"
+description = ""
+authors = ["Martin Ueding <mu@martin-ueding.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10,<3.11"
+numpy = "^1.22.4"
+gpxpy = "^1.5.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
