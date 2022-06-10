@@ -1,0 +1,28 @@
+default_stages:
+  - commit
+fail_fast: true
+repos:
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.5.0
+    hooks:
+      - id: reorder-python-imports
+        name: Import reordering
+  - repo: local
+    hooks:
+      - id: black
+        name: Code formatting
+        entry: poetry run black
+        language: system
+        files: '.*\.py'
+      - id: mypy
+        name: Static type checking
+        entry: poetry run mypy -p vigilant_crypto_snatch
+        language: system
+        files: '.*\.py'
+        pass_filenames: false
+      - id: pytest
+        name: Unit tests
+        entry: poetry run pytest
+        pass_filenames: false
+        language: system
+        files: '.*\.py'
