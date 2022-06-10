@@ -3,26 +3,21 @@ import pathlib
 import pandas as pd
 
 from ..core.tiles import compute_tile
-from ..strava.importing import strava_checkout_path, read_gpx_activity
-
+from ..strava.importing import strava_checkout_path, read_activity
 
 cache_dir = pathlib.Path('~/.cache/geo-activity-playground').expanduser()
 cache_dir.mkdir(exist_ok=True)
 
 
 def generate_tile_history() -> None:
-    for path in (strava_checkout_path / 'activities').glob('*.gpx'):
-        tile_path = cache_dir / f"tiles-{path.name}.json"
+    activities_path = strava_checkout_path / 'activities'
+    for path in activities_path.glob('*'):
+        tile_path = cache_dir / f"tiles-{path.stem.split('.')[0]}.json"
         if tile_path.exists() and tile_path.stat().st_mtime > path.stat().st_mtime:
             continue
-        activity = read_gpx_activity(path)
-        print(activity.track_points)
-        print()
-        tiles = tiles_from_points(activity.track_points)
-        print(tiles)
-        print()
+        activity = read_activity(path)
+        tiles = tiles_from_points(activity)
         first_tiles = first_time_per_tile(tiles)
-        print(first_tiles)
         first_tiles.to_json(tile_path, date_unit='ns')
 
 
