@@ -1,14 +1,21 @@
+import dataclasses
 import math
 import pathlib
 import time
 from typing import Dict
+from typing import Generator
+from typing import List
 from typing import Set
 from typing import Tuple
 
 import click
+import numpy as np
+import pandas as pd
 import requests
+import scipy.interpolate
 from PIL import Image
 from PIL import ImageEnhance
+from tqdm import tqdm
 
 from geo_activity_playground.core.cache_dir import cache_dir
 
@@ -16,7 +23,6 @@ from geo_activity_playground.core.cache_dir import cache_dir
 def download_file(url: str, destination: pathlib.Path):
     if not destination.parent.exists():
         destination.parent.mkdir(exist_ok=True, parents=True)
-    print(url)
     r = requests.get(url, allow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
     with open(destination, "wb") as f:
         f.write(r.content)
@@ -47,7 +53,11 @@ def build_image(
     brightness: float = 1.0,
     width: int = 1920,
     height: int = 1080,
+    frame_counter: int = None,
 ) -> Image.Image:
+    path = pathlib.Path(f"video/{frame_counter:06d}.png")
+    if path.exists():
+        return None
     tile_pixels = 256
     img = Image.new("RGB", (width, height))
 
@@ -74,13 +84,91 @@ def build_image(
         enhancer = ImageEnhance.Brightness(img)
         img = enhancer.enhance(brightness)
 
+    path.parent.mkdir(exist_ok=True)
+    img.save(path)
     return img
+
+
+def chunk_tiles(tiles: pd.DataFrame) -> List[List[Tuple[int, int]]]:
+    last_x, last_y = -1000, -1000
+    chunks: List[List[Tuple[int, int]]] = []
+    chunk: List[Tuple[int, int]] = []
+    for index, row in tiles.iterrows():
+        x, y = row["Tile X"], row["Tile Y"]
+        if abs(x - last_x) + abs(y - last_y) > 3:
+            if chunk:
+                chunks.append(chunk)
+                chunk = []
+        chunk.append((x, y))
+        last_x, last_y = x, y
+    return chunks
+
+
+@dataclasses.dataclass
+class RenderArguments:
+    center_x: float
+    center_y: float
+    explored: Set[Tuple[int, int]]
+    brightness: float
+
+
+def animate_chunk(
+    chunk: List[Tuple[int, int]], explored: Set[Tuple[int, int]]
+) -> Generator[RenderArguments, None, None]:
+    if len(chunk) == 1:
+        x, y = chunk[0]
+        explored.add((x, y))
+        yield RenderArguments(x, y, explored, 1.0)
+    else:
+        coords = np.array(chunk).T
+        tck, u = scipy.interpolate.splprep(coords, k=min(len(chunk) - 1, 3))
+        u2 = np.linspace(0.0, 1.0, 25 * len(chunk))
+
+        interp_x, interp_y = scipy.interpolate.splev(u2, tck)
+
+        for uu, ix, iy in tqdm(list(zip(u2, interp_x, interp_y)), desc="Animation"):
+            passed = u <= uu
+            passed[0] = uu > 0
+            for coord in chunk[: sum(passed)]:
+                explored.add(coord)
+            yield RenderArguments(ix, iy, explored, 1.0)
 
 
 @click.command()
 def main():
-    img = build_image(8509.8, 5503.3, {(8509, 5503)})
-    img.save("test.png")
+    tile_df = pd.read_json(cache_dir / "tiles.json", date_unit="ns").sort_values("Time")
+    chunks = chunk_tiles(tile_df)
+    frame_counter = 0
+    explored = set()
+    for chunk in tqdm(chunks, desc="Chunk"):
+        for frame_id, frame in enumerate(animate_chunk(chunk, explored)):
+            if frame_id == 0:
+                for brightness in tqdm(np.linspace(0.0, 1.0, 25), desc="Fade-In"):
+                    build_image(
+                        frame.center_x,
+                        frame.center_y,
+                        explored - set(chunk[0]),
+                        brightness,
+                        frame_counter=frame_counter,
+                    )
+                    frame_counter += 1
+            build_image(
+                frame.center_x,
+                frame.center_y,
+                frame.explored,
+                frame.brightness,
+                frame_counter=frame_counter,
+            )
+            frame_counter += 1
+        for brightness in tqdm(np.linspace(1.0, 0.0, 25), desc="Fade-Out"):
+            build_image(
+                frame.center_x,
+                frame.center_y,
+                explored,
+                brightness,
+                frame_counter=frame_counter,
+            )
+            frame_counter += 1
 
 
 if __name__ == "__main__":
