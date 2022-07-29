@@ -1,4 +1,5 @@
-from .tiles import compute_tile, get_tile_upper_left_lat_lon
+from .tiles import compute_tile
+from .tiles import get_tile_upper_left_lat_lon
 
 
 def test_rheinbach() -> None:
