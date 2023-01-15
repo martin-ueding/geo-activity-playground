@@ -10,7 +10,7 @@ from .converters import cache_dir
 
 
 def get_border_tiles():
-    tiles = pd.read_json(cache_dir / "tiles.json")
+    tiles = pd.read_json(cache_dir / "explorer" / "tiles.json")
     tiles.Time = pd.to_datetime(tiles.Time)
     a = np.zeros((2**14, 2**14), dtype=np.int8)
     a[tiles["Tile X"], tiles["Tile Y"]] = 1

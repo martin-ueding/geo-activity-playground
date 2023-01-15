@@ -11,7 +11,7 @@ from ..strava.importing import strava_checkout_path
 def generate_tile_history() -> None:
     activities_path = strava_checkout_path / "activities"
     for path in activities_path.glob("*"):
-        tile_path = cache_dir / f"tiles-{path.stem.split('.')[0]}.json"
+        tile_path = cache_dir / "explorer" / f"tiles-{path.stem.split('.')[0]}.json"
         if tile_path.exists() and tile_path.stat().st_mtime > path.stat().st_mtime:
             continue
         activity = read_activity(path)
@@ -27,7 +27,7 @@ def combine_tile_history() -> None:
         pd.to_datetime(shard.Time)
         tiles = pd.concat([tiles, shard])
         tiles = first_time_per_tile(tiles)
-    tiles.to_json(cache_dir / "tiles.json", date_unit="ns")
+    tiles.to_json(cache_dir / "explorer" / "tiles.json", date_unit="ns")
 
 
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
