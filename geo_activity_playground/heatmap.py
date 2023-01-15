@@ -18,14 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import argparse
+import dataclasses
 import glob
 import os
-import time
-import urllib.error
-import urllib.request
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+from geo_activity_playground.core.tiles import get_tile
+from geo_activity_playground.core.tiles import latlon_to_xy
+from geo_activity_playground.core.tiles import xy_to_latlon
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map
@@ -35,42 +37,6 @@ MAX_HEATMAP_SIZE = (2160, 3840)  # maximum heatmap size in pixel
 OSM_TILE_SERVER = "https://maps.wikimedia.org/osm-intl/{}/{}/{}.png"  # OSM tile url from https://wiki.openstreetmap.org/wiki/Tile_servers
 OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
-
-# functions
-def deg2xy(lat_deg, lon_deg, zoom):
-    # returns OSM coordinates (x,y) from (lat,lon) in degree
-    # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-    #
-    # input: lat_deg = float
-    #        long_deg = float
-    #        zoom = int
-    # output: x = float
-    #         y = float
-
-    lat_rad = np.radians(lat_deg)
-    n = 2.0**zoom
-    x = (lon_deg + 180.0) / 360.0 * n
-    y = (1.0 - np.arcsinh(np.tan(lat_rad)) / np.pi) / 2.0 * n
-
-    return x, y
-
-
-def xy2deg(x, y, zoom):
-    # returns (lat, lon) in degree from OSM coordinates (x,y)
-    # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-    #
-    # input: x = float
-    #        y = float
-    #        zoom = int
-    # output: lat_deg = float
-    #         lon_deg = float
-
-    n = 2.0**zoom
-    lon_deg = x / n * 360.0 - 180.0
-    lat_rad = np.arctan(np.sinh(np.pi * (1.0 - 2.0 * y / n)))
-    lat_deg = np.degrees(lat_rad)
-
-    return lat_deg, lon_deg
 
 
 def gaussian_filter(image, sigma):
@@ -102,93 +68,25 @@ def gaussian_filter(image, sigma):
     return image
 
 
-def download_tile(tile_url, tile_file):
-    # download tile from url, save to file and wait 0.1s
-    #
-    # input: tile_url = str
-    #        tile_file = str
-    # output: bool
-
-    request = urllib.request.Request(tile_url, headers={"User-Agent": "Mozilla/5.0"})
-
-    try:
-        with urllib.request.urlopen(request) as response:
-            data = response.read()
-
-    except urllib.error.URLError:
-        return False
-
-    with open(tile_file, "wb") as file:
-        file.write(data)
-
-    time.sleep(0.1)
-
-    return True
+@dataclasses.dataclass
+class GeoBounds:
+    lat_bound_min: float
+    lat_bound_max: float
+    lon_bound_min: float
+    lon_bound_max: float
 
 
-def main(args):
-    # read GPX trackpoints
-    gpx_files = glob.glob("{}/{}".format(args.dir, args.filter))
+def filter_data(lat_lon_data: np.ndarray, bounds: GeoBounds) -> np.ndarray:
+    selection = (
+        (bounds.lat_bound_min < lat_lon_data[:, 0])
+        & (lat_lon_data[:, 0] < bounds.lat_bound_max)
+        & (bounds.lon_bound_min < lat_lon_data[:, 1])
+        & (lat_lon_data[:, 1] < bounds.lon_bound_max)
+    )
+    return lat_lon_data[selection, :]
 
-    if not gpx_files:
-        exit("ERROR no data matching {}/{}".format(args.dir, args.filter))
 
-    lat_lon_data = []
-
-    for gpx_file in gpx_files:
-        print("Reading {}".format(os.path.basename(gpx_file)))
-
-        with open(gpx_file) as file:
-            for line in file:
-                if "<time" in line:
-                    l = line.split(">")[1][:4]
-
-                    if args.year == "all" or l in args.year:
-                        for line in file:
-                            if "<trkpt" in line:
-                                l = line.split('"')
-
-                                lat_lon_data.append([float(l[1]), float(l[3])])
-
-                    else:
-                        break
-
-    lat_lon_data = np.array(lat_lon_data)
-
-    if lat_lon_data.size == 0:
-        exit(
-            "ERROR no data matching {}/{}{}".format(
-                args.dir,
-                args.filter,
-                " with year {}".format(args.year) if not args.year == "all" else "",
-            )
-        )
-
-    # crop to bounding box
-    lat_bound_min, lat_bound_max, lon_bound_min, lon_bound_max = args.bounds
-
-    lat_lon_data = lat_lon_data[
-        np.logical_and(
-            lat_lon_data[:, 0] > lat_bound_min, lat_lon_data[:, 0] < lat_bound_max
-        ),
-        :,
-    ]
-    lat_lon_data = lat_lon_data[
-        np.logical_and(
-            lat_lon_data[:, 1] > lon_bound_min, lat_lon_data[:, 1] < lon_bound_max
-        ),
-        :,
-    ]
-
-    if lat_lon_data.size == 0:
-        exit(
-            "ERROR no data matching {}/{} with bounds {}".format(
-                args.dir, args.filter, args.bounds
-            )
-        )
-
-    print("Read {} trackpoints".format(lat_lon_data.shape[0]))
-
+def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
     # find tiles coordinates
     lat_min, lon_min = np.min(lat_lon_data, axis=0)
     lat_max, lon_max = np.max(lat_lon_data, axis=0)
@@ -196,15 +94,15 @@ def main(args):
     if args.zoom > -1:
         zoom = min(args.zoom, OSM_MAX_ZOOM)
 
-        x_tile_min, y_tile_max = map(int, deg2xy(lat_min, lon_min, zoom))
-        x_tile_max, y_tile_min = map(int, deg2xy(lat_max, lon_max, zoom))
+        x_tile_min, y_tile_max = map(int, latlon_to_xy(lat_min, lon_min, zoom))
+        x_tile_max, y_tile_min = map(int, latlon_to_xy(lat_max, lon_max, zoom))
 
     else:
         zoom = OSM_MAX_ZOOM
 
         while True:
-            x_tile_min, y_tile_max = map(int, deg2xy(lat_min, lon_min, zoom))
-            x_tile_max, y_tile_min = map(int, deg2xy(lat_max, lon_max, zoom))
+            x_tile_min, y_tile_max = map(int, latlon_to_xy(lat_min, lon_min, zoom))
+            x_tile_max, y_tile_min = map(int, latlon_to_xy(lat_max, lon_max, zoom))
 
             if (x_tile_max - x_tile_min + 1) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[
                 0
@@ -220,9 +118,6 @@ def main(args):
     if tile_count > MAX_TILE_COUNT:
         exit("ERROR zoom value too high, too many tiles to download")
 
-    # download tiles
-    os.makedirs("tiles", exist_ok=True)
-
     supertile = np.zeros(
         (
             (y_tile_max - y_tile_min + 1) * OSM_TILE_SIZE,
@@ -236,25 +131,7 @@ def main(args):
         for y in range(y_tile_min, y_tile_max + 1):
             n += 1
 
-            tile_url = OSM_TILE_SERVER.format(zoom, x, y)
-
-            tile_file = "tiles/tile_{}_{}_{}.png".format(zoom, x, y)
-
-            if not glob.glob(tile_file):
-                print("downloading tile {}/{}".format(n, tile_count))
-
-                if not download_tile(tile_url, tile_file):
-                    print(
-                        "ERROR downloading tile {} failed, using blank tile".format(
-                            tile_url
-                        )
-                    )
-
-                    tile = np.ones((OSM_TILE_SIZE, OSM_TILE_SIZE, 3))
-
-                    plt.imsave(tile_file, tile)
-
-            tile = plt.imread(tile_file)
+            tile = get_tile(zoom, x, y)
 
             i = y - y_tile_min
             j = x - x_tile_min
@@ -275,7 +152,7 @@ def main(args):
 
     data = np.zeros(supertile.shape[:2])
 
-    xy_data = deg2xy(lat_lon_data[:, 0], lat_lon_data[:, 1], zoom)
+    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], zoom)
 
     xy_data = np.array(xy_data).T
     xy_data = np.round(
@@ -344,31 +221,7 @@ def main(args):
         for c in range(3):
             supertile[:, :, c] = (1.0 - data) * supertile[:, :, c] + data * color[c]
 
-    # save image
-    plt.imsave(args.output, supertile)
-
-    print("Saved {}".format(args.output))
-
-    # save csv
-    if args.csv and not args.orange:
-        csv_file = "{}.csv".format(os.path.splitext(args.output)[0])
-
-        with open(csv_file, "w") as file:
-            file.write("latitude,longitude,intensity\n")  # header
-
-            for i in range(data.shape[0]):
-                for j in range(data.shape[1]):
-                    if data[i, j] > 0.1:
-                        x = x_tile_min + j / OSM_TILE_SIZE
-                        y = y_tile_min + i / OSM_TILE_SIZE
-
-                        lat, lon = xy2deg(x, y, zoom)
-
-                        file.write("{},{},{}\n".format(lat, lon, data[i, j]))
-
-        print("Saved {}".format(csv_file))
-
-    return
+    return supertile
 
 
 if __name__ == "__main__":

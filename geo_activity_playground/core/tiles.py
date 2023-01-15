@@ -54,3 +54,27 @@ def get_tile(
         image = image.convert("RGB")
     _cache[(zoom, x, y)] = image
     return image
+
+
+def latlon_to_xy(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[float, float]:
+    """
+    Based on https://github.com/remisalmon/Strava-local-heatmap.
+    """
+    lat_rad = np.radians(lat_deg)
+    n = 2.0**zoom
+    x = (lon_deg + 180.0) / 360.0 * n
+    y = (1.0 - np.arcsinh(np.tan(lat_rad)) / np.pi) / 2.0 * n
+    return x, y
+
+
+def xy_to_latlon(x: float, y: float, zoom: int) -> Tuple[float, float]:
+    """
+    Returns (lat, lon) in degree from OSM coordinates (x,y) rom https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+
+    Based on https://github.com/remisalmon/Strava-local-heatmap.
+    """
+    n = 2.0**zoom
+    lon_deg = x / n * 360.0 - 180.0
+    lat_rad = np.arctan(np.sinh(np.pi * (1.0 - 2.0 * y / n)))
+    lat_deg = float(np.degrees(lat_rad))
+    return lat_deg, lon_deg
