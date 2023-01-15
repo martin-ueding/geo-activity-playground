@@ -224,23 +224,10 @@ def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
     return supertile
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate a PNG heatmap from local Strava GPX files",
         epilog="Report issues to https://github.com/remisalmon/Strava-local-heatmap/issues",
-    )
-
-    parser.add_argument(
-        "--dir", default="gpx", help="GPX files directory  (default: gpx)"
-    )
-    parser.add_argument(
-        "--filter", default="*.gpx", help="GPX files glob filter (default: *.gpx)"
-    )
-    parser.add_argument(
-        "--year",
-        nargs="+",
-        default="all",
-        help="GPX files year(s) filter (default: all)",
     )
     parser.add_argument(
         "--bounds",
@@ -265,11 +252,12 @@ if __name__ == "__main__":
         default=1,
         help="heatmap Gaussian kernel sigma in pixel (default: 1)",
     )
-    parser.add_argument("--orange", action="store_true", help="not a heatmap...")
-    parser.add_argument(
-        "--csv", action="store_true", help="also save the heatmap data to a CSV file"
-    )
 
-    args = parser.parse_args()
+    options = parser.parse_args()
 
-    main(args)
+    bounds = GeoBounds(*options.bounds)
+    heatmap = render_heatmap()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,25 +1,36 @@
 import gzip
 import pathlib
-import sys
 
 import fitdecode
 import gpxpy
 import pandas as pd
 
+from geo_activity_playground.core.cache_dir import cache_dir
+
 strava_checkout_path = pathlib.Path("~/Dokumente/Karten/Strava Export/").expanduser()
 
 
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
-    suffixes = path.suffixes
-    if suffixes[-1] == ".gz":
-        if suffixes[-2] == ".gpx":
-            return read_gpx_activity(path, gzip.open)
-        elif suffixes[-2] == ".fit":
-            return read_fit_activity(path, gzip.open)
-    elif suffixes[-1] == ".gpx":
-        return read_gpx_activity(path, open)
-    elif suffixes[-1] == ".fit":
-        return read_fit_activity(path, open)
+    activity_cache_dir = cache_dir / "activities"
+    activity_cache_path = activity_cache_dir / (path.stem + ".json")
+    if activity_cache_path.exists():
+        return pd.read_json(activity_cache_path)
+    else:
+        suffixes = path.suffixes
+        if suffixes[-1] == ".gz":
+            if suffixes[-2] == ".gpx":
+                df = read_gpx_activity(path, gzip.open)
+            elif suffixes[-2] == ".fit":
+                df = read_fit_activity(path, gzip.open)
+            else:
+                raise NotImplementedError(f"Unknown suffix: {path}")
+        elif suffixes[-1] == ".gpx":
+            df = read_gpx_activity(path, open)
+        elif suffixes[-1] == ".fit":
+            df = read_fit_activity(path, open)
+        else:
+            raise NotImplementedError(f"Unknown suffix: {path}")
+        df.to_json(activity_cache_path)
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
