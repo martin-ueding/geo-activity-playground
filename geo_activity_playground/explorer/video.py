@@ -1,8 +1,6 @@
 import dataclasses
 import math
 import pathlib
-import time
-from typing import Dict
 from typing import Generator
 from typing import List
 from typing import Set
@@ -11,39 +9,13 @@ from typing import Tuple
 import click
 import numpy as np
 import pandas as pd
-import requests
 import scipy.interpolate
 from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
 from geo_activity_playground.core.cache_dir import cache_dir
-
-
-def download_file(url: str, destination: pathlib.Path):
-    if not destination.parent.exists():
-        destination.parent.mkdir(exist_ok=True, parents=True)
-    r = requests.get(url, allow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
-    with open(destination, "wb") as f:
-        f.write(r.content)
-    time.sleep(0.1)
-
-
-def get_tile(
-    zoom: int, x: int, y: int, _cache: Dict[Tuple[int, int, int], Image.Image] = {}
-) -> Image.Image:
-    if (zoom, x, y) in _cache:
-        return _cache[(zoom, x, y)]
-    destination = cache_dir / "osm_tiles" / f"{zoom}/{x}/{y}.png"
-    if not destination.exists():
-        url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
-        # url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
-        download_file(url, destination)
-    with Image.open(destination) as image:
-        image.load()
-        image = image.convert("RGB")
-    _cache[(zoom, x, y)] = image
-    return image
+from geo_activity_playground.core.tiles import get_tile
 
 
 def build_image(
