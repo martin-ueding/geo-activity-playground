@@ -28,6 +28,7 @@ import numpy as np
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import latlon_to_xy
 from geo_activity_playground.core.tiles import xy_to_latlon
+from geo_activity_playground.strava.importing import read_all_activities
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map
@@ -76,23 +77,15 @@ class GeoBounds:
     lon_bound_max: float
 
 
-def filter_data(lat_lon_data: np.ndarray, bounds: GeoBounds) -> np.ndarray:
-    selection = (
-        (bounds.lat_bound_min < lat_lon_data[:, 0])
-        & (lat_lon_data[:, 0] < bounds.lat_bound_max)
-        & (bounds.lon_bound_min < lat_lon_data[:, 1])
-        & (lat_lon_data[:, 1] < bounds.lon_bound_max)
-    )
-    return lat_lon_data[selection, :]
-
-
-def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
+def render_heatmap(
+    lat_lon_data: np.ndarray, num_activities: int, arg_zoom: int = -1
+) -> np.ndarray:
     # find tiles coordinates
     lat_min, lon_min = np.min(lat_lon_data, axis=0)
     lat_max, lon_max = np.max(lat_lon_data, axis=0)
 
-    if args.zoom > -1:
-        zoom = min(args.zoom, OSM_MAX_ZOOM)
+    if arg_zoom > -1:
+        zoom = min(arg_zoom, OSM_MAX_ZOOM)
 
         x_tile_min, y_tile_max = map(int, latlon_to_xy(lat_min, lon_min, zoom))
         x_tile_max, y_tile_min = map(int, latlon_to_xy(lat_max, lon_max, zoom))
@@ -131,7 +124,7 @@ def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
         for y in range(y_tile_min, y_tile_max + 1):
             n += 1
 
-            tile = get_tile(zoom, x, y)
+            tile = np.array(get_tile(zoom, x, y)) / 255
 
             i = y - y_tile_min
             j = x - x_tile_min
@@ -142,13 +135,12 @@ def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
                 :,
             ] = tile[:, :, :3]
 
-    if not args.orange:
-        supertile = np.sum(supertile * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
-        supertile = 1.0 - supertile  # invert colors
-        supertile = np.dstack((supertile, supertile, supertile))  # to rgb
+    supertile = np.sum(supertile * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
+    supertile = 1.0 - supertile  # invert colors
+    supertile = np.dstack((supertile, supertile, supertile))  # to rgb
 
     # fill trackpoints
-    sigma_pixel = args.sigma if not args.orange else 1
+    sigma_pixel = 1
 
     data = np.zeros(supertile.shape[:2])
 
@@ -164,62 +156,43 @@ def render_heatmap(lat_lon_data: np.ndarray) -> np.ndarray:
             i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
         ] += 1.0
 
-    # threshold to max accumulation of trackpoint
-    if not args.orange:
-        res_pixel = (
-            156543.03 * np.cos(np.radians(np.mean(lat_lon_data[:, 0]))) / (2.0**zoom)
-        )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+    res_pixel = (
+        156543.03 * np.cos(np.radians(np.mean(lat_lon_data[:, 0]))) / (2.0**zoom)
+    )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
-        # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
-        # (Strava records trackpoints every 5 meters in average for cycling activites)
-        m = np.round((1.0 / 5.0) * res_pixel * len(gpx_files))
-
-    else:
-        m = 1.0
+    # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
+    # (Strava records trackpoints every 5 meters in average for cycling activites)
+    m = np.round((1.0 / 5.0) * res_pixel * num_activities)
 
     data[data > m] = m
 
     # equalize histogram and compute kernel density estimation
-    if not args.orange:
-        data_hist, _ = np.histogram(data, bins=int(m + 1))
+    data_hist, _ = np.histogram(data, bins=int(m + 1))
 
-        data_hist = np.cumsum(data_hist) / data.size  # normalized cumulated histogram
+    data_hist = np.cumsum(data_hist) / data.size  # normalized cumulated histogram
 
-        for i in range(data.shape[0]):
-            for j in range(data.shape[1]):
-                data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
 
-        data = gaussian_filter(
-            data, float(sigma_pixel)
-        )  # kernel density estimation with normal kernel
+    data = gaussian_filter(
+        data, float(sigma_pixel)
+    )  # kernel density estimation with normal kernel
 
-        data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
+    data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
 
     # colorize
-    if not args.orange:
-        cmap = plt.get_cmap(PLT_COLORMAP)
+    cmap = plt.get_cmap(PLT_COLORMAP)
 
-        data_color = cmap(data)
-        data_color[data_color == cmap(0.0)] = 0.0  # remove background color
+    data_color = cmap(data)
+    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 
-        for c in range(3):
-            supertile[:, :, c] = (1.0 - data_color[:, :, c]) * supertile[
-                :, :, c
-            ] + data_color[:, :, c]
+    for c in range(3):
+        supertile[:, :, c] = (1.0 - data_color[:, :, c]) * supertile[
+            :, :, c
+        ] + data_color[:, :, c]
 
-    else:
-        color = np.array([255, 82, 0], dtype=float) / 255  # orange
-
-        for c in range(3):
-            supertile[:, :, c] = np.minimum(
-                supertile[:, :, c] + gaussian_filter(data, 1.0), 1.0
-            )  # white
-
-        data = gaussian_filter(data, 0.5)
-        data = (data - data.min()) / (data.max() - data.min())
-
-        for c in range(3):
-            supertile[:, :, c] = (1.0 - data) * supertile[:, :, c] + data * color[c]
+    print(np.min(supertile), np.max(supertile))
 
     return supertile
 
@@ -234,7 +207,7 @@ def main() -> None:
         type=float,
         nargs=4,
         metavar="BOUND",
-        default=[-90.0, +90.0, -180.0, +180.0],
+        default=[50.6570, 50.7896, 6.9979, 7.2136],
         help="heatmap bounding box as lat_min, lat_max, lon_min, lon_max (default: -90 +90 -180 +180)",
     )
     parser.add_argument(
@@ -256,7 +229,20 @@ def main() -> None:
     options = parser.parse_args()
 
     bounds = GeoBounds(*options.bounds)
-    heatmap = render_heatmap()
+    activities = read_all_activities()
+    selection = (
+        (bounds.lat_bound_min < activities.Latitude)
+        & (activities.Latitude < bounds.lat_bound_max)
+        & (bounds.lon_bound_min < activities.Longitude)
+        & (activities.Longitude < bounds.lon_bound_max)
+    )
+    filtered_points = activities.loc[selection]
+    points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
+    print("Rendering Heatmap …")
+    heatmap = render_heatmap(
+        points, num_activities=len(filtered_points.Activity.unique())
+    )
+    plt.imsave(options.output, heatmap)
 
 
 if __name__ == "__main__":

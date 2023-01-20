@@ -9,6 +9,7 @@ license = "MIT"
 activity = "geo_activity_playground.__main__:main"
 explorer = "geo_activity_playground.explorer.__main__:main"
 explorer-video = "geo_activity_playground.explorer.video:main"
+geo-heatmap = "geo_activity_playground.heatmap:main"
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.12"
