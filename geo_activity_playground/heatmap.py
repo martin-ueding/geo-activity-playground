@@ -207,7 +207,3 @@ def heatmaps_main() -> None:
             / f"Heatmap {heatmap_name}.png"
         )
         plt.imsave(output_filename, heatmap)
-
-
-if __name__ == "__main__":
-    main()
