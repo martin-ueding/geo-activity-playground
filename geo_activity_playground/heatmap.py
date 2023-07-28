@@ -208,6 +208,7 @@ def heatmaps_main() -> None:
         heatmap = render_heatmap(
             points, num_activities=len(filtered_points.Activity.unique())
         )
+        heatmap = crop_heatmap(heatmap, heatmap_spec)
         output_filename = (
             pathlib.Path(config["heatmaps"]["destination"])
             / f"Heatmap {heatmap_name}.png"
