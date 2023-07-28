@@ -31,9 +31,15 @@ def get_tile_upper_left_lat_lon(
 
 
 def download_file(url: str, destination: pathlib.Path):
+    print(f"Downloading {url} …")
     if not destination.parent.exists():
         destination.parent.mkdir(exist_ok=True, parents=True)
-    r = requests.get(url, allow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
+    r = requests.get(
+        url,
+        allow_redirects=True,
+        headers={"User-Agent": "Martin's Geo Activity Playground"},
+    )
+    assert r.ok
     with open(destination, "wb") as f:
         f.write(r.content)
     time.sleep(0.1)
@@ -46,8 +52,8 @@ def get_tile(
         return _cache[(zoom, x, y)]
     destination = cache_dir / "osm_tiles" / f"{zoom}/{x}/{y}.png"
     if not destination.exists():
-        url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
-        # url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
+        # url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
+        url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
         download_file(url, destination)
     with Image.open(destination) as image:
         image.load()

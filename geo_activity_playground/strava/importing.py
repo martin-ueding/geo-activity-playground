@@ -29,6 +29,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
     if activity_cache_path.exists():
         return pd.read_pickle(activity_cache_path)
     else:
+        print(f"Loading activity {path} …")
         suffixes = path.suffixes
         if suffixes[-1] == ".gz":
             if suffixes[-2] == ".gpx":

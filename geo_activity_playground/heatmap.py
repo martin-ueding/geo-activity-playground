@@ -21,6 +21,8 @@ import argparse
 import dataclasses
 import glob
 import os
+import pathlib
+import tomllib
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -226,23 +228,37 @@ def main() -> None:
         help="heatmap Gaussian kernel sigma in pixel (default: 1)",
     )
 
-    options = parser.parse_args()
+    parser.add_argument("config_file", type=pathlib.Path)
 
-    bounds = GeoBounds(*options.bounds)
+    options = parser.parse_args()
+    config_file: pathlib.Path = options.config_file
+
+    with open(config_file, "rb") as f:
+        config = tomllib.load(f)
+
     activities = read_all_activities()
-    selection = (
-        (bounds.lat_bound_min < activities.Latitude)
-        & (activities.Latitude < bounds.lat_bound_max)
-        & (bounds.lon_bound_min < activities.Longitude)
-        & (activities.Longitude < bounds.lon_bound_max)
-    )
-    filtered_points = activities.loc[selection]
-    points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
-    print("Rendering Heatmap …")
-    heatmap = render_heatmap(
-        points, num_activities=len(filtered_points.Activity.unique())
-    )
-    plt.imsave(options.output, heatmap)
+
+    for heatmap_name, heatmap_spec in config["heatmaps"].items():
+        bounds = GeoBounds(
+            heatmap_spec["bottom"],
+            heatmap_spec["top"],
+            heatmap_spec["left"],
+            heatmap_spec["right"],
+        )
+        selection = (
+            (bounds.lat_bound_min < activities.Latitude)
+            & (activities.Latitude < bounds.lat_bound_max)
+            & (bounds.lon_bound_min < activities.Longitude)
+            & (activities.Longitude < bounds.lon_bound_max)
+        )
+        filtered_points = activities.loc[selection]
+        points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
+        print("Rendering Heatmap …")
+        heatmap = render_heatmap(
+            points, num_activities=len(filtered_points.Activity.unique())
+        )
+        output_filename = config_file.parent / f"Heatmap {heatmap_name}.png"
+        plt.imsave(output_filename, heatmap)
 
 
 if __name__ == "__main__":
