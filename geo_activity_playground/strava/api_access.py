@@ -107,24 +107,6 @@ def iter_all_activities() -> Iterator[Activity]:
             yield pickle.load(f)
 
 
-"""
-id
-commute
-distance
-end_latlng
-gear_id
-name
-sport_type
-start_date
-start_latlng
-type
-upload_id
-calories
-description
-gear
-"""
-
-
 def make_activity_dict(activity: Activity) -> dict[str, Any]:
     result = {
         "id": activity.id,
@@ -133,14 +115,16 @@ def make_activity_dict(activity: Activity) -> dict[str, Any]:
         "name": activity.name,
         "type": activity.type,
         "start_date": activity.start_date,
+        "elapsed_time": activity.elapsed_time,
+        "gear_id": activity.gear_id,
+        "calories": activity.calories,
+        "description": activity.description,
     }
     if activity.start_latlng is not None and activity.end_latlng is not None:
         result.update(
             {
-                "start_lat": activity.start_latlng.lat,
-                "start_lon": activity.start_latlng.lon,
-                "end_lat": activity.end_latlng.lat,
-                "end_lon": activity.end_latlng.lon,
+                "start_latlon": (activity.start_latlng.lat, activity.start_latlng.lon),
+                "end_latlon": (activity.end_latlng.lat, activity.end_latlng.lon),
             }
         )
     return result
