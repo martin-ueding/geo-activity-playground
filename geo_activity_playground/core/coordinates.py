@@ -9,7 +9,7 @@ def get_distance(latlon_1: tuple[float, float], latlon_2: tuple[float, float]) -
     lat_1 = np.radians(latlon_1[0])
     lon_1 = np.radians(latlon_1[1])
     lat_2 = np.radians(latlon_2[0])
-    lon_1 = np.radians(latlon_2[1])
+    lon_2 = np.radians(latlon_2[1])
 
     lat_diff = lat_2 - lat_1
     lon_diff = lon_2 - lon_1

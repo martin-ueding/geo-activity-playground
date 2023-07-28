@@ -2,6 +2,7 @@ import argparse
 import dataclasses
 import datetime
 import logging
+import pathlib
 import pickle
 from typing import Any
 from typing import Iterator
@@ -71,6 +72,7 @@ def main() -> None:
 
     parquet = subparsers.add_parser("parquet")
     parquet.set_defaults(func=main_parquet)
+    parquet.add_argument("out_path", type=pathlib.Path)
 
     options = parser.parse_args()
     options.func(options)
@@ -119,6 +121,7 @@ def make_activity_dict(activity: Activity) -> dict[str, Any]:
         "gear_id": activity.gear_id,
         "calories": activity.calories,
         "description": activity.description,
+        "private": activity.private,
     }
     if activity.start_latlng is not None and activity.end_latlng is not None:
         result.update(
@@ -132,7 +135,7 @@ def make_activity_dict(activity: Activity) -> dict[str, Any]:
 
 def main_parquet(options: argparse.Namespace) -> None:
     df = pd.DataFrame(map(make_activity_dict, iter_all_activities()))
-    df.to_parquet("activities.parquet")
+    df.to_parquet(options.out_path)
 
 
 if __name__ == "__main__":
