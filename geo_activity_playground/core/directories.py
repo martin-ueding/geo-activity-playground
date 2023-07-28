@@ -6,7 +6,6 @@ from typing import Any
 
 from appdirs import AppDirs
 
-
 app_dirs = AppDirs("geo-activity-playground", "Martin Ueding")
 app_dirs.user_config_dir
 
@@ -20,7 +19,6 @@ def get_config() -> dict:
 
 def get_state(name: str) -> Any:
     state_path = _make_state_path(name)
-    print(f"{state_path = }")
     if state_path.exists():
         with open(state_path) as f:
             return json.load(f)

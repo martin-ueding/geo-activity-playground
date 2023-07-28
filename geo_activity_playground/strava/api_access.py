@@ -1,11 +1,12 @@
+import dataclasses
 import datetime
 import logging
 
 from stravalib import Client
 
-from geo_activity_playground.directories import get_config
-from geo_activity_playground.directories import get_state
-from geo_activity_playground.directories import set_state
+from geo_activity_playground.core.directories import get_config
+from geo_activity_playground.core.directories import get_state
+from geo_activity_playground.core.directories import set_state
 
 
 logger = logging.getLogger(__name__)
@@ -48,10 +49,29 @@ def get_current_access_token() -> str:
     return tokens["access"]
 
 
+"""
+id
+commute
+distance
+end_latlng
+gear_id
+name
+sport_type
+start_date
+start_latlng
+type
+upload_id
+calories
+description
+gear
+"""
+
+
 def main() -> None:
     client = Client(access_token=get_current_access_token())
-    athlete = client.get_athlete()
-    print(athlete)
+
+    for activity in client.get_activities(after="2010-01-01T00:00:00Z", limit=2):
+        print(activity)
 
 
 if __name__ == "__main__":
