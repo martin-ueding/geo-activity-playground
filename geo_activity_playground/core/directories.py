@@ -6,13 +6,17 @@ from typing import Any
 
 from appdirs import AppDirs
 
-app_dirs = AppDirs("geo-activity-playground", "Martin Ueding")
-app_dirs.user_config_dir
+_app_dirs = AppDirs("geo-activity-playground", "Martin Ueding")
+_app_dirs.user_config_dir
+
+config_dir = pathlib.Path(_app_dirs.user_config_dir)
+cache_dir = pathlib.Path(_app_dirs.user_cache_dir)
+data_dir = pathlib.Path(_app_dirs.user_data_dir)
 
 
 @functools.cache
 def get_config() -> dict:
-    config_path = pathlib.Path(app_dirs.user_config_dir) / "config.toml"
+    config_path = pathlib.Path(_app_dirs.user_config_dir) / "config.toml"
     with open(config_path, "rb") as f:
         return tomllib.load(f)
 
@@ -32,4 +36,4 @@ def set_state(name: str, state: Any) -> None:
 
 
 def _make_state_path(name: str) -> pathlib.Path:
-    return pathlib.Path(app_dirs.user_data_dir) / f"{name}.json"
+    return pathlib.Path(_app_dirs.user_data_dir) / f"{name}.json"

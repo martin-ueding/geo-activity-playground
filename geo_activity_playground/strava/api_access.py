@@ -1,15 +1,21 @@
+import argparse
 import dataclasses
 import datetime
 import logging
+import pickle
 
 from stravalib import Client
+from tqdm import tqdm
 
+from geo_activity_playground.core.directories import cache_dir
 from geo_activity_playground.core.directories import get_config
 from geo_activity_playground.core.directories import get_state
 from geo_activity_playground.core.directories import set_state
 
 
 logger = logging.getLogger(__name__)
+
+activity_cache_dir = cache_dir / "strava-activities"
 
 
 def get_current_access_token() -> str:
@@ -68,10 +74,43 @@ gear
 
 
 def main() -> None:
-    client = Client(access_token=get_current_access_token())
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
 
-    for activity in client.get_activities(after="2010-01-01T00:00:00Z", limit=2):
-        print(activity)
+    init = subparsers.add_parser("init")
+    init.set_defaults(func=main_init)
+
+    download = subparsers.add_parser("download")
+    download.set_defaults(func=main_download)
+
+    options = parser.parse_args()
+    options.func(options)
+
+
+def main_init(options: argparse.Namespace) -> None:
+    download_activities_after("2000-01-01T00:00:00Z")
+
+
+def download_activities_after(after: str) -> None:
+    client = Client(access_token=get_current_access_token())
+    activity_cache_dir.mkdir(exist_ok=True, parents=True)
+
+    for activity in tqdm(
+        client.get_activities(after=after),
+        desc=f"Downloading Activities after {after}",
+    ):
+        start = int(activity.start_date.timestamp())
+        cache_file = activity_cache_dir / f"start-{start}.pickle"
+        with open(cache_file, "wb") as f:
+            pickle.dump(activity, f)
+
+
+def main_download(options: argparse.Namespace) -> None:
+    last_activity_path = max(activity_cache_dir.glob("*.pickle"))
+    print(last_activity_path)
+    with open(last_activity_path, "rb") as f:
+        activity = pickle.load(f)
+    download_activities_after(activity.start_date.isoformat().replace("+00:00", "Z"))
 
 
 if __name__ == "__main__":
