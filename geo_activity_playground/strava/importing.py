@@ -5,7 +5,7 @@ import fitdecode
 import gpxpy
 import pandas as pd
 
-from geo_activity_playground.core.cache_dir import cache_dir
+from geo_activity_playground.core.directories import cache_dir
 
 strava_checkout_path = pathlib.Path("~/Dokumente/Karten/Strava Export/").expanduser()
 

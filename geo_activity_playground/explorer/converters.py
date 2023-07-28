@@ -1,8 +1,6 @@
-import pathlib
-
 import pandas as pd
 
-from ..core.cache_dir import cache_dir
+from ..core.directories import cache_dir
 from ..core.tiles import compute_tile
 from ..strava.importing import read_activity
 from ..strava.importing import strava_checkout_path

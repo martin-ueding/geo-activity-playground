@@ -6,7 +6,6 @@ from typing import List
 from typing import Set
 from typing import Tuple
 
-import click
 import numpy as np
 import pandas as pd
 import scipy.interpolate
@@ -14,7 +13,7 @@ from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
-from geo_activity_playground.core.cache_dir import cache_dir
+from geo_activity_playground.core.directories import cache_dir
 from geo_activity_playground.core.tiles import get_tile
 
 
@@ -106,8 +105,7 @@ def animate_chunk(
             yield RenderArguments(ix, iy, explored, 1.0)
 
 
-@click.command()
-def main():
+def explorer_video_main():
     tile_df = pd.read_json(cache_dir / "tiles.json", date_unit="ns").sort_values("Time")
     chunks = chunk_tiles(tile_df)
     frame_counter = 0
@@ -141,7 +139,3 @@ def main():
                 frame_counter=frame_counter,
             )
             frame_counter += 1
-
-
-if __name__ == "__main__":
-    main()

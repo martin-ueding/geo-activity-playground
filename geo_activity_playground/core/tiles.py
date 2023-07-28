@@ -8,7 +8,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-from geo_activity_playground.core.cache_dir import cache_dir
+from geo_activity_playground.core.directories import cache_dir
 
 
 def compute_tile(lat: float, lon: float, zoom: int = 14) -> Tuple[int, int]:
