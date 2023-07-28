@@ -6,8 +6,8 @@ from .explorer.converters import generate_tile_history
 from .explorer.grid_file import get_border_tiles
 from .explorer.grid_file import make_adapted_grid_file
 from .explorer.grid_file import make_grid_file
-from geo_activity_playground.explorer.video import explorer_video_main
-from geo_activity_playground.heatmap import heatmaps_main
+from .explorer.video import explorer_video_main
+from .heatmap import heatmaps_main
 
 
 def main() -> None:

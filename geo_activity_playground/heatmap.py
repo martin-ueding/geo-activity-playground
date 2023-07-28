@@ -22,10 +22,10 @@ import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from geo_activity_playground.core.directories import get_config
-from geo_activity_playground.core.tiles import get_tile
-from geo_activity_playground.core.tiles import latlon_to_xy
-from geo_activity_playground.strava.importing import read_all_activities
+from .core.directories import get_config
+from .core.tiles import get_tile
+from .core.tiles import latlon_to_xy
+from .strava.importing import read_all_activities
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map
