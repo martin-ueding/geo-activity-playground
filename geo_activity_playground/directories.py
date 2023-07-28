@@ -30,7 +30,7 @@ def set_state(name: str, state: Any) -> None:
     state_path = _make_state_path(name)
     state_path.parent.mkdir(exist_ok=True, parents=True)
     with open(_make_state_path(name), "w") as f:
-        json.dump(state, f)
+        json.dump(state, f, indent=2, sort_keys=True, ensure_ascii=False)
 
 
 def _make_state_path(name: str) -> pathlib.Path:
