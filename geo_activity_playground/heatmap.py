@@ -19,17 +19,15 @@
 # SOFTWARE.
 import argparse
 import dataclasses
-import glob
-import os
 import pathlib
 import tomllib
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from geo_activity_playground.core.directories import get_config
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import latlon_to_xy
-from geo_activity_playground.core.tiles import xy_to_latlon
 from geo_activity_playground.strava.importing import read_all_activities
 
 # globals
@@ -37,7 +35,6 @@ PLT_COLORMAP = "hot"  # matplotlib color map
 MAX_TILE_COUNT = 2000  # maximum number of tiles to download
 MAX_HEATMAP_SIZE = (2160, 3840)  # maximum heatmap size in pixel
 
-OSM_TILE_SERVER = "https://maps.wikimedia.org/osm-intl/{}/{}/{}.png"  # OSM tile url from https://wiki.openstreetmap.org/wiki/Tile_servers
 OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
 
@@ -199,46 +196,11 @@ def render_heatmap(
     return supertile
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate a PNG heatmap from local Strava GPX files",
-        epilog="Report issues to https://github.com/remisalmon/Strava-local-heatmap/issues",
-    )
-    parser.add_argument(
-        "--bounds",
-        type=float,
-        nargs=4,
-        metavar="BOUND",
-        default=[50.6570, 50.7896, 6.9979, 7.2136],
-        help="heatmap bounding box as lat_min, lat_max, lon_min, lon_max (default: -90 +90 -180 +180)",
-    )
-    parser.add_argument(
-        "--output", default="heatmap.png", help="heatmap name (default: heatmap.png)"
-    )
-    parser.add_argument(
-        "--zoom",
-        type=int,
-        default=-1,
-        help="heatmap zoom level 0-19 or -1 for auto (default: -1)",
-    )
-    parser.add_argument(
-        "--sigma",
-        type=int,
-        default=1,
-        help="heatmap Gaussian kernel sigma in pixel (default: 1)",
-    )
-
-    parser.add_argument("config_file", type=pathlib.Path)
-
-    options = parser.parse_args()
-    config_file: pathlib.Path = options.config_file
-
-    with open(config_file, "rb") as f:
-        config = tomllib.load(f)
-
+def heatmaps_main() -> None:
+    config = get_config()
     activities = read_all_activities()
 
-    for heatmap_name, heatmap_spec in config["heatmaps"].items():
+    for heatmap_name, heatmap_spec in config["heatmaps"]["views"].items():
         bounds = GeoBounds(
             heatmap_spec["bottom"],
             heatmap_spec["top"],
@@ -257,7 +219,10 @@ def main() -> None:
         heatmap = render_heatmap(
             points, num_activities=len(filtered_points.Activity.unique())
         )
-        output_filename = config_file.parent / f"Heatmap {heatmap_name}.png"
+        output_filename = (
+            pathlib.Path(config["heatmaps"]["destination"])
+            / f"Heatmap {heatmap_name}.png"
+        )
         plt.imsave(output_filename, heatmap)
 
 

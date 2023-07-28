@@ -7,6 +7,7 @@ from .explorer.grid_file import get_border_tiles
 from .explorer.grid_file import make_adapted_grid_file
 from .explorer.grid_file import make_grid_file
 from geo_activity_playground.explorer.video import explorer_video_main
+from geo_activity_playground.heatmap import heatmaps_main
 
 
 def main() -> None:
@@ -42,6 +43,11 @@ def main() -> None:
         "explorer-video", help="Generate video with explorer timeline."
     )
     explorer_video.set_defaults(func=lambda options: explorer_video_main())
+
+    heatmaps = subparsers.add_parser(
+        "heatmaps", help="Generate heatmaps from activities"
+    )
+    heatmaps.set_defaults(func=lambda options: heatmaps_main())
 
     options = parser.parse_args()
     options.func(options)
