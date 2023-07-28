@@ -180,7 +180,13 @@ def render_heatmap(
             :, :, c
         ] + data_color[:, :, c]
 
-    print(np.min(supertile), np.max(supertile))
+    xy_data
+
+    supertile = supertile[
+        int(min(xy_data[:, 1])) : int(max(xy_data[:, 1])),
+        int(min(xy_data[:, 0])) : int(max(xy_data[:, 0])),
+        :,
+    ]
 
     return supertile
 
@@ -190,6 +196,7 @@ def heatmaps_main() -> None:
     activities = read_all_activities()
 
     for heatmap_name, heatmap_spec in config["heatmaps"]["views"].items():
+        print(f"Creating heatmap {heatmap_name} …")
         selection = (
             (heatmap_spec["bottom"] < activities.Latitude)
             & (activities.Latitude < heatmap_spec["top"])
@@ -198,7 +205,6 @@ def heatmaps_main() -> None:
         )
         filtered_points = activities.loc[selection]
         points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
-        print("Rendering Heatmap …")
         heatmap = render_heatmap(
             points, num_activities=len(filtered_points.Activity.unique())
         )
