@@ -17,10 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import argparse
-import dataclasses
 import pathlib
-import tomllib
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -66,14 +63,6 @@ def gaussian_filter(image, sigma):
     image = np.fft.irfft2(image_fft * gaussian_fft)
 
     return image
-
-
-@dataclasses.dataclass
-class GeoBounds:
-    lat_bound_min: float
-    lat_bound_max: float
-    lon_bound_min: float
-    lon_bound_max: float
 
 
 def render_heatmap(
@@ -201,17 +190,11 @@ def heatmaps_main() -> None:
     activities = read_all_activities()
 
     for heatmap_name, heatmap_spec in config["heatmaps"]["views"].items():
-        bounds = GeoBounds(
-            heatmap_spec["bottom"],
-            heatmap_spec["top"],
-            heatmap_spec["left"],
-            heatmap_spec["right"],
-        )
         selection = (
-            (bounds.lat_bound_min < activities.Latitude)
-            & (activities.Latitude < bounds.lat_bound_max)
-            & (bounds.lon_bound_min < activities.Longitude)
-            & (activities.Longitude < bounds.lon_bound_max)
+            (heatmap_spec["bottom"] < activities.Latitude)
+            & (activities.Latitude < heatmap_spec["top"])
+            & (heatmap_spec["left"] < activities.Longitude)
+            & (activities.Longitude < heatmap_spec["right"])
         )
         filtered_points = activities.loc[selection]
         points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
