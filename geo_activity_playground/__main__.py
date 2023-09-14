@@ -8,6 +8,7 @@ from .explorer.grid_file import make_adapted_grid_file
 from .explorer.grid_file import make_grid_file
 from .explorer.video import explorer_video_main
 from .heatmap import heatmaps_main
+from .heatmap import heatmaps_main_2
 
 
 def main() -> None:
@@ -44,10 +45,15 @@ def main() -> None:
     )
     explorer_video.set_defaults(func=lambda options: explorer_video_main())
 
-    heatmaps = subparsers.add_parser(
+    subparser = subparsers.add_parser(
         "heatmaps", help="Generate heatmaps from activities"
     )
-    heatmaps.set_defaults(func=lambda options: heatmaps_main())
+    subparser.set_defaults(func=lambda options: heatmaps_main())
+
+    subparser = subparsers.add_parser(
+        "heatmaps2", help="Generate heatmaps from activities"
+    )
+    subparser.set_defaults(func=lambda options: heatmaps_main_2())
 
     options = parser.parse_args()
     options.func(options)

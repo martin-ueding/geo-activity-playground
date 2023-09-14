@@ -21,10 +21,13 @@ import pathlib
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import sklearn.cluster
 
 from .core.directories import get_config
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
+from .strava.api_access import activity_streams_dir
 from .strava.importing import read_all_activities
 
 # globals
@@ -208,9 +211,42 @@ def heatmaps_main() -> None:
         heatmap = render_heatmap(
             points, num_activities=len(filtered_points.Activity.unique())
         )
-        heatmap = crop_heatmap(heatmap, heatmap_spec)
         output_filename = (
             pathlib.Path(config["heatmaps"]["destination"])
             / f"Heatmap {heatmap_name}.png"
         )
         plt.imsave(output_filename, heatmap)
+
+
+def heatmaps_main_2() -> None:
+    arrays = []
+    names = []
+    for path in activity_streams_dir.glob("*.parquet"):
+        df = pd.read_parquet(path)
+        latlon = np.column_stack([df.latitude, df.longitude])
+        names.extend([hash(path)] * len(df))
+        arrays.append(latlon)
+    latlon = np.row_stack(arrays)
+    del arrays
+    print(latlon.shape)
+
+    dbscan = sklearn.cluster.DBSCAN(eps=1e-2)
+    labels = dbscan.fit_predict(latlon)
+    del dbscan
+    print(labels.shape)
+    print(len(names))
+
+    all_df = pd.DataFrame(latlon, columns=["lat", "lon"])
+    all_df["cluster"] = labels
+    all_df["activity"] = names
+
+    del labels
+    del names
+
+    print("Number of clusters", len(all_df.cluster.unique()))
+
+    for cluster, group in all_df.groupby("cluster"):
+        print(f"Cluster {cluster} has {len(group)} elements.")
+        latlon = np.column_stack([group.lat, group.lon])
+        heatmap = render_heatmap(latlon, num_activities=len(group.activity.unique()))
+        plt.imsave(f"cluster-{cluster}.png", heatmap)
