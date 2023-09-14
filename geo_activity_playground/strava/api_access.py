@@ -147,10 +147,13 @@ def main_parquet(options: argparse.Namespace) -> None:
 def main_streams(options: argparse.Namespace) -> None:
     client = Client(access_token=get_current_access_token())
     activity_streams_dir.mkdir(exist_ok=True)
-    for activity in tqdm(iter_all_activities()):
-        stream_path = activity_streams_dir / f"{activity.id}.parquet"
-        if stream_path.exists():
-            continue
+    to_download = [
+        activity
+        for activity in iter_all_activities()
+        if not (activity_streams_dir / f"{activity.id}.parquet").exists()
+    ]
+    to_download.reverse()
+    for activity in tqdm(to_download):
         streams = client.get_activity_streams(
             activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
         )
@@ -162,7 +165,7 @@ def main_streams(options: argparse.Namespace) -> None:
             if name in streams:
                 columns[name] = streams[name].data
         df = pd.DataFrame(columns)
-        df.to_parquet(stream_path)
+        df.to_parquet(activity_streams_dir / f"{activity.id}.parquet")
 
 
 if __name__ == "__main__":
