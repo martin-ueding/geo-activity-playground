@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import itertools
 import pathlib
 
 import matplotlib.pyplot as plt
@@ -25,6 +26,7 @@ import pandas as pd
 import sklearn.cluster
 
 from .core.directories import get_config
+from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
 from .strava.api_access import activity_streams_dir
@@ -230,14 +232,22 @@ def heatmaps_main_2() -> None:
     del arrays
     print(latlon.shape)
 
-    dbscan = sklearn.cluster.DBSCAN(eps=1e-2)
-    labels = dbscan.fit_predict(latlon)
-    del dbscan
-    print(labels.shape)
-    print(len(names))
+    tiles = [compute_tile(lat, lon) for lat, lon in latlon]
+
+    unique_tiles = set(tiles)
+    unique_tiles_array = np.array(list(unique_tiles))
+    print(unique_tiles_array)
+
+    dbscan = sklearn.cluster.DBSCAN(eps=10, min_samples=1)
+    labels = dbscan.fit_predict(unique_tiles_array)
+
+    cluster_mapping = {
+        tuple(xy): label for xy, label in zip(unique_tiles_array, labels)
+    }
+    print(cluster_mapping)
 
     all_df = pd.DataFrame(latlon, columns=["lat", "lon"])
-    all_df["cluster"] = labels
+    all_df["cluster"] = [cluster_mapping[xy] for xy in tiles]
     all_df["activity"] = names
 
     del labels
