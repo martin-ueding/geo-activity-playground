@@ -62,6 +62,7 @@ def get_current_access_token() -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.set_defaults(func=lambda options: parser.print_help())
     subparsers = parser.add_subparsers()
 
     init = subparsers.add_parser("init")
