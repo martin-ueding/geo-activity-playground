@@ -21,6 +21,8 @@ from geo_activity_playground.core.directories import set_state
 logger = logging.getLogger(__name__)
 
 activity_cache_dir = cache_dir / "strava-activities"
+activity_metadata_dir = activity_cache_dir / "metadata"
+activity_streams_dir = activity_cache_dir / "data"
 
 
 def get_current_access_token() -> str:
@@ -65,15 +67,18 @@ def main() -> None:
     parser.set_defaults(func=lambda options: parser.print_help())
     subparsers = parser.add_subparsers()
 
-    init = subparsers.add_parser("init")
-    init.set_defaults(func=main_init)
+    subparser = subparsers.add_parser("init")
+    subparser.set_defaults(func=main_init)
 
-    download = subparsers.add_parser("download")
-    download.set_defaults(func=main_download)
+    subparser = subparsers.add_parser("download")
+    subparser.set_defaults(func=main_download)
 
-    parquet = subparsers.add_parser("parquet")
-    parquet.set_defaults(func=main_parquet)
-    parquet.add_argument("out_path", type=pathlib.Path)
+    subparser = subparsers.add_parser("streams")
+    subparser.set_defaults(func=main_streams)
+
+    subparser = subparsers.add_parser("parquet")
+    subparser.set_defaults(func=main_parquet)
+    subparser.add_argument("out_path", type=pathlib.Path)
 
     options = parser.parse_args()
     options.func(options)
@@ -92,20 +97,20 @@ def download_activities_after(after: str) -> None:
         desc=f"Downloading Activities after {after}",
     ):
         start = int(activity.start_date.timestamp())
-        cache_file = activity_cache_dir / f"start-{start}.pickle"
+        cache_file = activity_metadata_dir / f"start-{start}.pickle"
         with open(cache_file, "wb") as f:
             pickle.dump(activity, f)
 
 
 def main_download(options: argparse.Namespace) -> None:
-    last_activity_path = max(activity_cache_dir.glob("*.pickle"))
+    last_activity_path = max(activity_metadata_dir.glob("*.pickle"))
     with open(last_activity_path, "rb") as f:
         activity = pickle.load(f)
     download_activities_after(activity.start_date.isoformat().replace("+00:00", "Z"))
 
 
 def iter_all_activities() -> Iterator[Activity]:
-    for path in activity_cache_dir.glob("*.pickle"):
+    for path in activity_metadata_dir.glob("*.pickle"):
         with open(path, "rb") as f:
             yield pickle.load(f)
 
@@ -137,6 +142,27 @@ def make_activity_dict(activity: Activity) -> dict[str, Any]:
 def main_parquet(options: argparse.Namespace) -> None:
     df = pd.DataFrame(map(make_activity_dict, iter_all_activities()))
     df.to_parquet(options.out_path)
+
+
+def main_streams(options: argparse.Namespace) -> None:
+    client = Client(access_token=get_current_access_token())
+    activity_streams_dir.mkdir(exist_ok=True)
+    for activity in tqdm(iter_all_activities()):
+        stream_path = activity_streams_dir / f"{activity.id}.parquet"
+        if stream_path.exists():
+            continue
+        streams = client.get_activity_streams(
+            activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
+        )
+        columns = {}
+        if "latlng" in streams:
+            columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
+            columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
+        for name in ["distance", "altitude", "heartrate", "time"]:
+            if name in streams:
+                columns[name] = streams[name].data
+        df = pd.DataFrame(columns)
+        df.to_parquet(stream_path)
 
 
 if __name__ == "__main__":
