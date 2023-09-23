@@ -8,6 +8,9 @@ from .explorer.grid_file import make_grid_file
 from .explorer.video import explorer_video_main
 from .heatmap import heatmaps_main
 from .heatmap import heatmaps_main_2
+from geo_activity_playground.core.sources import TimeSeriesSource
+from geo_activity_playground.strava.api_access import StravaAPITimeSeriesSource
+from geo_activity_playground.strava.importing import StravaExportTimeSeriesSource
 
 
 def main() -> None:
@@ -55,11 +58,10 @@ def main() -> None:
         "heatmaps2", help="Generate heatmaps from activities"
     )
     subparser.set_defaults(
-        func=lambda options: heatmaps_main_2(options.basedir, options.source)
+        func=lambda options: heatmaps_main_2(
+            make_time_series_source(options.basedir, options.source)
+        )
     )
-
-    subparser = subparsers.add_parser("magic")
-    subparser.set_defaults(func=lambda options: main_magic(options.basedir))
 
     options = parser.parse_args()
     options.func(options)
@@ -77,5 +79,11 @@ def main_x() -> None:
     combine_tile_history()
 
 
-def main_magic(basedir: pathlib.Path) -> None:
+def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSource:
     os.chdir(basedir)
+
+    ts_source: TimeSeriesSource
+    if source == "api":
+        ts_source = StravaAPITimeSeriesSource()
+    elif source == "export":
+        ts_source = StravaExportTimeSeriesSource()

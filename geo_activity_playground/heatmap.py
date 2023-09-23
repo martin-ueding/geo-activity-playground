@@ -30,8 +30,6 @@ from .core.directories import get_config
 from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
-from .strava.api_access import StravaAPITimeSeriesSource
-from .strava.importing import StravaExportTimeSeriesSource
 from geo_activity_playground.core.sources import TimeSeriesSource
 
 # globals
@@ -222,15 +220,7 @@ def heatmaps_main() -> None:
         plt.imsave(output_filename, heatmap)
 
 
-def heatmaps_main_2(basedir: pathlib.Path, source: str) -> None:
-    os.chdir(basedir)
-
-    ts_source: TimeSeriesSource
-    if source == "api":
-        ts_source = StravaAPITimeSeriesSource()
-    elif source == "export":
-        ts_source = StravaExportTimeSeriesSource()
-
+def heatmaps_main_2(ts_source: TimeSeriesSource) -> None:
     arrays = []
     names = []
     for i, df in enumerate(ts_source.iter_activities()):
