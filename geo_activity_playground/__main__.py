@@ -4,7 +4,6 @@ import pathlib
 
 from .explorer.grid_file import get_border_tiles
 from .explorer.grid_file import make_adapted_grid_file
-from .explorer.grid_file import make_grid_file
 from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.core.sources import TimeSeriesSource
@@ -19,6 +18,7 @@ def main() -> None:
     parser.set_defaults(func=lambda options: parser.print_help())
     parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
     parser.add_argument("--source", choices=["api", "export"], default="api")
+
     subparsers = parser.add_subparsers(
         description="The tools are organized in subcommands.", metavar="Command"
     )
@@ -26,20 +26,9 @@ def main() -> None:
     subparser = subparsers.add_parser(
         "explorer-missing", help="Generate GPX file with missing explorer tiles."
     )
-    subparser.add_argument("path", type=pathlib.Path)
-    subparser.set_defaults(func=lambda options: main_explorer(options.path))
-
-    subparser = subparsers.add_parser(
-        "explorer-grid", help="Generate GPX file with explorer grid."
-    )
-    subparser.add_argument("west", type=int)
-    subparser.add_argument("north", type=int)
-    subparser.add_argument("east", type=int)
-    subparser.add_argument("south", type=int)
-    subparser.add_argument("path", type=pathlib.Path)
     subparser.set_defaults(
-        func=lambda options: make_grid_file(
-            options.west, options.north, options.east, options.south, options.path
+        func=lambda options: main_explorer(
+            make_time_series_source(options.basedir, options.source)
         )
     )
 
@@ -61,16 +50,9 @@ def main() -> None:
     options.func(options)
 
 
-def main_explorer(path: pathlib.Path) -> None:
-    generate_tile_history()
-    combine_tile_history()
-    border_x, border_y = get_border_tiles()
-    make_adapted_grid_file(border_x, border_y, path)
-
-
-def main_x() -> None:
-    generate_tile_history()
-    combine_tile_history()
+def main_explorer(ts_source: TimeSeriesSource) -> None:
+    border_x, border_y = get_border_tiles(ts_source)
+    make_adapted_grid_file(border_x, border_y)
 
 
 def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSource:

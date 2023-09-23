@@ -1,40 +1,40 @@
+import pathlib
+
 import pandas as pd
+from tqdm import tqdm
 
 from ..core.tiles import compute_tile
-from ..strava.importing import read_activity
-from ..strava.importing import strava_checkout_path
+from geo_activity_playground.core.sources import TimeSeriesSource
 
 
-def generate_tile_history() -> None:
-    activities_path = strava_checkout_path / "activities"
-    for path in activities_path.glob("*"):
-        tile_path = cache_dir / "explorer" / f"tiles-{path.stem.split('.')[0]}.json"
-        if tile_path.exists() and tile_path.stat().st_mtime > path.stat().st_mtime:
-            continue
-        activity = read_activity(path)
-        tiles = tiles_from_points(activity)
-        first_tiles = first_time_per_tile(tiles)
-        first_tiles.to_json(tile_path, date_unit="ns")
+def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
+    explorer_cache_dir = pathlib.Path("Explorer Cache") / "Per Activity"
+    explorer_cache_dir.mkdir(exist_ok=True, parents=True)
 
+    for activity in tqdm(ts_source.iter_activities(), desc="Extract explorer tiles"):
+        target_path = explorer_cache_dir / f"{activity.name}.parquet"
+        if not target_path.exists():
+            tiles = tiles_from_points(activity)
+            first_tiles = first_time_per_tile(tiles)
+            first_tiles.to_parquet(target_path)
 
-def combine_tile_history() -> None:
     tiles = pd.DataFrame()
-    for path in (cache_dir / "explorer").glob("tiles-*.json"):
-        shard = pd.read_json(path)
-        pd.to_datetime(shard.Time)
+    for path in tqdm(explorer_cache_dir.glob("*.parquet"), desc="Build tile history"):
+        shard = pd.read_parquet(path)
         tiles = pd.concat([tiles, shard])
         tiles = first_time_per_tile(tiles)
-    tiles.to_json(cache_dir / "explorer" / "tiles.json", date_unit="ns")
+    tiles.to_parquet(explorer_cache_dir.parent / "first_time_per_tile.parquet")
+    return tiles
 
 
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
     new_rows = []
     for index, row in points.iterrows():
-        tile = compute_tile(row["Latitude"], row["Longitude"])
-        new_rows.append((row["Time"],) + tile)
-    return pd.DataFrame(new_rows, columns=["Time", "Tile X", "Tile Y"])
+        tile = compute_tile(row["latitude"], row["longitude"])
+        new_rows.append((row["time"],) + tile)
+    return pd.DataFrame(new_rows, columns=["time", "tile_x", "tile_y"])
 
 
 def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
-    reduced = tiles.groupby(["Tile X", "Tile Y"]).min().reset_index()
+    reduced = tiles.groupby(["tile_x", "tile_y"]).min().reset_index()
     return reduced

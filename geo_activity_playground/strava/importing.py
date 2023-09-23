@@ -49,6 +49,7 @@ def extract_all_activities() -> None:
         if len(df) == 0:
             continue
         df.time = df.time.dt.tz_convert(None)
+        df.name = path.stem.split(".")[0]
         cache_path = make_activity_cache_path(path)
         df.to_parquet(cache_path)
         pd.read_parquet(cache_path)
@@ -96,4 +97,5 @@ class StravaExportTimeSeriesSource(TimeSeriesSource):
     def iter_activities(self) -> Iterator[pd.DataFrame]:
         for path in sorted(activity_cache_dir().glob("*.parquet")):
             df = pd.read_parquet(path)
+            df.name = path.stem
             yield df

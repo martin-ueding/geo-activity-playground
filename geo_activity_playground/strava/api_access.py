@@ -161,6 +161,7 @@ def download_missing_activity_streams() -> None:
             if name in streams:
                 columns[name] = streams[name].data
         df = pd.DataFrame(columns)
+        df.name = str(activity.id)
         df.to_parquet(activity_streams_dir() / f"{activity.id}.parquet")
 
 
@@ -175,6 +176,7 @@ class StravaAPITimeSeriesSource(TimeSeriesSource):
     def iter_activities(self) -> Iterator[pd.DataFrame]:
         for path in activity_streams_dir().glob("*.parquet"):
             df = pd.read_parquet(path)
+            df.name = path.stem
             if "latitude" not in df.columns:
                 continue
             yield df
