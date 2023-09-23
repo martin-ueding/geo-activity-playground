@@ -229,21 +229,18 @@ def heatmaps_main_2(ts_source: TimeSeriesSource) -> None:
         arrays.append(latlon)
     latlon = np.row_stack(arrays)
     del arrays
-    print(latlon.shape)
 
     tiles = [compute_tile(lat, lon) for lat, lon in latlon]
 
     unique_tiles = set(tiles)
     unique_tiles_array = np.array(list(unique_tiles))
-    print(unique_tiles_array)
 
-    dbscan = sklearn.cluster.DBSCAN(eps=10, min_samples=1)
+    dbscan = sklearn.cluster.DBSCAN(eps=5, min_samples=3)
     labels = dbscan.fit_predict(unique_tiles_array)
 
     cluster_mapping = {
         tuple(xy): label for xy, label in zip(unique_tiles_array, labels)
     }
-    print(cluster_mapping)
 
     all_df = pd.DataFrame(latlon, columns=["lat", "lon"])
     all_df["cluster"] = [cluster_mapping[xy] for xy in tiles]
@@ -252,10 +249,19 @@ def heatmaps_main_2(ts_source: TimeSeriesSource) -> None:
     del labels
     del names
 
-    print("Number of clusters", len(all_df.cluster.unique()))
+    output_dir = pathlib.Path("Heatmaps") / str(ts_source)
+    output_dir.mkdir(exist_ok=True)
+    for old_image in output_dir.glob("*.png"):
+        old_image.unlink()
 
-    for cluster, group in all_df.groupby("cluster"):
-        print(f"Cluster {cluster} has {len(group)} elements.")
+    print("Number of clusters", len(all_df.cluster.unique()))
+    for i, (cluster_id, group) in enumerate(
+        sorted(all_df.groupby("cluster"), key=lambda elem: len(elem[1]), reverse=True),
+        start=1,
+    ):
+        if cluster_id == -1:
+            continue
+        print(f"Cluster {cluster_id} has {len(group)} elements.")
         latlon = np.column_stack([group.lat, group.lon])
         heatmap = render_heatmap(latlon, num_activities=len(group.activity.unique()))
-        plt.imsave(f"cluster-{cluster}.png", heatmap)
+        plt.imsave(output_dir / f"Cluster-{i}.png", heatmap)

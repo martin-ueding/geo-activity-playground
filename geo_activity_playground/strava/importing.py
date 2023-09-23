@@ -45,7 +45,13 @@ def extract_all_activities() -> None:
             df = read_fit_activity(path, open)
         else:
             raise NotImplementedError(f"Unknown suffix: {path}")
-        df.to_parquet(make_activity_cache_path(path))
+        # Some FIT files don't have any location data, they might be just weight lifting. We'll skip them.
+        if len(df) == 0:
+            continue
+        df.time = df.time.dt.tz_convert(None)
+        cache_path = make_activity_cache_path(path)
+        df.to_parquet(cache_path)
+        pd.read_parquet(cache_path)
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
@@ -91,3 +97,6 @@ class StravaExportTimeSeriesSource(TimeSeriesSource):
         for path in sorted(activity_cache_dir().glob("*.parquet")):
             df = pd.read_parquet(path)
             yield df
+
+    def __str__(self) -> str:
+        return "Strava Export"

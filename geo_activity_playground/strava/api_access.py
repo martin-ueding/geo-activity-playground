@@ -85,7 +85,7 @@ def download_activities_after(after: str) -> None:
 
     for activity in tqdm(
         client.get_activities(after=after),
-        desc=f"Downloading Activities after {after}",
+        desc=f"Downloading metadata",
     ):
         start = int(activity.start_date.timestamp())
         cache_file = activity_metadata_dir() / f"start-{start}.pickle"
@@ -149,7 +149,7 @@ def download_missing_activity_streams() -> None:
         if not (activity_streams_dir() / f"{activity.id}.parquet").exists()
     ]
     to_download.reverse()
-    for activity in tqdm(to_download):
+    for activity in tqdm(to_download, desc="Downloading time series"):
         streams = client.get_activity_streams(
             activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
         )
@@ -173,6 +173,11 @@ class StravaAPITimeSeriesSource(TimeSeriesSource):
             pass
 
     def iter_activities(self) -> Iterator[pd.DataFrame]:
-        for path in activity_streams_dir.glob("*.parquet"):
+        for path in activity_streams_dir().glob("*.parquet"):
             df = pd.read_parquet(path)
+            if "latitude" not in df.columns:
+                continue
             yield df
+
+    def __str__(self) -> str:
+        return "Strava API"

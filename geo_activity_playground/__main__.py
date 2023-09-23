@@ -87,3 +87,4 @@ def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSou
         ts_source = StravaAPITimeSeriesSource()
     elif source == "export":
         ts_source = StravaExportTimeSeriesSource()
+    return ts_source
