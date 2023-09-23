@@ -371,6 +371,18 @@ unicode = ["unicodedata2 (>=15.0.0)"]
 woff = ["brotli (>=1.0.1)", "brotlicffi (>=0.8.0)", "zopfli (>=0.1.4)"]
 
 [[package]]
+name = "geojson"
+version = "3.0.1"
+description = "Python bindings and utilities for GeoJSON"
+category = "main"
+optional = false
+python-versions = ">=3.7, <3.12"
+files = [
+    {file = "geojson-3.0.1-py3-none-any.whl", hash = "sha256:e49df982b204ed481e4c1236c57f587adf71537301cf8faf7120ab27d73c7568"},
+    {file = "geojson-3.0.1.tar.gz", hash = "sha256:ff3d75acab60b1e66504a11f7ea12c104bad32ff3c410a807788663b966dee4a"},
+]
+
+[[package]]
 name = "ghp-import"
 version = "2.1.0"
 description = "Copy your docs directly to the gh-pages branch."
@@ -1797,4 +1809,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.12"
-content-hash = "fe962e78b7f59dd877fe7bcf7144abd1142bd95700faa9c17b7b697f9f2f23d6"
+content-hash = "5674e6f6309e08acb984c9cc6480df4d7a19a8271a90d86fcc8096f955892aa9"

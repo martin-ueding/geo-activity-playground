@@ -3,7 +3,8 @@ import os
 import pathlib
 
 from .explorer.grid_file import get_border_tiles
-from .explorer.grid_file import make_adapted_grid_file
+from .explorer.grid_file import make_grid_file_geojson
+from .explorer.grid_file import make_grid_file_gpx
 from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.core.sources import TimeSeriesSource
@@ -51,8 +52,9 @@ def main() -> None:
 
 
 def main_explorer(ts_source: TimeSeriesSource) -> None:
-    border_x, border_y = get_border_tiles(ts_source)
-    make_adapted_grid_file(border_x, border_y)
+    points = get_border_tiles(ts_source)
+    make_grid_file_geojson(points)
+    make_grid_file_gpx(points)
 
 
 def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSource:
