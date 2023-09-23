@@ -97,6 +97,3 @@ class StravaExportTimeSeriesSource(TimeSeriesSource):
         for path in sorted(activity_cache_dir().glob("*.parquet")):
             df = pd.read_parquet(path)
             yield df
-
-    def __str__(self) -> str:
-        return "Strava Export"

@@ -18,7 +18,7 @@ def main() -> None:
     )
     parser.set_defaults(func=lambda options: parser.print_help())
     parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
-    parser.add_argument("--source", choices=["api", "export"], default="export")
+    parser.add_argument("--source", choices=["api", "export"], default="api")
     subparsers = parser.add_subparsers(
         description="The tools are organized in subcommands.", metavar="Command"
     )

@@ -178,6 +178,3 @@ class StravaAPITimeSeriesSource(TimeSeriesSource):
             if "latitude" not in df.columns:
                 continue
             yield df
-
-    def __str__(self) -> str:
-        return "Strava API"

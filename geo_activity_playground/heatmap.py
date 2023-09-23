@@ -225,7 +225,7 @@ def generate_heatmaps_per_cluster(ts_source: TimeSeriesSource) -> None:
     del labels
     del names
 
-    output_dir = pathlib.Path("Heatmaps") / str(ts_source)
+    output_dir = pathlib.Path("Heatmaps")
     output_dir.mkdir(exist_ok=True)
     for old_image in output_dir.glob("*.png"):
         old_image.unlink()
