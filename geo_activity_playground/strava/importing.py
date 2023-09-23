@@ -5,14 +5,12 @@ import fitdecode
 import gpxpy
 import pandas as pd
 
-from geo_activity_playground.core.directories import cache_dir
-
-strava_checkout_path = pathlib.Path("~/Dokumente/Karten/Strava Export/").expanduser()
-
 
 def read_all_activities() -> pd.DataFrame:
     print("Loading activities …")
-    activity_paths = list((strava_checkout_path / "activities").glob("?????*.*"))
+    activity_paths = list(
+        (pathlib.Path.cwd() / "Strava Export" / "activities").glob("?????*.*")
+    )
     activity_paths.sort()
     shards = [read_activity(activity_path) for activity_path in activity_paths]
     for path, shard in zip(activity_paths, shards):
@@ -22,10 +20,9 @@ def read_all_activities() -> pd.DataFrame:
 
 
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
-    activity_cache_dir = cache_dir / "activities"
-    if not activity_cache_dir.exists():
-        activity_cache_dir.mkdir()
-    activity_cache_path = activity_cache_dir / (path.stem.split(".")[0] + ".pickle")
+    activity_cache_dir = pathlib.Path.cwd() / "Strava Export Cache" / "Activities"
+    activity_cache_dir.mkdir(exist_ok=True, parents=True)
+    activity_cache_path = activity_cache_dir / (path.stem.split(".")[0] + ".parquet")
     if activity_cache_path.exists():
         return pd.read_pickle(activity_cache_path)
     else:
@@ -44,7 +41,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
             df = read_fit_activity(path, open)
         else:
             raise NotImplementedError(f"Unknown suffix: {path}")
-        df.to_pickle(activity_cache_path)
+        df.to_parquet(activity_cache_path)
         return df
 
 
@@ -57,7 +54,7 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 for point in segment.points:
                     points.append((point.time, point.latitude, point.longitude))
 
-    return pd.DataFrame(points, columns=["Time", "Latitude", "Longitude"])
+    return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
 
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
@@ -80,4 +77,4 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                             )
                         )
 
-    return pd.DataFrame(points, columns=["Time", "Latitude", "Longitude"])
+    return pd.DataFrame(points, columns=["time", "latitude", "longitude"])

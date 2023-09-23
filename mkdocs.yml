@@ -1,0 +1,28 @@
+site_name: Geo Activity Playground
+site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      media: "(prefers-color-scheme: light)"
+    - scheme: slate
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      media: "(prefers-color-scheme: dark)"
+
+nav:
+  - index.md
+  - directory-layout.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences

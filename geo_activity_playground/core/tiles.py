@@ -8,8 +8,6 @@ import numpy as np
 import requests
 from PIL import Image
 
-from geo_activity_playground.core.directories import cache_dir
-
 
 def compute_tile(lat: float, lon: float, zoom: int = 14) -> Tuple[int, int]:
     x = np.radians(lon)
@@ -50,7 +48,7 @@ def get_tile(
 ) -> Image.Image:
     if (zoom, x, y) in _cache:
         return _cache[(zoom, x, y)]
-    destination = cache_dir / "osm_tiles" / f"{zoom}/{x}/{y}.png"
+    destination = pathlib.Path.cwd() / "Open Street Map Tiles" / f"{zoom}/{x}/{y}.png"
     if not destination.exists():
         # url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
         url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"

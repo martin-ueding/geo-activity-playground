@@ -1,6 +1,5 @@
 import pandas as pd
 
-from ..core.directories import cache_dir
 from ..core.tiles import compute_tile
 from ..strava.importing import read_activity
 from ..strava.importing import strava_checkout_path
@@ -20,7 +19,7 @@ def generate_tile_history() -> None:
 
 def combine_tile_history() -> None:
     tiles = pd.DataFrame()
-    for path in cache_dir.glob("tiles-*.json"):
+    for path in (cache_dir / "explorer").glob("tiles-*.json"):
         shard = pd.read_json(path)
         pd.to_datetime(shard.Time)
         tiles = pd.concat([tiles, shard])

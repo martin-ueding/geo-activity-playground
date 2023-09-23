@@ -221,16 +221,21 @@ def heatmaps_main() -> None:
 
 
 def heatmaps_main_2() -> None:
-    arrays = []
-    names = []
-    for path in activity_streams_dir.glob("*.parquet"):
-        df = pd.read_parquet(path)
-        latlon = np.column_stack([df.latitude, df.longitude])
-        names.extend([hash(path)] * len(df))
-        arrays.append(latlon)
-    latlon = np.row_stack(arrays)
-    del arrays
-    print(latlon.shape)
+    if False:
+        arrays = []
+        names = []
+        for path in activity_streams_dir.glob("*.parquet"):
+            df = pd.read_parquet(path)
+            latlon = np.column_stack([df.latitude, df.longitude])
+            names.extend([hash(path)] * len(df))
+            arrays.append(latlon)
+        latlon = np.row_stack(arrays)
+        del arrays
+        print(latlon.shape)
+    else:
+        activities = read_all_activities()
+        latlon = np.column_stack([activities.Latitude, activities.Longitude])
+        names = list(activities.Activity)
 
     tiles = [compute_tile(lat, lon) for lat, lon in latlon]
 

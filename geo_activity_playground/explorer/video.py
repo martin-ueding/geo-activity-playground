@@ -13,7 +13,6 @@ from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
-from geo_activity_playground.core.directories import cache_dir
 from geo_activity_playground.core.tiles import get_tile
 
 

@@ -6,7 +6,6 @@ import pandas as pd
 import scipy.ndimage
 
 from ..core.tiles import get_tile_upper_left_lat_lon
-from .converters import cache_dir
 
 
 def get_border_tiles():
