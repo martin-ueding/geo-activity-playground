@@ -196,31 +196,7 @@ def render_heatmap(
     return supertile
 
 
-def heatmaps_main() -> None:
-    config = get_config()
-    activities = read_all_activities()
-
-    for heatmap_name, heatmap_spec in config["heatmaps"]["views"].items():
-        print(f"Creating heatmap {heatmap_name} …")
-        selection = (
-            (heatmap_spec["bottom"] < activities.Latitude)
-            & (activities.Latitude < heatmap_spec["top"])
-            & (heatmap_spec["left"] < activities.Longitude)
-            & (activities.Longitude < heatmap_spec["right"])
-        )
-        filtered_points = activities.loc[selection]
-        points = np.column_stack([filtered_points.Latitude, filtered_points.Longitude])
-        heatmap = render_heatmap(
-            points, num_activities=len(filtered_points.Activity.unique())
-        )
-        output_filename = (
-            pathlib.Path(config["heatmaps"]["destination"])
-            / f"Heatmap {heatmap_name}.png"
-        )
-        plt.imsave(output_filename, heatmap)
-
-
-def heatmaps_main_2(ts_source: TimeSeriesSource) -> None:
+def generate_heatmaps_per_cluster(ts_source: TimeSeriesSource) -> None:
     arrays = []
     names = []
     for i, df in enumerate(ts_source.iter_activities()):

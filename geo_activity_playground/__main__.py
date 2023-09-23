@@ -6,8 +6,7 @@ from .explorer.grid_file import get_border_tiles
 from .explorer.grid_file import make_adapted_grid_file
 from .explorer.grid_file import make_grid_file
 from .explorer.video import explorer_video_main
-from .heatmap import heatmaps_main
-from .heatmap import heatmaps_main_2
+from .heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.core.sources import TimeSeriesSource
 from geo_activity_playground.strava.api_access import StravaAPITimeSeriesSource
 from geo_activity_playground.strava.importing import StravaExportTimeSeriesSource
@@ -52,13 +51,8 @@ def main() -> None:
     subparser = subparsers.add_parser(
         "heatmaps", help="Generate heatmaps from activities"
     )
-    subparser.set_defaults(func=lambda options: heatmaps_main())
-
-    subparser = subparsers.add_parser(
-        "heatmaps2", help="Generate heatmaps from activities"
-    )
     subparser.set_defaults(
-        func=lambda options: heatmaps_main_2(
+        func=lambda options: generate_heatmaps_per_cluster(
             make_time_series_source(options.basedir, options.source)
         )
     )
