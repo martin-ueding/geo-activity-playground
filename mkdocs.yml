@@ -22,6 +22,7 @@ theme:
 nav:
   - index.md
   - directory-layout.md
+  - heatmaps.md
 
 markdown_extensions:
   - pymdownx.highlight

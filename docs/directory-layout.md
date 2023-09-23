@@ -14,7 +14,7 @@ The user has to put data into the following directories in order for it to be pi
 
 # Output
 
-- `Heatmaps`: Will contain heatmap images generated from the data.
+- `Heatmaps`: Will contain heatmap images generated from the data. They will be called like `Cluster-1.png` with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.
 
 # Cache
 
