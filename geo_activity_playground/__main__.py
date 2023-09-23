@@ -8,7 +8,6 @@ from .explorer.grid_file import make_grid_file
 from .explorer.video import explorer_video_main
 from .heatmap import heatmaps_main
 from .heatmap import heatmaps_main_2
-from geo_activity_playground.strava.api_access import sync_from_strava
 
 
 def main() -> None:
@@ -17,6 +16,7 @@ def main() -> None:
     )
     parser.set_defaults(func=lambda options: parser.print_help())
     parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
+    parser.add_argument("--source", choices=["api", "export"], default="export")
     subparsers = parser.add_subparsers(
         description="The tools are organized in subcommands.", metavar="Command"
     )
@@ -54,7 +54,9 @@ def main() -> None:
     subparser = subparsers.add_parser(
         "heatmaps2", help="Generate heatmaps from activities"
     )
-    subparser.set_defaults(func=lambda options: heatmaps_main_2())
+    subparser.set_defaults(
+        func=lambda options: heatmaps_main_2(options.basedir, options.source)
+    )
 
     subparser = subparsers.add_parser("magic")
     subparser.set_defaults(func=lambda options: main_magic(options.basedir))
@@ -77,4 +79,3 @@ def main_x() -> None:
 
 def main_magic(basedir: pathlib.Path) -> None:
     os.chdir(basedir)
-    sync_from_strava()

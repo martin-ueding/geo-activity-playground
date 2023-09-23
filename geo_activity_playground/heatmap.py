@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import itertools
+import os
 import pathlib
 
 import matplotlib.pyplot as plt
@@ -29,8 +30,9 @@ from .core.directories import get_config
 from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
-from .strava.api_access import activity_streams_dir
-from .strava.importing import read_all_activities
+from .strava.api_access import StravaAPITimeSeriesSource
+from .strava.importing import StravaExportTimeSeriesSource
+from geo_activity_playground.core.sources import TimeSeriesSource
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map
@@ -220,22 +222,24 @@ def heatmaps_main() -> None:
         plt.imsave(output_filename, heatmap)
 
 
-def heatmaps_main_2() -> None:
-    if False:
-        arrays = []
-        names = []
-        for path in activity_streams_dir.glob("*.parquet"):
-            df = pd.read_parquet(path)
-            latlon = np.column_stack([df.latitude, df.longitude])
-            names.extend([hash(path)] * len(df))
-            arrays.append(latlon)
-        latlon = np.row_stack(arrays)
-        del arrays
-        print(latlon.shape)
-    else:
-        activities = read_all_activities()
-        latlon = np.column_stack([activities.Latitude, activities.Longitude])
-        names = list(activities.Activity)
+def heatmaps_main_2(basedir: pathlib.Path, source: str) -> None:
+    os.chdir(basedir)
+
+    ts_source: TimeSeriesSource
+    if source == "api":
+        ts_source = StravaAPITimeSeriesSource()
+    elif source == "export":
+        ts_source = StravaExportTimeSeriesSource()
+
+    arrays = []
+    names = []
+    for i, df in enumerate(ts_source.iter_activities()):
+        latlon = np.column_stack([df.latitude, df.longitude])
+        names.extend([i] * len(df))
+        arrays.append(latlon)
+    latlon = np.row_stack(arrays)
+    del arrays
+    print(latlon.shape)
 
     tiles = [compute_tile(lat, lon) for lat, lon in latlon]
 

@@ -16,6 +16,7 @@ from tqdm import tqdm
 from geo_activity_playground.core.directories import get_config
 from geo_activity_playground.core.directories import get_state
 from geo_activity_playground.core.directories import set_state
+from geo_activity_playground.core.sources import TimeSeriesSource
 
 
 logger = logging.getLogger(__name__)
@@ -163,9 +164,15 @@ def download_missing_activity_streams() -> None:
         df.to_parquet(activity_streams_dir() / f"{activity.id}.parquet")
 
 
-def sync_from_strava() -> None:
-    try:
-        sync_activity_metadata()
-        download_missing_activity_streams()
-    except RateLimitExceeded as e:
-        pass
+class StravaAPITimeSeriesSource(TimeSeriesSource):
+    def __init__(self) -> None:
+        try:
+            sync_activity_metadata()
+            download_missing_activity_streams()
+        except RateLimitExceeded as e:
+            pass
+
+    def iter_activities(self) -> Iterator[pd.DataFrame]:
+        for path in activity_streams_dir.glob("*.parquet"):
+            df = pd.read_parquet(path)
+            yield df

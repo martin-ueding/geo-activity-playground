@@ -1,32 +1,36 @@
+import functools
 import gzip
 import pathlib
+from typing import Iterator
 
 import fitdecode
 import gpxpy
 import pandas as pd
+from tqdm import tqdm
+
+from geo_activity_playground.core.sources import TimeSeriesSource
 
 
-def read_all_activities() -> pd.DataFrame:
-    print("Loading activities …")
+@functools.cache
+def activity_cache_dir() -> pathlib.Path:
+    activity_cache_dir = pathlib.Path.cwd() / "Strava Export Cache" / "Activities"
+    activity_cache_dir.mkdir(exist_ok=True, parents=True)
+    return activity_cache_dir
+
+
+def make_activity_cache_path(activity_path: pathlib.Path) -> pathlib.Path:
+    return activity_cache_dir() / (activity_path.stem.split(".")[0] + ".parquet")
+
+
+def extract_all_activities() -> None:
     activity_paths = list(
         (pathlib.Path.cwd() / "Strava Export" / "activities").glob("?????*.*")
     )
     activity_paths.sort()
-    shards = [read_activity(activity_path) for activity_path in activity_paths]
-    for path, shard in zip(activity_paths, shards):
-        shard["Activity"] = int(path.stem.split(".")[0])
-    print("Concatenating shards …")
-    return pd.concat(shards)
-
-
-def read_activity(path: pathlib.Path) -> pd.DataFrame:
-    activity_cache_dir = pathlib.Path.cwd() / "Strava Export Cache" / "Activities"
-    activity_cache_dir.mkdir(exist_ok=True, parents=True)
-    activity_cache_path = activity_cache_dir / (path.stem.split(".")[0] + ".parquet")
-    if activity_cache_path.exists():
-        return pd.read_pickle(activity_cache_path)
-    else:
-        print(f"Loading activity {path} …")
+    to_extract = [
+        path for path in activity_paths if not make_activity_cache_path(path).exists()
+    ]
+    for path in tqdm(to_extract, desc="Extracting FIT/GPX files"):
         suffixes = path.suffixes
         if suffixes[-1] == ".gz":
             if suffixes[-2] == ".gpx":
@@ -41,8 +45,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
             df = read_fit_activity(path, open)
         else:
             raise NotImplementedError(f"Unknown suffix: {path}")
-        df.to_parquet(activity_cache_path)
-        return df
+        df.to_parquet(make_activity_cache_path(path))
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
@@ -78,3 +81,13 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                         )
 
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
+
+
+class StravaExportTimeSeriesSource(TimeSeriesSource):
+    def __init__(self) -> None:
+        extract_all_activities()
+
+    def iter_activities(self) -> Iterator[pd.DataFrame]:
+        for path in sorted(activity_cache_dir().glob("*.parquet")):
+            df = pd.read_parquet(path)
+            yield df
