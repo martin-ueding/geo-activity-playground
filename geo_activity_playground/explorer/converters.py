@@ -8,7 +8,7 @@ from geo_activity_playground.core.sources import TimeSeriesSource
 
 
 def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
-    explorer_cache_dir = pathlib.Path("Explorer Cache") / "Per Activity"
+    explorer_cache_dir = pathlib.Path("Explorer") / "Per Activity"
     explorer_cache_dir.mkdir(exist_ok=True, parents=True)
 
     for activity in tqdm(ts_source.iter_activities(), desc="Extract explorer tiles"):
