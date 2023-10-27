@@ -1,15 +1,13 @@
 import math
 import pathlib
 import time
-from typing import Dict
-from typing import Tuple
 
 import numpy as np
 import requests
 from PIL import Image
 
 
-def compute_tile(lat: float, lon: float, zoom: int = 14) -> Tuple[int, int]:
+def compute_tile(lat: float, lon: float, zoom: int = 14) -> tuple[int, int]:
     x = np.radians(lon)
     y = np.arcsinh(np.tan(np.radians(lat)))
     x = (1 + x / np.pi) / 2
@@ -20,7 +18,7 @@ def compute_tile(lat: float, lon: float, zoom: int = 14) -> Tuple[int, int]:
 
 def get_tile_upper_left_lat_lon(
     tile_x: int, tile_y: int, zoom: int
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     n = 2.0**zoom
     lon_deg = tile_x / n * 360.0 - 180.0
     lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * tile_y / n)))
@@ -44,7 +42,7 @@ def download_file(url: str, destination: pathlib.Path):
 
 
 def get_tile(
-    zoom: int, x: int, y: int, _cache: Dict[Tuple[int, int, int], Image.Image] = {}
+    zoom: int, x: int, y: int, _cache: dict[tuple[int, int, int], Image.Image] = {}
 ) -> Image.Image:
     if (zoom, x, y) in _cache:
         return _cache[(zoom, x, y)]
@@ -60,7 +58,7 @@ def get_tile(
     return image
 
 
-def latlon_to_xy(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[float, float]:
+def latlon_to_xy(lat_deg: float, lon_deg: float, zoom: int) -> tuple[float, float]:
     """
     Based on https://github.com/remisalmon/Strava-local-heatmap.
     """
@@ -71,7 +69,7 @@ def latlon_to_xy(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[float, floa
     return x, y
 
 
-def xy_to_latlon(x: float, y: float, zoom: int) -> Tuple[float, float]:
+def xy_to_latlon(x: float, y: float, zoom: int) -> tuple[float, float]:
     """
     Returns (lat, lon) in degree from OSM coordinates (x,y) rom https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
