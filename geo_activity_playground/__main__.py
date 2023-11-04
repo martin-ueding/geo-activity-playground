@@ -3,6 +3,7 @@ import os
 import pathlib
 
 from .explorer.grid_file import get_border_tiles
+from .explorer.grid_file import get_explored_tiles
 from .explorer.grid_file import make_grid_file_geojson
 from .explorer.grid_file import make_grid_file_gpx
 from .explorer.video import explorer_video_main
@@ -53,8 +54,12 @@ def main() -> None:
 
 def main_explorer(ts_source: TimeSeriesSource) -> None:
     points = get_border_tiles(ts_source)
-    make_grid_file_geojson(points)
-    make_grid_file_gpx(points)
+    make_grid_file_geojson(points, "missing_tiles")
+    make_grid_file_gpx(points, "missing_tiles")
+
+    points = get_explored_tiles(ts_source)
+    make_grid_file_geojson(points, "explored")
+    make_grid_file_gpx(points, "explored")
 
 
 def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSource:

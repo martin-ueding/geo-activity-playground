@@ -21,6 +21,11 @@ def get_border_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:
     return make_grid_points(zip(border_x, border_y))
 
 
+def get_explored_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:
+    tiles = get_tile_history(ts_source)
+    return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
+
+
 def make_grid_points(
     tile_iterator: Iterator[tuple[int, int]]
 ) -> list[list[list[float]]]:
@@ -37,7 +42,7 @@ def make_grid_points(
     return result
 
 
-def make_grid_file_gpx(grid_points: list[list[list[float]]]) -> None:
+def make_grid_file_gpx(grid_points: list[list[list[float]]], stem: str) -> None:
     gpx = gpxpy.gpx.GPX()
     gpx_track = gpxpy.gpx.GPXTrack()
     gpx.tracks.append(gpx_track)
@@ -48,14 +53,14 @@ def make_grid_file_gpx(grid_points: list[list[list[float]]]) -> None:
         for point in points:
             gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(*point))
 
-    out_path = pathlib.Path("Explorer") / "missing_tiles.gpx"
+    out_path = pathlib.Path("Explorer") / f"{stem}.gpx"
     out_path.parent.mkdir(exist_ok=True, parents=True)
 
     with open(out_path, "w") as f:
         f.write(gpx.to_xml())
 
 
-def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> None:
+def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> None:
     fc = geojson.FeatureCollection(
         [
             geojson.Feature(
@@ -65,7 +70,7 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> None:
         ]
     )
 
-    out_path = pathlib.Path("Explorer") / "missing_tiles.geojson"
+    out_path = pathlib.Path("Explorer") / f"{stem}.geojson"
     out_path.parent.mkdir(exist_ok=True, parents=True)
 
     with open(out_path, "w") as f:

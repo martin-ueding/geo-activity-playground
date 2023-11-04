@@ -1,3 +1,4 @@
+import functools
 import pathlib
 
 import pandas as pd
@@ -7,6 +8,7 @@ from ..core.tiles import compute_tile
 from geo_activity_playground.core.sources import TimeSeriesSource
 
 
+@functools.cache
 def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
     explorer_cache_dir = pathlib.Path("Explorer") / "Per Activity"
     explorer_cache_dir.mkdir(exist_ok=True, parents=True)
