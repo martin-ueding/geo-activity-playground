@@ -22,6 +22,8 @@ The following directories serve as a cache. One can inspect this but doesn't nee
     - `first_time_per_tile.parquet`: A data frame with the first visit datetime for each explorer tile. Columns `time`, `tile_x`, `tile_y`.
     - `missing_tiles.geojson`: A GeoJSON file with square polygons for all missing tiles at the boundary of explored tiles.
     - `missing_tiles.gpx`: The same, just expressed as square tracks in the GPX format.
+    - `explored.geojson`: A GeoJSON file with square polygons for all explored tiles.
+    - `explored.gpx`: The same, just expressed as square tracks in the GPX format.
 
 - `Heatmaps`: Will contain heatmap images generated from the data. They will be called like `Cluster-1.png` with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.
 
