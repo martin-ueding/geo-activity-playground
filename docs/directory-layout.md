@@ -25,14 +25,14 @@ The following directories serve as a cache. One can inspect this but doesn't nee
     - `explored.geojson`: A GeoJSON file with square polygons for all explored tiles.
     - `explored.gpx`: The same, just expressed as square tracks in the GPX format.
 
-- `Heatmaps`: Will contain heatmap images generated from the data. They will be called like `Cluster-1.png` with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.
+- `Heatmaps`: Will contain heatmap images generated from the data. They will be called like `Cluster-{i}.png` with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.
 
-- `Open Street Map Tiles`: Cached tiles from the Open Street Map. The substructure is `zoom/x/y.png`. Each image has a size of 256×256 pixels.
+- `Open Street Map Tiles`: Cached tiles from the Open Street Map. The substructure is `{zoom}/{x}/{y}.png`. Each image has a size of 256×256 pixels.
 
 - `Strava API`: Everything that is downloaded via the Strava API is stored in this subtree.
 
-    - `Data`: The time series data for each activity as a data frame stored in the Parquet format. Filenames are `2589868806.parquet` with the activity IDs. The column names are the following: `time`, `latitude`, `longitude` and optionally `distance`, `altitude`, `heartrate`.
-    - `Metadata`: The activity objects from the `stravalib` Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like `start-1364228189.pickle`.
+    - `Data`: The time series data for each activity as a data frame stored in the Parquet format. Filenames are `{activity_id}.parquet` with the activity IDs. The column names are the following: `time`, `latitude`, `longitude` and optionally `distance`, `altitude`, `heartrate`.
+    - `Metadata`: The activity objects from the `stravalib` Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like `start-{timestamp}.pickle`.
     - `strava_tokens.json`: Tokens for the Strava API. Contains the *access* and *refresh* tokens.
 
 - `Strava Export Cache`:
