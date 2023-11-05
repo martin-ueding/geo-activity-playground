@@ -8,13 +8,11 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/directory-layout/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/explorer-tiles/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../heatmaps/">
       
-      
-        <link rel="next" href="../heatmaps/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +20,7 @@
     
     
       
-        <title>Directory Layout - Geo Activity Playground</title>
+        <title>Explorer Tiles - Geo Activity Playground</title>
       
     
     
@@ -77,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#directory-layout" class="md-skip">
+        <a href="#explorer-tiles" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Directory Layout
+              Explorer Tiles
             
           </span>
         </div>
@@ -245,18 +243,9 @@
       
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../directory-layout/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -265,7 +254,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -293,9 +281,29 @@
       
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../explorer-tiles/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Explorer Tiles
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -304,6 +312,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-explorer-tiles" class="md-nav__link">
+    What are explorer tiles?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maps-with-explorer-tiles" class="md-nav__link">
+    Maps with explorer tiles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#missing-tiles" class="md-nav__link">
+    Missing tiles
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -328,6 +377,35 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-explorer-tiles" class="md-nav__link">
+    What are explorer tiles?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maps-with-explorer-tiles" class="md-nav__link">
+    Maps with explorer tiles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#missing-tiles" class="md-nav__link">
+    Missing tiles
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -341,52 +419,30 @@
                   
 
 
-<h1 id="directory-layout">Directory Layout</h1>
-<p>There are a bunch of files that need to be given to this set of scripts, are used as intermediate files or generated as output. In order to make it clear where everything is, the following document lists all the paths which are relevant to the script.</p>
-<p>Everything is relative to a <em>base directory</em> which can be passed with the <code>--basedir</code> option to the scripts.</p>
-<h1 id="input">Input</h1>
-<p>The user has to put data into the following directories in order for it to be picked up.</p>
-<ul>
-<li>
-<p><code>Strava Export</code>: Contains the exported data from Strava.</p>
-</li>
-<li>
-<p><code>config.toml</code>: Configuration file</p>
-</li>
-</ul>
-<h1 id="output-and-cache">Output and cache</h1>
-<p>The following directories serve as a cache. One can inspect this but doesn't need to work with that directly.</p>
-<ul>
-<li>
-<p><code>Explorer</code>: Things related to the explorer tiles.</p>
-<ul>
-<li><code>Per Activity</code>: A data frame with the tiles that have been visited within each activity. Each file is named with the activity ID like <code>2520340514.parquet</code>. The columns are <code>time</code>, <code>tile_x</code>, <code>tile_y</code>.</li>
-<li><code>first_time_per_tile.parquet</code>: A data frame with the first visit datetime for each explorer tile. Columns <code>time</code>, <code>tile_x</code>, <code>tile_y</code>.</li>
-<li><code>missing_tiles.geojson</code>: A GeoJSON file with square polygons for all missing tiles at the boundary of explored tiles.</li>
-<li><code>missing_tiles.gpx</code>: The same, just expressed as square tracks in the GPX format.</li>
-</ul>
-</li>
-<li>
-<p><code>Heatmaps</code>: Will contain heatmap images generated from the data. They will be called like <code>Cluster-1.png</code> with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.</p>
-</li>
-<li>
-<p><code>Open Street Map Tiles</code>: Cached tiles from the Open Street Map. The substructure is <code>zoom/x/y.png</code>. Each image has a size of 256×256 pixels.</p>
-</li>
-<li>
-<p><code>Strava API</code>: Everything that is downloaded via the Strava API is stored in this subtree.</p>
-<ul>
-<li><code>Data</code>: The time series data for each activity as a data frame stored in the Parquet format. Filenames are <code>2589868806.parquet</code> with the activity IDs. The column names are the following: <code>time</code>, <code>latitude</code>, <code>longitude</code> and optionally <code>distance</code>, <code>altitude</code>, <code>heartrate</code>.</li>
-<li><code>Metadata</code>: The activity objects from the <code>stravalib</code> Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like <code>start-1364228189.pickle</code>.</li>
-<li><code>strava_tokens.json</code>: Tokens for the Strava API. Contains the <em>access</em> and <em>refresh</em> tokens.</li>
-</ul>
-</li>
-<li>
-<p><code>Strava Export Cache</code>:</p>
-<ul>
-<li><code>Activities</code>: Same as <code>Strava API/Data</code>.</li>
-</ul>
-</li>
-</ul>
+<h1 id="explorer-tiles">Explorer Tiles</h1>
+<h2 id="what-are-explorer-tiles">What are explorer tiles?</h2>
+<p>Maps accessible via the web browser are usually served as little image tiles. The Open Street Map uses the <em>Web Mercator</em> coordinate system to map from latitude and longitude to pixels on the map.</p>
+<p>Each tile is 256 × 256 pixels in size. The zoom levels zoom in by a factor of two. Therefore all the tiles are organized in a <em>quad tree</em>. As you zoom in, each tile gets split into four tiles which can then show more detail. The following prescription maps from latitude and longitude (given in degrees) to tile indices:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_tile</span><span class="p">(</span><span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">zoom</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+</code></pre></div>
+<p>At zoom level 14 the tiles have a side length of roughly 1.5 km where I live. These tiles are used as the basis for <em>explorer tiles</em>. The basic idea is that every tile where you have at least one point in an activity is considered an <em>explored tile</em>.</p>
+<p>From your activities the program will extract all the tiles that you have visited. And then it does a few things with those.</p>
+<h2 id="maps-with-explorer-tiles">Maps with explorer tiles</h2>
+<p>The most straightforward artifact is a map with all the tiles that you have explored. This is created in the GeoJSON format as that can encode polygons. You can then take a look at these maps with programs like <a href="https://www.gpxsee.org/">GPXSee</a> or online viewers like <a href="http://geojson.io/">GeoJSON.io</a>.</p>
+<p>The explored tiles map looks like this for the Hunsrück area for me:</p>
+<p><img alt="" src="../explorer-explored.png" /></p>
+<h2 id="missing-tiles">Missing tiles</h2>
+<p>The next interesting question are the missing tiles. I often have little gaps and would like to see them easily. The program computes the boundary around the tiles that you have explored. This can be used to plan extensions of the explored area.</p>
+<p><img alt="" src="../explorer-missing.png" /></p>
+<p>On Android one can use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately <a href="https://osmand.net/docs/technical/osmand-file-formats/">GeoJSON is not supported</a>, therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:</p>
+<p><img alt="" src="../explorer-missing-gpx.png" /></p>
+<p>Transfer this GPX file to OsmAnd and you can have it display the missing tiles such that you can extend your explored area systematically.</p>
 
 
 
