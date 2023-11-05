@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/directory-layout/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../getting-started/">
       
       
         <link rel="next" href="../heatmaps/">
@@ -245,6 +245,25 @@
       
   
   
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -369,21 +388,21 @@
 </ul>
 </li>
 <li>
-<p><code>Heatmaps</code>: Will contain heatmap images generated from the data. They will be called like <code>Cluster-1.png</code> with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.</p>
+<p><code>Heatmaps</code>: Will contain heatmap images generated from the data. They will be called like <code>Cluster-{i}.png</code> with increasing numbers. When one re-generates the heatmaps, the old files will be deleted to make sure that even if the numbers of clusters has been reduced there are no old files remaining.</p>
 </li>
 <li>
-<p><code>Open Street Map Tiles</code>: Cached tiles from the Open Street Map. The substructure is <code>zoom/x/y.png</code>. Each image has a size of 256×256 pixels.</p>
+<p><code>Open Street Map Tiles</code>: Cached tiles from the Open Street Map. The substructure is <code>{zoom}/{x}/{y}.png</code>. Each image has a size of 256×256 pixels.</p>
 </li>
 <li>
 <p><code>Strava API</code>: Everything that is downloaded via the Strava API is stored in this subtree.</p>
 <ul>
-<li><code>Data</code>: The time series data for each activity as a data frame stored in the Parquet format. Filenames are <code>2589868806.parquet</code> with the activity IDs. The column names are the following: <code>time</code>, <code>latitude</code>, <code>longitude</code> and optionally <code>distance</code>, <code>altitude</code>, <code>heartrate</code>.</li>
-<li><code>Metadata</code>: The activity objects from the <code>stravalib</code> Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like <code>start-1364228189.pickle</code>.</li>
+<li><code>Data</code>: The time series data for each activity as a data frame stored in the Parquet format. Filenames are <code>{activity_id}.parquet</code> with the activity IDs. The column names are the following: <code>time</code>, <code>latitude</code>, <code>longitude</code> and optionally <code>distance</code>, <code>altitude</code>, <code>heartrate</code>.</li>
+<li><code>Metadata</code>: The activity objects from the <code>stravalib</code> Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like <code>start-{timestamp}.pickle</code>.</li>
 <li><code>strava_tokens.json</code>: Tokens for the Strava API. Contains the <em>access</em> and <em>refresh</em> tokens.</li>
 </ul>
 </li>
 <li>
-<p><code>Strava Export Cache</code>:</p>
+<p><code>Strava Export Cache</code>: Caching directory for files derived from the Strava export.</p>
 <ul>
 <li><code>Activities</code>: Same as <code>Strava API/Data</code>.</li>
 </ul>

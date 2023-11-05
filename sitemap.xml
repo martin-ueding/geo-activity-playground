@@ -16,6 +16,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/</loc>
+         <lastmod>2023-11-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/heatmaps/</loc>
          <lastmod>2023-11-05</lastmod>
          <changefreq>daily</changefreq>
