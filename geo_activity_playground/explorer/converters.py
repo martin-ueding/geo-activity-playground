@@ -2,7 +2,6 @@ import functools
 import pathlib
 
 import pandas as pd
-from tqdm import tqdm
 
 from ..core.tiles import compute_tile
 from geo_activity_playground.core.sources import TimeSeriesSource
@@ -10,23 +9,32 @@ from geo_activity_playground.core.sources import TimeSeriesSource
 
 @functools.cache
 def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
-    explorer_cache_dir = pathlib.Path("Explorer") / "Per Activity"
-    explorer_cache_dir.mkdir(exist_ok=True, parents=True)
-
-    for activity in tqdm(ts_source.iter_activities(), desc="Extract explorer tiles"):
-        target_path = explorer_cache_dir / f"{activity.name}.parquet"
-        if not target_path.exists():
-            tiles = tiles_from_points(activity)
-            first_tiles = first_time_per_tile(tiles)
-            first_tiles.to_parquet(target_path)
-
     tiles = pd.DataFrame()
-    for path in tqdm(explorer_cache_dir.glob("*.parquet"), desc="Build tile history"):
-        shard = pd.read_parquet(path)
+    for activity in ts_source.iter_activities():
+        shard = get_first_tiles(activity)
+        if not len(shard):
+            continue
         tiles = pd.concat([tiles, shard])
         tiles = first_time_per_tile(tiles)
-    tiles.to_parquet(explorer_cache_dir.parent / "first_time_per_tile.parquet")
+
+    explorer_cache_dir = pathlib.Path("Explorer")
+    explorer_cache_dir.mkdir(exist_ok=True, parents=True)
+    tiles.to_parquet(explorer_cache_dir / "first_time_per_tile.parquet")
     return tiles
+
+
+def get_first_tiles(activity: pd.DataFrame) -> pd.DataFrame:
+    explorer_cache_dir = pathlib.Path("Explorer") / "Per Activity"
+    explorer_cache_dir.mkdir(exist_ok=True, parents=True)
+    target_path = explorer_cache_dir / f"{activity.name}.parquet"
+
+    if target_path.exists():
+        return pd.read_parquet(target_path)
+    else:
+        tiles = tiles_from_points(activity)
+        first_tiles = first_time_per_tile(tiles)
+        first_tiles.to_parquet(target_path)
+        return first_tiles
 
 
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
