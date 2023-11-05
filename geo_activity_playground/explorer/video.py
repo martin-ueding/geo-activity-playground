@@ -13,7 +13,7 @@ from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
-from geo_activity_playground.core.tiles import get_tile
+from ..core.tiles import get_tile
 
 
 def build_image(

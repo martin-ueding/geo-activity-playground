@@ -4,8 +4,8 @@ from typing import Iterator
 
 import pandas as pd
 
-from geo_activity_playground.core.activity_parsers import read_activity
-from geo_activity_playground.core.sources import TimeSeriesSource
+from ..core.activity_parsers import read_activity
+from ..core.sources import TimeSeriesSource
 
 
 @functools.cache
@@ -22,7 +22,7 @@ def make_activity_cache_path(activity_path: pathlib.Path) -> pathlib.Path:
 class StravaExportTimeSeriesSource(TimeSeriesSource):
     def iter_activities(self) -> Iterator[pd.DataFrame]:
         activity_paths = list(
-            (pathlib.Path.cwd() / "Strava Export" / "activities").glob("?????*.*")
+            (pathlib.Path("Strava Export") / "activities").glob("?????*.*")
         )
         activity_paths.sort()
         for path in activity_paths:

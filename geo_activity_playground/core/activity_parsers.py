@@ -5,7 +5,7 @@ import fitdecode
 import gpxpy
 import pandas as pd
 
-from geo_activity_playground.core.caching import cache_parquet
+from .caching import cache_parquet
 
 
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:

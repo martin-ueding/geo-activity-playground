@@ -17,8 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import itertools
-import os
 import pathlib
 
 import matplotlib.pyplot as plt
@@ -26,11 +24,10 @@ import numpy as np
 import pandas as pd
 import sklearn.cluster
 
-from .core.directories import get_config
+from .core.sources import TimeSeriesSource
 from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
-from geo_activity_playground.core.sources import TimeSeriesSource
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map

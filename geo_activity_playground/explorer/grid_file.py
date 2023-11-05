@@ -6,9 +6,9 @@ import gpxpy
 import numpy as np
 import scipy.ndimage
 
+from ..core.sources import TimeSeriesSource
 from ..core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.core.sources import TimeSeriesSource
-from geo_activity_playground.explorer.converters import get_tile_history
+from .converters import get_tile_history
 
 
 def get_border_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:

@@ -13,10 +13,10 @@ from stravalib.exc import RateLimitExceeded
 from stravalib.model import Activity
 from tqdm import tqdm
 
-from geo_activity_playground.core.directories import get_config
-from geo_activity_playground.core.directories import get_state
-from geo_activity_playground.core.directories import set_state
-from geo_activity_playground.core.sources import TimeSeriesSource
+from ..core.directories import get_config
+from ..core.directories import get_state
+from ..core.directories import set_state
+from ..core.sources import TimeSeriesSource
 
 
 logger = logging.getLogger(__name__)

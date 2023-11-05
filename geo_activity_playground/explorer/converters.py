@@ -3,8 +3,8 @@ import pathlib
 
 import pandas as pd
 
+from ..core.sources import TimeSeriesSource
 from ..core.tiles import compute_tile
-from geo_activity_playground.core.sources import TimeSeriesSource
 
 
 @functools.cache
