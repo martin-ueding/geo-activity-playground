@@ -23,6 +23,7 @@ nav:
   - index.md
   - directory-layout.md
   - heatmaps.md
+  - explorer-tiles.md
 
 markdown_extensions:
   - pymdownx.highlight
