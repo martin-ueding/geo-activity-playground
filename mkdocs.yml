@@ -21,6 +21,7 @@ theme:
 
 nav:
   - index.md
+  - getting-started.md
   - directory-layout.md
   - heatmaps.md
   - explorer-tiles.md
