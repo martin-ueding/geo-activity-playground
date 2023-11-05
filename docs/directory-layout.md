@@ -35,6 +35,6 @@ The following directories serve as a cache. One can inspect this but doesn't nee
     - `Metadata`: The activity objects from the `stravalib` Python library are stored here as Python pickle objects. The file names are time stamp of the activity start, like `start-{timestamp}.pickle`.
     - `strava_tokens.json`: Tokens for the Strava API. Contains the *access* and *refresh* tokens.
 
-- `Strava Export Cache`:
+- `Strava Export Cache`: Caching directory for files derived from the Strava export.
 
     - `Activities`: Same as `Strava API/Data`.
