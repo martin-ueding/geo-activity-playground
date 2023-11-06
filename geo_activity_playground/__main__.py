@@ -62,7 +62,10 @@ def main() -> None:
     )
 
     options = parser.parse_args()
-    coloredlogs.install(level=options.loglevel.upper())
+    coloredlogs.install(
+        fmt="%(asctime)s %(name)s %(levelname)s %(message)s",
+        level=options.loglevel.upper(),
+    )
     options.func(options)
 
 
