@@ -2,6 +2,8 @@ import argparse
 import os
 import pathlib
 
+import coloredlogs
+
 from .core.sources import DirectoryTimeSeriesSource
 from .core.sources import TimeSeriesSource
 from .explorer.grid_file import get_border_tiles
@@ -24,6 +26,11 @@ def main() -> None:
         "--source",
         choices=["strava-api", "strava-export", "directory"],
         default="strava-api",
+    )
+    parser.add_argument(
+        "--loglevel",
+        choices=["debug", "info", "warning", "error", "critical"],
+        default="debug",
     )
 
     subparsers = parser.add_subparsers(
@@ -55,6 +62,7 @@ def main() -> None:
     )
 
     options = parser.parse_args()
+    coloredlogs.install(level=options.loglevel.upper())
     options.func(options)
 
 
