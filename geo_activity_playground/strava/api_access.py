@@ -89,18 +89,17 @@ def download_activities_after(after: str) -> None:
 
     for activity in client.get_activities(after=after):
         logger.info(f"Downloaded activity {activity}.")
-        cache_file = activity_metadata_dir() / f"{activity.id}.pickle"
+        start = int(activity.start_date.timestamp())
+        cache_file = activity_metadata_dir() / f"{start}.pickle"
         with open(cache_file, "wb") as f:
             pickle.dump(activity, f)
-        latest_path = activity_metadata_dir() / "latest"
-        latest_path.unlink(missing_ok=True)
-        os.symlink(cache_file, latest_path)
 
 
 def sync_activity_metadata() -> None:
-    latest_path = activity_metadata_dir() / "latest"
-    if latest_path.exists():
-        with open(latest_path, "rb") as f:
+    cached_activity_paths = list(activity_metadata_dir().glob("*.pickle"))
+    if cached_activity_paths:
+        last_activity_path = max(cached_activity_paths)
+        with open(last_activity_path, "rb") as f:
             activity = pickle.load(f)
         download_activities_after(
             activity.start_date.isoformat().replace("+00:00", "Z")
@@ -146,7 +145,7 @@ def make_activity(activity: Activity) -> ActivityMeta:
         distance=activity.distance.magnitude,
         elapsed_time=activity.elapsed_time,
         equipment=activity.gear_id,
-        id=activity.id,
+        id=int(activity.start_date.timestamp()),
         kind=activity.type,
         name=activity.name,
         start=activity.start_date,
@@ -162,7 +161,9 @@ def download_missing_activity_streams() -> None:
     to_download = [
         activity
         for activity in iter_all_activities()
-        if not (activity_streams_dir() / f"{activity.id}.parquet").exists()
+        if not (
+            activity_streams_dir() / f"{int(activity.start_date.timestamp())}.parquet"
+        ).exists()
     ]
     to_download.reverse()
     if to_download:
@@ -182,7 +183,10 @@ def download_missing_activity_streams() -> None:
                     columns[name] = streams[name].data
             df = pd.DataFrame(columns)
             df.name = str(activity.id)
-            df.to_parquet(activity_streams_dir() / f"{activity.id}.parquet")
+            df.to_parquet(
+                activity_streams_dir()
+                / f"{int(activity.start_date.timestamp())}.parquet"
+            )
 
 
 class StravaAPITimeSeriesSource(TimeSeriesSource):
