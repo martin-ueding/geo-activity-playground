@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import functools
-import json
 import logging
 import pathlib
 import pickle
@@ -12,14 +11,13 @@ import pandas as pd
 from stravalib import Client
 from stravalib.exc import RateLimitExceeded
 from stravalib.model import Activity
-from tqdm import tqdm
 
-from ..core.directories import get_config
-from ..core.directories import get_state
-from ..core.directories import set_state
-from ..core.sources import TimeSeriesSource
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.directories import get_config
+from geo_activity_playground.core.directories import get_state
+from geo_activity_playground.core.directories import set_state
+from geo_activity_playground.core.sources import TimeSeriesSource
 
 
 logger = logging.getLogger(__name__)
@@ -86,10 +84,8 @@ def get_current_access_token() -> str:
 def download_activities_after(after: str) -> None:
     client = Client(access_token=get_current_access_token())
 
-    for activity in tqdm(
-        client.get_activities(after=after),
-        desc=f"Downloading metadata",
-    ):
+    for activity in client.get_activities(after=after):
+        logger.info(f"Downloaded activity {activity}.")
         start = int(activity.start_date.timestamp())
         cache_file = activity_metadata_dir() / f"start-{start}.pickle"
         with open(cache_file, "wb") as f:
@@ -167,7 +163,8 @@ def download_missing_activity_streams() -> None:
     to_download.reverse()
     if to_download:
         client = Client(access_token=get_current_access_token())
-        for activity in tqdm(to_download, desc="Downloading time series"):
+        for activity in to_download:
+            logger.info(f"Downloading time series data for activity {activity} …")
             streams = client.get_activity_streams(
                 activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
             )
