@@ -1,15 +1,19 @@
+import itertools
 import pathlib
 
 from flask import Flask
 from flask import render_template
 
+from geo_activity_playground.core.activities import ActivityRepository
 
-def webui_main(basedir: pathlib.Path) -> None:
+
+def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     app = Flask(__name__)
 
     @app.route("/")
     def index():
-        return render_template("index.html")
+        activities = list(itertools.islice(repository.iter_activities(), 3))
+        return render_template("index.html", activities=activities)
 
     @app.route("/explorer")
     def explorer():

@@ -12,8 +12,10 @@ from .explorer.grid_file import make_grid_file_geojson
 from .explorer.grid_file import make_grid_file_gpx
 from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
+from .strava.api_access import StravaAPIActivityRepository
 from .strava.api_access import StravaAPITimeSeriesSource
 from .strava.importing import StravaExportTimeSeriesSource
+from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.webui.app import webui_main
 
 
@@ -63,7 +65,11 @@ def main() -> None:
     )
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
-    subparser.set_defaults(func=lambda options: webui_main(options.basedir))
+    subparser.set_defaults(
+        func=lambda options: webui_main(
+            options.basedir, make_activity_repository(options.basedir, options.source)
+        )
+    )
 
     options = parser.parse_args()
     coloredlogs.install(
@@ -93,4 +99,17 @@ def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSou
         ts_source = StravaExportTimeSeriesSource()
     elif source == "directory":
         ts_source = DirectoryTimeSeriesSource()
+    return ts_source
+
+
+def make_activity_repository(basedir: pathlib.Path, source: str) -> ActivityRepository:
+    os.chdir(basedir)
+
+    ts_source: TimeSeriesSource
+    if source == "strava-api":
+        ts_source = StravaAPIActivityRepository()
+    elif source == "strava-export":
+        ts_source = ...
+    elif source == "directory":
+        ts_source = ...
     return ts_source

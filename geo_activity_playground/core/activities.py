@@ -2,30 +2,36 @@ import abc
 import dataclasses
 import datetime
 from typing import Iterator
+from typing import Optional
 
 import pandas as pd
 
 
 @dataclasses.dataclass
-class Activity:
-    id: int
-    name: str
-    kind: str
-    equipment: str
-    start: datetime.datetime
+class ActivityMeta:
+    calories: float
+    commute: bool
     distance: float
-    duration: datetime.timedelta
+    elapsed_time: datetime.timedelta
+    equipment: str
+    id: int
+    kind: str
+    name: str
+    start: datetime.datetime
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.kind}; {self.distance/1000:.1f} km; {self.elapsed_time})"
 
 
 class ActivityRepository(abc.ABC):
-    @abc.abstractclassmethod
-    def get_activity_by_id(id: int) -> Activity:
+    @abc.abstractmethod
+    def iter_activities(self) -> Iterator[ActivityMeta]:
         raise NotImplementedError()
 
-    @abc.abstractclassmethod
-    def iter_activities() -> Iterator[Activity]:
+    @abc.abstractmethod
+    def get_activity_by_id(self, id: int) -> ActivityMeta:
         raise NotImplementedError()
 
-    @abc.abstractclassmethod
-    def get_time_series(id: int) -> pd.DataFrame:
+    @abc.abstractmethod
+    def get_time_series(self, id: int) -> pd.DataFrame:
         raise NotImplementedError()

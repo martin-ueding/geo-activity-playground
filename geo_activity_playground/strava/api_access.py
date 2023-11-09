@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import functools
+import json
 import logging
 import pathlib
 import pickle
@@ -17,6 +18,8 @@ from ..core.directories import get_config
 from ..core.directories import get_state
 from ..core.directories import set_state
 from ..core.sources import TimeSeriesSource
+from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.activities import ActivityRepository
 
 
 logger = logging.getLogger(__name__)
@@ -136,33 +139,48 @@ def make_activity_dict(activity: Activity) -> dict[str, Any]:
     return result
 
 
+def make_activity(activity: Activity) -> ActivityMeta:
+    return ActivityMeta(
+        calories=activity.calories,
+        commute=activity.commute,
+        distance=activity.distance.magnitude,
+        elapsed_time=activity.elapsed_time,
+        equipment=activity.gear_id,
+        id=activity.id,
+        kind=activity.type,
+        name=activity.name,
+        start=activity.start_date,
+    )
+
+
 def main_parquet(options: argparse.Namespace) -> None:
     df = pd.DataFrame(map(make_activity_dict, iter_all_activities()))
     df.to_parquet(options.out_path)
 
 
 def download_missing_activity_streams() -> None:
-    client = Client(access_token=get_current_access_token())
     to_download = [
         activity
         for activity in iter_all_activities()
         if not (activity_streams_dir() / f"{activity.id}.parquet").exists()
     ]
     to_download.reverse()
-    for activity in tqdm(to_download, desc="Downloading time series"):
-        streams = client.get_activity_streams(
-            activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
-        )
-        columns = {}
-        if "latlng" in streams:
-            columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
-            columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
-        for name in ["distance", "altitude", "heartrate", "time"]:
-            if name in streams:
-                columns[name] = streams[name].data
-        df = pd.DataFrame(columns)
-        df.name = str(activity.id)
-        df.to_parquet(activity_streams_dir() / f"{activity.id}.parquet")
+    if to_download:
+        client = Client(access_token=get_current_access_token())
+        for activity in tqdm(to_download, desc="Downloading time series"):
+            streams = client.get_activity_streams(
+                activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
+            )
+            columns = {}
+            if "latlng" in streams:
+                columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
+                columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
+            for name in ["distance", "altitude", "heartrate", "time"]:
+                if name in streams:
+                    columns[name] = streams[name].data
+            df = pd.DataFrame(columns)
+            df.name = str(activity.id)
+            df.to_parquet(activity_streams_dir() / f"{activity.id}.parquet")
 
 
 class StravaAPITimeSeriesSource(TimeSeriesSource):
@@ -180,3 +198,26 @@ class StravaAPITimeSeriesSource(TimeSeriesSource):
             if "latitude" not in df.columns:
                 continue
             yield df
+
+
+class StravaAPIActivityRepository(ActivityRepository):
+    def __init__(self) -> None:
+        self._client = Client(access_token=get_current_access_token())
+
+        try:
+            sync_activity_metadata()
+            download_missing_activity_streams()
+        except RateLimitExceeded as e:
+            pass
+
+    def iter_activities(self) -> Iterator[ActivityMeta]:
+        for path in reversed(list(activity_metadata_dir().glob("*.pickle"))):
+            with open(path, "rb") as f:
+                strava_activity = pickle.load(f)
+                yield make_activity(strava_activity)
+
+    def get_activity_by_id(self, id: int) -> ActivityMeta:
+        ...
+
+    def get_time_series(self, id: int) -> pd.DataFrame:
+        ...

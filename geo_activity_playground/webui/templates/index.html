@@ -1,5 +1,15 @@
 {% extends "page.html" %}
 
 {% block container %}
-Hi!
+<div class="row">
+    <div class="col">
+        <h1>Latest activities</h1>
+
+        <ul>
+            {% for activity in activities %}
+            <li>{{ activity }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 {% endblock %}
