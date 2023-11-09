@@ -16,6 +16,12 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Vega for plots.-->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
 </head>
 
 <body>
@@ -40,6 +46,13 @@
                 </div>
             </div>
         </nav>
+
+        {% macro vega(id, path) %}
+        <div id="{{ id }}"></div>
+        <script type="text/javascript">
+            vegaEmbed('#{{ id }}', "{{ path }}").then(function (result) { }).catch(console.error);
+        </script>
+        {% endmacro %}
 
         {% block container %}
         {% endblock %}

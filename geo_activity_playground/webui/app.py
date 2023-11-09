@@ -5,6 +5,7 @@ from flask import Flask
 from flask import render_template
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.plots import activity_track_plot
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
@@ -16,9 +17,14 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
         return render_template("index.html", activities=activities)
 
     @app.route("/activity/<id>")
-    def activities(id: int):
+    def activity(id: int):
         activity = repository.get_activity_by_id(id)
         return render_template("activity.html", activity=activity)
+
+    @app.route("/activity/<id>/track.json")
+    def activity_track(id: int):
+        plot = activity_track_plot(repository.get_time_series(id))
+        return plot
 
     @app.route("/explorer")
     def explorer():

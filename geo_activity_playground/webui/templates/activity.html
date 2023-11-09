@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row mb-1">
     <div class="col-4">
         <dl>
             <dt>Name</dt>
@@ -39,4 +39,13 @@
         </dl>
     </div>
 </div>
+
+
+<div class="row mb-1">
+    <div class="col">
+        {{ vega("track", "/activity/%d/track.json"|format(activity.id)) }}
+    </div>
+</div>
+
+
 {% endblock %}

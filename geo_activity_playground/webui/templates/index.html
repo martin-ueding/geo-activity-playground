@@ -1,10 +1,21 @@
 {% extends "page.html" %}
 
 {% block container %}
-<div class="row">
+<div class="row mb-1">
     <div class="col">
-        <h1 class="mb-1">Latest activities</h1>
+        <h1>Latest activities</h1>
+    </div>
+</div>
 
+
+<div class="row mb-1">
+    <div class="col">
+        {{ vega("progress", "/vega/progress.json") }}
+    </div>
+</div>
+
+<div class="row mb-1">
+    <div class="col">
         <ul>
             {% for activity in activities %}
             <li><a href="/activity/{{ activity.id }}">{{ activity }}</a></li>
