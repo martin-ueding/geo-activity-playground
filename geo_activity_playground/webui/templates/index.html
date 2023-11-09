@@ -3,11 +3,11 @@
 {% block container %}
 <div class="row">
     <div class="col">
-        <h1>Latest activities</h1>
+        <h1 class="mb-1">Latest activities</h1>
 
         <ul>
             {% for activity in activities %}
-            <li><a href="/activities/{{ activity.id }}">{{ activity }}</a></li>
+            <li><a href="/activity/{{ activity.id }}">{{ activity }}</a></li>
             {% endfor %}
         </ul>
     </div>

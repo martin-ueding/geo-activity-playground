@@ -33,7 +33,7 @@ def main() -> None:
     parser.add_argument(
         "--loglevel",
         choices=["debug", "info", "warning", "error", "critical"],
-        default="debug",
+        default="info",
     )
 
     subparsers = parser.add_subparsers(

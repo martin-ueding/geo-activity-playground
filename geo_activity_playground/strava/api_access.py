@@ -2,8 +2,10 @@ import argparse
 import datetime
 import functools
 import logging
+import os
 import pathlib
 import pickle
+import shutil
 from typing import Any
 from typing import Iterator
 
@@ -82,21 +84,23 @@ def get_current_access_token() -> str:
 
 
 def download_activities_after(after: str) -> None:
+    logger.info(f"Downloading activities after {after} …")
     client = Client(access_token=get_current_access_token())
 
     for activity in client.get_activities(after=after):
         logger.info(f"Downloaded activity {activity}.")
-        start = int(activity.start_date.timestamp())
-        cache_file = activity_metadata_dir() / f"start-{start}.pickle"
+        cache_file = activity_metadata_dir() / f"{activity.id}.pickle"
         with open(cache_file, "wb") as f:
             pickle.dump(activity, f)
+        latest_path = activity_metadata_dir() / "latest"
+        latest_path.unlink(missing_ok=True)
+        os.symlink(cache_file, latest_path)
 
 
 def sync_activity_metadata() -> None:
-    cached_activity_paths = list(activity_metadata_dir().glob("*.pickle"))
-    if cached_activity_paths:
-        last_activity_path = max(cached_activity_paths)
-        with open(last_activity_path, "rb") as f:
+    latest_path = activity_metadata_dir() / "latest"
+    if latest_path.exists():
+        with open(latest_path, "rb") as f:
             activity = pickle.load(f)
         download_activities_after(
             activity.start_date.isoformat().replace("+00:00", "Z")
@@ -162,6 +166,7 @@ def download_missing_activity_streams() -> None:
     ]
     to_download.reverse()
     if to_download:
+        logger.info(f"Downloading time series data for {len(to_download)} activities …")
         client = Client(access_token=get_current_access_token())
         for activity in to_download:
             logger.info(f"Downloading time series data for activity {activity} …")
@@ -214,7 +219,9 @@ class StravaAPIActivityRepository(ActivityRepository):
                 yield make_activity(strava_activity)
 
     def get_activity_by_id(self, id: int) -> ActivityMeta:
-        ...
+        with open(activity_metadata_dir() / f"{id}.pickle", "rb") as f:
+            strava_activity = pickle.load(f)
+            return make_activity(strava_activity)
 
     def get_time_series(self, id: int) -> pd.DataFrame:
-        ...
+        return pd.read_parquet(activity_streams_dir() / f"{id}.parquet")
