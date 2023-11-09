@@ -12,7 +12,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/")
     def index():
-        activities = list(itertools.islice(repository.iter_activities(), 3))
+        activities = list(itertools.islice(repository.iter_activities(), 20))
         return render_template("index.html", activities=activities)
 
     @app.route("/explorer")

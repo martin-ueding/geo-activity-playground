@@ -7,7 +7,7 @@
 
         <ul>
             {% for activity in activities %}
-            <li>{{ activity }}</li>
+            <li><a href="/activities/{{ activity.id }}">{{ activity }}</a></li>
             {% endfor %}
         </ul>
     </div>
