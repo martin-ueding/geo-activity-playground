@@ -14,6 +14,7 @@ from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
 from .strava.api_access import StravaAPITimeSeriesSource
 from .strava.importing import StravaExportTimeSeriesSource
+from geo_activity_playground.webui.app import webui_main
 
 
 def main() -> None:
@@ -60,6 +61,9 @@ def main() -> None:
             make_time_series_source(options.basedir, options.source)
         )
     )
+
+    subparser = subparsers.add_parser("serve", help="Launch webserver")
+    subparser.set_defaults(func=lambda options: webui_main(options.basedir))
 
     options = parser.parse_args()
     coloredlogs.install(

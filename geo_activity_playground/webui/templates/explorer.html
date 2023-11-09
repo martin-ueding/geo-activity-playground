@@ -1,0 +1,22 @@
+{% extends "page.html" %}
+
+{% block container %}
+<div class="row">
+    <div class="col">
+        <h1>Map with explored tiles</h1>
+        <div id="explorer-map" style="height: 800px;"></div>
+    </div>
+</div>
+
+<script>
+    var map = L.map('explorer-map').setView([50.7358, 7.1013], 10);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    fetch('/explored-tiles.geojson')
+        .then((response) => response.json())
+        .then(feature => L.geoJSON(feature).addTo(map))
+</script>
+{% endblock %}
