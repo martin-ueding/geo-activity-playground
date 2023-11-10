@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import functools
+import itertools
 import logging
 import os
 import pathlib
@@ -157,38 +158,6 @@ def main_parquet(options: argparse.Namespace) -> None:
     df.to_parquet(options.out_path)
 
 
-def download_missing_activity_streams() -> None:
-    to_download = [
-        activity
-        for activity in iter_all_activities()
-        if not (
-            activity_streams_dir() / f"{int(activity.start_date.timestamp())}.parquet"
-        ).exists()
-    ]
-    to_download.reverse()
-    if to_download:
-        logger.info(f"Downloading time series data for {len(to_download)} activities …")
-        client = Client(access_token=get_current_access_token())
-        for activity in to_download:
-            logger.info(f"Downloading time series data for activity {activity} …")
-            streams = client.get_activity_streams(
-                activity.id, ["time", "latlng", "altitude", "heartrate", "temp"]
-            )
-            columns = {}
-            if "latlng" in streams:
-                columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
-                columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
-            for name in ["distance", "altitude", "heartrate", "time"]:
-                if name in streams:
-                    columns[name] = streams[name].data
-            df = pd.DataFrame(columns)
-            df.name = str(activity.id)
-            df.to_parquet(
-                activity_streams_dir()
-                / f"{int(activity.start_date.timestamp())}.parquet"
-            )
-
-
 class StravaAPITimeSeriesSource(TimeSeriesSource):
     def __init__(self) -> None:
         try:
@@ -229,3 +198,82 @@ class StravaAPIActivityRepository(ActivityRepository):
 
     def get_time_series(self, id: int) -> pd.DataFrame:
         return pd.read_parquet(activity_streams_dir() / f"{id}.parquet")
+
+
+def bring_strava_api_up_to_speed(basedir: pathlib.Path) -> None:
+    os.chdir(basedir)
+
+    meta_file = pathlib.Path("Cache") / "activities.parquet"
+    if meta_file.exists():
+        logger.info("Loading metadata file …")
+        meta = pd.read_parquet(meta_file)
+        get_after = meta.iloc[-1]["start"].isoformat().replace("+00:00", "Z")
+    else:
+        logger.info("Didn't find a metadata file.")
+        meta = None
+        get_after = "2000-01-01T00:00:00Z"
+
+    client = Client(access_token=get_current_access_token())
+
+    new_rows: list[dict] = []
+    for activity in client.get_activities(after=get_after):
+        logger.info(f"Downloaded Strava activity {activity.id}.")
+        cache_file = (
+            pathlib.Path("Cache") / "Activity Metadata" / f"{activity.id}.pickle"
+        )
+        cache_file.parent.mkdir(exist_ok=True, parents=True)
+        with open(cache_file, "wb") as f:
+            pickle.dump(activity, f)
+        new_rows.append(
+            {
+                "id": activity.id,
+                "commute": activity.commute,
+                "distance": activity.distance.magnitude,
+                "name": activity.name,
+                "kind": str(activity.type),
+                "start": activity.start_date,
+                "elapsed_time": activity.elapsed_time,
+                "equipment": activity.gear_id,
+                "calories": activity.calories,
+            }
+        )
+
+    new_df = pd.DataFrame(new_rows)
+    merged = pd.concat([meta, new_df])
+    meta_file.parent.mkdir(exist_ok=True, parents=True)
+    merged.to_parquet(meta_file)
+
+    download_missing_activity_streams()
+
+
+activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
+
+
+def download_missing_activity_streams() -> None:
+    logger.info(f"Checking for missing time series data …")
+    meta_file = pathlib.Path("Cache") / "activities.parquet"
+    meta = pd.read_parquet(meta_file)
+
+    to_download = [
+        id for id in meta["id"] if not (activity_stream_dir / f"{id}.parquet").exists()
+    ]
+    to_download.reverse()
+    if to_download:
+        logger.info(f"Downloading time series data for {len(to_download)} activities …")
+        activity_stream_dir.mkdir(exist_ok=True, parents=True)
+        client = Client(access_token=get_current_access_token())
+        for id in to_download:
+            logger.info(f"Downloading time series data for activity {id} …")
+            streams = client.get_activity_streams(
+                id, ["time", "latlng", "altitude", "heartrate", "temp"]
+            )
+            columns = {}
+            if "latlng" in streams:
+                columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
+                columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
+            for name in ["distance", "altitude", "heartrate", "time"]:
+                if name in streams:
+                    columns[name] = streams[name].data
+            df = pd.DataFrame(columns)
+            df.name = str(id)
+            df.to_parquet(activity_stream_dir / f"{id}.parquet")

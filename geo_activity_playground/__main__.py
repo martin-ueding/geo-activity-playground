@@ -12,6 +12,7 @@ from .explorer.grid_file import make_grid_file_geojson
 from .explorer.grid_file import make_grid_file_gpx
 from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
+from .strava.api_access import bring_strava_api_up_to_speed
 from .strava.api_access import StravaAPIActivityRepository
 from .strava.api_access import StravaAPITimeSeriesSource
 from .strava.importing import StravaExportTimeSeriesSource
@@ -69,6 +70,11 @@ def main() -> None:
         func=lambda options: webui_main(
             options.basedir, make_activity_repository(options.basedir, options.source)
         )
+    )
+
+    subparser = subparsers.add_parser("cache", help="Cache stuff")
+    subparser.set_defaults(
+        func=lambda options: bring_strava_api_up_to_speed(options.basedir)
     )
 
     options = parser.parse_args()
