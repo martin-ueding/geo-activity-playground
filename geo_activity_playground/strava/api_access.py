@@ -73,7 +73,7 @@ def get_current_access_token() -> str:
     return tokens["access"]
 
 
-def bring_strava_api_up_to_speed() -> None:
+def import_from_strava_api() -> None:
     meta_file = pathlib.Path("Cache") / "activities.parquet"
     if meta_file.exists():
         logger.info("Loading metadata file …")

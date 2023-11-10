@@ -8,7 +8,7 @@ from geo_activity_playground.core.activity_parsers import read_activity
 logger = logging.getLogger(__name__)
 
 
-def import_directory() -> None:
+def import_from_directory() -> None:
     meta_file = pathlib.Path("Cache") / "activities.parquet"
     if meta_file.exists():
         logger.info("Loading metadata file …")

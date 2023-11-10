@@ -12,9 +12,9 @@ from .explorer.grid_file import make_grid_file_geojson
 from .explorer.grid_file import make_grid_file_gpx
 from .explorer.video import explorer_video_main
 from .heatmap import generate_heatmaps_per_cluster
-from .strava.api_access import bring_strava_api_up_to_speed
+from .strava.api_access import import_from_strava_api
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.importers.directory import import_directory
+from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.webui.app import webui_main
 
 
@@ -96,7 +96,7 @@ def main_explorer(ts_source: TimeSeriesSource) -> None:
 def make_activity_repository(basedir: pathlib.Path, source: str) -> ActivityRepository:
     os.chdir(basedir)
     if source == "strava-api":
-        bring_strava_api_up_to_speed()
+        import_from_strava_api()
     elif source == "directory":
-        import_directory()
+        import_from_directory()
     return ActivityRepository()
