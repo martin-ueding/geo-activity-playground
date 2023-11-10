@@ -340,6 +340,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-from-source" class="md-nav__link">
+    Running from source
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -479,6 +486,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-from-source" class="md-nav__link">
+    Running from source
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -499,11 +513,11 @@
 <h2 id="installation">Installation</h2>
 <p>You can install it either system-wide or for your user. The user installation might be the best option, though it might require setting the <code>PATH</code> variable.</p>
 <p>Install the project with the following:</p>
-<div class="highlight"><pre><span></span><code>pip install --user geo-activity-playground
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 <p>Make sure that <code>~/.local/bin</code> is part of your <code>PATH</code> variable. Otherwise you will need to call the command line tool with <code>~/.local/bin/geo-activity-playground</code>.</p>
 <p>Alternatively you can install it system-wide:</p>
-<div class="highlight"><pre><span></span><code>sudo pip install geo-activity-playground
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 <p>Then you don't need to adjust the path.</p>
 <h2 id="set-up-your-data">Set up your data</h2>
@@ -516,15 +530,20 @@
 <h3 id="strava-api-source">Strava API source</h3>
 <p>TODO: Document how to set this up.</p>
 <h2 id="run-the-program">Run the program</h2>
-<p>Once you have set it up and copied your data into the right place, you can create some explorer tile related files:</p>
-<div class="highlight"><pre><span></span><code>cd path/to/your/playground
-geo-activity-playground explorer
+<p>Once you have set it up and copied your data into the right place, you can start the webserver and play with it:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>path/to/your/playground
+geo-activity-playground<span class="w"> </span>--source<span class="w"> </span>directory<span class="w"> </span>serve
 </code></pre></div>
-<p>This will create a new directory <code>Explorer</code> and put some files in there.</p>
-<p>While you're there, you can also create some heatmaps:</p>
-<div class="highlight"><pre><span></span><code>geo-activity-playground heatmaps
-</code></pre></div>
+<p>Then open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> and you should be able to access the web interface.</p>
 <p>At this point it will likely break. It would be great if you could <a href="https://github.com/martin-ueding/geo-activity-playground/issues">file those as an issue</a> and also attach the traceback.</p>
+<h2 id="running-from-source">Running from source</h2>
+<p>If you want to use the latest version, you can also clone the repository and launch from there:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/martin-ueding/geo-activity-playground.git
+<span class="nb">cd</span><span class="w"> </span>geo-activity-playground
+poetry<span class="w"> </span>install
+poetry<span class="w"> </span>run<span class="w"> </span>geo-activity-playground<span class="w"> </span>--basedir<span class="w"> </span>~/path/to/your/playground<span class="w"> </span>--source<span class="w"> </span>directory<span class="w"> </span>serve
+</code></pre></div>
+<p>You might need to install Poetry via <code>pip install poetry</code> beforehand.</p>
 
 
 
