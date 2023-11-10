@@ -18,12 +18,12 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/activity/<id>")
     def activity(id: int):
-        activity = repository.get_activity_by_id(id)
+        activity = repository.get_activity_by_id(int(id))
         return render_template("activity.html", activity=activity)
 
     @app.route("/activity/<id>/track.json")
     def activity_track(id: int):
-        plot = activity_track_plot(repository.get_time_series(id))
+        plot = activity_track_plot(repository.get_time_series(int(id)))
         return plot
 
     @app.route("/explorer")

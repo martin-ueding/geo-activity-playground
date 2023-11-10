@@ -33,18 +33,7 @@ def strava_api_dir() -> pathlib.Path:
     return result
 
 
-@functools.cache
-def activity_metadata_dir() -> pathlib.Path:
-    result = strava_api_dir() / "Metadata"
-    result.mkdir(exist_ok=True, parents=True)
-    return result
-
-
-@functools.cache
-def activity_streams_dir() -> pathlib.Path:
-    result = strava_api_dir() / "Data"
-    result.mkdir(exist_ok=True, parents=True)
-    return result
+activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
 
 
 def get_current_access_token() -> str:
@@ -82,122 +71,6 @@ def get_current_access_token() -> str:
     set_state(strava_api_dir() / "strava_tokens.json", tokens)
 
     return tokens["access"]
-
-
-def download_activities_after(after: str) -> None:
-    logger.info(f"Downloading activities after {after} …")
-    client = Client(access_token=get_current_access_token())
-
-    for activity in client.get_activities(after=after):
-        logger.info(f"Downloaded activity {activity}.")
-        start = int(activity.start_date.timestamp())
-        cache_file = activity_metadata_dir() / f"{start}.pickle"
-        with open(cache_file, "wb") as f:
-            pickle.dump(activity, f)
-
-
-def sync_activity_metadata() -> None:
-    cached_activity_paths = list(activity_metadata_dir().glob("*.pickle"))
-    if cached_activity_paths:
-        last_activity_path = max(cached_activity_paths)
-        with open(last_activity_path, "rb") as f:
-            activity = pickle.load(f)
-        download_activities_after(
-            activity.start_date.isoformat().replace("+00:00", "Z")
-        )
-    else:
-        download_activities_after("2000-01-01T00:00:00Z")
-
-
-def iter_all_activities() -> Iterator[Activity]:
-    for path in activity_metadata_dir().glob("*.pickle"):
-        with open(path, "rb") as f:
-            yield pickle.load(f)
-
-
-def make_activity_dict(activity: Activity) -> dict[str, Any]:
-    result = {
-        "id": activity.id,
-        "commute": activity.commute,
-        "distance": activity.distance.magnitude,
-        "name": activity.name,
-        "type": activity.type,
-        "start_date": activity.start_date,
-        "elapsed_time": activity.elapsed_time,
-        "gear_id": activity.gear_id,
-        "calories": activity.calories,
-        "description": activity.description,
-        "private": activity.private,
-    }
-    if activity.start_latlng is not None and activity.end_latlng is not None:
-        result.update(
-            {
-                "start_latlon": (activity.start_latlng.lat, activity.start_latlng.lon),
-                "end_latlon": (activity.end_latlng.lat, activity.end_latlng.lon),
-            }
-        )
-    return result
-
-
-def make_activity(activity: Activity) -> ActivityMeta:
-    return ActivityMeta(
-        calories=activity.calories,
-        commute=activity.commute,
-        distance=activity.distance.magnitude,
-        elapsed_time=activity.elapsed_time,
-        equipment=activity.gear_id,
-        id=int(activity.start_date.timestamp()),
-        kind=activity.type,
-        name=activity.name,
-        start=activity.start_date,
-    )
-
-
-def main_parquet(options: argparse.Namespace) -> None:
-    df = pd.DataFrame(map(make_activity_dict, iter_all_activities()))
-    df.to_parquet(options.out_path)
-
-
-class StravaAPITimeSeriesSource(TimeSeriesSource):
-    def __init__(self) -> None:
-        try:
-            sync_activity_metadata()
-            download_missing_activity_streams()
-        except RateLimitExceeded as e:
-            pass
-
-    def iter_activities(self) -> Iterator[pd.DataFrame]:
-        for path in activity_streams_dir().glob("*.parquet"):
-            df = pd.read_parquet(path)
-            df.name = path.stem
-            if "latitude" not in df.columns:
-                continue
-            yield df
-
-
-class StravaAPIActivityRepository(ActivityRepository):
-    def __init__(self) -> None:
-        self._client = Client(access_token=get_current_access_token())
-
-        try:
-            sync_activity_metadata()
-            download_missing_activity_streams()
-        except RateLimitExceeded as e:
-            pass
-
-    def iter_activities(self) -> Iterator[ActivityMeta]:
-        for path in reversed(list(activity_metadata_dir().glob("*.pickle"))):
-            with open(path, "rb") as f:
-                strava_activity = pickle.load(f)
-                yield make_activity(strava_activity)
-
-    def get_activity_by_id(self, id: int) -> ActivityMeta:
-        with open(activity_metadata_dir() / f"{id}.pickle", "rb") as f:
-            strava_activity = pickle.load(f)
-            return make_activity(strava_activity)
-
-    def get_time_series(self, id: int) -> pd.DataFrame:
-        return pd.read_parquet(activity_streams_dir() / f"{id}.parquet")
 
 
 def bring_strava_api_up_to_speed(basedir: pathlib.Path) -> None:
@@ -239,14 +112,12 @@ def bring_strava_api_up_to_speed(basedir: pathlib.Path) -> None:
         )
 
     new_df = pd.DataFrame(new_rows)
-    merged = pd.concat([meta, new_df])
+    merged: pd.DataFrame = pd.concat([meta, new_df])
+    merged.sort_values("start", inplace=True)
     meta_file.parent.mkdir(exist_ok=True, parents=True)
     merged.to_parquet(meta_file)
 
     download_missing_activity_streams()
-
-
-activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
 
 
 def download_missing_activity_streams() -> None:

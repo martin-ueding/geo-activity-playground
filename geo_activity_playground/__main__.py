@@ -110,12 +110,5 @@ def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSou
 
 def make_activity_repository(basedir: pathlib.Path, source: str) -> ActivityRepository:
     os.chdir(basedir)
-
-    ts_source: TimeSeriesSource
-    if source == "strava-api":
-        ts_source = StravaAPIActivityRepository()
-    elif source == "strava-export":
-        ts_source = ...
-    elif source == "directory":
-        ts_source = ...
-    return ts_source
+    bring_strava_api_up_to_speed(basedir)
+    return ActivityRepository()

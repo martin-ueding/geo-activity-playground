@@ -23,15 +23,18 @@ class ActivityMeta:
         return f"{self.name} ({self.kind}; {self.distance/1000:.1f} km; {self.elapsed_time})"
 
 
-class ActivityRepository(abc.ABC):
-    @abc.abstractmethod
+class ActivityRepository:
+    def __init__(self) -> None:
+        self._meta = pd.read_parquet("Cache/activities.parquet")
+        self._meta.index = self._meta["id"]
+        print(self._meta.head(15))
+
     def iter_activities(self) -> Iterator[ActivityMeta]:
-        raise NotImplementedError()
+        for id, row in self._meta[::-1].iterrows():
+            yield ActivityMeta(**row)
 
-    @abc.abstractmethod
     def get_activity_by_id(self, id: int) -> ActivityMeta:
-        raise NotImplementedError()
+        return ActivityMeta(**self._meta.loc[id])
 
-    @abc.abstractmethod
     def get_time_series(self, id: int) -> pd.DataFrame:
-        raise NotImplementedError()
+        return pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
