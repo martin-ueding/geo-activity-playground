@@ -5,8 +5,6 @@ import fitdecode
 import gpxpy
 import pandas as pd
 
-from .caching import cache_parquet
-
 
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     points = []
