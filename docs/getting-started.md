@@ -8,7 +8,7 @@ You can install it either system-wide or for your user. The user installation mi
 
 Install the project with the following:
 
-```
+```bash
 pip install --user geo-activity-playground
 ```
 
@@ -16,7 +16,7 @@ Make sure that `~/.local/bin` is part of your `PATH` variable. Otherwise you wil
 
 Alternatively you can install it system-wide:
 
-```
+```bash
 sudo pip install geo-activity-playground
 ```
 
@@ -42,19 +42,26 @@ TODO: Document how to set this up.
 
 ## Run the program
 
-Once you have set it up and copied your data into the right place, you can create some explorer tile related files:
+Once you have set it up and copied your data into the right place, you can start the webserver and play with it:
 
-```
+```bash
 cd path/to/your/playground
-geo-activity-playground explorer
+geo-activity-playground --source directory serve
 ```
 
-This will create a new directory `Explorer` and put some files in there.
-
-While you're there, you can also create some heatmaps:
-
-```
-geo-activity-playground heatmaps
-```
+Then open <http://127.0.0.1:5000/> and you should be able to access the web interface.
 
 At this point it will likely break. It would be great if you could [file those as an issue](https://github.com/martin-ueding/geo-activity-playground/issues) and also attach the traceback.
+
+## Running from source
+
+If you want to use the latest version, you can also clone the repository and launch from there:
+
+```bash
+git clone https://github.com/martin-ueding/geo-activity-playground.git
+cd geo-activity-playground
+poetry install
+poetry run geo-activity-playground --basedir ~/path/to/your/playground --source directory serve
+```
+
+You might need to install Poetry via `pip install poetry` beforehand.
