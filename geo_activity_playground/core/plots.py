@@ -37,6 +37,20 @@ def distance_heatmap_meta_plot(meta: pd.DataFrame) -> str:
     )
 
 
+def year_on_year_distance_meta_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Year on Year Distance")
+        .mark_bar()
+        .encode(
+            alt.X("month(start)"),
+            alt.Y("sum(distance)"),
+            alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
+        )
+        .facet(facet="year(start):O", columns=4)
+        .to_json(format="vega")
+    )
+
+
 def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.utcnow() - datetime.timedelta(days=31), utc=True
@@ -62,4 +76,5 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
 meta_plots = {
     "distance-heatmap": distance_heatmap_meta_plot,
     "distance-last-30-days": distance_last_30_days_meta_plot,
+    "year-on-year-distance": year_on_year_distance_meta_plot,
 }
