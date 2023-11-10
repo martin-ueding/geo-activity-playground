@@ -1,6 +1,8 @@
 import altair as alt
 import pandas as pd
 
+alt.data_transformers.enable("vegafusion")
+
 
 def activity_track_plot(df: pd.DataFrame) -> str:
     chart = (
@@ -8,4 +10,4 @@ def activity_track_plot(df: pd.DataFrame) -> str:
         .mark_line()
         .encode(alt.Latitude("latitude"), alt.Longitude("longitude"))
     )
-    return chart.to_json()
+    return chart.to_json(format="vega")

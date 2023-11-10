@@ -1251,6 +1251,54 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "protobuf"
+version = "4.25.0"
+description = ""
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "protobuf-4.25.0-cp310-abi3-win32.whl", hash = "sha256:5c1203ac9f50e4853b0a0bfffd32c67118ef552a33942982eeab543f5c634395"},
+    {file = "protobuf-4.25.0-cp310-abi3-win_amd64.whl", hash = "sha256:c40ff8f00aa737938c5378d461637d15c442a12275a81019cc2fef06d81c9419"},
+    {file = "protobuf-4.25.0-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:cf21faba64cd2c9a3ed92b7a67f226296b10159dbb8fbc5e854fc90657d908e4"},
+    {file = "protobuf-4.25.0-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:32ac2100b0e23412413d948c03060184d34a7c50b3e5d7524ee96ac2b10acf51"},
+    {file = "protobuf-4.25.0-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:683dc44c61f2620b32ce4927de2108f3ebe8ccf2fd716e1e684e5a50da154054"},
+    {file = "protobuf-4.25.0-cp38-cp38-win32.whl", hash = "sha256:1a3ba712877e6d37013cdc3476040ea1e313a6c2e1580836a94f76b3c176d575"},
+    {file = "protobuf-4.25.0-cp38-cp38-win_amd64.whl", hash = "sha256:b2cf8b5d381f9378afe84618288b239e75665fe58d0f3fd5db400959274296e9"},
+    {file = "protobuf-4.25.0-cp39-cp39-win32.whl", hash = "sha256:63714e79b761a37048c9701a37438aa29945cd2417a97076048232c1df07b701"},
+    {file = "protobuf-4.25.0-cp39-cp39-win_amd64.whl", hash = "sha256:d94a33db8b7ddbd0af7c467475fb9fde0c705fb315a8433c0e2020942b863a1f"},
+    {file = "protobuf-4.25.0-py3-none-any.whl", hash = "sha256:1a53d6f64b00eecf53b65ff4a8c23dc95df1fa1e97bb06b8122e5a64f49fc90a"},
+    {file = "protobuf-4.25.0.tar.gz", hash = "sha256:68f7caf0d4f012fd194a301420cf6aa258366144d814f358c5b32558228afa7c"},
+]
+
+[[package]]
+name = "psutil"
+version = "5.9.6"
+description = "Cross-platform lib for process and system monitoring in Python."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+files = [
+    {file = "psutil-5.9.6-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:fb8a697f11b0f5994550555fcfe3e69799e5b060c8ecf9e2f75c69302cc35c0d"},
+    {file = "psutil-5.9.6-cp27-cp27m-manylinux2010_i686.whl", hash = "sha256:91ecd2d9c00db9817a4b4192107cf6954addb5d9d67a969a4f436dbc9200f88c"},
+    {file = "psutil-5.9.6-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:10e8c17b4f898d64b121149afb136c53ea8b68c7531155147867b7b1ac9e7e28"},
+    {file = "psutil-5.9.6-cp27-cp27mu-manylinux2010_i686.whl", hash = "sha256:18cd22c5db486f33998f37e2bb054cc62fd06646995285e02a51b1e08da97017"},
+    {file = "psutil-5.9.6-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:ca2780f5e038379e520281e4c032dddd086906ddff9ef0d1b9dcf00710e5071c"},
+    {file = "psutil-5.9.6-cp27-none-win32.whl", hash = "sha256:70cb3beb98bc3fd5ac9ac617a327af7e7f826373ee64c80efd4eb2856e5051e9"},
+    {file = "psutil-5.9.6-cp27-none-win_amd64.whl", hash = "sha256:51dc3d54607c73148f63732c727856f5febec1c7c336f8f41fcbd6315cce76ac"},
+    {file = "psutil-5.9.6-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:c69596f9fc2f8acd574a12d5f8b7b1ba3765a641ea5d60fb4736bf3c08a8214a"},
+    {file = "psutil-5.9.6-cp36-abi3-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:92e0cc43c524834af53e9d3369245e6cc3b130e78e26100d1f63cdb0abeb3d3c"},
+    {file = "psutil-5.9.6-cp36-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:748c9dd2583ed86347ed65d0035f45fa8c851e8d90354c122ab72319b5f366f4"},
+    {file = "psutil-5.9.6-cp36-cp36m-win32.whl", hash = "sha256:3ebf2158c16cc69db777e3c7decb3c0f43a7af94a60d72e87b2823aebac3d602"},
+    {file = "psutil-5.9.6-cp36-cp36m-win_amd64.whl", hash = "sha256:ff18b8d1a784b810df0b0fff3bcb50ab941c3b8e2c8de5726f9c71c601c611aa"},
+    {file = "psutil-5.9.6-cp37-abi3-win32.whl", hash = "sha256:a6f01f03bf1843280f4ad16f4bde26b817847b4c1a0db59bf6419807bc5ce05c"},
+    {file = "psutil-5.9.6-cp37-abi3-win_amd64.whl", hash = "sha256:6e5fb8dc711a514da83098bc5234264e551ad980cec5f85dabf4d38ed6f15e9a"},
+    {file = "psutil-5.9.6-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:daecbcbd29b289aac14ece28eca6a3e60aa361754cf6da3dfb20d4d32b6c7f57"},
+    {file = "psutil-5.9.6.tar.gz", hash = "sha256:e4b92ddcd7dd4cdd3f900180ea1e104932c7bce234fb88976e2a3b296441225a"},
+]
+
+[package.extras]
+test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
+
+[[package]]
 name = "pyarrow"
 version = "12.0.1"
 description = "Python library for Apache Arrow"
@@ -2006,6 +2054,57 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "vegafusion"
+version = "1.4.3"
+description = "Core tools for using VegaFusion from Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "vegafusion-1.4.3-py3-none-any.whl", hash = "sha256:20d5f158d19006d45cdac06c8eebb4325eac9eb33d99831d3e3592f1c4491b0d"},
+    {file = "vegafusion-1.4.3.tar.gz", hash = "sha256:64825aabd987a1d51727d6d6ac597d719aae8e568d0347e5635d4f2dc9679a28"},
+]
+
+[package.dependencies]
+altair = ">=4.2.0"
+pandas = "*"
+protobuf = "*"
+psutil = "*"
+pyarrow = ">=5"
+
+[package.extras]
+embed = ["vegafusion-python-embed (==1.4.3)", "vl-convert-python (>=0.7.0)"]
+
+[[package]]
+name = "vegafusion-python-embed"
+version = "1.4.3"
+description = "vegafusion-python-embed PyO3 Python Package"
+optional = false
+python-versions = "*"
+files = [
+    {file = "vegafusion_python_embed-1.4.3-cp38-abi3-macosx_10_7_x86_64.whl", hash = "sha256:c9b774fa40ec3c66b0a54d5bdaf8e6dbccd850bcc93de8ea22abb43619f6fc94"},
+    {file = "vegafusion_python_embed-1.4.3-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:19d023f2d86baa53f5b4286ee5857d5458ca1a128bb8381129fcb8d6d8b1411f"},
+    {file = "vegafusion_python_embed-1.4.3-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d35360509aa1e0f99c4e657b925f06f3c2d06652b5b13243bef4aa7352b8dbbe"},
+    {file = "vegafusion_python_embed-1.4.3-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8550a2ee2588007ecd69319d7ac3d950454ca099af87d1bae150c1d9d2dfedfb"},
+    {file = "vegafusion_python_embed-1.4.3-cp38-abi3-win_amd64.whl", hash = "sha256:6cafd9265b846edfb0de43cf229ee50d4cf8d27d1ba652794dad37681da90fc9"},
+    {file = "vegafusion_python_embed-1.4.3.tar.gz", hash = "sha256:355aa9d6503fd2575c92caed5ae21c2e8e116cb3ff241b0a677503c448db71d9"},
+]
+
+[[package]]
+name = "vl-convert-python"
+version = "1.0.1"
+description = "Convert Vega-Lite chart specifications to SVG, PNG, or Vega"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "vl_convert_python-1.0.1-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:7e7de0e3e4c2e95a39a5adf5f431b2ca63506cd3fd2a752f52a87f20841c65a6"},
+    {file = "vl_convert_python-1.0.1-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:3cb8b13171b530d82d6a153e2ab7f1245d342c84cf22f3ccbe9770d0a90a6ac5"},
+    {file = "vl_convert_python-1.0.1-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:267baeea59b69fdb076c6e44416a34476ab1639b23c78b7fdcd7e9f39d20f457"},
+    {file = "vl_convert_python-1.0.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2142be5a8ca5adbdc207c25a541659ef95a640b64d4e465787d4bbc7e09d7e5d"},
+    {file = "vl_convert_python-1.0.1-cp37-abi3-win_amd64.whl", hash = "sha256:ad0c8c10f1e96b499c4878193de280a2a03cc96e6d3fb9b1b6d878aaf24a82f3"},
+    {file = "vl_convert_python-1.0.1.tar.gz", hash = "sha256:488565b6a0eb5e75558f82147217c5090672bee58745e79225b2f2902db9fffd"},
+]
+
+[[package]]
 name = "watchdog"
 version = "3.0.0"
 description = "Filesystem events monitoring"
@@ -2064,4 +2163,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.12"
-content-hash = "a938633750dab1f2f84fc923b873f833db12d3974e0926b8945b74165f9b64c5"
+content-hash = "be24c71aabb5f23952f6d985d9695267513e4daac2d6cf8c105285972880b49d"
