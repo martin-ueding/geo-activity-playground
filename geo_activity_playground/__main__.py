@@ -4,7 +4,6 @@ import pathlib
 
 import coloredlogs
 
-from .core.sources import DirectoryTimeSeriesSource
 from .core.sources import TimeSeriesSource
 from .explorer.grid_file import get_border_tiles
 from .explorer.grid_file import get_explored_tiles
