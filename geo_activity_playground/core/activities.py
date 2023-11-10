@@ -25,7 +25,9 @@ class ActivityRepository:
     def __init__(self) -> None:
         self.meta = pd.read_parquet("Cache/activities.parquet")
         self.meta.index = self.meta["id"]
-        print(self.meta.head(15))
+        self.meta.index.name = "index"
+        self.meta["distance"] /= 1000
+        print(self.meta)
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
