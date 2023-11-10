@@ -43,7 +43,7 @@ def import_from_directory() -> None:
                 "elapsed_time": timeseries["time"].iloc[-1]
                 - timeseries["time"].iloc[0],
                 "equipment": None,
-                "calories": None,
+                "calories": 0,
             }
         )
 
