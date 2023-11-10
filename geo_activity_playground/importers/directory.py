@@ -31,7 +31,8 @@ def import_from_directory() -> None:
         logger.info(f"Parsing activity file {path} …")
         timeseries = read_activity(path)
         timeseries_path = activity_stream_dir / f"{id}.parquet"
-        timeseries.to_pickle(timeseries_path)
+        print(timeseries)
+        timeseries.to_parquet(timeseries_path)
         new_rows.append(
             {
                 "id": id,
