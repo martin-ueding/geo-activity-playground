@@ -43,7 +43,6 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
 
-@cache_parquet
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
     suffixes = path.suffixes
     if suffixes[-1] == ".gz":
