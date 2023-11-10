@@ -23,17 +23,17 @@ class ActivityMeta:
 
 class ActivityRepository:
     def __init__(self) -> None:
-        self._meta = pd.read_parquet("Cache/activities.parquet")
-        self._meta.index = self._meta["id"]
-        print(self._meta.head(15))
+        self.meta = pd.read_parquet("Cache/activities.parquet")
+        self.meta.index = self.meta["id"]
+        print(self.meta.head(15))
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
-        for id, row in self._meta[::direction].iterrows():
+        for id, row in self.meta[::direction].iterrows():
             yield ActivityMeta(**row)
 
     def get_activity_by_id(self, id: int) -> ActivityMeta:
-        return ActivityMeta(**self._meta.loc[id])
+        return ActivityMeta(**self.meta.loc[id])
 
     def get_time_series(self, id: int) -> pd.DataFrame:
         df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
