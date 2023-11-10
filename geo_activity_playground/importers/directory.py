@@ -21,6 +21,7 @@ def import_from_directory() -> None:
     already_parsed = set(meta.id) if meta is not None else set()
 
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
+    activity_stream_dir.mkdir(exist_ok=True, parents=True)
     new_rows: list[dict] = []
     for path in pathlib.Path("Activities").rglob("*.*"):
         id = int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62
@@ -29,8 +30,7 @@ def import_from_directory() -> None:
 
         logger.info(f"Parsing activity file {path} …")
         timeseries = read_activity(path)
-        timeseries_path = pathlib.Path(f"Cache/Activity Timeseries/{id}.parquet")
-        timeseries_path.parent.mkdir(exist_ok=True, parents=True)
+        timeseries_path = activity_stream_dir / f"{id}.parquet"
         timeseries.to_pickle(timeseries_path)
         new_rows.append(
             {
