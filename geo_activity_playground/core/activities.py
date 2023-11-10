@@ -35,4 +35,6 @@ class ActivityRepository:
         return ActivityMeta(**self._meta.loc[id])
 
     def get_time_series(self, id: int) -> pd.DataFrame:
-        return pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
+        df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
+        df.name = id
+        return df
