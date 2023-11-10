@@ -27,8 +27,9 @@ class ActivityRepository:
         self._meta.index = self._meta["id"]
         print(self._meta.head(15))
 
-    def iter_activities(self) -> Iterator[ActivityMeta]:
-        for id, row in self._meta[::-1].iterrows():
+    def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
+        direction = -1 if new_to_old else 1
+        for id, row in self._meta[::direction].iterrows():
             yield ActivityMeta(**row)
 
     def get_activity_by_id(self, id: int) -> ActivityMeta:

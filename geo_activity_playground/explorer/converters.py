@@ -1,10 +1,14 @@
 import functools
+import logging
 import pathlib
 
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import compute_tile
+
+
+logger = logging.getLogger(__name__)
 
 
 @functools.cache
@@ -19,6 +23,7 @@ def get_first_tiles(id, repository: ActivityRepository) -> pd.DataFrame:
     if target_path.exists():
         return pd.read_parquet(target_path)
     else:
+        logger.info(f"Extracting tiles from activity {id} …")
         time_series = repository.get_time_series(id)
         tiles = tiles_from_points(time_series)
         first_tiles = first_time_per_tile(tiles)
@@ -29,8 +34,9 @@ def get_first_tiles(id, repository: ActivityRepository) -> pd.DataFrame:
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
     new_rows = []
     for index, row in points.iterrows():
-        tile = compute_tile(row["latitude"], row["longitude"])
-        new_rows.append((row["time"],) + tile)
+        if "latitude" in row.keys() and "longitude" in row.keys():
+            tile = compute_tile(row["latitude"], row["longitude"])
+            new_rows.append((row["time"],) + tile)
     return pd.DataFrame(new_rows, columns=["time", "tile_x", "tile_y"])
 
 
@@ -41,8 +47,9 @@ def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
 
 @functools.cache
 def get_tile_history(repository: ActivityRepository) -> pd.DataFrame:
+    logger.info("Building explorer tile history from all activities …")
     tiles = pd.DataFrame()
-    for activity in repository.iter_activities():
+    for activity in repository.iter_activities(new_to_old=False):
         shard = get_first_tiles(activity.id, repository)
         if not len(shard):
             continue
