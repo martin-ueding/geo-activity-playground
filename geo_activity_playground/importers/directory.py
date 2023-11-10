@@ -23,7 +23,7 @@ def import_from_directory() -> None:
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     new_rows: list[dict] = []
     for path in pathlib.Path("Activities").rglob("*.*"):
-        id = int(hashlib.md5(str(path).encode()).hexdigest(), 16) % 2**62
+        id = int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62
         if id in already_parsed:
             continue
 
