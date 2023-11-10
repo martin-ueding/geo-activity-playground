@@ -8,6 +8,27 @@ from ..core.tiles import compute_tile
 
 
 @functools.cache
+def explorer_cache_dir() -> pathlib.Path:
+    path = pathlib.Path("Cache") / "Explorer Per Activity"
+    path.mkdir(exist_ok=True, parents=True)
+    return path
+
+
+def get_first_tiles(activity: pd.DataFrame) -> pd.DataFrame:
+    target_path = explorer_cache_dir() / f"{activity.name}.parquet"
+    if target_path.exists():
+        return pd.read_parquet(target_path)
+    else:
+        tiles = tiles_from_points(activity)
+        first_tiles = first_time_per_tile(tiles)
+        first_tiles.to_parquet(target_path)
+        return first_tiles
+
+
+...
+
+
+@functools.cache
 def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
     tiles = pd.DataFrame()
     for activity in ts_source.iter_activities():
@@ -21,20 +42,6 @@ def get_tile_history(ts_source: TimeSeriesSource) -> pd.DataFrame:
     explorer_cache_dir.mkdir(exist_ok=True, parents=True)
     tiles.to_parquet(explorer_cache_dir / "first_time_per_tile.parquet")
     return tiles
-
-
-def get_first_tiles(activity: pd.DataFrame) -> pd.DataFrame:
-    explorer_cache_dir = pathlib.Path("Explorer") / "Per Activity"
-    explorer_cache_dir.mkdir(exist_ok=True, parents=True)
-    target_path = explorer_cache_dir / f"{activity.name}.parquet"
-
-    if target_path.exists():
-        return pd.read_parquet(target_path)
-    else:
-        tiles = tiles_from_points(activity)
-        first_tiles = first_time_per_tile(tiles)
-        first_tiles.to_parquet(target_path)
-        return first_tiles
 
 
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
