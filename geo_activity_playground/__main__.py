@@ -54,14 +54,14 @@ def main() -> None:
     )
     subparser.set_defaults(func=lambda options: explorer_video_main())
 
-    subparser = subparsers.add_parser(
-        "heatmaps", help="Generate heatmaps from activities"
-    )
-    subparser.set_defaults(
-        func=lambda options: generate_heatmaps_per_cluster(
-            make_time_series_source(options.basedir, options.source)
-        )
-    )
+    # subparser = subparsers.add_parser(
+    #     "heatmaps", help="Generate heatmaps from activities"
+    # )
+    # subparser.set_defaults(
+    #     func=lambda options: generate_heatmaps_per_cluster(
+    #         make_time_series_source(options.basedir, options.source)
+    #     )
+    # )
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
@@ -72,7 +72,7 @@ def main() -> None:
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
     subparser.set_defaults(
-        func=lambda options: bring_strava_api_up_to_speed(options.basedir)
+        func=lambda options: make_activity_repository(options.basedir, options.source)
     )
 
     options = parser.parse_args()
@@ -93,23 +93,10 @@ def main_explorer(ts_source: TimeSeriesSource) -> None:
     make_grid_file_gpx(points, "explored")
 
 
-def make_time_series_source(basedir: pathlib.Path, source: str) -> TimeSeriesSource:
-    os.chdir(basedir)
-
-    ts_source: TimeSeriesSource
-    if source == "strava-api":
-        ts_source = StravaAPITimeSeriesSource()
-    elif source == "strava-export":
-        ts_source = StravaExportTimeSeriesSource()
-    elif source == "directory":
-        ts_source = DirectoryTimeSeriesSource()
-    return ts_source
-
-
 def make_activity_repository(basedir: pathlib.Path, source: str) -> ActivityRepository:
     os.chdir(basedir)
     if source == "strava-api":
-        bring_strava_api_up_to_speed(basedir)
+        bring_strava_api_up_to_speed()
     elif source == "directory":
         import_directory()
     return ActivityRepository()
