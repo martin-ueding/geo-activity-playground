@@ -6,13 +6,13 @@ import gpxpy
 import numpy as np
 import scipy.ndimage
 
-from ..core.sources import TimeSeriesSource
-from ..core.tiles import get_tile_upper_left_lat_lon
-from .converters import get_tile_history
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.converters import get_tile_history
 
 
-def get_border_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:
-    tiles = get_tile_history(ts_source)
+def get_border_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
+    tiles = get_tile_history(repository)
     a = np.zeros((2**14, 2**14), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
     dilated = scipy.ndimage.binary_dilation(a, iterations=1)
@@ -21,8 +21,8 @@ def get_border_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:
     return make_grid_points(zip(border_x, border_y))
 
 
-def get_explored_tiles(ts_source: TimeSeriesSource) -> list[list[list[float]]]:
-    tiles = get_tile_history(ts_source)
+def get_explored_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
+    tiles = get_tile_history(repository)
     return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
 
 
@@ -60,7 +60,7 @@ def make_grid_file_gpx(grid_points: list[list[list[float]]], stem: str) -> None:
         f.write(gpx.to_xml())
 
 
-def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> None:
+def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> None:
     fc = geojson.FeatureCollection(
         [
             geojson.Feature(
@@ -69,9 +69,11 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> N
             for points in grid_points
         ]
     )
+    return geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
 
-    out_path = pathlib.Path("Explorer") / f"{stem}.geojson"
-    out_path.parent.mkdir(exist_ok=True, parents=True)
 
-    with open(out_path, "w") as f:
-        geojson.dump(fc, f, sort_keys=True, indent=4, ensure_ascii=False)
+def get_explored_geojson(repository: ActivityRepository) -> str:
+    tiles = get_tile_history(repository)
+    return make_grid_file_geojson(
+        make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
+    )

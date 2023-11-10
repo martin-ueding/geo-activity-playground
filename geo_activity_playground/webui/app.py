@@ -6,6 +6,7 @@ from flask import render_template
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.plots import activity_track_plot
+from geo_activity_playground.explorer.grid_file import get_explored_geojson
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
@@ -32,7 +33,6 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/explored-tiles.geojson")
     def explored_tiles():
-        with open(basedir / "Explorer" / "explored.geojson") as f:
-            return f.read()
+        return get_explored_geojson(repository)
 
     app.run()
