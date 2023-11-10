@@ -5,6 +5,7 @@ import pathlib
 import pandas as pd
 
 from geo_activity_playground.core.activity_parsers import read_activity
+from geo_activity_playground.core.coordinates import get_distance
 
 logger = logging.getLogger(__name__)
 
@@ -33,11 +34,25 @@ def import_from_directory() -> None:
         timeseries_path = activity_stream_dir / f"{id}.parquet"
         print(timeseries)
         timeseries.to_parquet(timeseries_path)
+
+        distances = [
+            get_distance(lat_1, lon_1, lat_2, lon_2)
+            for lat_1, lon_1, lat_2, lon_2 in zip(
+                timeseries["latitude"],
+                timeseries["longitude"],
+                timeseries["latitude"].iloc[1:],
+                timeseries["longitude"].iloc[1:],
+            )
+        ]
+
+        print(len(distances))
+        distance = sum(distances)
+
         new_rows.append(
             {
                 "id": id,
                 "commute": None,
-                "distance": 0,
+                "distance": distance,
                 "name": path.stem,
                 "kind": None,
                 "start": timeseries["time"].iloc[0],

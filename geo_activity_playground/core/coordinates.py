@@ -1,16 +1,15 @@
 import numpy as np
 
 
-def get_distance(latlon_1: tuple[float, float], latlon_2: tuple[float, float]) -> float:
+def get_distance(lat_1: float, lon_1: float, lat_2: float, lon_2: float) -> float:
     """
     https://en.wikipedia.org/wiki/Haversine_formula
     """
     earth_radius = 6371e3
-    lat_1 = np.radians(latlon_1[0])
-    lon_1 = np.radians(latlon_1[1])
-    lat_2 = np.radians(latlon_2[0])
-    lon_2 = np.radians(latlon_2[1])
-
+    lat_1 = np.radians(lat_1)
+    lon_1 = np.radians(lon_1)
+    lat_2 = np.radians(lat_2)
+    lon_2 = np.radians(lon_2)
     lat_diff = lat_2 - lat_1
     lon_diff = lon_2 - lon_1
     a = (
