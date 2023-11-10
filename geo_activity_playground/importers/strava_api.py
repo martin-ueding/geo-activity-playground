@@ -1,26 +1,16 @@
-import argparse
 import datetime
 import functools
-import itertools
 import logging
-import os
 import pathlib
 import pickle
-import shutil
-from typing import Any
-from typing import Iterator
 
 import pandas as pd
 from stravalib import Client
 from stravalib.exc import RateLimitExceeded
-from stravalib.model import Activity
 
-from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.directories import get_config
 from geo_activity_playground.core.directories import get_state
 from geo_activity_playground.core.directories import set_state
-from geo_activity_playground.core.sources import TimeSeriesSource
 
 
 logger = logging.getLogger(__name__)

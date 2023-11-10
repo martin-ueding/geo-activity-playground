@@ -4,16 +4,16 @@ import pathlib
 
 import coloredlogs
 
-from .core.sources import TimeSeriesSource
-from .explorer.grid_file import get_border_tiles
-from .explorer.grid_file import get_explored_tiles
-from .explorer.grid_file import make_grid_file_geojson
-from .explorer.grid_file import make_grid_file_gpx
-from .explorer.video import explorer_video_main
-from .heatmap import generate_heatmaps_per_cluster
-from .strava.api_access import import_from_strava_api
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.sources import TimeSeriesSource
+from geo_activity_playground.explorer.grid_file import get_border_tiles
+from geo_activity_playground.explorer.grid_file import get_explored_tiles
+from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
+from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
+from geo_activity_playground.explorer.video import explorer_video_main
+from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
+from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
 
 
