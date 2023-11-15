@@ -44,4 +44,8 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     def meta_plot(name: str):
         return meta_plots[name](repository.meta.reset_index())
 
+    @app.route("/eddington")
+    def eddington():
+        return render_template("eddington.html")
+
     app.run()

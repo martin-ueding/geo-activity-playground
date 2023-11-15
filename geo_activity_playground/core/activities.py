@@ -18,7 +18,7 @@ class ActivityMeta:
     start: datetime.datetime
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.kind}; {self.distance/1000:.1f} km; {self.elapsed_time})"
+        return f"{self.name} ({self.kind}; {self.distance:.1f} km; {self.elapsed_time})"
 
 
 class ActivityRepository:

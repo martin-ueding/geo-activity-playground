@@ -1,0 +1,15 @@
+{% extends "page.html" %}
+
+{% block container %}
+<div class="row mb-1">
+    <div class="col">
+        <h1>Eddington Number</h1>
+    </div>
+</div>
+
+<div class="row mb-1">
+    <div class="col">
+        {{ vega("eddington-log", "/meta-plot/eddington-log.json") }}
+    </div>
+</div>
+{% endblock %}
