@@ -25,6 +25,10 @@ nav:
   - directory-layout.md
   - heatmaps.md
   - explorer-tiles.md
+  - Explanation:
+      - explanation/explorer-tiles.md
+  - Reference:
+      - reference/changelog.md
 
 markdown_extensions:
   - pymdownx.highlight
