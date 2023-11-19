@@ -69,4 +69,4 @@ class EddingtonController:
             .to_json(format="vega")
         )
 
-        return {"logarithmic_plot": logarithmic_plot}
+        return {"eddington_number": en, "logarithmic_plot": logarithmic_plot}
