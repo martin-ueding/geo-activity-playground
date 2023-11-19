@@ -93,28 +93,36 @@ def eddington_log_meta_plot(meta: pd.DataFrame) -> str:
 
     return (
         (
-            alt.Chart(eddington, height=500, width=1000, title=f"Eddington Number {en}")
-            .mark_bar()
-            .encode(
-                alt.X("distance", scale=alt.Scale(domainMin=0), title="Distance / km"),
-                alt.Y(
-                    "total",
-                    scale=alt.Scale(type="log"),
-                    title="Days exceeding distance",
-                ),
-                [
-                    alt.Tooltip("distance", title="Distance / km"),
-                    alt.Tooltip("total", title="Days exceeding distance"),
-                    alt.Tooltip("missing", title="Days missing for next"),
-                ],
+            (
+                alt.Chart(
+                    eddington, height=500, width=1000, title=f"Eddington Number {en}"
+                )
+                .mark_bar()
+                .encode(
+                    alt.X(
+                        "distance", scale=alt.Scale(domainMin=0), title="Distance / km"
+                    ),
+                    alt.Y(
+                        "total",
+                        scale=alt.Scale(type="log"),
+                        title="Days exceeding distance",
+                    ),
+                    [
+                        alt.Tooltip("distance", title="Distance / km"),
+                        alt.Tooltip("total", title="Days exceeding distance"),
+                        alt.Tooltip("missing", title="Days missing for next"),
+                    ],
+                )
+            )
+            + (
+                alt.Chart(pd.DataFrame({"distance": x, "total": x}))
+                .mark_line(color="red")
+                .encode(alt.X("distance"), alt.Y("total"))
             )
         )
-        + (
-            alt.Chart(pd.DataFrame({"distance": x, "total": x}))
-            .mark_line(color="red")
-            .encode(alt.X("distance"), alt.Y("total"))
-        )
-    ).to_json(format="vega")
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
 
 
 meta_plots = {
