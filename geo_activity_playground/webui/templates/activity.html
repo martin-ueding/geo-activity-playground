@@ -16,20 +16,12 @@
             <dd>{{ activity.kind }}</dd>
             <dt>Commute</dt>
             <dd>{{ activity.commute }}</dd>
-        </dl>
-    </div>
-    <div class="col-4">
-        <dl>
             <dt>Distance</dt>
             <dd>{{ activity.distance|round(1) }} km</dd>
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
             <dt>Start time</dt>
             <dd>{{ activity.start }}</dd>
-        </dl>
-    </div>
-    <div class="col-4">
-        <dl>
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
             <dt>Equipment</dt>
@@ -38,11 +30,8 @@
             <dd>{{ activity.id }}</dd>
         </dl>
     </div>
-</div>
-
-<div class="row mb-1">
-    <div class="col">
-        <div id="activity-map" style="height: 400px;"></div>
+    <div class="col-8">
+        <div id="activity-map" style="height: 500px;"></div>
         <script>
             var map = L.map('activity-map');
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -53,13 +42,6 @@
             let geojson = L.geoJSON({{ line_json| safe }}).addTo(map)
             map.fitBounds(geojson.getBounds());
         </script>
-    </div>
-</div>
-
-
-<div class="row mb-1">
-    <div class="col">
-        {{ vega_direct("track", activity_plot) }}
     </div>
 </div>
 
