@@ -1,6 +1,7 @@
 import functools
 
 import altair as alt
+import geojson
 
 from geo_activity_playground.core.activities import ActivityRepository
 
@@ -20,4 +21,16 @@ class ActivityController:
             .encode(alt.Latitude("latitude"), alt.Longitude("longitude"))
         ).to_json(format="vega")
 
-        return {"activity": activity, "activity_plot": activity_plot}
+        line = geojson.LineString(
+            [
+                (lon, lat)
+                for lat, lon in zip(time_series["latitude"], time_series["longitude"])
+            ]
+        )
+        line_json = geojson.dumps(line)
+
+        return {
+            "activity": activity,
+            "activity_plot": activity_plot,
+            "line_json": line_json,
+        }

@@ -40,6 +40,22 @@
     </div>
 </div>
 
+<div class="row mb-1">
+    <div class="col">
+        <div id="activity-map" style="height: 400px;"></div>
+        <script>
+            var map = L.map('activity-map').setView([50.7358, 7.1013], 6);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            let geojson = L.geoJSON({{ line_json| safe }}).addTo(map)
+            map.fitBounds(geojson.getBounds());
+        </script>
+    </div>
+</div>
+
 
 <div class="row mb-1">
     <div class="col">

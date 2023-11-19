@@ -13,15 +13,15 @@
     </div>
 </div>
 
-<script>
-    var map = L.map('explorer-map').setView([50.7358, 7.1013], 6);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+        <script>
+            var map = L.map('explorer-map').setView([50.7358, 7.1013], 6);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
 
-    fetch('/explored-tiles.geojson')
-        .then((response) => response.json())
-        .then(feature => L.geoJSON(feature).addTo(map))
-</script>
+            fetch('/explored-tiles.geojson')
+                .then((response) => response.json())
+                .then(feature => L.geoJSON(feature).addTo(map))
+        </script>
 {% endblock %}
