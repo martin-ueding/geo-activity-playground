@@ -8,6 +8,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.plots import activity_track_plot
 from geo_activity_playground.core.plots import meta_plots
 from geo_activity_playground.explorer.grid_file import get_explored_geojson
+from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar import CalendarController
 from geo_activity_playground.webui.eddington import EddingtonController
 
@@ -17,6 +18,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     calendar_controller = CalendarController(repository)
     eddington_controller = EddingtonController(repository)
+    activity_controller = ActivityController(repository)
 
     @app.route("/")
     def index():
@@ -25,8 +27,9 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/activity/<id>")
     def activity(id: int):
-        activity = repository.get_activity_by_id(int(id))
-        return render_template("activity.html", activity=activity)
+        return render_template(
+            "activity.html", **activity_controller.render_activity(int(id))
+        )
 
     @app.route("/activity/<id>/track.json")
     def activity_track(id: int):
