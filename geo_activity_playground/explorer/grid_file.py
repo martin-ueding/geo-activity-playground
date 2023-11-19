@@ -11,6 +11,53 @@ from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.converters import get_tile_history
 
 
+def get_three_color_tiles(repository: ActivityRepository) -> str:
+    # Create array with visited tiles.
+    tiles = get_tile_history(repository)
+    a = np.zeros((2**14, 2**14), dtype=np.int8)
+    a[tiles["tile_x"], tiles["tile_y"]] = 1
+
+    # Get cluster tiles via erosion.
+    cluster = scipy.ndimage.binary_erosion(a)
+    a[cluster] = 2
+
+    # Compute biggest square.
+    square_size = 1
+    biggest = None
+    tile_set = {elem for elem in zip(tiles["tile_x"], tiles["tile_y"])}
+    for x, y in sorted(tile_set):
+        while True:
+            for i in range(square_size):
+                for j in range(square_size):
+                    if (x + i, y + j) not in tile_set:
+                        break
+                else:
+                    continue
+                break
+            else:
+                biggest = (x, y, square_size)
+                square_size += 1
+                continue
+            break
+
+    if biggest is not None:
+        square_x, square_y, square_size = biggest
+        a[square_x : square_x + square_size, square_y : square_y + square_size] = 3
+
+    # Find non-zero tiles.
+    border_x, border_y = np.where(a)
+    return geojson.dumps(
+        geojson.FeatureCollection(
+            features=[
+                make_explorer_tile(
+                    x, y, {"color": {1: "red", 2: "green", 3: "blue"}[a[x, y]]}
+                )
+                for x, y in zip(border_x, border_y)
+            ]
+        )
+    )
+
+
 def get_border_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
     tiles = get_tile_history(repository)
     a = np.zeros((2**14, 2**14), dtype=np.int8)
@@ -24,6 +71,23 @@ def get_border_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
 def get_explored_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
     tiles = get_tile_history(repository)
     return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
+
+
+def make_explorer_tile(tile_x: int, tile_y: int, properties: dict) -> geojson.Feature:
+    corners = [
+        get_tile_upper_left_lat_lon(*args)
+        for args in [
+            (tile_x, tile_y, 14),
+            (tile_x + 1, tile_y, 14),
+            (tile_x + 1, tile_y + 1, 14),
+            (tile_x, tile_y + 1, 14),
+            (tile_x, tile_y, 14),
+        ]
+    ]
+    return geojson.Feature(
+        geometry=geojson.Polygon([[(coord[1], coord[0]) for coord in corners]]),
+        properties=properties,
+    )
 
 
 def make_grid_points(

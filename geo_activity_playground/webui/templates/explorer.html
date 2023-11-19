@@ -10,18 +10,16 @@
 <div class="row mb-1">
     <div class="col">
         <div id="explorer-map" style="height: 800px;"></div>
-    </div>
-</div>
-
         <script>
-            var map = L.map('explorer-map').setView([50.7358, 7.1013], 6);
+            let explorer_geojson = {{ explored_geojson| safe}}
+            let map = L.map('explorer-map');
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
-
-            fetch('/explored-tiles.geojson')
-                .then((response) => response.json())
-                .then(feature => L.geoJSON(feature).addTo(map))
+            }).addTo(map)
+            let explorer_layer = L.geoJSON(explorer_geojson, { style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } } }).addTo(map)
+            map.fitBounds(explorer_layer.getBounds())
         </script>
+    </div>
+</div>
 {% endblock %}

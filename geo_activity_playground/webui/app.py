@@ -11,6 +11,7 @@ from geo_activity_playground.explorer.grid_file import get_explored_geojson
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar import CalendarController
 from geo_activity_playground.webui.eddington import EddingtonController
+from geo_activity_playground.webui.explorer_controller import ExplorerController
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
@@ -19,6 +20,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     calendar_controller = CalendarController(repository)
     eddington_controller = EddingtonController(repository)
     activity_controller = ActivityController(repository)
+    explorer_controller = ExplorerController(repository)
 
     @app.route("/")
     def index():
@@ -38,11 +40,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/explorer")
     def explorer():
-        return render_template("explorer.html")
-
-    @app.route("/explored-tiles.geojson")
-    def explored_tiles():
-        return get_explored_geojson(repository)
+        return render_template("explorer.html", **explorer_controller.render())
 
     @app.route("/summary-statistics")
     def summary_statistics():
