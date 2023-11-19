@@ -1,4 +1,8 @@
+import collections
+import datetime
 import functools
+
+import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 
@@ -28,3 +32,40 @@ class CalendarController:
             "num_activities": len(self._repository.meta),
             "monthly_distances": monthly_pivot,
         }
+
+    @functools.cache
+    def render_month(self, year: int, month: int) -> dict:
+        meta = self._repository.meta.copy()
+        meta["date"] = meta["start"].dt.date
+        meta["year"] = meta["start"].dt.year
+        meta["month"] = meta["start"].dt.month
+        meta["day"] = meta["start"].dt.day
+        meta["day_of_week"] = meta["start"].dt.day_of_week
+        meta["isoweek"] = meta["start"].dt.isocalendar().week
+
+        filtered = meta.loc[
+            (meta["year"] == year) & (meta["month"] == month)
+        ].sort_values("start")
+
+        weeks = collections.defaultdict(dict)
+
+        date = datetime.datetime(year, month, 1)
+        while date.month == month:
+            iso = date.isocalendar()
+            weeks[iso.week][iso.weekday] = []
+            date += datetime.timedelta(days=1)
+
+        for index, row in filtered.iterrows():
+            iso = row["start"].isocalendar()
+            weeks[iso.week][iso.weekday].append(
+                {
+                    "name": row["name"],
+                    "kind": row["kind"],
+                    "distance": row["distance"],
+                    "id": row["id"],
+                }
+            )
+
+        print(weeks)
+
+        return {"year": year, "month": month, "weeks": weeks}

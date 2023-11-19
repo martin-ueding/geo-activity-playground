@@ -55,4 +55,11 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     def calendar():
         return render_template("calendar.html", **calendar_controller.render_overview())
 
+    @app.route("/calendar/<year>/<month>")
+    def calendar_year_month(year: str, month: str):
+        return render_template(
+            "calendar-month.html",
+            **calendar_controller.render_month(int(year), int(month))
+        )
+
     app.run()
