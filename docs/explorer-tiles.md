@@ -39,3 +39,5 @@ On Android one can use the OsmAnd app to display tracks and also try to visualiz
 ![](explorer-missing-gpx.png)
 
 Transfer this GPX file to OsmAnd and you can have it display the missing tiles such that you can extend your explored area systematically.
+
+https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps
