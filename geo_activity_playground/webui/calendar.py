@@ -66,6 +66,4 @@ class CalendarController:
                 }
             )
 
-        print(weeks)
-
         return {"year": year, "month": month, "weeks": weeks}
