@@ -12,10 +12,7 @@
 
 <div class="row mb-1">
     <div class="col">
-        <div id="eddington-log"></div>
-        <script type="text/javascript">
-            vegaEmbed('#eddington-log', {{ logarithmic_plot| safe }}).then(function (result) { }).catch(console.error);
-        </script>
+        {{ vega_direct("eddington-log", logarithmic_plot) }}
     </div>
 </div>
 {% endblock %}

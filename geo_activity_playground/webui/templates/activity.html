@@ -43,7 +43,7 @@
 
 <div class="row mb-1">
     <div class="col">
-        {{ vega("track", "/activity/%d/track.json"|format(activity.id)) }}
+        {{ vega_direct("track", activity_plot) }}
     </div>
 </div>
 

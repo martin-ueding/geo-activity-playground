@@ -64,6 +64,13 @@
         </script>
         {% endmacro %}
 
+        {% macro vega_direct(id, spec) %}
+        <div id="{{ id }}"></div>
+        <script type="text/javascript">
+            vegaEmbed('#{{ id }}', {{ spec| safe }}).then(function (result) { }).catch(console.error);
+        </script>
+        {% endmacro %}
+
         {% block container %}
         {% endblock %}
     </div>
