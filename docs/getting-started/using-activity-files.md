@@ -9,3 +9,5 @@ Inside `Playground`, create another directory `Activities`. You can create an ar
 Either way, at the moment we only really need `Playground/Activities/{name}.gpx` (or `.fit`).
 
 Once you have your files there, you can proceed with the next steps.
+
+When starting the program, you need to supply the argument `--source directory` to select the activity files as your source.

@@ -35,7 +35,7 @@ code = "…"
 
 Add the _client ID_ and the _client secret_ from your Strava app. Add the _code_ that we have read off this localhost URL.
 
-Then you are all set to download data from the Strava API.
+Then you are all set to download data from the Strava API. Select the Strava API by supplying `--source strava-api` to the commands.
 
 ## Rate limiting
 

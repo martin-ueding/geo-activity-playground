@@ -26,7 +26,7 @@ nav:
       - getting-started/installing-git-on-linux.md
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
-  - getting-started.md
+      - getting-started/starting-the-webserver.md
   - heatmaps.md
   - explorer-tiles.md
   - Explanation:
