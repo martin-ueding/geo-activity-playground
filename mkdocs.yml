@@ -21,14 +21,19 @@ theme:
 
 nav:
   - index.md
+  - Getting Started:
+      - getting-started/installing-stable-on-linux.md
+      - getting-started/installing-git-on-linux.md
+      - getting-started/using-activity-files.md
+      - getting-started/using-strava-api.md
   - getting-started.md
-  - directory-layout.md
   - heatmaps.md
   - explorer-tiles.md
   - Explanation:
       - explanation/explorer-tiles.md
   - Reference:
       - reference/changelog.md
+      - reference/directory-layout.md
 
 markdown_extensions:
   - pymdownx.highlight
