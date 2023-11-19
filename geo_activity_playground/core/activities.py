@@ -27,7 +27,6 @@ class ActivityRepository:
         self.meta.index = self.meta["id"]
         self.meta.index.name = "index"
         self.meta["distance"] /= 1000
-        print(self.meta)
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
