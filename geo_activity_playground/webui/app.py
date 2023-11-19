@@ -8,10 +8,13 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.plots import activity_track_plot
 from geo_activity_playground.core.plots import meta_plots
 from geo_activity_playground.explorer.grid_file import get_explored_geojson
+from geo_activity_playground.webui.calendar import CalendarController
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     app = Flask(__name__)
+
+    calendar_controller = CalendarController(repository)
 
     @app.route("/")
     def index():
@@ -47,5 +50,9 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     @app.route("/eddington")
     def eddington():
         return render_template("eddington.html")
+
+    @app.route("/calendar")
+    def calendar():
+        return render_template("calendar.html", **calendar_controller.render_overview())
 
     app.run()
