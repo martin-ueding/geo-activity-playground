@@ -38,7 +38,7 @@ class EntryController:
         return (
             alt.Chart(
                 meta.loc[meta["start"] > before_30_days],
-                width=1140,
+                width=700,
                 height=200,
                 title="Distance per day",
             )
