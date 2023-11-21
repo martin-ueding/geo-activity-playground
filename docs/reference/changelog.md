@@ -11,6 +11,9 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Interactive map for each activity.
 - Color explorer tiles in red, green and blue.
 - Directly serve GeoJSON and Vega JSON embedded in the document.
+- Automatically detect which source is to be used.
+- Fix the name of the script to be `geo-activity-playground` and not just `geo-playground`.
+- Add mini maps to the landing page.
 
 ### Version 0.5
 
