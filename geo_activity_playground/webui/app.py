@@ -9,8 +9,8 @@ from geo_activity_playground.core.plots import activity_track_plot
 from geo_activity_playground.core.plots import meta_plots
 from geo_activity_playground.explorer.grid_file import get_explored_geojson
 from geo_activity_playground.webui.activity_controller import ActivityController
-from geo_activity_playground.webui.calendar import CalendarController
-from geo_activity_playground.webui.eddington import EddingtonController
+from geo_activity_playground.webui.calendar_controller import CalendarController
+from geo_activity_playground.webui.eddington_controller import EddingtonController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 
 
