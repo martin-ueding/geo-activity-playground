@@ -12,7 +12,9 @@
         <div id="explorer-map" style="height: 800px;"></div>
         <script>
             let explorer_geojson = {{ explored_geojson| safe}}
-            let map = L.map('explorer-map');
+            let map = L.map('explorer-map', {
+                fullscreenControl: true
+            });
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
