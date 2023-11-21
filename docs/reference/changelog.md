@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Automatically detect which source is to be used.
 - Fix the name of the script to be `geo-activity-playground` and not just `geo-playground`.
 - Add mini maps to the landing page.
+- Add fullscreen button to the maps.
 
 ### Version 0.5
 
