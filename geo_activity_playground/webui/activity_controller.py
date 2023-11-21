@@ -4,6 +4,7 @@ import altair as alt
 import geojson
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activities import make_geojson_from_time_series
 
 
 class ActivityController:
@@ -15,22 +16,9 @@ class ActivityController:
         activity = self._repository.get_activity_by_id(id)
 
         time_series = self._repository.get_time_series(id)
-        activity_plot = (
-            alt.Chart(time_series)
-            .mark_line()
-            .encode(alt.Latitude("latitude"), alt.Longitude("longitude"))
-        ).to_json(format="vega")
-
-        line = geojson.LineString(
-            [
-                (lon, lat)
-                for lat, lon in zip(time_series["latitude"], time_series["longitude"])
-            ]
-        )
-        line_json = geojson.dumps(line)
+        line_json = make_geojson_from_time_series(time_series)
 
         return {
             "activity": activity,
-            "activity_plot": activity_plot,
             "line_json": line_json,
         }

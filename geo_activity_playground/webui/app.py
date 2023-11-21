@@ -1,4 +1,3 @@
-import itertools
 import pathlib
 
 from flask import Flask
@@ -7,16 +6,17 @@ from flask import render_template
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.plots import activity_track_plot
 from geo_activity_playground.core.plots import meta_plots
-from geo_activity_playground.explorer.grid_file import get_explored_geojson
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
 from geo_activity_playground.webui.eddington_controller import EddingtonController
+from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     app = Flask(__name__)
 
+    entry_controller = EntryController(repository)
     calendar_controller = CalendarController(repository)
     eddington_controller = EddingtonController(repository)
     activity_controller = ActivityController(repository)
@@ -24,8 +24,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
 
     @app.route("/")
     def index():
-        activities = list(itertools.islice(repository.iter_activities(), 50))
-        return render_template("index.html", activities=activities)
+        return render_template("index.html", **entry_controller.render())
 
     @app.route("/activity/<id>")
     def activity(id: int):

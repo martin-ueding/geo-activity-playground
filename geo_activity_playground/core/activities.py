@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from typing import Iterator
 
+import geojson
 import pandas as pd
 
 
@@ -40,3 +41,13 @@ class ActivityRepository:
         df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
         df.name = id
         return df
+
+
+def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
+    line = geojson.LineString(
+        [
+            (lon, lat)
+            for lat, lon in zip(time_series["latitude"], time_series["longitude"])
+        ]
+    )
+    return geojson.dumps(line)
