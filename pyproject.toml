@@ -6,7 +6,7 @@ authors = ["Martin Ueding <mu@martin-ueding.de>"]
 license = "MIT"
 
 [tool.poetry.scripts]
-geo-playground = "geo_activity_playground.__main__:main"
+geo-activity-playground = "geo_activity_playground.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.12"
