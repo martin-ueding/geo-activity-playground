@@ -15,6 +15,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Fix the name of the script to be `geo-activity-playground` and not just `geo-playground`.
 - Add mini maps to the landing page.
 - Add fullscreen button to the maps.
+- Add favicon.
 
 ### Version 0.5
 
