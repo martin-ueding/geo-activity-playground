@@ -1,13 +1,13 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<div class="row mb-1">
+<div class="row mb-3">
     <div class="col">
         <h1>{{ activity.name }}</h1>
     </div>
 </div>
 
-<div class="row mb-1">
+<div class="row mb-3">
     <div class="col-4">
         <dl>
             <dt>Name</dt>
@@ -47,5 +47,23 @@
     </div>
 </div>
 
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Time series</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("distance_time_plot", distance_time_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("altitude_time_plot", altitude_time_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("heartrate_time_plot", heartrate_time_plot) }}
+    </div>
+</div>
 
 {% endblock %}
