@@ -16,6 +16,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add mini maps to the landing page.
 - Add fullscreen button to the maps.
 - Add favicon.
+- Added some more clever caching to the explorer tiles such that loading the page with explorer tiles comes up in just a few seconds.
 
 ### Version 0.5
 
