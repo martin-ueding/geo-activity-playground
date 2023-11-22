@@ -1,4 +1,5 @@
 import functools
+import json
 import logging
 import pathlib
 
@@ -32,6 +33,7 @@ def get_first_tiles(id, repository: ActivityRepository) -> pd.DataFrame:
 
 
 def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
+    assert pd.api.types.is_dtype_equal(points["time"].dtype, "datetime64[ns, UTC]")
     new_rows = []
     for index, row in points.iterrows():
         if "latitude" in row.keys() and "longitude" in row.keys():
@@ -48,12 +50,38 @@ def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
 @functools.cache
 def get_tile_history(repository: ActivityRepository) -> pd.DataFrame:
     logger.info("Building explorer tile history from all activities …")
-    tiles = pd.DataFrame()
+
+    cache_file = pathlib.Path("Cache/first_time_per_tile.parquet")
+    if cache_file.exists():
+        tiles = pd.read_parquet(cache_file)
+    else:
+        tiles = pd.DataFrame()
+
+    parsed_activities_file = pathlib.Path("Cache/task_first_time_per_tile.json")
+    if parsed_activities_file.exists():
+        with open(parsed_activities_file) as f:
+            parsed_activities = set(json.load(f))
+    else:
+        parsed_activities = set()
+
     for activity in repository.iter_activities(new_to_old=False):
+        if activity.id in parsed_activities:
+            continue
+        parsed_activities.add(activity.id)
+
+        logger.info(f"Activity {activity.id} wasn't parsed yet, reading them …")
         shard = get_first_tiles(activity.id, repository)
+        shard["activity_id"] = activity.id
         if not len(shard):
             continue
         tiles = pd.concat([tiles, shard])
+    logger.info("Consolidating explorer tile history …")
     tiles = first_time_per_tile(tiles)
-    tiles.to_parquet("Cache/first_time_per_tile.parquet")
+
+    logger.info("Store explorer tile history to cache file …")
+    tiles.to_parquet(cache_file)
+
+    with open(parsed_activities_file, "w") as f:
+        json.dump(list(parsed_activities), f)
+
     return tiles

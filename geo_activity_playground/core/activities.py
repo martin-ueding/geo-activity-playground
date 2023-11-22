@@ -40,6 +40,12 @@ class ActivityRepository:
     def get_time_series(self, id: int) -> pd.DataFrame:
         df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
         df.name = id
+        if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
+            start = self.get_activity_by_id(id).start
+            time = df["time"]
+            del df["time"]
+            df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
+        assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
         return df
 
 

@@ -148,9 +148,17 @@ def download_missing_activity_streams() -> None:
             if "latlng" in streams:
                 columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
                 columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
-            for name in ["distance", "altitude", "heartrate", "time"]:
+            for name in ["distance", "altitude", "heartrate"]:
                 if name in streams:
                     columns[name] = streams[name].data
+            start = meta.loc[meta["id"] == id]["start"].iloc[0]
+            print(start)
+            columns["time"] = [
+                start + datetime.timedelta(seconds=time)
+                for time in streams["time"].data
+            ]
             df = pd.DataFrame(columns)
+            print(df)
+            print(df.dtypes)
             df.name = str(id)
             df.to_parquet(activity_stream_dir / f"{id}.parquet")
