@@ -17,6 +17,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add fullscreen button to the maps.
 - Add favicon.
 - Added some more clever caching to the explorer tiles such that loading the page with explorer tiles comes up in just a few seconds.
+- Add a triplet of time series plots (distance, altitude, heart rate) for each activity.
 
 ### Version 0.5
 
