@@ -1,9 +1,17 @@
 import dataclasses
 import datetime
+import logging
+import pathlib
+import tomllib
 from typing import Iterator
+from typing import Optional
 
 import geojson
+import numpy as np
 import pandas as pd
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -57,3 +65,36 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
         ]
     )
     return geojson.dumps(line)
+
+
+def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
+    if "heartrate" not in time_series:
+        return None
+    config_path = pathlib.Path("config.toml")
+    if not config_path.exists():
+        logger.warning("Missing a config, cannot extract heart rate zones.")
+        return None
+    with open(config_path, "rb") as f:
+        config = tomllib.load(f)
+
+    try:
+        birthyear = config["heart"]["birthyear"]
+    except KeyError:
+        logger.warning(
+            "Missing config entry `heart.birthyear`, cannot determine heart rate zones."
+        )
+        return None
+
+    age = time_series["time"].iloc[0].year - birthyear
+    max_rate = 220 - age
+    zones: pd.Series = time_series["heartrate"] * 10 // max_rate - 4
+    zones.loc[zones < 0] = 0
+    df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
+    duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
+    duration_per_zone.name = "minutes"
+    for i in range(6):
+        if i not in duration_per_zone:
+            duration_per_zone.loc[i] = 0.0
+    result = duration_per_zone.reset_index()
+    print(result)
+    return result

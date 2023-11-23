@@ -66,4 +66,12 @@
     </div>
 </div>
 
+{% if heart_zones_plot is defined %}
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("heart_zones_plot", heart_zones_plot) }}
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
