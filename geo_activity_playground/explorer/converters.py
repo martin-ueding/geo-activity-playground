@@ -1,3 +1,4 @@
+import contextlib
 import functools
 import json
 import logging
@@ -47,6 +48,20 @@ def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
     return reduced
 
 
+@contextlib.contextmanager
+def work_tracker(path: pathlib.Path):
+    if path.exists():
+        with open(path) as f:
+            s = set(json.load(f))
+    else:
+        s = set()
+
+    yield s
+
+    with open(path, "w") as f:
+        json.dump(list(s), f)
+
+
 @functools.cache
 def get_tile_history(repository: ActivityRepository) -> pd.DataFrame:
     logger.info("Building explorer tile history from all activities …")
@@ -57,31 +72,24 @@ def get_tile_history(repository: ActivityRepository) -> pd.DataFrame:
     else:
         tiles = pd.DataFrame()
 
-    parsed_activities_file = pathlib.Path("Cache/task_first_time_per_tile.json")
-    if parsed_activities_file.exists():
-        with open(parsed_activities_file) as f:
-            parsed_activities = set(json.load(f))
-    else:
-        parsed_activities = set()
+    with work_tracker(
+        pathlib.Path("Cache/task_first_time_per_tile.json")
+    ) as parsed_activities:
+        for activity in repository.iter_activities(new_to_old=False):
+            if activity.id in parsed_activities:
+                continue
+            parsed_activities.add(activity.id)
 
-    for activity in repository.iter_activities(new_to_old=False):
-        if activity.id in parsed_activities:
-            continue
-        parsed_activities.add(activity.id)
-
-        logger.info(f"Activity {activity.id} wasn't parsed yet, reading them …")
-        shard = get_first_tiles(activity.id, repository)
-        shard["activity_id"] = activity.id
-        if not len(shard):
-            continue
-        tiles = pd.concat([tiles, shard])
+            logger.info(f"Activity {activity.id} wasn't parsed yet, reading them …")
+            shard = get_first_tiles(activity.id, repository)
+            shard["activity_id"] = activity.id
+            if not len(shard):
+                continue
+            tiles = pd.concat([tiles, shard])
     logger.info("Consolidating explorer tile history …")
     tiles = first_time_per_tile(tiles)
 
     logger.info("Store explorer tile history to cache file …")
     tiles.to_parquet(cache_file)
-
-    with open(parsed_activities_file, "w") as f:
-        json.dump(list(parsed_activities), f)
 
     return tiles
