@@ -1,12 +1,11 @@
-import contextlib
 import functools
-import json
 import logging
 import pathlib
 
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile
 
 
@@ -46,20 +45,6 @@ def tiles_from_points(points: pd.DataFrame) -> pd.DataFrame:
 def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
     reduced = tiles.groupby(["tile_x", "tile_y"]).min().reset_index()
     return reduced
-
-
-@contextlib.contextmanager
-def work_tracker(path: pathlib.Path):
-    if path.exists():
-        with open(path) as f:
-            s = set(json.load(f))
-    else:
-        s = set()
-
-    yield s
-
-    with open(path, "w") as f:
-        json.dump(list(s), f)
 
 
 @functools.cache
