@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
 import pathlib
 
 import matplotlib.pyplot as plt
@@ -28,6 +29,10 @@ from .core.sources import TimeSeriesSource
 from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
+from geo_activity_playground.core.activities import ActivityRepository
+
+
+logger = logging.getLogger(__name__)
 
 # globals
 PLT_COLORMAP = "hot"  # matplotlib color map
@@ -67,6 +72,12 @@ def gaussian_filter(image, sigma):
     return image
 
 
+def add_margin(lower: int, upper: int) -> tuple[int, int]:
+    spread = upper - lower
+    margin = spread // 20
+    return max(0, lower - margin), upper + margin
+
+
 def render_heatmap(
     lat_lon_data: np.ndarray, num_activities: int, arg_zoom: int = -1
 ) -> np.ndarray:
@@ -93,8 +104,6 @@ def render_heatmap(
                 break
 
             zoom -= 1
-
-        print("Auto zoom = {}".format(zoom))
 
     tile_count = (x_tile_max - x_tile_min + 1) * (y_tile_max - y_tile_min + 1)
 
@@ -182,30 +191,32 @@ def render_heatmap(
             :, :, c
         ] + data_color[:, :, c]
 
-    supertile = supertile[
-        int(min(xy_data[:, 1])) : int(max(xy_data[:, 1])),
-        int(min(xy_data[:, 0])) : int(max(xy_data[:, 0])),
-        :,
-    ]
-
+    min_x, max_x = add_margin(int(min(xy_data[:, 1])), int(max(xy_data[:, 1])))
+    min_y, max_y = add_margin(int(min(xy_data[:, 0])), int(max(xy_data[:, 0])))
+    supertile = supertile[min_x:max_x, min_y:max_y, :]
     return supertile
 
 
-def generate_heatmaps_per_cluster(ts_source: TimeSeriesSource) -> None:
+def generate_heatmaps_per_cluster(repository: ActivityRepository) -> None:
+    logger.info("Gathering data points …")
     arrays = []
     names = []
-    for i, df in enumerate(ts_source.iter_activities()):
-        latlon = np.column_stack([df.latitude, df.longitude])
-        names.extend([i] * len(df))
-        arrays.append(latlon)
+    for activity in repository.iter_activities():
+        df = repository.get_time_series(activity.id)
+        if "latitude" in df.columns:
+            latlon = np.column_stack([df["latitude"], df["longitude"]])
+            names.extend([activity.id] * len(df))
+            arrays.append(latlon)
     latlon = np.row_stack(arrays)
     del arrays
 
+    logger.info("Compute tiles for each point …")
     tiles = [compute_tile(lat, lon) for lat, lon in latlon]
 
     unique_tiles = set(tiles)
     unique_tiles_array = np.array(list(unique_tiles))
 
+    logger.info("Run DBSCAN cluster finding algorithm …")
     dbscan = sklearn.cluster.DBSCAN(eps=5, min_samples=3)
     labels = dbscan.fit_predict(unique_tiles_array)
 
@@ -225,14 +236,16 @@ def generate_heatmaps_per_cluster(ts_source: TimeSeriesSource) -> None:
     for old_image in output_dir.glob("*.png"):
         old_image.unlink()
 
-    print("Number of clusters", len(all_df.cluster.unique()))
+    logger.info(f"Found {len(all_df.cluster.unique())} clusters …")
     for i, (cluster_id, group) in enumerate(
         sorted(all_df.groupby("cluster"), key=lambda elem: len(elem[1]), reverse=True),
         start=1,
     ):
         if cluster_id == -1:
             continue
-        print(f"Cluster {cluster_id} has {len(group)} elements.")
+        logger.info(
+            f"Rendering heatmap for cluster {cluster_id} with {len(group)} elements …"
+        )
         latlon = np.column_stack([group.lat, group.lon])
         heatmap = render_heatmap(latlon, num_activities=len(group.activity.unique()))
         plt.imsave(output_dir / f"Cluster-{i}.png", heatmap)

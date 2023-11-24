@@ -17,7 +17,7 @@ from geo_activity_playground.webui.explorer_controller import ExplorerController
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
 
 
-def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
+def webui_main(repository: ActivityRepository) -> None:
     app = Flask(__name__)
 
     entry_controller = EntryController(repository)

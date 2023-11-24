@@ -12,6 +12,7 @@ from geo_activity_playground.explorer.grid_file import get_explored_tiles
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
 from geo_activity_playground.explorer.video import explorer_video_main
+from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
@@ -48,20 +49,18 @@ def main() -> None:
     )
     subparser.set_defaults(func=lambda options: explorer_video_main())
 
-    # subparser = subparsers.add_parser(
-    #     "heatmaps", help="Generate heatmaps from activities"
-    # )
-    # subparser.set_defaults(
-    #     func=lambda options: generate_heatmaps_per_cluster(
-    #         make_time_series_source(options.basedir, options.source)
-    #     )
-    # )
+    subparser = subparsers.add_parser(
+        "heatmaps", help="Generate heatmaps from activities"
+    )
+    subparser.set_defaults(
+        func=lambda options: generate_heatmaps_per_cluster(
+            make_activity_repository(options.basedir)
+        )
+    )
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
-        func=lambda options: webui_main(
-            options.basedir, make_activity_repository(options.basedir)
-        )
+        func=lambda options: webui_main(make_activity_repository(options.basedir))
     )
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
