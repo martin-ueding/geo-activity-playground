@@ -1,0 +1,47 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Equipment</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Equipment</th>
+                    <th style="text-align: right;">Distance / km</th>
+                    <th style="text-align: right;">First use</th>
+                    <th style="text-align: right;">Last use</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipment in equipment_summary %}
+                <tr>
+                    <td>{{ equipment.equipment }}</td>
+                    <td style="text-align: right;">{{ equipment.total_distance|int }}</td>
+                    <td style="text-align: right;">{{ equipment.first_use.date() }}</td>
+                    <td style="text-align: right;">{{ equipment.last_use.date() }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>Usage over time</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct("total_distances_plot", total_distances_plot) }}
+    </div>
+</div>
+{% endblock %}

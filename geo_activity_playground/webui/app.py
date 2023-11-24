@@ -10,6 +10,7 @@ from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
 from geo_activity_playground.webui.eddington_controller import EddingtonController
 from geo_activity_playground.webui.entry_controller import EntryController
+from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 
 
@@ -21,6 +22,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     eddington_controller = EddingtonController(repository)
     activity_controller = ActivityController(repository)
     explorer_controller = ExplorerController(repository)
+    equipment_controller = EquipmentController(repository)
 
     @app.route("/")
     def index():
@@ -65,5 +67,9 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
             "calendar-month.html.j2",
             **calendar_controller.render_month(int(year), int(month))
         )
+
+    @app.route("/equipment")
+    def equipment():
+        return render_template("equipment.html.j2", **equipment_controller.render())
 
     app.run()
