@@ -23,6 +23,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Resolve Strava Gear name. [GH-18](https://github.com/martin-ueding/geo-activity-playground/issues/18)
 - Add page for equipment. [GH-3](https://github.com/martin-ueding/geo-activity-playground/issues/3)
 - Add a pop-up with some metadata about the first visit to the explorer tiles. [GH-14](https://github.com/martin-ueding/geo-activity-playground/issues/14)
+- Integrate missing explorer tiles into the web interface. [GH-7](https://github.com/martin-ueding/geo-activity-playground/issues/7).
 
 ### Version 0.5
 

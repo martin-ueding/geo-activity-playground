@@ -77,16 +77,6 @@ def main() -> None:
     options.func(options)
 
 
-def main_explorer(ts_source: TimeSeriesSource) -> None:
-    points = get_border_tiles(ts_source)
-    make_grid_file_geojson(points, "missing_tiles")
-    make_grid_file_gpx(points, "missing_tiles")
-
-    points = get_explored_tiles(ts_source)
-    make_grid_file_geojson(points, "explored")
-    make_grid_file_gpx(points, "explored")
-
-
 def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     os.chdir(basedir)
     if pathlib.Path("Activities").exists():

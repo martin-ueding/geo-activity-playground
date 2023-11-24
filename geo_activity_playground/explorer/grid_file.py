@@ -4,6 +4,7 @@ from typing import Iterator
 import geojson
 import gpxpy
 import numpy as np
+import pandas as pd
 import scipy.ndimage
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -11,9 +12,8 @@ from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.converters import get_tile_history
 
 
-def get_three_color_tiles(repository: ActivityRepository) -> str:
+def get_three_color_tiles(tiles: pd.DataFrame, repository: ActivityRepository) -> str:
     # Create array with visited tiles.
-    tiles = get_tile_history(repository)
     a = np.zeros((2**14, 2**14), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
 
@@ -72,18 +72,16 @@ def get_three_color_tiles(repository: ActivityRepository) -> str:
     )
 
 
-def get_border_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
-    tiles = get_tile_history(repository)
+def get_border_tiles(tiles: pd.DataFrame) -> list[list[list[float]]]:
     a = np.zeros((2**14, 2**14), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
-    dilated = scipy.ndimage.binary_dilation(a, iterations=1)
+    dilated = scipy.ndimage.binary_dilation(a, iterations=2)
     border = dilated - a
     border_x, border_y = np.where(border)
     return make_grid_points(zip(border_x, border_y))
 
 
-def get_explored_tiles(repository: ActivityRepository) -> list[list[list[float]]]:
-    tiles = get_tile_history(repository)
+def get_explored_tiles(tiles: pd.DataFrame) -> list[list[list[float]]]:
     return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
 
 
@@ -131,14 +129,14 @@ def make_grid_file_gpx(grid_points: list[list[list[float]]], stem: str) -> None:
         for point in points:
             gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(*point))
 
-    out_path = pathlib.Path("Explorer") / f"{stem}.gpx"
+    out_path = pathlib.Path("Download") / f"{stem}.gpx"
     out_path.parent.mkdir(exist_ok=True, parents=True)
 
     with open(out_path, "w") as f:
         f.write(gpx.to_xml())
 
 
-def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> None:
+def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> str:
     fc = geojson.FeatureCollection(
         [
             geojson.Feature(
@@ -147,7 +145,12 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> None:
             for points in grid_points
         ]
     )
-    return geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
+    result = geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
+    out_path = pathlib.Path("Download") / f"{stem}.geojson"
+    out_path.parent.mkdir(exist_ok=True, parents=True)
+    with open(out_path, "w") as f:
+        f.write(result)
+    return result
 
 
 def get_explored_geojson(repository: ActivityRepository) -> str:

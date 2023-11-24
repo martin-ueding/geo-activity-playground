@@ -2,6 +2,7 @@ import pathlib
 
 from flask import Flask
 from flask import render_template
+from flask import send_from_directory
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.plots import activity_track_plot
@@ -50,6 +51,11 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     @app.route("/meta-plot/<name>.json")
     def meta_plot(name: str):
         return meta_plots[name](repository.meta.reset_index())
+
+    @app.route("/download/<filename>")
+    def download(filename: str):
+        assert "/" not in filename
+        return send_from_directory(pathlib.Path.cwd() / "Download", filename)
 
     @app.route("/eddington")
     def eddington():
