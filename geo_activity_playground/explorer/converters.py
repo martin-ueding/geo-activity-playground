@@ -72,7 +72,14 @@ def get_tile_history(repository: ActivityRepository) -> pd.DataFrame:
                 continue
             tiles = pd.concat([tiles, shard])
     logger.info("Consolidating explorer tile history …")
-    tiles = first_time_per_tile(tiles)
+    print(tiles)
+    tiles = (
+        tiles.sort_values("time")
+        .groupby(["tile_x", "tile_y"])
+        .apply(lambda group: group.iloc[0])
+        .reset_index(drop=True)
+    )
+    print(tiles)
 
     logger.info("Store explorer tile history to cache file …")
     tiles.to_parquet(cache_file)

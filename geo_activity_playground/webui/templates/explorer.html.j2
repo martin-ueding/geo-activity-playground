@@ -11,6 +11,12 @@
     <div class="col">
         <div id="explorer-map" style="height: 800px;"></div>
         <script>
+            function onEachFeature(feature, layer) {
+                if (feature.properties && feature.properties.first_visit) {
+                    layer.bindPopup(`First visited on ${feature.properties.first_visit} as part of <a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>.`)
+                }
+            }
+
             let explorer_geojson = {{ explored_geojson| safe}}
             let map = L.map('explorer-map', {
                 fullscreenControl: true
@@ -19,7 +25,10 @@
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
-            let explorer_layer = L.geoJSON(explorer_geojson, { style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } } }).addTo(map)
+            let explorer_layer = L.geoJSON(explorer_geojson, {
+                style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } },
+                onEachFeature: onEachFeature
+            }).addTo(map)
             map.fitBounds(explorer_layer.getBounds())
         </script>
     </div>

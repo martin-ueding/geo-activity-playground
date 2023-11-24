@@ -46,7 +46,7 @@ def get_three_color_tiles(repository: ActivityRepository) -> str:
 
     tile_metadata = {
         (row["tile_x"], row["tile_y"]): {
-            "first_visit": row["time"].isoformat(),
+            "first_visit": row["time"].date().isoformat(),
             "activity_id": row["activity_id"],
             "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
         }
