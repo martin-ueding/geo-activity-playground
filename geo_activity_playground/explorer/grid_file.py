@@ -44,13 +44,27 @@ def get_three_color_tiles(repository: ActivityRepository) -> str:
         square_x, square_y, square_size = biggest
         a[square_x : square_x + square_size, square_y : square_y + square_size] = 3
 
+    tile_metadata = {
+        (row["tile_x"], row["tile_y"]): {
+            "first_visit": row["time"].isoformat(),
+            "activity_id": row["activity_id"],
+            "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
+        }
+        for index, row in tiles.iterrows()
+    }
+
     # Find non-zero tiles.
     border_x, border_y = np.where(a)
     return geojson.dumps(
         geojson.FeatureCollection(
             features=[
                 make_explorer_tile(
-                    x, y, {"color": {1: "red", 2: "green", 3: "blue"}[a[x, y]]}
+                    x,
+                    y,
+                    {
+                        "color": {1: "red", 2: "green", 3: "blue"}[a[x, y]],
+                        **tile_metadata[(x, y)],
+                    },
                 )
                 for x, y in zip(border_x, border_y)
             ]

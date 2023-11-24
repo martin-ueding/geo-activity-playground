@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+import functools
 import logging
 import pathlib
 import tomllib
@@ -42,6 +43,7 @@ class ActivityRepository:
         for id, row in self.meta[::direction].iterrows():
             yield ActivityMeta(**row)
 
+    @functools.lru_cache()
     def get_activity_by_id(self, id: int) -> ActivityMeta:
         return ActivityMeta(**self.meta.loc[id])
 
