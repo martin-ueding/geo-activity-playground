@@ -35,6 +35,7 @@ def import_from_directory() -> None:
             timeseries = read_activity(path)
             if len(timeseries) == 0:
                 continue
+            timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
             timeseries_path = activity_stream_dir / f"{id}.parquet"
             timeseries.to_parquet(timeseries_path)
 
