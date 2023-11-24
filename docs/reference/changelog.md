@@ -20,6 +20,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add a triplet of time series plots (distance, altitude, heart rate) for each activity.
 - Show plot for heart rate zones per activity. [GH-12](https://github.com/martin-ueding/geo-activity-playground/issues/12)
 - Handle activities without any location points. [GH-10](https://github.com/martin-ueding/geo-activity-playground/issues/10)
+- Resolve Strava Gear name. [GH-18](https://github.com/martin-ueding/geo-activity-playground/issues/18)
 
 ### Version 0.5
 

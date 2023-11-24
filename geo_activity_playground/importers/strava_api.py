@@ -92,6 +92,8 @@ def import_from_strava_api() -> None:
         meta = None
         get_after = "2000-01-01T00:00:00Z"
 
+    gear_names = {None: "None"}
+
     client = Client(access_token=get_current_access_token())
 
     new_rows: list[dict] = []
@@ -103,6 +105,11 @@ def import_from_strava_api() -> None:
         cache_file.parent.mkdir(exist_ok=True, parents=True)
         with open(cache_file, "wb") as f:
             pickle.dump(activity, f)
+        if not activity.gear_id in gear_names:
+            gear = client.get_gear(activity.gear_id)
+            gear_names[activity.gear_id] = (
+                f"{gear.name}" or f"{gear.brand_name} {gear.model_name}"
+            )
         new_rows.append(
             {
                 "id": activity.id,
@@ -112,7 +119,7 @@ def import_from_strava_api() -> None:
                 "kind": str(activity.type),
                 "start": activity.start_date,
                 "elapsed_time": activity.elapsed_time,
-                "equipment": activity.gear_id,
+                "equipment": gear_names[activity.gear_id],
                 "calories": activity.calories,
             }
         )
