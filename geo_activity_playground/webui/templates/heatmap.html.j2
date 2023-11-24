@@ -14,8 +14,8 @@
         <script>
             let map = L.map('heatmap', {
                 fullscreenControl: true,
-                center: [51.505, -0.09],
-                zoom: 13
+                center: [{{ center.latitude }}, {{ center.longitude }}],
+            zoom: 14
             });
             L.tileLayer('/heatmap/tile/{z}/{x}/{y}.png', {
                 maxZoom: 19,
