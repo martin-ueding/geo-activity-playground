@@ -11,7 +11,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def compute_tile(lat: float, lon: float, zoom: int = 14) -> tuple[int, int]:
+def compute_tile(lat: float, lon: float, zoom: int) -> tuple[int, int]:
     x = np.radians(lon)
     y = np.arcsinh(np.tan(np.radians(lat)))
     x = (1 + x / np.pi) / 2

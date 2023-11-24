@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.7
+
+- Add _Squadratinhos_, which are explorer tiles at zoom 17 instead of zoom 14.
+
 ### Version 0.6
 
 - Interactive map for each activity.

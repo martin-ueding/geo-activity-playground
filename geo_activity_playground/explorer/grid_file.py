@@ -12,9 +12,11 @@ from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.converters import get_tile_history
 
 
-def get_three_color_tiles(tiles: pd.DataFrame, repository: ActivityRepository) -> str:
+def get_three_color_tiles(
+    tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
+) -> str:
     # Create array with visited tiles.
-    a = np.zeros((2**14, 2**14), dtype=np.int8)
+    a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
 
     # Get cluster tiles via erosion.
@@ -65,6 +67,7 @@ def get_three_color_tiles(tiles: pd.DataFrame, repository: ActivityRepository) -
                         "color": {1: "red", 2: "green", 3: "blue"}[a[x, y]],
                         **tile_metadata[(x, y)],
                     },
+                    zoom,
                 )
                 for x, y in zip(border_x, border_y)
             ]
@@ -72,28 +75,30 @@ def get_three_color_tiles(tiles: pd.DataFrame, repository: ActivityRepository) -
     )
 
 
-def get_border_tiles(tiles: pd.DataFrame) -> list[list[list[float]]]:
-    a = np.zeros((2**14, 2**14), dtype=np.int8)
+def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
+    a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
     dilated = scipy.ndimage.binary_dilation(a, iterations=2)
     border = dilated - a
     border_x, border_y = np.where(border)
-    return make_grid_points(zip(border_x, border_y))
+    return make_grid_points(zip(border_x, border_y), zoom)
 
 
-def get_explored_tiles(tiles: pd.DataFrame) -> list[list[list[float]]]:
-    return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
+def get_explored_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
+    return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]), zoom)
 
 
-def make_explorer_tile(tile_x: int, tile_y: int, properties: dict) -> geojson.Feature:
+def make_explorer_tile(
+    tile_x: int, tile_y: int, properties: dict, zoom: int
+) -> geojson.Feature:
     corners = [
         get_tile_upper_left_lat_lon(*args)
         for args in [
-            (tile_x, tile_y, 14),
-            (tile_x + 1, tile_y, 14),
-            (tile_x + 1, tile_y + 1, 14),
-            (tile_x, tile_y + 1, 14),
-            (tile_x, tile_y, 14),
+            (tile_x, tile_y, zoom),
+            (tile_x + 1, tile_y, zoom),
+            (tile_x + 1, tile_y + 1, zoom),
+            (tile_x, tile_y + 1, zoom),
+            (tile_x, tile_y, zoom),
         ]
     ]
     return geojson.Feature(
@@ -103,16 +108,16 @@ def make_explorer_tile(tile_x: int, tile_y: int, properties: dict) -> geojson.Fe
 
 
 def make_grid_points(
-    tile_iterator: Iterator[tuple[int, int]]
+    tile_iterator: Iterator[tuple[int, int]], zoom: int
 ) -> list[list[list[float]]]:
     result = []
     for tile_x, tile_y in tile_iterator:
         tile = [
-            get_tile_upper_left_lat_lon(tile_x, tile_y, 14),
-            get_tile_upper_left_lat_lon(tile_x + 1, tile_y, 14),
-            get_tile_upper_left_lat_lon(tile_x + 1, tile_y + 1, 14),
-            get_tile_upper_left_lat_lon(tile_x, tile_y + 1, 14),
-            get_tile_upper_left_lat_lon(tile_x, tile_y, 14),
+            get_tile_upper_left_lat_lon(tile_x, tile_y, zoom),
+            get_tile_upper_left_lat_lon(tile_x + 1, tile_y, zoom),
+            get_tile_upper_left_lat_lon(tile_x + 1, tile_y + 1, zoom),
+            get_tile_upper_left_lat_lon(tile_x, tile_y + 1, zoom),
+            get_tile_upper_left_lat_lon(tile_x, tile_y, zoom),
         ]
         result.append(tile)
     return result
@@ -153,8 +158,8 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> s
     return result
 
 
-def get_explored_geojson(repository: ActivityRepository) -> str:
-    tiles = get_tile_history(repository)
+def get_explored_geojson(repository: ActivityRepository, zoom: int) -> str:
+    tiles = get_tile_history(repository, zoom)
     return make_grid_file_geojson(
         make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
     )

@@ -211,7 +211,7 @@ def generate_heatmaps_per_cluster(repository: ActivityRepository) -> None:
     del arrays
 
     logger.info("Compute tiles for each point …")
-    tiles = [compute_tile(lat, lon) for lat, lon in latlon]
+    tiles = [compute_tile(lat, lon, 14) for lat, lon in latlon]
 
     unique_tiles = set(tiles)
     unique_tiles_array = np.array(list(unique_tiles))

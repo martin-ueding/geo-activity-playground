@@ -15,16 +15,16 @@ class ExplorerController:
         self._repository = repository
 
     @functools.cache
-    def render(self) -> dict:
-        tiles = get_tile_history(self._repository)
+    def render(self, zoom: int) -> dict:
+        tiles = get_tile_history(self._repository, zoom)
 
-        explored_geojson = get_three_color_tiles(tiles, self._repository)
+        explored_geojson = get_three_color_tiles(tiles, self._repository, zoom)
 
-        points = get_border_tiles(tiles)
+        points = get_border_tiles(tiles, zoom)
         missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
         make_grid_file_gpx(points, "missing_tiles")
 
-        points = get_explored_tiles(tiles)
+        points = get_explored_tiles(tiles, zoom)
         explored_tiles_geojson = make_grid_file_geojson(points, "explored")
         make_grid_file_gpx(points, "explored")
 

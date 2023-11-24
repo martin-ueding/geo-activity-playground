@@ -33,19 +33,21 @@ def webui_main(repository: ActivityRepository) -> None:
         return render_template("index.html.j2", **entry_controller.render())
 
     @app.route("/activity/<id>")
-    def activity(id: int):
+    def activity(id: str):
         return render_template(
             "activity.html.j2", **activity_controller.render_activity(int(id))
         )
 
     @app.route("/activity/<id>/track.json")
-    def activity_track(id: int):
+    def activity_track(id: str):
         plot = activity_track_plot(repository.get_time_series(int(id)))
         return plot
 
-    @app.route("/explorer")
-    def explorer():
-        return render_template("explorer.html.j2", **explorer_controller.render())
+    @app.route("/explorer/<zoom>")
+    def explorer(zoom: str):
+        return render_template(
+            "explorer.html.j2", **explorer_controller.render(int(zoom))
+        )
 
     @app.route("/summary-statistics")
     def summary_statistics():
