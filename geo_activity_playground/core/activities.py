@@ -98,5 +98,4 @@ def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame
         if i not in duration_per_zone:
             duration_per_zone.loc[i] = 0.0
     result = duration_per_zone.reset_index()
-    print(result)
     return result
