@@ -1,4 +1,5 @@
 import functools
+import logging
 import math
 import pathlib
 import time
@@ -6,6 +7,8 @@ import time
 import numpy as np
 import requests
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 def compute_tile(lat: float, lon: float, zoom: int = 14) -> tuple[int, int]:
@@ -28,7 +31,6 @@ def get_tile_upper_left_lat_lon(
 
 
 def download_file(url: str, destination: pathlib.Path):
-    print(f"Downloading {url} …")
     if not destination.parent.exists():
         destination.parent.mkdir(exist_ok=True, parents=True)
     r = requests.get(
@@ -46,7 +48,7 @@ def download_file(url: str, destination: pathlib.Path):
 def get_tile(zoom: int, x: int, y: int) -> Image.Image:
     destination = pathlib.Path.cwd() / "Open Street Map Tiles" / f"{zoom}/{x}/{y}.png"
     if not destination.exists():
-        # url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
+        logger.info(f"Downloading OSM tile {x=}, {y=}, {zoom=} …")
         url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
         download_file(url, destination)
     with Image.open(destination) as image:
