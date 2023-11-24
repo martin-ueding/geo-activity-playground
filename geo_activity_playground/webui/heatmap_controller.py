@@ -48,37 +48,9 @@ class HeatmapController:
         )
         return self._xy
 
-    @functools.cache
-    def compute_hist(self, z: int, num_activities: int) -> np.ndarray:
-        counts = self._xy.groupby(["x", "y"]).apply(lambda group: len(group))
-        # counts, counts2 = np.unique(counts, return_counts=True)
-        # print(counts.tolist())
-        # print(counts2.tolist())
-
-        res_pixel = (
-            156543.03 * np.cos(np.radians(50)) / (2.0**z)
-        )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-
-        # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
-        # (Strava records trackpoints every 5 meters in average for cycling activites)
-        m = np.round((1.0 / 5.0) * res_pixel * num_activities)
-        print(f"{m = }")
-        counts.loc[counts > m] = m
-
-        # equalize histogram and compute kernel density estimation
-        data_hist, _ = np.histogram(counts, bins=int(m + 1))
-        print(f"{data_hist = }")
-
-        data_hist = np.cumsum(data_hist)
-        normalized_histogram = data_hist / data_hist[-1]
-        print(f"{normalized_histogram = }")
-        return normalized_histogram
-
     def render_tile(self, x: int, y: int, z: int) -> bytes:
         with self._mutex:
             all_points = get_all_points(self._repository)
-            # xy = self.compute_xy(z)
-            # data_hist = self.compute_hist(z, len(self._repository.meta))
 
         lat_max, lon_min = get_tile_upper_left_lat_lon(x, y, z)
         lat_min, lon_max = get_tile_upper_left_lat_lon(x + 1, y + 1, z)
@@ -105,22 +77,6 @@ class HeatmapController:
             data[
                 i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
             ] += 1.0
-
-        res_pixel = (
-            156543.03 * np.cos(np.radians(np.mean(all_points["latitude"]))) / (2.0**z)
-        )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-
-        # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
-        # (Strava records trackpoints every 5 meters in average for cycling activites)
-        # m = len(data_hist) - 1
-        # data[data > m] = m
-        # data_hist[0] = 0
-
-        # for i in range(data.shape[0]):
-        #     for j in range(data.shape[1]):
-        #         data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
-
-        # data = gaussian_filter(data, float(sigma_pixel))
 
         np.log(data, where=data > 0, out=data)
         data /= 6
