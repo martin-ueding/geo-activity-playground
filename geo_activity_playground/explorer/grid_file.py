@@ -19,19 +19,25 @@ def get_three_color_tiles(
     a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
 
-    # Get cluster tiles via erosion.
-    cluster = scipy.ndimage.binary_erosion(a)
-    a[cluster] = 2
+    tile_dict = {elem: 1 for elem in zip(tiles["tile_x"], tiles["tile_y"])}
+
+    for x, y in tile_dict.keys():
+        if (
+            (x + 1, y) in tile_dict
+            and (x - 1, y) in tile_dict
+            and (x, y + 1) in tile_dict
+            and (x, y - 1) in tile_dict
+        ):
+            tile_dict[(x, y)] = 2
 
     # Compute biggest square.
     square_size = 1
     biggest = None
-    tile_set = {elem for elem in zip(tiles["tile_x"], tiles["tile_y"])}
-    for x, y in sorted(tile_set):
+    for x, y in sorted(tile_dict):
         while True:
             for i in range(square_size):
                 for j in range(square_size):
-                    if (x + i, y + j) not in tile_set:
+                    if (x + i, y + j) not in tile_dict:
                         break
                 else:
                     continue
@@ -44,7 +50,9 @@ def get_three_color_tiles(
 
     if biggest is not None:
         square_x, square_y, square_size = biggest
-        a[square_x : square_x + square_size, square_y : square_y + square_size] = 3
+        for x in range(square_x, square_x + square_size):
+            for y in range(square_y, square_y + square_size):
+                tile_dict[(x, y)] = 3
 
     tile_metadata = {
         (row["tile_x"], row["tile_y"]): {
@@ -56,7 +64,6 @@ def get_three_color_tiles(
     }
 
     # Find non-zero tiles.
-    border_x, border_y = np.where(a)
     return geojson.dumps(
         geojson.FeatureCollection(
             features=[
@@ -64,12 +71,12 @@ def get_three_color_tiles(
                     x,
                     y,
                     {
-                        "color": {1: "red", 2: "green", 3: "blue"}[a[x, y]],
+                        "color": {1: "red", 2: "green", 3: "blue"}[v],
                         **tile_metadata[(x, y)],
                     },
                     zoom,
                 )
-                for x, y in zip(border_x, border_y)
+                for (x, y), v in tile_dict.items()
             ]
         )
     )

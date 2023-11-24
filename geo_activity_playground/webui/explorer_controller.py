@@ -20,13 +20,16 @@ class ExplorerController:
 
         explored_geojson = get_three_color_tiles(tiles, self._repository, zoom)
 
-        points = get_border_tiles(tiles, zoom)
-        missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
-        make_grid_file_gpx(points, "missing_tiles")
+        if zoom <= 14:
+            points = get_border_tiles(tiles, zoom)
+            missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
+            make_grid_file_gpx(points, "missing_tiles")
 
-        points = get_explored_tiles(tiles, zoom)
-        explored_tiles_geojson = make_grid_file_geojson(points, "explored")
-        make_grid_file_gpx(points, "explored")
+            points = get_explored_tiles(tiles, zoom)
+            explored_tiles_geojson = make_grid_file_geojson(points, "explored")
+            make_grid_file_gpx(points, "explored")
+        else:
+            missing_tiles_geojson = {}
 
         return {
             "explored_geojson": explored_geojson,
