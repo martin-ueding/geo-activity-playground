@@ -40,7 +40,7 @@
 <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
     {% for elem in activity_batch %}
     <div class="col">
-        <div class="card">
+        <div class="card {{ '' if elem.activity.commute else 'border-primary' }}">
             <div class="card-img-top" id="map-{{ elem.activity.id }}" style="height: 200px; width: 100%;"></div>
             <script>
                 let map{{ elem.activity.id }} = add_map("{{ elem.activity.id }}", {{ elem.line_geojson | safe }})
