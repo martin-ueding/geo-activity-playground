@@ -9,19 +9,21 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.6
 
 - Interactive map for each activity.
-- Color explorer tiles in red, green and blue.
+- Color explorer tiles in red, green and blue. [GH-2](https://github.com/martin-ueding/geo-activity-playground/issues/2)
 - Directly serve GeoJSON and Vega JSON embedded in the document.
-- Automatically detect which source is to be used.
-- Fix the name of the script to be `geo-activity-playground` and not just `geo-playground`.
-- Add mini maps to the landing page.
-- Add fullscreen button to the maps.
-- Add favicon.
+- Automatically detect which source is to be used. [GH-16](https://github.com/martin-ueding/geo-activity-playground/issues/16)
+- Fix the name of the script to be `geo-activity-playground` and not just `geo-playground`. [GH-11](https://github.com/martin-ueding/geo-activity-playground/issues/11)
+- Add mini maps to the landing page. [GH-9](https://github.com/martin-ueding/geo-activity-playground/issues/9)
+- Add fullscreen button to the maps. [GH-4](https://github.com/martin-ueding/geo-activity-playground/issues/4)
+- Add favicon. [GH-19](https://github.com/martin-ueding/geo-activity-playground/issues/19)
 - Added some more clever caching to the explorer tiles such that loading the page with explorer tiles comes up in just a few seconds.
 - Add a triplet of time series plots (distance, altitude, heart rate) for each activity.
+- Show plot for heart rate zones per activity. [GH-12](https://github.com/martin-ueding/geo-activity-playground/issues/12)
+- Handle activities without any location points. [GH-10](https://github.com/martin-ueding/geo-activity-playground/issues/10)
 
 ### Version 0.5
 
-- Add some plots for the Eddington number.
+- Add some plots for the Eddington number. [GH-3](https://github.com/martin-ueding/geo-activity-playground/issues/3)
 
 ### Version 0.4
 
