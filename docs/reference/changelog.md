@@ -26,6 +26,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Integrate missing explorer tiles into the web interface. [GH-7](https://github.com/martin-ueding/geo-activity-playground/issues/7).
 - Color activity line with speed. [GH-13](https://github.com/martin-ueding/geo-activity-playground/issues/13)
 - Add interactive heatmap.
+- Add margin to generated heatmaps. [GH-1](https://github.com/martin-ueding/geo-activity-playground/issues/1)
 
 ### Version 0.5
 
