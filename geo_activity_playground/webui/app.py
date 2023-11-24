@@ -2,6 +2,7 @@ import pathlib
 
 from flask import Flask
 from flask import render_template
+from flask import Response
 from flask import send_from_directory
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -13,6 +14,7 @@ from geo_activity_playground.webui.eddington_controller import EddingtonControll
 from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
+from geo_activity_playground.webui.heatmap_controller import HeatmapController
 
 
 def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
@@ -24,6 +26,7 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     activity_controller = ActivityController(repository)
     explorer_controller = ExplorerController(repository)
     equipment_controller = EquipmentController(repository)
+    heatmap_controller = HeatmapController(repository)
 
     @app.route("/")
     def index():
@@ -77,5 +80,16 @@ def webui_main(basedir: pathlib.Path, repository: ActivityRepository) -> None:
     @app.route("/equipment")
     def equipment():
         return render_template("equipment.html.j2", **equipment_controller.render())
+
+    @app.route("/heatmap")
+    def heatmap():
+        return render_template("heatmap.html.j2", **heatmap_controller.render())
+
+    @app.route("/heatmap/tile/<z>/<x>/<y>.png")
+    def heatmap_tile(x: str, y: str, z: str):
+        return Response(
+            heatmap_controller.render_tile(int(x), int(y), int(z)),
+            mimetype="image/png",
+        )
 
     app.run()

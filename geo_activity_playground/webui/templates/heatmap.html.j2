@@ -1,0 +1,28 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Heatmap</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div id="heatmap" style="height: 800px;"></div>
+
+        <script>
+            let map = L.map('heatmap', {
+                fullscreenControl: true,
+                center: [51.505, -0.09],
+                zoom: 13
+            });
+            L.tileLayer('/heatmap/tile/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map)
+        </script>
+    </div>
+</div>
+
+{% endblock %}

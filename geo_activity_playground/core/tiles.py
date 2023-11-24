@@ -1,3 +1,4 @@
+import functools
 import math
 import pathlib
 import time
@@ -41,11 +42,8 @@ def download_file(url: str, destination: pathlib.Path):
     time.sleep(0.1)
 
 
-def get_tile(
-    zoom: int, x: int, y: int, _cache: dict[tuple[int, int, int], Image.Image] = {}
-) -> Image.Image:
-    if (zoom, x, y) in _cache:
-        return _cache[(zoom, x, y)]
+@functools.lru_cache()
+def get_tile(zoom: int, x: int, y: int) -> Image.Image:
     destination = pathlib.Path.cwd() / "Open Street Map Tiles" / f"{zoom}/{x}/{y}.png"
     if not destination.exists():
         # url = f"https://maps.wikimedia.org/osm-intl/{zoom}/{x}/{y}.png"
@@ -54,7 +52,6 @@ def get_tile(
     with Image.open(destination) as image:
         image.load()
         image = image.convert("RGB")
-    _cache[(zoom, x, y)] = image
     return image
 
 
