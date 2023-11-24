@@ -1,6 +1,7 @@
 import io
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.heatmap import get_all_points
 from geo_activity_playground.core.tiles import get_tile
 
 
@@ -9,6 +10,8 @@ class HeatmapController:
         self._repository = repository
 
     def render(self) -> dict:
+        self._all_points = get_all_points(self._repository)
+        print(self._all_points)
         return {}
 
     def render_tile(self, x: int, y: int, z: int) -> bytes:
