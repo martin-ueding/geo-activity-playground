@@ -1,3 +1,5 @@
+import functools
+
 import altair as alt
 import pandas as pd
 
@@ -8,6 +10,7 @@ class EquipmentController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
 
+    @functools.cache
     def render(self) -> dict:
         total_distances = (
             self._repository.meta.groupby("equipment")
