@@ -41,7 +41,9 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
-            let geojson = L.geoJSON({{ line_json| safe }}).addTo(map)
+            let geojson = L.geoJSON({{ color_line_geojson| safe }}, {
+                style: function (feature) { return { color: feature.properties.color } }
+            }).addTo(map)
             map.fitBounds(geojson.getBounds());
         </script>
     </div>

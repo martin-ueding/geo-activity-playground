@@ -24,6 +24,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add page for equipment. [GH-3](https://github.com/martin-ueding/geo-activity-playground/issues/3)
 - Add a pop-up with some metadata about the first visit to the explorer tiles. [GH-14](https://github.com/martin-ueding/geo-activity-playground/issues/14)
 - Integrate missing explorer tiles into the web interface. [GH-7](https://github.com/martin-ueding/geo-activity-playground/issues/7).
+- Color activity line with speed. [GH-13](https://github.com/martin-ueding/geo-activity-playground/issues/13)
 
 ### Version 0.5
 

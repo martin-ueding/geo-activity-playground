@@ -6,6 +6,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import extract_heart_rate_zones
+from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 
 
@@ -24,6 +25,7 @@ class ActivityController:
             "activity": activity,
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
+            "color_line_geojson": make_geojson_color_line(time_series),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)

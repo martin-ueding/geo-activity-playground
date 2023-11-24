@@ -8,6 +8,7 @@ from typing import Iterator
 from typing import Optional
 
 import geojson
+import matplotlib
 import numpy as np
 import pandas as pd
 
@@ -67,6 +68,38 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
         ]
     )
     return geojson.dumps(line)
+
+
+def make_geojson_color_line(time_series: pd.DataFrame) -> str:
+    time_series["speed"] = (
+        time_series["distance"].diff()
+        / time_series["time"].diff().dt.total_seconds()
+        * 3.6
+    )
+    cmap = matplotlib.colormaps["viridis"]
+    return geojson.dumps(
+        geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.LineString(
+                        coordinates=[
+                            [row["longitude"], row["latitude"]],
+                            [next["longitude"], next["latitude"]],
+                        ]
+                    ),
+                    properties={
+                        "speed": next["speed"],
+                        "color": matplotlib.colors.to_hex(
+                            cmap(min(next["speed"] / 35, 1.0))
+                        ),
+                    },
+                )
+                for (_, row), (_, next) in zip(
+                    time_series.iterrows(), time_series.iloc[1:].iterrows()
+                )
+            ]
+        )
+    )
 
 
 def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
