@@ -182,8 +182,6 @@ def render_heatmap(
             :, :, c
         ] + data_color[:, :, c]
 
-    xy_data
-
     supertile = supertile[
         int(min(xy_data[:, 1])) : int(max(xy_data[:, 1])),
         int(min(xy_data[:, 0])) : int(max(xy_data[:, 0])),

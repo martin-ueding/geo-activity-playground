@@ -1,3 +1,4 @@
+import functools
 import logging
 import pathlib
 
@@ -10,6 +11,7 @@ from geo_activity_playground.core.tasks import work_tracker
 logger = logging.getLogger(__name__)
 
 
+@functools.cache
 def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
     logger.info("Gathering all points …")
     all_points_path = pathlib.Path("Cache/all_points.parquet")
