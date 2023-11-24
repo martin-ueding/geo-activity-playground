@@ -424,6 +424,26 @@
 
               
             
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration File
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -679,7 +699,7 @@
 <span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;…&quot;</span>
 </code></pre></div>
 <p>Add the <em>client ID</em> and the <em>client secret</em> from your Strava app. Add the <em>code</em> that we have read off this localhost URL.</p>
-<p>Then you are all set to download data from the Strava API. Select the Strava API by supplying <code>--source strava-api</code> to the commands.</p>
+<p>Then you are all set to download data from the Strava API. When you start one of the commands, it will automatically start to download.</p>
 <h2 id="rate-limiting">Rate limiting</h2>
 <p>When you first start this program and use the Strava API as a data source, it will download the metadata for all your activities. Then it will start to download all the time series data for each activity. Strava has a rate limiting, so after the first 200 activities it will crash and you will have to wait for 15 minutes until you can try again and it will download the next batch.</p>
 
