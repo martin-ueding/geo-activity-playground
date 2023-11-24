@@ -27,6 +27,7 @@ nav:
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
       - getting-started/starting-the-webserver.md
+      - getting-started/config-file.md
   - heatmaps.md
   - explorer-tiles.md
   - Explanation:
