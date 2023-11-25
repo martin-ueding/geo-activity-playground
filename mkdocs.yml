@@ -28,10 +28,10 @@ nav:
       - getting-started/using-strava-api.md
       - getting-started/starting-the-webserver.md
       - getting-started/config-file.md
-  - heatmaps.md
-  - explorer-tiles.md
-  - Explanation:
-      - explanation/explorer-tiles.md
+  - Features:
+      - features/explorer-tiles.md
+      - features/heatmaps.md
+      - features/eddington.md
   - Reference:
       - reference/changelog.md
       - reference/directory-layout.md
