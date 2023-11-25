@@ -32,6 +32,7 @@ nav:
       - features/explorer-tiles.md
       - features/heatmaps.md
       - features/eddington.md
+      - features/equipment.md
   - Reference:
       - reference/changelog.md
       - reference/directory-layout.md
