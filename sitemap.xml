@@ -36,11 +36,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/config-file/</loc>
-         <lastmod>2023-11-25</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-git-on-linux/</loc>
          <lastmod>2023-11-25</lastmod>
          <changefreq>daily</changefreq>
