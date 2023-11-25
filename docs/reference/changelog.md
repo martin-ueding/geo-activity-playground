@@ -9,6 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.8
 
 - Make heart rate zone computation a bit more flexibly by offering a lower bound for the resting heart rate.
+- Open explorer map centered around median tile.
 
 ### Version 0.7
 

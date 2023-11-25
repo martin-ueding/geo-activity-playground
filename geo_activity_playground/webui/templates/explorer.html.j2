@@ -61,13 +61,14 @@
             let missing_geojson = {{ missing_tiles_geojson| safe}}
             let missing_map = L.map('missing-map', {
                 fullscreenControl: true
+                center: [{{ center.latitude }}, {{ center.longitude }}],
+            zoom: 10
             });
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(missing_map)
             let missing_layer = L.geoJSON(missing_geojson).addTo(missing_map)
-            missing_map.fitBounds(missing_layer.getBounds())
         </script>
     </div>
 </div>
