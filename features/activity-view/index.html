@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-stable-on-linux/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/activity-view/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../calendar/">
       
       
-        <link rel="next" href="../installing-git-on-linux/">
+        <link rel="next" href="../heatmaps/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Installing Stable On Linux - Geo Activity Playground</title>
+        <title>Activity View - Geo Activity Playground</title>
       
     
     
@@ -77,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installing-stable-on-linux" class="md-skip">
+        <a href="#activity-view" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installing Stable On Linux
+              Activity View
             
           </span>
         </div>
@@ -245,19 +245,17 @@
       
   
   
-    
-  
   
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
@@ -270,7 +268,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Getting Started
@@ -281,29 +279,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Installing Stable On Linux
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting-started/installing-stable-on-linux/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -312,40 +290,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
-    Ensure that the PATH is correct
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#upgrading-to-the-latest-version" class="md-nav__link">
-    Upgrading to the latest version
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -357,7 +301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installing-git-on-linux/" class="md-nav__link">
+      <a href="../../getting-started/installing-git-on-linux/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -377,7 +321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../using-activity-files/" class="md-nav__link">
+      <a href="../../getting-started/using-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -397,7 +341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../using-strava-api/" class="md-nav__link">
+      <a href="../../getting-started/using-strava-api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -417,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../starting-the-webserver/" class="md-nav__link">
+      <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -437,7 +381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config-file/" class="md-nav__link">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -462,17 +406,19 @@
       
   
   
+    
+  
   
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
@@ -485,7 +431,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Features
@@ -498,7 +444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/calendar/" class="md-nav__link">
+      <a href="../calendar/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -516,9 +462,29 @@
                 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../features/activity-view/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Activity View
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -527,6 +493,40 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    Metadata
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#map-with-track" class="md-nav__link">
+    Map with track
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -538,7 +538,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/heatmaps/" class="md-nav__link">
+      <a href="../heatmaps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -558,7 +558,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/explorer-tiles/" class="md-nav__link">
+      <a href="../explorer-tiles/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -578,7 +578,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/eddington/" class="md-nav__link">
+      <a href="../eddington/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -598,7 +598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/equipment/" class="md-nav__link">
+      <a href="../equipment/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -727,15 +727,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
-    Ensure that the PATH is correct
+  <a href="#metadata" class="md-nav__link">
+    Metadata
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#upgrading-to-the-latest-version" class="md-nav__link">
-    Upgrading to the latest version
+  <a href="#map-with-track" class="md-nav__link">
+    Map with track
   </a>
   
 </li>
@@ -755,27 +755,16 @@
                   
 
 
-<h1 id="installing-stable-on-linux">Installing Stable On Linux</h1>
-<p>In this how-to guide I will show you how you can install the latest stable version of this project on Linux.</p>
-<p>Using PIP, you can install the latest version using this command:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>geo-activity-playground
-</code></pre></div>
-<p>If you get an error about the command <code>pip</code> not found, you will need to install that first. On Ubuntu or Debian use <code>sudo apt install python3-pip</code>, on Fedora or RedHat use <code>sudo dnf install python3-pip</code>. After you have installed PIP, repeat the above command.</p>
-<h2 id="ensure-that-the-path-is-correct">Ensure that the PATH is correct</h2>
-<p>Next you can try to start the program by just entering the following into the terminal:</p>
-<div class="highlight"><pre><span></span><code>geo-activity-playground<span class="w"> </span>--help
-</code></pre></div>
-<p>If you get a help message, everything is fine. If you get an error about <em>command not found</em>, we need to adjust your PATH. Execute the following in your command line:</p>
-<div class="highlight"><pre><span></span><code>xdg-open<span class="w"> </span>~/.profile
-</code></pre></div>
-<p>This brings up an editor with your shell profile. Add a line containing the following at the end of the file:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$HOME</span>/.local/bin
-</code></pre></div>
-<p>This adds the path to your shell environment. After you have done it, close your terminal window and open a new one. Try the first command in this section again, you should see the help message now.</p>
-<h2 id="upgrading-to-the-latest-version">Upgrading to the latest version</h2>
-<p>At some later point you likely want to upgrade to the latest version. For this use this command:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">geo</span><span class="o">-</span><span class="n">activity</span><span class="o">-</span><span class="n">playground</span>
-</code></pre></div>
+<h1 id="activity-view">Activity View</h1>
+<p>When you have selected a particular activity, you can view various details about it. This is what the screen looks like, we will go through the different parts in the following.</p>
+<p><img alt="" src="../activity-overview.png" /></p>
+<h2 id="metadata">Metadata</h2>
+<p>You have a column with metadata about the activity. The activity kind, whether it is a commute and the equipment are currently only supported via the Strava API, but we can build something to infer that from directories as well.</p>
+<p><img alt="" src="../activity-meta.png" /></p>
+<p>The calories are broken in the Strava API wrapper library that I use, therefore they don't show even if they are there.</p>
+<p>You can also see the ID which is an internal ID.</p>
+<h2 id="map-with-track">Map with track</h2>
+<p><img alt="" src="../activity-map.png" /></p>
 
 
 

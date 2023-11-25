@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-stable-on-linux/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/explorer-tiles/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../heatmaps/">
       
       
-        <link rel="next" href="../installing-git-on-linux/">
+        <link rel="next" href="../eddington/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Installing Stable On Linux - Geo Activity Playground</title>
+        <title>Explorer Tiles - Geo Activity Playground</title>
       
     
     
@@ -77,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installing-stable-on-linux" class="md-skip">
+        <a href="#explorer-tiles" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installing Stable On Linux
+              Explorer Tiles
             
           </span>
         </div>
@@ -245,19 +245,17 @@
       
   
   
-    
-  
   
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
@@ -270,7 +268,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Getting Started
@@ -281,29 +279,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Installing Stable On Linux
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting-started/installing-stable-on-linux/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -312,40 +290,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
-    Ensure that the PATH is correct
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#upgrading-to-the-latest-version" class="md-nav__link">
-    Upgrading to the latest version
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -357,7 +301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installing-git-on-linux/" class="md-nav__link">
+      <a href="../../getting-started/installing-git-on-linux/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -377,7 +321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../using-activity-files/" class="md-nav__link">
+      <a href="../../getting-started/using-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -397,7 +341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../using-strava-api/" class="md-nav__link">
+      <a href="../../getting-started/using-strava-api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -417,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../starting-the-webserver/" class="md-nav__link">
+      <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -437,7 +381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config-file/" class="md-nav__link">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -462,17 +406,19 @@
       
   
   
+    
+  
   
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
@@ -485,7 +431,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Features
@@ -498,7 +444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/calendar/" class="md-nav__link">
+      <a href="../calendar/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -518,7 +464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/activity-view/" class="md-nav__link">
+      <a href="../activity-view/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -538,7 +484,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/heatmaps/" class="md-nav__link">
+      <a href="../heatmaps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -556,9 +502,29 @@
                 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../features/explorer-tiles/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Explorer Tiles
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -567,6 +533,40 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#squadratinhos" class="md-nav__link">
+    Squadratinhos
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#missing-tile-files" class="md-nav__link">
+    Missing tile files
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -578,7 +578,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/eddington/" class="md-nav__link">
+      <a href="../eddington/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -598,7 +598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/equipment/" class="md-nav__link">
+      <a href="../equipment/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -727,15 +727,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
-    Ensure that the PATH is correct
+  <a href="#squadratinhos" class="md-nav__link">
+    Squadratinhos
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#upgrading-to-the-latest-version" class="md-nav__link">
-    Upgrading to the latest version
+  <a href="#missing-tile-files" class="md-nav__link">
+    Missing tile files
   </a>
   
 </li>
@@ -755,27 +755,48 @@
                   
 
 
-<h1 id="installing-stable-on-linux">Installing Stable On Linux</h1>
-<p>In this how-to guide I will show you how you can install the latest stable version of this project on Linux.</p>
-<p>Using PIP, you can install the latest version using this command:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>geo-activity-playground
+<h1 id="explorer-tiles">Explorer Tiles</h1>
+<p>Maps accessible via the web browser are usually served as little image tiles. The Open Street Map uses the <em>Web Mercator</em> coordinate system to map from latitude and longitude to pixels on the map.</p>
+<p>Each tile is 256×256 pixels in size. The zoom levels zoom in by a factor of two. Therefore all the tiles are organized in a <em>quad tree</em>. As you zoom in, each tile gets split into four tiles which can then show more detail. The following prescription maps from latitude and longitude (given in degrees) to tile indices:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute_tile</span><span class="p">(</span><span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">zoom</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
 </code></pre></div>
-<p>If you get an error about the command <code>pip</code> not found, you will need to install that first. On Ubuntu or Debian use <code>sudo apt install python3-pip</code>, on Fedora or RedHat use <code>sudo dnf install python3-pip</code>. After you have installed PIP, repeat the above command.</p>
-<h2 id="ensure-that-the-path-is-correct">Ensure that the PATH is correct</h2>
-<p>Next you can try to start the program by just entering the following into the terminal:</p>
-<div class="highlight"><pre><span></span><code>geo-activity-playground<span class="w"> </span>--help
-</code></pre></div>
-<p>If you get a help message, everything is fine. If you get an error about <em>command not found</em>, we need to adjust your PATH. Execute the following in your command line:</p>
-<div class="highlight"><pre><span></span><code>xdg-open<span class="w"> </span>~/.profile
-</code></pre></div>
-<p>This brings up an editor with your shell profile. Add a line containing the following at the end of the file:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$HOME</span>/.local/bin
-</code></pre></div>
-<p>This adds the path to your shell environment. After you have done it, close your terminal window and open a new one. Try the first command in this section again, you should see the help message now.</p>
-<h2 id="upgrading-to-the-latest-version">Upgrading to the latest version</h2>
-<p>At some later point you likely want to upgrade to the latest version. For this use this command:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">geo</span><span class="o">-</span><span class="n">activity</span><span class="o">-</span><span class="n">playground</span>
-</code></pre></div>
+<p>At zoom level 14 the tiles have a side length of roughly 1.5 km in Germany. These tiles are used as the basis for <em>explorer tiles</em>. The basic idea is that every tile where you have at least one point in an activity is considered an <em>explored tile</em>.</p>
+<p>From your activities the program will extract all the tiles that you have visited. And then it does a few things with those. One main thing is that it will display these on an interactive map. When we zoom into one area where I've been on vacation in 2023, you can see the explored tiles there:</p>
+<p><img alt="" src="../explorer-sluis.png" /></p>
+<p>The colored tiles are explored, I have been there. The green tiles are <em>cluster tiles</em>, that means that all their four neighbor tiles are also explored.</p>
+<p>You can see here how I have explored a region and ensured that it is mostly contiguous.</p>
+<p>There is another vacation from 2013 where I wasn't aware of the cluster tiles. I just did some bike trips and didn't look out for the tiles. There the tiles look like this:</p>
+<p><img alt="" src="../explorer-sint-annaland.png" /></p>
+<p>You see all these gaps in there. And this is what the explorer tiles are about: This OCD (obsessive compulsive disorder) like craving to fill in the gaps.</p>
+<p>Let's take a look at my main cluster of explorer tiles. Here I have explored much more than in the areas where I was on vacation.</p>
+<p><img alt="" src="../explorer-home.png" /></p>
+<p>You can see an additional feature, the blue square. This is the one largest square which can be fit into all explored tiles. In this picture it has size 21². The idea of the square is to have a really tough challenge. Not only does one need to explore increasingly many tiles to expand the square by one unit, there must not be any gaps.</p>
+<p>As you can see in this picture, there is a tile missing right at the top edge. I will never be able to get that because that is an off-limits area of the German air force at the airport. So I can expand my square to the south only.</p>
+<p>You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity:</p>
+<p><img alt="" src="../explorer-tooltip.png" /></p>
+<h2 id="squadratinhos">Squadratinhos</h2>
+<p>The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the <em>squadratinhos</em> which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.</p>
+<p>These are better suited for walking and making sure that you really explored every little place in your neighborhood. Since they are so small, there are many properties which one cannot go onto, like industrial sites, airports or just a wide river.</p>
+<p>For my home city it looks like this:</p>
+<p><img alt="" src="../squadratinhos-bonn.png" /></p>
+<p>You can see how the squadratinhos are much smaller than the explorer tiles and how they lend themselves to more local exploring.</p>
+<h2 id="missing-tile-files">Missing tile files</h2>
+<p>Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Take for instance this set of tiles from a vacation:</p>
+<p><img alt="" src="../explorer-kell.png" /></p>
+<p>You can see those two gaps in the south. To make identifying these gaps a bit easier there is a second map which shows you the missing tiles. It has the gaps and also a border around the explored tiles:</p>
+<p><img alt="" src="../explorer-kell-missing.png" /></p>
+<p>One can use those maps to plan the routes. You can also download these maps as a GeoJSON file and use other programs to display them. For instance with GPX See on Linux it looks like this:</p>
+<p><img alt="" src="../explorer-missing-geojson.png" /></p>
+<p>I have not tested this software, but supposedly <a href="https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps">Offline Maps</a> is able to display GeoJSON on Android.</p>
+<p>On Android I use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately <a href="https://osmand.net/docs/technical/osmand-file-formats/">GeoJSON is not supported</a>, therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:</p>
+<p><img alt="" src="../explorer-missing-gpx.png" /></p>
+<p>Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so I don't have this displayed all the time.</p>
 
 
 
