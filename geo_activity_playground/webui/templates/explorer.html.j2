@@ -4,6 +4,9 @@
 <div class="row mb-3">
     <div class="col">
         <h1>Explorer Tiles</h1>
+        <p>You have {{ explored.num_tiles }} explored tiles. There are {{ explored.num_cluster_tiles }} cluster tiles in
+            total. Your largest square has size {{ explored.square_size }}².
+        </p>
     </div>
 </div>
 
@@ -26,7 +29,7 @@
                 }
             }
 
-            let explorer_geojson = {{ explored_geojson| safe}}
+            let explorer_geojson = {{ explored.explored_geojson| safe}}
             let map = L.map('explorer-map', {
                 fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],

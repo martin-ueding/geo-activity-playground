@@ -23,7 +23,7 @@ class ExplorerController:
             medians["tile_x"], medians["tile_y"], zoom
         )
 
-        explored_geojson = get_three_color_tiles(tiles, self._repository, zoom)
+        explored = get_three_color_tiles(tiles, self._repository, zoom)
 
         points = get_border_tiles(tiles, zoom)
         missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
@@ -38,6 +38,6 @@ class ExplorerController:
                 "latitude": median_lat,
                 "longitude": median_lon,
             },
-            "explored_geojson": explored_geojson,
+            "explored": explored,
             "missing_tiles_geojson": missing_tiles_geojson,
         }

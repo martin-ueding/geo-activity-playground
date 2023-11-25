@@ -63,23 +63,31 @@ def get_three_color_tiles(
         for index, row in tiles.iterrows()
     }
 
+    num_cluster_tiles = sum(value == 2 for value in tile_dict.values())
+
     # Find non-zero tiles.
-    return geojson.dumps(
-        geojson.FeatureCollection(
-            features=[
-                make_explorer_tile(
-                    x,
-                    y,
-                    {
-                        "color": {1: "red", 2: "green", 3: "blue"}[v],
-                        **tile_metadata[(x, y)],
-                    },
-                    zoom,
-                )
-                for (x, y), v in tile_dict.items()
-            ]
-        )
-    )
+    result = {
+        "explored_geojson": geojson.dumps(
+            geojson.FeatureCollection(
+                features=[
+                    make_explorer_tile(
+                        x,
+                        y,
+                        {
+                            "color": {1: "red", 2: "green", 3: "blue"}[v],
+                            **tile_metadata[(x, y)],
+                        },
+                        zoom,
+                    )
+                    for (x, y), v in tile_dict.items()
+                ]
+            )
+        ),
+        "num_cluster_tiles": num_cluster_tiles,
+        "num_tiles": len(tile_dict),
+        "square_size": square_size,
+    }
+    return result
 
 
 def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
