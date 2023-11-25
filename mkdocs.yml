@@ -27,7 +27,6 @@ nav:
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
       - getting-started/starting-the-webserver.md
-      - getting-started/config-file.md
   - Features:
       - features/calendar.md
       - features/activity-view.md

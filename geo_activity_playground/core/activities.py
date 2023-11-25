@@ -113,17 +113,33 @@ def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame
         config = tomllib.load(f)
 
     try:
-        birthyear = config["heart"]["birthyear"]
+        heart_config = config["heart"]
     except KeyError:
         logger.warning(
-            "Missing config entry `heart.birthyear`, cannot determine heart rate zones."
+            "Missing config entry `heart`, cannot determine heart rate zones."
         )
         return None
 
-    age = time_series["time"].iloc[0].year - birthyear
-    max_rate = 220 - age
-    zones: pd.Series = time_series["heartrate"] * 10 // max_rate - 4
+    birthyear = heart_config.get("birthyear", None)
+    maximum = heart_config.get("maximum", None)
+    resting = heart_config.get("resting", None)
+
+    if not maximum and birthyear:
+        age = time_series["time"].iloc[0].year - birthyear
+        maximum = 220 - age
+    if not resting:
+        resting = 0
+    if not maximum:
+        logger.warning(
+            "Missing config entry `heart.maximum` or `heart.birthyear`, cannot determine heart rate zones."
+        )
+        return None
+
+    zones: pd.Series = (time_series["heartrate"] - resting) * 10 // (
+        maximum - resting
+    ) - 4
     zones.loc[zones < 0] = 0
+    zones.loc[zones > 5] = 5
     df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
     duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
     duration_per_zone.name = "minutes"

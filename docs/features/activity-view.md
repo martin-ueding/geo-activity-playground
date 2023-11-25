@@ -40,18 +40,41 @@ More interesting regarding the heart rate are the zones which one has spent time
 
 ![](activity-heartzone.png)
 
-There are some common definitions of _heart rate zones_, take for instance [this one by Polar](https://www.polar.com/blog/running-heart-rate-zones-basics/). There are five zones, namely from 50 to 60 %, 60 to 70 %, 70 to 80 %, 80 to 90 % and 90 to 100 % of the maximum heart rate. The maximum heart rate would need to be measured, but taking the formula _220 - age_ will do for most people.
+The definition of the heart rate zones is not standardized. Usually there are five zones and they have the same names. What differs is how their ranges are computed and there is some chaos around that.
 
-On [this blog](https://theathleteblog.com/heart-rate-zones/) there are also some names given to the zones, the same way that my Garmin watch does it:
+All definitions that I found take the maximum heart rate as the upper limit. One can measure this as part of a professional training or just use the _220 minus age_ prescription which at least for me matches close enough. What they differ on is how they use a lower bound. It seems that [Polar](https://www.polar.com/blog/running-heart-rate-zones-basics/) or [REI](https://www.rei.com/learn/expert-advice/how-to-train-with-a-heart-rate-monitor.html) basically use 0 as the lower bound. My Garmin system also uses 0 as the lower bound. But as one can see in [this blog](https://theathleteblog.com/heart-rate-zones/), one can also use the resting heart rate as the lower bound.
 
-Zone | Heart Rate | Training
+Based on the maximum and resting heart rate we will then compute the heart rate zones using certain percentages of _effort_. We can compute the heart rate as the following:
+
+> rate = effort × (maximum – minimum) + minimum
+
+The zones then take the following efforts:
+
+Zone | Effort | Training
 ---: | ---: | ---:
-1 | 50 to 60 % | Warmup
-2 | 60 to 70 % | Light
-3 | 70 to 80 % | Aerobic
-4 | 80 to 90 % | Intensive
-5 | 90 to 100 % | Maximal
+1 | 50 to 60 % | Warmup/Recovery
+2 | 60 to 70 % | Base Fitness
+3 | 70 to 80 % | Aerobic Endurance
+4 | 80 to 90 % | Anerobic Capacity
+5 | 90 to 100 % | Speed Training
 
-One can [find slightly different zone definition](https://www.rei.com/learn/expert-advice/how-to-train-with-a-heart-rate-monitor.html).
+You can decide how you want to do work with that. If you want to have the same definitions that say Garmin uses, you need to just enter your birth year and we can compute the rest. If you want to use a lower bound, you need to specify that.
 
-For this to work you need to enter your birth year into the [configuration file](../getting-started/config-file.md). If you are not satisfied with the _220 minus age_ prescription, please let me know. We can make this more flexible.
+For this create a configuration file at `Playground/config.toml` and enter a stanza in there, like this:
+
+```toml
+[heart]
+birthyear = 19..
+```
+
+If you know your maximum heart rate, you can also write `maximum = 187`. If you want to use the lower bound, write `resting = 48` as well. So it might look like this:
+
+```toml
+[heart]
+maximum = 187
+resting = 48
+```
+
+You can also combine `birthyear` and `resting` and leave out `maximum`.
+
+If you are not happy with this prescription, please let me know.
