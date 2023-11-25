@@ -8,7 +8,7 @@ The configuration file is a text file named `config.toml` inside the playground 
 
 ## Heart rate zones
 
-There are some common definitions of _heart rate zones_, take for instance [this one by Polar](https://www.polar.com/blog/running-heart-rate-zones-basics/). There are five zones, namely from 50 to 60 %, 60 to 70 %, 70 to 80 %, 80 to 90 % and 90 to 100 % of the maximum heart rate. The maximum heart rate would need to be measured, but taking the formula _220 - age_ will do for most people.
+
 
 In your config add this block somewhere:
 

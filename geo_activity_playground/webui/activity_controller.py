@@ -19,6 +19,7 @@ class ActivityController:
         activity = self._repository.get_activity_by_id(id)
 
         time_series = self._repository.get_time_series(id)
+        time_series["distance/km"] = time_series["distance"] / 1000
         line_json = make_geojson_from_time_series(time_series)
 
         result = {
@@ -40,7 +41,9 @@ def distance_time_plot(time_series: pd.DataFrame) -> str:
     return (
         alt.Chart(time_series, title="Distance")
         .mark_line()
-        .encode(alt.X("time", title="Time"), alt.Y("distance", title="Distance / km"))
+        .encode(
+            alt.X("time", title="Time"), alt.Y("distance/km", title="Distance / km")
+        )
         .interactive()
         .to_json(format="vega")
     )
