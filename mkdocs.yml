@@ -29,8 +29,10 @@ nav:
       - getting-started/starting-the-webserver.md
       - getting-started/config-file.md
   - Features:
-      - features/explorer-tiles.md
+      - features/calendar.md
+      - features/activity-view.md
       - features/heatmaps.md
+      - features/explorer-tiles.md
       - features/eddington.md
       - features/equipment.md
   - Reference:
