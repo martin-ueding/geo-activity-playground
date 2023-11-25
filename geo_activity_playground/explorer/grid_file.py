@@ -1,3 +1,4 @@
+import logging
 import pathlib
 from typing import Iterator
 
@@ -6,10 +7,14 @@ import gpxpy
 import numpy as np
 import pandas as pd
 import scipy.ndimage
+import sklearn.cluster
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.converters import get_tile_history
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_three_color_tiles(
@@ -19,7 +24,10 @@ def get_three_color_tiles(
     a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
     a[tiles["tile_x"], tiles["tile_y"]] = 1
 
-    tile_dict = {elem: 1 for elem in zip(tiles["tile_x"], tiles["tile_y"])}
+    tile_dict = {
+        elem: {"cluster": False, "square": False}
+        for elem in zip(tiles["tile_x"], tiles["tile_y"])
+    }
 
     for x, y in tile_dict.keys():
         if (
@@ -28,7 +36,7 @@ def get_three_color_tiles(
             and (x, y + 1) in tile_dict
             and (x, y - 1) in tile_dict
         ):
-            tile_dict[(x, y)] = 2
+            tile_dict[(x, y)]["cluster"] = True
 
     # Compute biggest square.
     square_size = 1
@@ -52,7 +60,7 @@ def get_three_color_tiles(
         square_x, square_y, square_size = biggest
         for x in range(square_x, square_x + square_size):
             for y in range(square_y, square_y + square_size):
-                tile_dict[(x, y)] = 3
+                tile_dict[(x, y)]["square"] = True
 
     tile_metadata = {
         (row["tile_x"], row["tile_y"]): {
@@ -63,7 +71,19 @@ def get_three_color_tiles(
         for index, row in tiles.iterrows()
     }
 
-    num_cluster_tiles = sum(value == 2 for value in tile_dict.values())
+    num_cluster_tiles = sum(value["cluster"] for value in tile_dict.values())
+
+    cluster_tiles = np.array(
+        [tile for tile, value in tile_dict.items() if value["cluster"]]
+    )
+
+    logger.info("Run DBSCAN cluster finding algorithm …")
+    dbscan = sklearn.cluster.DBSCAN(eps=1.1, min_samples=1)
+    labels = dbscan.fit_predict(cluster_tiles)
+    label_counts = dict(zip(*np.unique(labels, return_counts=True)))
+    max_cluster_size = max(
+        count for label, count in label_counts.items() if label != -1
+    )
 
     # Find non-zero tiles.
     result = {
@@ -74,7 +94,7 @@ def get_three_color_tiles(
                         x,
                         y,
                         {
-                            "color": {1: "red", 2: "green", 3: "blue"}[v],
+                            "color": map_color(v),
                             **tile_metadata[(x, y)],
                         },
                         zoom,
@@ -83,11 +103,21 @@ def get_three_color_tiles(
                 ]
             )
         ),
+        "max_cluster_size": max_cluster_size,
         "num_cluster_tiles": num_cluster_tiles,
         "num_tiles": len(tile_dict),
         "square_size": square_size,
     }
     return result
+
+
+def map_color(tile_meta: dict) -> str:
+    if tile_meta["square"]:
+        return "blue"
+    elif tile_meta["cluster"]:
+        return "green"
+    else:
+        return "red"
 
 
 def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
