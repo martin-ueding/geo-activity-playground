@@ -83,12 +83,13 @@ def get_three_color_tiles(
 
 
 def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
-    a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
-    a[tiles["tile_x"], tiles["tile_y"]] = 1
-    dilated = scipy.ndimage.binary_dilation(a, iterations=2)
-    border = dilated - a
-    border_x, border_y = np.where(border)
-    return make_grid_points(zip(border_x, border_y), zoom)
+    tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
+    border_tiles = set()
+    for x, y in tile_set:
+        for neighbor in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+            if neighbor not in tile_set:
+                border_tiles.add(neighbor)
+    return make_grid_points(border_tiles, zoom)
 
 
 def get_explored_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
