@@ -48,8 +48,8 @@ Zone | Heart Rate | Training
 ---: | ---: | ---:
 1 | 50 to 60 % | Warmup
 2 | 60 to 70 % | Light
-3 | 70 to 80 % | Aerob
-4 | 80 to 90 % | Intensiv
+3 | 70 to 80 % | Aerobic
+4 | 80 to 90 % | Intensive
 5 | 90 to 100 % | Maximal
 
 One can [find slightly different zone definition](https://www.rei.com/learn/expert-advice/how-to-train-with-a-heart-rate-monitor.html).
