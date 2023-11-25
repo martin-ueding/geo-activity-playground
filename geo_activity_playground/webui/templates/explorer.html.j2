@@ -28,7 +28,9 @@
 
             let explorer_geojson = {{ explored_geojson| safe}}
             let map = L.map('explorer-map', {
-                fullscreenControl: true
+                fullscreenControl: true,
+                center: [{{ center.latitude }}, {{ center.longitude }}],
+            zoom: 10
             });
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -38,7 +40,6 @@
                 style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } },
                 onEachFeature: onEachFeature
             }).addTo(map)
-            map.fitBounds(explorer_layer.getBounds())
         </script>
     </div>
 </div>
