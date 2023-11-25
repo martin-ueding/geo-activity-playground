@@ -27,7 +27,12 @@
         <script>
             function onEachFeature(feature, layer) {
                 if (feature.properties && feature.properties.first_visit) {
-                    layer.bindPopup(`First visited on ${feature.properties.first_visit} as part of <a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>.`)
+                    let lines = [`First visit: ${feature.properties.first_visit}`,
+                    `First activity: <a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>`]
+                    if (feature.properties.this_cluster_size) {
+                        lines.push(`This cluster size: ${feature.properties.this_cluster_size}`)
+                    }
+                    layer.bindPopup(lines.join('<br />'))
                 }
             }
 

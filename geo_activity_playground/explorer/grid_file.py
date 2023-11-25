@@ -62,14 +62,15 @@ def get_three_color_tiles(
             for y in range(square_y, square_y + square_size):
                 tile_dict[(x, y)]["square"] = True
 
-    tile_metadata = {
-        (row["tile_x"], row["tile_y"]): {
-            "first_visit": row["time"].date().isoformat(),
-            "activity_id": row["activity_id"],
-            "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
-        }
-        for index, row in tiles.iterrows()
-    }
+    for index, row in tiles.iterrows():
+        tile_dict[(row["tile_x"], row["tile_y"])].update(
+            {
+                "first_visit": row["time"].date().isoformat(),
+                "activity_id": row["activity_id"],
+                "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
+                "color": map_color(tile_dict[(row["tile_x"], row["tile_y"])]),
+            }
+        )
 
     num_cluster_tiles = sum(value["cluster"] for value in tile_dict.values())
 
@@ -84,6 +85,9 @@ def get_three_color_tiles(
     max_cluster_size = max(
         count for label, count in label_counts.items() if label != -1
     )
+    for xy, label in zip(cluster_tiles, labels):
+        tile_dict[tuple(xy)]["cluster_id"] = int(label)
+        tile_dict[tuple(xy)]["this_cluster_size"] = int(label_counts[label])
 
     # Find non-zero tiles.
     result = {
@@ -93,10 +97,7 @@ def get_three_color_tiles(
                     make_explorer_tile(
                         x,
                         y,
-                        {
-                            "color": map_color(v),
-                            **tile_metadata[(x, y)],
-                        },
+                        tile_dict[(x, y)],
                         zoom,
                     )
                     for (x, y), v in tile_dict.items()
