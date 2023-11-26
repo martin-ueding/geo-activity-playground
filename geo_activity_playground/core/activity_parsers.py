@@ -1,8 +1,10 @@
+import datetime
 import gzip
 import pathlib
 import tempfile
 import xml
 
+import dateutil.parser
 import fitdecode
 import gpxpy
 import pandas as pd
@@ -76,7 +78,11 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
         for track in gpx.tracks:
             for segment in track.segments:
                 for point in segment.points:
-                    points.append((point.time, point.latitude, point.longitude))
+                    if isinstance(point.time, datetime.datetime):
+                        time = point.time
+                    else:
+                        time = dateutil.parser.parse(str(point.time))
+                    points.append((time, point.latitude, point.longitude))
 
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
@@ -119,7 +125,6 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 row["distance"] = trackpoint.distance
             rows.append(row)
     df = pd.DataFrame(rows)
-    print(df)
     return df
 
 
