@@ -62,7 +62,7 @@ def get_three_color_tiles(
         tile_dict[(row["tile_x"], row["tile_y"])].update(
             {
                 "first_visit": row["time"].date().isoformat(),
-                "activity_id": row["activity_id"],
+                "activity_id": str(row["activity_id"]),
                 "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
                 "color": map_color(tile_dict[(row["tile_x"], row["tile_y"])]),
             }

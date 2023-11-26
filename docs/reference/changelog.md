@@ -10,6 +10,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - Certain exceptions are not skipped when parsing files. This way one can gather all errors at the end. [GH-29](https://github.com/martin-ueding/geo-activity-playground/issues/29)
 - Support TCX files. [GH-8](https://github.com/martin-ueding/geo-activity-playground/issues/8)
+- Fix equipment view when using the directory source. [GH-25](https://github.com/martin-ueding/geo-activity-playground/issues/25)
+- Fix links from the explorer tiles to the first activity that explored them. [GH-30](https://github.com/martin-ueding/geo-activity-playground/issues/30)
 
 ### Version 0.8
 
