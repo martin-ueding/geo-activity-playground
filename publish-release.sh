@@ -6,7 +6,7 @@ set -eu
 git push
 
 # Tag this version and upload the tag.
-git tag "$(poetry version --sort)"
+git tag "$(poetry version --short)"
 git push --tags
 
 poetry build
