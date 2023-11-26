@@ -20,10 +20,6 @@ logger = logging.getLogger(__name__)
 def get_three_color_tiles(
     tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
 ) -> str:
-    # Create array with visited tiles.
-    a = np.zeros((2**zoom, 2**zoom), dtype=np.int8)
-    a[tiles["tile_x"], tiles["tile_y"]] = 1
-
     tile_dict = {
         elem: {"cluster": False, "square": False}
         for elem in zip(tiles["tile_x"], tiles["tile_y"])
