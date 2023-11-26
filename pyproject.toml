@@ -9,7 +9,7 @@ license = "MIT"
 geo-activity-playground = "geo_activity_playground.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.12"
+python = "^3.9,<3.12"
 
 altair = "^5.1.2"
 appdirs = "^1.4.4"
