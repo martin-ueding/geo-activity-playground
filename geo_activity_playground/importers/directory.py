@@ -2,6 +2,7 @@ import hashlib
 import logging
 import pathlib
 
+import numpy as np
 import pandas as pd
 
 from geo_activity_playground.core.activity_parsers import read_activity
@@ -36,10 +37,8 @@ def import_from_directory() -> None:
             if len(timeseries) == 0:
                 continue
             timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
-            timeseries_path = activity_stream_dir / f"{id}.parquet"
-            timeseries.to_parquet(timeseries_path)
 
-            distances = [
+            distances = [0] + [
                 get_distance(lat_1, lon_1, lat_2, lon_2)
                 for lat_1, lon_1, lat_2, lon_2 in zip(
                     timeseries["latitude"],
@@ -48,7 +47,11 @@ def import_from_directory() -> None:
                     timeseries["longitude"].iloc[1:],
                 )
             ]
+            timeseries["distance"] = pd.Series(np.cumsum(distances))
             distance = sum(distances)
+
+            timeseries_path = activity_stream_dir / f"{id}.parquet"
+            timeseries.to_parquet(timeseries_path)
 
             new_rows.append(
                 {

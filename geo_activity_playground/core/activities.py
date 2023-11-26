@@ -37,6 +37,7 @@ class ActivityRepository:
         self.meta.index = self.meta["id"]
         self.meta.index.name = "index"
         self.meta["distance"] /= 1000
+        self.meta["kind"].fillna("Unknown", inplace=True)
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
@@ -56,6 +57,7 @@ class ActivityRepository:
             del df["time"]
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
         assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
+        df["distance/km"] = df["distance"] / 1000
         return df
 
 
