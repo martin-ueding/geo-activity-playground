@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.8
 
+#### Version 0.8.1
+
+- Fix reading of FIT files from Wahoo hardware by reading them in binary mode. [GH-20](https://github.com/martin-ueding/geo-activity-playground/issues/20).
+
+#### Version 0.8.0
+
 - Make heart rate zone computation a bit more flexibly by offering a lower bound for the resting heart rate.
 - Open explorer map centered around median tile.
 - Compute explorer cluster and square size, print that. [GH-2](https://github.com/martin-ueding/geo-activity-playground/issues/2)
