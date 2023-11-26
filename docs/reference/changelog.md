@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 #### Version 0.8.1
 
 - Fix reading of FIT files from Wahoo hardware by reading them in binary mode. [GH-20](https://github.com/martin-ueding/geo-activity-playground/issues/20).
+- Fix divide-by-zero error in speed calculation. [GH-21](https://github.com/martin-ueding/geo-activity-playground/issues/21)
 
 #### Version 0.8.0
 
