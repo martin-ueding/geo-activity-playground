@@ -84,4 +84,8 @@ On Android I use the OsmAnd app to display tracks and also try to visualize the 
 
 ![](explorer-missing-gpx.png)
 
+And on OsmAnd it looks like this:
+
+![](explorer-osmand.jpg)
+
 Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so I don't have this displayed all the time.
