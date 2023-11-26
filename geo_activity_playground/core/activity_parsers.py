@@ -33,8 +33,8 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                     fields = {field.name: field.value for field in frame.fields}
                     if (
                         "timestamp" in fields
-                        and "position_lat" in fields
-                        and "position_long" in fields
+                        and fields.get("position_lat", None)
+                        and fields.get("position_long", None)
                     ):
                         row = {
                             "time": fields["timestamp"],

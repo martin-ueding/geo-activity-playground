@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.8
 
+#### Version 0.8.2
+
+- Some FIT files apparently have entries with explicit latitude/longitude values, but those are null. I've added a check which skips those points.
+
 #### Version 0.8.1
 
 - Fix reading of FIT files from Wahoo hardware by reading them in binary mode. [GH-20](https://github.com/martin-ueding/geo-activity-playground/issues/20).
