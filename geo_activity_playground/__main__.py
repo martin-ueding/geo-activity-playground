@@ -1,16 +1,11 @@
 import argparse
 import os
 import pathlib
-import tomllib
 
 import coloredlogs
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.sources import TimeSeriesSource
-from geo_activity_playground.explorer.grid_file import get_border_tiles
-from geo_activity_playground.explorer.grid_file import get_explored_tiles
-from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
-from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
+from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
@@ -78,11 +73,10 @@ def main() -> None:
 
 def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     os.chdir(basedir)
+    config = get_config()
     if pathlib.Path("Activities").exists():
         import_from_directory()
-    elif pathlib.Path("config.toml").exists():
-        with open("config.toml", "rb") as f:
-            config = tomllib.load(f)
+    elif config:
         if "strava" in config:
             import_from_strava_api()
     return ActivityRepository()

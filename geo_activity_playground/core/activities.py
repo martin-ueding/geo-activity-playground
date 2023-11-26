@@ -2,15 +2,14 @@ import dataclasses
 import datetime
 import functools
 import logging
-import pathlib
-import tomllib
 from typing import Iterator
 from typing import Optional
 
 import geojson
 import matplotlib
-import numpy as np
 import pandas as pd
+
+from geo_activity_playground.core.config import get_config
 
 
 logger = logging.getLogger(__name__)
@@ -105,13 +104,7 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
 def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
     if "heartrate" not in time_series:
         return None
-    config_path = pathlib.Path("config.toml")
-    if not config_path.exists():
-        logger.warning("Missing a config, cannot extract heart rate zones.")
-        return None
-    with open(config_path, "rb") as f:
-        config = tomllib.load(f)
-
+    config = get_config()
     try:
         heart_config = config["heart"]
     except KeyError:

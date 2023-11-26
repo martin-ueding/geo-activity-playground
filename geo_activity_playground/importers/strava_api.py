@@ -4,22 +4,16 @@ import json
 import logging
 import pathlib
 import pickle
-import tomllib
 from typing import Any
 
 import pandas as pd
 from stravalib import Client
 from stravalib.exc import RateLimitExceeded
 
+from geo_activity_playground.core.config import get_config
+
 
 logger = logging.getLogger(__name__)
-
-
-@functools.cache
-def get_config() -> dict:
-    config_path = pathlib.Path("config.toml")
-    with open(config_path, "rb") as f:
-        return tomllib.load(f)
 
 
 def get_state(path: pathlib.Path) -> Any:
