@@ -150,7 +150,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
         except xml.etree.ElementTree.ParseError as e:
             raise ActivityParseError("Syntax error in TCX file") from e
     else:
-        raise ActivityParseError(f"Unsupported file format: {suffixes[-2]}")
+        raise ActivityParseError(f"Unsupported file format: {file_type}")
 
     if len(df):
         try:
