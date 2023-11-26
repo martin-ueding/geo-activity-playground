@@ -7,8 +7,26 @@ import pandas as pd
 
 
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
+    """
+    {'timestamp': datetime.datetime(2023, 11, 11, 16, 29, 49, tzinfo=datetime.timezone.utc),
+    'position_lat': <int>,
+    'position_long': <int>,
+    'gps_accuracy': 6,
+    'enhanced_altitude': 517.2,
+    'altitude': 517.2,
+    'grade': 1.88,
+    'distance': 4238.37,
+    'heart_rate': 155,
+    'calories': 253,
+    'cadence': 76,
+    'enhanced_speed': 3.972,
+    'speed': 3.972,
+    'temperature': -1,
+    'ascent': 35,
+    'descent': 11}
+    """
     points = []
-    with open(path) as f:
+    with open(path, "rb") as f:
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
