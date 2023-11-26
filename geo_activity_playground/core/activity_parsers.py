@@ -25,7 +25,7 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     'ascent': 35,
     'descent': 11}
     """
-    points = []
+    rows = []
     with open(path, "rb") as f:
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
@@ -36,15 +36,30 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                         and "position_lat" in fields
                         and "position_long" in fields
                     ):
-                        points.append(
-                            (
-                                fields["timestamp"],
-                                fields["position_lat"] / ((2**32) / 360),
-                                fields["position_long"] / ((2**32) / 360),
-                            )
-                        )
+                        row = {
+                            "time": fields["timestamp"],
+                            "latitude": fields["position_lat"] / ((2**32) / 360),
+                            "longitude": fields["position_long"] / ((2**32) / 360),
+                        }
+                        if "heart_rate" in fields:
+                            row["heartrate"] = fields["heart_rate"]
+                        if "calories" in fields:
+                            row["calories"] = fields["calories"]
+                        if "cadence" in fields:
+                            row["cadence"] = fields["cadence"]
+                        if "distance" in fields:
+                            row["distance"] = fields["distance"]
+                        if "altitude" in fields:
+                            row["altitude"] = fields["altitude"]
+                        if "enhanced_altitude" in fields:
+                            row["altitude"] = fields["enhanced_altitude"]
+                        if "speed" in fields:
+                            row["speed"] = fields["speed"]
+                        if "enhanced_speed" in fields:
+                            row["speed"] = fields["enhanced_speed"]
+                        rows.append(row)
 
-    return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
+    return pd.DataFrame(rows)
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
