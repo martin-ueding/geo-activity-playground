@@ -6,6 +6,10 @@ import gpxpy
 import pandas as pd
 
 
+class ActivityParseError(BaseException):
+    pass
+
+
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     """
     {'timestamp': datetime.datetime(2023, 11, 11, 16, 29, 49, tzinfo=datetime.timezone.utc),
@@ -78,17 +82,23 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
     suffixes = path.suffixes
     if suffixes[-1] == ".gz":
         if suffixes[-2] == ".gpx":
-            df = read_gpx_activity(path, gzip.open)
+            read_method = lambda path: read_gpx_activity(path, gzip.open)
         elif suffixes[-2] == ".fit":
-            df = read_fit_activity(path, gzip.open)
+            read_method = lambda path: read_fit_activity(path, gzip.open)
         else:
-            raise NotImplementedError(f"Unknown suffix: {path}")
+            raise ActivityParseError(f"Unsupported file format: {suffixes[-2]}")
     elif suffixes[-1] == ".gpx":
-        df = read_gpx_activity(path, open)
+        read_method = lambda path: read_gpx_activity(path, open)
     elif suffixes[-1] == ".fit":
-        df = read_fit_activity(path, open)
+        read_method = lambda path: read_fit_activity(path, open)
     else:
-        raise NotImplementedError(f"Unknown suffix: {path}")
+        raise ActivityParseError(f"Unsupported file format: {suffixes[-1]}")
+
+    try:
+        df = read_method(path)
+    except gpxpy.gpx.GPXXMLSyntaxException as e:
+        raise ActivityParseError("Syntax error while parsing GPX file") from e
+
     if len(df):
         try:
             df.time = df.time.dt.tz_convert(None)

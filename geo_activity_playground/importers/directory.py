@@ -6,6 +6,7 @@ import traceback
 import numpy as np
 import pandas as pd
 
+from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.tasks import work_tracker
@@ -36,7 +37,7 @@ def import_from_directory() -> None:
             logger.info(f"Parsing activity file {path} …")
             try:
                 timeseries = read_activity(path)
-            except NotImplementedError as e:
+            except ActivityParseError as e:
                 logger.error(f"Error while parsing file {path}:")
                 traceback.print_exc()
                 paths_with_errors.append((path, str(e)))
