@@ -41,7 +41,7 @@
                 fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 10
-            });
+            })
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -70,7 +70,7 @@
         <script>
             let missing_geojson = {{ missing_tiles_geojson| safe}}
             let missing_map = L.map('missing-map', {
-                fullscreenControl: true
+                fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 10
             });
