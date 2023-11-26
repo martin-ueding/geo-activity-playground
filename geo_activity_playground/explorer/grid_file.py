@@ -78,16 +78,19 @@ def get_three_color_tiles(
         [tile for tile, value in tile_dict.items() if value["cluster"]]
     )
 
-    logger.info("Run DBSCAN cluster finding algorithm …")
-    dbscan = sklearn.cluster.DBSCAN(eps=1.1, min_samples=1)
-    labels = dbscan.fit_predict(cluster_tiles)
-    label_counts = dict(zip(*np.unique(labels, return_counts=True)))
-    max_cluster_size = max(
-        count for label, count in label_counts.items() if label != -1
-    )
-    for xy, label in zip(cluster_tiles, labels):
-        tile_dict[tuple(xy)]["cluster_id"] = int(label)
-        tile_dict[tuple(xy)]["this_cluster_size"] = int(label_counts[label])
+    if len(cluster_tiles) > 1:
+        logger.info("Run DBSCAN cluster finding algorithm …")
+        dbscan = sklearn.cluster.DBSCAN(eps=1.1, min_samples=1)
+        labels = dbscan.fit_predict(cluster_tiles)
+        label_counts = dict(zip(*np.unique(labels, return_counts=True)))
+        max_cluster_size = max(
+            count for label, count in label_counts.items() if label != -1
+        )
+        for xy, label in zip(cluster_tiles, labels):
+            tile_dict[tuple(xy)]["cluster_id"] = int(label)
+            tile_dict[tuple(xy)]["this_cluster_size"] = int(label_counts[label])
+    else:
+        max_cluster_size = len(cluster_tiles)
 
     # Find non-zero tiles.
     result = {
