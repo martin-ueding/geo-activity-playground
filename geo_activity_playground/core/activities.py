@@ -57,7 +57,16 @@ class ActivityRepository:
             del df["time"]
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
         assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
+
         df["distance/km"] = df["distance"] / 1000
+
+        if "speed" not in df.columns:
+            df["speed"] = (
+                df["distance"].diff()
+                / (df["time"].diff().dt.total_seconds() + 1e-3)
+                * 3.6
+            )
+
         return df
 
 
@@ -72,11 +81,6 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
 
 
 def make_geojson_color_line(time_series: pd.DataFrame) -> str:
-    time_series["speed"] = (
-        time_series["distance"].diff()
-        / time_series["time"].diff().dt.total_seconds()
-        * 3.6
-    )
     cmap = matplotlib.colormaps["viridis"]
     return geojson.dumps(
         geojson.FeatureCollection(
