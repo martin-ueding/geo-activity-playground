@@ -20,6 +20,10 @@
 
 <div class="row mb-3">
     <div class="col">
+        <div class="btn-group mb-3" role="group">
+            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster coloring</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('age')">Age coloring</button>
+        </div>
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
         <p>Download this as <a href="/download/explored.geojson">GeoJSON</a> or <a
                 href="/download/explored.gpx">GPX</a>.</p>
@@ -46,10 +50,24 @@
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
-            let explorer_layer = L.geoJSON(explorer_geojson, {
+            let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
                 style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } },
                 onEachFeature: onEachFeature
             }).addTo(map)
+            let explorer_layer_age_color = L.geoJSON(explorer_geojson, {
+                style: function (feature) { return { color: "#440154", fillColor: feature.properties.age_color, weight: 1 } },
+                onEachFeature: onEachFeature
+            })
+
+            function changeColor(method) {
+                if (method == "cluster") {
+                    map.removeLayer(explorer_layer_age_color)
+                    map.addLayer(explorer_layer_cluster_color)
+                } else if (method == "age") {
+                    map.removeLayer(explorer_layer_cluster_color)
+                    map.addLayer(explorer_layer_age_color)
+                }
+            }
         </script>
     </div>
 </div>

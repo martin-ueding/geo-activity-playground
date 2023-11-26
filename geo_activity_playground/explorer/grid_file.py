@@ -5,6 +5,7 @@ from typing import Iterator
 
 import geojson
 import gpxpy
+import matplotlib
 import numpy as np
 import pandas as pd
 import sklearn.cluster
@@ -21,17 +22,19 @@ def get_three_color_tiles(
     tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
 ) -> str:
     today = datetime.date.today()
+    cmap = matplotlib.colormaps["plasma"]
     tile_dict = {}
     for index, row in tiles.iterrows():
         age_days = (today - row["time"].date()).days
         tile_dict[(row["tile_x"], row["tile_y"])] = {
             "activity_id": str(row["activity_id"]),
             "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
+            "age_days": age_days,
+            "age_color": matplotlib.colors.to_hex(cmap(max(1 - age_days / 365, 0.0))),
             "cluster": False,
             "color": "red",
             "first_visit": row["time"].date().isoformat(),
             "square": False,
-            "age_days": age_days,
         }
 
     for x, y in tile_dict.keys():
