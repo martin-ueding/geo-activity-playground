@@ -8,6 +8,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.8
 
+- Certain exceptions are not skipped when parsing files. This way one can gather all errors at the end. [GH-29](https://github.com/martin-ueding/geo-activity-playground/issues/29)
+
 #### Version 0.8.3
 
 - Only compute the explorer tile cluster size if there are cluster tiles. Otherwise the DBSCAN algorithm doesn't work anyway. [GH-24](https://github.com/martin-ueding/geo-activity-playground/issues/24)

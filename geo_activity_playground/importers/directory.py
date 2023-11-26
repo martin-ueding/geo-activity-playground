@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import pathlib
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,8 @@ def import_from_directory() -> None:
         logger.info("Didn't find a metadata file.")
         meta = None
 
+    paths_with_errors = []
+
     with work_tracker(pathlib.Path("Cache/parsed_activities.json")) as already_parsed:
         activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
         activity_stream_dir.mkdir(exist_ok=True, parents=True)
@@ -29,11 +32,18 @@ def import_from_directory() -> None:
             id = int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62
             if id in already_parsed:
                 continue
+
+            logger.info(f"Parsing activity file {path} …")
+            try:
+                timeseries = read_activity(path)
+            except NotImplementedError as e:
+                logger.error(f"Error while parsing file {path}:")
+                traceback.print_exc()
+                paths_with_errors.append((path, str(e)))
+                continue
             else:
                 already_parsed.add(id)
 
-            logger.info(f"Parsing activity file {path} …")
-            timeseries = read_activity(path)
             if len(timeseries) == 0:
                 continue
             timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
@@ -71,6 +81,13 @@ def import_from_directory() -> None:
                 row["calories"] = timeseries["calories"].iloc[-1]
 
             new_rows.append(row)
+
+    if paths_with_errors:
+        logger.warning(
+            "There were errors while parsing some of the files. These were skipped and tried again next time."
+        )
+        for path, error in paths_with_errors:
+            logger.error(f"{path}: {error}")
 
     new_df = pd.DataFrame(new_rows)
     merged: pd.DataFrame = pd.concat([meta, new_df])
