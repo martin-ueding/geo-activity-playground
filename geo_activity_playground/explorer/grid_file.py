@@ -1,3 +1,4 @@
+import datetime
 import logging
 import pathlib
 from typing import Iterator
@@ -6,7 +7,6 @@ import geojson
 import gpxpy
 import numpy as np
 import pandas as pd
-import scipy.ndimage
 import sklearn.cluster
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -20,10 +20,19 @@ logger = logging.getLogger(__name__)
 def get_three_color_tiles(
     tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
 ) -> str:
-    tile_dict = {
-        elem: {"cluster": False, "square": False}
-        for elem in zip(tiles["tile_x"], tiles["tile_y"])
-    }
+    today = datetime.date.today()
+    tile_dict = {}
+    for index, row in tiles.iterrows():
+        age_days = (today - row["time"].date()).days
+        tile_dict[(row["tile_x"], row["tile_y"])] = {
+            "activity_id": str(row["activity_id"]),
+            "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
+            "cluster": False,
+            "color": "red",
+            "first_visit": row["time"].date().isoformat(),
+            "square": False,
+            "age_days": age_days,
+        }
 
     for x, y in tile_dict.keys():
         if (
@@ -33,6 +42,7 @@ def get_three_color_tiles(
             and (x, y - 1) in tile_dict
         ):
             tile_dict[(x, y)]["cluster"] = True
+            tile_dict[(x, y)]["color"] = "green"
 
     # Compute biggest square.
     square_size = 1
@@ -57,16 +67,7 @@ def get_three_color_tiles(
         for x in range(square_x, square_x + square_size):
             for y in range(square_y, square_y + square_size):
                 tile_dict[(x, y)]["square"] = True
-
-    for index, row in tiles.iterrows():
-        tile_dict[(row["tile_x"], row["tile_y"])].update(
-            {
-                "first_visit": row["time"].date().isoformat(),
-                "activity_id": str(row["activity_id"]),
-                "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
-                "color": map_color(tile_dict[(row["tile_x"], row["tile_y"])]),
-            }
-        )
+                tile_dict[(x, y)]["color"] = "blue"
 
     num_cluster_tiles = sum(value["cluster"] for value in tile_dict.values())
 
@@ -109,15 +110,6 @@ def get_three_color_tiles(
         "square_size": square_size,
     }
     return result
-
-
-def map_color(tile_meta: dict) -> str:
-    if tile_meta["square"]:
-        return "blue"
-    elif tile_meta["cluster"]:
-        return "green"
-    else:
-        return "red"
 
 
 def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
