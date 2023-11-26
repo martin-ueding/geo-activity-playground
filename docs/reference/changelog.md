@@ -8,6 +8,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.8
 
+#### Version 0.8.3
+
 - Only compute the explorer tile cluster size if there are cluster tiles. Otherwise the DBSCAN algorithm doesn't work anyway. [GH-24](https://github.com/martin-ueding/geo-activity-playground/issues/24)
 - Remove allocation of huge array. [GH-23](https://github.com/martin-ueding/geo-activity-playground/issues/23)
 
