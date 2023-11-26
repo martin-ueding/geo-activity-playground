@@ -90,6 +90,11 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
     else:
         raise NotImplementedError(f"Unknown suffix: {path}")
     if len(df):
-        df.time = df.time.dt.tz_convert(None)
+        try:
+            df.time = df.time.dt.tz_convert(None)
+        except AttributeError:
+            print(df)
+            print(df.dtypes)
+            raise
     df.name = path.stem.split(".")[0]
     return df
