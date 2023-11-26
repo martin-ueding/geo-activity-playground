@@ -38,35 +38,39 @@ def import_from_directory() -> None:
                 continue
             timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
 
-            distances = [0] + [
-                get_distance(lat_1, lon_1, lat_2, lon_2)
-                for lat_1, lon_1, lat_2, lon_2 in zip(
-                    timeseries["latitude"],
-                    timeseries["longitude"],
-                    timeseries["latitude"].iloc[1:],
-                    timeseries["longitude"].iloc[1:],
-                )
-            ]
-            timeseries["distance"] = pd.Series(np.cumsum(distances))
-            distance = sum(distances)
+            if "distance" not in timeseries.columns:
+                distances = [0] + [
+                    get_distance(lat_1, lon_1, lat_2, lon_2)
+                    for lat_1, lon_1, lat_2, lon_2 in zip(
+                        timeseries["latitude"],
+                        timeseries["longitude"],
+                        timeseries["latitude"].iloc[1:],
+                        timeseries["longitude"].iloc[1:],
+                    )
+                ]
+                timeseries["distance"] = pd.Series(np.cumsum(distances))
+            distance = timeseries["distance"].iloc[-1]
 
             timeseries_path = activity_stream_dir / f"{id}.parquet"
             timeseries.to_parquet(timeseries_path)
 
-            new_rows.append(
-                {
-                    "id": id,
-                    "commute": None,
-                    "distance": distance,
-                    "name": path.stem,
-                    "kind": None,
-                    "start": timeseries["time"].iloc[0],
-                    "elapsed_time": timeseries["time"].iloc[-1]
-                    - timeseries["time"].iloc[0],
-                    "equipment": None,
-                    "calories": 0,
-                }
-            )
+            row = {
+                "id": id,
+                "commute": None,
+                "distance": distance,
+                "name": path.stem,
+                "kind": None,
+                "start": timeseries["time"].iloc[0],
+                "elapsed_time": timeseries["time"].iloc[-1]
+                - timeseries["time"].iloc[0],
+                "equipment": None,
+                "calories": 0,
+            }
+
+            if "calories" in timeseries.columns:
+                row["calories"] = timeseries["calories"].iloc[-1]
+
+            new_rows.append(row)
 
     new_df = pd.DataFrame(new_rows)
     merged: pd.DataFrame = pd.concat([meta, new_df])
