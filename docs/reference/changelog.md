@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Make heart rate zone computation a bit more flexibly by offering a lower bound for the resting heart rate.
 - Open explorer map centered around median tile.
 - Compute explorer cluster and square size, print that. [GH-2](https://github.com/martin-ueding/geo-activity-playground/issues/2)
+- Make it compatible with Python versions from 3.9 to 3.11 such that more people can use it. [GH-22](https://github.com/martin-ueding/geo-activity-playground/issues/22)
 
 ### Version 0.7
 
