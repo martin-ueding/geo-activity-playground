@@ -42,6 +42,16 @@ You can click on each tile and get some information about that particular tile. 
 
 ![](explorer-tooltip.png)
 
+There is also the option to color the tiles by age:
+
+![](explorer-age-coloring.png)
+
+This uses Matplotlib's _Plasma_ scale (see below) to color the age of a tile. Very new tiles will get a yellow color, half a year old tiles a reddish color and tiles a year old or older a colder blue. This is the scale:
+
+![](plasma-scale.png)
+
+You can switch this with the buttons above the map.
+
 ## Squadratinhos
 
 The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the _squadratinhos_ which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.
