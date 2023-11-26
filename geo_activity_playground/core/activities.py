@@ -38,6 +38,7 @@ class ActivityRepository:
         self.meta.index.name = "index"
         self.meta["distance"] /= 1000
         self.meta["kind"].fillna("Unknown", inplace=True)
+        self.meta["equipment"].fillna("Unknown", inplace=True)
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1

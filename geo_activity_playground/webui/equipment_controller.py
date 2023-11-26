@@ -12,6 +12,8 @@ class EquipmentController:
 
     @functools.cache
     def render(self) -> dict:
+        print(self._repository.meta)
+        print(self._repository.meta.dtypes)
         total_distances = (
             self._repository.meta.groupby("equipment")
             .apply(
