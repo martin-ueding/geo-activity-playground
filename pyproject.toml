@@ -33,6 +33,7 @@ tqdm = "^4.64.0"
 vegafusion = "^1.4.3"
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
+tcxreader = "^0.4.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"

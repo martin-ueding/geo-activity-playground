@@ -6,9 +6,12 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.8
+### Version 0.9
 
 - Certain exceptions are not skipped when parsing files. This way one can gather all errors at the end. [GH-29](https://github.com/martin-ueding/geo-activity-playground/issues/29)
+- Support TCX files. [GH-8](https://github.com/martin-ueding/geo-activity-playground/issues/8)
+
+### Version 0.8
 
 #### Version 0.8.3
 

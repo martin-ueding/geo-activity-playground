@@ -2000,6 +2000,17 @@ pytz = "*"
 requests = "*"
 
 [[package]]
+name = "tcxreader"
+version = "0.4.5"
+description = "tcxreader is a reader for Garmin’s TCX file format. It also works well with missing data!"
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "tcxreader-0.4.5-py3-none-any.whl", hash = "sha256:ed62e0a83cc03c6897dd638df4ce324d812f61f148be01be3efafd3f8c888d22"},
+    {file = "tcxreader-0.4.5.tar.gz", hash = "sha256:6a973b89b73e1b4b20cfc9743a72094626b051ab1c4b1aaa676b8e9f89ab6c90"},
+]
+
+[[package]]
 name = "threadpoolctl"
 version = "3.2.0"
 description = "threadpoolctl"
@@ -2226,4 +2237,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9,<3.12"
-content-hash = "ef72239d02ff65194b3da1daba537177a14f5b36406de4a9b49c86b82d413afa"
+content-hash = "b908870e917429b94c4435db8c201b3def496195f4b9f8b0858bb7220c57d3b2"

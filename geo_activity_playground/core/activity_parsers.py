@@ -1,9 +1,12 @@
 import gzip
 import pathlib
+import tempfile
+import xml
 
 import fitdecode
 import gpxpy
 import pandas as pd
+import tcxreader.tcxreader
 
 
 class ActivityParseError(BaseException):
@@ -78,33 +81,81 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
 
+def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
+    """
+    cadence = {NoneType} None
+     distance = {float} 7.329999923706055
+     elevation = {float} 2250.60009765625
+     hr_value = {int} 87
+     latitude = {float} 46.49582446552813
+     longitude = {float} 15.50408081151545
+     time = {datetime} 2020-12-26 15:14:28
+     tpx_ext = {dict: 2} {'Speed': 0.7459999918937683, 'RunCadence': 58}
+    """
+    rows = []
+    tcx_reader = tcxreader.tcxreader.TCXReader()
+
+    with open(path, "rb") as f:
+        content = f.read().strip()
+    with tempfile.NamedTemporaryFile("wb", suffix=".tcx") as f:
+        f.write(content)
+        f.flush()
+        data = tcx_reader.read(f.name)
+
+    for trackpoint in data.trackpoints:
+        if trackpoint.latitude and trackpoint.longitude:
+            row = {
+                "time": trackpoint.time,
+                "latitude": trackpoint.latitude,
+                "longitude": trackpoint.longitude,
+            }
+            if trackpoint.elevation:
+                row["altitude"] = trackpoint.elevation
+            if trackpoint.hr_value:
+                row["heartrate"] = trackpoint.hr_value
+            if trackpoint.cadence:
+                row["cadence"] = trackpoint.cadence
+            if trackpoint.distance:
+                row["distance"] = trackpoint.distance
+            rows.append(row)
+    df = pd.DataFrame(rows)
+    print(df)
+    return df
+
+
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
     suffixes = path.suffixes
     if suffixes[-1] == ".gz":
-        if suffixes[-2] == ".gpx":
-            read_method = lambda path: read_gpx_activity(path, gzip.open)
-        elif suffixes[-2] == ".fit":
-            read_method = lambda path: read_fit_activity(path, gzip.open)
-        else:
-            raise ActivityParseError(f"Unsupported file format: {suffixes[-2]}")
-    elif suffixes[-1] == ".gpx":
-        read_method = lambda path: read_gpx_activity(path, open)
-    elif suffixes[-1] == ".fit":
-        read_method = lambda path: read_fit_activity(path, open)
+        opener = gzip.open
+        file_type = suffixes[-2]
     else:
-        raise ActivityParseError(f"Unsupported file format: {suffixes[-1]}")
+        opener = open
+        file_type = suffixes[-1]
 
-    try:
-        df = read_method(path)
-    except gpxpy.gpx.GPXXMLSyntaxException as e:
-        raise ActivityParseError("Syntax error while parsing GPX file") from e
+    if file_type == ".gpx":
+        try:
+            df = read_gpx_activity(path, opener)
+        except gpxpy.gpx.GPXXMLSyntaxException as e:
+            raise ActivityParseError("Syntax error while parsing GPX file") from e
+    elif file_type == ".fit":
+        df = read_fit_activity(path, opener)
+    elif file_type == ".tcx":
+        try:
+            df = read_tcx_activity(path, opener)
+        except xml.etree.ElementTree.ParseError as e:
+            raise ActivityParseError("Syntax error in TCX file") from e
+    else:
+        raise ActivityParseError(f"Unsupported file format: {suffixes[-2]}")
 
     if len(df):
         try:
-            df.time = df.time.dt.tz_convert(None)
-        except AttributeError:
+            if df.time.dt.tz is not None:
+                df.time = df.time.dt.tz_localize(None)
+        except AttributeError as e:
             print(df)
             print(df.dtypes)
-            raise
+            raise ActivityParseError(
+                "It looks like the date parsing has gone wrong."
+            ) from e
     df.name = path.stem.split(".")[0]
     return df
