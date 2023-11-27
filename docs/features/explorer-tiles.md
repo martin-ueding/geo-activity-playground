@@ -46,7 +46,7 @@ There is also the option to color the tiles by age:
 
 ![](explorer-age-coloring.png)
 
-This uses Matplotlib's _Plasma_ scale (see below) to color the age of a tile. Very new tiles will get a yellow color, half a year old tiles a reddish color and tiles a year old or older a colder blue. This is the scale:
+This uses Matplotlib's _Plasma_ scale (see below) to color the age of a tile. Very new tiles will get a yellow color, a year old tiles a reddish color and tiles two years old or older a colder blue. This is the scale:
 
 ![](plasma-scale.png)
 

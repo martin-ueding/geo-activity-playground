@@ -30,7 +30,9 @@ def get_three_color_tiles(
             "activity_id": str(row["activity_id"]),
             "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
             "age_days": age_days,
-            "age_color": matplotlib.colors.to_hex(cmap(max(1 - age_days / 365, 0.0))),
+            "age_color": matplotlib.colors.to_hex(
+                cmap(max(1 - age_days / (2 * 365), 0.0))
+            ),
             "cluster": False,
             "color": "red",
             "first_visit": row["time"].date().isoformat(),
