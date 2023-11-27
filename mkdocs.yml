@@ -37,6 +37,7 @@ nav:
   - Reference:
       - reference/changelog.md
       - reference/directory-layout.md
+  - acknowledgments.md
 
 markdown_extensions:
   - pymdownx.highlight
