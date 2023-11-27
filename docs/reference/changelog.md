@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Support TCX files. [GH-8](https://github.com/martin-ueding/geo-activity-playground/issues/8)
 - Fix equipment view when using the directory source. [GH-25](https://github.com/martin-ueding/geo-activity-playground/issues/25)
 - Fix links from the explorer tiles to the first activity that explored them. [GH-30](https://github.com/martin-ueding/geo-activity-playground/issues/30)
+- Fix how the API response from Strava is handled during the initial token exchange. [GH-37](https://github.com/martin-ueding/geo-activity-playground/issues/37)
 
 ### Version 0.8
 
