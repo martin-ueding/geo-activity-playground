@@ -53,7 +53,7 @@ def get_current_access_token() -> str:
         tokens = {
             "access": token_response["access_token"],
             "refresh": token_response["refresh_token"],
-            "expires_at": token_response["refresh"],
+            "expires_at": token_response["expires_at"],
         }
 
     if tokens["expires_at"] < datetime.datetime.now().timestamp():
