@@ -9,6 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.10
 
 - Use a grayscale map for the explorer tile maps. [GH-38](https://github.com/martin-ueding/geo-activity-playground/issues/38)
+- Explicitly write “0 km” in calendar cells where there are no activities. [GH-39](https://github.com/martin-ueding/geo-activity-playground/issues/39), [GH-40](https://github.com/martin-ueding/geo-activity-playground/pull/40)
 
 ### Version 0.9
 
