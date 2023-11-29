@@ -14,6 +14,9 @@ from geo_activity_playground.webui.eddington_controller import EddingtonControll
 from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
+from geo_activity_playground.webui.grayscale_tile_controller import (
+    GrayscaleTileController,
+)
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
 
 
@@ -27,6 +30,7 @@ def webui_main(repository: ActivityRepository) -> None:
     explorer_controller = ExplorerController(repository)
     equipment_controller = EquipmentController(repository)
     heatmap_controller = HeatmapController(repository)
+    grayscale_tile_controller = GrayscaleTileController()
 
     @app.route("/")
     def index():
@@ -91,6 +95,13 @@ def webui_main(repository: ActivityRepository) -> None:
     def heatmap_tile(x: str, y: str, z: str):
         return Response(
             heatmap_controller.render_tile(int(x), int(y), int(z)),
+            mimetype="image/png",
+        )
+
+    @app.route("/grayscale-tile/<z>/<x>/<y>.png")
+    def grayscale_tile(x: str, y: str, z: str):
+        return Response(
+            grayscale_tile_controller.render_tile(int(x), int(y), int(z)),
             mimetype="image/png",
         )
 

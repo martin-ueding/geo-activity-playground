@@ -46,16 +46,16 @@
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 10
             })
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('/grayscale-tile/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
             let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 1 } },
+                style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 0.5 } },
                 onEachFeature: onEachFeature
             }).addTo(map)
             let explorer_layer_age_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: "#440154", fillColor: feature.properties.age_color, weight: 1 } },
+                style: function (feature) { return { color: "#440154", fillColor: feature.properties.age_color, weight: 0.5 } },
                 onEachFeature: onEachFeature
             })
 
