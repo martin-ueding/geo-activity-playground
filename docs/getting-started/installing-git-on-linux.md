@@ -34,7 +34,7 @@ Replace the `--help` with the subcommands described in the help message or the o
 
 You will need the `--basedir` option because you run the program from the source directory and not from your playground directory. If you install the stable version via PIP as described in the other page, you will not need this option.
 
-# Updating to the latest version
+## Updating to the latest version
 
 Over time I will add more _commits_ to the source control system. In order to update your _clone_ to the latest version, execute the following:
 

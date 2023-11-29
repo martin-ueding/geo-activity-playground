@@ -4,7 +4,7 @@ There are a bunch of files that need to be given to this set of scripts, are use
 
 Everything is relative to a *base directory* which can be passed with the `--basedir` option to the scripts.
 
-# Input
+## Input
 
 The user has to put data into the following directories in order for it to be picked up.
 
@@ -12,7 +12,7 @@ The user has to put data into the following directories in order for it to be pi
 
 - `config.toml`: Configuration file
 
-# Output and cache
+## Output and cache
 
 The following directories serve as a cache. One can inspect this but doesn't need to work with that directly.
 
