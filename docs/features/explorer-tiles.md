@@ -38,13 +38,21 @@ You can see an additional feature, the blue square. This is the one largest squa
 
 As you can see in this picture, there is a tile missing right at the top edge. I will never be able to get that because that is an off-limits area of the German air force at the airport. So I can expand my square to the south only.
 
-You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity:
+You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity. Also it shows the last activity there as well as the number of activities. If it is a local cluster, it will also show the cluster size.
 
 ![](explorer-tooltip.png)
 
-There is also the option to color the tiles by age:
+There is also the option to color the tiles by first or last visit. Use one of the buttons above the map:
 
-![](explorer-age-coloring.png)
+![](explorer-color-switcher.png)
+
+Then the map will show the first visit:
+
+![](explorer-color-first.png)
+
+Or how recent your last visit is:
+
+![](explorer-color-last.png)
 
 This uses Matplotlib's _Plasma_ scale (see below) to color the age of a tile. Very new tiles will get a yellow color, a year old tiles a reddish color and tiles two years old or older a colder blue. This is the scale:
 
