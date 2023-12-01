@@ -21,8 +21,9 @@
 <div class="row mb-3">
     <div class="col">
         <div class="btn-group mb-3" role="group">
-            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster coloring</button>
-            <button type="button" class="btn btn-secondary" onclick="changeColor('age')">Age coloring</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('first')">First Visit</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
         </div>
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
         <p>Download this as <a href="/download/explored.geojson">GeoJSON</a> or <a
@@ -31,12 +32,18 @@
         <script>
             function onEachFeature(feature, layer) {
                 if (feature.properties && feature.properties.first_visit) {
-                    let lines = [`First visit: ${feature.properties.first_visit}`,
-                    `First activity: <a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>`]
+                    let lines = [
+                        `<dt>First visit</dt>`,
+                        `<dd>${feature.properties.first_visit}</br><a href=/activity/${feature.properties.first_activity_id}>${feature.properties.first_activity_name}</a></dd>`,
+                        `<dt>Last visit</dt>`,
+                        `<dd>${feature.properties.last_visit}</br><a href=/activity/${feature.properties.last_activity_id}>${feature.properties.last_activity_name}</a></dd>`,
+                        `<dt>Number of visits</dt>`,
+                        `<dd>${feature.properties.num_visits}</dd>`,
+                    ]
                     if (feature.properties.this_cluster_size) {
-                        lines.push(`This cluster size: ${feature.properties.this_cluster_size}`)
+                        lines.push(`<dt>This cluster size</dt><dd>${feature.properties.this_cluster_size}</dd>`)
                     }
-                    layer.bindPopup(lines.join('<br />'))
+                    layer.bindPopup('<dl>' + lines.join('') + '</dl>')
                 }
             }
 
@@ -54,19 +61,27 @@
                 style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 0.5 } },
                 onEachFeature: onEachFeature
             }).addTo(map)
-            let explorer_layer_age_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: "#440154", fillColor: feature.properties.age_color, weight: 0.5 } },
+            let explorer_layer_first_age_color = L.geoJSON(explorer_geojson, {
+                style: function (feature) { return { color: "#440154", fillColor: feature.properties.first_age_color, weight: 0.5 } },
+                onEachFeature: onEachFeature
+            })
+            let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
+                style: function (feature) { return { color: "#440154", fillColor: feature.properties.last_age_color, weight: 0.5 } },
                 onEachFeature: onEachFeature
             })
 
+            active_layer = explorer_layer_cluster_color
+
             function changeColor(method) {
+                map.removeLayer(active_layer)
                 if (method == "cluster") {
-                    map.removeLayer(explorer_layer_age_color)
-                    map.addLayer(explorer_layer_cluster_color)
-                } else if (method == "age") {
-                    map.removeLayer(explorer_layer_cluster_color)
-                    map.addLayer(explorer_layer_age_color)
+                    active_layer = explorer_layer_cluster_color
+                } else if (method == "first") {
+                    active_layer = explorer_layer_first_age_color
+                } else if (method == "last") {
+                    active_layer = explorer_layer_last_age_color
                 }
+                map.addLayer(active_layer)
             }
         </script>
     </div>

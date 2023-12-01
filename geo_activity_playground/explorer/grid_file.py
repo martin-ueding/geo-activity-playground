@@ -22,20 +22,30 @@ def get_three_color_tiles(
     tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
 ) -> str:
     today = datetime.date.today()
-    cmap = matplotlib.colormaps["plasma"]
+    cmap_first = matplotlib.colormaps["plasma"]
+    cmap_last = matplotlib.colormaps["plasma"]
     tile_dict = {}
     for index, row in tiles.iterrows():
-        age_days = (today - row["time"].date()).days
+        first_age_days = (today - row["first_time"].date()).days
+        last_age_days = (today - row["last_time"].date()).days
         tile_dict[(row["tile_x"], row["tile_y"])] = {
-            "activity_id": str(row["activity_id"]),
-            "activity_name": repository.get_activity_by_id(row["activity_id"]).name,
-            "age_days": age_days,
-            "age_color": matplotlib.colors.to_hex(
-                cmap(max(1 - age_days / (2 * 365), 0.0))
+            "first_activity_id": str(row["first_id"]),
+            "first_activity_name": repository.get_activity_by_id(row["first_id"]).name,
+            "last_activity_id": str(row["last_id"]),
+            "last_activity_name": repository.get_activity_by_id(row["last_id"]).name,
+            "first_age_days": first_age_days,
+            "first_age_color": matplotlib.colors.to_hex(
+                cmap_first(max(1 - first_age_days / (2 * 365), 0.0))
+            ),
+            "last_age_days": last_age_days,
+            "last_age_color": matplotlib.colors.to_hex(
+                cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
             ),
             "cluster": False,
             "color": "red",
-            "first_visit": row["time"].date().isoformat(),
+            "first_visit": row["first_time"].date().isoformat(),
+            "last_visit": row["last_time"].date().isoformat(),
+            "num_visits": row["count"],
             "square": False,
         }
 

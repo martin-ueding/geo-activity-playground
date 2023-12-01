@@ -48,6 +48,21 @@ def first_time_per_tile(tiles: pd.DataFrame) -> pd.DataFrame:
     return reduced
 
 
+def reduce_tile_group(group: pd.DataFrame) -> pd.DataFrame:
+    first_idx = group["first_time"].argmin()
+    last_idx = group["last_time"].argmax()
+    return pd.DataFrame(
+        {
+            "first_time": group["first_time"].iloc[first_idx],
+            "first_id": group["first_id"].iloc[first_idx],
+            "last_time": group["last_time"].iloc[last_idx],
+            "last_id": group["last_id"].iloc[last_idx],
+            "count": group["count"].sum(),
+        },
+        index=[0],
+    )
+
+
 @functools.cache
 def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
     logger.info("Building explorer tile history from all activities …")
@@ -68,17 +83,22 @@ def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
 
             logger.info(f"Activity {activity.id} wasn't parsed yet, reading them …")
             shard = get_first_tiles(activity.id, repository, zoom)
-            shard["activity_id"] = activity.id
             if not len(shard):
                 continue
-            tiles = pd.concat([tiles, shard])
+            shard2 = pd.DataFrame(
+                {
+                    "tile_x": shard["tile_x"],
+                    "tile_y": shard["tile_y"],
+                    "first_id": activity.id,
+                    "last_id": activity.id,
+                    "first_time": shard["time"],
+                    "last_time": shard["time"],
+                    "count": 1,
+                }
+            )
+            tiles = pd.concat([tiles, shard2])
     logger.info("Consolidating explorer tile history …")
-    tiles = (
-        tiles.sort_values("time")
-        .groupby(["tile_x", "tile_y"])
-        .apply(lambda group: group.iloc[0])
-        .reset_index(drop=True)
-    )
+    tiles = tiles.groupby(["tile_x", "tile_y"]).apply(reduce_tile_group).reset_index()
 
     logger.info("Store explorer tile history to cache file …")
     tiles.to_parquet(cache_file)
