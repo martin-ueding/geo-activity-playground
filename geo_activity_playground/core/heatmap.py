@@ -53,6 +53,18 @@ def get_bounds(lat_lon_data: np.array) -> GeoBounds:
     return GeoBounds(*np.min(lat_lon_data, axis=0), *np.max(lat_lon_data, axis=0))
 
 
+def add_margin(lower: float, upper: float) -> tuple[float, float]:
+    spread = upper - lower
+    margin = spread / 20
+    return max(0, lower - margin), upper + margin
+
+
+def add_margin_to_geo_bounds(bounds: GeoBounds) -> GeoBounds:
+    lat_min, lat_max = add_margin(bounds.lat_min, bounds.lat_max)
+    lon_min, lon_max = add_margin(bounds.lon_min, bounds.lon_max)
+    return GeoBounds(lat_min, lon_min, lat_max, lon_max)
+
+
 MAX_HEATMAP_SIZE = (2160, 3840)  # maximum heatmap size in pixel
 OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
@@ -128,4 +140,21 @@ def build_map_from_tiles(tile_bounds: TileBounds) -> np.array:
 def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
     image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
     image = np.dstack((image, image, image))
+    return image
+
+
+def crop_image_to_bounds(
+    image: np.ndarray, geo_bounds: GeoBounds, tile_bounds: TileBounds
+) -> np.ndarray:
+    min_x, min_y = latlon_to_xy(
+        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
+    )
+    max_x, max_y = latlon_to_xy(
+        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
+    )
+    min_x = int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
+    min_y = int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
+    max_x = int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
+    max_y = int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
+    image = image[min_y:max_y, min_x:max_x, :]
     return image

@@ -30,8 +30,10 @@ from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import convert_to_grayscale
+from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 
@@ -76,17 +78,12 @@ def gaussian_filter(image, sigma):
     return image
 
 
-def add_margin(lower: int, upper: int) -> tuple[int, int]:
-    spread = upper - lower
-    margin = spread // 20
-    return max(0, lower - margin), upper + margin
-
-
 def render_heatmap(
     lat_lon_data: np.ndarray, num_activities: int, arg_zoom: int = -1
 ) -> np.ndarray:
-    bounds = get_bounds(lat_lon_data)
-    tile_bounds = get_sensible_zoom_level(bounds)
+    geo_bounds = get_bounds(lat_lon_data)
+    geo_bounds = add_margin_to_geo_bounds(geo_bounds)
+    tile_bounds = get_sensible_zoom_level(geo_bounds)
     supertile = build_map_from_tiles(tile_bounds)
     supertile = convert_to_grayscale(supertile)
     supertile = 1.0 - supertile  # invert colors
@@ -146,9 +143,7 @@ def render_heatmap(
             :, :, c
         ] + data_color[:, :, c]
 
-    min_x, max_x = add_margin(int(min(xy_data[:, 1])), int(max(xy_data[:, 1])))
-    min_y, max_y = add_margin(int(min(xy_data[:, 0])), int(max(xy_data[:, 0])))
-    supertile = supertile[min_x:max_x, min_y:max_y, :]
+    supertile = crop_image_to_bounds(supertile, geo_bounds, tile_bounds)
     return supertile
 
 
