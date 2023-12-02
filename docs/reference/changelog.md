@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add last activity in tile to the tooltip. [GH-35](https://github.com/martin-ueding/geo-activity-playground/issues/35)
 - Add explorer coloring mode by last activity. [GH-45](https://github.com/martin-ueding/geo-activity-playground/issues/45)
 - Actually implement `Activity/{Kind}/{Equipment}/{Name}.{Format}` directory structure.
+- Document configuration file.
 
 ### Version 0.10
 
