@@ -3,6 +3,7 @@ import logging
 import math
 import pathlib
 import time
+from typing import Optional
 
 import numpy as np
 import requests
@@ -79,3 +80,19 @@ def xy_to_latlon(x: float, y: float, zoom: int) -> tuple[float, float]:
     lat_rad = np.arctan(np.sinh(np.pi * (1.0 - 2.0 * y / n)))
     lat_deg = float(np.degrees(lat_rad))
     return lat_deg, lon_deg
+
+
+def interpolate_missing_tile(
+    x1: float, y1: float, x2: float, y2: float
+) -> Optional[tuple[int, int]]:
+    # We are only interested in diagonal tile combinations, therefore we skip adjacent ones.
+    if int(x1) == int(x2) or int(y1) == int(y2):
+        return None
+
+    x_hat = int(max(x1, x2))
+    l = (x_hat - x1) / (x2 - x1)
+    y_hat = int(y1 + l * (y2 - y1))
+    if y_hat == int(y1):
+        return (int(x2), y_hat)
+    else:
+        return (int(x1), y_hat)
