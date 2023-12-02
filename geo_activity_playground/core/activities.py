@@ -59,14 +59,15 @@ class ActivityRepository:
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
         assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
 
-        df["distance/km"] = df["distance"] / 1000
+        if "distance" in df.columns:
+            df["distance/km"] = df["distance"] / 1000
 
-        if "speed" not in df.columns:
-            df["speed"] = (
-                df["distance"].diff()
-                / (df["time"].diff().dt.total_seconds() + 1e-3)
-                * 3.6
-            )
+            if "speed" not in df.columns:
+                df["speed"] = (
+                    df["distance"].diff()
+                    / (df["time"].diff().dt.total_seconds() + 1e-3)
+                    * 3.6
+                )
 
         return df
 

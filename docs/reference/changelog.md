@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add explorer coloring mode by last activity. [GH-45](https://github.com/martin-ueding/geo-activity-playground/issues/45)
 - Actually implement `Activity/{Kind}/{Equipment}/{Name}.{Format}` directory structure.
 - Document configuration file.
+- Interpolate tracks to find more explorer tiles. [GH-27](https://github.com/martin-ueding/geo-activity-playground/issues/27)
 
 ### Version 0.10
 
