@@ -21,6 +21,15 @@ def compute_tile(lat: float, lon: float, zoom: int) -> tuple[int, int]:
     return int(x * n), int(y * n)
 
 
+def compute_tile_float(lat: float, lon: float, zoom: int) -> tuple[int, int]:
+    x = np.radians(lon)
+    y = np.arcsinh(np.tan(np.radians(lat)))
+    x = (1 + x / np.pi) / 2
+    y = (1 - y / np.pi) / 2
+    n = 2**zoom
+    return x * n, y * n
+
+
 def get_tile_upper_left_lat_lon(
     tile_x: int, tile_y: int, zoom: int
 ) -> tuple[float, float]:

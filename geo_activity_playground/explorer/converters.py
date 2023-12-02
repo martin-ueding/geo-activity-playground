@@ -2,11 +2,14 @@ import functools
 import logging
 import pathlib
 
+import numpy as np
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile
+from geo_activity_playground.core.tiles import compute_tile_float
+from geo_activity_playground.core.tiles import interpolate_missing_tile
 
 
 logger = logging.getLogger(__name__)
@@ -36,10 +39,17 @@ def get_first_tiles(id, repository: ActivityRepository, zoom: int) -> pd.DataFra
 def tiles_from_points(points: pd.DataFrame, zoom: int) -> pd.DataFrame:
     assert pd.api.types.is_dtype_equal(points["time"].dtype, "datetime64[ns, UTC]")
     new_rows = []
-    for index, row in points.iterrows():
-        if "latitude" in row.keys() and "longitude" in row.keys():
-            tile = compute_tile(row["latitude"], row["longitude"], zoom)
-            new_rows.append((row["time"],) + tile)
+    if "latitude" in points.columns and "longitude" in points.columns:
+        xf, yf = compute_tile_float(points["latitude"], points["longitude"], zoom)
+        for t1, x1, y1, x2, y2 in zip(points["time"], xf, yf, xf.shift(1), yf.shift(1)):
+            new_rows.append((t1, int(x1), int(y1)))
+            if len(new_rows) > 1:
+                interpolated = interpolate_missing_tile(x1, y1, x2, y2)
+                if interpolated is not None:
+                    logger.info(
+                        f"Interpolated an explorer tile: {(x1, y1)}, {(x2, y2)} → {interpolated}"
+                    )
+                    new_rows.append((t1,) + interpolated)
     return pd.DataFrame(new_rows, columns=["time", "tile_x", "tile_y"])
 
 
