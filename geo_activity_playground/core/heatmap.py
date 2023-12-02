@@ -67,7 +67,6 @@ def add_margin_to_geo_bounds(bounds: GeoBounds) -> GeoBounds:
     return GeoBounds(lat_min, lon_min, lat_max, lon_max)
 
 
-MAX_HEATMAP_SIZE = (2160, 3840)  # maximum heatmap size in pixel
 OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
 MAX_TILE_COUNT = 2000  # maximum number of tiles to download
@@ -99,7 +98,9 @@ def geo_bounds_from_tile_bounds(tile_bounds: TileBounds) -> GeoBounds:
     return GeoBounds(lat_min, lon_min, lat_max, lon_max)
 
 
-def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
+def get_sensible_zoom_level(
+    bounds: GeoBounds, picture_size: tuple[int, int]
+) -> TileBounds:
     zoom = OSM_MAX_ZOOM
 
     while True:
@@ -113,9 +114,9 @@ def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
         x_tile_max += 1
         y_tile_max += 1
 
-        if (x_tile_max - x_tile_min) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[0] and (
+        if (x_tile_max - x_tile_min) * OSM_TILE_SIZE <= picture_size[0] and (
             y_tile_max - y_tile_min
-        ) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[1]:
+        ) * OSM_TILE_SIZE <= picture_size[1]:
             break
 
         zoom -= 1
