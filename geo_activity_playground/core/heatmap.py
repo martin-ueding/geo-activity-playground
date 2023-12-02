@@ -1,3 +1,6 @@
+"""
+This code is based on https://github.com/remisalmon/Strava-local-heatmap.
+"""
 import dataclasses
 import functools
 import logging
