@@ -10,6 +10,7 @@ import pandas as pd
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
+from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.core.tiles import latlon_to_xy
 
 
@@ -83,9 +84,19 @@ class TileBounds:
     @property
     def shape(self) -> tuple[int, int]:
         return (
-            (self.y_tile_max - self.y_tile_min + 1) * OSM_TILE_SIZE,
-            (self.x_tile_max - self.x_tile_min + 1) * OSM_TILE_SIZE,
+            (self.y_tile_max - self.y_tile_min) * OSM_TILE_SIZE,
+            (self.x_tile_max - self.x_tile_min) * OSM_TILE_SIZE,
         )
+
+
+def geo_bounds_from_tile_bounds(tile_bounds: TileBounds) -> GeoBounds:
+    lat_max, lon_min = get_tile_upper_left_lat_lon(
+        tile_bounds.x_tile_min, tile_bounds.y_tile_min, tile_bounds.zoom
+    )
+    lat_min, lon_max = get_tile_upper_left_lat_lon(
+        tile_bounds.x_tile_max, tile_bounds.y_tile_max, tile_bounds.zoom
+    )
+    return GeoBounds(lat_min, lon_min, lat_max, lon_max)
 
 
 def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
@@ -99,14 +110,17 @@ def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
             int, latlon_to_xy(bounds.lat_max, bounds.lon_max, zoom)
         )
 
-        if (x_tile_max - x_tile_min + 1) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[0] and (
-            y_tile_max - y_tile_min + 1
+        x_tile_max += 1
+        y_tile_max += 1
+
+        if (x_tile_max - x_tile_min) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[0] and (
+            y_tile_max - y_tile_min
         ) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[1]:
             break
 
         zoom -= 1
 
-    tile_count = (x_tile_max - x_tile_min + 1) * (y_tile_max - y_tile_min + 1)
+    tile_count = (x_tile_max - x_tile_min) * (y_tile_max - y_tile_min)
 
     if tile_count > MAX_TILE_COUNT:
         raise RuntimeError("Zoom value too high, too many tiles to download")
@@ -123,8 +137,8 @@ def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
 def build_map_from_tiles(tile_bounds: TileBounds) -> np.array:
     background = np.zeros((*tile_bounds.shape, 3))
 
-    for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max + 1):
-        for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max + 1):
+    for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
+        for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
             tile = np.array(get_tile(tile_bounds.zoom, x, y)) / 255
 
             i = y - tile_bounds.y_tile_min
@@ -200,7 +214,6 @@ def build_heatmap_image(
     data = np.zeros(tile_bounds.shape)
 
     xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
-
     xy_data = np.array(xy_data).T
     xy_data = np.round(
         (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
@@ -237,6 +250,35 @@ def build_heatmap_image(
     )  # kernel density estimation with normal kernel
 
     data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
+
+    # colorize
+    cmap = pl.get_cmap("hot")
+
+    data_color = cmap(data)
+    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
+    return data_color
+
+
+def build_heatmap_tile(lat_lon_data: np.ndarray, tile_bounds: TileBounds) -> np.ndarray:
+    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
+    xy_data = np.array(xy_data).T
+
+    xy_data = np.round(
+        (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
+    )
+    sigma_pixel = 1
+    data = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE))
+    for j, i in xy_data.astype(int):
+        data[
+            i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
+        ] += 1.0
+
+    np.log(data, where=data > 0, out=data)
+    data /= 6
+    data_max = data.max()
+    if data_max > 2:
+        logger.warning(f"Maximum data in tile: {data_max}")
+    data[data > 1.0] = 1.0
 
     # colorize
     cmap = pl.get_cmap("hot")
