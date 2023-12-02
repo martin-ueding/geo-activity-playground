@@ -65,16 +65,28 @@ def import_from_directory() -> None:
             timeseries_path = activity_stream_dir / f"{id}.parquet"
             timeseries.to_parquet(timeseries_path)
 
+            commute = False
+            if path.parts[-2] == "Commute":
+                commute = True
+            kind = None
+            if len(path.parts) >= 3 and path.parts[1] != "Commute":
+                kind = path.parts[1]
+            equipment = None
+            if len(path.parts) >= 4 and path.parts[2] != "Commute":
+                equipment = path.parts[2]
+
+            print(path.parts, (kind, equipment, commute))
+
             row = {
                 "id": id,
-                "commute": None,
+                "commute": commute,
                 "distance": distance,
                 "name": path.stem,
-                "kind": None,
+                "kind": kind,
                 "start": timeseries["time"].iloc[0],
                 "elapsed_time": timeseries["time"].iloc[-1]
                 - timeseries["time"].iloc[0],
-                "equipment": None,
+                "equipment": equipment,
                 "calories": 0,
             }
 
