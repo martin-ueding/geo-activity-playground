@@ -47,6 +47,13 @@ def webui_main(repository: ActivityRepository) -> None:
         plot = activity_track_plot(repository.get_time_series(int(id)))
         return plot
 
+    @app.route("/activity/<id>/sharepic.png")
+    def activity_sharepic(id: str):
+        return Response(
+            activity_controller.render_sharepic(int(id)),
+            mimetype="image/png",
+        )
+
     @app.route("/explorer/<zoom>")
     def explorer(zoom: str):
         return render_template(

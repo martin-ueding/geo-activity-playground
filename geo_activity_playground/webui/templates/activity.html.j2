@@ -52,7 +52,7 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Time series</h2>
+        <h2>Distance & altitude</h2>
     </div>
 </div>
 
@@ -63,17 +63,33 @@
     <div class="col-md-4">
         {{ vega_direct("altitude_time_plot", altitude_time_plot) }}
     </div>
-    <div class="col-md-4">
-        {{ vega_direct("heartrate_time_plot", heartrate_time_plot) }}
+</div>
+
+{% if heartrate_time_plot is defined %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>Heart rate</h2>
     </div>
 </div>
 
-{% if heart_zones_plot is defined %}
 <div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("heartrate_time_plot", heartrate_time_plot) }}
+    </div>
+    {% if heart_zones_plot is defined %}
     <div class="col-md-4">
         {{ vega_direct("heart_zones_plot", heart_zones_plot) }}
     </div>
+    {% endif %}
 </div>
 {% endif %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Share picture</h2>
+
+        <img src="/activity/{{ activity.id }}/sharepic.png" />
+    </div>
+</div>
 
 {% endblock %}
