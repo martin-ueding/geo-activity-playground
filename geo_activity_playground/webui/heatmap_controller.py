@@ -13,7 +13,6 @@ from geo_activity_playground.core.heatmap import get_all_points
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.core.tiles import latlon_to_xy
-from geo_activity_playground.heatmap import gaussian_filter
 
 
 logger = logging.getLogger(__name__)

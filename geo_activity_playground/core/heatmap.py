@@ -3,6 +3,7 @@ import functools
 import logging
 import pathlib
 
+import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
 
@@ -79,6 +80,13 @@ class TileBounds:
     y_tile_min: int
     y_tile_max: int
 
+    @property
+    def shape(self) -> tuple[int, int]:
+        return (
+            (self.y_tile_max - self.y_tile_min + 1) * OSM_TILE_SIZE,
+            (self.x_tile_max - self.x_tile_min + 1) * OSM_TILE_SIZE,
+        )
+
 
 def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
     zoom = OSM_MAX_ZOOM
@@ -113,13 +121,7 @@ def get_sensible_zoom_level(bounds: GeoBounds) -> TileBounds:
 
 
 def build_map_from_tiles(tile_bounds: TileBounds) -> np.array:
-    background = np.zeros(
-        (
-            (tile_bounds.y_tile_max - tile_bounds.y_tile_min + 1) * OSM_TILE_SIZE,
-            (tile_bounds.x_tile_max - tile_bounds.x_tile_min + 1) * OSM_TILE_SIZE,
-            3,
-        )
-    )
+    background = np.zeros((*tile_bounds.shape, 3))
 
     for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max + 1):
         for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max + 1):
@@ -158,3 +160,87 @@ def crop_image_to_bounds(
     max_y = int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
     image = image[min_y:max_y, min_x:max_x, :]
     return image
+
+
+def gaussian_filter(image, sigma):
+    # returns image filtered with a gaussian function of variance sigma**2
+    #
+    # input: image = numpy.ndarray
+    #        sigma = float
+    # output: image = numpy.ndarray
+
+    i, j = np.meshgrid(
+        np.arange(image.shape[0]), np.arange(image.shape[1]), indexing="ij"
+    )
+
+    mu = (int(image.shape[0] / 2.0), int(image.shape[1] / 2.0))
+
+    gaussian = (
+        1.0
+        / (2.0 * np.pi * sigma * sigma)
+        * np.exp(-0.5 * (((i - mu[0]) / sigma) ** 2 + ((j - mu[1]) / sigma) ** 2))
+    )
+
+    gaussian = np.roll(gaussian, (-mu[0], -mu[1]), axis=(0, 1))
+
+    image_fft = np.fft.rfft2(image)
+    gaussian_fft = np.fft.rfft2(gaussian)
+
+    image = np.fft.irfft2(image_fft * gaussian_fft)
+
+    return image
+
+
+def build_heatmap_image(
+    lat_lon_data: np.ndarray, num_activities: int, tile_bounds: TileBounds
+) -> np.ndarray:
+    # fill trackpoints
+    sigma_pixel = 1
+
+    data = np.zeros(tile_bounds.shape)
+
+    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
+
+    xy_data = np.array(xy_data).T
+    xy_data = np.round(
+        (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
+    )  # to supertile coordinates
+
+    for j, i in xy_data.astype(int):
+        data[
+            i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
+        ] += 1.0
+
+    res_pixel = (
+        156543.03
+        * np.cos(np.radians(np.mean(lat_lon_data[:, 0])))
+        / (2.0**tile_bounds.zoom)
+    )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+
+    # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
+    # (Strava records trackpoints every 5 meters in average for cycling activites)
+    m = np.round((1.0 / 5.0) * res_pixel * num_activities)
+
+    data[data > m] = m
+
+    # equalize histogram and compute kernel density estimation
+    data_hist, _ = np.histogram(data, bins=int(m + 1))
+
+    data_hist = np.cumsum(data_hist) / data.size  # normalized cumulated histogram
+
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
+
+    data = gaussian_filter(
+        data, float(sigma_pixel)
+    )  # kernel density estimation with normal kernel
+
+    data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
+
+    # colorize
+    cmap = pl.get_cmap("hot")
+
+    data_color = cmap(data)
+    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
+    return data_color

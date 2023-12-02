@@ -25,12 +25,10 @@ import numpy as np
 import pandas as pd
 import sklearn.cluster
 
-from .core.sources import TimeSeriesSource
 from .core.tiles import compute_tile
-from .core.tiles import get_tile
-from .core.tiles import latlon_to_xy
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
+from geo_activity_playground.core.heatmap import build_heatmap_image
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.heatmap import crop_image_to_bounds
@@ -40,42 +38,11 @@ from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 
 logger = logging.getLogger(__name__)
 
-# globals
-PLT_COLORMAP = "hot"  # matplotlib color map
 MAX_TILE_COUNT = 2000  # maximum number of tiles to download
 MAX_HEATMAP_SIZE = (2160, 3840)  # maximum heatmap size in pixel
 
 OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
-
-
-def gaussian_filter(image, sigma):
-    # returns image filtered with a gaussian function of variance sigma**2
-    #
-    # input: image = numpy.ndarray
-    #        sigma = float
-    # output: image = numpy.ndarray
-
-    i, j = np.meshgrid(
-        np.arange(image.shape[0]), np.arange(image.shape[1]), indexing="ij"
-    )
-
-    mu = (int(image.shape[0] / 2.0), int(image.shape[1] / 2.0))
-
-    gaussian = (
-        1.0
-        / (2.0 * np.pi * sigma * sigma)
-        * np.exp(-0.5 * (((i - mu[0]) / sigma) ** 2 + ((j - mu[1]) / sigma) ** 2))
-    )
-
-    gaussian = np.roll(gaussian, (-mu[0], -mu[1]), axis=(0, 1))
-
-    image_fft = np.fft.rfft2(image)
-    gaussian_fft = np.fft.rfft2(gaussian)
-
-    image = np.fft.irfft2(image_fft * gaussian_fft)
-
-    return image
 
 
 def render_heatmap(
@@ -84,67 +51,16 @@ def render_heatmap(
     geo_bounds = get_bounds(lat_lon_data)
     geo_bounds = add_margin_to_geo_bounds(geo_bounds)
     tile_bounds = get_sensible_zoom_level(geo_bounds)
-    supertile = build_map_from_tiles(tile_bounds)
-    supertile = convert_to_grayscale(supertile)
-    supertile = 1.0 - supertile  # invert colors
-
-    # fill trackpoints
-    sigma_pixel = 1
-
-    data = np.zeros(supertile.shape[:2])
-
-    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
-
-    xy_data = np.array(xy_data).T
-    xy_data = np.round(
-        (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
-    )  # to supertile coordinates
-
-    for j, i in xy_data.astype(int):
-        data[
-            i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
-        ] += 1.0
-
-    res_pixel = (
-        156543.03
-        * np.cos(np.radians(np.mean(lat_lon_data[:, 0])))
-        / (2.0**tile_bounds.zoom)
-    )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-
-    # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
-    # (Strava records trackpoints every 5 meters in average for cycling activites)
-    m = np.round((1.0 / 5.0) * res_pixel * num_activities)
-
-    data[data > m] = m
-
-    # equalize histogram and compute kernel density estimation
-    data_hist, _ = np.histogram(data, bins=int(m + 1))
-
-    data_hist = np.cumsum(data_hist) / data.size  # normalized cumulated histogram
-
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
-
-    data = gaussian_filter(
-        data, float(sigma_pixel)
-    )  # kernel density estimation with normal kernel
-
-    data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
-
-    # colorize
-    cmap = plt.get_cmap(PLT_COLORMAP)
-
-    data_color = cmap(data)
-    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
-
+    background = build_map_from_tiles(tile_bounds)
+    background = convert_to_grayscale(background)
+    background = 1.0 - background
+    data_color = build_heatmap_image(lat_lon_data, num_activities, tile_bounds)
     for c in range(3):
-        supertile[:, :, c] = (1.0 - data_color[:, :, c]) * supertile[
+        background[:, :, c] = (1.0 - data_color[:, :, c]) * background[
             :, :, c
         ] + data_color[:, :, c]
-
-    supertile = crop_image_to_bounds(supertile, geo_bounds, tile_bounds)
-    return supertile
+    background = crop_image_to_bounds(background, geo_bounds, tile_bounds)
+    return background
 
 
 def generate_heatmaps_per_cluster(repository: ActivityRepository) -> None:
