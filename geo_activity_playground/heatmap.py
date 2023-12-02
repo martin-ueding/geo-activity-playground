@@ -30,6 +30,10 @@ from .core.tiles import compute_tile
 from .core.tiles import get_tile
 from .core.tiles import latlon_to_xy
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.heatmap import build_map_from_tiles
+from geo_activity_playground.core.heatmap import convert_to_grayscale
+from geo_activity_playground.core.heatmap import get_bounds
+from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 
 
 logger = logging.getLogger(__name__)
@@ -81,73 +85,22 @@ def add_margin(lower: int, upper: int) -> tuple[int, int]:
 def render_heatmap(
     lat_lon_data: np.ndarray, num_activities: int, arg_zoom: int = -1
 ) -> np.ndarray:
-    # find tiles coordinates
-    lat_min, lon_min = np.min(lat_lon_data, axis=0)
-    lat_max, lon_max = np.max(lat_lon_data, axis=0)
-
-    if arg_zoom > -1:
-        zoom = min(arg_zoom, OSM_MAX_ZOOM)
-
-        x_tile_min, y_tile_max = map(int, latlon_to_xy(lat_min, lon_min, zoom))
-        x_tile_max, y_tile_min = map(int, latlon_to_xy(lat_max, lon_max, zoom))
-
-    else:
-        zoom = OSM_MAX_ZOOM
-
-        while True:
-            x_tile_min, y_tile_max = map(int, latlon_to_xy(lat_min, lon_min, zoom))
-            x_tile_max, y_tile_min = map(int, latlon_to_xy(lat_max, lon_max, zoom))
-
-            if (x_tile_max - x_tile_min + 1) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[
-                0
-            ] and (y_tile_max - y_tile_min + 1) * OSM_TILE_SIZE <= MAX_HEATMAP_SIZE[1]:
-                break
-
-            zoom -= 1
-
-    tile_count = (x_tile_max - x_tile_min + 1) * (y_tile_max - y_tile_min + 1)
-
-    if tile_count > MAX_TILE_COUNT:
-        exit("ERROR zoom value too high, too many tiles to download")
-
-    supertile = np.zeros(
-        (
-            (y_tile_max - y_tile_min + 1) * OSM_TILE_SIZE,
-            (x_tile_max - x_tile_min + 1) * OSM_TILE_SIZE,
-            3,
-        )
-    )
-
-    n = 0
-    for x in range(x_tile_min, x_tile_max + 1):
-        for y in range(y_tile_min, y_tile_max + 1):
-            n += 1
-
-            tile = np.array(get_tile(zoom, x, y)) / 255
-
-            i = y - y_tile_min
-            j = x - x_tile_min
-
-            supertile[
-                i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
-                j * OSM_TILE_SIZE : (j + 1) * OSM_TILE_SIZE,
-                :,
-            ] = tile[:, :, :3]
-
-    supertile = np.sum(supertile * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
+    bounds = get_bounds(lat_lon_data)
+    tile_bounds = get_sensible_zoom_level(bounds)
+    supertile = build_map_from_tiles(tile_bounds)
+    supertile = convert_to_grayscale(supertile)
     supertile = 1.0 - supertile  # invert colors
-    supertile = np.dstack((supertile, supertile, supertile))  # to rgb
 
     # fill trackpoints
     sigma_pixel = 1
 
     data = np.zeros(supertile.shape[:2])
 
-    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], zoom)
+    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
 
     xy_data = np.array(xy_data).T
     xy_data = np.round(
-        (xy_data - [x_tile_min, y_tile_min]) * OSM_TILE_SIZE
+        (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
     )  # to supertile coordinates
 
     for j, i in xy_data.astype(int):
@@ -156,7 +109,9 @@ def render_heatmap(
         ] += 1.0
 
     res_pixel = (
-        156543.03 * np.cos(np.radians(np.mean(lat_lon_data[:, 0]))) / (2.0**zoom)
+        156543.03
+        * np.cos(np.radians(np.mean(lat_lon_data[:, 0])))
+        / (2.0**tile_bounds.zoom)
     )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
     # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
