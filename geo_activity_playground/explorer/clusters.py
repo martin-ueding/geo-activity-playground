@@ -2,7 +2,6 @@ import json
 import pathlib
 from typing import Iterator
 
-import altair as alt
 import geojson
 import pandas as pd
 
@@ -170,3 +169,80 @@ def bounding_box_for_biggest_cluster(
             ),
         )
     )
+
+
+class SquareHistoryState:
+    def __init__(self, zoom: int) -> None:
+        self._state_path = pathlib.Path(f"Cache/square_history_{zoom}_state.json")
+        self._square_history_path = pathlib.Path(f"Cache/square_history_{zoom}.parquet")
+
+        self.max_square_size = 1
+        self.start = 0
+        self.visited_tiles = set()
+        self.square_history = pd.DataFrame()
+
+    def load(self) -> None:
+        if self._state_path.exists():
+            with open(self._state_path) as f:
+                data = json.load(f)
+            self.visited_tiles = set((x, y) for x, y in data["visited_tiles"])
+            self.max_square_size = data["max_square_size"]
+            self.start = data["start"]
+
+        if self._square_history_path.exists():
+            self.square_history = pd.read_parquet(self._square_history_path)
+
+    def save(self) -> None:
+        data = {
+            "max_square_size": self.max_square_size,
+            "visited_tiles": list(self.visited_tiles),
+            "start": self.start,
+        }
+        with open(self._state_path, "w") as f:
+            json.dump(data, f)
+
+        self.square_history.to_parquet(self._square_history_path)
+
+
+def get_square_history(zoom: int) -> SquareHistoryState:
+    tiles = pd.read_parquet(f"Cache/first_time_per_tile_{zoom}.parquet")
+    tiles.sort_values("first_time", inplace=True)
+    s = SquareHistoryState(zoom)
+    s.load()
+    rows = []
+    for index, row in tiles.iloc[s.start :].iterrows():
+        tile = (row["tile_x"], row["tile_y"])
+        x, y = tile
+        s.visited_tiles.add(tile)
+        for square_size in range(s.max_square_size + 1, 25):
+            this_tile_size_viable = False
+            for x_offset in range(square_size):
+                for y_offset in range(square_size):
+                    this_offset_viable = True
+                    for xx in range(square_size):
+                        for yy in range(square_size):
+                            if (
+                                x + xx - x_offset,
+                                y + yy - y_offset,
+                            ) not in s.visited_tiles:
+                                this_offset_viable = False
+                                break
+                        if not this_offset_viable:
+                            break
+                    if this_offset_viable:
+                        s.max_square_size = square_size
+                        rows.append(
+                            {"time": row["first_time"], "max_square_size": square_size}
+                        )
+                        this_tile_size_viable = True
+                        break
+                if this_tile_size_viable:
+                    break
+            if not this_tile_size_viable:
+                break
+
+    new_square_history = pd.DataFrame(rows)
+    s.square_history = pd.concat([s.square_history, new_square_history])
+    s.start = len(tiles)
+    s.save()
+    return s

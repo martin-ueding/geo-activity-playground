@@ -8,6 +8,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
 from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
+from geo_activity_playground.explorer.clusters import get_square_history
 from geo_activity_playground.explorer.converters import get_tile_history
 from geo_activity_playground.explorer.grid_file import get_border_tiles
 from geo_activity_playground.explorer.grid_file import get_explored_geojson
@@ -35,6 +36,8 @@ class ExplorerController:
         cluster_state = get_explorer_cluster_evolution(zoom)
         explored = get_three_color_tiles(tiles, self._repository, cluster_state, zoom)
 
+        square_history = get_square_history(zoom)
+
         points = get_border_tiles(tiles, zoom)
         missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
         make_grid_file_gpx(points, "missing_tiles")
@@ -58,6 +61,9 @@ class ExplorerController:
             "plot_tile_evolution": plot_tile_evolution(tiles),
             "plot_cluster_evolution": plot_cluster_evolution(
                 cluster_state.cluster_evolution
+            ),
+            "plot_square_evolution": plot_square_evolution(
+                square_history.square_history
             ),
         }
 
@@ -83,6 +89,19 @@ def plot_cluster_evolution(cluster_evolution: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y("max_cluster_size", title="Maximum cluster size"),
+        )
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
+
+
+def plot_square_evolution(square_evolution: pd.DataFrame) -> str:
+    return (
+        alt.Chart(square_evolution, title="Square")
+        .mark_line(interpolate="step-after")
+        .encode(
+            alt.X("time", title="Time"),
+            alt.Y("max_square_size", title="Maximum square size"),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
