@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import pathlib
@@ -225,7 +226,7 @@ def get_square_history(zoom: int) -> SquareHistoryState:
         tile = (row["tile_x"], row["tile_y"])
         x, y = tile
         s.visited_tiles.add(tile)
-        for square_size in range(s.max_square_size + 1, 25):
+        for square_size in itertools.count(s.max_square_size + 1):
             this_tile_size_viable = False
             for x_offset in range(square_size):
                 for y_offset in range(square_size):
