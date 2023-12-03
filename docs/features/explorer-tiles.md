@@ -72,6 +72,12 @@ For my home city it looks like this:
 
 You can see how the squadratinhos are much smaller than the explorer tiles and how they lend themselves to more local exploring.
 
+## History
+
+The map only shows the current state of your explorer tiles. In order to get a sense of how many new tiles you have discovered in the past, there are also plots that show you how you have extended the total number of squares, the size of your largest cluster and the size of your largest square over time:
+
+![](explorer-history.png)
+
 ## Missing tile files
 
 Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Take for instance this set of tiles from a vacation:
