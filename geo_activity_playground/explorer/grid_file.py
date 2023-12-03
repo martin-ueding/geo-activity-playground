@@ -6,12 +6,13 @@ from typing import Iterator
 import geojson
 import gpxpy
 import matplotlib
-import numpy as np
 import pandas as pd
-import sklearn.cluster
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.clusters import (
+    get_explorer_cluster_evolution,
+)
 from geo_activity_playground.explorer.converters import get_tile_history
 
 
@@ -42,22 +43,12 @@ def get_three_color_tiles(
                 cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
             ),
             "cluster": False,
-            "color": "red",
+            "color": None,
             "first_visit": row["first_time"].date().isoformat(),
             "last_visit": row["last_time"].date().isoformat(),
             "num_visits": row["count"],
             "square": False,
         }
-
-    for x, y in tile_dict.keys():
-        if (
-            (x + 1, y) in tile_dict
-            and (x - 1, y) in tile_dict
-            and (x, y + 1) in tile_dict
-            and (x, y - 1) in tile_dict
-        ):
-            tile_dict[(x, y)]["cluster"] = True
-            tile_dict[(x, y)]["color"] = "green"
 
     # Compute biggest square.
     square_size = 1
@@ -76,7 +67,6 @@ def get_three_color_tiles(
                 square_size += 1
                 continue
             break
-
     if biggest is not None:
         square_x, square_y, square_size = biggest
         for x in range(square_x, square_x + square_size):
@@ -84,27 +74,26 @@ def get_three_color_tiles(
                 tile_dict[(x, y)]["square"] = True
                 tile_dict[(x, y)]["color"] = "blue"
 
-    num_cluster_tiles = sum(value["cluster"] for value in tile_dict.values())
-
-    cluster_tiles = np.array(
-        [tile for tile, value in tile_dict.items() if value["cluster"]]
-    )
-
-    if len(cluster_tiles) > 1:
-        logger.info("Run DBSCAN cluster finding algorithm …")
-        dbscan = sklearn.cluster.DBSCAN(eps=1.1, min_samples=1)
-        labels = dbscan.fit_predict(cluster_tiles)
-        label_counts = dict(zip(*np.unique(labels, return_counts=True)))
-        max_cluster_size = max(
-            count for label, count in label_counts.items() if label != -1
-        )
-        for xy, label in zip(cluster_tiles, labels):
-            tile_dict[tuple(xy)]["cluster_id"] = int(label)
-            tile_dict[tuple(xy)]["this_cluster_size"] = int(label_counts[label])
+    # Add cluster information.
+    cluster_state = get_explorer_cluster_evolution(zoom)
+    for xy, members in cluster_state.cluster_tiles.items():
+        tile_dict[xy]["this_cluster_size"] = len(members)
+        tile_dict[xy]["cluster"] = True
+    if len(cluster_state.cluster_evolution) > 0:
+        max_cluster_size = cluster_state.cluster_evolution["max_cluster_size"].iloc[-1]
     else:
-        max_cluster_size = len(cluster_tiles)
+        max_cluster_size = 0
+    num_cluster_tiles = len(cluster_state.cluster_tiles)
 
-    # Find non-zero tiles.
+    # Apply cluster colors.
+    for xy, xy_dict in tile_dict.items():
+        if xy_dict["square"]:
+            xy_dict["color"] = "blue"
+        elif xy_dict["cluster"]:
+            xy_dict["color"] = "green"
+        else:
+            xy_dict["color"] = "red"
+
     result = {
         "explored_geojson": geojson.dumps(
             geojson.FeatureCollection(
