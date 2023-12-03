@@ -1,4 +1,5 @@
 import json
+import logging
 import pathlib
 from typing import Iterator
 
@@ -6,6 +7,9 @@ import geojson
 import pandas as pd
 
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+
+
+logger = logging.getLogger(__name__)
 
 
 def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
@@ -29,6 +33,7 @@ class ExplorerClusterState:
         )
 
     def load(self) -> None:
+        logger.info("Loading explorer cluster state …")
         if self._state_path.exists():
             with open(self._state_path) as f:
                 data = json.load(f)
@@ -48,6 +53,7 @@ class ExplorerClusterState:
             self.cluster_evolution = pd.read_parquet(self._cluster_evolution_path)
 
     def save(self) -> None:
+        logger.info("Saving explorer cluster state …")
         data = {
             "num_neighbors": {
                 f"{x}/{y}": count for (x, y), count in self.num_neighbors.items()
@@ -73,6 +79,8 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
 
     s = ExplorerClusterState(zoom)
     s.load()
+
+    logger.info("Compute new explorer cluster state …")
 
     if len(s.cluster_evolution) > 0:
         max_cluster_so_far = s.cluster_evolution["max_cluster_size"].iloc[-1]
@@ -182,6 +190,7 @@ class SquareHistoryState:
         self.square_history = pd.DataFrame()
 
     def load(self) -> None:
+        logger.info("Load explorer square state …")
         if self._state_path.exists():
             with open(self._state_path) as f:
                 data = json.load(f)
@@ -193,6 +202,7 @@ class SquareHistoryState:
             self.square_history = pd.read_parquet(self._square_history_path)
 
     def save(self) -> None:
+        logger.info("Save explorer square state …")
         data = {
             "max_square_size": self.max_square_size,
             "visited_tiles": list(self.visited_tiles),
@@ -209,6 +219,7 @@ def get_square_history(zoom: int) -> SquareHistoryState:
     tiles.sort_values("first_time", inplace=True)
     s = SquareHistoryState(zoom)
     s.load()
+    logger.info("Compute new explorer square state …")
     rows = []
     for index, row in tiles.iloc[s.start :].iterrows():
         tile = (row["tile_x"], row["tile_y"])

@@ -23,6 +23,7 @@ def get_three_color_tiles(
     cluster_state: ExplorerClusterState,
     zoom: int,
 ) -> str:
+    logger.info("Generate data for explorer tile map …")
     today = datetime.date.today()
     cmap_first = matplotlib.colormaps["plasma"]
     cmap_last = matplotlib.colormaps["plasma"]
@@ -117,6 +118,7 @@ def get_three_color_tiles(
 
 
 def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
+    logger.info("Generate border tiles …")
     tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
     border_tiles = set()
     for x, y in tile_set:
