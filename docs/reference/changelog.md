@@ -16,6 +16,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Fix bug that occurs when activities have no distance information.
 - Show time evolution of the number of explorer tiles, the largest cluster and the square size. [GH-33](https://github.com/martin-ueding/geo-activity-playground/issues/33)
 - Center map view on biggest explorer cluster.
+- Show speed distribution. [GH-42](https://github.com/martin-ueding/geo-activity-playground/issues/42)
 
 ### Version 0.10
 
