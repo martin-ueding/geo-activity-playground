@@ -176,7 +176,7 @@ class SquareHistoryState:
         self._state_path = pathlib.Path(f"Cache/square_history_{zoom}_state.json")
         self._square_history_path = pathlib.Path(f"Cache/square_history_{zoom}.parquet")
 
-        self.max_square_size = 1
+        self.max_square_size = 0
         self.start = 0
         self.visited_tiles = set()
         self.square_history = pd.DataFrame()
