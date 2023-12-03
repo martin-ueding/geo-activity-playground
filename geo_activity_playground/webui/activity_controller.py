@@ -39,6 +39,8 @@ class ActivityController:
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
             "color_line_geojson": make_geojson_color_line(time_series),
+            "speed_time_plot": speed_time_plot(time_series),
+            "speed_distribution_plot": speed_distribution_plot(time_series),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)
@@ -51,6 +53,34 @@ class ActivityController:
     def render_sharepic(self, id: int) -> bytes:
         time_series = self._repository.get_time_series(id)
         return make_sharepic(time_series)
+
+
+def speed_time_plot(time_series: pd.DataFrame) -> str:
+    return (
+        alt.Chart(time_series, title="Speed")
+        .mark_line()
+        .encode(alt.X("time", title="Time"), alt.Y("speed", title="Speed / km/h"))
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
+
+
+def speed_distribution_plot(time_series: pd.DataFrame) -> str:
+    df = pd.DataFrame(
+        {
+            "speed": time_series["speed"],
+            "step": time_series["time"].diff().dt.total_seconds() / 60,
+        }
+    ).dropna()
+    return (
+        alt.Chart(df, title="Speed distribution")
+        .mark_bar()
+        .encode(
+            alt.X("speed", bin=alt.Bin(step=5), title="Speed / km/h"),
+            alt.Y("sum(step)", title="Duration / min"),
+        )
+        .to_json(format="vega")
+    )
 
 
 def distance_time_plot(time_series: pd.DataFrame) -> str:
@@ -73,7 +103,7 @@ def altitude_time_plot(time_series: pd.DataFrame) -> str:
             alt.X("time", title="Time"),
             alt.Y("altitude", scale=alt.Scale(zero=False), title="Altitude / m"),
         )
-        .interactive()
+        .interactive(bind_y=False)
         .to_json(format="vega")
     )
 
@@ -86,7 +116,7 @@ def heartrate_time_plot(time_series: pd.DataFrame) -> str:
             alt.X("time", title="Time"),
             alt.Y("heartrate", scale=alt.Scale(zero=False), title="Heart rate"),
         )
-        .interactive()
+        .interactive(bind_y=False)
         .to_json(format="vega")
     )
 
@@ -96,11 +126,10 @@ def heartrate_zone_plot(heart_zones: pd.DataFrame) -> str:
         alt.Chart(heart_zones, title="Heart Rate Zones")
         .mark_bar()
         .encode(
-            alt.X("minutes", title="Minutes"),
+            alt.X("minutes", title="Duration / min"),
             alt.Y("heartzone:O", title="Zone"),
             alt.Color("heartzone:O", scale=alt.Scale(scheme="turbo"), title="Zone"),
         )
-        .interactive()
         .to_json(format="vega")
     )
 

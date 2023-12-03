@@ -52,7 +52,7 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Distance & altitude</h2>
+        <h2>Distance & speed</h2>
     </div>
 </div>
 
@@ -60,6 +60,21 @@
     <div class="col-md-4">
         {{ vega_direct("distance_time_plot", distance_time_plot) }}
     </div>
+    <div class="col-md-4">
+        {{ vega_direct("speed_time_plot", speed_time_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("speed_distribution_plot", speed_distribution_plot) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Altitude</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
     <div class="col-md-4">
         {{ vega_direct("altitude_time_plot", altitude_time_plot) }}
     </div>
