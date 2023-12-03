@@ -89,6 +89,21 @@
 
 <div class="row mb-3">
     <div class="col">
+        <h2>Tile history</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("plot_tile_evolution", plot_tile_evolution) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("plot_cluster_evolution", plot_cluster_evolution) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
         <h2>Map with unexplored tiles</h2>
         <p>The following is the “halo” of unexplored tiles around the tiles that you have already explored.</p>
     </div>

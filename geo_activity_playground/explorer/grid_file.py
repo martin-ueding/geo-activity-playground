@@ -10,9 +10,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.clusters import (
-    get_explorer_cluster_evolution,
-)
+from geo_activity_playground.explorer.clusters import ExplorerClusterState
 from geo_activity_playground.explorer.converters import get_tile_history
 
 
@@ -20,7 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_three_color_tiles(
-    tiles: pd.DataFrame, repository: ActivityRepository, zoom: int
+    tiles: pd.DataFrame,
+    repository: ActivityRepository,
+    cluster_state: ExplorerClusterState,
+    zoom: int,
 ) -> str:
     today = datetime.date.today()
     cmap_first = matplotlib.colormaps["plasma"]
@@ -75,7 +76,6 @@ def get_three_color_tiles(
                 tile_dict[(x, y)]["color"] = "blue"
 
     # Add cluster information.
-    cluster_state = get_explorer_cluster_evolution(zoom)
     for xy, members in cluster_state.cluster_tiles.items():
         tile_dict[xy]["this_cluster_size"] = len(members)
         tile_dict[xy]["cluster"] = True

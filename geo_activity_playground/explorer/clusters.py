@@ -140,13 +140,3 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
     s.start = len(tiles)
     s.save()
     return s
-
-
-def plot_cluster_evolution(cluster_evolution: pd.DataFrame) -> str:
-    return (
-        alt.Chart(cluster_evolution)
-        .mark_line(interpolate="step-after")
-        .encode(alt.X("time"), alt.Y("max_cluster_size"))
-        .interactive()
-        .to_json(format="vega")
-    )
