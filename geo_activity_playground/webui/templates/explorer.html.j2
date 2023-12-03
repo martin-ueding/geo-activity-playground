@@ -132,6 +132,9 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(missing_map)
             let missing_layer = L.geoJSON(missing_geojson).addTo(missing_map)
+            if (bbox) {
+                missing_map.fitBounds(L.geoJSON(bbox).getBounds())
+            }
         </script>
     </div>
 </div>
