@@ -20,21 +20,29 @@ The interactive map shows a line with the activity. The speed is color-coded and
 
 ![](activity-map.png)
 
-## Time series plots
+## Distance, speed and altitude
 
 Then there are a couple of time series plots. One is the distance vs. time. You can see how much distance you covered when and also see plateaus when you went on a break.
 
 ![](activity-distance.png)
 
+From this we can also compute the speed, although that might be pretty noisy:
+
+![](activity-speed.png)
+
+And more interesting is the distribution of the various speed zones. This gives you an understanding how much time you spent at which speed. The buckets are set in 5 km/h intervals, but we could also change that.
+
+![](activity-speed-hist.png)
+
 If the time series data has the altitude, which isn't always the case, you can see it in the plot there. Here we can see how I did a tour and continually rode downhill. Except at the end where I had to climb in order to get the explorer tile that I wanted.
 
 ![](activity-altitude.png)
 
+## Heart rate
+
 The heart rate isn't too helpful, I feel. Still I've created the plot from the given data.
 
 ![](activity-heartrate.png)
-
-## Heart rate zones
 
 More interesting regarding the heart rate are the zones which one has spent time during this activity.
 
