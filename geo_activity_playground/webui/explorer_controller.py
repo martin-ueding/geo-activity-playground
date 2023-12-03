@@ -6,6 +6,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
 from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
 from geo_activity_playground.explorer.converters import get_tile_history
 from geo_activity_playground.explorer.grid_file import get_border_tiles
@@ -46,6 +47,11 @@ class ExplorerController:
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
+                "bbox": bounding_box_for_biggest_cluster(
+                    cluster_state.cluster_tiles.values(), zoom
+                )
+                if len(cluster_state.cluster_tiles) > 0
+                else {},
             },
             "explored": explored,
             "missing_tiles_geojson": missing_tiles_geojson,

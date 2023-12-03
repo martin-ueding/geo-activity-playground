@@ -3,7 +3,10 @@ import pathlib
 from typing import Iterator
 
 import altair as alt
+import geojson
 import pandas as pd
+
+from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 
 
 def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
@@ -140,3 +143,30 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
     s.start = len(tiles)
     s.save()
     return s
+
+
+def bounding_box_for_biggest_cluster(
+    clusters: list[list[tuple[int, int]]], zoom: int
+) -> str:
+    biggest_cluster = max(clusters, key=lambda members: len(members))
+    min_x = min(x for x, y in biggest_cluster)
+    max_x = max(x for x, y in biggest_cluster)
+    min_y = min(y for x, y in biggest_cluster)
+    max_y = max(y for x, y in biggest_cluster)
+    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
+    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
+    return geojson.dumps(
+        geojson.Feature(
+            geometry=geojson.Polygon(
+                [
+                    [
+                        (lon_min, lat_max),
+                        (lon_max, lat_max),
+                        (lon_max, lat_min),
+                        (lon_min, lat_min),
+                        (lon_min, lat_max),
+                    ]
+                ]
+            ),
+        )
+    )
