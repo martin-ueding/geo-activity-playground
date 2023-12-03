@@ -363,6 +363,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -426,11 +446,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/calendar/" class="md-nav__link">
+      <a href="../../features/overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -451,6 +471,26 @@
   
   <span class="md-ellipsis">
     Activity View
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
   </span>
   
 
@@ -620,6 +660,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Directory Layout
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -629,6 +680,43 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-and-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output and cache
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -681,6 +769,32 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-and-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output and cache
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -697,7 +811,7 @@
 <h1 id="directory-layout">Directory Layout</h1>
 <p>There are a bunch of files that need to be given to this set of scripts, are used as intermediate files or generated as output. In order to make it clear where everything is, the following document lists all the paths which are relevant to the script.</p>
 <p>Everything is relative to a <em>base directory</em> which can be passed with the <code>--basedir</code> option to the scripts.</p>
-<h1 id="input">Input</h1>
+<h2 id="input">Input</h2>
 <p>The user has to put data into the following directories in order for it to be picked up.</p>
 <ul>
 <li>
@@ -707,7 +821,7 @@
 <p><code>config.toml</code>: Configuration file</p>
 </li>
 </ul>
-<h1 id="output-and-cache">Output and cache</h1>
+<h2 id="output-and-cache">Output and cache</h2>
 <p>The following directories serve as a cache. One can inspect this but doesn't need to work with that directly.</p>
 <ul>
 <li>

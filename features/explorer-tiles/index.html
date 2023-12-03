@@ -363,6 +363,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -428,11 +448,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../calendar/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -453,6 +473,26 @@
   
   <span class="md-ellipsis">
     Activity View
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
   </span>
   
 
@@ -537,6 +577,15 @@
   <a href="#squadratinhos" class="md-nav__link">
     <span class="md-ellipsis">
       Squadratinhos
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#history" class="md-nav__link">
+    <span class="md-ellipsis">
+      History
     </span>
   </a>
   
@@ -745,6 +794,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#history" class="md-nav__link">
+    <span class="md-ellipsis">
+      History
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#missing-tile-files" class="md-nav__link">
     <span class="md-ellipsis">
       Missing tile files
@@ -791,10 +849,14 @@
 <p><img alt="" src="../explorer-home.png" /></p>
 <p>You can see an additional feature, the blue square. This is the one largest square which can be fit into all explored tiles. In this picture it has size 21². The idea of the square is to have a really tough challenge. Not only does one need to explore increasingly many tiles to expand the square by one unit, there must not be any gaps.</p>
 <p>As you can see in this picture, there is a tile missing right at the top edge. I will never be able to get that because that is an off-limits area of the German air force at the airport. So I can expand my square to the south only.</p>
-<p>You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity:</p>
+<p>You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity. Also it shows the last activity there as well as the number of activities. If it is a local cluster, it will also show the cluster size.</p>
 <p><img alt="" src="../explorer-tooltip.png" /></p>
-<p>There is also the option to color the tiles by age:</p>
-<p><img alt="" src="../explorer-age-coloring.png" /></p>
+<p>There is also the option to color the tiles by first or last visit. Use one of the buttons above the map:</p>
+<p><img alt="" src="../explorer-color-switcher.png" /></p>
+<p>Then the map will show the first visit:</p>
+<p><img alt="" src="../explorer-color-first.png" /></p>
+<p>Or how recent your last visit is:</p>
+<p><img alt="" src="../explorer-color-last.png" /></p>
 <p>This uses Matplotlib's <em>Plasma</em> scale (see below) to color the age of a tile. Very new tiles will get a yellow color, a year old tiles a reddish color and tiles two years old or older a colder blue. This is the scale:</p>
 <p><img alt="" src="../plasma-scale.png" /></p>
 <p>You can switch this with the buttons above the map.</p>
@@ -804,6 +866,9 @@
 <p>For my home city it looks like this:</p>
 <p><img alt="" src="../squadratinhos-bonn.png" /></p>
 <p>You can see how the squadratinhos are much smaller than the explorer tiles and how they lend themselves to more local exploring.</p>
+<h2 id="history">History</h2>
+<p>The map only shows the current state of your explorer tiles. In order to get a sense of how many new tiles you have discovered in the past, there are also plots that show you how you have extended the total number of squares, the size of your largest cluster and the size of your largest square over time:</p>
+<p><img alt="" src="../explorer-history.png" /></p>
 <h2 id="missing-tile-files">Missing tile files</h2>
 <p>Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Take for instance this set of tiles from a vacation:</p>
 <p><img alt="" src="../explorer-kell.png" /></p>

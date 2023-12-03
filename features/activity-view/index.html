@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/activity-view/">
       
       
-        <link rel="prev" href="../calendar/">
+        <link rel="prev" href="../overview/">
       
       
-        <link rel="next" href="../heatmaps/">
+        <link rel="next" href="../calendar/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -363,6 +363,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -428,11 +448,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../calendar/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -512,18 +532,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#time-series-plots" class="md-nav__link">
+  <a href="#distance-speed-and-altitude" class="md-nav__link">
     <span class="md-ellipsis">
-      Time series plots
+      Distance, speed and altitude
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#heart-rate-zones" class="md-nav__link">
+  <a href="#heart-rate" class="md-nav__link">
     <span class="md-ellipsis">
-      Heart rate zones
+      Heart rate
     </span>
   </a>
   
@@ -533,6 +553,26 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -772,18 +812,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#time-series-plots" class="md-nav__link">
+  <a href="#distance-speed-and-altitude" class="md-nav__link">
     <span class="md-ellipsis">
-      Time series plots
+      Distance, speed and altitude
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#heart-rate-zones" class="md-nav__link">
+  <a href="#heart-rate" class="md-nav__link">
     <span class="md-ellipsis">
-      Heart rate zones
+      Heart rate
     </span>
   </a>
   
@@ -815,14 +855,18 @@
 <h2 id="map-with-track">Map with track</h2>
 <p>The interactive map shows a line with the activity. The speed is color-coded and peaks at 35 km/h with a yellow color.</p>
 <p><img alt="" src="../activity-map.png" /></p>
-<h2 id="time-series-plots">Time series plots</h2>
+<h2 id="distance-speed-and-altitude">Distance, speed and altitude</h2>
 <p>Then there are a couple of time series plots. One is the distance vs. time. You can see how much distance you covered when and also see plateaus when you went on a break.</p>
 <p><img alt="" src="../activity-distance.png" /></p>
+<p>From this we can also compute the speed, although that might be pretty noisy:</p>
+<p><img alt="" src="../activity-speed.png" /></p>
+<p>And more interesting is the distribution of the various speed zones. This gives you an understanding how much time you spent at which speed. The buckets are set in 5 km/h intervals, but we could also change that.</p>
+<p><img alt="" src="../activity-speed-hist.png" /></p>
 <p>If the time series data has the altitude, which isn't always the case, you can see it in the plot there. Here we can see how I did a tour and continually rode downhill. Except at the end where I had to climb in order to get the explorer tile that I wanted.</p>
 <p><img alt="" src="../activity-altitude.png" /></p>
+<h2 id="heart-rate">Heart rate</h2>
 <p>The heart rate isn't too helpful, I feel. Still I've created the plot from the given data.</p>
 <p><img alt="" src="../activity-heartrate.png" /></p>
-<h2 id="heart-rate-zones">Heart rate zones</h2>
 <p>More interesting regarding the heart rate are the zones which one has spent time during this activity.</p>
 <p><img alt="" src="../activity-heartzone.png" /></p>
 <p>The definition of the heart rate zones is not standardized. Usually there are five zones and they have the same names. What differs is how their ranges are computed and there is some chaos around that.</p>

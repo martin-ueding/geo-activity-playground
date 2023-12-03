@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/heatmaps/">
       
       
-        <link rel="prev" href="../activity-view/">
+        <link rel="prev" href="../calendar/">
       
       
         <link rel="next" href="../explorer-tiles/">
@@ -363,6 +363,26 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -428,11 +448,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../calendar/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -466,6 +486,26 @@
                 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -477,6 +517,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Heatmaps
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -486,6 +537,34 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#heatmap-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Heatmap images
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -681,6 +760,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#heatmap-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Heatmap images
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -699,7 +795,7 @@
 <p><img alt="" src="../heatmap-interactive.png" /></p>
 <p>Here you can see where I mostly travel between Bonn and Cologne.</p>
 <p>The heatmap computation is based on the <a href="https://github.com/remisalmon/Strava-local-heatmap">Strava local heatmap code</a>. For the interactive map I needed to adjust it a lot. It might be possible that heatmaps don't look very nice if you have a different recording interval from the one that I use.</p>
-<h1 id="heatmap-images">Heatmap images</h1>
+<h2 id="heatmap-images">Heatmap images</h2>
 <p>There is a second mode to generate heatmap images. Instead of using the <code>serve</code> command, use the <code>heatmaps</code> command. That will generate heatmap images with carefully adjusted colors using the original logic of <a href="https://github.com/remisalmon/Strava-local-heatmap">Strava local heatmap</a>.</p>
 <p>We don't generate a single heatmap for all your activities as this will not look great as soon as you have done an activity away from home. Rather we use a clustering algorithm to find all disjoint geographical clusters in your activities and generate one heatmap per cluster.</p>
 <p>For instance the heatmap generated from all my activities in the <a href="https://en.wikipedia.org/wiki/Randstad">Randstad</a> in the Netherlands:</p>

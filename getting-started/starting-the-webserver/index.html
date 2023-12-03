@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/starting-the-webserver/">
       
       
-        <link rel="prev" href="../using-strava-api/">
+        <link rel="prev" href="../config-file/">
       
       
-        <link rel="next" href="../../features/calendar/">
+        <link rel="next" href="../../features/overview/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -363,6 +363,26 @@
                 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -438,11 +458,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/calendar/" class="md-nav__link">
+      <a href="../../features/overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -463,6 +483,26 @@
   
   <span class="md-ellipsis">
     Activity View
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
   </span>
   
 
@@ -702,7 +742,7 @@
 </ul>
 <p>Now we can start the webserver which provides most of the features. This is done with the <code>serve</code> command. So depending on how you have installed it, the commands could look like these:</p>
 <ul>
-<li><code>geo-activity-playground --source strava-api serve</code> if you are in the playground directory and have installed a stable version.</li>
+<li><code>geo-activity-playground serve</code> if you are in the playground directory and have installed a stable version.</li>
 <li><code>poetry run geo-activity-playground --basedir ~/Dokumente/Karten/Playground serve</code> if you have it from the git checkout and want to use local files in your directory as a data source.</li>
 </ul>
 <p>The webserver will start up and give you a bit of output like this:</p>

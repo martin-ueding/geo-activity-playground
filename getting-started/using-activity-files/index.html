@@ -334,6 +334,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Using Activity Files
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -343,6 +354,52 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory structure
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-file-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported file formats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -360,6 +417,26 @@
   
   <span class="md-ellipsis">
     Using Strava API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config-file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration file
   </span>
   
 
@@ -438,11 +515,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/calendar/" class="md-nav__link">
+      <a href="../../features/overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Calendar
+    Overview page
   </span>
   
 
@@ -463,6 +540,26 @@
   
   <span class="md-ellipsis">
     Activity View
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/calendar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calendar
   </span>
   
 
@@ -681,6 +778,41 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory structure
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-file-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported file formats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -697,9 +829,102 @@
 <h1 id="using-activity-files">Using Activity Files</h1>
 <p>Outdoor activities are usually recorded as GPX or FIT files. Some apps like OsmAnd give you these files.</p>
 <p>Create a directory somewhere, this will be your <em>playground</em>. I have mine in <code>~/Dokumente/Karten/Playground</code>, but you can put yours wherever you would like.</p>
-<p>Inside <code>Playground</code>, create another directory <code>Activities</code>. You can create an arbitrary directory structure below that, at the moment it doesn't have any meaning. I do plan to give it meaning at some point and think about a structure like <code>Playground/Activities/{Activity Type}/{Equipment}/{year}-{month}-{day}-{hour}-{minute}-{name}.gpx</code>. Then the <em>activity type</em> would be things like <em>ride</em>, <em>run</em>, <em>walk</em>, <em>hike</em>. The equipment would be the name for bikes or shoes such that one can aggregate distances per equipment. Perhaps one could add another subdirectory <code>Commute</code> such that all the repetitive commutes could go into there.</p>
-<p>Either way, at the moment we only really need <code>Playground/Activities/{name}.gpx</code> (or <code>.fit</code>).</p>
-<p>Once you have your files there, you can proceed with the next steps.</p>
+<p>Inside <code>Playground</code>, create another directory <code>Activities</code> where your activity files will go. The program will not modify files in that directory and treat them as read-only.</p>
+<h2 id="directory-structure">Directory structure</h2>
+<p>Inside the <code>Activities</code> you can dump all your files in a flat fashion. If you want to add some more metadata, use the following directory layout.</p>
+<p>The first directory level will indicate the type of the activity. You can pick whatever make sense for you, classic options are <em>ride</em>, <em>run</em>, <em>walk</em>, <em>hike</em>. Then the second level will indicate your equipment. You can use terms like “rental bike”, the brand and make of your shoes or whatever you find sensible. Specifying the equipment allows to track the total distance traveled with a given equipment.</p>
+<p>At any level you can have a special directory <code>Commute</code>. All activities inside of that will be marked as commutes and not highlighted as much as non-commute activities. The idea is that you can find your cool activities along potentially many commutes.</p>
+<p>Other directory names on the third level will just be ignored, you can use those to organize your activities further in some sense.</p>
+<p>Let us take the following directory/file structure as an example:</p>
+<div class="highlight"><pre><span></span><code>Activities
+├── Commute
+│   └── From the Beach.gpx
+├── Ride
+│   └── Rental Bike
+│       ├── Beach Rides
+│       │   └── Breskens.gpx
+│       └── Zwin.gpx
+├── To Piazza.gpx
+└── Walk
+    ├── Commute
+    │   └── To the Beach.gpx
+    ├── New Balance Fresh Foam 860v11
+    │   ├── Beach Walk.gpx
+    │   └── Commute
+    │       └── From Piazza.gpx
+    └── Nieuvfliet.gpx
+</code></pre></div>
+<p>You can see that I have one file on the top level (<code>To Piazza.gpx</code>), a file on the first level (<code>Walk/Nieuvfliet.gpx</code>), some on the second level (<code>Ride/Rental Bike/Zwin.gpx</code>), one commute (<code>Walk/New Balance Fresh Foam 860v11/Commute/From Piazza.gpx</code>) and one with a group directory which isn't commuting (<code>Ride/Rental Bike/Dunes in Sluis/Breskens.gpx</code>). From this the program will extract the following metadata:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Equipment</th>
+<th>Commute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>From the Beach</td>
+<td><em>None</em></td>
+<td><em>None</em></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Breskens</td>
+<td>Ride</td>
+<td>Rental Bike</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Zwin</td>
+<td>Ride</td>
+<td>Rental Bike</td>
+<td>No</td>
+</tr>
+<tr>
+<td>To Piazza</td>
+<td><em>None</em></td>
+<td><em>None</em></td>
+<td>No</td>
+</tr>
+<tr>
+<td>To the Beach</td>
+<td>Walk</td>
+<td><em>None</em></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Beach Walk</td>
+<td>Walk</td>
+<td>New Balance Fresh Foam 860v11</td>
+<td>No</td>
+</tr>
+<tr>
+<td>From Piazza</td>
+<td>Walk</td>
+<td>New Balance Fresh Foam 860v11</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Nieuwvliet</td>
+<td>Walk</td>
+<td><em>None</em></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>The file name of your activity will become the name of the activity.</p>
+<h2 id="supported-file-formats">Supported file formats</h2>
+<p>At the moment the following file formats are supported:</p>
+<ol>
+<li>FIT</li>
+<li>GPX</li>
+<li>TCX</li>
+</ol>
+<h2 id="next-steps">Next steps</h2>
+<p>Once you have your files put into the directory, you're all set and can proceed with the next steps.</p>
 
 
 
