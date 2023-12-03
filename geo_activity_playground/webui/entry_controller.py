@@ -49,7 +49,7 @@ class EntryController:
                 alt.X("yearmonthdate(start)", title="Date"),
                 alt.Y("sum(distance)", title="Distance / km"),
                 alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
-                [alt.Tooltip("yearmonthdate(start)")],
+                [alt.Tooltip("yearmonthdate(start)", title="Date")],
             )
             .to_json(format="vega")
         )
