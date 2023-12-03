@@ -14,6 +14,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Document configuration file.
 - Interpolate tracks to find more explorer tiles. [GH-27](https://github.com/martin-ueding/geo-activity-playground/issues/27)
 - Fix bug that occurs when activities have no distance information.
+- Show time evolution of the number of explorer tiles and the largest cluster. [GH-33](https://github.com/martin-ueding/geo-activity-playground/issues/33)
+- Center map view on biggest explorer cluster.
 
 ### Version 0.10
 
