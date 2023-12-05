@@ -69,6 +69,8 @@ class ExplorerController:
 
 
 def plot_tile_evolution(tiles: pd.DataFrame) -> str:
+    if len(tiles) == 0:
+        return ""
     tiles.sort_values("first_time", inplace=True)
     tiles["count"] = np.arange(1, len(tiles) + 1)
     return (
@@ -83,6 +85,8 @@ def plot_tile_evolution(tiles: pd.DataFrame) -> str:
 
 
 def plot_cluster_evolution(cluster_evolution: pd.DataFrame) -> str:
+    if len(cluster_evolution) == 0:
+        return ""
     return (
         alt.Chart(cluster_evolution, title="Cluster")
         .mark_line(interpolate="step-after")
@@ -96,6 +100,8 @@ def plot_cluster_evolution(cluster_evolution: pd.DataFrame) -> str:
 
 
 def plot_square_evolution(square_evolution: pd.DataFrame) -> str:
+    if len(square_evolution) == 0:
+        return ""
     return (
         alt.Chart(square_evolution, title="Square")
         .mark_line(interpolate="step-after")
