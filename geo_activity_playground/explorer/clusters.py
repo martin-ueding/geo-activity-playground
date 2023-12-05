@@ -29,7 +29,7 @@ class ExplorerClusterState:
         self.cluster_evolution = pd.DataFrame()
         self.start = 0
 
-        self._state_path = pathlib.Path(f"Cache/explorer_cluster_{zoom}_state.json")
+        self._state_path = pathlib.Path(f"Cache/explorer_cluster_{zoom}_state_v2.json")
         self._cluster_evolution_path = pathlib.Path(
             f"Cache/explorer_cluster_{zoom}_evolution.parquet"
         )

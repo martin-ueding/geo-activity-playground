@@ -91,7 +91,7 @@ def get_three_color_tiles(
     # Apply cluster colors.
     cluster_cmap = matplotlib.colormaps["tab10"]
     for color, members in zip(
-        itertools.cycle(map(cluster_cmap, range(20))),
+        itertools.cycle(map(cluster_cmap, range(10))),
         sorted(
             cluster_state.clusters.values(),
             key=lambda members: len(members),
