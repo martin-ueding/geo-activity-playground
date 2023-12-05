@@ -47,7 +47,7 @@ def get_three_color_tiles(
                 cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
             ),
             "cluster": False,
-            "color": "#404040",
+            "color": "#303030",
             "first_visit": row["first_time"].date().isoformat(),
             "last_visit": row["last_time"].date().isoformat(),
             "num_visits": row["count"],
