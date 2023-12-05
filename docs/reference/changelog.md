@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.12
+
+- Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.
+
 ### Version 0.11
 
 - Add last activity in tile to the tooltip. [GH-35](https://github.com/martin-ueding/geo-activity-playground/issues/35)
