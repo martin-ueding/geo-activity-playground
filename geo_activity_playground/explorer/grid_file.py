@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import logging
 import pathlib
 from typing import Iterator
@@ -46,7 +47,7 @@ def get_three_color_tiles(
                 cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
             ),
             "cluster": False,
-            "color": None,
+            "color": "#4f4f4f",
             "first_visit": row["first_time"].date().isoformat(),
             "last_visit": row["last_time"].date().isoformat(),
             "num_visits": row["count"],
@@ -77,16 +78,30 @@ def get_three_color_tiles(
                 tile_dict[(x, y)]["square"] = True
 
     # Add cluster information.
-    for xy, members in cluster_state.cluster_tiles.items():
-        tile_dict[xy]["this_cluster_size"] = len(members)
-        tile_dict[xy]["cluster"] = True
+    for members in cluster_state.clusters.values():
+        for member in members:
+            tile_dict[member]["this_cluster_size"] = len(members)
+            tile_dict[member]["cluster"] = True
     if len(cluster_state.cluster_evolution) > 0:
         max_cluster_size = cluster_state.cluster_evolution["max_cluster_size"].iloc[-1]
     else:
         max_cluster_size = 0
-    num_cluster_tiles = len(cluster_state.cluster_tiles)
+    num_cluster_tiles = len(cluster_state.memberships)
 
     # Apply cluster colors.
+    cluster_cmap = matplotlib.colormaps["tab10"]
+    for color, members in zip(
+        itertools.cycle(map(cluster_cmap, range(20))),
+        sorted(
+            cluster_state.clusters.values(),
+            key=lambda members: len(members),
+            reverse=True,
+        ),
+    ):
+        hex_color = matplotlib.colors.to_hex(color)
+        print(f"Color cluster with {len(members)} tiles in {hex_color}.")
+        for member in members:
+            tile_dict[member]["color"] = hex_color
 
     result = {
         "explored_geojson": geojson.dumps(

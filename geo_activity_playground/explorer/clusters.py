@@ -24,7 +24,8 @@ def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
 class ExplorerClusterState:
     def __init__(self, zoom: int) -> None:
         self.num_neighbors: dict[tuple[int, int], int] = {}
-        self.cluster_tiles: dict[tuple[int, int], list[tuple[int, int]]] = {}
+        self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
+        self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
         self.cluster_evolution = pd.DataFrame()
         self.start = 0
 
@@ -42,11 +43,13 @@ class ExplorerClusterState:
                 tuple(map(int, key.split("/"))): value
                 for key, value in data["num_neighbors"].items()
             }
-            self.cluster_tiles = {
-                tuple(map(int, key.split("/"))): [
-                    tuple(t) for t in data["clusters"][str(value)]
-                ]
+            self.memberships = {
+                tuple(map(int, key.split("/"))): value
                 for key, value in data["memberships"].items()
+            }
+            self.clusters = {
+                tuple(map(int, key.split("/"))): [tuple(t) for t in value]
+                for key, value in data["clusters"].items()
             }
             self.start = data["start"]
 
@@ -60,11 +63,10 @@ class ExplorerClusterState:
                 f"{x}/{y}": count for (x, y), count in self.num_neighbors.items()
             },
             "memberships": {
-                f"{x}/{y}": id(members)
-                for (x, y), members in self.cluster_tiles.items()
+                f"{x}/{y}": value for (x, y), value in self.memberships.items()
             },
             "clusters": {
-                id(members): members for members in self.cluster_tiles.values()
+                f"{x}/{y}": members for (x, y), members in self.clusters.items()
             },
             "start": self.start,
         }
@@ -107,34 +109,41 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
 
         # If the current tile has all neighbors, make it it's own cluster.
         if s.num_neighbors[tile] == 4:
-            s.cluster_tiles[tile] = [tile]
+            s.clusters[tile] = [tile]
+            s.memberships[tile] = tile
 
         # Also make the adjacent tiles their own clusters, if they are full.
         this_and_neighbors = [tile] + list(adjacent_to(tile))
         for other in this_and_neighbors:
             if s.num_neighbors.get(other, 0) == 4:
-                s.cluster_tiles[other] = [other]
+                s.clusters[other] = [other]
+                s.memberships[other] = other
 
         for candidate in this_and_neighbors:
-            if candidate not in s.cluster_tiles:
+            # If the the candidate is not a cluster tile, skip.
+            if candidate not in s.memberships:
                 continue
             # The candidate is a cluster tile. Let's see whether any of the neighbors are also cluster tiles but with a different cluster. Then we need to join them.
             for other in adjacent_to(candidate):
-                if other not in s.cluster_tiles:
+                if other not in s.memberships:
                     continue
                 # The other tile is also a cluster tile.
-                if s.cluster_tiles[candidate] is s.cluster_tiles[other]:
+                if s.memberships[candidate] == s.memberships[other]:
                     continue
                 # The two clusters are not the same. We add the other's cluster tile to this tile.
-                s.cluster_tiles[candidate].extend(s.cluster_tiles[other])
+                this_cluster = s.clusters[s.memberships[candidate]]
+                other_cluster = s.clusters[s.memberships[other]]
+                other_cluster_name = s.memberships[other]
+                this_cluster.extend(other_cluster)
                 # Update the other cluster tiles that they now point to the new cluster. This also updates the other tile.
-                for member in s.cluster_tiles[other]:
-                    s.cluster_tiles[member] = s.cluster_tiles[candidate]
+                for member in other_cluster:
+                    s.memberships[member] = s.memberships[candidate]
+                del s.clusters[other_cluster_name]
                 new_clusters = True
 
         if new_clusters:
             max_cluster_size = max(
-                (len(members) for members in s.cluster_tiles.values()),
+                (len(members) for members in s.clusters.values()),
                 default=0,
             )
             if max_cluster_size > max_cluster_so_far:

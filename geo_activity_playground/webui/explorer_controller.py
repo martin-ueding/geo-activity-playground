@@ -51,9 +51,9 @@ class ExplorerController:
                 "latitude": median_lat,
                 "longitude": median_lon,
                 "bbox": bounding_box_for_biggest_cluster(
-                    cluster_state.cluster_tiles.values(), zoom
+                    cluster_state.clusters.values(), zoom
                 )
-                if len(cluster_state.cluster_tiles) > 0
+                if len(cluster_state.memberships) > 0
                 else {},
             },
             "explored": explored,
