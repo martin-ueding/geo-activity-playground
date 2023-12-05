@@ -2,6 +2,7 @@ import datetime
 import logging
 import pathlib
 from typing import Iterator
+from typing import Optional
 
 import geojson
 import gpxpy
@@ -74,7 +75,6 @@ def get_three_color_tiles(
         for x in range(square_x, square_x + square_size):
             for y in range(square_y, square_y + square_size):
                 tile_dict[(x, y)]["square"] = True
-                tile_dict[(x, y)]["color"] = "blue"
 
     # Add cluster information.
     for xy, members in cluster_state.cluster_tiles.items():
@@ -87,13 +87,6 @@ def get_three_color_tiles(
     num_cluster_tiles = len(cluster_state.cluster_tiles)
 
     # Apply cluster colors.
-    for xy, xy_dict in tile_dict.items():
-        if xy_dict["square"]:
-            xy_dict["color"] = "blue"
-        elif xy_dict["cluster"]:
-            xy_dict["color"] = "green"
-        else:
-            xy_dict["color"] = "red"
 
     result = {
         "explored_geojson": geojson.dumps(
@@ -113,6 +106,19 @@ def get_three_color_tiles(
         "num_cluster_tiles": num_cluster_tiles,
         "num_tiles": len(tile_dict),
         "square_size": square_size,
+        "square_geojson": geojson.dumps(
+            geojson.FeatureCollection(
+                features=[
+                    make_explorer_rectangle(
+                        square_x,
+                        square_y,
+                        square_x + square_size,
+                        square_y + square_size,
+                        zoom,
+                    )
+                ]
+            )
+        ),
     }
     return result
 
@@ -135,14 +141,22 @@ def get_explored_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]
 def make_explorer_tile(
     tile_x: int, tile_y: int, properties: dict, zoom: int
 ) -> geojson.Feature:
+    return make_explorer_rectangle(
+        tile_x, tile_y, tile_x + 1, tile_y + 1, zoom, properties
+    )
+
+
+def make_explorer_rectangle(
+    x1: int, y1: int, x2: int, y2: int, zoom: int, properties: Optional[dict] = None
+) -> geojson.Feature:
     corners = [
         get_tile_upper_left_lat_lon(*args)
         for args in [
-            (tile_x, tile_y, zoom),
-            (tile_x + 1, tile_y, zoom),
-            (tile_x + 1, tile_y + 1, zoom),
-            (tile_x, tile_y + 1, zoom),
-            (tile_x, tile_y, zoom),
+            (x1, y1, zoom),
+            (x2, y1, zoom),
+            (x2, y2, zoom),
+            (x1, y2, zoom),
+            (x1, y1, zoom),
         ]
     ]
     return geojson.Feature(

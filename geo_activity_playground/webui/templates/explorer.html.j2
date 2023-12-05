@@ -48,6 +48,7 @@
             }
 
             let explorer_geojson = {{ explored.explored_geojson| safe}}
+            let square_geojson = {{ explored.square_geojson | safe }}
             let map = L.map('explorer-map', {
                 fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],
@@ -74,6 +75,16 @@
             if (bbox) {
                 map.fitBounds(L.geoJSON(bbox).getBounds())
             }
+
+            let explorer_square_layer = L.geoJSON(square_geojson,
+                {
+                    style: function (feature) {
+                        return {
+                            color: "blue", fill: false, weight: 2
+                        }
+                    }
+                }
+            ).addTo(map)
 
             active_layer = explorer_layer_cluster_color
 
