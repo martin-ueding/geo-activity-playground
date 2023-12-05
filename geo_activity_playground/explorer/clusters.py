@@ -44,7 +44,7 @@ class ExplorerClusterState:
                 for key, value in data["num_neighbors"].items()
             }
             self.memberships = {
-                tuple(map(int, key.split("/"))): value
+                tuple(map(int, key.split("/"))): tuple(value)
                 for key, value in data["memberships"].items()
             }
             self.clusters = {
@@ -66,7 +66,8 @@ class ExplorerClusterState:
                 f"{x}/{y}": value for (x, y), value in self.memberships.items()
             },
             "clusters": {
-                f"{x}/{y}": members for (x, y), members in self.clusters.items()
+                f"{x}/{y}": [tuple(member) for member in members]
+                for (x, y), members in self.clusters.items()
             },
             "start": self.start,
         }
@@ -132,6 +133,8 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
                     continue
                 # The two clusters are not the same. We add the other's cluster tile to this tile.
                 this_cluster = s.clusters[s.memberships[candidate]]
+                assert isinstance(other, tuple), other
+                assert isinstance(s.memberships[other], tuple), s.memberships[other]
                 other_cluster = s.clusters[s.memberships[other]]
                 other_cluster_name = s.memberships[other]
                 this_cluster.extend(other_cluster)
