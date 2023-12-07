@@ -159,6 +159,12 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
         except AttributeError as e:
             print(df)
             print(df.dtypes)
+            types = {}
+            for elem in df["time"]:
+                t = str(type(elem))
+                if t not in types:
+                    types[t] = elem
+            print(types)
             raise ActivityParseError(
                 "It looks like the date parsing has gone wrong."
             ) from e
