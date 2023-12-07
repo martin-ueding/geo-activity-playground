@@ -85,7 +85,7 @@ def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
         tile_visits = {}
 
     with work_tracker(
-        pathlib.Path(f"Cache/task_first_time_per_tile_{zoom}.json")
+        pathlib.Path(f"Cache/task_first_time_per_tile_{zoom}_v2.json")
     ) as parsed_activities:
         for activity in repository.iter_activities(new_to_old=False):
             if activity.id in parsed_activities:

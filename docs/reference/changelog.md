@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.
 - Fix bug with explorer tile page when the maximum cluster or square is just 1.
+- Speed up the 
 
 ### Version 0.11
 
