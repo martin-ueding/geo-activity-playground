@@ -9,7 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.12
 
 - Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.
-- Fix bug with explorer tile page when the maximum cluster or square is just 1.
+- Fix bug with explorer tile page when the maximum cluster or square is just 1. [GH-51](https://github.com/martin-ueding/geo-activity-playground/issues/51)
 - Speed up the computation of the latest tiles.
 
 ### Version 0.11
