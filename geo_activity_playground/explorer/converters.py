@@ -81,6 +81,7 @@ def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
     else:
         tiles = pd.DataFrame()
 
+    len_tiles_before = len(tiles)
     with work_tracker(
         pathlib.Path(f"Cache/task_first_time_per_tile_{zoom}.json")
     ) as parsed_activities:
@@ -105,10 +106,13 @@ def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
                 }
             )
             tiles = pd.concat([tiles, shard2])
-    logger.info("Consolidating explorer tile history …")
-    tiles = tiles.groupby(["tile_x", "tile_y"]).apply(reduce_tile_group).reset_index()
+    if len(tiles) != len_tiles_before:
+        logger.info("Consolidating explorer tile history …")
+        tiles = (
+            tiles.groupby(["tile_x", "tile_y"]).apply(reduce_tile_group).reset_index()
+        )
 
-    logger.info("Store explorer tile history to cache file …")
-    tiles.to_parquet(cache_file)
+        logger.info("Store explorer tile history to cache file …")
+        tiles.to_parquet(cache_file)
 
     return tiles
