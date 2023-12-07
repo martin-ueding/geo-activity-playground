@@ -1,6 +1,7 @@
 import functools
 import logging
 import pathlib
+import pickle
 
 import pandas as pd
 
@@ -75,13 +76,14 @@ def reduce_tile_group(group: pd.DataFrame) -> pd.DataFrame:
 def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
     logger.info("Building explorer tile history from all activities …")
 
-    cache_file = pathlib.Path(f"Cache/first_time_per_tile_{zoom}.parquet")
-    if cache_file.exists():
-        tiles = pd.read_parquet(cache_file)
-    else:
-        tiles = pd.DataFrame()
+    cache_file = pathlib.Path(f"Cache/first_time_per_tile_{zoom}.pickle")
 
-    len_tiles_before = len(tiles)
+    if cache_file.exists():
+        with open(cache_file, "rb") as f:
+            tile_visits = pickle.load(f)
+    else:
+        tile_visits = {}
+
     with work_tracker(
         pathlib.Path(f"Cache/task_first_time_per_tile_{zoom}.json")
     ) as parsed_activities:
@@ -94,25 +96,33 @@ def get_tile_history(repository: ActivityRepository, zoom: int) -> pd.DataFrame:
             shard = get_first_tiles(activity.id, repository, zoom)
             if not len(shard):
                 continue
-            shard2 = pd.DataFrame(
-                {
-                    "tile_x": shard["tile_x"],
-                    "tile_y": shard["tile_y"],
-                    "first_id": activity.id,
-                    "last_id": activity.id,
-                    "first_time": shard["time"],
-                    "last_time": shard["time"],
-                    "count": 1,
-                }
-            )
-            tiles = pd.concat([tiles, shard2])
-    if len(tiles) != len_tiles_before:
-        logger.info("Consolidating explorer tile history …")
-        tiles = (
-            tiles.groupby(["tile_x", "tile_y"]).apply(reduce_tile_group).reset_index()
-        )
+            for _, row in shard.iterrows():
+                tile = (row["tile_x"], row["tile_y"])
+                if tile in tile_visits:
+                    d = tile_visits[tile]
+                    d["count"] += 1
+                    if d["first_time"] > row["time"]:
+                        d["first_time"] = row["time"]
+                        d["first_id"] = activity.id
+                    if d["last_time"] < row["time"]:
+                        d["last_time"] = row["time"]
+                        d["last_id"] = activity.id
+                else:
+                    tile_visits[tile] = {
+                        "count": 1,
+                        "first_time": row["time"],
+                        "first_id": activity.id,
+                        "last_time": row["time"],
+                        "last_id": activity.id,
+                    }
 
-        logger.info("Store explorer tile history to cache file …")
-        tiles.to_parquet(cache_file)
+    logger.info("Store explorer tile history to cache file …")
+    with open(cache_file, "wb") as f:
+        pickle.dump(tile_visits, f)
 
+    tiles = pd.DataFrame(
+        [{"tile_x": x, "tile_y": y, **meta} for (x, y), meta in tile_visits.items()]
+    )
+    parquet_output = pathlib.Path(f"Cache/first_time_per_tile_{zoom}.parquet")
+    tiles.to_parquet(parquet_output)
     return tiles
