@@ -43,14 +43,11 @@ def compute_activities_per_tile(
             logger.info(f"Add activity {activity.id} to all zoom levels …")
             time_series = repository.get_time_series(activity.id)
             if "latitude" in time_series.columns and "longitude" in time_series.columns:
-                x, y = compute_tile_float(
-                    time_series["latitude"], time_series["longitude"], 0
-                )
                 for zoom in range(1, 20):
                     if zoom not in data:
                         data[zoom] = {}
-                    xz = np.floor(x * 2**zoom)
-                    yz = np.floor(y * 2**zoom)
+                    xz = np.floor(time_series["x"] * 2**zoom)
+                    yz = np.floor(time_series["y"] * 2**zoom)
                     tiles_this_activity = set(zip(xz, yz))
                     for tile in tiles_this_activity:
                         if tile not in data[zoom]:

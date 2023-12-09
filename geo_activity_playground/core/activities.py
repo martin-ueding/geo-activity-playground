@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 import functools
 import logging
+import pathlib
 from typing import Iterator
 from typing import Optional
 
@@ -10,6 +11,7 @@ import matplotlib
 import pandas as pd
 
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.tiles import compute_tile_float
 
 
 logger = logging.getLogger(__name__)
@@ -51,17 +53,22 @@ class ActivityRepository:
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
-        df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
+        path = pathlib.Path(f"Cache/Activity Timeseries/{id}.parquet")
+        df = pd.read_parquet(path)
         df.name = id
+        changed = False
         if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
             start = self.get_activity_by_id(id).start
             time = df["time"]
             del df["time"]
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
+            changed = True
         assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
 
         if "distance" in df.columns:
-            df["distance/km"] = df["distance"] / 1000
+            if "distance/km" not in df.columns:
+                df["distance/km"] = df["distance"] / 1000
+                changed = True
 
             if "speed" not in df.columns:
                 df["speed"] = (
@@ -69,6 +76,17 @@ class ActivityRepository:
                     / (df["time"].diff().dt.total_seconds() + 1e-3)
                     * 3.6
                 )
+                changed = True
+
+        if "latitude" in df.columns and "x" not in df.columns:
+            x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
+            df["x"] = x
+            df["y"] = y
+            changed = True
+
+        if changed:
+            logger.info(f"Updating activity time series for {id = } …")
+            df.to_parquet(path)
 
         return df
 
