@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.13
+
+- Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels. [GH-47](https://github.com/martin-ueding/geo-activity-playground/issues/47)
+
 ### Version 0.12
 
 - Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.
