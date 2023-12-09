@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pylab as pl
 import numpy as np
 import pandas as pd
+from PIL import Image
+from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.heatmap import build_heatmap_tile
@@ -64,15 +66,27 @@ class HeatmapController:
             & (all_points["latitude"] <= geo_bounds.lat_max)
             & (geo_bounds.lon_min <= all_points["longitude"])
             & (all_points["longitude"] <= geo_bounds.lon_max)
-        ]
+        ].copy()
 
-        print(relevant_points)
-        print(x, y, z)
-        data_color = build_heatmap_tile(
-            np.array(
-                [relevant_points["x"] * 2**z - x, relevant_points["y"] * 2**z - y]
-            ).T
-        )
+        tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
+        tile_counts = np.zeros(tile_pixels, dtype=np.int32)
+        for index, group in relevant_points.groupby("activity_id"):
+            xy_pixels = (
+                np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
+                * OSM_TILE_SIZE
+            )
+            im = Image.new("L", tile_pixels)
+            draw = ImageDraw.Draw(im)
+            pixels = list(map(int, xy_pixels.flatten()))
+            draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
+            aim = np.array(im)
+            tile_counts += aim
+        tile_counts = np.sqrt(tile_counts) / 5
+        tile_counts[tile_counts > 1.0] = 1.0
+
+        cmap = pl.get_cmap("hot")
+        data_color = cmap(tile_counts)
+        data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 
         map_tile = np.array(get_tile(z, x, y)) / 255
         map_tile = convert_to_grayscale(map_tile)

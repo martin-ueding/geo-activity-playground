@@ -42,7 +42,10 @@ def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
                 continue
             shard = time_series[["latitude", "longitude"]].copy()
             shard["activity_id"] = activity.id
-            x, y = compute_tile_float(shard["latitude"], shard["longitude"], 0)
+            x, y = compute_tile_float(
+                shard["latitude"],
+                shard["longitude"],
+            )
             shard["x"] = x
             shard["y"] = y
             new_shards.append(shard)
