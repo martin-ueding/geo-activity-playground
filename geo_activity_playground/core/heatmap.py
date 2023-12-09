@@ -1,10 +1,12 @@
 """
 This code is based on https://github.com/remisalmon/Strava-local-heatmap.
 """
+import collections
 import dataclasses
 import functools
 import logging
 import pathlib
+import pickle
 
 import matplotlib.pyplot as pl
 import numpy as np
@@ -19,6 +21,46 @@ from geo_activity_playground.core.tiles import latlon_to_xy
 
 
 logger = logging.getLogger(__name__)
+
+
+@functools.cache
+def compute_activities_per_tile(
+    repository: ActivityRepository,
+) -> dict[int, dict[tuple[int, int], set[int]]]:
+    logger.info("Extracting activities per tile …")
+    cache_path = pathlib.Path("Cache/activities-per-tile.pickle")
+    if cache_path.exists():
+        with open(cache_path, "rb") as f:
+            data = pickle.load(f)
+    else:
+        data: dict[int, dict[tuple[int, int], set[int]]] = {}
+    with work_tracker(pathlib.Path("Cache/activities-per-tile-task.json")) as tracker:
+        for activity in repository.iter_activities():
+            if activity.id in tracker:
+                continue
+            tracker.add(activity.id)
+
+            logger.info(f"Add activity {activity.id} to all zoom levels …")
+            time_series = repository.get_time_series(activity.id)
+            if "latitude" in time_series.columns and "longitude" in time_series.columns:
+                x, y = compute_tile_float(
+                    time_series["latitude"], time_series["longitude"], 0
+                )
+                for zoom in range(1, 20):
+                    if zoom not in data:
+                        data[zoom] = {}
+                    xz = np.floor(x * 2**zoom)
+                    yz = np.floor(y * 2**zoom)
+                    tiles_this_activity = set(zip(xz, yz))
+                    for tile in tiles_this_activity:
+                        if tile not in data[zoom]:
+                            data[zoom][tile] = set()
+                        data[zoom][tile].add(activity.id)
+
+    with open(cache_path, "wb") as f:
+        pickle.dump(data, f)
+
+    return data
 
 
 @functools.cache

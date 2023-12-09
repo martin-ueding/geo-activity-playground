@@ -49,6 +49,7 @@ class ActivityRepository:
     def get_activity_by_id(self, id: int) -> ActivityMeta:
         return ActivityMeta(**self.meta.loc[id])
 
+    @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
         df = pd.read_parquet(f"Cache/Activity Timeseries/{id}.parquet")
         df.name = id

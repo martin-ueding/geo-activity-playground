@@ -12,10 +12,12 @@ from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.heatmap import build_heatmap_tile
+from geo_activity_playground.core.heatmap import compute_activities_per_tile
 from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.heatmap import geo_bounds_from_tile_bounds
 from geo_activity_playground.core.heatmap import get_all_points
 from geo_activity_playground.core.heatmap import TileBounds
+from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.core.tiles import latlon_to_xy
@@ -55,26 +57,15 @@ class HeatmapController:
 
     def render_tile(self, x: int, y: int, z: int) -> bytes:
         with self._mutex:
-            all_points = get_all_points(self._repository)
-
-        tile_bounds = TileBounds(z, x, x + 1, y, y + 1)
-        geo_bounds = geo_bounds_from_tile_bounds(tile_bounds)
-
-        logger.info(f"Filtering relevant points for {x}/{y} at {z} …")
-        relevant_points = all_points.loc[
-            (geo_bounds.lat_min <= all_points["latitude"])
-            & (all_points["latitude"] <= geo_bounds.lat_max)
-            & (geo_bounds.lon_min <= all_points["longitude"])
-            & (all_points["longitude"] <= geo_bounds.lon_max)
-        ].copy()
-
+            activities_per_tile = compute_activities_per_tile(self._repository)
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-        for index, group in relevant_points.groupby("activity_id"):
-            xy_pixels = (
-                np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
-                * OSM_TILE_SIZE
+        for activity_id in activities_per_tile[z].get((x, y), set()):
+            time_series = self._repository.get_time_series(activity_id)
+            ts_x, ts_y = compute_tile_float(
+                time_series["latitude"], time_series["longitude"], z
             )
+            xy_pixels = np.array([ts_x - x, ts_y - y]).T * OSM_TILE_SIZE
             im = Image.new("L", tile_pixels)
             draw = ImageDraw.Draw(im)
             pixels = list(map(int, xy_pixels.flatten()))
