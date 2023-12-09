@@ -41,6 +41,7 @@ mkdocs-material = "^9.4.1"
 mypy = "^0.961"
 pytest = "^7.1.2"
 py-spy = "^0.3.14"
+ipykernel = "^6.27.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

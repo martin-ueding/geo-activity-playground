@@ -12,6 +12,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tasks import work_tracker
+from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.core.tiles import latlon_to_xy
@@ -23,13 +24,13 @@ logger = logging.getLogger(__name__)
 @functools.cache
 def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
     logger.info("Gathering all points …")
-    all_points_path = pathlib.Path("Cache/all_points.parquet")
+    all_points_path = pathlib.Path("Cache/all-points.parquet")
     if all_points_path.exists():
         all_points = pd.read_parquet(all_points_path)
     else:
         all_points = pd.DataFrame()
     new_shards = []
-    with work_tracker(pathlib.Path("Cache/task_all_points.json")) as tracker:
+    with work_tracker(pathlib.Path("Cache/all-points-task.json")) as tracker:
         for activity in repository.iter_activities():
             if activity.id in tracker:
                 continue
@@ -39,7 +40,12 @@ def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
             time_series = repository.get_time_series(activity.id)
             if len(time_series) == 0 or "latitude" not in time_series.columns:
                 continue
-            new_shards.append(time_series[["latitude", "longitude"]])
+            shard = time_series[["latitude", "longitude"]].copy()
+            shard["activity_id"] = activity.id
+            x, y = compute_tile_float(shard["latitude"], shard["longitude"], 0)
+            shard["x"] = x
+            shard["y"] = y
+            new_shards.append(shard)
     logger.info("Concatenating shards …")
     all_points = pd.concat([all_points] + new_shards)
     all_points.to_parquet(all_points_path)
@@ -263,13 +269,10 @@ def build_heatmap_image(
     return data_color
 
 
-def build_heatmap_tile(lat_lon_data: np.ndarray, tile_bounds: TileBounds) -> np.ndarray:
-    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
-    xy_data = np.array(xy_data).T
-
-    xy_data = np.round(
-        (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
-    )
+def build_heatmap_tile(xy: np.ndarray) -> np.ndarray:
+    print(xy)
+    xy_data = np.round(xy * OSM_TILE_SIZE)
+    print(xy_data)
     sigma_pixel = 1
     data = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE))
     for j, i in xy_data.astype(int):

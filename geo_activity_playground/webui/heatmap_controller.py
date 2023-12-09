@@ -66,9 +66,12 @@ class HeatmapController:
             & (all_points["longitude"] <= geo_bounds.lon_max)
         ]
 
+        print(relevant_points)
+        print(x, y, z)
         data_color = build_heatmap_tile(
-            np.array([relevant_points["latitude"], relevant_points["longitude"]]).T,
-            tile_bounds,
+            np.array(
+                [relevant_points["x"] * 2**z - x, relevant_points["y"] * 2**z - y]
+            ).T
         )
 
         map_tile = np.array(get_tile(z, x, y)) / 255
