@@ -80,26 +80,26 @@ The map only shows the current state of your explorer tiles. In order to get a s
 
 ## Missing tile files
 
-Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Take for instance this set of tiles from a vacation:
+Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Let us take another look at my tile history in Sint Annaland:
 
-![](explorer-kell.png)
+![](explorer-sint-annaland.png)
 
-You can see those two gaps in the south. To make identifying these gaps a bit easier there is a second map which shows you the missing tiles. It has the gaps and also a border around the explored tiles:
+You can see those gaps in the clusters. To make it easier to explore tiles while on the go, we can export a file with the missing tiles. Pan and zoom the map to an area which you want to export. Below the map you will find two links:
 
-![](explorer-kell-missing.png)
+> Download missing tiles in visible area as **GeoJSON** or **GPX**.
 
-One can use those maps to plan the routes. You can also download these maps as a GeoJSON file and use other programs to display them. For instance with GPX See on Linux it looks like this:
+This export is available as GeoJSON or GPX such that you can open it with other applications. For instance with GPX See on Linux it looks like this when opening the GeoJSON file:
 
-![](explorer-missing-geojson.png)
+![](explorer-sint-annaland-missing-geojson.png)
 
 I have not tested this software, but supposedly [Offline Maps](https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps) is able to display GeoJSON on Android.
 
 On Android I use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/), therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:
 
-![](explorer-missing-gpx.png)
+![](explorer-sint-annaland-missing-gpx.png)
 
-And on OsmAnd it looks like this:
+And on OsmAnd such files look like this:
 
 ![](explorer-osmand.jpg)
 
-Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so I don't have this displayed all the time.
+Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so make sure to only export it from rather small regions.

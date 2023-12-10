@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add cache migration functionality.
     - Make sure that cache directory is created beforehand. [GH-55](https://github.com/martin-ueding/geo-activity-playground/issues/55)
 - Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. [GH-47](https://github.com/martin-ueding/geo-activity-playground/issues/47)
+    - Fix introduced bug. [GH-56](https://github.com/martin-ueding/geo-activity-playground/issues/56)
 - Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.
 - Add a footer. [GH-49](https://github.com/martin-ueding/geo-activity-playground/issues/49)
 

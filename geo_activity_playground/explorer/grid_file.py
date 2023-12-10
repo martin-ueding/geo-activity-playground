@@ -11,7 +11,9 @@ import matplotlib
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.clusters import adjacent_to
 from geo_activity_playground.explorer.clusters import ExplorerClusterState
 from geo_activity_playground.explorer.converters import get_tile_history
 
@@ -137,14 +139,18 @@ def get_three_color_tiles(
     return result
 
 
-def get_border_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
+def get_border_tiles(
+    tiles: pd.DataFrame, zoom: int, tile_bounds: Bounds
+) -> list[list[list[float]]]:
     logger.info("Generate border tiles …")
     tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
     border_tiles = set()
-    for x, y in tile_set:
-        for neighbor in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+    for tile in tile_set:
+        for neighbor in adjacent_to(tile):
             if neighbor not in tile_set:
-                border_tiles.add(neighbor)
+                for neighbor2 in adjacent_to(neighbor):
+                    if neighbor2 not in tile_set and tile_bounds.contains(*neighbor):
+                        border_tiles.add(neighbor2)
     return make_grid_points(border_tiles, zoom)
 
 
@@ -195,7 +201,7 @@ def make_grid_points(
     return result
 
 
-def make_grid_file_gpx(grid_points: list[list[list[float]]], stem: str) -> None:
+def make_grid_file_gpx(grid_points: list[list[list[float]]]) -> str:
     gpx = gpxpy.gpx.GPX()
     gpx_track = gpxpy.gpx.GPXTrack()
     gpx.tracks.append(gpx_track)
@@ -205,15 +211,10 @@ def make_grid_file_gpx(grid_points: list[list[list[float]]], stem: str) -> None:
         gpx_track.segments.append(gpx_segment)
         for point in points:
             gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(*point))
-
-    out_path = pathlib.Path("Download") / f"{stem}.gpx"
-    out_path.parent.mkdir(exist_ok=True, parents=True)
-
-    with open(out_path, "w") as f:
-        f.write(gpx.to_xml())
+    return gpx.to_xml()
 
 
-def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> str:
+def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> str:
     fc = geojson.FeatureCollection(
         [
             geojson.Feature(
@@ -223,10 +224,6 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]], stem: str) -> s
         ]
     )
     result = geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
-    out_path = pathlib.Path("Download") / f"{stem}.geojson"
-    out_path.parent.mkdir(exist_ok=True, parents=True)
-    with open(out_path, "w") as f:
-        f.write(result)
     return result
 
 

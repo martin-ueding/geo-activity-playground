@@ -1,6 +1,20 @@
 import numpy as np
 
 
+class Bounds:
+    def __init__(self, x_min: int, y_min: int, x_max: int, y_max: int) -> None:
+        assert x_min <= x_max
+        assert y_min <= y_max
+
+        self.x_min = x_min
+        self.y_min = y_min
+        self.x_max = x_max
+        self.y_max = y_max
+
+    def contains(self, x: int, y: int) -> bool:
+        return (self.x_min < x < self.x_max) and (self.y_min < y < self.y_max)
+
+
 def get_distance(lat_1: float, lon_1: float, lat_2: float, lon_2: float) -> float:
     """
     https://en.wikipedia.org/wiki/Haversine_formula

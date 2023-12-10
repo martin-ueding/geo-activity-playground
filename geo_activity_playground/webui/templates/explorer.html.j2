@@ -26,8 +26,8 @@
             <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
         </div>
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
-        <p>Download this as <a href="/download/explored.geojson">GeoJSON</a> or <a
-                href="/download/explored.gpx">GPX</a>.</p>
+        <p>Download missing tiles in visible area as <a href="#" onclick="downloadAs('geojson')">GeoJSON</a> or <a
+                href="#" onclick="downloadAs('gpx')"">GPX</a>.</p>
 
         <script>
             function onEachFeature(feature, layer) {
@@ -56,18 +56,33 @@
             })
             L.tileLayer('/grayscale-tile/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '&copy; <a href=" http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
             let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: feature.properties.color, fillColor: feature.properties.color, weight: 0.5 } },
+                style: function (feature) {
+                    return {
+                        color: feature.properties.color, fillColor: feature.properties.color,
+                        weight: 0.5
+                    }
+                },
                 onEachFeature: onEachFeature
             }).addTo(map)
             let explorer_layer_first_age_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: "#440154", fillColor: feature.properties.first_age_color, weight: 0.5 } },
+                style: function (feature) {
+                    return {
+                        color: "#440154", fillColor: feature.properties.first_age_color,
+                        weight: 0.5
+                    }
+                },
                 onEachFeature: onEachFeature
             })
             let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) { return { color: "#440154", fillColor: feature.properties.last_age_color, weight: 0.5 } },
+                style: function (feature) {
+                    return {
+                        color: "#440154", fillColor: feature.properties.last_age_color, weight:
+                            0.5
+                    }
+                },
                 onEachFeature: onEachFeature
             })
 
@@ -99,6 +114,13 @@
                 }
                 map.addLayer(active_layer)
             }
+
+            function downloadAs(suffix) {
+                bounds = map.getBounds()
+                zoom = "{{ zoom }}"
+                window.location.href =
+                    `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/missing.${suffix}`
+            }
         </script>
     </div>
 </div>
@@ -124,38 +146,6 @@
         {% if plot_square_evolution|length > 0 %}
         {{ vega_direct("plot_square_evolution", plot_square_evolution) }}
         {% endif %}
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>Map with unexplored tiles</h2>
-        <p>The following is the “halo” of unexplored tiles around the tiles that you have already explored.</p>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col">
-        <div id="missing-map" class="mb-1" style="height: 800px;"></div>
-        <p>Download this as <a href="/download/missing_tiles.geojson">GeoJSON</a> or <a
-                href="/download/missing_tiles.gpx">GPX</a>.</p>
-
-        <script>
-            let missing_geojson = {{ missing_tiles_geojson| safe}}
-            let missing_map = L.map('missing-map', {
-                fullscreenControl: true,
-                center: [{{ center.latitude }}, {{ center.longitude }}],
-            zoom: 10
-            });
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(missing_map)
-            let missing_layer = L.geoJSON(missing_geojson).addTo(missing_map)
-            if (bbox) {
-                missing_map.fitBounds(L.geoJSON(bbox).getBounds())
-            }
-        </script>
     </div>
 </div>
 

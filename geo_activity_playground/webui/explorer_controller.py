@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.coordinates import Bounds
+from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
 from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
@@ -38,14 +40,6 @@ class ExplorerController:
 
         square_history = get_square_history(zoom)
 
-        points = get_border_tiles(tiles, zoom)
-        missing_tiles_geojson = make_grid_file_geojson(points, "missing_tiles")
-        make_grid_file_gpx(points, "missing_tiles")
-
-        points = get_explored_tiles(tiles, zoom)
-        explored_tiles_geojson = make_grid_file_geojson(points, "explored")
-        make_grid_file_gpx(points, "explored")
-
         return {
             "center": {
                 "latitude": median_lat,
@@ -57,7 +51,6 @@ class ExplorerController:
                 else {},
             },
             "explored": explored,
-            "missing_tiles_geojson": missing_tiles_geojson,
             "plot_tile_evolution": plot_tile_evolution(tiles),
             "plot_cluster_evolution": plot_cluster_evolution(
                 cluster_state.cluster_evolution
@@ -65,7 +58,21 @@ class ExplorerController:
             "plot_square_evolution": plot_square_evolution(
                 square_history.square_history
             ),
+            "zoom": zoom,
         }
+
+    def export_missing_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
+        x1, y1 = compute_tile_float(north, west, zoom)
+        x2, y2 = compute_tile_float(south, east, zoom)
+        tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
+
+        tiles = get_tile_history(self._repository, zoom)
+        points = get_border_tiles(tiles, zoom, tile_bounds)
+        if suffix == "geojson":
+            return make_grid_file_geojson(points)
+        elif suffix == "gpx":
+            return make_grid_file_gpx(points)
+        ...
 
 
 def plot_tile_evolution(tiles: pd.DataFrame) -> str:

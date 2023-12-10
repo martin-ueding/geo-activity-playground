@@ -60,6 +60,24 @@ def webui_main(repository: ActivityRepository) -> None:
             "explorer.html.j2", **explorer_controller.render(int(zoom))
         )
 
+    @app.route("/explorer/<zoom>/<north>/<east>/<south>/<west>/missing.<suffix>")
+    def explorer_missing(
+        zoom: str, north: str, east: str, south: str, west: str, suffix: str
+    ):
+        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
+        return Response(
+            explorer_controller.export_missing_tiles(
+                int(zoom),
+                float(north),
+                float(east),
+                float(south),
+                float(west),
+                suffix,
+            ),
+            mimetype=mimetypes[suffix],
+            headers={"Content-disposition": "attachment"},
+        )
+
     @app.route("/summary-statistics")
     def summary_statistics():
         return render_template("summary-statistics.html.j2")
