@@ -20,7 +20,7 @@ from geo_activity_playground.webui.grayscale_tile_controller import (
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
 
 
-def webui_main(repository: ActivityRepository) -> None:
+def webui_main(repository: ActivityRepository, host: str = "127.0.0.1") -> None:
     app = Flask(__name__)
 
     entry_controller = EntryController(repository)
@@ -130,4 +130,4 @@ def webui_main(repository: ActivityRepository) -> None:
             mimetype="image/png",
         )
 
-    app.run()
+    app.run(host=host)

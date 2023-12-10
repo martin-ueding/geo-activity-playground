@@ -56,7 +56,13 @@ def main() -> None:
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
-        func=lambda options: webui_main(make_activity_repository(options.basedir))
+        func=lambda options: webui_main(make_activity_repository(options.basedir), 
+                                        host=options.host)
+    )
+    subparser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="IP address to listen on"
     )
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
