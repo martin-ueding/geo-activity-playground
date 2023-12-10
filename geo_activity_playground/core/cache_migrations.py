@@ -29,5 +29,6 @@ def apply_cache_migrations() -> None:
         logger.info(f"Applying cache migration {migration.__name__} …")
         migration()
         cache_status["num_applied_migrations"] += 1
+        cache_status_file.parent.mkdir(exist_ok=True, parents=True)
         with open(cache_status_file, "w") as f:
             json.dump(cache_status, f)
