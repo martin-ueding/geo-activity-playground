@@ -153,13 +153,10 @@ def download_missing_activity_streams() -> None:
                 if name in streams:
                     columns[name] = streams[name].data
             start = meta.loc[meta["id"] == id]["start"].iloc[0]
-            print(start)
             columns["time"] = [
                 start + datetime.timedelta(seconds=time)
                 for time in streams["time"].data
             ]
             df = pd.DataFrame(columns)
-            print(df)
-            print(df.dtypes)
             df.name = str(id)
             df.to_parquet(activity_stream_dir / f"{id}.parquet")

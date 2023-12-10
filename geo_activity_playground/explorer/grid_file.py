@@ -99,7 +99,6 @@ def get_three_color_tiles(
         ),
     ):
         hex_color = matplotlib.colors.to_hex(color)
-        print(f"Color cluster with {len(members)} tiles in {hex_color}.")
         for member in members:
             tile_dict[member]["color"] = hex_color
 

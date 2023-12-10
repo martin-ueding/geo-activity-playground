@@ -35,8 +35,6 @@ class EntryController:
         before_30_days = pd.to_datetime(
             datetime.datetime.utcnow() - datetime.timedelta(days=31), utc=True
         )
-        print(repr(meta["start"].iloc[0]))
-        print(repr(before_30_days))
         return (
             alt.Chart(
                 meta.loc[meta["start"] > before_30_days],

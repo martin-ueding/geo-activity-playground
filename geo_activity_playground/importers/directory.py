@@ -75,8 +75,6 @@ def import_from_directory() -> None:
             if len(path.parts) >= 4 and path.parts[2] != "Commute":
                 equipment = path.parts[2]
 
-            print(path.parts, (kind, equipment, commute))
-
             row = {
                 "id": id,
                 "commute": commute,
