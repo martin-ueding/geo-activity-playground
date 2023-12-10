@@ -1,6 +1,7 @@
 import functools
 import io
 import logging
+import pathlib
 import threading
 
 import matplotlib
@@ -13,6 +14,7 @@ from PIL import ImageDraw
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.heatmap import compute_activities_per_tile
 from geo_activity_playground.core.heatmap import convert_to_grayscale
+from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -58,20 +60,35 @@ class HeatmapController:
         with self._mutex:
             activities_per_tile = compute_activities_per_tile(self._repository)
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
-        tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-        for activity_id in activities_per_tile[z].get((x, y), set()):
-            time_series = self._repository.get_time_series(activity_id)
-            for _, group in time_series.groupby("segment_id"):
-                xy_pixels = (
-                    np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
-                    * OSM_TILE_SIZE
-                )
-                im = Image.new("L", tile_pixels)
-                draw = ImageDraw.Draw(im)
-                pixels = list(map(int, xy_pixels.flatten()))
-                draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
-                aim = np.array(im)
-                tile_counts += aim
+        tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
+        if tile_count_cache_path.exists():
+            tile_counts = np.load(tile_count_cache_path)
+        else:
+            tile_counts = np.zeros(tile_pixels, dtype=np.int32)
+        tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
+        if activities_per_tile[z].get((x, y), set()):
+            with work_tracker(
+                tile_count_cache_path.with_suffix(".json")
+            ) as parsed_activities:
+                for activity_id in activities_per_tile[z].get((x, y), set()):
+                    if activity_id in parsed_activities:
+                        continue
+                    parsed_activities.add(activity_id)
+                    time_series = self._repository.get_time_series(activity_id)
+                    for _, group in time_series.groupby("segment_id"):
+                        xy_pixels = (
+                            np.array(
+                                [group["x"] * 2**z - x, group["y"] * 2**z - y]
+                            ).T
+                            * OSM_TILE_SIZE
+                        )
+                        im = Image.new("L", tile_pixels)
+                        draw = ImageDraw.Draw(im)
+                        pixels = list(map(int, xy_pixels.flatten()))
+                        draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
+                        aim = np.array(im)
+                        tile_counts += aim
+            np.save(tile_count_cache_path, tile_counts)
         tile_counts = np.sqrt(tile_counts) / 5
         tile_counts[tile_counts > 1.0] = 1.0
 

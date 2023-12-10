@@ -7,7 +7,6 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tasks import work_tracker
-from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import interpolate_missing_tile
 
 
