@@ -55,7 +55,12 @@ class ActivityRepository:
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
         path = pathlib.Path(f"Cache/Activity Timeseries/{id}.parquet")
-        df = pd.read_parquet(path)
+        try:
+            df = pd.read_parquet(path)
+        except OSError as e:
+            logger.error(f"Error while reading {path}, deleting cache file …")
+            path.unlink(missing_ok=True)
+            raise
         df.name = id
         changed = False
         if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):

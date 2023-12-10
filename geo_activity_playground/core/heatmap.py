@@ -307,29 +307,3 @@ def build_heatmap_image(
     data_color = cmap(data)
     data_color[data_color == cmap(0.0)] = 0.0  # remove background color
     return data_color
-
-
-def build_heatmap_tile(xy: np.ndarray) -> np.ndarray:
-    print(xy)
-    xy_data = np.round(xy * OSM_TILE_SIZE)
-    print(xy_data)
-    sigma_pixel = 1
-    data = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE))
-    for j, i in xy_data.astype(int):
-        data[
-            i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
-        ] += 1.0
-
-    np.log(data, where=data > 0, out=data)
-    data /= 6
-    data_max = data.max()
-    if data_max > 2:
-        logger.warning(f"Maximum data in tile: {data_max}")
-    data[data > 1.0] = 1.0
-
-    # colorize
-    cmap = pl.get_cmap("hot")
-
-    data_color = cmap(data)
-    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
-    return data_color

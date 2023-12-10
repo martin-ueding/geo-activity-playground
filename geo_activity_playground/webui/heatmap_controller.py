@@ -61,16 +61,17 @@ class HeatmapController:
         tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         for activity_id in activities_per_tile[z].get((x, y), set()):
             time_series = self._repository.get_time_series(activity_id)
-            ts_x, ts_y = compute_tile_float(
-                time_series["latitude"], time_series["longitude"], z
-            )
-            xy_pixels = np.array([ts_x - x, ts_y - y]).T * OSM_TILE_SIZE
-            im = Image.new("L", tile_pixels)
-            draw = ImageDraw.Draw(im)
-            pixels = list(map(int, xy_pixels.flatten()))
-            draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
-            aim = np.array(im)
-            tile_counts += aim
+            for _, group in time_series.groupby("segment_id"):
+                xy_pixels = (
+                    np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
+                    * OSM_TILE_SIZE
+                )
+                im = Image.new("L", tile_pixels)
+                draw = ImageDraw.Draw(im)
+                pixels = list(map(int, xy_pixels.flatten()))
+                draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
+                aim = np.array(im)
+                tile_counts += aim
         tile_counts = np.sqrt(tile_counts) / 5
         tile_counts[tile_counts > 1.0] = 1.0
 
