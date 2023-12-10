@@ -19,7 +19,8 @@ def main() -> None:
         description="Utilities to work with recorded activities."
     )
     parser.set_defaults(func=lambda options: parser.print_help())
-    parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
+    parser.add_argument("--basedir", type=pathlib.Path,
+                        default=pathlib.Path.cwd())
     parser.add_argument(
         "--loglevel",
         choices=["debug", "info", "warning", "error", "critical"],
@@ -56,13 +57,19 @@ def main() -> None:
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
-        func=lambda options: webui_main(make_activity_repository(options.basedir), 
-                                        host=options.host)
+        func=lambda options: webui_main(make_activity_repository(options.basedir),
+                                        host=options.host, port=options.port)
     )
     subparser.add_argument(
         "--host",
         default="127.0.0.1",
         help="IP address to listen on"
+    )
+    subparser.add_argument(
+        "--port",
+        default=5000,
+        type=int,
+        help="the port to run listen on"
     )
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
