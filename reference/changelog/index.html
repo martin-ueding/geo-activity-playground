@@ -705,6 +705,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-013" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-012" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.12
@@ -856,7 +865,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#version-013" class="md-nav__link">
+  <a href="#version-013_1" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.1.3
     </span>
@@ -968,6 +977,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-013" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-012" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.12
@@ -1119,7 +1137,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#version-013" class="md-nav__link">
+  <a href="#version-013_1" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.1.3
     </span>
@@ -1156,10 +1174,29 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-013">Version 0.13</h3>
+<ul>
+<li>Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.<ul>
+<li>This also fixes the gaps that were present before. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/34">GH-34</a></li>
+</ul>
+</li>
+<li>Add cache migration functionality.<ul>
+<li>Make sure that cache directory is created beforehand. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/55">GH-55</a></li>
+</ul>
+</li>
+<li>Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/47">GH-47</a><ul>
+<li>Fix introduced bug. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/56">GH-56</a></li>
+</ul>
+</li>
+<li>Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.</li>
+<li>Add a footer. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/49">GH-49</a></li>
+<li>Only export missing tiles in the active viewport. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/53">GH-53</a></li>
+<li>Add missing dependency to SciKit Learn again; I was too eager to remove that. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/59">GH-59</a></li>
+</ul>
 <h3 id="version-012">Version 0.12</h3>
 <ul>
 <li>Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.</li>
-<li>Fix bug with explorer tile page when the maximum cluster or square is just 1.</li>
+<li>Fix bug with explorer tile page when the maximum cluster or square is just 1. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/51">GH-51</a></li>
 <li>Speed up the computation of the latest tiles.</li>
 </ul>
 <h3 id="version-011">Version 0.11</h3>
@@ -1259,7 +1296,7 @@
 <li>Add directory source.</li>
 </ul>
 <h3 id="version-01">Version 0.1</h3>
-<h4 id="version-013">Version 0.1.3</h4>
+<h4 id="version-013_1">Version 0.1.3</h4>
 <ul>
 <li>Generate some heatmap images.</li>
 <li>Generate an explorer tile video.</li>

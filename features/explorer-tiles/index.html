@@ -860,11 +860,11 @@
 <p>At zoom level 14 the tiles have a side length of roughly 1.5 km in Germany. These tiles are used as the basis for <em>explorer tiles</em>. The basic idea is that every tile where you have at least one point in an activity is considered an <em>explored tile</em>.</p>
 <p>From your activities the program will extract all the tiles that you have visited. And then it does a few things with those. One main thing is that it will display these on an interactive map. When we zoom into one area where I've been on vacation in 2023, you can see the explored tiles there:</p>
 <p><img alt="" src="../explorer-sluis.png" /></p>
-<p>The colored tiles are explored, I have been there. The green tiles are <em>cluster tiles</em>, that means that all their four neighbor tiles are also explored.</p>
+<p>The filled tiles are explored, I have been there. The colored tiles are <em>cluster tiles</em>, that means that all their four neighbor tiles are also explored.</p>
 <p>You can see here how I have explored a region and ensured that it is mostly contiguous.</p>
 <p>There is another vacation from 2013 where I wasn't aware of the cluster tiles. I just did some bike trips and didn't look out for the tiles. There the tiles look like this:</p>
 <p><img alt="" src="../explorer-sint-annaland.png" /></p>
-<p>You see all these gaps in there. And this is what the explorer tiles are about: This OCD (obsessive compulsive disorder) like craving to fill in the gaps.</p>
+<p>You see all these gaps in there. Also there are three different clusters which are not connected. Each unique cluster is assigned a different color such that one can see where there are gaps between the cluster tiles. And filling the gaps is what the explorer tiles are about: This OCD (obsessive compulsive disorder) like craving to fill in the gaps.</p>
 <p>Let's take a look at my main cluster of explorer tiles. Here I have explored much more than in the areas where I was on vacation.</p>
 <p><img alt="" src="../explorer-home.png" /></p>
 <p>You can see an additional feature, the blue square. This is the one largest square which can be fit into all explored tiles. In this picture it has size 21². The idea of the square is to have a really tough challenge. Not only does one need to explore increasingly many tiles to expand the square by one unit, there must not be any gaps.</p>
@@ -890,18 +890,20 @@
 <p>The map only shows the current state of your explorer tiles. In order to get a sense of how many new tiles you have discovered in the past, there are also plots that show you how you have extended the total number of squares, the size of your largest cluster and the size of your largest square over time:</p>
 <p><img alt="" src="../explorer-history.png" /></p>
 <h2 id="missing-tile-files">Missing tile files</h2>
-<p>Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Take for instance this set of tiles from a vacation:</p>
-<p><img alt="" src="../explorer-kell.png" /></p>
-<p>You can see those two gaps in the south. To make identifying these gaps a bit easier there is a second map which shows you the missing tiles. It has the gaps and also a border around the explored tiles:</p>
-<p><img alt="" src="../explorer-kell-missing.png" /></p>
-<p>One can use those maps to plan the routes. You can also download these maps as a GeoJSON file and use other programs to display them. For instance with GPX See on Linux it looks like this:</p>
-<p><img alt="" src="../explorer-missing-geojson.png" /></p>
+<p>Looking at these maps you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Let us take another look at my tile history in Sint Annaland:</p>
+<p><img alt="" src="../explorer-sint-annaland.png" /></p>
+<p>You can see those gaps in the clusters. To make it easier to explore tiles while on the go, we can export a file with the missing tiles. Pan and zoom the map to an area which you want to export. Below the map you will find two links:</p>
+<blockquote>
+<p>Download missing tiles in visible area as <strong>GeoJSON</strong> or <strong>GPX</strong>.</p>
+</blockquote>
+<p>This export is available as GeoJSON or GPX such that you can open it with other applications. For instance with GPX See on Linux it looks like this when opening the GeoJSON file:</p>
+<p><img alt="" src="../explorer-sint-annaland-missing-geojson.png" /></p>
 <p>I have not tested this software, but supposedly <a href="https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps">Offline Maps</a> is able to display GeoJSON on Android.</p>
 <p>On Android I use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately <a href="https://osmand.net/docs/technical/osmand-file-formats/">GeoJSON is not supported</a>, therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:</p>
-<p><img alt="" src="../explorer-missing-gpx.png" /></p>
-<p>And on OsmAnd it looks like this:</p>
+<p><img alt="" src="../explorer-sint-annaland-missing-gpx.png" /></p>
+<p>And on OsmAnd such files look like this:</p>
 <p><img alt="" src="../explorer-osmand.jpg" /></p>
-<p>Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so I don't have this displayed all the time.</p>
+<p>Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so make sure to only export it from rather small regions.</p>
 
 
 
