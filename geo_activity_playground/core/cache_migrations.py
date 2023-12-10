@@ -1,0 +1,24 @@
+import json
+import logging
+import pathlib
+
+logger = logging.getLogger(__name__)
+
+
+def apply_cache_migrations() -> None:
+    logger.info("Apply cache migration if needed …")
+    cache_status_file = pathlib.Path("Cache/status.json")
+    if cache_status_file.exists():
+        with open(cache_status_file) as f:
+            cache_status = json.load(f)
+    else:
+        cache_status = {"num_applied_migrations": 0}
+
+    migrations = []
+
+    for migration in migrations[cache_status["num_applied_migrations"] :]:
+        logger.info(f"Applying cache migration {migration.__name__} …")
+        migration()
+        cache_status["num_applied_migrations"] += 1
+        with open(cache_status_file, "w") as f:
+            json.dump(cache_status, f)

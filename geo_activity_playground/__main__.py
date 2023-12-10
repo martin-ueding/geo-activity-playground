@@ -5,6 +5,7 @@ import pathlib
 import coloredlogs
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
@@ -73,6 +74,7 @@ def main() -> None:
 
 def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     os.chdir(basedir)
+    apply_cache_migrations()
     config = get_config()
     if pathlib.Path("Activities").exists():
         import_from_directory()
