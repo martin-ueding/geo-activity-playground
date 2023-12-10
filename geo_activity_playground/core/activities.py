@@ -8,6 +8,7 @@ from typing import Optional
 
 import geojson
 import matplotlib
+import numpy as np
 import pandas as pd
 
 from geo_activity_playground.core.config import get_config
@@ -82,6 +83,12 @@ class ActivityRepository:
             x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
             df["x"] = x
             df["y"] = y
+            changed = True
+
+        if "segment_id" not in df.columns:
+            time_diff = (df["time"] - df["time"].shift(1)).dt.total_seconds()
+            jump_indices = time_diff >= 30
+            df["segment_id"] = np.cumsum(jump_indices)
             changed = True
 
         if changed:

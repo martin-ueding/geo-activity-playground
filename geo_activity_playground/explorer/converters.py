@@ -40,9 +40,18 @@ def tiles_from_points(time_series: pd.DataFrame, zoom: int) -> pd.DataFrame:
     if "latitude" in time_series.columns and "longitude" in time_series.columns:
         xf = time_series["x"] * 2**zoom
         yf = time_series["y"] * 2**zoom
-        for t1, x1, y1, x2, y2 in zip(
-            time_series["time"], xf, yf, xf.shift(1), yf.shift(1)
+        for t1, t2, x1, y1, x2, y2, s1, s2 in zip(
+            time_series["time"],
+            xf,
+            yf,
+            xf.shift(1),
+            yf.shift(1),
+            time_series["segment_id"],
+            time_series["segment_id"].shift(1),
         ):
+            # We don't want to interpolate over segment boundaries.
+            if s1 != s2:
+                continue
             new_rows.append((t1, int(x1), int(y1)))
             if len(new_rows) > 1:
                 interpolated = interpolate_missing_tile(x1, y1, x2, y2)
