@@ -8,7 +8,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.13
 
-- Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels. [GH-47](https://github.com/martin-ueding/geo-activity-playground/issues/47)
+- Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.
+- Add cache migration functionality.
 
 ### Version 0.12
 
