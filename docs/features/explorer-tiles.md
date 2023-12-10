@@ -20,7 +20,7 @@ From your activities the program will extract all the tiles that you have visite
 
 ![](explorer-sluis.png)
 
-The colored tiles are explored, I have been there. The green tiles are _cluster tiles_, that means that all their four neighbor tiles are also explored.
+The filled tiles are explored, I have been there. The colored tiles are _cluster tiles_, that means that all their four neighbor tiles are also explored.
 
 You can see here how I have explored a region and ensured that it is mostly contiguous.
 
@@ -28,7 +28,7 @@ There is another vacation from 2013 where I wasn't aware of the cluster tiles. I
 
 ![](explorer-sint-annaland.png)
 
-You see all these gaps in there. And this is what the explorer tiles are about: This OCD (obsessive compulsive disorder) like craving to fill in the gaps.
+You see all these gaps in there. Also there are three different clusters which are not connected. Each unique cluster is assigned a different color such that one can see where there are gaps between the cluster tiles. And filling the gaps is what the explorer tiles are about: This OCD (obsessive compulsive disorder) like craving to fill in the gaps.
 
 Let's take a look at my main cluster of explorer tiles. Here I have explored much more than in the areas where I was on vacation.
 
