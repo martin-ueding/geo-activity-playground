@@ -87,6 +87,10 @@ def interpolate_missing_tile(
     if int(x1) == int(x2) or int(y1) == int(y2):
         return None
 
+    # Some people have large jumps in their tracks. We don't want to interpolate when there is more than tile in between.
+    if abs(x1 - x2) > 1 or abs(y1 - y2) > 1:
+        return None
+
     x_hat = int(max(x1, x2))
     l = (x_hat - x1) / (x2 - x1)
     y_hat = int(y1 + l * (y2 - y1))
