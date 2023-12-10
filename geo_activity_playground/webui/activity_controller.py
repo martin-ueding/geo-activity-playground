@@ -14,13 +14,12 @@ from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
-from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import gaussian_filter
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
-from geo_activity_playground.core.tiles import latlon_to_xy
+from geo_activity_playground.core.tiles import compute_tile_float
 
 
 class ActivityController:
@@ -143,7 +142,7 @@ def make_sharepic(time_series: pd.DataFrame) -> bytes:
     background = build_map_from_tiles(tile_bounds)
     # background = convert_to_grayscale(background)
 
-    xs, ys = latlon_to_xy(
+    xs, ys = compute_tile_float(
         time_series["latitude"], time_series["longitude"], tile_bounds.zoom
     )
     yx = list(

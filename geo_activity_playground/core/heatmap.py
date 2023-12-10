@@ -1,7 +1,6 @@
 """
 This code is based on https://github.com/remisalmon/Strava-local-heatmap.
 """
-import collections
 import dataclasses
 import functools
 import logging
@@ -17,7 +16,6 @@ from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.core.tiles import latlon_to_xy
 
 
 logger = logging.getLogger(__name__)
@@ -156,10 +154,10 @@ def get_sensible_zoom_level(
 
     while True:
         x_tile_min, y_tile_max = map(
-            int, latlon_to_xy(bounds.lat_min, bounds.lon_min, zoom)
+            int, compute_tile_float(bounds.lat_min, bounds.lon_min, zoom)
         )
         x_tile_max, y_tile_min = map(
-            int, latlon_to_xy(bounds.lat_max, bounds.lon_max, zoom)
+            int, compute_tile_float(bounds.lat_max, bounds.lon_max, zoom)
         )
 
         x_tile_max += 1
@@ -214,10 +212,10 @@ def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
 def crop_image_to_bounds(
     image: np.ndarray, geo_bounds: GeoBounds, tile_bounds: TileBounds
 ) -> np.ndarray:
-    min_x, min_y = latlon_to_xy(
+    min_x, min_y = compute_tile_float(
         geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
     )
-    max_x, max_y = latlon_to_xy(
+    max_x, max_y = compute_tile_float(
         geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
     )
     min_x = int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
@@ -265,7 +263,9 @@ def build_heatmap_image(
 
     data = np.zeros(tile_bounds.shape)
 
-    xy_data = latlon_to_xy(lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom)
+    xy_data = compute_tile_float(
+        lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom
+    )
     xy_data = np.array(xy_data).T
     xy_data = np.round(
         (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE

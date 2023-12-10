@@ -11,16 +11,11 @@ from PIL import Image
 from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.heatmap import build_heatmap_tile
 from geo_activity_playground.core.heatmap import compute_activities_per_tile
 from geo_activity_playground.core.heatmap import convert_to_grayscale
-from geo_activity_playground.core.heatmap import geo_bounds_from_tile_bounds
-from geo_activity_playground.core.heatmap import get_all_points
-from geo_activity_playground.core.heatmap import TileBounds
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.core.tiles import latlon_to_xy
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
 from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
 from geo_activity_playground.explorer.converters import get_tile_history

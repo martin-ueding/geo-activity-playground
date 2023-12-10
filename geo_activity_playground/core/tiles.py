@@ -30,17 +30,6 @@ def compute_tile_float(lat: float, lon: float, zoom: int) -> tuple[int, int]:
     return x * n, y * n
 
 
-def latlon_to_xy(lat_deg: float, lon_deg: float, zoom: int) -> tuple[float, float]:
-    """
-    Based on https://github.com/remisalmon/Strava-local-heatmap.
-    """
-    lat_rad = np.radians(lat_deg)
-    n = 2.0**zoom
-    x = (lon_deg + 180.0) / 360.0 * n
-    y = (1.0 - np.arcsinh(np.tan(lat_rad)) / np.pi) / 2.0 * n
-    return x, y
-
-
 def get_tile_upper_left_lat_lon(
     tile_x: int, tile_y: int, zoom: int
 ) -> tuple[float, float]:
