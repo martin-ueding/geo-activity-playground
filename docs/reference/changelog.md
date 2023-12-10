@@ -17,6 +17,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.
 - Add a footer. [GH-49](https://github.com/martin-ueding/geo-activity-playground/issues/49)
 - Only export missing tiles in the active viewport. [GH-53](https://github.com/martin-ueding/geo-activity-playground/issues/53)
+- Add missing dependency to SciKit Learn again; I was too eager to remove that. [GH-59](https://github.com/martin-ueding/geo-activity-playground/issues/59)
 
 ### Version 0.12
 
