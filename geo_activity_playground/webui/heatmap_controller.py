@@ -21,6 +21,9 @@ from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.core.tiles import latlon_to_xy
+from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
+from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
+from geo_activity_playground.explorer.converters import get_tile_history
 
 
 logger = logging.getLogger(__name__)
@@ -37,23 +40,24 @@ class HeatmapController:
 
     @functools.cache
     def render(self) -> dict:
-        all_points = get_all_points(self._repository)
-        medians = all_points.median()
+        zoom = 14
+        tiles = get_tile_history(self._repository, zoom)
+        medians = tiles.median()
+        median_lat, median_lon = get_tile_upper_left_lat_lon(
+            medians["tile_x"], medians["tile_y"], zoom
+        )
+        cluster_state = get_explorer_cluster_evolution(zoom)
         return {
             "center": {
-                "latitude": medians["latitude"],
-                "longitude": medians["longitude"],
+                "latitude": median_lat,
+                "longitude": median_lon,
+                "bbox": bounding_box_for_biggest_cluster(
+                    cluster_state.clusters.values(), zoom
+                )
+                if len(cluster_state.memberships) > 0
+                else {},
             }
         }
-
-    @functools.cache
-    def compute_xy(self, z: int) -> pd.DataFrame:
-        points = get_all_points(self._repository)
-        x, y = latlon_to_xy(points["latitude"], points["longitude"], z)
-        self._xy = pd.DataFrame(
-            {"x": x * OSM_TILE_SIZE, "y": y * OSM_TILE_SIZE}, dtype="int"
-        )
-        return self._xy
 
     def render_tile(self, x: int, y: int, z: int) -> bytes:
         with self._mutex:
