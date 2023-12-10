@@ -16,6 +16,7 @@ from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.converters import get_first_tiles
 
 
 logger = logging.getLogger(__name__)
@@ -39,18 +40,15 @@ def compute_activities_per_tile(
             tracker.add(activity.id)
 
             logger.info(f"Add activity {activity.id} to all zoom levels …")
-            time_series = repository.get_time_series(activity.id)
-            if "latitude" in time_series.columns and "longitude" in time_series.columns:
-                for zoom in range(1, 20):
-                    if zoom not in data:
-                        data[zoom] = {}
-                    xz = np.floor(time_series["x"] * 2**zoom)
-                    yz = np.floor(time_series["y"] * 2**zoom)
-                    tiles_this_activity = set(zip(xz, yz))
-                    for tile in tiles_this_activity:
-                        if tile not in data[zoom]:
-                            data[zoom][tile] = set()
-                        data[zoom][tile].add(activity.id)
+            for zoom in range(1, 20):
+                if zoom not in data:
+                    data[zoom] = {}
+                tiles_this_activity = get_first_tiles(activity.id, repository, zoom)
+                for _, row in tiles_this_activity.iterrows():
+                    tile = (row["tile_x"], row["tile_y"])
+                    if tile not in data[zoom]:
+                        data[zoom][tile] = set()
+                    data[zoom][tile].add(activity.id)
 
     with open(cache_path, "wb") as f:
         pickle.dump(data, f)

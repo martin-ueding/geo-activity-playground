@@ -26,7 +26,6 @@ def get_first_tiles(id, repository: ActivityRepository, zoom: int) -> pd.DataFra
     if target_path.exists():
         return pd.read_parquet(target_path)
     else:
-        logger.info(f"Extracting tiles from activity {id} …")
         time_series = repository.get_time_series(id)
         tiles = tiles_from_points(time_series, zoom)
         first_tiles = first_time_per_tile(tiles)
@@ -35,19 +34,19 @@ def get_first_tiles(id, repository: ActivityRepository, zoom: int) -> pd.DataFra
         return first_tiles
 
 
-def tiles_from_points(points: pd.DataFrame, zoom: int) -> pd.DataFrame:
-    assert pd.api.types.is_dtype_equal(points["time"].dtype, "datetime64[ns, UTC]")
+def tiles_from_points(time_series: pd.DataFrame, zoom: int) -> pd.DataFrame:
+    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns, UTC]")
     new_rows = []
-    if "latitude" in points.columns and "longitude" in points.columns:
-        xf, yf = compute_tile_float(points["latitude"], points["longitude"], zoom)
-        for t1, x1, y1, x2, y2 in zip(points["time"], xf, yf, xf.shift(1), yf.shift(1)):
+    if "latitude" in time_series.columns and "longitude" in time_series.columns:
+        xf = time_series["x"] * 2**zoom
+        yf = time_series["y"] * 2**zoom
+        for t1, x1, y1, x2, y2 in zip(
+            time_series["time"], xf, yf, xf.shift(1), yf.shift(1)
+        ):
             new_rows.append((t1, int(x1), int(y1)))
             if len(new_rows) > 1:
                 interpolated = interpolate_missing_tile(x1, y1, x2, y2)
                 if interpolated is not None:
-                    logger.info(
-                        f"Interpolated an explorer tile: {(x1, y1)}, {(x2, y2)} → {interpolated}"
-                    )
                     new_rows.append((t1,) + interpolated)
     return pd.DataFrame(new_rows, columns=["time", "tile_x", "tile_y"])
 
