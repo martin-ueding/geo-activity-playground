@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_three_color_tiles(
-    tiles: pd.DataFrame,
+    tile_visits: dict,
     repository: ActivityRepository,
     cluster_state: TileEvolutionState,
     zoom: int,
@@ -31,10 +31,10 @@ def get_three_color_tiles(
     cmap_first = matplotlib.colormaps["plasma"]
     cmap_last = matplotlib.colormaps["plasma"]
     tile_dict = {}
-    for index, row in tiles.iterrows():
+    for tile, row in tile_visits.items():
         first_age_days = (today - row["first_time"].date()).days
         last_age_days = (today - row["last_time"].date()).days
-        tile_dict[(row["tile_x"], row["tile_y"])] = {
+        tile_dict[tile] = {
             "first_activity_id": str(row["first_id"]),
             "first_activity_name": repository.get_activity_by_id(row["first_id"]).name,
             "last_activity_id": str(row["last_id"]),
@@ -55,27 +55,16 @@ def get_three_color_tiles(
             "square": False,
         }
 
-    # Compute biggest square.
-    square_size = 1
-    biggest = None
-    for x, y in sorted(tile_dict):
-        while True:
-            for i in range(square_size):
-                for j in range(square_size):
-                    if (x + i, y + j) not in tile_dict:
-                        break
-                else:
-                    continue
-                break
-            else:
-                biggest = (x, y, square_size)
-                square_size += 1
-                continue
-            break
-    if biggest is not None:
-        square_x, square_y, square_size = biggest
-        for x in range(square_x, square_x + square_size):
-            for y in range(square_y, square_y + square_size):
+    # Mark biggest square.
+    if cluster_state.max_square_size:
+        for x in range(
+            cluster_state.square_x,
+            cluster_state.square_x + cluster_state.max_square_size,
+        ):
+            for y in range(
+                cluster_state.square_y,
+                cluster_state.square_y + cluster_state.max_square_size,
+            ):
                 tile_dict[(x, y)]["square"] = True
 
     # Add cluster information.
@@ -103,6 +92,23 @@ def get_three_color_tiles(
         for member in members:
             tile_dict[member]["color"] = hex_color
 
+    if cluster_state.max_square_size:
+        square_geojson = geojson.dumps(
+            geojson.FeatureCollection(
+                features=[
+                    make_explorer_rectangle(
+                        cluster_state.square_x,
+                        cluster_state.square_y,
+                        cluster_state.square_x + cluster_state.max_square_size,
+                        cluster_state.square_y + cluster_state.max_square_size,
+                        zoom,
+                    )
+                ]
+            )
+        )
+    else:
+        square_geojson = "{}"
+
     result = {
         "explored_geojson": geojson.dumps(
             geojson.FeatureCollection(
@@ -120,20 +126,8 @@ def get_three_color_tiles(
         "max_cluster_size": max_cluster_size,
         "num_cluster_tiles": num_cluster_tiles,
         "num_tiles": len(tile_dict),
-        "square_size": square_size,
-        "square_geojson": geojson.dumps(
-            geojson.FeatureCollection(
-                features=[
-                    make_explorer_rectangle(
-                        square_x,
-                        square_y,
-                        square_x + square_size,
-                        square_y + square_size,
-                        zoom,
-                    )
-                ]
-            )
-        ),
+        "square_size": cluster_state.max_square_size,
+        "square_geojson": square_geojson,
     }
     return result
 

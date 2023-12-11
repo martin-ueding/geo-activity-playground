@@ -10,7 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.converters import TILE_HISTORY_PATH
+from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
 
 
 logger = logging.getLogger(__name__)
@@ -32,14 +32,17 @@ class TileEvolutionState:
         self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
         self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
         self.cluster_evolution = pd.DataFrame()
-        self.start = 0
+        self.square_start = 0
+        self.cluster_start = 0
         self.max_square_size = 0
         self.visited_tiles = set()
         self.square_evolution = pd.DataFrame()
+        self.square_x = None
+        self.square_y = None
 
 
 def compute_tile_evolution() -> None:
-    with open(TILE_HISTORY_PATH, "rb") as f:
+    with open(TILE_HISTORIES_PATH, "rb") as f:
         tile_histories = pickle.load(f)
 
     if TILE_EVOLUTION_STATES_PATH.exists():
@@ -64,7 +67,7 @@ def compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> Non
         max_cluster_so_far = 0
 
     rows = []
-    for index, row in tiles.iloc[s.start :].iterrows():
+    for index, row in tiles.iloc[s.cluster_start :].iterrows():
         new_clusters = False
         # Current tile.
         tile = (row["tile_x"], row["tile_y"])
@@ -132,7 +135,7 @@ def compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> Non
 
     new_cluster_evolution = pd.DataFrame(rows)
     s.cluster_evolution = pd.concat([s.cluster_evolution, new_cluster_evolution])
-    s.start = len(tiles)
+    s.cluster_start = len(tiles)
 
 
 def bounding_box_for_biggest_cluster(
@@ -164,7 +167,7 @@ def bounding_box_for_biggest_cluster(
 
 def compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
     rows = []
-    for index, row in tiles.iloc[s.start :].iterrows():
+    for index, row in tiles.iloc[s.square_start :].iterrows():
         tile = (row["tile_x"], row["tile_y"])
         x, y = tile
         s.visited_tiles.add(tile)
@@ -185,8 +188,15 @@ def compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
                             break
                     if this_offset_viable:
                         s.max_square_size = square_size
+                        s.square_x = x - x_offset
+                        s.square_y = y - y_offset
                         rows.append(
-                            {"time": row["time"], "max_square_size": square_size}
+                            {
+                                "time": row["time"],
+                                "max_square_size": square_size,
+                                "square_x": s.square_x,
+                                "square_y": s.square_y,
+                            }
                         )
                         this_tile_size_viable = True
                         break
@@ -197,4 +207,4 @@ def compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
 
     new_square_history = pd.DataFrame(rows)
     s.square_evolution = pd.concat([s.square_evolution, new_square_history])
-    s.start = len(tiles)
+    s.square_start = len(tiles)

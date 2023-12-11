@@ -1,4 +1,5 @@
 import functools
+import pickle
 
 import altair as alt
 import numpy as np
@@ -9,6 +10,9 @@ from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
+from geo_activity_playground.explorer.clusters import TILE_EVOLUTION_STATES_PATH
+from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
+from geo_activity_playground.explorer.converters import TILE_VISITS_PATH
 from geo_activity_playground.explorer.grid_file import get_border_tiles
 from geo_activity_playground.explorer.grid_file import get_three_color_tiles
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
@@ -24,34 +28,39 @@ class ExplorerController:
 
     @functools.cache
     def render(self, zoom: int) -> dict:
-        tile_history = load_tile_history()
-        medians = tiles.median()
+        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
+            tile_evolution_states = pickle.load(f)
+        with open(TILE_VISITS_PATH, "rb") as f:
+            tile_visits = pickle.load(f)
+        with open(TILE_HISTORIES_PATH, "rb") as f:
+            tile_histories = pickle.load(f)
+
+        medians = tile_histories[zoom].median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )
 
-        cluster_state = get_explorer_cluster_evolution(zoom)
-        explored = get_three_color_tiles(tiles, self._repository, cluster_state, zoom)
-
-        square_history = get_square_history(zoom)
+        explored = get_three_color_tiles(
+            tile_visits[zoom], self._repository, tile_evolution_states[zoom], zoom
+        )
 
         return {
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
                 "bbox": bounding_box_for_biggest_cluster(
-                    cluster_state.clusters.values(), zoom
+                    tile_evolution_states[zoom].clusters.values(), zoom
                 )
-                if len(cluster_state.memberships) > 0
+                if len(tile_evolution_states[zoom].memberships) > 0
                 else {},
             },
             "explored": explored,
-            "plot_tile_evolution": plot_tile_evolution(tiles),
+            "plot_tile_evolution": plot_tile_evolution(tile_histories[zoom]),
             "plot_cluster_evolution": plot_cluster_evolution(
-                cluster_state.cluster_evolution
+                tile_evolution_states[zoom].cluster_evolution
             ),
             "plot_square_evolution": plot_square_evolution(
-                square_history.square_history
+                tile_evolution_states[zoom].square_evolution
             ),
             "zoom": zoom,
         }
@@ -61,7 +70,9 @@ class ExplorerController:
         x2, y2 = compute_tile_float(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tiles = get_tile_history(self._repository, zoom)
+        with open(TILE_HISTORIES_PATH, "rb") as f:
+            tile_histories = pickle.load(f)
+        tiles = tile_histories[zoom]
         points = get_border_tiles(tiles, zoom, tile_bounds)
         if suffix == "geojson":
             return make_grid_file_geojson(points)
@@ -73,14 +84,11 @@ class ExplorerController:
 def plot_tile_evolution(tiles: pd.DataFrame) -> str:
     if len(tiles) == 0:
         return ""
-    tiles.sort_values("first_time", inplace=True)
     tiles["count"] = np.arange(1, len(tiles) + 1)
     return (
         alt.Chart(tiles, title="Tiles")
         .mark_line(interpolate="step-after")
-        .encode(
-            alt.X("first_time", title="Time"), alt.Y("count", title="Number of tiles")
-        )
+        .encode(alt.X("time", title="Time"), alt.Y("count", title="Number of tiles"))
         .interactive(bind_y=False)
         .to_json(format="vega")
     )

@@ -18,7 +18,7 @@ from geo_activity_playground.core.tiles import interpolate_missing_tile
 logger = logging.getLogger(__name__)
 
 TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
-TILE_HISTORY_PATH = pathlib.Path(f"Cache/tile-history.pickle")
+TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
 
 
 def tiles_from_points(
@@ -53,8 +53,8 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
             int, dict[tuple[int, int], dict[str, Any]]
         ] = collections.defaultdict(dict)
 
-    if TILE_HISTORY_PATH.exists():
-        with open(TILE_HISTORY_PATH, "rb") as f:
+    if TILE_HISTORIES_PATH.exists():
+        with open(TILE_HISTORIES_PATH, "rb") as f:
             tile_history = pickle.load(f)
     else:
         tile_history: dict[int, pd.DataFrame] = collections.defaultdict(pd.DataFrame)
@@ -107,7 +107,7 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
             new_df.sort_values("time", inplace=True)
             tile_history[zoom] = pd.concat([tile_history[zoom], new_df])
 
-        with open(TILE_HISTORY_PATH, "wb") as f:
+        with open(TILE_HISTORIES_PATH, "wb") as f:
             pickle.dump(tile_history, f)
 
     work_tracker.close()
