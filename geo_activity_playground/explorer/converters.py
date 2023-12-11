@@ -87,7 +87,6 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
                     }
         work_tracker.mark_done(activity_id)
 
-    logger.info("Store explorer tile history to cache file …")
     with open(TILE_VISITS_PATH, "wb") as f:
         pickle.dump(tile_visits, f)
 
