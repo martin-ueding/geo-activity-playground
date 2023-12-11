@@ -6,6 +6,7 @@ import pathlib
 import coloredlogs
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.video import explorer_video_main
@@ -85,4 +86,6 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     elif config:
         if "strava" in config:
             import_from_strava_api()
-    return ActivityRepository()
+    repository = ActivityRepository()
+    embellish_time_series(repository)
+    return repository

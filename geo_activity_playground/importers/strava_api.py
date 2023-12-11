@@ -116,11 +116,13 @@ def import_from_strava_api() -> None:
             time_series = pd.read_parquet(time_series_path)
         else:
             time_series = download_strava_time_series(activity.id, client)
-            time_series.name = activity.id
-            time_series["time"] = [
+            time_series.name = activity.upload_id_str
+            new_time = [
                 activity.start_date + datetime.timedelta(seconds=time)
                 for time in time_series["time"]
             ]
+            del time_series["time"]
+            time_series["time"] = new_time
             time_series.to_parquet(time_series_path)
 
         if len(time_series) > 0 and "latitude" in time_series.columns:

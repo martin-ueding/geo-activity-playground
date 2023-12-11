@@ -10,8 +10,10 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.tiles import compute_tile_float
 
 
@@ -34,47 +36,6 @@ class ActivityMeta:
         return f"{self.name} ({self.kind}; {self.distance:.1f} km; {self.elapsed_time})"
 
 
-def embellish_time_series(path: pathlib.Path) -> None:
-    df = pd.read_parquet(path)
-    df.name = id
-    changed = False
-    if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
-        start = self.get_activity_by_id(id).start
-        time = df["time"]
-        del df["time"]
-        df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
-        changed = True
-    assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
-
-    if "distance" in df.columns:
-        if "distance/km" not in df.columns:
-            df["distance/km"] = df["distance"] / 1000
-            changed = True
-
-        if "speed" not in df.columns:
-            df["speed"] = (
-                df["distance"].diff()
-                / (df["time"].diff().dt.total_seconds() + 1e-3)
-                * 3.6
-            )
-            changed = True
-
-    if "x" not in df.columns:
-        x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
-        df["x"] = x
-        df["y"] = y
-        changed = True
-
-    if "segment_id" not in df.columns:
-        time_diff = (df["time"] - df["time"].shift(1)).dt.total_seconds()
-        jump_indices = time_diff >= 30
-        df["segment_id"] = np.cumsum(jump_indices)
-        changed = True
-
-    if changed:
-        df.to_parquet(path)
-
-
 class ActivityRepository:
     def __init__(self) -> None:
         self.meta = pd.read_parquet("Cache/activities.parquet")
@@ -83,6 +44,10 @@ class ActivityRepository:
         self.meta["distance"] /= 1000
         self.meta["kind"].fillna("Unknown", inplace=True)
         self.meta["equipment"].fillna("Unknown", inplace=True)
+
+    @property
+    def activity_ids(self) -> set[int]:
+        return set(self.meta["id"])
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
@@ -142,6 +107,53 @@ class ActivityRepository:
             df.to_parquet(path)
 
         return df
+
+
+def embellish_time_series(repository: ActivityRepository) -> None:
+    work_tracker = WorkTracker("embellish-time-series")
+    activities_to_process = work_tracker.filter(repository.activity_ids)
+    for activity_id in tqdm(activities_to_process, desc="Embellish time series data"):
+        path = pathlib.Path(f"Cache/Activity Timeseries/{activity_id}.parquet")
+        df = pd.read_parquet(path)
+        df.name = id
+        changed = False
+        if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
+            start = repository.get_activity_by_id(activity_id).start
+            time = df["time"]
+            del df["time"]
+            df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
+            changed = True
+        assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
+
+        if "distance" in df.columns:
+            if "distance/km" not in df.columns:
+                df["distance/km"] = df["distance"] / 1000
+                changed = True
+
+            if "speed" not in df.columns:
+                df["speed"] = (
+                    df["distance"].diff()
+                    / (df["time"].diff().dt.total_seconds() + 1e-3)
+                    * 3.6
+                )
+                changed = True
+
+        if "x" not in df.columns:
+            x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
+            df["x"] = x
+            df["y"] = y
+            changed = True
+
+        if "segment_id" not in df.columns:
+            time_diff = (df["time"] - df["time"].shift(1)).dt.total_seconds()
+            jump_indices = time_diff >= 30
+            df["segment_id"] = np.cumsum(jump_indices)
+            changed = True
+
+        if changed:
+            df.to_parquet(path)
+        work_tracker.mark_done(activity_id)
+    work_tracker.close()
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
