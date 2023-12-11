@@ -2,6 +2,7 @@ import functools
 import io
 import logging
 import pathlib
+import pickle
 import threading
 
 import matplotlib
@@ -17,6 +18,9 @@ from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
+from geo_activity_playground.explorer.clusters import TILE_EVOLUTION_STATES_PATH
+from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
+from geo_activity_playground.explorer.converters import TILE_VISITS_PATH
 
 
 logger = logging.getLogger(__name__)
@@ -29,17 +33,23 @@ class HeatmapController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
         self._all_points = pd.DataFrame()
-        self._mutex = threading.Lock()
+
+        with open(TILE_HISTORIES_PATH, "rb") as f:
+            self.tile_histories = pickle.load(f)
+        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
+            self.tile_evolution_states = pickle.load(f)
+        with open(TILE_VISITS_PATH, "rb") as f:
+            self.tile_visits = pickle.load(f)
 
     @functools.cache
     def render(self) -> dict:
         zoom = 14
-        tiles = get_tile_history(self._repository, zoom)
+        tiles = self.tile_histories[zoom]
         medians = tiles.median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )
-        cluster_state = get_explorer_cluster_evolution(zoom)
+        cluster_state = self.tile_evolution_states[zoom]
         return {
             "center": {
                 "latitude": median_lat,
@@ -53,8 +63,6 @@ class HeatmapController:
         }
 
     def render_tile(self, x: int, y: int, z: int) -> bytes:
-        with self._mutex:
-            activities_per_tile = compute_activities_per_tile(self._repository)
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():
@@ -62,11 +70,12 @@ class HeatmapController:
         else:
             tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        if activities_per_tile[z].get((x, y), set()):
+        activity_ids = self.tile_visits[z].get((x, y), {}).get("activity_ids", set())
+        if activity_ids:
             with work_tracker(
                 tile_count_cache_path.with_suffix(".json")
             ) as parsed_activities:
-                for activity_id in activities_per_tile[z].get((x, y), set()):
+                for activity_id in activity_ids:
                     if activity_id in parsed_activities:
                         continue
                     parsed_activities.add(activity_id)
