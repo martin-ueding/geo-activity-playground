@@ -5,11 +5,12 @@ import traceback
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.coordinates import get_distance
-from geo_activity_playground.core.tasks import work_tracker
+from geo_activity_playground.core.tasks import WorkTracker
 
 logger = logging.getLogger(__name__)
 
@@ -17,81 +18,81 @@ logger = logging.getLogger(__name__)
 def import_from_directory() -> None:
     meta_file = pathlib.Path("Cache") / "activities.parquet"
     if meta_file.exists():
-        logger.info("Loading metadata file …")
         meta = pd.read_parquet(meta_file)
     else:
-        logger.info("Didn't find a metadata file.")
         meta = None
 
     paths_with_errors = []
+    work_tracker = WorkTracker("parse-activity-files")
 
-    with work_tracker(pathlib.Path("Cache/parsed_activities.json")) as already_parsed:
-        activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
-        activity_stream_dir.mkdir(exist_ok=True, parents=True)
-        new_rows: list[dict] = []
-        for path in pathlib.Path("Activities").rglob("*.*"):
-            id = int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62
-            if id in already_parsed:
-                continue
+    activity_paths = {
+        int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62: path
+        for path in pathlib.Path("Activities").rglob("*.*")
+    }
+    activities_ids_to_parse = work_tracker.filter(activity_paths.keys())
 
-            logger.info(f"Parsing activity file {path} …")
-            try:
-                timeseries = read_activity(path)
-            except ActivityParseError as e:
-                logger.error(f"Error while parsing file {path}:")
-                traceback.print_exc()
-                paths_with_errors.append((path, str(e)))
-                continue
-            else:
-                already_parsed.add(id)
+    activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
+    activity_stream_dir.mkdir(exist_ok=True, parents=True)
+    new_rows: list[dict] = []
+    for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
+        path = activity_paths[activity_id]
+        try:
+            timeseries = read_activity(path)
+        except ActivityParseError as e:
+            logger.error(f"Error while parsing file {path}:")
+            traceback.print_exc()
+            paths_with_errors.append((path, str(e)))
+            continue
 
-            if len(timeseries) == 0:
-                continue
-            timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
+        work_tracker.mark_done(activity_id)
 
-            if "distance" not in timeseries.columns:
-                distances = [0] + [
-                    get_distance(lat_1, lon_1, lat_2, lon_2)
-                    for lat_1, lon_1, lat_2, lon_2 in zip(
-                        timeseries["latitude"],
-                        timeseries["longitude"],
-                        timeseries["latitude"].iloc[1:],
-                        timeseries["longitude"].iloc[1:],
-                    )
-                ]
-                timeseries["distance"] = pd.Series(np.cumsum(distances))
-            distance = timeseries["distance"].iloc[-1]
+        if len(timeseries) == 0:
+            continue
 
-            timeseries_path = activity_stream_dir / f"{id}.parquet"
-            timeseries.to_parquet(timeseries_path)
+        timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
 
-            commute = False
-            if path.parts[-2] == "Commute":
-                commute = True
-            kind = None
-            if len(path.parts) >= 3 and path.parts[1] != "Commute":
-                kind = path.parts[1]
-            equipment = None
-            if len(path.parts) >= 4 and path.parts[2] != "Commute":
-                equipment = path.parts[2]
+        if "distance" not in timeseries.columns:
+            distances = [0] + [
+                get_distance(lat_1, lon_1, lat_2, lon_2)
+                for lat_1, lon_1, lat_2, lon_2 in zip(
+                    timeseries["latitude"],
+                    timeseries["longitude"],
+                    timeseries["latitude"].iloc[1:],
+                    timeseries["longitude"].iloc[1:],
+                )
+            ]
+            timeseries["distance"] = pd.Series(np.cumsum(distances))
+        distance = timeseries["distance"].iloc[-1]
 
-            row = {
-                "id": id,
-                "commute": commute,
-                "distance": distance,
-                "name": path.stem,
-                "kind": kind,
-                "start": timeseries["time"].iloc[0],
-                "elapsed_time": timeseries["time"].iloc[-1]
-                - timeseries["time"].iloc[0],
-                "equipment": equipment,
-                "calories": 0,
-            }
+        timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
+        timeseries.to_parquet(timeseries_path)
 
-            if "calories" in timeseries.columns:
-                row["calories"] = timeseries["calories"].iloc[-1]
+        commute = False
+        if path.parts[-2] == "Commute":
+            commute = True
+        kind = None
+        if len(path.parts) >= 3 and path.parts[1] != "Commute":
+            kind = path.parts[1]
+        equipment = None
+        if len(path.parts) >= 4 and path.parts[2] != "Commute":
+            equipment = path.parts[2]
 
-            new_rows.append(row)
+        row = {
+            "id": activity_id,
+            "commute": commute,
+            "distance": distance,
+            "name": path.stem,
+            "kind": kind,
+            "start": timeseries["time"].iloc[0],
+            "elapsed_time": timeseries["time"].iloc[-1] - timeseries["time"].iloc[0],
+            "equipment": equipment,
+            "calories": 0,
+        }
+
+        if "calories" in timeseries.columns:
+            row["calories"] = timeseries["calories"].iloc[-1]
+
+        new_rows.append(row)
 
     if paths_with_errors:
         logger.warning(
@@ -105,3 +106,4 @@ def import_from_directory() -> None:
     merged.sort_values("start", inplace=True)
     meta_file.parent.mkdir(exist_ok=True, parents=True)
     merged.to_parquet(meta_file)
+    work_tracker.close()

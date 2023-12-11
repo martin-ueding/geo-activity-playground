@@ -21,7 +21,7 @@ def compute_tile(lat: float, lon: float, zoom: int) -> tuple[int, int]:
     return int(x * n), int(y * n)
 
 
-def compute_tile_float(lat: float, lon: float, zoom: int) -> tuple[int, int]:
+def compute_tile_float(lat: float, lon: float, zoom: int) -> tuple[float, float]:
     x = np.radians(lon)
     y = np.arcsinh(np.tan(np.radians(lat)))
     x = (1 + x / np.pi) / 2
