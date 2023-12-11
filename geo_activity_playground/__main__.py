@@ -9,6 +9,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.explorer.clusters import compute_tile_evolution
 from geo_activity_playground.explorer.converters import compute_tile_visits
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
@@ -90,4 +91,5 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     repository = ActivityRepository()
     embellish_time_series(repository)
     compute_tile_visits(repository)
+    compute_tile_evolution()
     return repository

@@ -1,16 +1,21 @@
+import collections
 import itertools
-import json
 import logging
 import pathlib
+import pickle
 from typing import Iterator
 
 import geojson
 import pandas as pd
+from tqdm import tqdm
 
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from geo_activity_playground.explorer.converters import TILE_HISTORY_PATH
 
 
 logger = logging.getLogger(__name__)
+
+TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
 
 
 def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
@@ -21,71 +26,38 @@ def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
     yield (x, y - 1)
 
 
-class ExplorerClusterState:
-    def __init__(self, zoom: int) -> None:
+class TileEvolutionState:
+    def __init__(self) -> None:
         self.num_neighbors: dict[tuple[int, int], int] = {}
         self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
         self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
         self.cluster_evolution = pd.DataFrame()
         self.start = 0
-
-        self._state_path = pathlib.Path(f"Cache/explorer_cluster_{zoom}_state_v2.json")
-        self._cluster_evolution_path = pathlib.Path(
-            f"Cache/explorer_cluster_{zoom}_evolution.parquet"
-        )
-
-    def load(self) -> None:
-        logger.info("Loading explorer cluster state …")
-        if self._state_path.exists():
-            with open(self._state_path) as f:
-                data = json.load(f)
-            self.num_neighbors = {
-                tuple(map(int, key.split("/"))): value
-                for key, value in data["num_neighbors"].items()
-            }
-            self.memberships = {
-                tuple(map(int, key.split("/"))): tuple(value)
-                for key, value in data["memberships"].items()
-            }
-            self.clusters = {
-                tuple(map(int, key.split("/"))): [tuple(t) for t in value]
-                for key, value in data["clusters"].items()
-            }
-            self.start = data["start"]
-
-        if self._cluster_evolution_path.exists():
-            self.cluster_evolution = pd.read_parquet(self._cluster_evolution_path)
-
-    def save(self) -> None:
-        logger.info("Saving explorer cluster state …")
-        data = {
-            "num_neighbors": {
-                f"{x}/{y}": count for (x, y), count in self.num_neighbors.items()
-            },
-            "memberships": {
-                f"{x}/{y}": value for (x, y), value in self.memberships.items()
-            },
-            "clusters": {
-                f"{x}/{y}": [tuple(member) for member in members]
-                for (x, y), members in self.clusters.items()
-            },
-            "start": self.start,
-        }
-        with open(self._state_path, "w") as f:
-            json.dump(data, f)
-
-        self.cluster_evolution.to_parquet(self._cluster_evolution_path)
+        self.max_square_size = 0
+        self.visited_tiles = set()
+        self.square_evolution = pd.DataFrame()
 
 
-def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
-    tiles = pd.read_parquet(pathlib.Path(f"Cache/first_time_per_tile_{zoom}.parquet"))
-    tiles.sort_values("first_time", inplace=True)
+def compute_tile_evolution() -> None:
+    with open(TILE_HISTORY_PATH, "rb") as f:
+        tile_histories = pickle.load(f)
 
-    s = ExplorerClusterState(zoom)
-    s.load()
+    if TILE_EVOLUTION_STATES_PATH.exists():
+        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
+            states = pickle.load(f)
+    else:
+        states = collections.defaultdict(TileEvolutionState)
 
-    logger.info("Compute new explorer cluster state …")
+    for zoom in tqdm(range(20), desc="Compute explorer cluster evolution"):
+        compute_cluster_evolution(tile_histories[zoom], states[zoom])
+    for zoom in tqdm(range(20), desc="Compute explorer square evolution"):
+        compute_square_history(tile_histories[zoom], states[zoom])
 
+    with open(TILE_EVOLUTION_STATES_PATH, "wb") as f:
+        pickle.dump(states, f)
+
+
+def compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
     if len(s.cluster_evolution) > 0:
         max_cluster_so_far = s.cluster_evolution["max_cluster_size"].iloc[-1]
     else:
@@ -152,7 +124,7 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
             if max_cluster_size > max_cluster_so_far:
                 rows.append(
                     {
-                        "time": row["first_time"],
+                        "time": row["time"],
                         "max_cluster_size": max_cluster_size,
                     }
                 )
@@ -161,8 +133,6 @@ def get_explorer_cluster_evolution(zoom: int) -> ExplorerClusterState:
     new_cluster_evolution = pd.DataFrame(rows)
     s.cluster_evolution = pd.concat([s.cluster_evolution, new_cluster_evolution])
     s.start = len(tiles)
-    s.save()
-    return s
 
 
 def bounding_box_for_biggest_cluster(
@@ -192,47 +162,7 @@ def bounding_box_for_biggest_cluster(
     )
 
 
-class SquareHistoryState:
-    def __init__(self, zoom: int) -> None:
-        self._state_path = pathlib.Path(f"Cache/square_history_{zoom}_state.json")
-        self._square_history_path = pathlib.Path(f"Cache/square_history_{zoom}.parquet")
-
-        self.max_square_size = 0
-        self.start = 0
-        self.visited_tiles = set()
-        self.square_history = pd.DataFrame()
-
-    def load(self) -> None:
-        logger.info("Load explorer square state …")
-        if self._state_path.exists():
-            with open(self._state_path) as f:
-                data = json.load(f)
-            self.visited_tiles = set((x, y) for x, y in data["visited_tiles"])
-            self.max_square_size = data["max_square_size"]
-            self.start = data["start"]
-
-        if self._square_history_path.exists():
-            self.square_history = pd.read_parquet(self._square_history_path)
-
-    def save(self) -> None:
-        logger.info("Save explorer square state …")
-        data = {
-            "max_square_size": self.max_square_size,
-            "visited_tiles": list(self.visited_tiles),
-            "start": self.start,
-        }
-        with open(self._state_path, "w") as f:
-            json.dump(data, f)
-
-        self.square_history.to_parquet(self._square_history_path)
-
-
-def get_square_history(zoom: int) -> SquareHistoryState:
-    tiles = pd.read_parquet(f"Cache/first_time_per_tile_{zoom}.parquet")
-    tiles.sort_values("first_time", inplace=True)
-    s = SquareHistoryState(zoom)
-    s.load()
-    logger.info("Compute new explorer square state …")
+def compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
     rows = []
     for index, row in tiles.iloc[s.start :].iterrows():
         tile = (row["tile_x"], row["tile_y"])
@@ -256,7 +186,7 @@ def get_square_history(zoom: int) -> SquareHistoryState:
                     if this_offset_viable:
                         s.max_square_size = square_size
                         rows.append(
-                            {"time": row["first_time"], "max_square_size": square_size}
+                            {"time": row["time"], "max_square_size": square_size}
                         )
                         this_tile_size_viable = True
                         break
@@ -266,7 +196,5 @@ def get_square_history(zoom: int) -> SquareHistoryState:
                 break
 
     new_square_history = pd.DataFrame(rows)
-    s.square_history = pd.concat([s.square_history, new_square_history])
+    s.square_evolution = pd.concat([s.square_evolution, new_square_history])
     s.start = len(tiles)
-    s.save()
-    return s

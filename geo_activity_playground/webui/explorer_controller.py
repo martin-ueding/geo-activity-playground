@@ -9,9 +9,6 @@ from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
-from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
-from geo_activity_playground.explorer.clusters import get_square_history
-from geo_activity_playground.explorer.converters import load_tile_history
 from geo_activity_playground.explorer.grid_file import get_border_tiles
 from geo_activity_playground.explorer.grid_file import get_three_color_tiles
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson

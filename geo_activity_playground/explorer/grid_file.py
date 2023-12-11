@@ -14,7 +14,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import adjacent_to
-from geo_activity_playground.explorer.clusters import ExplorerClusterState
+from geo_activity_playground.explorer.clusters import TileEvolutionState
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def get_three_color_tiles(
     tiles: pd.DataFrame,
     repository: ActivityRepository,
-    cluster_state: ExplorerClusterState,
+    cluster_state: TileEvolutionState,
     zoom: int,
 ) -> str:
     logger.info("Generate data for explorer tile map …")
