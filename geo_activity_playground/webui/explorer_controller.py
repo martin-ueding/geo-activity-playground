@@ -11,10 +11,8 @@ from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
 from geo_activity_playground.explorer.clusters import get_explorer_cluster_evolution
 from geo_activity_playground.explorer.clusters import get_square_history
-from geo_activity_playground.explorer.converters import get_tile_history
+from geo_activity_playground.explorer.converters import load_tile_history
 from geo_activity_playground.explorer.grid_file import get_border_tiles
-from geo_activity_playground.explorer.grid_file import get_explored_geojson
-from geo_activity_playground.explorer.grid_file import get_explored_tiles
 from geo_activity_playground.explorer.grid_file import get_three_color_tiles
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
@@ -29,7 +27,7 @@ class ExplorerController:
 
     @functools.cache
     def render(self, zoom: int) -> dict:
-        tiles = get_tile_history(self._repository, zoom)
+        tile_history = load_tile_history()
         medians = tiles.median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom

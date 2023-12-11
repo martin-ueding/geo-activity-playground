@@ -15,7 +15,6 @@ from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.clusters import adjacent_to
 from geo_activity_playground.explorer.clusters import ExplorerClusterState
-from geo_activity_playground.explorer.converters import get_tile_history
 
 
 logger = logging.getLogger(__name__)

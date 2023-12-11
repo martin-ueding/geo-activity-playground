@@ -5,7 +5,6 @@ import dataclasses
 import functools
 import logging
 import pathlib
-import pickle
 
 import matplotlib.pyplot as pl
 import numpy as np
@@ -16,44 +15,9 @@ from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.converters import get_first_tiles
 
 
 logger = logging.getLogger(__name__)
-
-
-@functools.cache
-def compute_activities_per_tile(
-    repository: ActivityRepository,
-) -> dict[int, dict[tuple[int, int], set[int]]]:
-    logger.info("Extracting activities per tile …")
-    cache_path = pathlib.Path("Cache/activities-per-tile.pickle")
-    if cache_path.exists():
-        with open(cache_path, "rb") as f:
-            data = pickle.load(f)
-    else:
-        data: dict[int, dict[tuple[int, int], set[int]]] = {}
-    with work_tracker(pathlib.Path("Cache/activities-per-tile-task.json")) as tracker:
-        for activity in repository.iter_activities():
-            if activity.id in tracker:
-                continue
-            tracker.add(activity.id)
-
-            logger.info(f"Add activity {activity.id} to all zoom levels …")
-            for zoom in range(1, 20):
-                if zoom not in data:
-                    data[zoom] = {}
-                tiles_this_activity = get_first_tiles(activity.id, repository, zoom)
-                for _, row in tiles_this_activity.iterrows():
-                    tile = (row["tile_x"], row["tile_y"])
-                    if tile not in data[zoom]:
-                        data[zoom][tile] = set()
-                    data[zoom][tile].add(activity.id)
-
-    with open(cache_path, "wb") as f:
-        pickle.dump(data, f)
-
-    return data
 
 
 @functools.cache
@@ -77,12 +41,6 @@ def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
                 continue
             shard = time_series[["latitude", "longitude"]].copy()
             shard["activity_id"] = activity.id
-            x, y = compute_tile_float(
-                shard["latitude"],
-                shard["longitude"],
-            )
-            shard["x"] = x
-            shard["y"] = y
             new_shards.append(shard)
     logger.info("Concatenating shards …")
     all_points = pd.concat([all_points] + new_shards)
