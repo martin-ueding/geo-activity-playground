@@ -51,9 +51,11 @@ def compute_tile_evolution() -> None:
     else:
         states = collections.defaultdict(TileEvolutionState)
 
-    for zoom in tqdm(range(20), desc="Compute explorer cluster evolution"):
+    zoom_levels = list(reversed(list(range(20))))
+
+    for zoom in tqdm(zoom_levels, desc="Compute explorer cluster evolution"):
         compute_cluster_evolution(tile_histories[zoom], states[zoom])
-    for zoom in tqdm(range(20), desc="Compute explorer square evolution"):
+    for zoom in tqdm(zoom_levels, desc="Compute explorer square evolution"):
         compute_square_history(tile_histories[zoom], states[zoom])
 
     with open(TILE_EVOLUTION_STATES_PATH, "wb") as f:
