@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import pathlib
 
@@ -69,6 +70,9 @@ def main() -> None:
         fmt="%(asctime)s %(name)s %(levelname)s %(message)s",
         level=options.loglevel.upper(),
     )
+
+    logging.getLogger("stravalib.protocol.ApiV3").setLevel(logging.WARNING)
+
     options.func(options)
 
 
