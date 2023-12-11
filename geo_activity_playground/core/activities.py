@@ -59,7 +59,7 @@ def embellish_time_series(path: pathlib.Path) -> None:
             )
             changed = True
 
-    if "latitude" in df.columns and "x" not in df.columns:
+    if "x" not in df.columns:
         x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
         df["x"] = x
         df["y"] = y
