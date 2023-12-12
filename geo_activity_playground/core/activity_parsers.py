@@ -15,6 +15,50 @@ class ActivityParseError(BaseException):
     pass
 
 
+def read_activity(path: pathlib.Path) -> pd.DataFrame:
+    suffixes = path.suffixes
+    if suffixes[-1] == ".gz":
+        opener = gzip.open
+        file_type = suffixes[-2]
+    else:
+        opener = open
+        file_type = suffixes[-1]
+
+    if file_type == ".gpx":
+        try:
+            df = read_gpx_activity(path, opener)
+        except gpxpy.gpx.GPXXMLSyntaxException as e:
+            raise ActivityParseError("Syntax error while parsing GPX file") from e
+    elif file_type == ".fit":
+        df = read_fit_activity(path, opener)
+    elif file_type == ".tcx":
+        try:
+            df = read_tcx_activity(path, opener)
+        except xml.etree.ElementTree.ParseError as e:
+            raise ActivityParseError("Syntax error in TCX file") from e
+    else:
+        raise ActivityParseError(f"Unsupported file format: {file_type}")
+
+    if len(df):
+        try:
+            if df.time.dt.tz is not None:
+                df.time = df.time.dt.tz_localize(None)
+        except AttributeError as e:
+            print(df)
+            print(df.dtypes)
+            types = {}
+            for elem in df["time"]:
+                t = str(type(elem))
+                if t not in types:
+                    types[t] = elem
+            print(types)
+            raise ActivityParseError(
+                "It looks like the date parsing has gone wrong."
+            ) from e
+    df.name = path.stem.split(".")[0]
+    return df
+
+
 def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     """
     {'timestamp': datetime.datetime(2023, 11, 11, 16, 29, 49, tzinfo=datetime.timezone.utc),
@@ -133,48 +177,4 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 row["distance"] = trackpoint.distance
             rows.append(row)
     df = pd.DataFrame(rows)
-    return df
-
-
-def read_activity(path: pathlib.Path) -> pd.DataFrame:
-    suffixes = path.suffixes
-    if suffixes[-1] == ".gz":
-        opener = gzip.open
-        file_type = suffixes[-2]
-    else:
-        opener = open
-        file_type = suffixes[-1]
-
-    if file_type == ".gpx":
-        try:
-            df = read_gpx_activity(path, opener)
-        except gpxpy.gpx.GPXXMLSyntaxException as e:
-            raise ActivityParseError("Syntax error while parsing GPX file") from e
-    elif file_type == ".fit":
-        df = read_fit_activity(path, opener)
-    elif file_type == ".tcx":
-        try:
-            df = read_tcx_activity(path, opener)
-        except xml.etree.ElementTree.ParseError as e:
-            raise ActivityParseError("Syntax error in TCX file") from e
-    else:
-        raise ActivityParseError(f"Unsupported file format: {file_type}")
-
-    if len(df):
-        try:
-            if df.time.dt.tz is not None:
-                df.time = df.time.dt.tz_localize(None)
-        except AttributeError as e:
-            print(df)
-            print(df.dtypes)
-            types = {}
-            for elem in df["time"]:
-                t = str(type(elem))
-                if t not in types:
-                    types[t] = elem
-            print(types)
-            raise ActivityParseError(
-                "It looks like the date parsing has gone wrong."
-            ) from e
-    df.name = path.stem.split(".")[0]
     return df

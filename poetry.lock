@@ -539,6 +539,21 @@ files = [
 tests = ["asttokens (>=2.1.0)", "coverage", "coverage-enable-subprocess", "ipython", "littleutils", "pytest", "rich"]
 
 [[package]]
+name = "fastkml"
+version = "0.12"
+description = "Fast KML processing in python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "fastkml-0.12-py3-none-any.whl", hash = "sha256:73e68cf1f6640dd701d0bfeefb8f9a01145fec30b6a84beff0056f9ae04d7630"},
+    {file = "fastkml-0.12.tar.gz", hash = "sha256:34d8eb2f77b554002743bb8be5678f89d8ecea5a64ded1480028f43405d8b638"},
+]
+
+[package.dependencies]
+pygeoif = "<1.0"
+python-dateutil = "*"
+
+[[package]]
 name = "fitdecode"
 version = "0.10.0"
 description = "FIT file parser and decoder"
@@ -1877,6 +1892,16 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pygeoif"
+version = "0.7"
+description = "A basic implementation of the __geo_interface__"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pygeoif-0.7.tar.gz", hash = "sha256:11aa0c071d38befa4af3bd123efa834abe0823a873f3744f0a070a44025afe04"},
+]
+
+[[package]]
 name = "pygments"
 version = "2.17.2"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -2844,4 +2869,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9,<3.12"
-content-hash = "c24f5a6f15157e44acb8884fce5d5441abc3540ad432ca223383c988aeddf83e"
+content-hash = "7f52501dce0cbd3e0c80d6469cb51ca2e817e93aaf496d82e7ffb739338d428d"
