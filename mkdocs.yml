@@ -38,7 +38,6 @@ nav:
       - features/equipment.md
   - Reference:
       - reference/changelog.md
-      - reference/directory-layout.md
   - acknowledgments.md
 
 markdown_extensions:
