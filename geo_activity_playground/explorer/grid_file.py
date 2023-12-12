@@ -1,135 +1,17 @@
-import datetime
-import itertools
 import logging
-import pathlib
 from typing import Iterator
 from typing import Optional
 
 import geojson
 import gpxpy
-import matplotlib
 import pandas as pd
 
-from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.coordinates import Bounds
+from geo_activity_playground.core.tiles import adjacent_to
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.clusters import adjacent_to
-from geo_activity_playground.explorer.clusters import TileEvolutionState
 
 
 logger = logging.getLogger(__name__)
-
-
-def get_three_color_tiles(
-    tile_visits: dict,
-    repository: ActivityRepository,
-    cluster_state: TileEvolutionState,
-    zoom: int,
-) -> str:
-    logger.info("Generate data for explorer tile map …")
-    today = datetime.date.today()
-    cmap_first = matplotlib.colormaps["plasma"]
-    cmap_last = matplotlib.colormaps["plasma"]
-    tile_dict = {}
-    for tile, row in tile_visits.items():
-        first_age_days = (today - row["first_time"].date()).days
-        last_age_days = (today - row["last_time"].date()).days
-        tile_dict[tile] = {
-            "first_activity_id": str(row["first_id"]),
-            "first_activity_name": repository.get_activity_by_id(row["first_id"]).name,
-            "last_activity_id": str(row["last_id"]),
-            "last_activity_name": repository.get_activity_by_id(row["last_id"]).name,
-            "first_age_days": first_age_days,
-            "first_age_color": matplotlib.colors.to_hex(
-                cmap_first(max(1 - first_age_days / (2 * 365), 0.0))
-            ),
-            "last_age_days": last_age_days,
-            "last_age_color": matplotlib.colors.to_hex(
-                cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
-            ),
-            "cluster": False,
-            "color": "#303030",
-            "first_visit": row["first_time"].date().isoformat(),
-            "last_visit": row["last_time"].date().isoformat(),
-            "num_visits": row["count"],
-            "square": False,
-        }
-
-    # Mark biggest square.
-    if cluster_state.max_square_size:
-        for x in range(
-            cluster_state.square_x,
-            cluster_state.square_x + cluster_state.max_square_size,
-        ):
-            for y in range(
-                cluster_state.square_y,
-                cluster_state.square_y + cluster_state.max_square_size,
-            ):
-                tile_dict[(x, y)]["square"] = True
-
-    # Add cluster information.
-    for members in cluster_state.clusters.values():
-        for member in members:
-            tile_dict[member]["this_cluster_size"] = len(members)
-            tile_dict[member]["cluster"] = True
-    if len(cluster_state.cluster_evolution) > 0:
-        max_cluster_size = cluster_state.cluster_evolution["max_cluster_size"].iloc[-1]
-    else:
-        max_cluster_size = 0
-    num_cluster_tiles = len(cluster_state.memberships)
-
-    # Apply cluster colors.
-    cluster_cmap = matplotlib.colormaps["tab10"]
-    for color, members in zip(
-        itertools.cycle(map(cluster_cmap, [0, 1, 2, 3, 4, 5, 6, 8, 9])),
-        sorted(
-            cluster_state.clusters.values(),
-            key=lambda members: len(members),
-            reverse=True,
-        ),
-    ):
-        hex_color = matplotlib.colors.to_hex(color)
-        for member in members:
-            tile_dict[member]["color"] = hex_color
-
-    if cluster_state.max_square_size:
-        square_geojson = geojson.dumps(
-            geojson.FeatureCollection(
-                features=[
-                    make_explorer_rectangle(
-                        cluster_state.square_x,
-                        cluster_state.square_y,
-                        cluster_state.square_x + cluster_state.max_square_size,
-                        cluster_state.square_y + cluster_state.max_square_size,
-                        zoom,
-                    )
-                ]
-            )
-        )
-    else:
-        square_geojson = "{}"
-
-    result = {
-        "explored_geojson": geojson.dumps(
-            geojson.FeatureCollection(
-                features=[
-                    make_explorer_tile(
-                        x,
-                        y,
-                        tile_dict[(x, y)],
-                        zoom,
-                    )
-                    for (x, y), v in tile_dict.items()
-                ]
-            )
-        ),
-        "max_cluster_size": max_cluster_size,
-        "num_cluster_tiles": num_cluster_tiles,
-        "num_tiles": len(tile_dict),
-        "square_size": cluster_state.max_square_size,
-        "square_geojson": square_geojson,
-    }
-    return result
 
 
 def get_border_tiles(

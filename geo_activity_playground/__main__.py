@@ -9,8 +9,8 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
-from geo_activity_playground.explorer.clusters import compute_tile_evolution
-from geo_activity_playground.explorer.converters import compute_tile_visits
+from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
+from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
@@ -23,8 +23,7 @@ def main() -> None:
         description="Utilities to work with recorded activities."
     )
     parser.set_defaults(func=lambda options: parser.print_help())
-    parser.add_argument("--basedir", type=pathlib.Path,
-                        default=pathlib.Path.cwd())
+    parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
     parser.add_argument(
         "--loglevel",
         choices=["debug", "info", "warning", "error", "critical"],
@@ -61,19 +60,17 @@ def main() -> None:
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
-        func=lambda options: webui_main(make_activity_repository(options.basedir),
-                                        host=options.host, port=options.port)
+        func=lambda options: webui_main(
+            make_activity_repository(options.basedir),
+            host=options.host,
+            port=options.port,
+        )
     )
     subparser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="IP address to listen on"
+        "--host", default="127.0.0.1", help="IP address to listen on"
     )
     subparser.add_argument(
-        "--port",
-        default=5000,
-        type=int,
-        help="the port to run listen on"
+        "--port", default=5000, type=int, help="the port to run listen on"
     )
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")

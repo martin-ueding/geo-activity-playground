@@ -3,6 +3,7 @@ import logging
 import math
 import pathlib
 import time
+from typing import Iterator
 from typing import Optional
 
 import numpy as np
@@ -98,3 +99,11 @@ def interpolate_missing_tile(
         return (int(x2), y_hat)
     else:
         return (int(x1), y_hat)
+
+
+def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
+    x, y = tile
+    yield (x + 1, y)
+    yield (x - 1, y)
+    yield (x, y + 1)
+    yield (x, y - 1)

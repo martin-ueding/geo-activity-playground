@@ -1,7 +1,11 @@
+import datetime
 import functools
+import itertools
 import pickle
 
 import altair as alt
+import geojson
+import matplotlib
 import numpy as np
 import pandas as pd
 
@@ -9,18 +13,159 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
-from geo_activity_playground.explorer.clusters import TILE_EVOLUTION_STATES_PATH
-from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
-from geo_activity_playground.explorer.converters import TILE_VISITS_PATH
 from geo_activity_playground.explorer.grid_file import get_border_tiles
-from geo_activity_playground.explorer.grid_file import get_three_color_tiles
+from geo_activity_playground.explorer.grid_file import logger
+from geo_activity_playground.explorer.grid_file import make_explorer_rectangle
+from geo_activity_playground.explorer.grid_file import make_explorer_tile
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
 from geo_activity_playground.explorer.grid_file import make_grid_points
+from geo_activity_playground.explorer.tile_visits import TILE_EVOLUTION_STATES_PATH
+from geo_activity_playground.explorer.tile_visits import TILE_HISTORIES_PATH
+from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
+from geo_activity_playground.explorer.tile_visits import TileEvolutionState
 
 
 alt.data_transformers.enable("vegafusion")
+
+
+def get_three_color_tiles(
+    tile_visits: dict,
+    repository: ActivityRepository,
+    cluster_state: TileEvolutionState,
+    zoom: int,
+) -> str:
+    logger.info("Generate data for explorer tile map …")
+    today = datetime.date.today()
+    cmap_first = matplotlib.colormaps["plasma"]
+    cmap_last = matplotlib.colormaps["plasma"]
+    tile_dict = {}
+    for tile, row in tile_visits.items():
+        first_age_days = (today - row["first_time"].date()).days
+        last_age_days = (today - row["last_time"].date()).days
+        tile_dict[tile] = {
+            "first_activity_id": str(row["first_id"]),
+            "first_activity_name": repository.get_activity_by_id(row["first_id"]).name,
+            "last_activity_id": str(row["last_id"]),
+            "last_activity_name": repository.get_activity_by_id(row["last_id"]).name,
+            "first_age_days": first_age_days,
+            "first_age_color": matplotlib.colors.to_hex(
+                cmap_first(max(1 - first_age_days / (2 * 365), 0.0))
+            ),
+            "last_age_days": last_age_days,
+            "last_age_color": matplotlib.colors.to_hex(
+                cmap_last(max(1 - last_age_days / (2 * 365), 0.0))
+            ),
+            "cluster": False,
+            "color": "#303030",
+            "first_visit": row["first_time"].date().isoformat(),
+            "last_visit": row["last_time"].date().isoformat(),
+            "num_visits": row["count"],
+            "square": False,
+        }
+
+    # Mark biggest square.
+    if cluster_state.max_square_size:
+        for x in range(
+            cluster_state.square_x,
+            cluster_state.square_x + cluster_state.max_square_size,
+        ):
+            for y in range(
+                cluster_state.square_y,
+                cluster_state.square_y + cluster_state.max_square_size,
+            ):
+                tile_dict[(x, y)]["square"] = True
+
+    # Add cluster information.
+    for members in cluster_state.clusters.values():
+        for member in members:
+            tile_dict[member]["this_cluster_size"] = len(members)
+            tile_dict[member]["cluster"] = True
+    if len(cluster_state.cluster_evolution) > 0:
+        max_cluster_size = cluster_state.cluster_evolution["max_cluster_size"].iloc[-1]
+    else:
+        max_cluster_size = 0
+    num_cluster_tiles = len(cluster_state.memberships)
+
+    # Apply cluster colors.
+    cluster_cmap = matplotlib.colormaps["tab10"]
+    for color, members in zip(
+        itertools.cycle(map(cluster_cmap, [0, 1, 2, 3, 4, 5, 6, 8, 9])),
+        sorted(
+            cluster_state.clusters.values(),
+            key=lambda members: len(members),
+            reverse=True,
+        ),
+    ):
+        hex_color = matplotlib.colors.to_hex(color)
+        for member in members:
+            tile_dict[member]["color"] = hex_color
+
+    if cluster_state.max_square_size:
+        square_geojson = geojson.dumps(
+            geojson.FeatureCollection(
+                features=[
+                    make_explorer_rectangle(
+                        cluster_state.square_x,
+                        cluster_state.square_y,
+                        cluster_state.square_x + cluster_state.max_square_size,
+                        cluster_state.square_y + cluster_state.max_square_size,
+                        zoom,
+                    )
+                ]
+            )
+        )
+    else:
+        square_geojson = "{}"
+
+    result = {
+        "explored_geojson": geojson.dumps(
+            geojson.FeatureCollection(
+                features=[
+                    make_explorer_tile(
+                        x,
+                        y,
+                        tile_dict[(x, y)],
+                        zoom,
+                    )
+                    for (x, y), v in tile_dict.items()
+                ]
+            )
+        ),
+        "max_cluster_size": max_cluster_size,
+        "num_cluster_tiles": num_cluster_tiles,
+        "num_tiles": len(tile_dict),
+        "square_size": cluster_state.max_square_size,
+        "square_geojson": square_geojson,
+    }
+    return result
+
+
+def bounding_box_for_biggest_cluster(
+    clusters: list[list[tuple[int, int]]], zoom: int
+) -> str:
+    biggest_cluster = max(clusters, key=lambda members: len(members))
+    min_x = min(x for x, y in biggest_cluster)
+    max_x = max(x for x, y in biggest_cluster)
+    min_y = min(y for x, y in biggest_cluster)
+    max_y = max(y for x, y in biggest_cluster)
+    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
+    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
+    return geojson.dumps(
+        geojson.Feature(
+            geometry=geojson.Polygon(
+                [
+                    [
+                        (lon_min, lat_max),
+                        (lon_max, lat_max),
+                        (lon_max, lat_min),
+                        (lon_min, lat_min),
+                        (lon_min, lat_max),
+                    ]
+                ]
+            ),
+        )
+    )
 
 
 class ExplorerController:

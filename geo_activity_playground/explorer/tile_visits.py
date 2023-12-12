@@ -1,29 +1,112 @@
 import collections
+import datetime
 import itertools
 import logging
 import pathlib
 import pickle
+from typing import Any
 from typing import Iterator
 
-import geojson
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.tasks import try_load_pickle
+from geo_activity_playground.core.tasks import WorkTracker
+from geo_activity_playground.core.tiles import adjacent_to
+from geo_activity_playground.core.tiles import interpolate_missing_tile
 
 
 logger = logging.getLogger(__name__)
 
 TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
+TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
+TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
 
 
-def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
-    x, y = tile
-    yield (x + 1, y)
-    yield (x - 1, y)
-    yield (x, y + 1)
-    yield (x, y - 1)
+def compute_tile_visits(repository: ActivityRepository) -> None:
+    tile_visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
+        TILE_VISITS_PATH
+    ) or collections.defaultdict(dict)
+    tile_history: dict[int, pd.DataFrame] = try_load_pickle(
+        TILE_HISTORIES_PATH
+    ) or collections.defaultdict(pd.DataFrame)
+
+    work_tracker = WorkTracker("tile-visits")
+    activity_ids_to_process = work_tracker.filter(repository.activity_ids)
+    new_tile_history_rows = collections.defaultdict(list)
+    for activity_id in tqdm(
+        activity_ids_to_process, desc="Extract explorer tile visits"
+    ):
+        time_series = repository.get_time_series(activity_id)
+        for zoom in range(20):
+            for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
+                tile = (tile_x, tile_y)
+                if tile in tile_visits[zoom]:
+                    d = tile_visits[zoom][tile]
+                    d["count"] += 1
+                    if d["first_time"] > time:
+                        d["first_time"] = time
+                        d["first_id"] = activity_id
+                    if d["last_time"] < time:
+                        d["last_time"] = time
+                        d["last_id"] = activity_id
+                    d["activity_ids"].add(activity_id)
+                else:
+                    tile_visits[zoom][tile] = {
+                        "count": 1,
+                        "first_time": time,
+                        "first_id": activity_id,
+                        "last_time": time,
+                        "last_id": activity_id,
+                        "activity_ids": {activity_id},
+                    }
+                    new_tile_history_rows[zoom].append(
+                        {
+                            "activity_id": activity_id,
+                            "time": time,
+                            "tile_x": tile_x,
+                            "tile_y": tile_y,
+                        }
+                    )
+        work_tracker.mark_done(activity_id)
+
+    if activity_ids_to_process:
+        with open(TILE_VISITS_PATH, "wb") as f:
+            pickle.dump(tile_visits, f)
+
+        for zoom, new_rows in new_tile_history_rows.items():
+            new_df = pd.DataFrame(new_rows)
+            new_df.sort_values("time", inplace=True)
+            tile_history[zoom] = pd.concat([tile_history[zoom], new_df])
+
+        with open(TILE_HISTORIES_PATH, "wb") as f:
+            pickle.dump(tile_history, f)
+
+    work_tracker.close()
+
+
+def _tiles_from_points(
+    time_series: pd.DataFrame, zoom: int
+) -> Iterator[tuple[datetime.datetime, int, int]]:
+    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns, UTC]")
+    xf = time_series["x"] * 2**zoom
+    yf = time_series["y"] * 2**zoom
+    for t1, x1, y1, x2, y2, s1, s2 in zip(
+        time_series["time"],
+        xf,
+        yf,
+        xf.shift(1),
+        yf.shift(1),
+        time_series["segment_id"],
+        time_series["segment_id"].shift(1),
+    ):
+        yield (t1, int(x1), int(y1))
+        # We don't want to interpolate over segment boundaries.
+        if s1 == s2:
+            interpolated = interpolate_missing_tile(x1, y1, x2, y2)
+            if interpolated is not None:
+                yield (t1,) + interpolated
 
 
 class TileEvolutionState:
@@ -45,24 +128,22 @@ def compute_tile_evolution() -> None:
     with open(TILE_HISTORIES_PATH, "rb") as f:
         tile_histories = pickle.load(f)
 
-    if TILE_EVOLUTION_STATES_PATH.exists():
-        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
-            states = pickle.load(f)
-    else:
-        states = collections.defaultdict(TileEvolutionState)
+    states = try_load_pickle(TILE_EVOLUTION_STATES_PATH) or collections.defaultdict(
+        TileEvolutionState
+    )
 
     zoom_levels = list(reversed(list(range(20))))
 
     for zoom in tqdm(zoom_levels, desc="Compute explorer cluster evolution"):
-        compute_cluster_evolution(tile_histories[zoom], states[zoom])
+        _compute_cluster_evolution(tile_histories[zoom], states[zoom])
     for zoom in tqdm(zoom_levels, desc="Compute explorer square evolution"):
-        compute_square_history(tile_histories[zoom], states[zoom])
+        _compute_square_history(tile_histories[zoom], states[zoom])
 
     with open(TILE_EVOLUTION_STATES_PATH, "wb") as f:
         pickle.dump(states, f)
 
 
-def compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
+def _compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
     if len(s.cluster_evolution) > 0:
         max_cluster_so_far = s.cluster_evolution["max_cluster_size"].iloc[-1]
     else:
@@ -140,34 +221,7 @@ def compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> Non
     s.cluster_start = len(tiles)
 
 
-def bounding_box_for_biggest_cluster(
-    clusters: list[list[tuple[int, int]]], zoom: int
-) -> str:
-    biggest_cluster = max(clusters, key=lambda members: len(members))
-    min_x = min(x for x, y in biggest_cluster)
-    max_x = max(x for x, y in biggest_cluster)
-    min_y = min(y for x, y in biggest_cluster)
-    max_y = max(y for x, y in biggest_cluster)
-    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
-    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
-    return geojson.dumps(
-        geojson.Feature(
-            geometry=geojson.Polygon(
-                [
-                    [
-                        (lon_min, lat_max),
-                        (lon_max, lat_max),
-                        (lon_max, lat_min),
-                        (lon_min, lat_min),
-                        (lon_min, lat_max),
-                    ]
-                ]
-            ),
-        )
-    )
-
-
-def compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
+def _compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
     rows = []
     for index, row in tiles.iloc[s.square_start :].iterrows():
         tile = (row["tile_x"], row["tile_y"])

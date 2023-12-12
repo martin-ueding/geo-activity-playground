@@ -17,10 +17,12 @@ from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.clusters import bounding_box_for_biggest_cluster
-from geo_activity_playground.explorer.clusters import TILE_EVOLUTION_STATES_PATH
-from geo_activity_playground.explorer.converters import TILE_HISTORIES_PATH
-from geo_activity_playground.explorer.converters import TILE_VISITS_PATH
+from geo_activity_playground.explorer.tile_visits import TILE_EVOLUTION_STATES_PATH
+from geo_activity_playground.explorer.tile_visits import TILE_HISTORIES_PATH
+from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
+from geo_activity_playground.webui.explorer_controller import (
+    bounding_box_for_biggest_cluster,
+)
 
 
 logger = logging.getLogger(__name__)

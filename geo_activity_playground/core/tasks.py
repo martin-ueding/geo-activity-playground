@@ -2,6 +2,7 @@ import contextlib
 import json
 import pathlib
 import pickle
+from typing import Any
 
 
 @contextlib.contextmanager
@@ -37,3 +38,12 @@ class WorkTracker:
     def close(self) -> None:
         with open(self._path, "wb") as f:
             pickle.dump(self._done, f)
+
+
+def try_load_pickle(path: pathlib.Path) -> Any:
+    if path.exists():
+        try:
+            with open(path, "rb") as f:
+                return pickle.load(f)
+        except ModuleNotFoundError:
+            pass
