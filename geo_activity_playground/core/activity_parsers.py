@@ -184,12 +184,7 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
 
 
 def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
-    with open(
-        pathlib.Path(
-            "~/Dokumente/Karten/Playground-Directory/Activities/Zwin-2.kml"
-        ).expanduser(),
-        "rb",
-    ) as f:
+    with opener(path, "rb") as f:
         kml_dict = xmltodict.parse(f)
     doc = kml_dict["kml"]["Document"]
     keypoint_folder = doc["Folder"]
