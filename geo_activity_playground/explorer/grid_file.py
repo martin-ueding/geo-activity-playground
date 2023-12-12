@@ -218,10 +218,3 @@ def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> str:
     )
     result = geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
     return result
-
-
-def get_explored_geojson(repository: ActivityRepository, zoom: int) -> str:
-    tiles = get_tile_history(repository, zoom)
-    return make_grid_file_geojson(
-        make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]))
-    )
