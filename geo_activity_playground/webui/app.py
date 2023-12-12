@@ -1,13 +1,8 @@
-import pathlib
-
 from flask import Flask
 from flask import render_template
 from flask import Response
-from flask import send_from_directory
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.plots import activity_track_plot
-from geo_activity_playground.core.plots import meta_plots
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
 from geo_activity_playground.webui.eddington_controller import EddingtonController
@@ -18,6 +13,7 @@ from geo_activity_playground.webui.grayscale_tile_controller import (
     GrayscaleTileController,
 )
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.summary_controller import SummaryController
 
 
 def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
@@ -31,6 +27,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     equipment_controller = EquipmentController(repository)
     heatmap_controller = HeatmapController(repository)
     grayscale_tile_controller = GrayscaleTileController()
+    summary_controller = SummaryController(repository)
 
     @app.route("/")
     def index():
@@ -98,16 +95,9 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
 
     @app.route("/summary-statistics")
     def summary_statistics():
-        return render_template("summary-statistics.html.j2")
-
-    @app.route("/meta-plot/<name>.json")
-    def meta_plot(name: str):
-        return meta_plots[name](repository.meta.reset_index())
-
-    @app.route("/download/<filename>")
-    def download(filename: str):
-        assert "/" not in filename
-        return send_from_directory(pathlib.Path.cwd() / "Download", filename)
+        return render_template(
+            "summary-statistics.html.j2", **summary_controller.render()
+        )
 
     @app.route("/eddington")
     def eddington():

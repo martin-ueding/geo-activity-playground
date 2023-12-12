@@ -9,13 +9,13 @@
 
 <div class="row mb-1">
     <div class="col">
-        {{ vega("year-on-year-distance", "/meta-plot/year-on-year-distance.json") }}
+        {{ vega_direct("year_on_year_distance_meta_plot", year_on_year_distance_meta_plot) }}
     </div>
 </div>
 
 <div class="row mb-1">
     <div class="col">
-        {{ vega("distance-heatmap", "/meta-plot/distance-heatmap.json") }}
+        {{ vega_direct("distance_heatmap_meta_plot", distance_heatmap_meta_plot) }}
     </div>
 </div>
 {% endblock %}
