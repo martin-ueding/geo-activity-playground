@@ -9,6 +9,7 @@ import fitdecode
 import gpxpy
 import pandas as pd
 import tcxreader.tcxreader
+import xmltodict
 
 
 class ActivityParseError(BaseException):
@@ -36,6 +37,8 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
             df = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
             raise ActivityParseError("Syntax error in TCX file") from e
+    elif file_type in [".kml", ".kmz"]:
+        df = read_kml_activity(path, opener)
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
@@ -178,3 +181,31 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
             rows.append(row)
     df = pd.DataFrame(rows)
     return df
+
+
+def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
+    with open(
+        pathlib.Path(
+            "~/Dokumente/Karten/Playground-Directory/Activities/Zwin-2.kml"
+        ).expanduser(),
+        "rb",
+    ) as f:
+        kml_dict = xmltodict.parse(f)
+    doc = kml_dict["kml"]["Document"]
+    keypoint_folder = doc["Folder"]
+    placemark = keypoint_folder["Placemark"]
+    track = placemark["gx:Track"]
+    rows = []
+    for when, where in zip(track["when"], track["gx:coord"]):
+        time = dateutil.parser.parse(when).astimezone(datetime.timezone.utc)
+        parts = where.split(" ")
+        if len(parts) == 2:
+            lon, lat = parts
+            alt = None
+        if len(parts) == 3:
+            lon, lat, alt = parts
+        row = {"time": time, "latitude": float(lat), "longitude": float(lon)}
+        if alt is not None:
+            row["altitude"] = float(alt)
+        rows.append(row)
+    return pd.DataFrame(rows)
