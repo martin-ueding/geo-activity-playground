@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.15
+
+- Export all missing tiles in the viewport, not just the neighbors.
+
 ### Version 0.14
 
 #### Version 0.14.2
