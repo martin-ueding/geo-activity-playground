@@ -8,9 +8,13 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.14
 
+#### Version 0.14.2
+
+- Fix broken Strava import (bug introduced in 0.14.0).
+
 #### Version 0.14.1
 
-- Fix hard-coded part in KML import.
+- Fix hard-coded part in KML import (bug introduced in 0.14.0).
 
 #### Version 0.14.0
 
