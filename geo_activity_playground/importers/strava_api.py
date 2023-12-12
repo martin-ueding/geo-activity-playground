@@ -116,7 +116,7 @@ def import_from_strava_api() -> None:
             time_series = pd.read_parquet(time_series_path)
         else:
             time_series = download_strava_time_series(activity.id, client)
-            time_series.name = activity.upload_id_str
+            time_series.name = activity.id
             new_time = [
                 activity.start_date + datetime.timedelta(seconds=time)
                 for time in time_series["time"]
@@ -151,12 +151,13 @@ def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFram
     streams = client.get_activity_streams(
         activity_id, ["time", "latlng", "altitude", "heartrate", "temp"]
     )
-    columns = {}
+    columns = {"time": streams["time"].data}
     if "latlng" in streams:
         columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
         columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
     for name in ["distance", "altitude", "heartrate"]:
         if name in streams:
             columns[name] = streams[name].data
+
     df = pd.DataFrame(columns)
     return df
