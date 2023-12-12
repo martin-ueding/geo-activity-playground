@@ -30,3 +30,7 @@ Open <http://127.0.0.1:5000> to open the website in your browser. There might be
 ![](landing-page.png)
 
 Click around and explore the various features.
+
+## Setting host and port
+
+In case you don't like the default value of `127.0.0.1:5000`, you can use the optional command line arguments `--host` and `--port` to specify your values.
