@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - Do more calculations eagerly at startup such that the webserver is more responsive. [GH-58](https://github.com/martin-ueding/geo-activity-playground/issues/58)
 - Allow setting host and port via the command line. [GH-61](https://github.com/martin-ueding/geo-activity-playground/pull/61)
+- Re-add download of explored tiles in area. [GH-63](https://github.com/martin-ueding/geo-activity-playground/issues/63)
 
 ### Version 0.13
 

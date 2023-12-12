@@ -17,6 +17,7 @@ from geo_activity_playground.explorer.grid_file import get_border_tiles
 from geo_activity_playground.explorer.grid_file import get_three_color_tiles
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
+from geo_activity_playground.explorer.grid_file import make_grid_points
 
 
 alt.data_transformers.enable("vegafusion")
@@ -74,6 +75,22 @@ class ExplorerController:
             tile_histories = pickle.load(f)
         tiles = tile_histories[zoom]
         points = get_border_tiles(tiles, zoom, tile_bounds)
+        if suffix == "geojson":
+            return make_grid_file_geojson(points)
+        elif suffix == "gpx":
+            return make_grid_file_gpx(points)
+
+    def export_explored_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
+        x1, y1 = compute_tile_float(north, west, zoom)
+        x2, y2 = compute_tile_float(south, east, zoom)
+        tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
+
+        with open(TILE_VISITS_PATH, "rb") as f:
+            tile_visits = pickle.load(f)
+        tiles = tile_visits[zoom]
+        points = make_grid_points(
+            (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
+        )
         if suffix == "geojson":
             return make_grid_file_geojson(points)
         elif suffix == "gpx":

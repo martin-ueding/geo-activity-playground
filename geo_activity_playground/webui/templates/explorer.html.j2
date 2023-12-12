@@ -26,8 +26,10 @@
             <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
         </div>
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
-        <p>Download missing tiles in visible area as <a href="#" onclick="downloadAs('geojson')">GeoJSON</a> or <a
-                href="#" onclick="downloadAs('gpx')"">GPX</a>.</p>
+        <p>Download tiles in visible area: <a href="#" onclick="downloadAs('explored.geojson')">Explored as GeoJSON</a>,
+            <a href="#" onclick="downloadAs('explored.gpx')"">Explored as GPX</a>, <a href=" #"
+                onclick="downloadAs('missing.geojson')">Missing as GeoJSON</a> or <a href="#"
+                onclick="downloadAs('missing.gpx')"">Missing as GPX</a>.</p>
 
         <script>
             function onEachFeature(feature, layer) {
@@ -119,7 +121,7 @@
                 bounds = map.getBounds()
                 zoom = "{{ zoom }}"
                 window.location.href =
-                    `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/missing.${suffix}`
+                    `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
             }
         </script>
     </div>
