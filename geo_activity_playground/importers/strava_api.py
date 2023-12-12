@@ -5,6 +5,7 @@ import logging
 import pathlib
 import pickle
 from typing import Any
+import sys
 
 import pandas as pd
 from stravalib import Client
@@ -96,55 +97,59 @@ def import_from_strava_api() -> None:
     client = Client(access_token=get_current_access_token())
 
     new_rows: list[dict] = []
-    for activity in tqdm(
-        client.get_activities(after=get_after), desc="Downloading Strava activities"
-    ):
-        cache_file = (
-            pathlib.Path("Cache") / "Activity Metadata" / f"{activity.id}.pickle"
-        )
-        cache_file.parent.mkdir(exist_ok=True, parents=True)
-        with open(cache_file, "wb") as f:
-            pickle.dump(activity, f)
-        if not activity.gear_id in gear_names:
-            gear = client.get_gear(activity.gear_id)
-            gear_names[activity.gear_id] = (
-                f"{gear.name}" or f"{gear.brand_name} {gear.model_name}"
+    try:
+        for activity in tqdm(
+            client.get_activities(after=get_after), desc="Downloading Strava activities"
+        ):
+            cache_file = (
+                pathlib.Path("Cache") / "Activity Metadata" / f"{activity.id}.pickle"
             )
+            cache_file.parent.mkdir(exist_ok=True, parents=True)
+            with open(cache_file, "wb") as f:
+                pickle.dump(activity, f)
+            if not activity.gear_id in gear_names:
+                gear = client.get_gear(activity.gear_id)
+                gear_names[activity.gear_id] = (
+                    f"{gear.name}" or f"{gear.brand_name} {gear.model_name}"
+                )
 
-        time_series_path = activity_stream_dir() / f"{activity.id}.parquet"
-        if time_series_path.exists():
-            time_series = pd.read_parquet(time_series_path)
-        else:
-            time_series = download_strava_time_series(activity.id, client)
-            time_series.name = activity.id
-            new_time = [
-                activity.start_date + datetime.timedelta(seconds=time)
-                for time in time_series["time"]
-            ]
-            del time_series["time"]
-            time_series["time"] = new_time
-            time_series.to_parquet(time_series_path)
+            time_series_path = activity_stream_dir() / f"{activity.id}.parquet"
+            if time_series_path.exists():
+                time_series = pd.read_parquet(time_series_path)
+            else:
+                time_series = download_strava_time_series(activity.id, client)
+                time_series.name = activity.id
+                new_time = [
+                    activity.start_date + datetime.timedelta(seconds=time)
+                    for time in time_series["time"]
+                ]
+                del time_series["time"]
+                time_series["time"] = new_time
+                time_series.to_parquet(time_series_path)
 
-        if len(time_series) > 0 and "latitude" in time_series.columns:
-            new_rows.append(
-                {
-                    "id": activity.id,
-                    "commute": activity.commute,
-                    "distance": activity.distance.magnitude,
-                    "name": activity.name,
-                    "kind": str(activity.type),
-                    "start": activity.start_date,
-                    "elapsed_time": activity.elapsed_time,
-                    "equipment": gear_names[activity.gear_id],
-                    "calories": activity.calories,
-                }
-            )
+            if len(time_series) > 0 and "latitude" in time_series.columns:
+                new_rows.append(
+                    {
+                        "id": activity.id,
+                        "commute": activity.commute,
+                        "distance": activity.distance.magnitude,
+                        "name": activity.name,
+                        "kind": str(activity.type),
+                        "start": activity.start_date,
+                        "elapsed_time": activity.elapsed_time,
+                        "equipment": gear_names[activity.gear_id],
+                        "calories": activity.calories,
+                    }
+                )
 
-    new_df = pd.DataFrame(new_rows)
-    merged: pd.DataFrame = pd.concat([meta, new_df])
-    merged.sort_values("start", inplace=True)
-    meta_file.parent.mkdir(exist_ok=True, parents=True)
-    merged.to_parquet(meta_file)
+        new_df = pd.DataFrame(new_rows)
+        merged: pd.DataFrame = pd.concat([meta, new_df])
+        merged.sort_values("start", inplace=True)
+        meta_file.parent.mkdir(exist_ok=True, parents=True)
+        merged.to_parquet(meta_file)
+    except RateLimitExceeded:
+        print("Strava API rate limit exceeded. Try again in 15 minutes.")
+        sys.exit(1)
 
 
 def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFrame:
