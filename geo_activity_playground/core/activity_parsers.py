@@ -45,8 +45,11 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                         and fields.get("position_lat", None)
                         and fields.get("position_long", None)
                     ):
+                        time = fields["timestamp"]
+                        assert isinstance(time, datetime.datetime)
+                        time = time.astimezone(datetime.timezone.utc)
                         row = {
-                            "time": fields["timestamp"],
+                            "time": time,
                             "latitude": fields["position_lat"] / ((2**32) / 360),
                             "longitude": fields["position_long"] / ((2**32) / 360),
                         }
@@ -82,6 +85,8 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                         time = point.time
                     else:
                         time = dateutil.parser.parse(str(point.time))
+                    assert isinstance(time, datetime.datetime)
+                    time = time.astimezone(datetime.timezone.utc)
                     points.append((time, point.latitude, point.longitude))
 
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
@@ -110,8 +115,11 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
 
     for trackpoint in data.trackpoints:
         if trackpoint.latitude and trackpoint.longitude:
+            time = trackpoint.time
+            assert isinstance(time, datetime.datetime)
+            time = time.astimezone(datetime.timezone.utc)
             row = {
-                "time": trackpoint.time,
+                "time": time,
                 "latitude": trackpoint.latitude,
                 "longitude": trackpoint.longitude,
             }
