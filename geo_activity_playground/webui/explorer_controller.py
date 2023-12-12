@@ -11,7 +11,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.coordinates import Bounds
-from geo_activity_playground.core.tiles import compute_tile_float
+from geo_activity_playground.core.tiles import compute_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.grid_file import get_border_tiles
 from geo_activity_playground.explorer.grid_file import logger
@@ -212,8 +212,8 @@ class ExplorerController:
         }
 
     def export_missing_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
-        x1, y1 = compute_tile_float(north, west, zoom)
-        x2, y2 = compute_tile_float(south, east, zoom)
+        x1, y1 = compute_tile(north, west, zoom)
+        x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
         with open(TILE_HISTORIES_PATH, "rb") as f:
@@ -226,8 +226,8 @@ class ExplorerController:
             return make_grid_file_gpx(points)
 
     def export_explored_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
-        x1, y1 = compute_tile_float(north, west, zoom)
-        x2, y2 = compute_tile_float(south, east, zoom)
+        x1, y1 = compute_tile(north, west, zoom)
+        x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
         with open(TILE_VISITS_PATH, "rb") as f:

@@ -20,12 +20,11 @@ def get_border_tiles(
     logger.info("Generate border tiles …")
     tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
     border_tiles = set()
-    for tile in tile_set:
-        for neighbor in adjacent_to(tile):
-            if neighbor not in tile_set:
-                for neighbor2 in adjacent_to(neighbor):
-                    if neighbor2 not in tile_set and tile_bounds.contains(*neighbor):
-                        border_tiles.add(neighbor2)
+    for tile_x in range(tile_bounds.x_min, tile_bounds.x_max):
+        for tile_y in range(tile_bounds.y_min, tile_bounds.y_max):
+            tile = (tile_x, tile_y)
+            if tile not in tile_set:
+                border_tiles.add(tile)
     return make_grid_points(border_tiles, zoom)
 
 
