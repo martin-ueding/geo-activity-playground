@@ -92,7 +92,17 @@ This export is available as GeoJSON or GPX such that you can open it with other 
 
 ![](explorer-sint-annaland-missing-geojson.png)
 
-I have not tested this software, but supposedly [Offline Maps](https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps) is able to display GeoJSON on Android.
+You can then upload the GeoJSON file to [Bikerouter](https://bikerouter.de/) and it will display there:
+
+![](explorer-missing-bikerouter.png)
+
+Then plan a route that goes through as many tiles as possible. Download the route as GPX and use an app like OsmAnd to ride along it.
+
+### Missing tiles on the go
+
+The above is nice to plan the route, perhaps you also want to take the missing tiles along to do spontaneous tile hunting.
+
+[Offline Maps](https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps) is able to display GeoJSON on Android, though one needs to buy the add-on for like 5 EUR.
 
 On Android I use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/), therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:
 
