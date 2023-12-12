@@ -39,11 +39,6 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             "activity.html.j2", **activity_controller.render_activity(int(id))
         )
 
-    @app.route("/activity/<id>/track.json")
-    def activity_track(id: str):
-        plot = activity_track_plot(repository.get_time_series(int(id)))
-        return plot
-
     @app.route("/activity/<id>/sharepic.png")
     def activity_sharepic(id: str):
         return Response(
