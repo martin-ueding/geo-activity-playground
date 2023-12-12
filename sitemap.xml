@@ -2,87 +2,82 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/acknowledgments/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/activity-view/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/calendar/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/eddington/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/equipment/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/explorer-tiles/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/heatmaps/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/features/overview/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/config-file/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-git-on-linux/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-stable-on-linux/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/starting-the-webserver/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/using-activity-files/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/using-strava-api/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/reference/changelog/</loc>
-         <lastmod>2023-12-10</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://martin-ueding.github.io/geo-activity-playground/reference/directory-layout/</loc>
-         <lastmod>2023-12-10</lastmod>
+         <lastmod>2023-12-12</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

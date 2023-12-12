@@ -14,7 +14,7 @@
         <link rel="prev" href="../../features/equipment/">
       
       
-        <link rel="next" href="../directory-layout/">
+        <link rel="next" href="../../acknowledgments/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -705,6 +705,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-014" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-013" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.13
@@ -892,27 +901,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../directory-layout/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Directory Layout
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -975,6 +963,15 @@
   
     <nav class="md-nav" aria-label="Version 0">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-014" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#version-013" class="md-nav__link">
@@ -1174,6 +1171,14 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-014">Version 0.14</h3>
+<ul>
+<li>Do more calculations eagerly at startup such that the webserver is more responsive. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/58">GH-58</a></li>
+<li>Allow setting host and port via the command line. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/61">GH-61</a></li>
+<li>Re-add download of explored tiles in area. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/63">GH-63</a></li>
+<li>Unify time handling, use UTC for all internal representations. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/52">GH-52</a></li>
+<li>Add some sort of KML support that at least works for KML exported by Viking. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/62">GH-62</a></li>
+</ul>
 <h3 id="version-013">Version 0.13</h3>
 <ul>
 <li>Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.<ul>
