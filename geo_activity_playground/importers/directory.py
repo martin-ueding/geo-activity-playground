@@ -103,11 +103,7 @@ def import_from_directory() -> None:
             logger.error(f"{path}: {error}")
 
     new_df = pd.DataFrame(new_rows)
-    merged: pd.DataFrame = pd.concat([meta, new_df])
-    merged.sort_values("start", inplace=True)
-    meta_file.parent.mkdir(exist_ok=True, parents=True)
-    merged.to_parquet(meta_file)
-    work_tracker.close()
+    merged = pd.concat([meta, new_df])
 
     if len(merged) == 0:
         activities_dir = pathlib.Path("Activities").resolve()
@@ -116,3 +112,8 @@ def import_from_directory() -> None:
             f"Please copy at least one such file into {activities_dir}."
         )
         sys.exit(1)
+
+    merged.sort_values("start", inplace=True)
+    meta_file.parent.mkdir(exist_ok=True, parents=True)
+    merged.to_parquet(meta_file)
+    work_tracker.close()
