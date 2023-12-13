@@ -9,6 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.15
 
 - Export all missing tiles in the viewport, not just the neighbors.
+- Automatically retry Strava API when the rate limit is exhausted.
 
 ### Version 0.14
 
