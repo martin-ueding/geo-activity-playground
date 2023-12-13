@@ -30,7 +30,7 @@ This brings up an editor with your shell profile. Add a line containing the foll
 PATH=$PATH:$HOME/.local/bin
 ```
 
-This adds the path to your shell environment. After you have done it, close your terminal window and open a new one. Try the first command in this section again, you should see the help message now.
+This adds the path to your shell environment. This becomes active after you log in again. In order to apply it also to your current shell session, execute `export PATH=$PATH:$HOME/.local/bin` in the terminal window. Try the first command in this section again, you should see the help message now.
 
 ## Upgrading to the latest version
 
