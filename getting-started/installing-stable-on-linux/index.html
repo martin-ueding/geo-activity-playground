@@ -823,7 +823,7 @@
 <p>This brings up an editor with your shell profile. Add a line containing the following at the end of the file:</p>
 <div class="highlight"><pre><span></span><code><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$HOME</span>/.local/bin
 </code></pre></div>
-<p>This adds the path to your shell environment. After you have done it, close your terminal window and open a new one. Try the first command in this section again, you should see the help message now.</p>
+<p>This adds the path to your shell environment. This becomes active after you log in again. In order to apply it also to your current shell session, execute <code>export PATH=$PATH:$HOME/.local/bin</code> in the terminal window. Try the first command in this section again, you should see the help message now.</p>
 <h2 id="upgrading-to-the-latest-version">Upgrading to the latest version</h2>
 <p>At some later point you likely want to upgrade to the latest version. For this use this command:</p>
 <div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">geo</span><span class="o">-</span><span class="n">activity</span><span class="o">-</span><span class="n">playground</span>
