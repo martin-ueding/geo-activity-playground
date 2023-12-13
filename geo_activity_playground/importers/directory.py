@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import pathlib
+import sys
 import traceback
 
 import numpy as np
@@ -107,3 +108,11 @@ def import_from_directory() -> None:
     meta_file.parent.mkdir(exist_ok=True, parents=True)
     merged.to_parquet(meta_file)
     work_tracker.close()
+
+    if len(merged) == 0:
+        activities_dir = pathlib.Path("Activities").resolve()
+        logger.error(
+            f"You seemingly want to use activity files as a data source, but you have not copied any GPX/FIT/TCX/KML files."
+            f"Please copy at least one such file into {activities_dir}."
+        )
+        sys.exit(1)
