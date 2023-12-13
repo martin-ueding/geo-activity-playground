@@ -4,8 +4,9 @@ import json
 import logging
 import pathlib
 import pickle
-from typing import Any
 import sys
+import time
+from typing import Any
 
 import pandas as pd
 from stravalib import Client
@@ -81,7 +82,26 @@ def get_current_access_token() -> str:
     return tokens["access"]
 
 
+def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
+    previous_quarter = datetime.datetime(
+        date.year, date.month, date.day, date.hour, date.minute // 15 * 15, 0
+    )
+    next_quarter = previous_quarter + datetime.timedelta(minutes=15)
+    return next_quarter
+
+
 def import_from_strava_api() -> None:
+    while try_import_strava():
+        now = datetime.datetime.now()
+        next_quarter = round_to_next_quarter_hour(now)
+        seconds_to_wait = (next_quarter - now).total_seconds() + 10
+        logger.warning(
+            f"Strava rate limit exceeded, will try again at {next_quarter.isoformat()}."
+        )
+        time.sleep(seconds_to_wait)
+
+
+def try_import_strava() -> None:
     meta_file = pathlib.Path("Cache") / "activities.parquet"
     if meta_file.exists():
         logger.info("Loading metadata file …")
@@ -141,15 +161,17 @@ def import_from_strava_api() -> None:
                         "calories": activity.calories,
                     }
                 )
-
-        new_df = pd.DataFrame(new_rows)
-        merged: pd.DataFrame = pd.concat([meta, new_df])
-        merged.sort_values("start", inplace=True)
-        meta_file.parent.mkdir(exist_ok=True, parents=True)
-        merged.to_parquet(meta_file)
+        limit_exceeded = False
     except RateLimitExceeded:
-        print("Strava API rate limit exceeded. Try again in 15 minutes.")
-        sys.exit(1)
+        limit_exceeded = True
+
+    new_df = pd.DataFrame(new_rows)
+    merged: pd.DataFrame = pd.concat([meta, new_df])
+    merged.sort_values("start", inplace=True)
+    meta_file.parent.mkdir(exist_ok=True, parents=True)
+    merged.to_parquet(meta_file)
+
+    return limit_exceeded
 
 
 def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFrame:
