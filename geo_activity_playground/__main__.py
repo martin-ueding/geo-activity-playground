@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pathlib
+import sys
 
 import coloredlogs
 
@@ -16,6 +17,8 @@ from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
+
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -98,6 +101,11 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     elif config:
         if "strava" in config:
             import_from_strava_api()
+    else:
+        logger.error(
+            "You need to either have (1) an “Activity” directory with GPX/FIT/TCX/KML files in there or (2) a “config.toml” with information for the Strava API (see https://martin-ueding.github.io/geo-activity-playground/getting-started/using-strava-api/)."
+        )
+        sys.exit(1)
     repository = ActivityRepository()
     embellish_time_series(repository)
     compute_tile_visits(repository)
