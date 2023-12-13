@@ -4,7 +4,7 @@ Outdoor activities are usually recorded as GPX or FIT files. Some apps like OsmA
 
 Create a directory somewhere, this will be your _playground_. I have mine in `~/Dokumente/Karten/Playground`, but you can put yours wherever you would like.
 
-Inside `Playground`, create another directory `Activities` where your activity files will go. The program will not modify files in that directory and treat them as read-only.
+Inside `Playground`, create another directory `Activities` where your activity files will go. You will need to put at least one activity file in there, otherwise the program cannot start. The program will not modify files in that directory and treat them as read-only.
 
 ## Directory structure
 
