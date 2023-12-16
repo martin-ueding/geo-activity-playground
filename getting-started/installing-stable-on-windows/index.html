@@ -388,21 +388,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Starting the webserver">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-a-local-shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using a local shell
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -862,21 +847,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Starting the webserver">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-a-local-shell" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using a local shell
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -925,32 +895,20 @@
 <p><img alt="" src="../windows-installation-08.png" /></p>
 <p>You need to have at least one activity file before you can start the program.</p>
 <h2 id="starting-the-webserver">Starting the webserver</h2>
-<p>Once you have your activity files in place, we need to add a start script. Download this <a href="../start.bat"><code>start.bat</code></a> and put it into the playground folder next to the “Activities” folder. It should look like this:</p>
+<p>Once you have your activity files in place, we need to add a start script. Right-click into the playground folder (next to the “Activities folder”) and in the context menu select “Create New” and then “Text File”. Name it [<code>start.bat</code>]. Windows will ask you whether want to change the suffix (file extension) because it might get unusable. Yes, we want to do that. It should look like this:</p>
 <p><img alt="" src="../windows-installation-14.png" /></p>
-<p>Windows may warn you that this BAT/Batch file may contain malicious code. Feel free to do a right-click on it and select the <em>edit</em> option. You should just have the following content in the file:</p>
+<p>Then right-click on that file and select “Edit”. A text editor will open up. Put the following content into this file:</p>
 <div class="highlight"><pre><span></span><code>python -m geo_activity_playground serve
 <span class="k">pause</span>
 </code></pre></div>
-<p>Once you have it there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.</p>
+<p>Then save and close it. I need you to create this file yourself and cannot offer a download because the Windows Defender will not allow you to execute such script files downloaded as a security precaution. If you create the file yourself, it will let you execute it.</p>
+<p>Once you have the <code>start.bat</code> there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.</p>
 <p><img alt="" src="../windows-installation-15.png" /></p>
 <p>After it has loaded everything, you can open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> in your browser. You should then see the landing page:</p>
 <p><img alt="" src="../windows-installation-16.png" /></p>
 <p>Also other functions like the heatmap work:</p>
 <p><img alt="" src="../windows-installation-17.png" /></p>
 <p>That's it, have fun!</p>
-<h3 id="using-a-local-shell">Using a local shell</h3>
-<p>An alternative to the batch file is opening a shell window inside that directory. If you use the batch file, you don't need this section.</p>
-<p>In your playground folder use the <em>File</em> menu at the top to start a new Power Shell in the folder.</p>
-<p><img alt="" src="../windows-installation-09.png" /></p>
-<p>It will look like this and contain the path.</p>
-<p><img alt="" src="../windows-installation-11.png" /></p>
-<p>Then enter the following:</p>
-<div class="highlight"><pre><span></span><code>python -m geo_activity_playground serve
-</code></pre></div>
-<p><img alt="" src="../windows-installation-12.png" /></p>
-<p>Press <kbd>Enter</kbd> to launch it:</p>
-<p><img alt="" src="../windows-installation-13.png" /></p>
-<p>And then after it has loaded everything, you can open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> in your browser.</p>
 
 
 
