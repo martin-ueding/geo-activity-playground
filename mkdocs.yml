@@ -23,6 +23,7 @@ nav:
   - index.md
   - Getting Started:
       - getting-started/installing-stable-on-linux.md
+      - getting-started/installing-stable-on-windows.md
       - getting-started/installing-git-on-linux.md
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
