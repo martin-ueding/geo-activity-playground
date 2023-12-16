@@ -59,7 +59,7 @@ You need to have at least one activity file before you can start the program.
 
 ## Starting the webserver
 
-Once you have your activity files in place, we need to add a start script. Right-click into the playground folder (next to the “Activities folder”) and in the context menu select “Create New” and then “Text File”. Name it [`start.bat`]. Windows will ask you whether want to change the suffix (file extension) because it might get unusable. Yes, we want to do that. It should look like this:
+Once you have your activity files in place, we need to add a start script. Right-click into the playground folder (next to the “Activities folder”) and in the context menu select “Create New” and then “Text File”. Name it `start.bat`. Windows will ask you whether want to change the suffix (file extension) because it might get unusable. Yes, we want to do that. It should look like this:
 
 ![](windows-installation-14.png)
 
