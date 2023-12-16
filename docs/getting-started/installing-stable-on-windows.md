@@ -59,18 +59,20 @@ You need to have at least one activity file before you can start the program.
 
 ## Starting the webserver
 
-Once you have your activity files in place, we need to add a start script. Download this [`start.bat`](start.bat) and put it into the playground folder next to the “Activities” folder. It should look like this:
+Once you have your activity files in place, we need to add a start script. Right-click into the playground folder (next to the “Activities folder”) and in the context menu select “Create New” and then “Text File”. Name it [`start.bat`]. Windows will ask you whether want to change the suffix (file extension) because it might get unusable. Yes, we want to do that. It should look like this:
 
 ![](windows-installation-14.png)
 
-Windows may warn you that this BAT/Batch file may contain malicious code. Feel free to do a right-click on it and select the _edit_ option. You should just have the following content in the file:
+Then right-click on that file and select “Edit”. A text editor will open up. Put the following content into this file:
 
 ```bat
 python -m geo_activity_playground serve
 pause
 ```
 
-Once you have it there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.
+Then save and close it. I need you to create this file yourself and cannot offer a download because the Windows Defender will not allow you to execute such script files downloaded as a security precaution. If you create the file yourself, it will let you execute it.
+
+Once you have the `start.bat` there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.
 
 ![](windows-installation-15.png)
 
@@ -83,27 +85,3 @@ Also other functions like the heatmap work:
 ![](windows-installation-17.png)
 
 That's it, have fun!
-
-### Using a local shell
-
-An alternative to the batch file is opening a shell window inside that directory. If you use the batch file, you don't need this section.
-
-In your playground folder use the _File_ menu at the top to start a new Power Shell in the folder.
-
-![](windows-installation-09.png)
-
-It will look like this and contain the path.
-
-![](windows-installation-11.png)
-
-Then enter the following:
-
-    python -m geo_activity_playground serve
-
-![](windows-installation-12.png)
-
-Press <kbd>Enter</kbd> to launch it:
-
-![](windows-installation-13.png)
-
-And then after it has loaded everything, you can open <http://127.0.0.1:5000/> in your browser.
