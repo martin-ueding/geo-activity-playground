@@ -111,3 +111,7 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     compute_tile_visits(repository)
     compute_tile_evolution()
     return repository
+
+
+if __name__ == "__main__":
+    main()
