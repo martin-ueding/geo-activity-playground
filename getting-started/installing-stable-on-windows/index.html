@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/using-activity-files/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/installing-stable-on-windows/">
       
       
-        <link rel="prev" href="../installing-git-on-linux/">
+        <link rel="prev" href="../installing-stable-on-linux/">
       
       
-        <link rel="next" href="../using-strava-api/">
+        <link rel="next" href="../installing-git-on-linux/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Using Activity Files - Geo Activity Playground</title>
+        <title>Installing Stable on Windows - Geo Activity Playground</title>
       
     
     
@@ -77,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-activity-files" class="md-skip">
+        <a href="#installing-stable-on-windows" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using Activity Files
+              Installing Stable on Windows
             
           </span>
         </div>
@@ -306,10 +306,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../installing-stable-on-windows/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Installing Stable on Windows
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -318,6 +338,77 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installing-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing Python
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing the project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#putting-your-activity-files-in-place" class="md-nav__link">
+    <span class="md-ellipsis">
+      Putting your activity files in place
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starting-the-webserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      Starting the webserver
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Starting the webserver">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-a-local-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using a local shell
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -348,30 +439,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Using Activity Files
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../using-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -380,53 +451,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#directory-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      Directory structure
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported-file-formats" class="md-nav__link">
-    <span class="md-ellipsis">
-      Supported file formats
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -805,29 +829,53 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#directory-structure" class="md-nav__link">
+  <a href="#installing-python" class="md-nav__link">
     <span class="md-ellipsis">
-      Directory structure
+      Installing Python
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#supported-file-formats" class="md-nav__link">
+  <a href="#installing-the-project" class="md-nav__link">
     <span class="md-ellipsis">
-      Supported file formats
+      Installing the project
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#putting-your-activity-files-in-place" class="md-nav__link">
     <span class="md-ellipsis">
-      Next steps
+      Putting your activity files in place
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starting-the-webserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      Starting the webserver
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Starting the webserver">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-a-local-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using a local shell
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -846,105 +894,63 @@
                   
 
 
-<h1 id="using-activity-files">Using Activity Files</h1>
-<p>Outdoor activities are usually recorded as GPX or FIT files. Some apps like OsmAnd give you these files.</p>
-<p>Create a directory somewhere, this will be your <em>playground</em>. I have mine in <code>~/Dokumente/Karten/Playground</code>, but you can put yours wherever you would like.</p>
-<p>Inside <code>Playground</code>, create another directory <code>Activities</code> where your activity files will go. You will need to put at least one activity file in there, otherwise the program cannot start. The program will not modify files in that directory and treat them as read-only.</p>
-<h2 id="directory-structure">Directory structure</h2>
-<p>Inside the <code>Activities</code> you can dump all your files in a flat fashion. If you want to add some more metadata, use the following directory layout.</p>
-<p>The first directory level will indicate the type of the activity. You can pick whatever make sense for you, classic options are <em>ride</em>, <em>run</em>, <em>walk</em>, <em>hike</em>. Then the second level will indicate your equipment. You can use terms like “rental bike”, the brand and make of your shoes or whatever you find sensible. Specifying the equipment allows to track the total distance traveled with a given equipment.</p>
-<p>At any level you can have a special directory <code>Commute</code>. All activities inside of that will be marked as commutes and not highlighted as much as non-commute activities. The idea is that you can find your cool activities along potentially many commutes.</p>
-<p>Other directory names on the third level will just be ignored, you can use those to organize your activities further in some sense.</p>
-<p>Let us take the following directory/file structure as an example:</p>
-<div class="highlight"><pre><span></span><code>Activities
-├── Commute
-│   └── From the Beach.gpx
-├── Ride
-│   └── Rental Bike
-│       ├── Beach Rides
-│       │   └── Breskens.gpx
-│       └── Zwin.gpx
-├── To Piazza.gpx
-└── Walk
-    ├── Commute
-    │   └── To the Beach.gpx
-    ├── New Balance Fresh Foam 860v11
-    │   ├── Beach Walk.gpx
-    │   └── Commute
-    │       └── From Piazza.gpx
-    └── Nieuvfliet.gpx
+<h1 id="installing-stable-on-windows">Installing Stable on Windows</h1>
+<p>This how-to will show you the installation of the project on Windows. Here in the guide we use Windows 10 with the locale set to German, it should generalize to Windows 11 as well.</p>
+<h2 id="installing-python">Installing Python</h2>
+<p>First we need to install Python because that doesn't ship with Windows. Fortunately we can get it from the <em>Microsoft Store</em>. Open that via the start menu and you should see something like this:</p>
+<p><img alt="" src="../windows-installation-01.png" /></p>
+<p>Type “Python” into the search bar at the top. In the search results you likely see different Python versions like 3.11 and 3.10. The project is compatible with 3.11, 3.10 and 3.9; I'd suggest to just go with 3.11. In case that you have already installed one of the other compatible versions, you can skip this step.</p>
+<p>Here we select Python 3.11.</p>
+<p><img alt="" src="../windows-installation-02.png" /></p>
+<p>In the top right there is a blue button to install the software. Click that.</p>
+<h2 id="installing-the-project">Installing the project</h2>
+<p>After that has run through, you need to open the <em>Power Shell</em> via the start menu. It should open a command line window like this:</p>
+<p><img alt="" src="../windows-installation-03.png" /></p>
+<p>We can verify that Python is working by entering <code>python --version</code> and <code>pip --version</code>. It should give a sensible version message like this:</p>
+<p><img alt="" src="../windows-installation-04.png" /></p>
+<p>Then we can ues PIP to install the project. Type the following:</p>
+<div class="highlight"><pre><span></span><code>pip install -U geo-activity-playground
 </code></pre></div>
-<p>You can see that I have one file on the top level (<code>To Piazza.gpx</code>), a file on the first level (<code>Walk/Nieuvfliet.gpx</code>), some on the second level (<code>Ride/Rental Bike/Zwin.gpx</code>), one commute (<code>Walk/New Balance Fresh Foam 860v11/Commute/From Piazza.gpx</code>) and one with a group directory which isn't commuting (<code>Ride/Rental Bike/Dunes in Sluis/Breskens.gpx</code>). From this the program will extract the following metadata:</p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Equipment</th>
-<th>Commute</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>From the Beach</td>
-<td><em>None</em></td>
-<td><em>None</em></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Breskens</td>
-<td>Ride</td>
-<td>Rental Bike</td>
-<td>No</td>
-</tr>
-<tr>
-<td>Zwin</td>
-<td>Ride</td>
-<td>Rental Bike</td>
-<td>No</td>
-</tr>
-<tr>
-<td>To Piazza</td>
-<td><em>None</em></td>
-<td><em>None</em></td>
-<td>No</td>
-</tr>
-<tr>
-<td>To the Beach</td>
-<td>Walk</td>
-<td><em>None</em></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Beach Walk</td>
-<td>Walk</td>
-<td>New Balance Fresh Foam 860v11</td>
-<td>No</td>
-</tr>
-<tr>
-<td>From Piazza</td>
-<td>Walk</td>
-<td>New Balance Fresh Foam 860v11</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Nieuwvliet</td>
-<td>Walk</td>
-<td><em>None</em></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p>The file name of your activity will become the name of the activity.</p>
-<h2 id="supported-file-formats">Supported file formats</h2>
-<p>At the moment the following file formats are supported:</p>
-<ol>
-<li>FIT</li>
-<li>GPX</li>
-<li>TCX</li>
-</ol>
-<h2 id="next-steps">Next steps</h2>
-<p>Once you have your files put into the directory, you're all set and can proceed with the next steps.</p>
+<p>It should look like this:</p>
+<p><img alt="" src="../windows-installation-05.png" /></p>
+<p>Then press <kbd>Enter</kbd> and it will install it, looking like this:</p>
+<p><img alt="" src="../windows-installation-06.png" /></p>
+<p>That might take a while. After that has run through, it should give a success message:</p>
+<p><img alt="" src="../windows-installation-10.png" /></p>
+<p>Then we're done with this window, you can close it now.</p>
+<h2 id="putting-your-activity-files-in-place">Putting your activity files in place</h2>
+<p>Next you need to create a folder to put the files. I've placed mine just into the <em>Documents</em> folder. In there I've created a folder named exactly “Activities”.</p>
+<p><img alt="" src="../windows-installation-07.png" /></p>
+<p>Inside this folder there are my GPX/FIT/TCX/KML files as outlined in <a href="../using-activity-files/">how-to guide on using activity files</a>.</p>
+<p><img alt="" src="../windows-installation-08.png" /></p>
+<p>You need to have at least one activity file before you can start the program.</p>
+<h2 id="starting-the-webserver">Starting the webserver</h2>
+<p>Once you have your activity files in place, we need to add a start script. Download this <a href="../start.bat">`start.bat``</a> and put it into the playground folder next to the “Activities” folder. It should look like this:</p>
+<p><img alt="" src="../windows-installation-14.png" /></p>
+<p>Windows may warn you that this BAT/Batch file may contain malicious code. Feel free to do a right-click on it and select the <em>edit</em> option. You should just have the following content in the file:</p>
+<div class="highlight"><pre><span></span><code>python -m geo_activity_playground serve
+<span class="k">pause</span>
+</code></pre></div>
+<p>Once you have it there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.</p>
+<p><img alt="" src="../windows-installation-15.png" /></p>
+<p>After it has loaded everything, you can open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> in your browser. You should then see the landing page:</p>
+<p><img alt="" src="../windows-installation-16.png" /></p>
+<p>Also other functions like the heatmap work:</p>
+<p><img alt="" src="../windows-installation-17.png" /></p>
+<p>That's it, have fun!</p>
+<h3 id="using-a-local-shell">Using a local shell</h3>
+<p>An alternative to the batch file is opening a shell window inside that directory. If you use the batch file, you don't need this section.</p>
+<p>In your playground folder use the <em>File</em> menu at the top to start a new Power Shell in the folder.</p>
+<p><img alt="" src="../windows-installation-09.png" /></p>
+<p>It will look like this and contain the path.</p>
+<p><img alt="" src="../windows-installation-11.png" /></p>
+<p>Then enter the following:</p>
+<div class="highlight"><pre><span></span><code>python -m geo_activity_playground serve
+</code></pre></div>
+<p><img alt="" src="../windows-installation-12.png" /></p>
+<p>Press <kbd>Enter</kbd> to launch it:</p>
+<p><img alt="" src="../windows-installation-13.png" /></p>
+<p>And then after it has loaded everything, you can open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> in your browser.</p>
 
 
 
