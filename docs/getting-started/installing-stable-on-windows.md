@@ -59,7 +59,7 @@ You need to have at least one activity file before you can start the program.
 
 ## Starting the webserver
 
-Once you have your activity files in place, we need to add a start script. Download this [`start.bat``](start.bat) and put it into the playground folder next to the “Activities” folder. It should look like this:
+Once you have your activity files in place, we need to add a start script. Download this [`start.bat`](start.bat) and put it into the playground folder next to the “Activities” folder. It should look like this:
 
 ![](windows-installation-14.png)
 
