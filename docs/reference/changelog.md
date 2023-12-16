@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.15
 
+#### Version 0.15.1
+
+- Add `if __name__ == "__main__"` clause such that one can use `python -m geo_activity_playground` on Windows.
+
+#### Version 0.15.0
+
 - Export all missing tiles in the viewport, not just the neighbors.
 - Automatically retry Strava API when the rate limit is exhausted. [GH-67](https://github.com/martin-ueding/geo-activity-playground/pull/67)
 - Give more helpful error messages when the are no activity files present.
