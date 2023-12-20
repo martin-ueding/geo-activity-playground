@@ -123,7 +123,7 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     points = []
-    with open(path) as f:
+    with open(path, "rb") as f:
         gpx = gpxpy.parse(f)
         for track in gpx.tracks:
             for segment in track.segments:
