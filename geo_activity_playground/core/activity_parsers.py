@@ -1,5 +1,6 @@
 import datetime
 import gzip
+import os
 import pathlib
 import tempfile
 import xml
@@ -159,7 +160,8 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
 
     with open(path, "rb") as f:
         content = f.read().strip()
-    with tempfile.NamedTemporaryFile("wb", suffix=".tcx") as f:
+
+    with tempfile.NamedTemporaryFile("wb", dir=os.getcwd(), suffix=".tcx") as f:
         f.write(content)
         f.flush()
         data = tcx_reader.read(f.name)
