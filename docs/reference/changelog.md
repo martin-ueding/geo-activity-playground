@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.15
 
+#### Version 0.15.3
+
+- Create temporary file for TCX parsing in the same directory. There was a problem on Windows where the program didn't have access permissions to the temporary files directory.
+
 #### Version 0.15.2
 
 - Try to open GPX files in binary mode to avoid encoding issues. [GH-74](https://github.com/martin-ueding/geo-activity-playground/issues/74)
