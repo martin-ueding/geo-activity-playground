@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.15
 
+#### Version 0.15.2
+
+- Try to open GPX files in binary mode to avoid encoding issues. [GH-74](https://github.com/martin-ueding/geo-activity-playground/issues/74)
+
 #### Version 0.15.1
 
 - Add `if __name__ == "__main__"` clause such that one can use `python -m geo_activity_playground` on Windows.
