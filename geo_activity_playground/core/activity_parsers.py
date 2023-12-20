@@ -29,18 +29,22 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
         try:
             df = read_gpx_activity(path, opener)
         except gpxpy.gpx.GPXXMLSyntaxException as e:
-            raise ActivityParseError("Syntax error while parsing GPX file") from e
+            raise ActivityParseError(
+                f"Syntax error while parsing GPX file {path=}"
+            ) from e
+        except UnicodeDecodeError as e:
+            raise ActivityParseError(f"Encoding issue with {path=}: {e}") from e
     elif file_type == ".fit":
         df = read_fit_activity(path, opener)
     elif file_type == ".tcx":
         try:
             df = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
-            raise ActivityParseError("Syntax error in TCX file") from e
+            raise ActivityParseError(f"Syntax error in TCX file {path=}") from e
     elif file_type in [".kml", ".kmz"]:
         df = read_kml_activity(path, opener)
     else:
-        raise ActivityParseError(f"Unsupported file format: {file_type}")
+        raise ActivityParseError(f"Unsupported file format with {path=}: {file_type}")
 
     if len(df):
         try:
