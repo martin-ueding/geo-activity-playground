@@ -20,34 +20,6 @@ from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 logger = logging.getLogger(__name__)
 
 
-@functools.cache
-def get_all_points(repository: ActivityRepository) -> pd.DataFrame:
-    logger.info("Gathering all points …")
-    all_points_path = pathlib.Path("Cache/all-points.parquet")
-    if all_points_path.exists():
-        all_points = pd.read_parquet(all_points_path)
-    else:
-        all_points = pd.DataFrame()
-    new_shards = []
-    with work_tracker(pathlib.Path("Cache/all-points-task.json")) as tracker:
-        for activity in repository.iter_activities():
-            if activity.id in tracker:
-                continue
-            tracker.add(activity.id)
-
-            logger.info(f"Parsing points from {activity.id} …")
-            time_series = repository.get_time_series(activity.id)
-            if len(time_series) == 0 or "latitude" not in time_series.columns:
-                continue
-            shard = time_series[["latitude", "longitude"]].copy()
-            shard["activity_id"] = activity.id
-            new_shards.append(shard)
-    logger.info("Concatenating shards …")
-    all_points = pd.concat([all_points] + new_shards)
-    all_points.to_parquet(all_points_path)
-    return all_points
-
-
 @dataclasses.dataclass
 class GeoBounds:
     lat_min: float
