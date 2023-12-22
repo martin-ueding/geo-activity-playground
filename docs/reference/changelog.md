@@ -6,6 +6,11 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.16
+
+- Add feature to render heatmap from visible area. [GH-73](https://github.com/martin-ueding/geo-activity-playground/issues/73)
+- Remove heatmap image generation from clusters, remove Scikit-Learn dependency.
+
 ### Version 0.15
 
 #### Version 0.15.3
@@ -47,11 +52,11 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.13
 
 - Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.
-    - This also fixes the gaps that were present before. [GH-34](https://github.com/martin-ueding/geo-activity-playground/issues/34)
+  - This also fixes the gaps that were present before. [GH-34](https://github.com/martin-ueding/geo-activity-playground/issues/34)
 - Add cache migration functionality.
-    - Make sure that cache directory is created beforehand. [GH-55](https://github.com/martin-ueding/geo-activity-playground/issues/55)
+  - Make sure that cache directory is created beforehand. [GH-55](https://github.com/martin-ueding/geo-activity-playground/issues/55)
 - Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. [GH-47](https://github.com/martin-ueding/geo-activity-playground/issues/47)
-    - Fix introduced bug. [GH-56](https://github.com/martin-ueding/geo-activity-playground/issues/56)
+  - Fix introduced bug. [GH-56](https://github.com/martin-ueding/geo-activity-playground/issues/56)
 - Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.
 - Add a footer. [GH-49](https://github.com/martin-ueding/geo-activity-playground/issues/49)
 - Only export missing tiles in the active viewport. [GH-53](https://github.com/martin-ueding/geo-activity-playground/issues/53)

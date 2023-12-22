@@ -13,7 +13,6 @@ from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.video import explorer_video_main
-from geo_activity_playground.heatmap import generate_heatmaps_per_cluster
 from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
@@ -51,15 +50,6 @@ def main() -> None:
         "explorer-video", help="Generate video with explorer timeline."
     )
     subparser.set_defaults(func=lambda options: explorer_video_main())
-
-    subparser = subparsers.add_parser(
-        "heatmaps", help="Generate heatmaps from activities"
-    )
-    subparser.set_defaults(
-        func=lambda options: generate_heatmaps_per_cluster(
-            make_activity_repository(options.basedir)
-        )
-    )
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
