@@ -137,8 +137,6 @@ class HeatmapController:
                         "activity_ids"
                     ]
 
-        print(f"{relevant_activities = }")
-
         points = pd.concat(map(self._repository.get_time_series, relevant_activities))
         xy_data = np.array([points["x"], points["y"]]).T * 2**tile_bounds.zoom
 
