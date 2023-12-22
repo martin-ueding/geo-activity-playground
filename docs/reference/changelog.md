@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 #### Version 0.16.2
 
 - Make heatmap images that are downloaded look the same as the interactive one.
+- Always emit the path when there is something wrong while parsing an activity file.
 
 #### Version 0.16.1
 
