@@ -3,6 +3,7 @@ import functools
 import altair as alt
 import pandas as pd
 
+from ..core.config import get_config
 from geo_activity_playground.core.activities import ActivityRepository
 
 
@@ -58,10 +59,18 @@ class EquipmentController:
             )
             .reset_index()
             .sort_values("last_use", ascending=False)
-            .to_dict(orient="records")
         )
+
+        config = get_config()
+        print(config)
+        if "offsets" in config:
+            print(equipment_summary)
+            for equipment, offset in config["offsets"].items():
+                equipment_summary.loc[
+                    equipment_summary["equipment"] == equipment, "total_distance"
+                ] += offset
 
         return {
             "total_distances_plot": plot,
-            "equipment_summary": equipment_summary,
+            "equipment_summary": equipment_summary.to_dict(orient="records"),
         }
