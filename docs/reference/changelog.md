@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.16
 
+#### Version 0.16.2
+
+- Make heatmap images that are downloaded look the same as the interactive one.
+
 #### Version 0.16.1
 
 - Fix handling of TCX files on Windows. On that platform one cannot open the same file twice, therefore my approach failed. Now I close the file properly such that this should work on Windows as well.

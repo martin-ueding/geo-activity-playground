@@ -13,10 +13,7 @@ from PIL import Image
 from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.heatmap import build_heatmap_image
-from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import convert_to_grayscale
-from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import GeoBounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.tasks import work_tracker
@@ -69,7 +66,7 @@ class HeatmapController:
             }
         }
 
-    def render_tile(self, x: int, y: int, z: int) -> bytes:
+    def _render_tile_image(self, x: int, y: int, z: int) -> np.ndarray:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():
@@ -115,47 +112,30 @@ class HeatmapController:
             map_tile[:, :, c] = (1.0 - data_color[:, :, c]) * map_tile[
                 :, :, c
             ] + data_color[:, :, c]
+        return map_tile
 
+    def render_tile(self, x: int, y: int, z: int) -> bytes:
         f = io.BytesIO()
-        pl.imsave(f, map_tile, format="png")
+        pl.imsave(f, self._render_tile_image(x, y, z), format="png")
         return bytes(f.getbuffer())
 
     def download_heatmap(self, north, east, south, west) -> bytes:
         geo_bounds = GeoBounds(south, west, north, east)
-        tile_bounds = get_sensible_zoom_level(geo_bounds, (2160, 3840))
-        background = build_map_from_tiles(tile_bounds)
-        background = convert_to_grayscale(background)
-        background = 1.0 - background
+        tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
 
-        relevant_activities = set()
+        background = np.zeros((*tile_bounds.shape, 3))
+        for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
+            for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
+                tile = np.array(get_tile(tile_bounds.zoom, x, y)) / 255
 
-        for tile_x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
-            for tile_y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
-                tile = (tile_x, tile_y)
-                if tile in self.tile_visits[tile_bounds.zoom]:
-                    relevant_activities |= self.tile_visits[tile_bounds.zoom][tile][
-                        "activity_ids"
-                    ]
+                i = y - tile_bounds.y_tile_min
+                j = x - tile_bounds.x_tile_min
 
-        points = pd.concat(map(self._repository.get_time_series, relevant_activities))
-        xy_data = np.array([points["x"], points["y"]]).T * 2**tile_bounds.zoom
-
-        within = (
-            (tile_bounds.x_tile_min <= xy_data[:, 0])
-            & (xy_data[:, 0] <= tile_bounds.x_tile_max)
-            & (tile_bounds.y_tile_min <= xy_data[:, 1])
-            & (xy_data[:, 1] <= tile_bounds.y_tile_max)
-        )
-        xy_data = xy_data[within]
-
-        data_color = build_heatmap_image(
-            xy_data, np.mean(points["latitude"]), len(relevant_activities), tile_bounds
-        )
-        for c in range(3):
-            background[:, :, c] = (1.0 - data_color[:, :, c]) * background[
-                :, :, c
-            ] + data_color[:, :, c]
-        background = crop_image_to_bounds(background, geo_bounds, tile_bounds)
+                background[
+                    i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
+                    j * OSM_TILE_SIZE : (j + 1) * OSM_TILE_SIZE,
+                    :,
+                ] = self._render_tile_image(x, y, tile_bounds.zoom)
 
         f = io.BytesIO()
         pl.imsave(f, background, format="png")
