@@ -140,6 +140,14 @@ class HeatmapController:
         points = pd.concat(map(self._repository.get_time_series, relevant_activities))
         xy_data = np.array([points["x"], points["y"]]).T * 2**tile_bounds.zoom
 
+        within = (
+            (tile_bounds.x_tile_min <= xy_data[:, 0])
+            & (xy_data[:, 0] <= tile_bounds.x_tile_max)
+            & (tile_bounds.y_tile_min <= xy_data[:, 1])
+            & (xy_data[:, 1] <= tile_bounds.y_tile_max)
+        )
+        xy_data = xy_data[within]
+
         data_color = build_heatmap_image(
             xy_data, np.mean(points["latitude"]), len(relevant_activities), tile_bounds
         )
