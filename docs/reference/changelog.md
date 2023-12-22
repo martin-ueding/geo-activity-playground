@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add offsets for equipment. [GH-71](https://github.com/martin-ueding/geo-activity-playground/issues/71)
 - Fix number of tile visits in explorer view. [GH-69](https://github.com/martin-ueding/geo-activity-playground/issues/69)
 - Add action to convert Strava checkout to our format. [GH-65](https://github.com/martin-ueding/geo-activity-playground/issues/65)
+- Filter out some GPS jumps. [GH-54](https://github.com/martin-ueding/geo-activity-playground/issues/54)
 
 ### Version 0.15
 
