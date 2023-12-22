@@ -6,6 +6,7 @@ import sys
 
 import coloredlogs
 
+from .importers.strava_checkout import convert_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
@@ -50,6 +51,18 @@ def main() -> None:
         "explorer-video", help="Generate video with explorer timeline."
     )
     subparser.set_defaults(func=lambda options: explorer_video_main())
+
+    subparser = subparsers.add_parser(
+        "convert-strava-checkout",
+        help="Converts a Strava checkout to the structure used by this program.",
+    )
+    subparser.set_defaults(
+        func=lambda options: convert_strava_checkout(
+            options.checkout_path, options.playground_path
+        )
+    )
+    subparser.add_argument("checkout_path", type=pathlib.Path)
+    subparser.add_argument("playground_path", type=pathlib.Path)
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
