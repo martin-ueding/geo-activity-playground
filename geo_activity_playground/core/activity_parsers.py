@@ -1,8 +1,6 @@
 import datetime
 import gzip
-import os
 import pathlib
-import tempfile
 import xml
 
 import dateutil.parser
@@ -161,10 +159,11 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     with open(path, "rb") as f:
         content = f.read().strip()
 
-    with tempfile.NamedTemporaryFile("wb", dir=os.getcwd(), suffix=".tcx") as f:
+    stripped_file = pathlib.Path("Cache/temp.tcx")
+    with open(stripped_file, "wb") as f:
         f.write(content)
-        f.flush()
-        data = tcx_reader.read(f.name)
+    data = tcx_reader.read(str(stripped_file))
+    stripped_file.unlink()
 
     for trackpoint in data.trackpoints:
         if trackpoint.latitude and trackpoint.longitude:
