@@ -138,6 +138,11 @@ def embellish_time_series(repository: ActivityRepository) -> None:
                 )
                 changed = True
 
+            potential_jumps = (df["speed"] > 40) & (df["speed"].diff() > 10)
+            if np.any(potential_jumps):
+                df = df.loc[~potential_jumps]
+                changed = True
+
         if "x" not in df.columns:
             x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
             df["x"] = x

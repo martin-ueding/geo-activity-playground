@@ -14,6 +14,14 @@ def delete_activities_per_tile() -> None:
         path.unlink(missing_ok=True)
 
 
+def delete_work_tracker(name: str):
+    def migration() -> None:
+        path = pathlib.Path(f"Cache/work-tracker-{name}.pickle")
+        path.unlink(missing_ok=True)
+
+    return migration
+
+
 def apply_cache_migrations() -> None:
     logger.info("Apply cache migration if needed …")
     cache_status_file = pathlib.Path("Cache/status.json")
@@ -23,7 +31,10 @@ def apply_cache_migrations() -> None:
     else:
         cache_status = {"num_applied_migrations": 0}
 
-    migrations = [delete_activities_per_tile]
+    migrations = [
+        delete_activities_per_tile,
+        delete_work_tracker("embellish-time-series"),
+    ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:
         logger.info(f"Applying cache migration {migration.__name__} …")
