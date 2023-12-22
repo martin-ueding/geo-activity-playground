@@ -39,13 +39,15 @@ def convert_strava_checkout(
         if is_commute:
             activity_target /= "Commute"
 
-        activity_target /= (
-            f"{activity_date.year:04d}-{activity_date.month:02d}-{activity_date.day:02d}"
-            + " "
-            + f"{activity_date.hour:02d}-{activity_date.minute:02d}-{activity_date.second:02d}"
-            + " "
-            + activity_name
-            + activity_file.suffix
+        activity_target /= "".join(
+            [
+                f"{activity_date.year:04d}-{activity_date.month:02d}-{activity_date.day:02d}",
+                " ",
+                f"{activity_date.hour:02d}-{activity_date.minute:02d}-{activity_date.second:02d}",
+                " ",
+                activity_name,
+            ]
+            + activity_file.suffixes
         )
 
         activity_target.parent.mkdir(exist_ok=True, parents=True)
