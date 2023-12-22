@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/getting-started/config-file/">
       
       
-        <link rel="prev" href="../using-strava-api/">
+        <link rel="prev" href="../moving-from-strava/">
       
       
         <link rel="next" href="../starting-the-webserver/">
@@ -390,6 +390,27 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../moving-from-strava/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moving from Strava
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -451,6 +472,15 @@
   <a href="#heart-rate" class="md-nav__link">
     <span class="md-ellipsis">
       Heart rate
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#equipment-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Equipment offsets
     </span>
   </a>
   
@@ -813,6 +843,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#equipment-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Equipment offsets
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -850,6 +889,11 @@
 
 <span class="c1"># Optionally specify `resting`:</span>
 <span class="c1">## resting = 48</span>
+</code></pre></div>
+<h2 id="equipment-offsets">Equipment offsets</h2>
+<p>Perhaps you haven't recorded every single activity with an equipment but still know what the offset is. For me it is my trekking bike which I bought and used with a plain bike mounted odometer. Only after some time I've started to record all activities. I know that the offset is 3850 km, so I'd like to add that to my equipment overview. For this one can specify another block in the configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[offsets]</span>
+<span class="s2">&quot;Trekkingrad 2019&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3850</span>
 </code></pre></div>
 
 

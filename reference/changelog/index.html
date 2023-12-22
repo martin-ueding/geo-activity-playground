@@ -391,6 +391,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/moving-from-strava/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moving from Strava
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/config-file/" class="md-nav__link">
         
   
@@ -726,6 +747,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-016" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-015" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.15
@@ -734,6 +764,15 @@
   
     <nav class="md-nav" aria-label="Version 0.15">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0153" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.3
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#version-0152" class="md-nav__link">
@@ -1061,6 +1100,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-016" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-015" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.15
@@ -1069,6 +1117,15 @@
   
     <nav class="md-nav" aria-label="Version 0.15">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0153" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.3
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#version-0152" class="md-nav__link">
@@ -1342,7 +1399,21 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-016">Version 0.16</h3>
+<ul>
+<li>Add feature to render heatmap from visible area. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/73">GH-73</a></li>
+<li>Remove heatmap image generation from clusters, remove Scikit-Learn dependency.</li>
+<li>Add offsets for equipment. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/71">GH-71</a></li>
+<li>Fix number of tile visits in explorer view. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/69">GH-69</a></li>
+<li>Add action to convert Strava checkout to our format. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/65">GH-65</a></li>
+<li>Filter out some GPS jumps. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/54">GH-54</a></li>
+<li>Add simple search function. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/70">GH-70</a></li>
+</ul>
 <h3 id="version-015">Version 0.15</h3>
+<h4 id="version-0153">Version 0.15.3</h4>
+<ul>
+<li>Create temporary file for TCX parsing in the same directory. There was a problem on Windows where the program didn't have access permissions to the temporary files directory.</li>
+</ul>
 <h4 id="version-0152">Version 0.15.2</h4>
 <ul>
 <li>Try to open GPX files in binary mode to avoid encoding issues. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/74">GH-74</a></li>
@@ -1376,18 +1447,12 @@
 </ul>
 <h3 id="version-013">Version 0.13</h3>
 <ul>
-<li>Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.<ul>
+<li>Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.</li>
 <li>This also fixes the gaps that were present before. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/34">GH-34</a></li>
-</ul>
-</li>
-<li>Add cache migration functionality.<ul>
+<li>Add cache migration functionality.</li>
 <li>Make sure that cache directory is created beforehand. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/55">GH-55</a></li>
-</ul>
-</li>
-<li>Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/47">GH-47</a><ul>
+<li>Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/47">GH-47</a></li>
 <li>Fix introduced bug. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/56">GH-56</a></li>
-</ul>
-</li>
 <li>Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.</li>
 <li>Add a footer. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/49">GH-49</a></li>
 <li>Only export missing tiles in the active viewport. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/53">GH-53</a></li>
