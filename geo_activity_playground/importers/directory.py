@@ -45,6 +45,9 @@ def import_from_directory() -> None:
             traceback.print_exc()
             paths_with_errors.append((path, str(e)))
             continue
+        except:
+            logger.error(f"Encountered a problem with {path=}, see details below.")
+            raise
 
         work_tracker.mark_done(activity_id)
 

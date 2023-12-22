@@ -1,5 +1,6 @@
 import datetime
 import gzip
+import logging
 import pathlib
 import xml
 
@@ -9,6 +10,8 @@ import gpxpy
 import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
+
+logger = logging.getLogger(__name__)
 
 
 class ActivityParseError(BaseException):
@@ -43,7 +46,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
     elif file_type in [".kml", ".kmz"]:
         df = read_kml_activity(path, opener)
     else:
-        raise ActivityParseError(f"Unsupported file format with {path=}: {file_type}")
+        raise ActivityParseError(f"Unsupported file format: {file_type}")
 
     if len(df):
         try:
