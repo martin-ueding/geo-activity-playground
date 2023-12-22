@@ -122,20 +122,20 @@ def get_three_color_tiles(
     else:
         square_geojson = "{}"
 
+    try:
+        feature_collection = geojson.FeatureCollection(
+            features=[
+                make_explorer_tile(x, y, v, zoom) for (x, y), v in tile_dict.items()
+            ]
+        )
+        explored_geojson = geojson.dumps(feature_collection)
+    except TypeError as e:
+        logger.error(f"Encountered TypeError while building GeoJSON: {e=}")
+        logger.error(f"{tile_dict = }")
+        raise
+
     result = {
-        "explored_geojson": geojson.dumps(
-            geojson.FeatureCollection(
-                features=[
-                    make_explorer_tile(
-                        x,
-                        y,
-                        tile_dict[(x, y)],
-                        zoom,
-                    )
-                    for (x, y), v in tile_dict.items()
-                ]
-            )
-        ),
+        "explored_geojson": explored_geojson,
         "max_cluster_size": max_cluster_size,
         "num_cluster_tiles": num_cluster_tiles,
         "num_tiles": len(tile_dict),
