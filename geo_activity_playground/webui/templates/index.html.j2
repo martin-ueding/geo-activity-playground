@@ -2,14 +2,19 @@
 
 {% block container %}
 <div class="row mb-3">
-    <div class="col">
-        <h2>Last 30 days</h2>
-    </div>
 </div>
 
 <div class="row mb-3">
-    <div class="col">
+    <div class="col-md-9">
+        <h2>Last 30 days</h2>
         {{ vega_direct("distance-last-30-days", distance_last_30_days_plot) }}
+    </div>
+    <div class="col-md-3">
+        <h2>Search activities</h2>
+        <form method="post" action="/search">
+            <input type="search" name="name" />
+            <input type="submit" class="button" />
+        </form>
     </div>
 </div>
 

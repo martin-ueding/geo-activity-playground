@@ -1,0 +1,38 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Search Results</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Start</th>
+                    <th>Kind</th>
+                    <th>Distance</th>
+                    <th>Elapsed time</th>
+                    <th>Commute</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.name }}</td>
+                    <td>{{ activity.start }}</td>
+                    <td>{{ activity.kind }}</td>
+                    <td>{{ '%.1f' % activity["distance/km"] }} km</td>
+                    <td>{{ activity.elapsed_time }}</td>
+                    <td>{{ activity.commute }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

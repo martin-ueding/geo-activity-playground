@@ -1,7 +1,9 @@
 from flask import Flask
 from flask import render_template
+from flask import request
 from flask import Response
 
+from .search_controller import SearchController
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
@@ -28,10 +30,19 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     heatmap_controller = HeatmapController(repository)
     grayscale_tile_controller = GrayscaleTileController()
     summary_controller = SummaryController(repository)
+    search_controller = SearchController(repository)
 
     @app.route("/")
     def index():
         return render_template("index.html.j2", **entry_controller.render())
+
+    @app.route("/search", methods=["POST"])
+    def search():
+        form_input = request.form
+        return render_template(
+            "search.html.j2",
+            **search_controller.render_search_results(form_input["name"])
+        )
 
     @app.route("/activity/<id>")
     def activity(id: str):
