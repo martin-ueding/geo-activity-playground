@@ -2,16 +2,11 @@
 This code is based on https://github.com/remisalmon/Strava-local-heatmap.
 """
 import dataclasses
-import functools
 import logging
-import pathlib
 
 import matplotlib.pyplot as pl
 import numpy as np
-import pandas as pd
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -184,30 +179,28 @@ def gaussian_filter(image, sigma):
 
 
 def build_heatmap_image(
-    lat_lon_data: np.ndarray, num_activities: int, tile_bounds: TileBounds
+    xy_data: np.ndarray,
+    mean_latitude: float,
+    num_activities: int,
+    tile_bounds: TileBounds,
 ) -> np.ndarray:
-    # fill trackpoints
-    sigma_pixel = 1
+    assert xy_data.shape[1] == 2
 
     data = np.zeros(tile_bounds.shape)
 
-    xy_data = compute_tile_float(
-        lat_lon_data[:, 0], lat_lon_data[:, 1], tile_bounds.zoom
-    )
-    xy_data = np.array(xy_data).T
+    xy_data = np.array(xy_data)
     xy_data = np.round(
         (xy_data - [tile_bounds.x_tile_min, tile_bounds.y_tile_min]) * OSM_TILE_SIZE
-    )  # to supertile coordinates
+    )
 
+    sigma_pixel = 1
     for j, i in xy_data.astype(int):
         data[
             i - sigma_pixel : i + sigma_pixel, j - sigma_pixel : j + sigma_pixel
         ] += 1.0
 
     res_pixel = (
-        156543.03
-        * np.cos(np.radians(np.mean(lat_lon_data[:, 0])))
-        / (2.0**tile_bounds.zoom)
+        156543.03 * np.cos(np.radians(mean_latitude)) / (2.0**tile_bounds.zoom)
     )  # from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
     # trackpoint max accumulation per pixel = 1/5 (trackpoint/meter) * res_pixel (meter/pixel) * activities
@@ -218,20 +211,15 @@ def build_heatmap_image(
 
     # equalize histogram and compute kernel density estimation
     data_hist, _ = np.histogram(data, bins=int(m + 1))
-
     data_hist = np.cumsum(data_hist) / data.size  # normalized cumulated histogram
-
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            data[i, j] = m * data_hist[int(data[i, j])]  # histogram equalization
+            data[i, j] = m * data_hist[int(data[i, j])]
 
-    data = gaussian_filter(
-        data, float(sigma_pixel)
-    )  # kernel density estimation with normal kernel
+    data = gaussian_filter(data, float(sigma_pixel))
 
-    data = (data - data.min()) / (data.max() - data.min())  # normalize to [0,1]
+    data = (data - data.min()) / (data.max() - data.min())
 
-    # colorize
     cmap = pl.get_cmap("hot")
 
     data_color = cmap(data)
