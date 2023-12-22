@@ -126,6 +126,19 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             mimetype="image/png",
         )
 
+    @app.route("/heatmap-download/<north>/<east>/<south>/<west>")
+    def heatmap_download(north: str, east: str, south: str, west: str):
+        return Response(
+            heatmap_controller.download_heatmap(
+                float(north),
+                float(east),
+                float(south),
+                float(west),
+            ),
+            mimetype="image/png",
+            headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
+        )
+
     @app.route("/grayscale-tile/<z>/<x>/<y>.png")
     def grayscale_tile(x: str, y: str, z: str):
         return Response(

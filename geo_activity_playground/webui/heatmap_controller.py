@@ -13,7 +13,12 @@ from PIL import Image
 from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.heatmap import build_heatmap_image
+from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import convert_to_grayscale
+from geo_activity_playground.core.heatmap import crop_image_to_bounds
+from geo_activity_playground.core.heatmap import GeoBounds
+from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -113,4 +118,39 @@ class HeatmapController:
 
         f = io.BytesIO()
         pl.imsave(f, map_tile, format="png")
+        return bytes(f.getbuffer())
+
+    def download_heatmap(self, north, east, south, west) -> bytes:
+        geo_bounds = GeoBounds(south, west, north, east)
+        tile_bounds = get_sensible_zoom_level(geo_bounds, (2160, 3840))
+        background = build_map_from_tiles(tile_bounds)
+        background = convert_to_grayscale(background)
+        background = 1.0 - background
+
+        relevant_activities = set()
+
+        for tile_x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
+            for tile_y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
+                tile = (tile_x, tile_y)
+                if tile in self.tile_visits[tile_bounds.zoom]:
+                    relevant_activities |= self.tile_visits[tile_bounds.zoom][tile][
+                        "activity_ids"
+                    ]
+
+        print(f"{relevant_activities = }")
+
+        points = pd.concat(map(self._repository.get_time_series, relevant_activities))
+        lat_lon_data = np.array([points["latitude"], points["longitude"]]).T
+
+        data_color = build_heatmap_image(
+            lat_lon_data, len(relevant_activities), tile_bounds
+        )
+        for c in range(3):
+            background[:, :, c] = (1.0 - data_color[:, :, c]) * background[
+                :, :, c
+            ] + data_color[:, :, c]
+        background = crop_image_to_bounds(background, geo_bounds, tile_bounds)
+
+        f = io.BytesIO()
+        pl.imsave(f, background, format="png")
         return bytes(f.getbuffer())

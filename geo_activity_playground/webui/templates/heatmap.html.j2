@@ -10,6 +10,7 @@
 <div class="row mb-3">
     <div class="col">
         <div id="heatmap" style="height: 800px;"></div>
+        <p><a href="#" onclick="downloadAs()">Download heatmap in visible area</a></p>
 
         <script>
             let map = L.map('heatmap', {
@@ -25,6 +26,13 @@
             let bbox = {{ center.bbox| safe }}
             if (bbox) {
                 map.fitBounds(L.geoJSON(bbox).getBounds())
+            }
+
+
+            function downloadAs() {
+                bounds = map.getBounds()
+                window.location.href =
+                    `/heatmap-download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}`
             }
         </script>
     </div>
