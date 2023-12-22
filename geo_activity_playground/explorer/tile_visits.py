@@ -44,7 +44,6 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
                 tile = (tile_x, tile_y)
                 if tile in tile_visits[zoom]:
                     d = tile_visits[zoom][tile]
-                    d["count"] += 1
                     if d["first_time"] > time:
                         d["first_time"] = time
                         d["first_id"] = activity_id
@@ -54,7 +53,6 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
                     d["activity_ids"].add(activity_id)
                 else:
                     tile_visits[zoom][tile] = {
-                        "count": 1,
                         "first_time": time,
                         "first_id": activity_id,
                         "last_time": time,
