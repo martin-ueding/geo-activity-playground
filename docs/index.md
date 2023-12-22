@@ -12,5 +12,11 @@ This project is still in a early prototyping phase, I'm still changing a lot and
 
 ## Get started
 
-1. Install the software [using the stable version](getting-started/installing-stable-on-linux.md). If you want to use the latest development version, use that guide.
-2. Choose a data source, either local [activity files](getting-started/using-activity-files.md) or the [Strava API](getting-started/using-strava-api.md). You can only have one source per playground. But you can have as many playgrounds as you like.
+1. Install the software using one of the following options:
+   - [Using the stable version on Linux](getting-started/installing-stable-on-linux.md)
+   - [Using the stable version on Windows](getting-started/installing-stable-on-windows.md)
+   - [Using the development version on Linux](getting-started/installing-git-on-linux.md)
+2. Get your activity data in place using one of the following options:
+   - [Use local activity files](getting-started/using-activity-files.md) if you already have these.
+   - [Use the Strava API](getting-started/using-strava-api.md) if you want to use this project to analyse your data on Strava.
+   - [Move from Strava](getting-started/moving-from-strava.md) if you wan to leave Strava and work locally from then on.

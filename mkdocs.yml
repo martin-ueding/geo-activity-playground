@@ -27,6 +27,7 @@ nav:
       - getting-started/installing-git-on-linux.md
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
+      - getting-started/moving-from-strava.md
       - getting-started/config-file.md
       - getting-started/starting-the-webserver.md
   - Features:
