@@ -34,3 +34,12 @@ birthyear = 19..
 # Optionally specify `resting`:
 ## resting = 48
 ```
+
+## Equipment offsets
+
+Perhaps you haven't recorded every single activity with an equipment but still know what the offset is. For me it is my trekking bike which I bought and used with a plain bike mounted odometer. Only after some time I've started to record all activities. I know that the offset is 3850 km, so I'd like to add that to my equipment overview. For this one can specify another block in the configuration:
+
+```toml
+[offsets]
+"Trekkingrad 2019" = 3850
+```
