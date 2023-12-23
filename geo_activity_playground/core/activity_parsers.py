@@ -20,7 +20,9 @@ class ActivityParseError(BaseException):
 
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
     suffixes = path.suffixes
-    if suffixes[-1] == ".gz":
+    if not suffixes:  # Skip files without extensions like .DS_Store files on macos.
+        file_type = None
+    elif suffixes[-1] == ".gz":
         opener = gzip.open
         file_type = suffixes[-2]
     else:
@@ -42,13 +44,13 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
         try:
             df = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
-            raise ActivityParseError(f"Syntax error in TCX file {path=}") from e
+            raise ActivityParseError("Syntax error in TCX file") from e
     elif file_type in [".kml", ".kmz"]:
         df = read_kml_activity(path, opener)
     elif file_type == ".csv":  # Simra csv export
         df = read_simra_activity(path)
     else:
-        raise ActivityParseError(f"Unsupported file format: {file_type}")
+        raise ActivityParseError(f"Unsupported file format: {file_type} of file: {path}")
 
     if len(df):
         try:
