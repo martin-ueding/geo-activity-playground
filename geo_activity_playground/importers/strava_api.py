@@ -140,7 +140,7 @@ def try_import_strava() -> None:
             else:
                 try:
                     time_series = download_strava_time_series(activity.id, client)
-                except ObjectNotFound:
+                except ObjectNotFound as e:
                     logger.error(
                         f"The activity {activity.id} with name “{activity.name}” cannot be found. Perhaps it is a manual activity without a time series. Ignoring. {e=}"
                     )

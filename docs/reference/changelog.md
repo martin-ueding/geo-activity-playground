@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.16
 
+#### Version 0.16.4
+
+- Fix syntax error.
+
 #### Version 0.16.3
 
 - Ignore Strava activities without a time series.
