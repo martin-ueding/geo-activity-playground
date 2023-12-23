@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import logging
 import pathlib
@@ -78,15 +79,25 @@ def import_from_directory() -> None:
         kind = None
         if len(path.parts) >= 3 and path.parts[1] != "Commute":
             kind = path.parts[1]
+        else:
+            with contextlib.suppress(AttributeError):
+                kind = "/".join(timeseries.sport)
+            
         equipment = None
         if len(path.parts) >= 4 and path.parts[2] != "Commute":
             equipment = path.parts[2]
+
+        try:
+            name = timeseries.wkt_name
+        except AttributeError:
+            name = path.stem
 
         row = {
             "id": activity_id,
             "commute": commute,
             "distance": distance,
-            "name": path.stem,
+            "filename": path.stem,
+            "name": name,
             "kind": kind,
             "start": timeseries["time"].iloc[0],
             "elapsed_time": timeseries["time"].iloc[-1] - timeseries["time"].iloc[0],

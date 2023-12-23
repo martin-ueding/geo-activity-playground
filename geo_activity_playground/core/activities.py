@@ -30,6 +30,7 @@ class ActivityMeta:
     id: int
     kind: str
     name: str
+    filename: str
     start: datetime.datetime
 
     def __str__(self) -> str:

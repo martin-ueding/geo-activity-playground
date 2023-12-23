@@ -90,6 +90,7 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     'descent': 11}
     """
     rows = []
+    metadata = {}
     with open(path, "rb") as f:
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
@@ -120,13 +121,26 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                             row["altitude"] = fields["altitude"]
                         if "enhanced_altitude" in fields:
                             row["altitude"] = fields["enhanced_altitude"]
+                        if "grade" in fields:
+                            row["grade"] = fields["grade"]
                         if "speed" in fields:
                             row["speed"] = fields["speed"]
                         if "enhanced_speed" in fields:
                             row["speed"] = fields["enhanced_speed"]
+                        if "temperature" in fields:
+                            row["temperature"] = fields["temperature"]
+                        if "gps_accuracy" in fields:
+                            row["gps_accuracy"] = fields["gps_accuracy"]
                         rows.append(row)
-
-    return pd.DataFrame(rows)
+                    elif "wkt_name" in fields and "sport" in fields and "sub_sport" in fields:
+                        metadata["wkt_name"] = fields["wkt_name"]
+                        metadata["sport"] = (fields["sport"], fields["sub_sport"])
+                            
+    df = pd.DataFrame(rows)
+    if metadata:
+        for key, value in metadata.items():
+            setattr(df, key, value)
+    return df
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
