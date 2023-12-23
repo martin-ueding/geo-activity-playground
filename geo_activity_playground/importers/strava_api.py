@@ -10,6 +10,7 @@ from typing import Any
 
 import pandas as pd
 from stravalib import Client
+from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
@@ -137,7 +138,13 @@ def try_import_strava() -> None:
             if time_series_path.exists():
                 time_series = pd.read_parquet(time_series_path)
             else:
-                time_series = download_strava_time_series(activity.id, client)
+                try:
+                    time_series = download_strava_time_series(activity.id, client)
+                except ObjectNotFound:
+                    logger.error(
+                        f"The activity {activity.id} with name “{activity.name}” cannot be found. Perhaps it is a manual activity without a time series. Ignoring. {e=}"
+                    )
+                    continue
                 time_series.name = activity.id
                 new_time = [
                     activity.start_date + datetime.timedelta(seconds=time)
