@@ -89,6 +89,19 @@ class ActivityRepository:
                     * 3.6
                 )
                 changed = True
+            else:
+                # Wahoo ELEMENT Roam saves the speed in m/s so the conversion has to be done for the speed too.
+                # TODO devices however do save the speed in km/h, so no conversion is needed.
+                mean = (
+                    df["distance"].diff()
+                    / (df["time"].diff().dt.total_seconds() + 1e-3)
+                    * 3.6
+                ).mean()
+                if (abs(df["speed"].mean() - mean) > 1 and
+                    abs(df["speed"].mean() * 3.6 - mean) < 1):
+                    df["speed"] = 3.6 * df["speed"]
+                    changed = True
+
 
         if "latitude" in df.columns and "x" not in df.columns:
             x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
