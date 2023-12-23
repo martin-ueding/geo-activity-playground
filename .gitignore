@@ -3,3 +3,6 @@ __pycache__/
 dist
 site
 data
+.venv
+.DS_Store
+.gitignore
