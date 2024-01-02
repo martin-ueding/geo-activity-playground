@@ -1,0 +1,16 @@
+[strava]
+# client_id = "…"
+# client_secret = "…"
+# code = "..."
+
+[heart]
+# Specify either `birthyear` or `maximum`:
+birthyear = 1980
+## maximum = 187
+# Optionally specify `resting`:
+## resting = 48
+
+# [offsets]
+# "Trekkingrad 2019" = 3850
+
+# vim: ft=toml
