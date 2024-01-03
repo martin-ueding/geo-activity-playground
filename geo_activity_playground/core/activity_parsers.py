@@ -45,6 +45,8 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
             raise ActivityParseError(f"Syntax error in TCX file {path=}") from e
     elif file_type in [".kml", ".kmz"]:
         df = read_kml_activity(path, opener)
+    elif file_type == ".csv":  # Simra csv export
+        df = read_simra_activity(path, opener)
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
@@ -212,3 +214,12 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
             row["altitude"] = float(alt)
         rows.append(row)
     return pd.DataFrame(rows)
+
+def read_simra_activity(path: pathlib.Path, opener) -> pd.DataFrame:
+    data = pd.read_csv(path,header=1)
+    data['time'] = data['timeStamp'].apply(lambda d: datetime.datetime.fromtimestamp(d/1000))
+    data['time'] = data['time'].dt.tz_localize(datetime.timezone.utc)
+    data = data.rename(columns={'lat':'latitude','lon':'longitude'})
+    out =  data[data.latitude.isna() == False][['time','latitude','longitude']] # drop nan lines
+    out = out.reset_index(drop=True)
+    return out
