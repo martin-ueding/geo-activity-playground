@@ -8,6 +8,7 @@ Before you start here, you should have done these things:
 Now we can start the webserver which provides most of the features. This is done with the `serve` command. So depending on how you have installed it, the commands could look like these:
 
 - `geo-activity-playground serve` if you are in the playground directory and have installed a stable version.
+- `geo-activity-playground --basedir ~/Dokumente/Karten/Playground serve` if your playground directory is somewhere else and you have installed a stable version.
 - `poetry run geo-activity-playground --basedir ~/Dokumente/Karten/Playground serve` if you have it from the git checkout and want to use local files in your directory as a data source.
 
 The webserver will start up and give you a bit of output like this:
