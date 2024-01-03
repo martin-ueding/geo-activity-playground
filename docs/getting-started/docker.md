@@ -21,7 +21,7 @@ You need to set up your files according to one of the presented methods, like ac
 Once you have your playground directory, you can launch the Docker image with the following. Be sure to replace `path/to/playground` with your path.
 
 ```bash
-sudo docker -v -p 5000:5000 path/to/playground:/data -it geo-activity-playground 
+sudo docker run -p 5000:5000 -v path/to/playground:/data -it geo-activity-playground
 ```
 
 This will start the webserver on <http://localhost:5000/>.

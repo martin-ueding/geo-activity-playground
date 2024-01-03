@@ -23,6 +23,6 @@ RUN mkdir /data
 
 EXPOSE 5000
 
-CMD ["python", "-m", "geo_activity_playground", "--basedir", "/data", "serve", "--host 0.0.0.0"]
+CMD ["python", "-m", "geo_activity_playground", "--basedir", "/data", "serve", "--host", "0.0.0.0"]
 
 
