@@ -145,7 +145,7 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
 
-def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
+def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     """
     cadence = {NoneType} None
      distance = {float} 7.329999923706055
@@ -159,7 +159,7 @@ def read_tcx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     rows = []
     tcx_reader = tcxreader.tcxreader.TCXReader()
 
-    with open(path, "rb") as f:
+    with opener(path, "rb") as f:
         content = f.read().strip()
 
     stripped_file = pathlib.Path("Cache/temp.tcx")
