@@ -1,10 +1,8 @@
 # Configuration file
 
-The project tries to adhere to the _convention over configuration_ mantra and therefore minimizes the amount of configuration necessary. There are still a few data points which one might need to fill out.
+The project tries to adhere to the _convention over configuration_ mantra and therefore minimizes the amount of configuration necessary. There are still a few data points which one might need to fill out. This page summarizes all the configuration file elements and links to the features that use them.
 
-This page summarizes all the configuration file elements and links to the features that use them.
-
-The configuration file is in the [TOML format](https://toml.io/en/) and contains multiple _tables_ with options. We will go through them here one-by-one.
+The configuration file is optional. If you want to create one, it needs to be placed at `Playground/config.toml`. The configuration file is in the [TOML format](https://toml.io/en/) and contains multiple _tables_ with options. We will go through them here one-by-one.
 
 ## Strava API
 
