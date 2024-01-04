@@ -9,8 +9,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.17
 
 - Fix bug which broke the import of `.tcx.gz` files.
-- Add `Dockerfile` such that one can easily use this with Docker.
-- Add support for the CSV files of the [SimRa Project](https://simra-project.github.io/).
+- Add `Dockerfile` such that one can easily use this with Docker. [GH-78](https://github.com/martin-ueding/geo-activity-playground/pull/78)
+- Add support for the CSV files of the [SimRa Project](https://simra-project.github.io/). [GH-79](https://github.com/martin-ueding/geo-activity-playground/pull/79)
 
 ### Version 0.16
 
