@@ -1,0 +1,23 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Strava Connect</h1>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <form action="https://www.strava.com/oauth/authorize" method="GET">
+            <div class="mb-3">
+                <label for="client_id" class="form-label">Client ID</label>
+                <input type="text" class="form-control" id="client_id" name="client_id" placeholder="814722" />
+            </div>
+            <input type="hidden" name="redirect_uri" value="http://{{ host }}:{{ port }}/strava/callback" />
+            <input type="hidden" name="response_type" value="code" />
+            <input type="hidden" name="scope" value="activity:read_all" />
+            <input type="submit" value="Connect to Strava" />
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

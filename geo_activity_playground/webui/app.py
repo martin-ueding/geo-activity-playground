@@ -13,6 +13,7 @@ from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.strava_controller import StravaController
 from geo_activity_playground.webui.summary_controller import SummaryController
 from geo_activity_playground.webui.tile_controller import (
     TileController,
@@ -178,6 +179,29 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
         return render_template("index.html.j2", **entry_controller.render())
 
 
+def route_strava(app: Flask, host: str, port: int) -> None:
+    strava_controller = StravaController()
+
+    @app.route("/strava/connect")
+    def strava_connect():
+        return render_template(
+            "strava-connect.html.j2",
+            host=host,
+            port=port,
+            **strava_controller.action_connect()
+        )
+
+    @app.route("/strava/callback")
+    def strava_callback():
+        code = request.args.get("code", type=str)
+        return render_template(
+            "strava-connect.html.j2",
+            host=host,
+            port=port,
+            **strava_controller.action_connect()
+        )
+
+
 def route_summary(app: Flask, repository: ActivityRepository) -> None:
     summary_controller = SummaryController(repository)
 
@@ -216,6 +240,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     route_heatmap(app, repository)
     route_search(app, repository)
     route_start(app, repository)
+    route_strava(app, host, port)
     route_summary(app, repository)
     route_tiles(app, repository)
 
