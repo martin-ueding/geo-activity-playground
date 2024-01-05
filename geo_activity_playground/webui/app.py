@@ -18,31 +18,8 @@ from geo_activity_playground.webui.heatmap_controller import HeatmapController
 from geo_activity_playground.webui.summary_controller import SummaryController
 
 
-def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
-    app = Flask(__name__)
-
-    entry_controller = EntryController(repository)
-    calendar_controller = CalendarController(repository)
-    eddington_controller = EddingtonController(repository)
+def route_activity(app: Flask, repository: ActivityRepository) -> None:
     activity_controller = ActivityController(repository)
-    explorer_controller = ExplorerController(repository)
-    equipment_controller = EquipmentController(repository)
-    heatmap_controller = HeatmapController(repository)
-    grayscale_tile_controller = GrayscaleTileController()
-    summary_controller = SummaryController(repository)
-    search_controller = SearchController(repository)
-
-    @app.route("/")
-    def index():
-        return render_template("index.html.j2", **entry_controller.render())
-
-    @app.route("/search", methods=["POST"])
-    def search():
-        form_input = request.form
-        return render_template(
-            "search.html.j2",
-            **search_controller.render_search_results(form_input["name"])
-        )
 
     @app.route("/activity/<id>")
     def activity(id: str):
@@ -56,6 +33,43 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             activity_controller.render_sharepic(int(id)),
             mimetype="image/png",
         )
+
+
+def route_calendar(app: Flask, repository: ActivityRepository) -> None:
+    calendar_controller = CalendarController(repository)
+
+    @app.route("/calendar")
+    def calendar():
+        return render_template(
+            "calendar.html.j2", **calendar_controller.render_overview()
+        )
+
+    @app.route("/calendar/<year>/<month>")
+    def calendar_year_month(year: str, month: str):
+        return render_template(
+            "calendar-month.html.j2",
+            **calendar_controller.render_month(int(year), int(month))
+        )
+
+
+def route_eddington(app: Flask, repository: ActivityRepository) -> None:
+    eddington_controller = EddingtonController(repository)
+
+    @app.route("/eddington")
+    def eddington():
+        return render_template("eddington.html.j2", **eddington_controller.render())
+
+
+def route_equipment(app: Flask, repository: ActivityRepository) -> None:
+    equipment_controller = EquipmentController(repository)
+
+    @app.route("/equipment")
+    def equipment():
+        return render_template("equipment.html.j2", **equipment_controller.render())
+
+
+def route_explorer(app: Flask, repository: ActivityRepository) -> None:
+    explorer_controller = ExplorerController(repository)
 
     @app.route("/explorer/<zoom>")
     def explorer(zoom: str):
@@ -99,32 +113,9 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             headers={"Content-disposition": "attachment"},
         )
 
-    @app.route("/summary-statistics")
-    def summary_statistics():
-        return render_template(
-            "summary-statistics.html.j2", **summary_controller.render()
-        )
 
-    @app.route("/eddington")
-    def eddington():
-        return render_template("eddington.html.j2", **eddington_controller.render())
-
-    @app.route("/calendar")
-    def calendar():
-        return render_template(
-            "calendar.html.j2", **calendar_controller.render_overview()
-        )
-
-    @app.route("/calendar/<year>/<month>")
-    def calendar_year_month(year: str, month: str):
-        return render_template(
-            "calendar-month.html.j2",
-            **calendar_controller.render_month(int(year), int(month))
-        )
-
-    @app.route("/equipment")
-    def equipment():
-        return render_template("equipment.html.j2", **equipment_controller.render())
+def route_heatmap(app: Flask, repository: ActivityRepository) -> None:
+    heatmap_controller = HeatmapController(repository)
 
     @app.route("/heatmap")
     def heatmap():
@@ -137,7 +128,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             mimetype="image/png",
         )
 
-    @app.route("/heatmap-download/<north>/<east>/<south>/<west>")
+    @app.route("/heatmap/download/<north>/<east>/<south>/<west>")
     def heatmap_download(north: str, east: str, south: str, west: str):
         return Response(
             heatmap_controller.download_heatmap(
@@ -150,11 +141,60 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
             headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
         )
 
+
+def route_search(app: Flask, repository: ActivityRepository) -> None:
+    search_controller = SearchController(repository)
+
+    @app.route("/search", methods=["POST"])
+    def search():
+        form_input = request.form
+        return render_template(
+            "search.html.j2",
+            **search_controller.render_search_results(form_input["name"])
+        )
+
+
+def route_start(app: Flask, repository: ActivityRepository) -> None:
+    entry_controller = EntryController(repository)
+
+    @app.route("/")
+    def index():
+        return render_template("index.html.j2", **entry_controller.render())
+
+
+def route_summary(app: Flask, repository: ActivityRepository) -> None:
+    summary_controller = SummaryController(repository)
+
+    @app.route("/summary")
+    def summary_statistics():
+        return render_template(
+            "summary-statistics.html.j2", **summary_controller.render()
+        )
+
+
+def route_tiles(app: Flask, repository: ActivityRepository) -> None:
+    grayscale_tile_controller = GrayscaleTileController()
+
     @app.route("/grayscale-tile/<z>/<x>/<y>.png")
     def grayscale_tile(x: str, y: str, z: str):
         return Response(
             grayscale_tile_controller.render_tile(int(x), int(y), int(z)),
             mimetype="image/png",
         )
+
+
+def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
+    app = Flask(__name__)
+
+    route_activity(app, repository)
+    route_calendar(app, repository)
+    route_eddington(app, repository)
+    route_equipment(app, repository)
+    route_explorer(app, repository)
+    route_heatmap(app, repository)
+    route_search(app, repository)
+    route_start(app, repository)
+    route_summary(app, repository)
+    route_tiles(app, repository)
 
     app.run(host=host, port=port)
