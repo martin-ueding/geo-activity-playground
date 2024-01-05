@@ -6,6 +6,8 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+- Use locally downloaded tiles for all maps, this way we do not need to download them twice for activities and explorer/heatmap.
+
 ### Version 0.17
 
 - Fix bug which broke the import of `.tcx.gz` files.
