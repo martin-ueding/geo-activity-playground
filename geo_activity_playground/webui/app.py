@@ -7,6 +7,7 @@ from .search_controller import SearchController
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
+from geo_activity_playground.webui.config_controller import ConfigController
 from geo_activity_playground.webui.eddington_controller import EddingtonController
 from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
@@ -49,6 +50,21 @@ def route_calendar(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "calendar-month.html.j2",
             **calendar_controller.render_month(int(year), int(month))
+        )
+
+
+def route_config(app: Flask, repository: ActivityRepository) -> None:
+    config_controller = ConfigController(repository)
+
+    @app.route("/config")
+    def config_index():
+        return render_template("config.html.j2", **config_controller.action_index())
+
+    @app.route("/config/save", methods=["POST"])
+    def config_save():
+        form_input = request.form
+        return render_template(
+            "config.html.j2", **config_controller.action_save(form_input)
         )
 
 
@@ -193,6 +209,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
 
     route_activity(app, repository)
     route_calendar(app, repository)
+    route_config(app, repository)
     route_eddington(app, repository)
     route_equipment(app, repository)
     route_explorer(app, repository)
