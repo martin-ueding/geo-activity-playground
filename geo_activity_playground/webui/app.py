@@ -11,11 +11,11 @@ from geo_activity_playground.webui.eddington_controller import EddingtonControll
 from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
-from geo_activity_playground.webui.grayscale_tile_controller import (
-    GrayscaleTileController,
-)
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
 from geo_activity_playground.webui.summary_controller import SummaryController
+from geo_activity_playground.webui.tile_controller import (
+    TileController,
+)
 
 
 def route_activity(app: Flask, repository: ActivityRepository) -> None:
@@ -167,18 +167,23 @@ def route_summary(app: Flask, repository: ActivityRepository) -> None:
 
     @app.route("/summary")
     def summary_statistics():
-        return render_template(
-            "summary-statistics.html.j2", **summary_controller.render()
-        )
+        return render_template("summary.html.j2", **summary_controller.render())
 
 
 def route_tiles(app: Flask, repository: ActivityRepository) -> None:
-    grayscale_tile_controller = GrayscaleTileController()
+    tile_controller = TileController()
 
-    @app.route("/grayscale-tile/<z>/<x>/<y>.png")
-    def grayscale_tile(x: str, y: str, z: str):
+    @app.route("/tile/color/<z>/<x>/<y>.png")
+    def tile_color(x: str, y: str, z: str):
         return Response(
-            grayscale_tile_controller.render_tile(int(x), int(y), int(z)),
+            tile_controller.render_color(int(x), int(y), int(z)),
+            mimetype="image/png",
+        )
+
+    @app.route("/tile/grayscale/<z>/<x>/<y>.png")
+    def tile_grayscale(x: str, y: str, z: str):
+        return Response(
+            tile_controller.render_grayscale(int(x), int(y), int(z)),
             mimetype="image/png",
         )
 
