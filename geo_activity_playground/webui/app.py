@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import redirect
 from flask import render_template
 from flask import request
 from flask import Response
@@ -189,6 +190,14 @@ def route_strava(app: Flask, host: str, port: int) -> None:
             host=host,
             port=port,
             **strava_controller.action_connect()
+        )
+
+    @app.route("/strava/authorize")
+    def strava_authorize():
+        client_id = request.form["client_id"]
+        client_secret = request.form["client_secret"]
+        return redirect(
+            strava_controller.action_authorize(host, port, client_id, client_secret)
         )
 
     @app.route("/strava/callback")
