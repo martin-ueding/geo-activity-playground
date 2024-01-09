@@ -94,6 +94,12 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
+                    speed_factor = 1
+                    for field in frame.fields:
+                        if field.name == "speed":
+                            if field.units == "m/s":
+                                speed_factor = 3.6
+                            break
                     fields = {field.name: field.value for field in frame.fields}
                     if (
                         "timestamp" in fields
@@ -121,9 +127,12 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                         if "enhanced_altitude" in fields:
                             row["altitude"] = fields["enhanced_altitude"]
                         if "speed" in fields:
-                            row["speed"] = fields["speed"]
-                        if "enhanced_speed" in fields:
-                            row["speed"] = fields["enhanced_speed"]
+                            if fields["speed"] != None:
+                                row["speed"] = fields["speed"] * speed_factor
+                            else:
+                                row["speed"] = None
+                        if "enhanced_speed" in fields and fields["speed"] != None:
+                            row["speed"] = fields["enhanced_speed"] * speed_factor
                         rows.append(row)
 
     return pd.DataFrame(rows)
