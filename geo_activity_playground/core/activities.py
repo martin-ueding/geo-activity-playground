@@ -64,7 +64,6 @@ class ActivityRepository:
             logger.error(f"Error while reading {path}, deleting cache file …")
             path.unlink(missing_ok=True)
             raise
-        df.name = id
         changed = False
         if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
             start = self.get_activity_by_id(id)["start"]

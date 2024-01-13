@@ -83,7 +83,8 @@ def import_from_directory() -> None:
 
         metadata["commute"] = path.parts[-2] == "Commute"
         metadata["kind"] = kind
-        metadata["name"] = path.stem
+        # https://stackoverflow.com/a/74718395/653152
+        metadata["name"] = path.name.removesuffix("".join(path.suffixes))
         metadata["id"] = activity_id
         metadata["start"] = timeseries["time"].iloc[0]
         metadata["equipment"] = equipment

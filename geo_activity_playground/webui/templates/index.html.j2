@@ -52,7 +52,7 @@
             </script>
             <div class="card-body">
                 <a href="/activity/{{ elem.activity.id }}">
-                    <h5 class="card-title">{{ elem.activity.name }}</h5>
+                    <h5 class="card-title">{{ elem.activity["name"] }}</h5>
                 </a>
                 <p class="card-text">{{ elem.activity.kind }} with {{ elem.activity.distance|round(1) }} km in {{
                     elem.activity.elapsed_time }}</p>
