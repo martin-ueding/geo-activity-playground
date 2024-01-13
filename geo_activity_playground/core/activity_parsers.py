@@ -189,17 +189,24 @@ def _fit_speed_unit_factor(unit: str) -> float:
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     points = []
     with open(path, "rb") as f:
-        gpx = gpxpy.parse(f)
-        for track in gpx.tracks:
-            for segment in track.segments:
-                for point in segment.points:
-                    if isinstance(point.time, datetime.datetime):
-                        time = point.time
-                    else:
-                        time = dateutil.parser.parse(str(point.time))
-                    assert isinstance(time, datetime.datetime)
-                    time = time.astimezone(datetime.timezone.utc)
-                    points.append((time, point.latitude, point.longitude))
+        content = f.read()
+
+    try:
+        gpx = gpxpy.parse(content)
+    except UnicodeDecodeError as e:
+        logger.error(f"Cannot parse the following: {repr(f[:100])}")
+        raise
+
+    for track in gpx.tracks:
+        for segment in track.segments:
+            for point in segment.points:
+                if isinstance(point.time, datetime.datetime):
+                    time = point.time
+                else:
+                    time = dateutil.parser.parse(str(point.time))
+                assert isinstance(time, datetime.datetime)
+                time = time.astimezone(datetime.timezone.utc)
+                points.append((time, point.latitude, point.longitude))
 
     return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
 
