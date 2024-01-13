@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Parse speed unit from FIT file. There are many devices which record in m/s and not in km/h, yielding too low speeds in the analysis. This is now fixed. [GH-82](https://github.com/martin-ueding/geo-activity-playground/pull/82)
 - Skip `.DS_Store` files in the activity directory. [GH-81](https://github.com/martin-ueding/geo-activity-playground/pull/81)
 - From FIT files we also extract the _grade_, _temperature_ and _GPS accuracy_ fields if they are present. There is no analysis for them yet, though. Also extract the workout name, sport and sub-sport fields from FIT files. [GH-81](https://github.com/martin-ueding/geo-activity-playground/pull/81)
+- Add more logging to diagnose Unicode issue on macOS. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
 
 ### Version 0.17
 
