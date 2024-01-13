@@ -1,5 +1,7 @@
-.idea/
 __pycache__/
+.DS_Store
+.idea/
+.venv
+data
 dist
 site
-data
