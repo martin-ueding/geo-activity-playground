@@ -4,14 +4,12 @@ import pathlib
 import sys
 import traceback
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
-from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.tasks import WorkTracker
 
 logger = logging.getLogger(__name__)
@@ -39,9 +37,8 @@ def import_from_directory() -> None:
     new_rows: list[dict] = []
     for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
         path = activity_paths[activity_id]
-        metadata = ActivityMeta(id=activity_id, path=str(path))
         try:
-            parsed_metadata, timeseries = read_activity(path)
+            activity_meta_from_file, timeseries = read_activity(path)
         except ActivityParseError as e:
             logger.error(f"Error while parsing file {path}:")
             traceback.print_exc()
@@ -56,45 +53,23 @@ def import_from_directory() -> None:
         if len(timeseries) == 0:
             continue
 
-        timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
-
-        if "distance" not in timeseries.columns:
-            distances = [0] + [
-                get_distance(lat_1, lon_1, lat_2, lon_2)
-                for lat_1, lon_1, lat_2, lon_2 in zip(
-                    timeseries["latitude"],
-                    timeseries["longitude"],
-                    timeseries["latitude"].iloc[1:],
-                    timeseries["longitude"].iloc[1:],
-                )
-            ]
-            timeseries["distance"] = pd.Series(np.cumsum(distances))
-        metadata["distance"] = timeseries["distance"].iloc[-1]
-
         timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
         timeseries.to_parquet(timeseries_path)
 
-        kind = None
-        if len(path.parts) >= 3 and path.parts[1] != "Commute":
-            kind = path.parts[1]
-        equipment = None
-        if len(path.parts) >= 4 and path.parts[2] != "Commute":
-            equipment = path.parts[2]
-
-        metadata["commute"] = path.parts[-2] == "Commute"
-        metadata["kind"] = kind
-        # https://stackoverflow.com/a/74718395/653152
-        metadata["name"] = path.name.removesuffix("".join(path.suffixes))
-        metadata["start"] = timeseries["time"].iloc[0]
-        metadata["equipment"] = equipment
-        metadata["elapsed_time"] = (
-            timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
+        activity_meta = ActivityMeta(
+            commute=path.parts[-2] == "Commute",
+            id=activity_id,
+            # https://stackoverflow.com/a/74718395/653152
+            name=path.name.removesuffix("".join(path.suffixes)),
+            path=str(path),
         )
-        if "calories" in timeseries.columns:
-            metadata["calories"] = timeseries["calories"].iloc[-1]
+        if len(path.parts) >= 3 and path.parts[1] != "Commute":
+            activity_meta["kind"] = path.parts[1]
+        if len(path.parts) >= 4 and path.parts[2] != "Commute":
+            activity_meta["equipment"] = path.parts[2]
 
-        metadata.update(parsed_metadata)
-        new_rows.append(metadata)
+        activity_meta.update(activity_meta_from_file)
+        new_rows.append(activity_meta)
 
     if paths_with_errors:
         logger.warning(

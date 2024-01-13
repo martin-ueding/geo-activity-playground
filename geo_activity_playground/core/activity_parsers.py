@@ -7,11 +7,13 @@ import xml
 import dateutil.parser
 import fitdecode
 import gpxpy
+import numpy as np
 import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.coordinates import get_distance
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +35,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
 
     if file_type == ".gpx":
         try:
-            df = read_gpx_activity(path, opener)
+            timeseries = read_gpx_activity(path, opener)
         except gpxpy.gpx.GPXXMLSyntaxException as e:
             raise ActivityParseError(
                 f"Syntax error while parsing GPX file {path=}"
@@ -41,28 +43,30 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
         except UnicodeDecodeError as e:
             raise ActivityParseError(f"Encoding issue with {path=}: {e}") from e
     elif file_type == ".fit":
-        metadata, df = read_fit_activity(path, opener)
+        metadata, timeseries = read_fit_activity(path, opener)
     elif file_type == ".tcx":
         try:
-            df = read_tcx_activity(path, opener)
+            timeseries = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
             raise ActivityParseError(f"Syntax error in TCX file {path=}") from e
     elif file_type in [".kml", ".kmz"]:
-        df = read_kml_activity(path, opener)
+        timeseries = read_kml_activity(path, opener)
     elif file_type == ".csv":  # Simra csv export
-        df = read_simra_activity(path)
+        timeseries = read_simra_activity(path)
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
-    if len(df):
+    if len(timeseries):
+        # Unify time zones to UTC.
         try:
-            if df.time.dt.tz is not None:
-                df.time = df.time.dt.tz_localize(None)
+            if timeseries["time"].dt.tz is not None:
+                timeseries["time"] = timeseries["time"].dt.tz_localize(None)
+            timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
         except AttributeError as e:
-            print(df)
-            print(df.dtypes)
+            print(timeseries)
+            print(timeseries.dtypes)
             types = {}
-            for elem in df["time"]:
+            for elem in timeseries["time"]:
                 t = str(type(elem))
                 if t not in types:
                     types[t] = elem
@@ -70,8 +74,30 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
             raise ActivityParseError(
                 "It looks like the date parsing has gone wrong."
             ) from e
-    df.name = path.stem.split(".")[0]
-    return metadata, df
+
+        # Add distance column if missing.
+        if "distance" not in timeseries.columns:
+            distances = [0] + [
+                get_distance(lat_1, lon_1, lat_2, lon_2)
+                for lat_1, lon_1, lat_2, lon_2 in zip(
+                    timeseries["latitude"],
+                    timeseries["longitude"],
+                    timeseries["latitude"].iloc[1:],
+                    timeseries["longitude"].iloc[1:],
+                )
+            ]
+            timeseries["distance"] = pd.Series(np.cumsum(distances))
+
+        # Extract some meta data from the time series.
+        metadata["start"] = timeseries["time"].iloc[0]
+        metadata["elapsed_time"] = (
+            timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
+        )
+        metadata["distance"] = timeseries["distance"].iloc[-1]
+        if "calories" in timeseries.columns:
+            metadata["calories"] = timeseries["calories"].iloc[-1]
+
+    return metadata, timeseries
 
 
 def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFrame]:
