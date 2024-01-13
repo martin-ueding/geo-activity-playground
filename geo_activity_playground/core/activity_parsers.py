@@ -20,6 +20,11 @@ class ActivityParseError(BaseException):
 
 def read_activity(path: pathlib.Path) -> pd.DataFrame:
     suffixes = path.suffixes
+
+    # Files like `.DS_Store` are not activities, skip those.
+    if not suffixes:
+        return pd.DataFrame()
+
     if suffixes[-1] == ".gz":
         opener = gzip.open
         file_type = suffixes[-2]
