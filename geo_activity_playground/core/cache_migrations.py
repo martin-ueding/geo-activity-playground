@@ -16,11 +16,8 @@ def delete_activities_per_tile() -> None:
 
 
 def delete_work_tracker(name: str):
-    def migration() -> None:
-        path = pathlib.Path(f"Cache/work-tracker-{name}.pickle")
-        path.unlink(missing_ok=True)
-
-    return migration
+    path = pathlib.Path(f"Cache/work-tracker-{name}.pickle")
+    path.unlink(missing_ok=True)
 
 
 def reset_time_series_embellishment() -> None:
@@ -47,6 +44,11 @@ def delete_heatmap_cache() -> None:
         shutil.rmtree(path)
 
 
+def delete_activity_metadata() -> None:
+    delete_work_tracker("parse-activity-files")
+    pathlib.Path("Cache/activities.parquet").unlink(missing_ok=True)
+
+
 def apply_cache_migrations() -> None:
     logger.info("Apply cache migration if needed …")
     cache_status_file = pathlib.Path("Cache/status.json")
@@ -61,6 +63,7 @@ def apply_cache_migrations() -> None:
         reset_time_series_embellishment,
         delete_tile_visits,
         delete_heatmap_cache,
+        delete_activity_metadata,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:
