@@ -146,6 +146,14 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                             row["gps_accuracy"] = values["gps_accuracy"]
                         rows.append(row)
 
+                    # Additional meta data fields as documented in https://developer.garmin.com/fit/file-types/workout/.
+                    if "wkt_name" in fields:
+                        metadata["name"] = values["wkt_name"]
+                    if "sport" in fields:
+                        metadata["kind"] = values["sport"]
+                        if "sub_sport" in values:
+                            metadata["kind"] += " " + values["sub_sport"]
+
     return metadata, pd.DataFrame(rows)
 
 

@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.coordinates import get_distance
@@ -38,8 +39,9 @@ def import_from_directory() -> None:
     new_rows: list[dict] = []
     for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
         path = activity_paths[activity_id]
+        metadata = ActivityMeta(id=activity_id, path=str(path))
         try:
-            metadata, timeseries = read_activity(path)
+            parsed_metadata, timeseries = read_activity(path)
         except ActivityParseError as e:
             logger.error(f"Error while parsing file {path}:")
             traceback.print_exc()
@@ -53,8 +55,6 @@ def import_from_directory() -> None:
 
         if len(timeseries) == 0:
             continue
-
-        metadata["path"] = str(path)
 
         timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
 
@@ -85,7 +85,6 @@ def import_from_directory() -> None:
         metadata["kind"] = kind
         # https://stackoverflow.com/a/74718395/653152
         metadata["name"] = path.name.removesuffix("".join(path.suffixes))
-        metadata["id"] = activity_id
         metadata["start"] = timeseries["time"].iloc[0]
         metadata["equipment"] = equipment
         metadata["elapsed_time"] = (
@@ -94,6 +93,7 @@ def import_from_directory() -> None:
         if "calories" in timeseries.columns:
             metadata["calories"] = timeseries["calories"].iloc[-1]
 
+        metadata.update(parsed_metadata)
         new_rows.append(metadata)
 
     if paths_with_errors:
