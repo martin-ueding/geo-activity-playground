@@ -48,7 +48,7 @@ class ActivityRepository:
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
-        for id, row in self.meta[::direction].iterrows():
+        for index, row in self.meta[::direction].iterrows():
             yield row
 
     @functools.lru_cache()
