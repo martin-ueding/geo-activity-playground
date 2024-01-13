@@ -39,7 +39,7 @@ def import_from_directory() -> None:
     for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
         path = activity_paths[activity_id]
         try:
-            timeseries = read_activity(path)
+            metadata, timeseries = read_activity(path)
         except ActivityParseError as e:
             logger.error(f"Error while parsing file {path}:")
             traceback.print_exc()
@@ -54,6 +54,8 @@ def import_from_directory() -> None:
         if len(timeseries) == 0:
             continue
 
+        metadata["path"] = str(path)
+
         timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
 
         if "distance" not in timeseries.columns:
@@ -67,14 +69,11 @@ def import_from_directory() -> None:
                 )
             ]
             timeseries["distance"] = pd.Series(np.cumsum(distances))
-        distance = timeseries["distance"].iloc[-1]
+        metadata["distance"] = timeseries["distance"].iloc[-1]
 
         timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
         timeseries.to_parquet(timeseries_path)
 
-        commute = False
-        if path.parts[-2] == "Commute":
-            commute = True
         kind = None
         if len(path.parts) >= 3 and path.parts[1] != "Commute":
             kind = path.parts[1]
@@ -82,22 +81,19 @@ def import_from_directory() -> None:
         if len(path.parts) >= 4 and path.parts[2] != "Commute":
             equipment = path.parts[2]
 
-        row = {
-            "id": activity_id,
-            "commute": commute,
-            "distance": distance,
-            "name": path.stem,
-            "kind": kind,
-            "start": timeseries["time"].iloc[0],
-            "elapsed_time": timeseries["time"].iloc[-1] - timeseries["time"].iloc[0],
-            "equipment": equipment,
-            "calories": 0,
-        }
-
+        metadata["commute"] = path.parts[-2] == "Commute"
+        metadata["kind"] = kind
+        metadata["name"] = path.stem
+        metadata["id"] = activity_id
+        metadata["start"] = timeseries["time"].iloc[0]
+        metadata["equipment"] = equipment
+        metadata["elapsed_time"] = (
+            timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
+        )
         if "calories" in timeseries.columns:
-            row["calories"] = timeseries["calories"].iloc[-1]
+            metadata["calories"] = timeseries["calories"].iloc[-1]
 
-        new_rows.append(row)
+        new_rows.append(metadata)
 
     if paths_with_errors:
         logger.warning(

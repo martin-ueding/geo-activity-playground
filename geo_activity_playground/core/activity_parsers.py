@@ -11,6 +11,8 @@ import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
 
+from geo_activity_playground.core.activities import ActivityMeta
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,12 +20,13 @@ class ActivityParseError(BaseException):
     pass
 
 
-def read_activity(path: pathlib.Path) -> pd.DataFrame:
+def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     suffixes = path.suffixes
+    metadata = ActivityMeta()
 
     # Files like `.DS_Store` are not activities, skip those.
     if not suffixes:
-        return pd.DataFrame()
+        return metadata, pd.DataFrame()
 
     if suffixes[-1] == ".gz":
         opener = gzip.open
@@ -42,7 +45,7 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
         except UnicodeDecodeError as e:
             raise ActivityParseError(f"Encoding issue with {path=}: {e}") from e
     elif file_type == ".fit":
-        df = read_fit_activity(path, opener)
+        metadata, df = read_fit_activity(path, opener)
     elif file_type == ".tcx":
         try:
             df = read_tcx_activity(path, opener)
@@ -72,10 +75,10 @@ def read_activity(path: pathlib.Path) -> pd.DataFrame:
                 "It looks like the date parsing has gone wrong."
             ) from e
     df.name = path.stem.split(".")[0]
-    return df
+    return metadata, df
 
 
-def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
+def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFrame]:
     """
     {'timestamp': datetime.datetime(2023, 11, 11, 16, 29, 49, tzinfo=datetime.timezone.utc),
     'position_lat': <int>,
@@ -94,6 +97,7 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
     'ascent': 35,
     'descent': 11}
     """
+    metadata = ActivityMeta()
     rows = []
     with open(path, "rb") as f:
         with fitdecode.FitReader(f) as fit:
@@ -142,7 +146,7 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                             row["gps_accuracy"] = values["gps_accuracy"]
                         rows.append(row)
 
-    return pd.DataFrame(rows)
+    return metadata, pd.DataFrame(rows)
 
 
 def _fit_speed_unit_factor(unit: str) -> float:

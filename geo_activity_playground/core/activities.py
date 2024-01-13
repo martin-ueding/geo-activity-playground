@@ -29,6 +29,7 @@ class ActivityMeta(TypedDict):
     id: int
     kind: str
     name: str
+    path: str
     start: datetime.datetime
 
 
