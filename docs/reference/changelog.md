@@ -8,7 +8,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - Use locally downloaded tiles for all maps, this way we do not need to download them twice for activities and explorer/heatmap.
 - Localize SimRa files to local time zone. [GH-80](https://github.com/martin-ueding/geo-activity-playground/pull/80)
-- Parse speed unit from FIT file. [GH-82](https://github.com/martin-ueding/geo-activity-playground/pull/82)
+- Parse speed unit from FIT file. There are many devices which record in m/s and not in km/h, yielding too low speeds in the analysis. This is now fixed. [GH-82](https://github.com/martin-ueding/geo-activity-playground/pull/82)
 
 ### Version 0.17
 
