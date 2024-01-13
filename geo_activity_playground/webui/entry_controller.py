@@ -23,7 +23,7 @@ class EntryController:
         }
 
         for activity in itertools.islice(self._repository.iter_activities(), 15):
-            time_series = self._repository.get_time_series(activity.id)
+            time_series = self._repository.get_time_series(activity["id"])
             result["latest_activities"].append(
                 {
                     "line_geojson": make_geojson_from_time_series(time_series),

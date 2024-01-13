@@ -120,13 +120,13 @@ def get_three_color_tiles(
         last_age_days = (today - tile_data["last_time"].date()).days
         tile_dict[tile] = {
             "first_activity_id": str(tile_data["first_id"]),
-            "first_activity_name": repository.get_activity_by_id(
-                tile_data["first_id"]
-            ).name,
+            "first_activity_name": repository.get_activity_by_id(tile_data["first_id"])[
+                "name"
+            ],
             "last_activity_id": str(tile_data["last_id"]),
-            "last_activity_name": repository.get_activity_by_id(
-                tile_data["last_id"]
-            ).name,
+            "last_activity_name": repository.get_activity_by_id(tile_data["last_id"])[
+                "name"
+            ],
             "first_age_days": first_age_days,
             "first_age_color": matplotlib.colors.to_hex(
                 cmap_first(max(1 - first_age_days / (2 * 365), 0.0))

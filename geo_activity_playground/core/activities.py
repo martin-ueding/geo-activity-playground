@@ -1,10 +1,10 @@
-import dataclasses
 import datetime
 import functools
 import logging
 import pathlib
 from typing import Iterator
 from typing import Optional
+from typing import TypedDict
 
 import geojson
 import matplotlib
@@ -20,8 +20,7 @@ from geo_activity_playground.core.tiles import compute_tile_float
 logger = logging.getLogger(__name__)
 
 
-@dataclasses.dataclass
-class ActivityMeta:
+class ActivityMeta(TypedDict):
     calories: float
     commute: bool
     distance: float
@@ -31,9 +30,6 @@ class ActivityMeta:
     kind: str
     name: str
     start: datetime.datetime
-
-    def __str__(self) -> str:
-        return f"{self.name} ({self.kind}; {self.distance:.1f} km; {self.elapsed_time})"
 
 
 class ActivityRepository:
@@ -52,11 +48,11 @@ class ActivityRepository:
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
         for id, row in self.meta[::direction].iterrows():
-            yield ActivityMeta(**row)
+            yield row
 
     @functools.lru_cache()
     def get_activity_by_id(self, id: int) -> ActivityMeta:
-        return ActivityMeta(**self.meta.loc[id])
+        return self.meta.loc[id]
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
@@ -70,7 +66,7 @@ class ActivityRepository:
         df.name = id
         changed = False
         if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
-            start = self.get_activity_by_id(id).start
+            start = self.get_activity_by_id(id)["start"]
             time = df["time"]
             del df["time"]
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
@@ -118,7 +114,7 @@ def embellish_time_series(repository: ActivityRepository) -> None:
         df.name = id
         changed = False
         if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
-            start = repository.get_activity_by_id(activity_id).start
+            start = repository.get_activity_by_id(activity_id)["start"]
             time = df["time"]
             del df["time"]
             df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
