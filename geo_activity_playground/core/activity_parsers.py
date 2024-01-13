@@ -135,11 +135,11 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
                             )
                             row["speed"] = values["enhanced_speed"] * factor
                         if "grade" in fields:
-                            row["grade"] = fields["grade"]
+                            row["grade"] = values["grade"]
                         if "temperature" in fields:
-                            row["temperature"] = fields["temperature"]
+                            row["temperature"] = values["temperature"]
                         if "gps_accuracy" in fields:
-                            row["gps_accuracy"] = fields["gps_accuracy"]
+                            row["gps_accuracy"] = values["gps_accuracy"]
                         rows.append(row)
 
     return pd.DataFrame(rows)
