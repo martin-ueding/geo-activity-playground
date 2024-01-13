@@ -94,39 +94,53 @@ def read_fit_activity(path: pathlib.Path, open) -> pd.DataFrame:
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
-                    fields = {field.name: field.value for field in frame.fields}
+                    fields = {field.name: field for field in frame.fields}
+                    values = {field.name: field.value for field in frame.fields}
                     if (
-                        "timestamp" in fields
-                        and fields.get("position_lat", None)
-                        and fields.get("position_long", None)
+                        "timestamp" in values
+                        and values.get("position_lat", None)
+                        and values.get("position_long", None)
                     ):
-                        time = fields["timestamp"]
+                        time = values["timestamp"]
                         assert isinstance(time, datetime.datetime)
                         time = time.astimezone(datetime.timezone.utc)
                         row = {
                             "time": time,
-                            "latitude": fields["position_lat"] / ((2**32) / 360),
-                            "longitude": fields["position_long"] / ((2**32) / 360),
+                            "latitude": values["position_lat"] / ((2**32) / 360),
+                            "longitude": values["position_long"] / ((2**32) / 360),
                         }
                         if "heart_rate" in fields:
-                            row["heartrate"] = fields["heart_rate"]
+                            row["heartrate"] = values["heart_rate"]
                         if "calories" in fields:
-                            row["calories"] = fields["calories"]
+                            row["calories"] = values["calories"]
                         if "cadence" in fields:
-                            row["cadence"] = fields["cadence"]
+                            row["cadence"] = values["cadence"]
                         if "distance" in fields:
-                            row["distance"] = fields["distance"]
+                            row["distance"] = values["distance"]
                         if "altitude" in fields:
-                            row["altitude"] = fields["altitude"]
+                            row["altitude"] = values["altitude"]
                         if "enhanced_altitude" in fields:
-                            row["altitude"] = fields["enhanced_altitude"]
+                            row["altitude"] = values["enhanced_altitude"]
                         if "speed" in fields:
-                            row["speed"] = fields["speed"]
+                            factor = _fit_speed_unit_factor(fields["speed"].units)
+                            row["speed"] = values["speed"] * factor
                         if "enhanced_speed" in fields:
-                            row["speed"] = fields["enhanced_speed"]
+                            factor = _fit_speed_unit_factor(
+                                fields["enhanced_speed"].units
+                            )
+                            row["speed"] = values["enhanced_speed"] * factor
                         rows.append(row)
 
     return pd.DataFrame(rows)
+
+
+def _fit_speed_unit_factor(unit: str) -> float:
+    if unit == "m/s":
+        return 3.6
+    elif unit == "km/h":
+        return 1.0
+    else:
+        raise ActivityParseError(f"Unknown speed unit {unit}")
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
