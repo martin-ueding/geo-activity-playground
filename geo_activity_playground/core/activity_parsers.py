@@ -37,18 +37,16 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
         try:
             timeseries = read_gpx_activity(path, opener)
         except gpxpy.gpx.GPXXMLSyntaxException as e:
-            raise ActivityParseError(
-                f"Syntax error while parsing GPX file {path=}"
-            ) from e
+            raise ActivityParseError(f"Syntax error while parsing GPX file") from e
         except UnicodeDecodeError as e:
-            raise ActivityParseError(f"Encoding issue with {path=}: {e}") from e
+            raise ActivityParseError(f"Encoding issue") from e
     elif file_type == ".fit":
         metadata, timeseries = read_fit_activity(path, opener)
     elif file_type == ".tcx":
         try:
             timeseries = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
-            raise ActivityParseError(f"Syntax error in TCX file {path=}") from e
+            raise ActivityParseError(f"Syntax error in TCX file") from e
     elif file_type in [".kml", ".kmz"]:
         timeseries = read_kml_activity(path, opener)
     elif file_type == ".csv":  # Simra csv export
