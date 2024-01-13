@@ -24,10 +24,6 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     suffixes = path.suffixes
     metadata = ActivityMeta()
 
-    # Files like `.DS_Store` are not activities, skip those.
-    if not suffixes:
-        return metadata, pd.DataFrame()
-
     if suffixes[-1] == ".gz":
         opener = gzip.open
         file_type = suffixes[-2]
