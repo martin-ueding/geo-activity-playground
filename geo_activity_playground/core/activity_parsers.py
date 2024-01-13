@@ -216,13 +216,17 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def read_simra_activity(path: pathlib.Path) -> pd.DataFrame:
+def read_simra_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     data = pd.read_csv(path, header=1)
     data["time"] = data["timeStamp"].apply(
         lambda d: datetime.datetime.fromtimestamp(d / 1000)
     )
-    data["time"] = data["time"].dt.tz_localize(datetime.timezone.utc)
+    tz = (
+        datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+    )  # get local timezone
+    data["time"] = data["time"].dt.tz_localize(tz)
+    data["time"] = data["time"].dt.tz_convert("UTC")
     data = data.rename(columns={"lat": "latitude", "lon": "longitude"})
-    data.dropna(inplace=True)
-    out = out.reset_index(drop=True)
-    return out
+    return data.dropna(subset=["latitude"], ignore_index=True)[
+        ["time", "latitude", "longitude"]
+    ]
