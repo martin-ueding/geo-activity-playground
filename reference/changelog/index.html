@@ -774,6 +774,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Version 0.17">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0171" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-0170" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1187,6 +1211,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Version 0.17">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0171" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-0170" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1541,10 +1589,20 @@
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
 <h3 id="version-017">Version 0.17</h3>
+<h4 id="version-0171">Version 0.17.1</h4>
+<ul>
+<li>Use locally downloaded tiles for all maps, this way we do not need to download them twice for activities and explorer/heatmap.</li>
+<li>Localize SimRa files to local time zone. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/80">GH-80</a></li>
+<li>Parse speed unit from FIT file. There are many devices which record in m/s and not in km/h, yielding too low speeds in the analysis. This is now fixed. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/82">GH-82</a></li>
+<li>Skip <code>.DS_Store</code> files in the activity directory. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/81">GH-81</a></li>
+<li>From FIT files we also extract the <em>grade</em>, <em>temperature</em> and <em>GPS accuracy</em> fields if they are present. There is no analysis for them yet, though. Also extract the workout name, sport and sub-sport fields from FIT files. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/81">GH-81</a></li>
+<li>Add more logging to diagnose Unicode issue on macOS. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/83">GH-83</a></li>
+</ul>
+<h4 id="version-0170">Version 0.17.0</h4>
 <ul>
 <li>Fix bug which broke the import of <code>.tcx.gz</code> files.</li>
-<li>Add <code>Dockerfile</code> such that one can easily use this with Docker.</li>
-<li>Add support for the CSV files of the <a href="https://simra-project.github.io/">SimRa Project</a>.</li>
+<li>Add <code>Dockerfile</code> such that one can easily use this with Docker. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/78">GH-78</a></li>
+<li>Add support for the CSV files of the <a href="https://simra-project.github.io/">SimRa Project</a>. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/79">GH-79</a></li>
 </ul>
 <h3 id="version-016">Version 0.16</h3>
 <h4 id="version-0164">Version 0.16.4</h4>
