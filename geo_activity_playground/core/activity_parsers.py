@@ -4,6 +4,7 @@ import logging
 import pathlib
 import xml
 
+import charset_normalizer
 import dateutil.parser
 import fitdecode
 import gpxpy
@@ -197,9 +198,10 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
 
     try:
         gpx = gpxpy.parse(content)
-    except UnicodeDecodeError as e:
-        logger.error(f"Cannot parse the following: {repr(content[:100])}")
-        raise
+    except UnicodeDecodeError:
+        logger.warning(f"Cannot parse the following with UTF-8: {repr(content[:1000])}")
+        decoded = str(charset_normalizer.from_bytes(content).best())
+        gpx = gpxpy.parse(decoded)
 
     for track in gpx.tracks:
         for segment in track.segments:
