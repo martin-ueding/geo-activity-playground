@@ -198,7 +198,7 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     try:
         gpx = gpxpy.parse(content)
     except UnicodeDecodeError as e:
-        logger.error(f"Cannot parse the following: {repr(f[:100])}")
+        logger.error(f"Cannot parse the following: {repr(content[:100])}")
         raise
 
     for track in gpx.tracks:
