@@ -123,8 +123,12 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
         with fitdecode.FitReader(f) as fit:
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
-                    fields = {field.name: field for field in frame.fields}
-                    values = {field.name: field.value for field in frame.fields}
+                    fields = {
+                        field.name: field for field in frame.fields if field.value
+                    }
+                    values = {
+                        field.name: field.value for field in frame.fields if field.value
+                    }
                     if (
                         "timestamp" in values
                         and values.get("position_lat", None)

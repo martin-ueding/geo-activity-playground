@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.17
 
+#### Version 0.17.2
+
+- Fix FIT import failure when the sub-sport is none. [GH-84](https://github.com/martin-ueding/geo-activity-playground/issues/84)
+
 #### Version 0.17.1
 
 - Use locally downloaded tiles for all maps, this way we do not need to download them twice for activities and explorer/heatmap.
