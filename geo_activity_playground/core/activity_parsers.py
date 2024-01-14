@@ -175,9 +175,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                     if "wkt_name" in fields:
                         metadata["name"] = values["wkt_name"]
                     if "sport" in fields:
-                        metadata["kind"] = values["sport"]
+                        metadata["kind"] = str(values["sport"])
                         if "sub_sport" in values:
-                            metadata["kind"] += " " + values["sub_sport"]
+                            metadata["kind"] += " " + str(values["sub_sport"])
 
     return metadata, pd.DataFrame(rows)
 

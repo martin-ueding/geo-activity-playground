@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.17
 
+#### Version 0.17.5
+
+- Convert FIT sport type enum to strings. [GH-84](https://github.com/martin-ueding/geo-activity-playground/issues/84)
+
 #### Version 0.17.4
 
 - Try to use charset-normalizer to figure out the strange encoding. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
