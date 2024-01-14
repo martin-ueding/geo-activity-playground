@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.17
 
+#### Version 0.17.3
+
+- Fix error handler for GPX encoding issues. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
+
 #### Version 0.17.2
 
 - Fix FIT import failure when the sub-sport is none. [GH-84](https://github.com/martin-ueding/geo-activity-playground/issues/84)
