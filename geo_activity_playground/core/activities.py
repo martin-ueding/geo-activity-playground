@@ -55,6 +55,9 @@ class ActivityRepository:
             )
             new_df = pd.DataFrame(self._loose_activities)
             self.meta = pd.concat([self.meta, new_df])
+            assert pd.api.types.is_dtype_equal(
+                self.meta["start"].dtype, "datetime64[ns, UTC]"
+            ), self.meta["start"].dtype
             self.meta.index = self.meta["id"]
             self.meta.index.name = "index"
             self.meta.sort_values("start", inplace=True)

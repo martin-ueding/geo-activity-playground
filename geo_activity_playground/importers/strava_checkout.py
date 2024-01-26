@@ -35,7 +35,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     activity_stream_dir.mkdir(exist_ok=True, parents=True)
 
-    for activity_id in tqdm(activities_ids_to_parse):
+    for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
         row = activities.loc[activity_id]
         activity_file = checkout_path / row["Filename"]
         table_activity_meta = {
@@ -43,41 +43,45 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
             "commute": row["Commute"] == "true",
             "distance": row["Distance"],
             "elapsed_time": datetime.timedelta(seconds=int(row["Elapsed Time"])),
-            "equipment": nan_as_none(row["Activity Gear"])
-            or nan_as_none(row["Bike"])
-            or nan_as_none(row["Gear"])
-            or "",
+            "equipment": str(
+                nan_as_none(row["Activity Gear"])
+                or nan_as_none(row["Bike"])
+                or nan_as_none(row["Gear"])
+                or ""
+            ),
             "kind": row["Activity Type"],
             "id": activity_id,
             "name": row["Activity Name"],
             "path": str(activity_file),
-            "start": dateutil.parser.parse(row["Activity Date"]),
+            "start": dateutil.parser.parse(row["Activity Date"]).astimezone(
+                datetime.timezone.utc
+            ),
         }
 
-        work_tracker.mark_done
+        time_series_path = activity_stream_dir / f"{activity_id}.parquet"
+        if not time_series_path.exists():
+            try:
+                file_activity_meta, time_series = read_activity(activity_file)
+            except ActivityParseError as e:
+                logger.error(f"Error while parsing file {activity_file}:")
+                traceback.print_exc()
+                continue
+            except:
+                logger.error(
+                    f"Encountered a problem with {activity_file=}, see details below."
+                )
+                raise
 
-        try:
-            file_activity_meta, time_series = read_activity(activity_file)
-        except ActivityParseError as e:
-            logger.error(f"Error while parsing file {activity_file}:")
-            traceback.print_exc()
-            continue
-        except:
-            logger.error(
-                f"Encountered a problem with {activity_file=}, see details below."
-            )
-            raise
+            if not len(time_series):
+                continue
+
+            time_series.to_parquet(time_series_path)
 
         work_tracker.mark_done(activity_id)
-
-        if not len(time_series):
-            continue
-
-        time_series_path = activity_stream_dir / f"{activity_id}.parquet"
-        time_series.to_parquet(time_series_path)
         repository.add_activity(table_activity_meta)
 
     repository.commit()
+    work_tracker.close()
 
 
 def convert_strava_checkout(
