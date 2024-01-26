@@ -169,29 +169,25 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
 
 def make_geojson_color_line(time_series: pd.DataFrame) -> str:
     cmap = matplotlib.colormaps["viridis"]
-    return geojson.dumps(
-        geojson.FeatureCollection(
-            features=[
-                geojson.Feature(
-                    geometry=geojson.LineString(
-                        coordinates=[
-                            [row["longitude"], row["latitude"]],
-                            [next["longitude"], next["latitude"]],
-                        ]
-                    ),
-                    properties={
-                        "speed": next["speed"],
-                        "color": matplotlib.colors.to_hex(
-                            cmap(min(next["speed"] / 35, 1.0))
-                        ),
-                    },
-                )
-                for (_, row), (_, next) in zip(
-                    time_series.iterrows(), time_series.iloc[1:].iterrows()
-                )
-            ]
+    features = [
+        geojson.Feature(
+            geometry=geojson.LineString(
+                coordinates=[
+                    [row["longitude"], row["latitude"]],
+                    [next["longitude"], next["latitude"]],
+                ]
+            ),
+            properties={
+                "speed": next["speed"] if np.isfinite(next["speed"]) else 0.0,
+                "color": matplotlib.colors.to_hex(cmap(min(next["speed"] / 35, 1.0))),
+            },
         )
-    )
+        for (_, row), (_, next) in zip(
+            time_series.iterrows(), time_series.iloc[1:].iterrows()
+        )
+    ]
+    feature_collection = geojson.FeatureCollection(features)
+    return geojson.dumps(feature_collection)
 
 
 def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
