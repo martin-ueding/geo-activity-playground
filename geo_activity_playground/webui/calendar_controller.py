@@ -19,7 +19,7 @@ class CalendarController:
         meta["month"] = meta["start"].dt.month
 
         monthly_distance = meta.groupby(["year", "month"]).apply(
-            lambda group: sum(group["distance"])
+            lambda group: sum(group["distance"]) / 1000
         )
         monthly_distance.name = "total_distance"
         monthly_pivot = (

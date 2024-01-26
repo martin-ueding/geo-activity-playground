@@ -19,7 +19,7 @@ class EquipmentController:
                 lambda group: pd.DataFrame(
                     {
                         "time": group["start"],
-                        "total_distance": group["distance"].cumsum(),
+                        "total_distance": group["distance"].cumsum() / 1000,
                     }
                 )
             )
@@ -50,7 +50,7 @@ class EquipmentController:
             .apply(
                 lambda group: pd.DataFrame(
                     {
-                        "total_distance": group["distance"].sum(),
+                        "total_distance": group["distance"].sum() / 1000,
                         "first_use": group["start"].iloc[0],
                         "last_use": group["start"].iloc[-1],
                     },

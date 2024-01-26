@@ -17,7 +17,7 @@
             <dt>Commute</dt>
             <dd>{{ activity.commute }}</dd>
             <dt>Distance</dt>
-            <dd>{{ activity.distance|round(1) }} km</dd>
+            <dd>{{ (activity.distance / 1000)|round(1) }} km</dd>
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
             <dt>Start time</dt>
