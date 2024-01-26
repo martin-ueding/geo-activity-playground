@@ -8,6 +8,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.tasks import WorkTracker
@@ -15,13 +16,7 @@ from geo_activity_playground.core.tasks import WorkTracker
 logger = logging.getLogger(__name__)
 
 
-def import_from_directory() -> None:
-    meta_file = pathlib.Path("Cache") / "activities.parquet"
-    if meta_file.exists():
-        meta = pd.read_parquet(meta_file)
-    else:
-        meta = None
-
+def import_from_directory(repository: ActivityRepository) -> None:
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
 
@@ -34,7 +29,6 @@ def import_from_directory() -> None:
 
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     activity_stream_dir.mkdir(exist_ok=True, parents=True)
-    new_rows: list[dict] = []
     for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
         path = activity_paths[activity_id]
         try:
@@ -71,7 +65,7 @@ def import_from_directory() -> None:
             activity_meta["equipment"] = path.parts[2]
 
         activity_meta.update(activity_meta_from_file)
-        new_rows.append(activity_meta)
+        repository.add_activity(activity_meta)
 
     if paths_with_errors:
         logger.warning(
@@ -80,18 +74,6 @@ def import_from_directory() -> None:
         for path, error in paths_with_errors:
             logger.error(f"{path}: {error}")
 
-    new_df = pd.DataFrame(new_rows)
-    merged = pd.concat([meta, new_df])
+    repository.commit()
 
-    if len(merged) == 0:
-        activities_dir = pathlib.Path("Activities").resolve()
-        logger.error(
-            f"You seemingly want to use activity files as a data source, but you have not copied any GPX/FIT/TCX/KML files."
-            f"Please copy at least one such file into {activities_dir}."
-        )
-        sys.exit(1)
-
-    merged.sort_values("start", inplace=True)
-    meta_file.parent.mkdir(exist_ok=True, parents=True)
-    merged.to_parquet(meta_file)
     work_tracker.close()

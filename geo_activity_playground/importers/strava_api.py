@@ -14,6 +14,7 @@ from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
+from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
 
 
@@ -91,8 +92,8 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
-def import_from_strava_api() -> None:
-    while try_import_strava():
+def import_from_strava_api(repository: ActivityRepository) -> None:
+    while try_import_strava(repository):
         now = datetime.datetime.now()
         next_quarter = round_to_next_quarter_hour(now)
         seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -102,22 +103,17 @@ def import_from_strava_api() -> None:
         time.sleep(seconds_to_wait)
 
 
-def try_import_strava() -> None:
-    meta_file = pathlib.Path("Cache") / "activities.parquet"
-    if meta_file.exists():
-        logger.info("Loading metadata file …")
-        meta = pd.read_parquet(meta_file)
-        get_after = meta.iloc[-1]["start"].isoformat().replace("+00:00", "Z")
-    else:
-        logger.info("Didn't find a metadata file.")
-        meta = None
-        get_after = "2000-01-01T00:00:00Z"
+def try_import_strava(repository: ActivityRepository) -> None:
+    get_after = (
+        repository.last_activity_date().isoformat().replace("+00:00", "Z")
+        if repository.last_activity_date() is not None
+        else "2000-01-01T00:00:00Z"
+    )
 
     gear_names = {None: "None"}
 
     client = Client(access_token=get_current_access_token())
 
-    new_rows: list[dict] = []
     try:
         for activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
@@ -155,7 +151,7 @@ def try_import_strava() -> None:
                 time_series.to_parquet(time_series_path)
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
-                new_rows.append(
+                repository.add_activity(
                     {
                         "id": activity.id,
                         "commute": activity.commute,
@@ -172,11 +168,7 @@ def try_import_strava() -> None:
     except RateLimitExceeded:
         limit_exceeded = True
 
-    new_df = pd.DataFrame(new_rows)
-    merged: pd.DataFrame = pd.concat([meta, new_df])
-    merged.sort_values("start", inplace=True)
-    meta_file.parent.mkdir(exist_ok=True, parents=True)
-    merged.to_parquet(meta_file)
+    repository.commit()
 
     return limit_exceeded
 

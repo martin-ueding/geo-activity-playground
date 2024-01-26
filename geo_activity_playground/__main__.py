@@ -99,17 +99,14 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     os.chdir(basedir)
     apply_cache_migrations()
     config = get_config()
-    if pathlib.Path("Activities").exists():
-        import_from_directory()
-    elif config:
-        if "strava" in config:
-            import_from_strava_api()
-    else:
-        logger.error(
-            "You need to either have (1) an “Activities” directory with GPX/FIT/TCX/KML files in there or (2) a “config.toml” with information for the Strava API (see https://martin-ueding.github.io/geo-activity-playground/getting-started/using-strava-api/)."
-        )
-        sys.exit(1)
+
     repository = ActivityRepository()
+
+    if pathlib.Path("Activities").exists():
+        import_from_directory(repository)
+    if "strava" in config:
+        import_from_strava_api(repository)
+
     embellish_time_series(repository)
     compute_tile_visits(repository)
     compute_tile_evolution()

@@ -38,12 +38,10 @@ activity_path = pathlib.Path("Cache/activities.parquet")
 
 class ActivityRepository:
     def __init__(self) -> None:
-        self.meta = pd.read_parquet(activity_path)
-        self.meta.index = self.meta["id"]
-        self.meta.index.name = "index"
-        self.meta["distance"] /= 1000
-        self.meta["kind"].fillna("Unknown", inplace=True)
-        self.meta["equipment"].fillna("Unknown", inplace=True)
+        if activity_path.exists():
+            self.meta = pd.read_parquet(activity_path)
+        else:
+            self.meta = pd.DataFrame()
 
         self._loose_activities: list[ActivityMeta] = []
 
@@ -53,8 +51,10 @@ class ActivityRepository:
     def commit(self) -> None:
         if self._loose_activities:
             new_df = pd.DataFrame(self._loose_activities)
-            merged = pd.concat([self.meta, new_df])
-            merged.sort_values("start", inplace=True)
+            self.meta = pd.concat([self.meta, new_df])
+            self.meta.index = self.meta["id"]
+            self.meta.index.name = "index"
+            self.meta.sort_values("start", inplace=True)
             activity_path.parent.mkdir(exist_ok=True, parents=True)
             self.meta.to_parquet(activity_path)
             self._loose_activities = []
@@ -69,6 +69,10 @@ class ActivityRepository:
                 return True
 
         return False
+
+    def last_activity_date(self) -> Optional[datetime.datetime]:
+        if len(self.meta):
+            return self.meta.iloc[-1]["start"]
 
     @property
     def activity_ids(self) -> set[int]:
