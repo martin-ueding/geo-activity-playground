@@ -28,7 +28,7 @@ def import_from_directory() -> None:
     activity_paths = {
         int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62: path
         for path in pathlib.Path("Activities").rglob("*.*")
-        if path.is_file() and path.suffixes
+        if path.is_file() and path.suffixes and not path.stem.startswith(".")
     }
     activities_ids_to_parse = work_tracker.filter(activity_paths.keys())
 

@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - Fix _internal server error 500_ when there are not-a-number entries in the speed. [GH-85](https://github.com/martin-ueding/geo-activity-playground/issues/85)
 - Display activity source path in detail view.
+- Ignore files which start with a period. This should also avoid Apple Quarantine files. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
 
 #### Version 0.17.5
 
