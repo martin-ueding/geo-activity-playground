@@ -7,6 +7,7 @@ import sys
 import coloredlogs
 
 from .importers.strava_checkout import convert_strava_checkout
+from .importers.strava_checkout import import_from_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
@@ -104,6 +105,8 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
 
     if pathlib.Path("Activities").exists():
         import_from_directory(repository)
+    if pathlib.Path("Strava Export").exists():
+        import_from_strava_checkout(repository)
     if "strava" in config:
         import_from_strava_api(repository)
 

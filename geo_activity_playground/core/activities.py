@@ -50,6 +50,9 @@ class ActivityRepository:
 
     def commit(self) -> None:
         if self._loose_activities:
+            logger.debug(
+                f"Adding {len(self._loose_activities)} activities to the repository …"
+            )
             new_df = pd.DataFrame(self._loose_activities)
             self.meta = pd.concat([self.meta, new_df])
             self.meta.index = self.meta["id"]

@@ -1,10 +1,21 @@
+import datetime
+import logging
 import pathlib
 import shutil
+import traceback
 
 import dateutil.parser
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activity_parsers import ActivityParseError
+from geo_activity_playground.core.activity_parsers import read_activity
+from geo_activity_playground.core.tasks import WorkTracker
+
+
+logger = logging.getLogger(__name__)
 
 
 def nan_as_none(elem):
@@ -12,6 +23,61 @@ def nan_as_none(elem):
         return None
     else:
         return elem
+
+
+def import_from_strava_checkout(repository: ActivityRepository) -> None:
+    checkout_path = pathlib.Path("Strava Export")
+    activities = pd.read_csv(checkout_path / "activities.csv")
+    activities.index = activities["Activity ID"]
+    work_tracker = WorkTracker("import-strava-checkout-activities")
+    activities_ids_to_parse = work_tracker.filter(activities["Activity ID"])
+
+    activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
+    activity_stream_dir.mkdir(exist_ok=True, parents=True)
+
+    for activity_id in tqdm(activities_ids_to_parse):
+        row = activities.loc[activity_id]
+        activity_file = checkout_path / row["Filename"]
+        table_activity_meta = {
+            "calories": row["Calories"],
+            "commute": row["Commute"] == "true",
+            "distance": row["Distance"],
+            "elapsed_time": datetime.timedelta(seconds=int(row["Elapsed Time"])),
+            "equipment": nan_as_none(row["Activity Gear"])
+            or nan_as_none(row["Bike"])
+            or nan_as_none(row["Gear"])
+            or "",
+            "kind": row["Activity Type"],
+            "id": activity_id,
+            "name": row["Activity Name"],
+            "path": str(activity_file),
+            "start": dateutil.parser.parse(row["Activity Date"]),
+        }
+
+        work_tracker.mark_done
+
+        try:
+            file_activity_meta, time_series = read_activity(activity_file)
+        except ActivityParseError as e:
+            logger.error(f"Error while parsing file {activity_file}:")
+            traceback.print_exc()
+            continue
+        except:
+            logger.error(
+                f"Encountered a problem with {activity_file=}, see details below."
+            )
+            raise
+
+        work_tracker.mark_done(activity_id)
+
+        if not len(time_series):
+            continue
+
+        time_series_path = activity_stream_dir / f"{activity_id}.parquet"
+        time_series.to_parquet(time_series_path)
+        repository.add_activity(table_activity_meta)
+
+    repository.commit()
 
 
 def convert_strava_checkout(

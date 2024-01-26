@@ -6,11 +6,15 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.17
+### Version 0.18
 
 - Fix _internal server error 500_ when there are not-a-number entries in the speed. [GH-85](https://github.com/martin-ueding/geo-activity-playground/issues/85)
 - Display activity source path in detail view.
 - Ignore files which start with a period. This should also avoid Apple Quarantine files. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
+- Allow to have both Strava API and activity files.
+- Use an existing Strava Export to load activities, retrieve only the remainder from the Strava API.
+
+### Version 0.17
 
 #### Version 0.17.5
 

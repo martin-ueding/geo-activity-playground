@@ -37,6 +37,8 @@ Add the _client ID_ and the _client secret_ from your Strava app. Add the _code_
 
 Then you are all set to download data from the Strava API. When you start one of the commands, it will automatically start to download.
 
-## Rate limiting
+## Use export to avoid rate limiting
 
 When you first start this program and use the Strava API as a data source, it will download the metadata for all your activities. Then it will start to download all the time series data for each activity. Strava has a rate limiting, so after the first 200 activities it will crash and you will have to wait for 15 minutes until you can try again and it will download the next batch.
+
+Therefore it is recommended to use a Strava export in order to get started quicker. For this go to the [Strava account download page](https://www.strava.com/athlete/delete_your_account) and download all your data. You will get a ZIP file. Unpack the files into `Playground/Strava Export`. These will be picked up there. Activities from Strava will only be downloaded after importing all these, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.
