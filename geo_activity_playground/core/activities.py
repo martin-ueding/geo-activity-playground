@@ -92,43 +92,6 @@ class ActivityRepository:
             logger.error(f"Error while reading {path}, deleting cache file …")
             path.unlink(missing_ok=True)
             raise
-        changed = False
-        if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
-            start = self.get_activity_by_id(id)["start"]
-            time = df["time"]
-            del df["time"]
-            df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
-            changed = True
-        assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
-
-        if "distance" in df.columns:
-            if "distance/km" not in df.columns:
-                df["distance/km"] = df["distance"] / 1000
-                changed = True
-
-            if "speed" not in df.columns:
-                df["speed"] = (
-                    df["distance"].diff()
-                    / (df["time"].diff().dt.total_seconds() + 1e-3)
-                    * 3.6
-                )
-                changed = True
-
-        if "latitude" in df.columns and "x" not in df.columns:
-            x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
-            df["x"] = x
-            df["y"] = y
-            changed = True
-
-        if "segment_id" not in df.columns:
-            time_diff = (df["time"] - df["time"].shift(1)).dt.total_seconds()
-            jump_indices = time_diff >= 30
-            df["segment_id"] = np.cumsum(jump_indices)
-            changed = True
-
-        if changed:
-            logger.info(f"Updating activity time series for {id = } …")
-            df.to_parquet(path)
 
         return df
 
