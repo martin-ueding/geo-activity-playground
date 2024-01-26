@@ -9,6 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.17
 
 - Fix _internal server error 500_ when there are not-a-number entries in the speed. [GH-85](https://github.com/martin-ueding/geo-activity-playground/issues/85)
+- Display activity source path in detail view.
 
 #### Version 0.17.5
 
