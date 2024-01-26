@@ -16,6 +16,7 @@
                     {% for i in range(1, 13) %}
                     <th style="text-align: right;">{{ i }}</th>
                     {% endfor %}
+                    <th style="text-align: right;">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +33,7 @@
                         {% endif %}
                     </td>
                     {% endfor %}
+                    <td align="right">{{ yearly_distances[year]|int() }} km</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Ignore files which start with a period. This should also avoid Apple Quarantine files. [GH-83](https://github.com/martin-ueding/geo-activity-playground/issues/83)
 - Allow to have both Strava API and activity files.
 - Use an existing Strava Export to load activities, retrieve only the remainder from the Strava API.
+- In the calender, give the yearly total.
 
 ### Version 0.17
 

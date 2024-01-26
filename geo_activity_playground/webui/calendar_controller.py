@@ -28,9 +28,19 @@ class CalendarController:
             .fillna(0.0)
         )
 
+        yearly_distance = meta.groupby(["year"]).apply(
+            lambda group: sum(group["distance"]) / 1000
+        )
+        yearly_distance.name = "total_distance"
+        yearly_distances = {
+            row["year"]: row["total_distance"]
+            for index, row in yearly_distance.reset_index().iterrows()
+        }
+
         return {
             "num_activities": len(self._repository.meta),
             "monthly_distances": monthly_pivot,
+            "yearly_distances": yearly_distances,
         }
 
     @functools.cache
