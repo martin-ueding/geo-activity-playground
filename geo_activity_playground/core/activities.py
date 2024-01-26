@@ -33,14 +33,42 @@ class ActivityMeta(TypedDict):
     start: datetime.datetime
 
 
+activity_path = pathlib.Path("Cache/activities.parquet")
+
+
 class ActivityRepository:
     def __init__(self) -> None:
-        self.meta = pd.read_parquet("Cache/activities.parquet")
+        self.meta = pd.read_parquet(activity_path)
         self.meta.index = self.meta["id"]
         self.meta.index.name = "index"
         self.meta["distance"] /= 1000
         self.meta["kind"].fillna("Unknown", inplace=True)
         self.meta["equipment"].fillna("Unknown", inplace=True)
+
+        self._loose_activities: list[ActivityMeta] = []
+
+    def add_activity(self, activity_meta: ActivityMeta) -> None:
+        self._loose_activities.append(activity_meta)
+
+    def commit(self) -> None:
+        if self._loose_activities:
+            new_df = pd.DataFrame(self._loose_activities)
+            merged = pd.concat([self.meta, new_df])
+            merged.sort_values("start", inplace=True)
+            activity_path.parent.mkdir(exist_ok=True, parents=True)
+            self.meta.to_parquet(activity_path)
+            self._loose_activities = []
+
+    def has_activity(self, activity_id: int) -> bool:
+        if len(self.meta):
+            if activity_id in self.meta["id"]:
+                return True
+
+        for activity_meta in self._loose_activities:
+            if activity_meta["id"] == activity_id:
+                return True
+
+        return False
 
     @property
     def activity_ids(self) -> set[int]:
