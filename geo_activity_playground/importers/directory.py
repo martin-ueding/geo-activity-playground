@@ -62,6 +62,8 @@ def import_from_directory() -> None:
             # https://stackoverflow.com/a/74718395/653152
             name=path.name.removesuffix("".join(path.suffixes)),
             path=str(path),
+            kind="Unknown",
+            equipment="Unknown",
         )
         if len(path.parts) >= 3 and path.parts[1] != "Commute":
             activity_meta["kind"] = path.parts[1]

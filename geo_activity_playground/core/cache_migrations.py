@@ -64,6 +64,7 @@ def apply_cache_migrations() -> None:
         delete_tile_visits,
         delete_heatmap_cache,
         delete_activity_metadata,
+        delete_activity_metadata,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:
