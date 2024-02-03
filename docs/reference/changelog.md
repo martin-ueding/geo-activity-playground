@@ -6,7 +6,7 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Next
+### Version 0.19
 
 - Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88)
 - Add more tooltip information in the plot on the landing page.
