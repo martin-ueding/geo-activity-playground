@@ -44,6 +44,9 @@ class ActivityRepository:
 
         self._loose_activities: list[ActivityMeta] = []
 
+    def __len__(self) -> int:
+        return len(self.meta)
+
     def add_activity(self, activity_meta: ActivityMeta) -> None:
         self._loose_activities.append(activity_meta)
 

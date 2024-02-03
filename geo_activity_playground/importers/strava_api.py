@@ -217,6 +217,7 @@ def download_missing_calories(repository: ActivityRepository) -> None:
         for activity in tqdm(
             client.get_activities(after="2000-01-01T00:00:00Z"),
             desc="Downloading calories from Strava",
+            total=len(repository),
         ):
             if repository.has_activity(activity.id):
                 calories = get_detailed_activity(activity.id, client).calories
