@@ -130,6 +130,11 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
     activities.index = activities["Activity ID"]
     work_tracker = WorkTracker("import-strava-checkout-activities")
     activities_ids_to_parse = work_tracker.filter(activities["Activity ID"])
+    activities_ids_to_parse = [
+        activity_id
+        for activity_id in activities_ids_to_parse
+        if not repository.has_activity(activity_id)
+    ]
 
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     activity_stream_dir.mkdir(exist_ok=True, parents=True)
@@ -173,6 +178,8 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
                 )
                 raise
 
+        work_tracker.mark_done(activity_id)
+
         if not len(time_series):
             continue
 
@@ -181,7 +188,6 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
 
         time_series.to_parquet(time_series_path)
 
-        work_tracker.mark_done(activity_id)
         repository.add_activity(table_activity_meta)
 
     repository.commit()
