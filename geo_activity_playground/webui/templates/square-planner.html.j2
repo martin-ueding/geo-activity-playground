@@ -9,13 +9,78 @@
 
 
 <div class="row mb-3">
-    <div class="col">
-        <div class="btn-group mb-3" role="group">
-            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster</button>
-            <button type="button" class="btn btn-secondary" onclick="changeColor('first')">First Visit</button>
-            <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
-        </div>
-        <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
+    <div class="col-md-3">
+        <table>
+            <tr>
+                <td>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x-1 }}/{{ square_y-1 }}/{{ square_size+1 }}">↖</a>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x+1 }}/{{ square_y+1 }}/{{ square_size-1 }}">↘</a>
+                </td>
+                <td></td>
+                <td>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y+1 }}/{{ square_size-1 }}">↙</a>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y-1 }}/{{ square_size+1 }}">↗</a>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <table>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <a class="btn btn-primary"
+                                    href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y-1 }}/{{ square_size }}">↑</a>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a class="btn btn-primary"
+                                    href="/square-planner/{{ zoom }}/{{ square_x-1 }}/{{ square_y }}/{{ square_size }}">←</a>
+                            </td>
+                            <td></td>
+                            <td>
+                                <a class="btn btn-primary"
+                                    href="/square-planner/{{ zoom }}/{{ square_x+1 }}/{{ square_y }}/{{ square_size }}">→</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <a class="btn btn-primary"
+                                    href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y+1 }}/{{ square_size }}">↓</a>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x-1 }}/{{ square_y }}/{{ square_size+1 }}">↙</a>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x+1 }}/{{ square_y }}/{{ square_size-1 }}">↗</a>
+                </td>
+                <td></td>
+                <td>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size-1 }}">↖</a>
+                    <a class="btn btn-primary"
+                        href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size+1 }}">↘</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-9">
+
+        <div id="explorer-map" class="mb-1" style="height: 600px;"></div>
 
 
         <script>

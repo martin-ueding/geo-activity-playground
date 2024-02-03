@@ -51,6 +51,10 @@ class SquarePlannerController:
             "explored_geojson": self._get_explored_geojson(zoom),
             "missing_geojson": missing_geojson,
             "square_geojson": square_geojson,
+            "zoom": zoom,
+            "square_x": square_x,
+            "square_y": square_y,
+            "square_size": square_size,
         }
 
     @functools.cache
