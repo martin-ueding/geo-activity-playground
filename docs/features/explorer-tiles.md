@@ -113,3 +113,13 @@ And on OsmAnd such files look like this:
 ![](explorer-osmand.jpg)
 
 Unfortunately OsmAnd becomes a bit sluggish with such a huge track imported, so make sure to only export it from rather small regions.
+
+## Square planner
+
+From the explorer tile views you can open the _square planner_ which allows you to see which tiles you need to explore in order to extend the square into a particular direction. The screen will open with the largest square that you have, then you can use the buttons to extend or move your square.
+
+![](square-planner.png)
+
+Using the buttons in the middle you can move the square, the buttons in the corners allow to extend or shrink the square.
+
+When you have selected the square that you want to target, you can download the missing files in for that square as GeoJSON or GPX.

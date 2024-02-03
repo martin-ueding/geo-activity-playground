@@ -15,6 +15,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Add option `--skip-strava` to the `serve` command in order to start the webserver without reaching out to Strava first. This might be useful if the rate limit has been exceeded.
 - [GH-89](https://github.com/martin-ueding/geo-activity-playground/issues/89): Refactor some paths into a module such that there are not so many redundant definitions around.
 - [GH-86](https://github.com/martin-ueding/geo-activity-playground/issues/86): Attempt to also read Strava exports that are localized to German, though untested.
+- [GH-36](https://github.com/martin-ueding/geo-activity-playground/issues/36): Add a square planner.
 
 ### Version 0.18
 
