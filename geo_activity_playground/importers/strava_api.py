@@ -15,6 +15,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.paths import cache_dir
 
 
 logger = logging.getLogger(__name__)
@@ -213,16 +214,25 @@ def get_detailed_activity(activity_id: int, client: Client):
 def download_missing_calories(repository: ActivityRepository) -> None:
     client = Client(access_token=get_current_access_token())
 
+    latest_timestamp_path = cache_dir() / "strava-detailed-activity-last.json"
+    if latest_timestamp_path.exists():
+        with open(latest_timestamp_path) as f:
+            latest_timestamp = json.load(f)
+    else:
+        latest_timestamp = "2000-01-01T00:00:00Z"
+
     try:
         for activity in tqdm(
-            client.get_activities(after="2000-01-01T00:00:00Z"),
+            client.get_activities(after=latest_timestamp),
             desc="Downloading calories from Strava",
-            total=len(repository),
         ):
             if repository.has_activity(activity.id):
                 calories = get_detailed_activity(activity.id, client).calories
                 repository.meta.loc[activity.id, "calories"] = calories
+            latest_timestamp = activity.start.isoformat().replace("+00:00", "Z")
     except RateLimitExceeded:
         pass
     finally:
         repository.save()
+        with open(latest_timestamp_path, "w") as f:
+            json.dump(latest_timestamp, f)
