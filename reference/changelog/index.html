@@ -768,6 +768,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-019" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-018" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.18
@@ -1250,6 +1259,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-019" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-018" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.18
@@ -1678,6 +1696,17 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-019">Version 0.19</h3>
+<ul>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>: Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field <code>distance_km</code> and everything is represented as kilometer internally now. </li>
+<li>Add more tooltip information in the plot on the landing page.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/87">GH-87</a>: Add <code>prefer_metadata_from_file</code> configuration option.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/17">GH-17</a>: Download calories from Strava via the detailed API.</li>
+<li>Add option <code>--skip-strava</code> to the <code>serve</code> command in order to start the webserver without reaching out to Strava first. This might be useful if the rate limit has been exceeded.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/89">GH-89</a>: Refactor some paths into a module such that there are not so many redundant definitions around.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/86">GH-86</a>: Attempt to also read Strava exports that are localized to German, though untested.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/36">GH-36</a>: Add a square planner.</li>
+</ul>
 <h3 id="version-018">Version 0.18</h3>
 <ul>
 <li>Fix <em>internal server error 500</em> when there are not-a-number entries in the speed. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/85">GH-85</a></li>
