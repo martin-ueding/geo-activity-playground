@@ -40,6 +40,8 @@ class ActivityRepository:
     def __init__(self) -> None:
         if activity_path.exists():
             self.meta = pd.read_parquet(activity_path)
+            self.meta.index = self.meta["id"]
+            self.meta.index.name = "index"
         else:
             self.meta = pd.DataFrame()
 
@@ -58,13 +60,13 @@ class ActivityRepository:
             assert pd.api.types.is_dtype_equal(
                 self.meta["start"].dtype, "datetime64[ns, UTC]"
             ), self.meta["start"].dtype
-            self.meta.index = self.meta["id"]
-            self.meta.index.name = "index"
-            self.meta.sort_values("start", inplace=True)
             self.save()
             self._loose_activities = []
 
     def save(self) -> None:
+        self.meta.index = self.meta["id"]
+        self.meta.index.name = "index"
+        self.meta.sort_values("start", inplace=True)
         activity_path.parent.mkdir(exist_ok=True, parents=True)
         self.meta.to_parquet(activity_path)
 
