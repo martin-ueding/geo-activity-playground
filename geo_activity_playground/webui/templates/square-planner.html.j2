@@ -1,0 +1,60 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Square Planner</h1>
+    </div>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="btn-group mb-3" role="group">
+            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('first')">First Visit</button>
+            <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
+        </div>
+        <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
+
+
+        <script>
+            let map = L.map('explorer-map', {
+                fullscreenControl: true,
+                center: [0.0, 0.0],
+                zoom: 14
+            })
+
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href=" http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map)
+
+            {# let explorer_geojson = {{ explored_geojson| safe }}
+            let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
+                style: function (feature) {
+                    return {
+                        color: feature.properties.color, fillColor: feature.properties.color,
+                        weight: 0.5
+                    }
+                },
+                onEachFeature: onEachFeature
+            }).addTo(map) #}
+
+            let square_geojson = {{ square_geojson | safe }}
+            let explorer_square_layer = L.geoJSON(square_geojson,
+                {
+                    style: function (feature) {
+                        return {
+                            color: "blue", fill: false, weight: 2
+                        }
+                    }
+                }
+            ).addTo(map)
+
+            map.fitBounds(explorer_square_layer.getBounds())
+        </script>
+    </div>
+</div>
+
+{% endblock %}

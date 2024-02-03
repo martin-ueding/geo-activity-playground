@@ -14,6 +14,9 @@ from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.square_planner_controller import (
+    SquarePlannerController,
+)
 from geo_activity_playground.webui.strava_controller import StravaController
 from geo_activity_playground.webui.summary_controller import SummaryController
 from geo_activity_playground.webui.tile_controller import (
@@ -172,6 +175,17 @@ def route_search(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
+def route_square_planner(app: Flask, repository: ActivityRepository) -> None:
+    controller = SquarePlannerController(repository)
+
+    @app.route("/square-planner/<zoom>/<x>/<y>/<size>")
+    def square_planner(zoom, x, y, size):
+        return render_template(
+            "square-planner.html.j2",
+            **controller.render(int(zoom), int(x), int(y), int(size))
+        )
+
+
 def route_start(app: Flask, repository: ActivityRepository) -> None:
     entry_controller = EntryController(repository)
 
@@ -248,6 +262,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     route_explorer(app, repository)
     route_heatmap(app, repository)
     route_search(app, repository)
+    route_square_planner(app, repository)
     route_start(app, repository)
     route_strava(app, host, port)
     route_summary(app, repository)
