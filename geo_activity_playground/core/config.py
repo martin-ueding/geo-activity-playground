@@ -19,4 +19,9 @@ def get_config() -> dict:
         logger.warning("Missing a config, some features might be missing.")
         return {}
     with open(config_path, "rb") as f:
-        return tomllib.load(f)
+        config = tomllib.load(f)
+
+    # Filter out empty config groups.
+    config = {key: value for key, value in config.items() if value}
+
+    return config
