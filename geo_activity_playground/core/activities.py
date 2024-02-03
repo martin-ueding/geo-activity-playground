@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ActivityMeta(TypedDict):
     calories: float
     commute: bool
-    distance: float
+    distance_km: float
     elapsed_time: datetime.timedelta
     equipment: str
     id: int
@@ -122,16 +122,12 @@ def embellish_time_series(repository: ActivityRepository) -> None:
             changed = True
         assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
 
-        if "distance" in df.columns:
-            if "distance/km" not in df.columns:
-                df["distance/km"] = df["distance"] / 1000
-                changed = True
-
+        if "distance_km" in df.columns:
             if "speed" not in df.columns:
                 df["speed"] = (
-                    df["distance"].diff()
+                    df["distance_km"].diff()
                     / (df["time"].diff().dt.total_seconds() + 1e-3)
-                    * 3.6
+                    * 3600
                 )
                 changed = True
 

@@ -22,7 +22,7 @@
                 {% for equipment in equipment_summary %}
                 <tr>
                     <td>{{ equipment.equipment }}</td>
-                    <td style="text-align: right;">{{ equipment.total_distance|int }}</td>
+                    <td style="text-align: right;">{{ equipment.total_distance_km|int }}</td>
                     <td style="text-align: right;">{{ equipment.first_use.date() }}</td>
                     <td style="text-align: right;">{{ equipment.last_use.date() }}</td>
                 </tr>

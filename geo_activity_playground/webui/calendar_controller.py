@@ -19,21 +19,21 @@ class CalendarController:
         meta["month"] = meta["start"].dt.month
 
         monthly_distance = meta.groupby(["year", "month"]).apply(
-            lambda group: sum(group["distance"]) / 1000
+            lambda group: sum(group["distance_km"])
         )
-        monthly_distance.name = "total_distance"
+        monthly_distance.name = "total_distance_km"
         monthly_pivot = (
             monthly_distance.reset_index()
-            .pivot(index="month", columns="year", values="total_distance")
+            .pivot(index="month", columns="year", values="total_distance_km")
             .fillna(0.0)
         )
 
         yearly_distance = meta.groupby(["year"]).apply(
-            lambda group: sum(group["distance"]) / 1000
+            lambda group: sum(group["distance_km"])
         )
-        yearly_distance.name = "total_distance"
+        yearly_distance.name = "total_distance_km"
         yearly_distances = {
-            row["year"]: row["total_distance"]
+            row["year"]: row["total_distance_km"]
             for index, row in yearly_distance.reset_index().iterrows()
         }
 
@@ -71,7 +71,7 @@ class CalendarController:
                 {
                     "name": row["name"],
                     "kind": row["kind"],
-                    "distance": row["distance"],
+                    "distance_km": row["distance_km"],
                     "id": row["id"],
                 }
             )

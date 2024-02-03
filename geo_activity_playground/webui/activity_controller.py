@@ -87,7 +87,7 @@ def distance_time_plot(time_series: pd.DataFrame) -> str:
         alt.Chart(time_series, title="Distance")
         .mark_line()
         .encode(
-            alt.X("time", title="Time"), alt.Y("distance/km", title="Distance / km")
+            alt.X("time", title="Time"), alt.Y("distance_km", title="Distance / km")
         )
         .interactive()
         .to_json(format="vega")

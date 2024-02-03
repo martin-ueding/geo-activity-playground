@@ -20,7 +20,7 @@ class SearchController:
                         "name": row["name"],
                         "start": row["start"].isoformat(),
                         "kind": row["kind"],
-                        "distance/km": row["distance"],
+                        "distance_km": row["distance_km"],
                         "elapsed_time": row["elapsed_time"],
                         "commute": row["commute"],
                     }

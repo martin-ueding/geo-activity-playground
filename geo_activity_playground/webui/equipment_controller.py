@@ -19,7 +19,7 @@ class EquipmentController:
                 lambda group: pd.DataFrame(
                     {
                         "time": group["start"],
-                        "total_distance": group["distance"].cumsum() / 1000,
+                        "total_distance_km": group["distance_km"].cumsum(),
                     }
                 )
             )
@@ -36,7 +36,7 @@ class EquipmentController:
             .mark_line(interpolate="step-after")
             .encode(
                 alt.X("time", title="Date"),
-                alt.Y("total_distance", title="Cumulative distance / km"),
+                alt.Y("total_distance_km", title="Cumulative distance / km"),
             )
             .facet("equipment", columns=4, title="Equipment")
             .resolve_scale(y="independent")
@@ -50,7 +50,7 @@ class EquipmentController:
             .apply(
                 lambda group: pd.DataFrame(
                     {
-                        "total_distance": group["distance"].sum() / 1000,
+                        "total_distance_km": group["distance_km"].sum(),
                         "first_use": group["start"].iloc[0],
                         "last_use": group["start"].iloc[-1],
                     },
@@ -67,7 +67,7 @@ class EquipmentController:
             print(equipment_summary)
             for equipment, offset in config["offsets"].items():
                 equipment_summary.loc[
-                    equipment_summary["equipment"] == equipment, "total_distance"
+                    equipment_summary["equipment"] == equipment, "total_distance_km"
                 ] += offset
 
         return {

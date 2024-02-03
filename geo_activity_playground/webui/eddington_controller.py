@@ -17,19 +17,19 @@ class EddingtonController:
         activities["day"] = [start.date() for start in activities["start"]]
 
         sum_per_day = activities.groupby("day").apply(
-            lambda group: int(sum(group["distance"] / 1000))
+            lambda group: int(sum(group["distance_km"]))
         )
         counts = dict(zip(*np.unique(sorted(sum_per_day), return_counts=True)))
         eddington = pd.DataFrame(
-            {"distance": d, "count": counts.get(d, 0)}
+            {"distance_km": d, "count": counts.get(d, 0)}
             for d in range(max(counts.keys()) + 1)
         )
         eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
-        x = list(range(1, max(eddington["distance"]) + 1))
-        en = eddington.loc[eddington["total"] >= eddington["distance"]][
-            "distance"
+        x = list(range(1, max(eddington["distance_km"]) + 1))
+        en = eddington.loc[eddington["total"] >= eddington["distance_km"]][
+            "distance_km"
         ].iloc[-1]
-        eddington["missing"] = eddington["distance"] - eddington["total"]
+        eddington["missing"] = eddington["distance_km"] - eddington["total"]
 
         logarithmic_plot = (
             (
@@ -43,7 +43,7 @@ class EddingtonController:
                     .mark_bar()
                     .encode(
                         alt.X(
-                            "distance",
+                            "distance_km",
                             scale=alt.Scale(domainMin=0),
                             title="Distance / km",
                         ),
@@ -53,16 +53,16 @@ class EddingtonController:
                             title="Days exceeding distance",
                         ),
                         [
-                            alt.Tooltip("distance", title="Distance / km"),
+                            alt.Tooltip("distance_km", title="Distance / km"),
                             alt.Tooltip("total", title="Days exceeding distance"),
                             alt.Tooltip("missing", title="Days missing for next"),
                         ],
                     )
                 )
                 + (
-                    alt.Chart(pd.DataFrame({"distance": x, "total": x}))
+                    alt.Chart(pd.DataFrame({"distance_km": x, "total": x}))
                     .mark_line(color="red")
-                    .encode(alt.X("distance"), alt.Y("total"))
+                    .encode(alt.X("distance_km"), alt.Y("total"))
                 )
             )
             .interactive(bind_y=False)

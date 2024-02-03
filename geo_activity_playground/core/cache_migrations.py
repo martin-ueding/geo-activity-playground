@@ -3,6 +3,8 @@ import logging
 import pathlib
 import shutil
 
+import pandas as pd
+
 logger = logging.getLogger(__name__)
 
 
@@ -49,6 +51,28 @@ def delete_activity_metadata() -> None:
     pathlib.Path("Cache/activities.parquet").unlink(missing_ok=True)
 
 
+def convert_distances_to_km() -> None:
+    activities_path = pathlib.Path("Cache/activities.parquet")
+    if activities_path.exists():
+        activities = pd.read_parquet(activities_path)
+        if not "distance_km" in activities.columns:
+            activities["distance_km"] = activities["distance"] / 1000
+        for col in ["distance", "distance/km"]:
+            if col in activities.columns:
+                del activities[col]
+        activities.to_parquet(activities_path)
+
+    for time_series_path in pathlib.Path("Cache/Activity Timeseries/").glob(
+        "*.parquet"
+    ):
+        time_series = pd.read_parquet(time_series_path)
+        time_series["distance_km"] = time_series["distance"] / 1000
+        for col in ["distance", "distance/km"]:
+            if col in time_series.columns:
+                del time_series[col]
+        time_series.to_parquet(time_series_path)
+
+
 def apply_cache_migrations() -> None:
     logger.info("Apply cache migration if needed …")
     cache_status_file = pathlib.Path("Cache/status.json")
@@ -65,6 +89,7 @@ def apply_cache_migrations() -> None:
         delete_heatmap_cache,
         delete_activity_metadata,
         delete_activity_metadata,
+        convert_distances_to_km,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:

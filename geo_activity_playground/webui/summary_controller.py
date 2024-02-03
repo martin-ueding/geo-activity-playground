@@ -33,11 +33,13 @@ def distance_heatmap_meta_plot(meta: pd.DataFrame) -> str:
                 scale=alt.Scale(reverse=True),
                 title="Year and month",
             ),
-            alt.Color("sum(distance)", scale=alt.Scale(scheme="viridis")),
+            alt.Color("sum(distance_km)", scale=alt.Scale(scheme="viridis")),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
-                alt.Tooltip("sum(distance)", format=".1f", title="Total distance / km"),
-                alt.Tooltip("count(distance)", title="Number of activities"),
+                alt.Tooltip(
+                    "sum(distance_km)", format=".1f", title="Total distance / km"
+                ),
+                alt.Tooltip("count(distance_km)", title="Number of activities"),
             ],
         )
         .to_json(format="vega")
@@ -50,7 +52,7 @@ def year_on_year_distance_meta_plot(meta: pd.DataFrame) -> str:
         .mark_bar()
         .encode(
             alt.X("month(start)"),
-            alt.Y("sum(distance)"),
+            alt.Y("sum(distance_km)"),
             alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
         )
         .facet(facet="year(start):O", columns=4)

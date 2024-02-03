@@ -155,7 +155,7 @@ def try_import_strava(repository: ActivityRepository) -> None:
                     {
                         "id": activity.id,
                         "commute": activity.commute,
-                        "distance": activity.distance.magnitude,
+                        "distance_km": activity.distance.magnitude / 1000,
                         "name": activity.name,
                         "kind": str(activity.type),
                         "start": activity.start_date,
@@ -181,9 +181,11 @@ def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFram
     if "latlng" in streams:
         columns["latitude"] = [elem[0] for elem in streams["latlng"].data]
         columns["longitude"] = [elem[1] for elem in streams["latlng"].data]
-    for name in ["distance", "altitude", "heartrate"]:
+    for name in ["altitude", "heartrate"]:
         if name in streams:
             columns[name] = streams[name].data
+    if "distance" in streams:
+        columns["distance_km"] = streams["distance"].data / 1000
 
     df = pd.DataFrame(columns)
     return df

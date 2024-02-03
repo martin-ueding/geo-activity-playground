@@ -75,7 +75,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
             ) from e
 
         # Add distance column if missing.
-        if "distance" not in timeseries.columns:
+        if "distance_km" not in timeseries.columns:
             distances = [0] + [
                 get_distance(lat_1, lon_1, lat_2, lon_2)
                 for lat_1, lon_1, lat_2, lon_2 in zip(
@@ -85,14 +85,14 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
                     timeseries["longitude"].iloc[1:],
                 )
             ]
-            timeseries["distance"] = pd.Series(np.cumsum(distances))
+            timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
 
         # Extract some meta data from the time series.
         metadata["start"] = timeseries["time"].iloc[0]
         metadata["elapsed_time"] = (
             timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
         )
-        metadata["distance"] = timeseries["distance"].iloc[-1]
+        metadata["distance_km"] = timeseries["distance_km"].iloc[-1]
         if "calories" in timeseries.columns:
             metadata["calories"] = timeseries["calories"].iloc[-1]
 
