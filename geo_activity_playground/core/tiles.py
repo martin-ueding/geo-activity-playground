@@ -10,6 +10,8 @@ import numpy as np
 import requests
 from PIL import Image
 
+from geo_activity_playground.core.paths import osm_tile_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,7 +59,7 @@ def download_file(url: str, destination: pathlib.Path):
 
 @functools.lru_cache()
 def get_tile(zoom: int, x: int, y: int) -> Image.Image:
-    destination = pathlib.Path.cwd() / "Open Street Map Tiles" / f"{zoom}/{x}/{y}.png"
+    destination = osm_tile_path(x, y, zoom)
     if not destination.exists():
         logger.info(f"Downloading OSM tile {x=}, {y=}, {zoom=} …")
         url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"

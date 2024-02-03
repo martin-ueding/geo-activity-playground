@@ -23,3 +23,13 @@ activities_path = lambda: cache_dir() / "activities.parquet"
 
 def activity_timeseries_path(activity_id: int) -> pathlib.Path:
     return activity_timeseries_dir() / f"{activity_id}.parquet"
+
+
+def work_tracker_path(name: str) -> pathlib.Path:
+    return cache_dir() / f"work-tracker-{name}.pickle"
+
+
+def osm_tile_path(x: int, y: int, zoom: int) -> pathlib.Path:
+    path = pathlib.Path("Open Street Map Tiles") / f"{zoom}/{x}/{y}.png"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path

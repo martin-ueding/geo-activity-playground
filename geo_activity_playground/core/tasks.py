@@ -4,6 +4,8 @@ import pathlib
 import pickle
 from typing import Any
 
+from geo_activity_playground.core.paths import work_tracker_path
+
 
 @contextlib.contextmanager
 def work_tracker(path: pathlib.Path):
@@ -21,7 +23,7 @@ def work_tracker(path: pathlib.Path):
 
 class WorkTracker:
     def __init__(self, name: str) -> None:
-        self._path = pathlib.Path(f"Cache/work-tracker-{name}.pickle")
+        self._path = work_tracker_path(name)
 
         if self._path.exists():
             with open(self._path, "rb") as f:

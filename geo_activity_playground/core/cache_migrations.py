@@ -6,6 +6,10 @@ import shutil
 import pandas as pd
 from tqdm import tqdm
 
+from geo_activity_playground.core.paths import activities_path
+from geo_activity_playground.core.paths import activity_timeseries_dir
+from geo_activity_playground.core.paths import work_tracker_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,8 +23,7 @@ def delete_activities_per_tile() -> None:
 
 
 def delete_work_tracker(name: str):
-    path = pathlib.Path(f"Cache/work-tracker-{name}.pickle")
-    path.unlink(missing_ok=True)
+    work_tracker_path(name).unlink(missing_ok=True)
 
 
 def reset_time_series_embellishment() -> None:
@@ -49,22 +52,21 @@ def delete_heatmap_cache() -> None:
 
 def delete_activity_metadata() -> None:
     delete_work_tracker("parse-activity-files")
-    pathlib.Path("Cache/activities.parquet").unlink(missing_ok=True)
+    activities_path().unlink(missing_ok=True)
 
 
 def convert_distances_to_km() -> None:
-    activities_path = pathlib.Path("Cache/activities.parquet")
-    if activities_path.exists():
-        activities = pd.read_parquet(activities_path)
+    if activities_path().exists():
+        activities = pd.read_parquet(activities_path())
         if not "distance_km" in activities.columns:
             activities["distance_km"] = activities["distance"] / 1000
         for col in ["distance", "distance/km"]:
             if col in activities.columns:
                 del activities[col]
-        activities.to_parquet(activities_path)
+        activities.to_parquet(activities_path())
 
     for time_series_path in tqdm(
-        list(pathlib.Path("Cache/Activity Timeseries/").glob("*.parquet")),
+        list(activity_timeseries_dir().glob("*.parquet")),
         desc="Convert m to km",
     ):
         time_series = pd.read_parquet(time_series_path)
