@@ -49,7 +49,11 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
             alt.X("yearmonthdate(start)", title="Date"),
             alt.Y("sum(distance_km)", title="Distance / km"),
             alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
-            [alt.Tooltip("yearmonthdate(start)", title="Date")],
+            [
+                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("sum(distance_km)", format=".1f", title="Distance / km"),
+            ],
         )
         .to_json(format="vega")
     )
