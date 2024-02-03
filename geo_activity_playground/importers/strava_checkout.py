@@ -25,9 +25,107 @@ def nan_as_none(elem):
         return elem
 
 
+EXPECTED_COLUMNS = [
+    "Activity ID",
+    "Activity Date",
+    "Activity Name",
+    "Activity Type",
+    "Activity Description",
+    "Elapsed Time",
+    "Distance",
+    "Max Heart Rate",
+    "Relative Effort",
+    "Commute",
+    "Activity Private Note",
+    "Activity Gear",
+    "Filename",
+    "Athlete Weight",
+    "Bike Weight",
+    "Elapsed Time.1",
+    "Moving Time",
+    "Distance.1",
+    "Max Speed",
+    "Average Speed",
+    "Elevation Gain",
+    "Elevation Loss",
+    "Elevation Low",
+    "Elevation High",
+    "Max Grade",
+    "Average Grade",
+    "Average Positive Grade",
+    "Average Negative Grade",
+    "Max Cadence",
+    "Average Cadence",
+    "Max Heart Rate.1",
+    "Average Heart Rate",
+    "Max Watts",
+    "Average Watts",
+    "Calories",
+    "Max Temperature",
+    "Average Temperature",
+    "Relative Effort.1",
+    "Total Work",
+    "Number of Runs",
+    "Uphill Time",
+    "Downhill Time",
+    "Other Time",
+    "Perceived Exertion",
+    "Type",
+    "Start Time",
+    "Weighted Average Power",
+    "Power Count",
+    "Prefer Perceived Exertion",
+    "Perceived Relative Effort",
+    "Commute.1",
+    "Total Weight Lifted",
+    "From Upload",
+    "Grade Adjusted Distance",
+    "Weather Observation Time",
+    "Weather Condition",
+    "Weather Temperature",
+    "Apparent Temperature",
+    "Dewpoint",
+    "Humidity",
+    "Weather Pressure",
+    "Wind Speed",
+    "Wind Gust",
+    "Wind Bearing",
+    "Precipitation Intensity",
+    "Sunrise Time",
+    "Sunset Time",
+    "Moon Phase",
+    "Bike",
+    "Gear",
+    "Precipitation Probability",
+    "Precipitation Type",
+    "Cloud Cover",
+    "Weather Visibility",
+    "UV Index",
+    "Weather Ozone",
+    "Jump Count",
+    "Total Grit",
+    "Average Flow",
+    "Flagged",
+    "Average Elapsed Speed",
+    "Dirt Distance",
+    "Newly Explored Distance",
+    "Newly Explored Dirt Distance",
+    "Activity Count",
+    "Total Steps",
+    "Media",
+]
+
+
 def import_from_strava_checkout(repository: ActivityRepository) -> None:
     checkout_path = pathlib.Path("Strava Export")
     activities = pd.read_csv(checkout_path / "activities.csv")
+
+    if activities.columns[0] == EXPECTED_COLUMNS[0]:
+        dayfirst = False
+    if activities.columns[0] == "Aktivitäts-ID":
+        activities.columns = EXPECTED_COLUMNS
+        dayfirst = True
+
     activities.index = activities["Activity ID"]
     work_tracker = WorkTracker("import-strava-checkout-activities")
     activities_ids_to_parse = work_tracker.filter(activities["Activity ID"])
@@ -53,9 +151,9 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
             "id": activity_id,
             "name": row["Activity Name"],
             "path": str(activity_file),
-            "start": dateutil.parser.parse(row["Activity Date"]).astimezone(
-                datetime.timezone.utc
-            ),
+            "start": dateutil.parser.parse(
+                row["Activity Date"], dayfirst=dayfirst
+            ).astimezone(datetime.timezone.utc),
         }
 
         time_series_path = activity_stream_dir / f"{activity_id}.parquet"
