@@ -123,6 +123,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
     if activities.columns[0] == EXPECTED_COLUMNS[0]:
         dayfirst = False
     if activities.columns[0] == "Aktivitäts-ID":
+        activities = pd.read_csv(checkout_path / "activities.csv", decimal=",")
         activities.columns = EXPECTED_COLUMNS
         dayfirst = True
 
