@@ -116,8 +116,6 @@ def make_activity_repository(
     embellish_time_series(repository)
     compute_tile_visits(repository)
     compute_tile_evolution()
-    print(repository.meta)
-
     return repository
 
 
