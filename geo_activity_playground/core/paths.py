@@ -6,19 +6,31 @@ import pathlib
 import typing
 
 
-def make_path(path) -> typing.Callable[[], pathlib.Path]:
+def dir_wrapper(
+    dir_func: typing.Callable[[], pathlib.Path]
+) -> typing.Callable[[], pathlib.Path]:
+    @functools.wraps(dir_func)
     @functools.cache
-    def path_creator() -> pathlib.Path:
+    def wrapper() -> pathlib.Path:
+        path = dir_func()
         path.mkdir(exist_ok=True, parents=True)
         return path
 
-    return path_creator
+    return wrapper
 
 
-cache_dir = make_path(pathlib.Path("Cache"))
-activity_timeseries_dir = lambda: make_path(cache_dir() / "Activity Timeseries")
+@dir_wrapper
+def cache_dir() -> pathlib.Path:
+    return pathlib.Path("Cache")
 
-activities_path = lambda: cache_dir() / "activities.parquet"
+
+@dir_wrapper
+def activity_timeseries_dir() -> pathlib.Path:
+    return cache_dir() / "Activity Timeseries"
+
+
+def activities_path() -> pathlib.Path:
+    return cache_dir() / "activities.parquet"
 
 
 def activity_timeseries_path(activity_id: int) -> pathlib.Path:
