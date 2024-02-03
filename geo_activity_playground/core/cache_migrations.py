@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.paths import activities_path
 from geo_activity_playground.core.paths import activity_timeseries_dir
-from geo_activity_playground.core.paths import work_tracker_path
+from geo_activity_playground.core.tasks import work_tracker_path
 
 logger = logging.getLogger(__name__)
 

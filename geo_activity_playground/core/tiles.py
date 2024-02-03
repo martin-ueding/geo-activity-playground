@@ -10,9 +10,13 @@ import numpy as np
 import requests
 from PIL import Image
 
-from geo_activity_playground.core.paths import osm_tile_path
-
 logger = logging.getLogger(__name__)
+
+
+def osm_tile_path(x: int, y: int, zoom: int) -> pathlib.Path:
+    path = pathlib.Path("Open Street Map Tiles") / f"{zoom}/{x}/{y}.png"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def compute_tile(lat: float, lon: float, zoom: int) -> tuple[int, int]:

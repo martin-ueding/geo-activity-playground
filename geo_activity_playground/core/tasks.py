@@ -4,7 +4,11 @@ import pathlib
 import pickle
 from typing import Any
 
-from geo_activity_playground.core.paths import work_tracker_path
+from geo_activity_playground.core.paths import cache_dir
+
+
+def work_tracker_path(name: str) -> pathlib.Path:
+    return cache_dir() / f"work-tracker-{name}.pickle"
 
 
 @contextlib.contextmanager
