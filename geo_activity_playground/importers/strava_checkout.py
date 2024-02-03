@@ -41,7 +41,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
         table_activity_meta = {
             "calories": row["Calories"],
             "commute": row["Commute"] == "true",
-            "distance": row["Distance"],
+            "distance_km": row["Distance"],
             "elapsed_time": datetime.timedelta(seconds=int(row["Elapsed Time"])),
             "equipment": str(
                 nan_as_none(row["Activity Gear"])
@@ -59,7 +59,9 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
         }
 
         time_series_path = activity_stream_dir / f"{activity_id}.parquet"
-        if not time_series_path.exists():
+        if time_series_path.exists():
+            time_series = pd.read_parquet(time_series_path)
+        else:
             try:
                 file_activity_meta, time_series = read_activity(activity_file)
             except ActivityParseError as e:
@@ -72,10 +74,13 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
                 )
                 raise
 
-            if not len(time_series):
-                continue
+        if not len(time_series):
+            continue
 
-            time_series.to_parquet(time_series_path)
+        if "latitude" not in time_series.columns:
+            continue
+
+        time_series.to_parquet(time_series_path)
 
         work_tracker.mark_done(activity_id)
         repository.add_activity(table_activity_meta)

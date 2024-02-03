@@ -151,7 +151,7 @@ def try_import_strava(repository: ActivityRepository) -> None:
                 time_series["time"] = new_time
                 time_series.to_parquet(time_series_path)
 
-            detailed_activity = get_detailed_activity(activity.id)
+            detailed_activity = get_detailed_activity(activity.id, client)
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
                 repository.add_activity(
@@ -209,30 +209,3 @@ def get_detailed_activity(activity_id: int, client: Client):
         pickle.dump(detailed_activity, f)
 
     return detailed_activity
-
-
-def download_missing_calories(repository: ActivityRepository) -> None:
-    client = Client(access_token=get_current_access_token())
-
-    latest_timestamp_path = cache_dir() / "strava-detailed-activity-last.json"
-    if latest_timestamp_path.exists():
-        with open(latest_timestamp_path) as f:
-            latest_timestamp = json.load(f)
-    else:
-        latest_timestamp = "2000-01-01T00:00:00Z"
-
-    try:
-        for activity in tqdm(
-            client.get_activities(after=latest_timestamp),
-            desc="Downloading calories from Strava",
-        ):
-            if repository.has_activity(activity.id):
-                calories = get_detailed_activity(activity.id, client).calories
-                repository.meta.loc[activity.id, "calories"] = calories
-            latest_timestamp = activity.start.isoformat().replace("+00:00", "Z")
-    except RateLimitExceeded:
-        pass
-    finally:
-        repository.save()
-        with open(latest_timestamp_path, "w") as f:
-            json.dump(latest_timestamp, f)

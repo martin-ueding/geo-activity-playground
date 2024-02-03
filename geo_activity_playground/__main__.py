@@ -16,7 +16,6 @@ from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.importers.directory import import_from_directory
-from geo_activity_playground.importers.strava_api import download_missing_calories
 from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
 
@@ -113,11 +112,12 @@ def make_activity_repository(
         import_from_strava_checkout(repository)
     if "strava" in config and not skip_strava:
         import_from_strava_api(repository)
-        download_missing_calories(repository)
 
     embellish_time_series(repository)
     compute_tile_visits(repository)
     compute_tile_evolution()
+    print(repository.meta)
+
     return repository
 
 

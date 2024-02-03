@@ -86,7 +86,7 @@ class ActivityRepository:
 
     @property
     def activity_ids(self) -> set[int]:
-        return set(self.meta["id"])
+        return set(self.meta.index)
 
     def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
