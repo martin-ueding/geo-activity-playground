@@ -9,7 +9,7 @@
 
 <div class="row mb-3">
     <div class="col-md-3">
-        <table>
+        <table class="mb-3">
             <tr>
                 <td>
                     <a class="btn btn-primary"
@@ -76,9 +76,14 @@
                 </td>
             </tr>
         </table>
+
+        <p>Download missing tiles as <a
+                href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.geojson">GeoJSON</a>
+            or <a href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
+        </p>
     </div>
     <div class="col-md-9">
-        <div id="explorer-map" class="mb-1" style="height: 600px;"></div>
+        <div id="explorer-map" class="mb-3" style="height: 600px;"></div>
 
         <script>
             let map = L.map('explorer-map', {

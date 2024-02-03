@@ -6,6 +6,9 @@ import geojson
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.explorer.grid_file import make_explorer_rectangle
 from geo_activity_playground.explorer.grid_file import make_explorer_tile
+from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
+from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
+from geo_activity_playground.explorer.grid_file import make_grid_points
 from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
 
 
@@ -16,7 +19,9 @@ class SquarePlannerController:
         with open(TILE_VISITS_PATH, "rb") as f:
             self._tile_visits = pickle.load(f)
 
-    def render(self, zoom: int, square_x: int, square_y: int, square_size: int) -> dict:
+    def action_planner(
+        self, zoom: int, square_x: int, square_y: int, square_size: int
+    ) -> dict:
         square_geojson = geojson.dumps(
             geojson.FeatureCollection(
                 features=[
@@ -56,6 +61,23 @@ class SquarePlannerController:
             "square_y": square_y,
             "square_size": square_size,
         }
+
+    def export_missing_tiles(
+        self, zoom: int, square_x: int, square_y: int, square_size: int, suffix: str
+    ) -> str:
+        points = make_grid_points(
+            (
+                (tile_x, tile_y)
+                for tile_x in range(square_x, square_x + square_size)
+                for tile_y in range(square_y, square_y + square_size)
+                if (tile_x, tile_y) not in self._get_explored_tiles(zoom)
+            ),
+            zoom,
+        )
+        if suffix == "geojson":
+            return make_grid_file_geojson(points)
+        elif suffix == "gpx":
+            return make_grid_file_gpx(points)
 
     @functools.cache
     def _get_explored_tiles(self, zoom: int) -> set[tuple[int, int]]:

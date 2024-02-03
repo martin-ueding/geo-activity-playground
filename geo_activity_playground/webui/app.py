@@ -179,10 +179,25 @@ def route_square_planner(app: Flask, repository: ActivityRepository) -> None:
     controller = SquarePlannerController(repository)
 
     @app.route("/square-planner/<zoom>/<x>/<y>/<size>")
-    def square_planner(zoom, x, y, size):
+    def square_planner_planner(zoom, x, y, size):
         return render_template(
             "square-planner.html.j2",
-            **controller.render(int(zoom), int(x), int(y), int(size))
+            **controller.action_planner(int(zoom), int(x), int(y), int(size))
+        )
+
+    @app.route("/square-planner/<zoom>/<x>/<y>/<size>/missing.<suffix>")
+    def square_planner_missing(zoom, x, y, size, suffix: str):
+        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
+        return Response(
+            controller.export_missing_tiles(
+                int(zoom),
+                int(x),
+                int(y),
+                int(size),
+                suffix,
+            ),
+            mimetype=mimetypes[suffix],
+            headers={"Content-disposition": "attachment"},
         )
 
 
