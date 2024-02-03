@@ -51,7 +51,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     elif file_type in [".kml", ".kmz"]:
         timeseries = read_kml_activity(path, opener)
     elif file_type == ".csv":  # Simra csv export
-        timeseries = read_simra_activity(path)
+        timeseries = read_simra_activity(path, opener)
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
