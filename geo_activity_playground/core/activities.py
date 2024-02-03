@@ -1,7 +1,6 @@
 import datetime
 import functools
 import logging
-import pathlib
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -13,9 +12,10 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.paths import activities_path
+from geo_activity_playground.core.paths import activity_timeseries_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.tiles import compute_tile_float
-
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +33,10 @@ class ActivityMeta(TypedDict):
     start: datetime.datetime
 
 
-activity_path = pathlib.Path("Cache/activities.parquet")
-
-
 class ActivityRepository:
     def __init__(self) -> None:
-        if activity_path.exists():
-            self.meta = pd.read_parquet(activity_path)
+        if activities_path().exists():
+            self.meta = pd.read_parquet(activities_path())
             self.meta.index = self.meta["id"]
             self.meta.index.name = "index"
         else:
@@ -67,8 +64,7 @@ class ActivityRepository:
         self.meta.index = self.meta["id"]
         self.meta.index.name = "index"
         self.meta.sort_values("start", inplace=True)
-        activity_path.parent.mkdir(exist_ok=True, parents=True)
-        self.meta.to_parquet(activity_path)
+        self.meta.to_parquet(activities_path())
 
     def has_activity(self, activity_id: int) -> bool:
         if len(self.meta):
@@ -100,7 +96,7 @@ class ActivityRepository:
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
-        path = pathlib.Path(f"Cache/Activity Timeseries/{id}.parquet")
+        path = activity_timeseries_path(id)
         try:
             df = pd.read_parquet(path)
         except OSError as e:
@@ -115,7 +111,7 @@ def embellish_time_series(repository: ActivityRepository) -> None:
     work_tracker = WorkTracker("embellish-time-series")
     activities_to_process = work_tracker.filter(repository.activity_ids)
     for activity_id in tqdm(activities_to_process, desc="Embellish time series data"):
-        path = pathlib.Path(f"Cache/Activity Timeseries/{activity_id}.parquet")
+        path = activity_timeseries_path(activity_id)
         df = pd.read_parquet(path)
         df.name = id
         changed = False
