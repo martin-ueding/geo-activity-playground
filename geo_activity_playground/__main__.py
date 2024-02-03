@@ -105,9 +105,6 @@ def make_activity_repository(
     apply_cache_migrations()
     config = get_config()
 
-    if "strava" in config and not skip_strava:
-        download_missing_calories()
-
     repository = ActivityRepository()
 
     if pathlib.Path("Activities").exists():
@@ -116,6 +113,7 @@ def make_activity_repository(
         import_from_strava_checkout(repository)
     if "strava" in config and not skip_strava:
         import_from_strava_api(repository)
+        download_missing_calories(repository)
 
     embellish_time_series(repository)
     compute_tile_visits(repository)

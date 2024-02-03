@@ -61,9 +61,12 @@ class ActivityRepository:
             self.meta.index = self.meta["id"]
             self.meta.index.name = "index"
             self.meta.sort_values("start", inplace=True)
-            activity_path.parent.mkdir(exist_ok=True, parents=True)
-            self.meta.to_parquet(activity_path)
+            self.save()
             self._loose_activities = []
+
+    def save(self) -> None:
+        activity_path.parent.mkdir(exist_ok=True, parents=True)
+        self.meta.to_parquet(activity_path)
 
     def has_activity(self, activity_id: int) -> bool:
         if len(self.meta):

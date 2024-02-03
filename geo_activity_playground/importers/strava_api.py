@@ -210,14 +210,7 @@ def get_detailed_activity(activity_id: int, client: Client):
     return detailed_activity
 
 
-def download_missing_calories() -> None:
-    activity_meta_path = pathlib.Path("Cache/activities.parquet")
-    if not activity_meta_path.exists():
-        return
-
-    activity_meta = pd.read_parquet(activity_meta_path)
-    activity_meta.index = activity_meta["id"]
-
+def download_missing_calories(repository: ActivityRepository) -> None:
     client = Client(access_token=get_current_access_token())
 
     try:
@@ -225,9 +218,10 @@ def download_missing_calories() -> None:
             client.get_activities(after="2000-01-01T00:00:00Z"),
             desc="Downloading calories from Strava",
         ):
-            calories = get_detailed_activity(activity.id, client).calories
-            activity_meta.loc[activity.id, "calories"] = calories
+            if repository.has_activity(activity.id):
+                calories = get_detailed_activity(activity.id, client).calories
+                repository.meta.loc[activity.id, "calories"] = calories
     except RateLimitExceeded:
         pass
     finally:
-        activity_meta.to_parquet(activity_meta_path)
+        repository.save()
