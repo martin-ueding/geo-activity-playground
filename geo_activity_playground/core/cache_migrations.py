@@ -4,6 +4,7 @@ import pathlib
 import shutil
 
 import pandas as pd
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -62,11 +63,13 @@ def convert_distances_to_km() -> None:
                 del activities[col]
         activities.to_parquet(activities_path)
 
-    for time_series_path in pathlib.Path("Cache/Activity Timeseries/").glob(
-        "*.parquet"
+    for time_series_path in tqdm(
+        list(pathlib.Path("Cache/Activity Timeseries/").glob("*.parquet")),
+        desc="Convert m to km",
     ):
         time_series = pd.read_parquet(time_series_path)
-        time_series["distance_km"] = time_series["distance"] / 1000
+        if "distance" in time_series.columns:
+            time_series["distance_km"] = time_series["distance"] / 1000
         for col in ["distance", "distance/km"]:
             if col in time_series.columns:
                 del time_series[col]
