@@ -55,11 +55,13 @@ class ExplorerController:
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
-                "bbox": bounding_box_for_biggest_cluster(
-                    tile_evolution_states[zoom].clusters.values(), zoom
-                )
-                if len(tile_evolution_states[zoom].memberships) > 0
-                else {},
+                "bbox": (
+                    bounding_box_for_biggest_cluster(
+                        tile_evolution_states[zoom].clusters.values(), zoom
+                    )
+                    if len(tile_evolution_states[zoom].memberships) > 0
+                    else {}
+                ),
             },
             "explored": explored,
             "plot_tile_evolution": plot_tile_evolution(tile_histories[zoom]),
@@ -215,6 +217,8 @@ def get_three_color_tiles(
         "num_cluster_tiles": num_cluster_tiles,
         "num_tiles": len(tile_dict),
         "square_size": cluster_state.max_square_size,
+        "square_x": cluster_state.square_x,
+        "square_y": cluster_state.square_y,
         "square_geojson": square_geojson,
     }
     return result
