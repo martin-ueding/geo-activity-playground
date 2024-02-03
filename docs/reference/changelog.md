@@ -8,9 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.19
 
-- Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88)
+- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. 
 - Add more tooltip information in the plot on the landing page.
-- Add `prefer_metadata_from_file` configuration option. [GH-87](https://github.com/martin-ueding/geo-activity-playground/issues/87)
+- [GH-87](https://github.com/martin-ueding/geo-activity-playground/issues/87): Add `prefer_metadata_from_file` configuration option.
+- [GH-17](https://github.com/martin-ueding/geo-activity-playground/issues/17): Download calories from Strava via the detailed API.
+- Add option `--skip-strava` to the `serve` command in order to start the webserver without reaching out to Strava first. This might be useful if the rate limit has been exceeded.
+
 
 ### Version 0.18
 
