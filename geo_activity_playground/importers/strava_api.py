@@ -4,7 +4,6 @@ import json
 import logging
 import pathlib
 import pickle
-import sys
 import time
 from typing import Any
 
@@ -138,7 +137,8 @@ def try_import_strava(repository: ActivityRepository) -> None:
                     time_series = download_strava_time_series(activity.id, client)
                 except ObjectNotFound as e:
                     logger.error(
-                        f"The activity {activity.id} with name “{activity.name}” cannot be found. Perhaps it is a manual activity without a time series. Ignoring. {e=}"
+                        f"The activity {activity.id} with name “{activity.name}” cannot be found."
+                        f"Perhaps it is a manual activity without a time series. Ignoring. {e=}"
                     )
                     continue
                 time_series.name = activity.id
@@ -149,6 +149,8 @@ def try_import_strava(repository: ActivityRepository) -> None:
                 del time_series["time"]
                 time_series["time"] = new_time
                 time_series.to_parquet(time_series_path)
+
+            detailed_activity = get_detailed_activity(activity.id)
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
                 repository.add_activity(
@@ -161,7 +163,7 @@ def try_import_strava(repository: ActivityRepository) -> None:
                         "start": activity.start_date,
                         "elapsed_time": activity.elapsed_time,
                         "equipment": gear_names[activity.gear_id],
-                        "calories": activity.calories,
+                        "calories": detailed_activity.calories,
                     }
                 )
         limit_exceeded = False
@@ -189,3 +191,43 @@ def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFram
 
     df = pd.DataFrame(columns)
     return df
+
+
+def get_detailed_activity(activity_id: int, client: Client):
+    detailed_activity_path = pathlib.Path(
+        f"Cache/Detailed Activities/{activity_id}.pickle"
+    )
+    if detailed_activity_path.exists():
+        with open(detailed_activity_path, "rb") as f:
+            return pickle.load(f)
+
+    detailed_activity = client.get_activity(activity_id)
+
+    detailed_activity_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(detailed_activity_path, "wb") as f:
+        pickle.dump(detailed_activity, f)
+
+    return detailed_activity
+
+
+def download_missing_calories() -> None:
+    activity_meta_path = pathlib.Path("Cache/activities.parquet")
+    if not activity_meta_path.exists():
+        return
+
+    activity_meta = pd.read_parquet(activity_meta_path)
+    activity_meta.index = activity_meta["id"]
+
+    client = Client(access_token=get_current_access_token())
+
+    try:
+        for activity in tqdm(
+            client.get_activities(after="2000-01-01T00:00:00Z"),
+            desc="Downloading calories from Strava",
+        ):
+            calories = get_detailed_activity(activity.id, client).calories
+            activity_meta.loc[activity.id, "calories"] = calories
+    except RateLimitExceeded:
+        pass
+    finally:
+        activity_meta.to_parquet(activity_meta_path)

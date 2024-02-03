@@ -16,6 +16,7 @@ from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.importers.directory import import_from_directory
+from geo_activity_playground.importers.strava_api import download_missing_calories
 from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
 
@@ -68,7 +69,7 @@ def main() -> None:
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
         func=lambda options: webui_main(
-            make_activity_repository(options.basedir),
+            make_activity_repository(options.basedir, options.skip_strava),
             host=options.host,
             port=options.port,
         )
@@ -79,10 +80,11 @@ def main() -> None:
     subparser.add_argument(
         "--port", default=5000, type=int, help="the port to run listen on"
     )
+    subparser.add_argument("--skip-strava", action=argparse.BooleanOptionalAction)
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
     subparser.set_defaults(
-        func=lambda options: make_activity_repository(options.basedir)
+        func=lambda options: make_activity_repository(options.basedir, False)
     )
 
     options = parser.parse_args()
@@ -96,10 +98,15 @@ def main() -> None:
     options.func(options)
 
 
-def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
+def make_activity_repository(
+    basedir: pathlib.Path, skip_strava: bool
+) -> ActivityRepository:
     os.chdir(basedir)
     apply_cache_migrations()
     config = get_config()
+
+    if "strava" in config and not skip_strava:
+        download_missing_calories()
 
     repository = ActivityRepository()
 
@@ -107,7 +114,7 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
         import_from_directory(repository, config.get("prefer_metadata_from_file", True))
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)
-    if "strava" in config:
+    if "strava" in config and not skip_strava:
         import_from_strava_api(repository)
 
     embellish_time_series(repository)
