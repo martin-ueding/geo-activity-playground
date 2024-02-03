@@ -62,9 +62,7 @@ class EquipmentController:
         )
 
         config = get_config()
-        print(config)
         if "offsets" in config:
-            print(equipment_summary)
             for equipment, offset in config["offsets"].items():
                 equipment_summary.loc[
                     equipment_summary["equipment"] == equipment, "total_distance_km"
