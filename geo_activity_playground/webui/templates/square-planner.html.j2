@@ -30,16 +30,25 @@
                 attribution: '&copy; <a href=" http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
 
-            {# let explorer_geojson = {{ explored_geojson| safe }}
+            let explorer_geojson = {{ explored_geojson| safe }}
             let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
                 style: function (feature) {
                     return {
-                        color: feature.properties.color, fillColor: feature.properties.color,
+                        color: "#4daf4a", fillColor: "#4daf4a",
                         weight: 0.5
                     }
-                },
-                onEachFeature: onEachFeature
-            }).addTo(map) #}
+                }
+            }).addTo(map)
+
+            let missing_geojson = {{ missing_geojson| safe }}
+            let missing_layer_cluster_color = L.geoJSON(missing_geojson, {
+                style: function (feature) {
+                    return {
+                        color: "#e41a1c", fillColor: "#e41a1c",
+                        weight: 0.5
+                    }
+                }
+            }).addTo(map)
 
             let square_geojson = {{ square_geojson | safe }}
             let explorer_square_layer = L.geoJSON(square_geojson,
