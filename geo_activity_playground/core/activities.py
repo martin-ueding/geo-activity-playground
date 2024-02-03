@@ -48,6 +48,9 @@ class ActivityRepository:
         return len(self.meta)
 
     def add_activity(self, activity_meta: ActivityMeta) -> None:
+        assert not self.has_activity(
+            activity_meta["id"]
+        ), f"Trying to add the following activity which already exists: {activity_meta}"
         self._loose_activities.append(activity_meta)
 
     def commit(self) -> None:
@@ -95,7 +98,9 @@ class ActivityRepository:
 
     @functools.lru_cache()
     def get_activity_by_id(self, id: int) -> ActivityMeta:
-        return self.meta.loc[id]
+        activity = self.meta.loc[id]
+        assert isinstance(activity["name"], str), activity["name"]
+        return activity
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:

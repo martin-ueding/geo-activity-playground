@@ -118,6 +118,9 @@ def try_import_strava(repository: ActivityRepository) -> None:
         for activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
         ):
+            # Sometimes we still get an activity here although it has already been imported from the Strava checkout.
+            if repository.has_activity(activity.id):
+                continue
             cache_file = (
                 pathlib.Path("Cache") / "Activity Metadata" / f"{activity.id}.pickle"
             )

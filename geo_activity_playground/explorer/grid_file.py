@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Iterator
 from typing import Optional
@@ -53,6 +54,11 @@ def make_explorer_rectangle(
             (x1, y1, zoom),
         ]
     ]
+    try:
+        json.dumps(properties)
+    except TypeError:
+        logger.error(f"Cannot serialize the following as JSON: {properties}")
+        raise
     return geojson.Feature(
         geometry=geojson.Polygon([[(coord[1], coord[0]) for coord in corners]]),
         properties=properties,
