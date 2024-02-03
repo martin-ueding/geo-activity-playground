@@ -104,7 +104,7 @@ def make_activity_repository(basedir: pathlib.Path) -> ActivityRepository:
     repository = ActivityRepository()
 
     if pathlib.Path("Activities").exists():
-        import_from_directory(repository)
+        import_from_directory(repository, config.get("prefer_metadata_from_file", True))
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)
     if "strava" in config:

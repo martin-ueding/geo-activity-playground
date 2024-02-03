@@ -16,7 +16,9 @@ from geo_activity_playground.core.tasks import WorkTracker
 logger = logging.getLogger(__name__)
 
 
-def import_from_directory(repository: ActivityRepository) -> None:
+def import_from_directory(
+    repository: ActivityRepository, prefer_metadata_from_file: bool
+) -> None:
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
 
@@ -64,7 +66,10 @@ def import_from_directory(repository: ActivityRepository) -> None:
         if len(path.parts) >= 4 and path.parts[2] != "Commute":
             activity_meta["equipment"] = path.parts[2]
 
-        activity_meta.update(activity_meta_from_file)
+        if prefer_metadata_from_file:
+            activity_meta = {**activity_meta, **activity_meta_from_file}
+        else:
+            activity_meta = {**activity_meta_from_file, **activity_meta}
         repository.add_activity(activity_meta)
 
     if paths_with_errors:

@@ -8,6 +8,14 @@ Inside `Playground`, create another directory `Activities` where your activity f
 
 ## Directory structure
 
+Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. If you prefer to have the metadata from the path and filename to override what is inside the file, add the following line to the top of your configuration file:
+
+```toml
+prefer_metadata_from_file = false
+```
+
+With that disabled, you are free to do the following.
+
 Inside the `Activities` you can dump all your files in a flat fashion. If you want to add some more metadata, use the following directory layout.
 
 The first directory level will indicate the type of the activity. You can pick whatever make sense for you, classic options are _ride_, _run_, _walk_, _hike_. Then the second level will indicate your equipment. You can use terms like “rental bike”, the brand and make of your shoes or whatever you find sensible. Specifying the equipment allows to track the total distance traveled with a given equipment.
