@@ -37,6 +37,7 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.utcnow() - datetime.timedelta(days=31), utc=True
     )
+    meta["distance/km"] = meta["distance"] / 1000
     return (
         alt.Chart(
             meta.loc[meta["start"] > before_30_days],
@@ -47,7 +48,7 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
         .mark_bar()
         .encode(
             alt.X("yearmonthdate(start)", title="Date"),
-            alt.Y("sum(distance)", title="Distance / km"),
+            alt.Y("sum(distance/km)", title="Distance / km"),
             alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
             [alt.Tooltip("yearmonthdate(start)", title="Date")],
         )
