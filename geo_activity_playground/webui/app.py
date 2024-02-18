@@ -4,7 +4,6 @@ from flask import render_template
 from flask import request
 from flask import Response
 
-from .search_controller import SearchController
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
@@ -14,6 +13,7 @@ from geo_activity_playground.webui.entry_controller import EntryController
 from geo_activity_playground.webui.equipment_controller import EquipmentController
 from geo_activity_playground.webui.explorer_controller import ExplorerController
 from geo_activity_playground.webui.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.search_controller import SearchController
 from geo_activity_playground.webui.square_planner_controller import (
     SquarePlannerController,
 )

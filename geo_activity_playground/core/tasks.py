@@ -2,7 +2,9 @@ import contextlib
 import json
 import pathlib
 import pickle
+from collections.abc import Iterable
 from typing import Any
+from typing import Sequence
 
 from geo_activity_playground.core.paths import cache_dir
 
@@ -35,7 +37,7 @@ class WorkTracker:
         else:
             self._done = set()
 
-    def filter(self, ids: list[int]) -> set[int]:
+    def filter(self, ids: Iterable[int]) -> set[int]:
         return set(ids) - self._done
 
     def mark_done(self, id: int) -> None:

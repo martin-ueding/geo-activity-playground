@@ -86,6 +86,8 @@ class ActivityRepository:
     def last_activity_date(self) -> Optional[datetime.datetime]:
         if len(self.meta):
             return self.meta.iloc[-1]["start"]
+        else:
+            return None
 
     @property
     def activity_ids(self) -> set[int]:

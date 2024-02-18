@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Iterator
+from collections.abc import Iterable
 from typing import Optional
 
 import geojson
@@ -8,7 +8,6 @@ import gpxpy
 import pandas as pd
 
 from geo_activity_playground.core.coordinates import Bounds
-from geo_activity_playground.core.tiles import adjacent_to
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 
 
@@ -66,10 +65,10 @@ def make_explorer_rectangle(
 
 
 def make_grid_points(
-    tile_iterator: Iterator[tuple[int, int]], zoom: int
+    tiles: Iterable[tuple[int, int]], zoom: int
 ) -> list[list[list[float]]]:
     result = []
-    for tile_x, tile_y in tile_iterator:
+    for tile_x, tile_y in tiles:
         tile = [
             get_tile_upper_left_lat_lon(tile_x, tile_y, zoom),
             get_tile_upper_left_lat_lon(tile_x + 1, tile_y, zoom),

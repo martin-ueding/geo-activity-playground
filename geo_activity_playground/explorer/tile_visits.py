@@ -6,6 +6,7 @@ import pathlib
 import pickle
 from typing import Any
 from typing import Iterator
+from typing import Optional
 
 import pandas as pd
 from tqdm import tqdm
@@ -116,10 +117,10 @@ class TileEvolutionState:
         self.square_start = 0
         self.cluster_start = 0
         self.max_square_size = 0
-        self.visited_tiles = set()
+        self.visited_tiles: set[tuple[int, int]] = set()
         self.square_evolution = pd.DataFrame()
-        self.square_x = None
-        self.square_y = None
+        self.square_x: Optional[int] = None
+        self.square_y: Optional[int] = None
 
 
 def compute_tile_evolution() -> None:
