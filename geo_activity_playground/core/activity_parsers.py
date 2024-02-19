@@ -212,9 +212,9 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                     time = dateutil.parser.parse(str(point.time))
                 assert isinstance(time, datetime.datetime)
                 time = time.astimezone(datetime.timezone.utc)
-                points.append((time, point.latitude, point.longitude))
+                points.append((time, point.latitude, point.longitude, point.elevation))
 
-    return pd.DataFrame(points, columns=["time", "latitude", "longitude"])
+    return pd.DataFrame(points, columns=["time", "latitude", "longitude",  "altitude"])
 
 
 def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
