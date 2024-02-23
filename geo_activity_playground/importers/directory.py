@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import pathlib
+import pickle
 import sys
 import traceback
 
@@ -22,35 +23,45 @@ def import_from_directory(
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
 
-    activity_paths = {
-        int(hashlib.sha3_224(str(path).encode()).hexdigest(), 16) % 2**62: path
+    activity_paths = [
+        path
         for path in pathlib.Path("Activities").rglob("*.*")
         if path.is_file() and path.suffixes and not path.stem.startswith(".")
-    }
-    activities_ids_to_parse = work_tracker.filter(activity_paths.keys())
+    ]
+    new_activity_paths = work_tracker.filter(activity_paths)
 
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     activity_stream_dir.mkdir(exist_ok=True, parents=True)
-    for activity_id in tqdm(activities_ids_to_parse, desc="Parse activity files"):
-        path = activity_paths[activity_id]
-        try:
-            activity_meta_from_file, timeseries = read_activity(path)
-        except ActivityParseError as e:
-            logger.error(f"Error while parsing file {path}:")
-            traceback.print_exc()
-            paths_with_errors.append((path, str(e)))
-            continue
-        except:
-            logger.error(f"Encountered a problem with {path=}, see details below.")
-            raise
+    file_metadata_dir = pathlib.Path("Cache/Activity Metadata")
+    file_metadata_dir.mkdir(exist_ok=True, parents=True)
 
-        work_tracker.mark_done(activity_id)
-
-        if len(timeseries) == 0:
-            continue
-
+    for path in tqdm(new_activity_paths, desc="Parse activity files"):
+        activity_id = _get_file_hash(path)
         timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
-        timeseries.to_parquet(timeseries_path)
+        file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
+        work_tracker.mark_done(path)
+
+        if not timeseries_path.exists():
+            try:
+                activity_meta_from_file, timeseries = read_activity(path)
+            except ActivityParseError as e:
+                logger.error(f"Error while parsing file {path}:")
+                traceback.print_exc()
+                paths_with_errors.append((path, str(e)))
+                continue
+            except:
+                logger.error(f"Encountered a problem with {path=}, see details below.")
+                raise
+
+            if len(timeseries) == 0:
+                continue
+
+            timeseries.to_parquet(timeseries_path)
+            with open(file_metadata_path, "wb") as f:
+                pickle.dump(activity_meta_from_file, f)
+        else:
+            with open(file_metadata_path, "rb") as f:
+                activity_meta_from_file = pickle.load(f)
 
         activity_meta = ActivityMeta(
             commute=path.parts[-2] == "Commute",
@@ -82,3 +93,11 @@ def import_from_directory(
     repository.commit()
 
     work_tracker.close()
+
+
+def _get_file_hash(path: pathlib.Path) -> int:
+    file_hash = hashlib.blake2s()
+    with open(path, "rb") as f:
+        while chunk := f.read(8192):
+            file_hash.update(chunk)
+    return int(file_hash.hexdigest(), 16) % 2**62
