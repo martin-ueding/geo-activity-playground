@@ -1,6 +1,7 @@
 import datetime
 import functools
 import logging
+import pathlib
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -25,11 +26,15 @@ class ActivityMeta(TypedDict):
     commute: bool
     distance_km: float
     elapsed_time: datetime.timedelta
+    end_latitude: float
+    end_longitude: float
     equipment: str
     id: int
     kind: str
     name: str
     path: str
+    start_latitude: float
+    start_longitude: float
     start: datetime.datetime
 
 
@@ -48,9 +53,7 @@ class ActivityRepository:
         return len(self.meta)
 
     def add_activity(self, activity_meta: ActivityMeta) -> None:
-        assert not self.has_activity(
-            activity_meta["id"]
-        ), f"Trying to add the following activity which already exists: {activity_meta}"
+        _extend_metadata_from_timeseries(activity_meta)
         self._loose_activities.append(activity_meta)
 
     def commit(self) -> None:
@@ -59,7 +62,15 @@ class ActivityRepository:
                 f"Adding {len(self._loose_activities)} activities to the repository …"
             )
             new_df = pd.DataFrame(self._loose_activities)
-            self.meta = pd.concat([self.meta, new_df])
+            if len(self.meta):
+                new_ids_set = set(new_df["id"])
+                is_kept = [
+                    activity_id not in new_ids_set for activity_id in self.meta["id"]
+                ]
+                old_df = self.meta.loc[is_kept]
+            else:
+                old_df = self.meta
+            self.meta = pd.concat([old_df, new_df])
             assert pd.api.types.is_dtype_equal(
                 self.meta["start"].dtype, "datetime64[ns, UTC]"
             ), self.meta["start"].dtype
@@ -238,3 +249,14 @@ def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame
             duration_per_zone.loc[i] = 0.0
     result = duration_per_zone.reset_index()
     return result
+
+
+def _extend_metadata_from_timeseries(metadata: ActivityMeta) -> None:
+    timeseries = pd.read_parquet(
+        pathlib.Path("Cache/Activity Timeseries") / f"{metadata['id']}.parquet"
+    )
+
+    metadata["start_latitude"] = timeseries["latitude"].iloc[0]
+    metadata["end_latitude"] = timeseries["latitude"].iloc[-1]
+    metadata["start_longitude"] = timeseries["longitude"].iloc[0]
+    metadata["end_longitude"] = timeseries["longitude"].iloc[-1]

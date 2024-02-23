@@ -95,6 +95,7 @@ def apply_cache_migrations() -> None:
         delete_activity_metadata,
         delete_activity_metadata,
         convert_distances_to_km,
+        delete_activity_metadata,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:

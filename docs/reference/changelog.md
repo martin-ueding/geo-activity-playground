@@ -6,6 +6,11 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.20.0
+
+- Import altitude information from GPX files if available. [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91)
+- Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92).
+
 ### Version 0.19.1
 
 - Fix broken import of CSV files due to missing argument `opener`.
