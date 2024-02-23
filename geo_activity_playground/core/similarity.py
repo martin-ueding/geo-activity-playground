@@ -22,45 +22,44 @@ def precompute_activity_distances(repository: ActivityRepository) -> None:
         with open(similarity_path, "rb") as f:
             raw_similarities, near_activities = pickle.load(f)
 
-    activity_ids = [activity["id"] for activity in repository.iter_activities()]
-    missing_pairs = [
-        pair
-        for pair in itertools.product(activity_ids, activity_ids)
-        if pair[0] < pair[1] and not pair in raw_similarities
-    ]
+    missing_pairs = []
+    for first in repository.iter_activities():
+        for second in repository.iter_activities():
+            if (
+                get_distance(
+                    first["start_latitude"],
+                    first["start_longitude"],
+                    second["start_latitude"],
+                    second["start_longitude"],
+                )
+                > 100
+                or get_distance(
+                    first["end_latitude"],
+                    first["end_longitude"],
+                    second["end_latitude"],
+                    second["end_longitude"],
+                )
+                > 100
+            ):
+                raw_similarities[(first.id, second.id)] = 0
+                raw_similarities[(second.id, first.id)] = 0
+                continue
 
-    for first_id, second_id in tqdm(missing_pairs, desc="Activity distances"):
-        first_activity = repository.get_activity_by_id(first_id)
-        second_activity = repository.get_activity_by_id(second_id)
+            if not (first.id, second.id) in raw_similarities:
+                missing_pairs.append((first, second))
 
-        distance_between_starts = get_distance(
-            first_activity["start_latitude"],
-            first_activity["start_longitude"],
-            second_activity["start_latitude"],
-            second_activity["start_longitude"],
-        )
-        distance_between_ends = get_distance(
-            first_activity["end_latitude"],
-            first_activity["end_longitude"],
-            second_activity["end_latitude"],
-            second_activity["end_longitude"],
-        )
+    for first, second in tqdm(missing_pairs, desc="Activity distances"):
+        first_ts = repository.get_time_series(first.id)
+        second_ts = repository.get_time_series(second.id)
+        distance_1 = asymmetric_activity_overlap(first_ts, second_ts)
+        distance_2 = asymmetric_activity_overlap(second_ts, first_ts)
+        raw_similarities[(first.id, second.id)] = distance_1
+        raw_similarities[(second.id, first.id)] = distance_2
 
-        if min(distance_between_starts, distance_between_ends) > 200:
-            raw_similarities[(first_id, second_id)] = 0
-            raw_similarities[(second_id, first_id)] = 0
-        else:
-            first_ts = repository.get_time_series(first_id)
-            second_ts = repository.get_time_series(second_id)
-            distance_1 = asymmetric_activity_overlap(first_ts, second_ts)
-            distance_2 = asymmetric_activity_overlap(second_ts, first_ts)
-            raw_similarities[(first_id, second_id)] = distance_1
-            raw_similarities[(second_id, first_id)] = distance_2
-
-            overlap = min(distance_1, distance_2)
-            if overlap > 0.9:
-                near_activities[first_id][second_id] = overlap
-                near_activities[second_id][first_id] = overlap
+        overlap = min(distance_1, distance_2)
+        if overlap > 0.9:
+            near_activities[first.id][second.id] = overlap
+            near_activities[second.id][first.id] = overlap
 
     with open(similarity_path, "wb") as f:
         pickle.dump((raw_similarities, near_activities), f)
@@ -69,7 +68,7 @@ def precompute_activity_distances(repository: ActivityRepository) -> None:
 def asymmetric_activity_overlap(
     activity: pd.DataFrame, reference: pd.DataFrame
 ) -> float:
-    sample = activity.iloc[np.linspace(0, len(activity) - 1, 100, dtype=np.int64)]
+    sample = activity.iloc[np.linspace(0, len(activity) - 1, 50, dtype=np.int64)]
     min_distances = [
         _get_min_distance(latitude, longitude, reference)
         for (latitude, longitude) in zip(sample["latitude"], sample["longitude"])
