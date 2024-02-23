@@ -25,6 +25,9 @@ def precompute_activity_distances(repository: ActivityRepository) -> None:
     missing_pairs = []
     for first in repository.iter_activities():
         for second in repository.iter_activities():
+            if (first.id, second.id) in raw_similarities:
+                continue
+
             if (
                 get_distance(
                     first["start_latitude"],
