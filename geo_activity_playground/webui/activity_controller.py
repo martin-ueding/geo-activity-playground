@@ -1,5 +1,6 @@
 import functools
 import io
+import pickle
 
 import altair as alt
 import matplotlib.pyplot as pl
@@ -19,6 +20,7 @@ from geo_activity_playground.core.heatmap import gaussian_filter
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
+from geo_activity_playground.core.similarity import distances_path
 from geo_activity_playground.core.tiles import compute_tile_float
 
 
@@ -33,6 +35,17 @@ class ActivityController:
         time_series = self._repository.get_time_series(id)
         line_json = make_geojson_from_time_series(time_series)
 
+        with open(distances_path, "rb") as f:
+            distances = pickle.load(f)
+
+        similar_activites = {
+            distance: [
+                self._repository.get_activity_by_id(activity_id)
+                for activity_id in distances[activity.id].get(distance, set())
+            ]
+            for distance in range(10)
+        }
+
         result = {
             "activity": activity,
             "line_json": line_json,
@@ -40,6 +53,7 @@ class ActivityController:
             "color_line_geojson": make_geojson_color_line(time_series),
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
+            "similar_activites": similar_activites,
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)

@@ -109,4 +109,35 @@
     </div>
 </div>
 
+<div class="row mb-3">
+    <div class="col">
+        <h2>Similar activities</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Hamming distance</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Distance / km</th>
+                    <th>Elapsed time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for distance, other_activities in similar_activites.items() %}
+                {% for other_activity in other_activities %}
+                <tr>
+                    <td>{{ distance }}</td>
+                    <td><a href="/activity/{{ other_activity.id }}">{{ other_activity["name"] }}</a></td>
+                    <td>{{ other_activity.start }}</td>
+                    <td>{{ other_activity.distance_km | round(1) }}</td>
+                    <td>{{ other_activity.elapsed_time }}</td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}
