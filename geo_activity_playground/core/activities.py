@@ -1,6 +1,7 @@
 import datetime
 import functools
 import logging
+import pathlib
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -25,11 +26,15 @@ class ActivityMeta(TypedDict):
     commute: bool
     distance_km: float
     elapsed_time: datetime.timedelta
+    end_latitude: float
+    end_longitude: float
     equipment: str
     id: int
     kind: str
     name: str
     path: str
+    start_latitude: float
+    start_longitude: float
     start: datetime.datetime
 
 
@@ -48,6 +53,7 @@ class ActivityRepository:
         return len(self.meta)
 
     def add_activity(self, activity_meta: ActivityMeta) -> None:
+        _extend_metadata_from_timeseries(activity_meta)
         self._loose_activities.append(activity_meta)
 
     def commit(self) -> None:
@@ -241,3 +247,14 @@ def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame
             duration_per_zone.loc[i] = 0.0
     result = duration_per_zone.reset_index()
     return result
+
+
+def _extend_metadata_from_timeseries(metadata: ActivityMeta) -> None:
+    timeseries = pd.read_parquet(
+        pathlib.Path("Cache/Activity Timeseries") / f"{metadata['id']}.parquet"
+    )
+
+    metadata["start_latitude"] = timeseries["latitude"].iloc[0]
+    metadata["end_latitude"] = timeseries["latitude"].iloc[-1]
+    metadata["start_longitude"] = timeseries["longitude"].iloc[0]
+    metadata["end_longitude"] = timeseries["longitude"].iloc[-1]
