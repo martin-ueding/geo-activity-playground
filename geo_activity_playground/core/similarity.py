@@ -1,64 +1,64 @@
-import collections
-import itertools
 import pathlib
 import pickle
 
+import imagehash
 import numpy as np
 import pandas as pd
+from PIL import Image
+from PIL import ImageDraw
 from tqdm import tqdm
 
 from .activities import ActivityRepository
 from .coordinates import get_distance
 
 
-similarity_path = pathlib.Path("Cache/activity_similarity.pickle")
+fingerprint_path = pathlib.Path("Cache/activity_fingerprints.pickle")
+distances_path = pathlib.Path("Cache/activity_distances.pickle")
+
+
+def add_distance(distances, this, other, distance) -> None:
+    if this not in distances:
+        distances[this] = {}
+    if distance not in distances[this]:
+        distances[this][distance] = set()
+    distances[this][distance].add(other)
 
 
 def precompute_activity_distances(repository: ActivityRepository) -> None:
-    raw_similarities: dict[tuple[int, int], float] = {}
-    near_activities: dict[int, dict[int, float]] = collections.defaultdict(dict)
+    fingerprints: dict[int, int] = {}
+    if fingerprint_path.exists():
+        with open(fingerprint_path, "rb") as f:
+            fingerprints = pickle.load(f)
 
-    if similarity_path.exists():
-        with open(similarity_path, "rb") as f:
-            raw_similarities, near_activities = pickle.load(f)
+    activity_ids = repository.activity_ids
 
-    missing_pairs = []
-    for first in tqdm(repository.iter_activities(), desc="Finding new activity pairs"):
-        for second in repository.iter_activities():
-            meters_per_degree = 100_000
-            threshold = 50 / meters_per_degree
+    activity_ids_without_fingerprint = [
+        activity_id for activity_id in activity_ids if activity_id not in fingerprints
+    ]
+    for activity_id in tqdm(
+        activity_ids_without_fingerprint, desc="Compute activity fingerprints"
+    ):
+        ts = repository.get_time_series(activity_id)
+        ts_hash = _compute_image_hash(ts)
+        fingerprints[activity_id] = ts_hash
 
-            if (first.id, second.id) in raw_similarities:
-                continue
+    distances = {}
+    if distances_path.exists():
+        with open(distances_path, "rb") as f:
+            distances = pickle.load(f)
 
-            if (
-                abs(first["start_latitude"] - second["start_latitude"]) > threshold
-                or abs(first["start_longitude"] - second["start_longitude"]) > threshold
-                or abs(first["end_latitude"] - second["end_latitude"]) > threshold
-                or abs(first["end_latitude"] - second["end_latitude"]) > threshold
-            ):
-                raw_similarities[(first.id, second.id)] = 0
-                raw_similarities[(second.id, first.id)] = 0
-                continue
+    for this in tqdm(
+        activity_ids_without_fingerprint, desc="Compute activity distances"
+    ):
+        for other in activity_ids:
+            distance = _hamming_distance(fingerprints[this], fingerprints[other])
+            add_distance(distances, this, other, distance)
+            add_distance(distances, other, this, distance)
 
-            if not (first.id, second.id) in raw_similarities:
-                missing_pairs.append((first, second))
-
-    for first, second in tqdm(missing_pairs, desc="Activity distances"):
-        first_ts = repository.get_time_series(first.id)
-        second_ts = repository.get_time_series(second.id)
-        distance_1 = asymmetric_activity_overlap(first_ts, second_ts)
-        distance_2 = asymmetric_activity_overlap(second_ts, first_ts)
-        raw_similarities[(first.id, second.id)] = distance_1
-        raw_similarities[(second.id, first.id)] = distance_2
-
-        overlap = min(distance_1, distance_2)
-        if overlap > 0.9:
-            near_activities[first.id][second.id] = overlap
-            near_activities[second.id][first.id] = overlap
-
-    with open(similarity_path, "wb") as f:
-        pickle.dump((raw_similarities, near_activities), f)
+    with open(fingerprint_path, "wb") as f:
+        pickle.dump(fingerprints, f)
+    with open(distances_path, "wb") as f:
+        pickle.dump(distances, f)
 
 
 def asymmetric_activity_overlap(
@@ -75,3 +75,25 @@ def asymmetric_activity_overlap(
 def _get_min_distance(latitude: float, longitude: float, other: pd.DataFrame) -> float:
     distances = get_distance(latitude, longitude, other["latitude"], other["longitude"])
     return np.min(distances)
+
+
+def _compute_image_hash(time_series) -> int:
+    z = 12 + 8
+    x = time_series["x"] * 2**z
+    y = time_series["y"] * 2**z
+    xy_pixels = np.array([x - x.min(), y - y.min()]).T
+    dim = xy_pixels.max(axis=0)
+    im = Image.new("L", tuple(map(int, dim)))
+    draw = ImageDraw.Draw(im)
+    pixels = list(map(int, xy_pixels.flatten()))
+    draw.line(pixels, fill=255, width=5)
+    return int(str(imagehash.dhash(im)), 16)
+
+
+def _hamming_distance(a: int, b: int) -> int:
+    diff = a ^ b
+    result = 0
+    while diff:
+        result += diff % 2
+        diff //= 2
+    return result
