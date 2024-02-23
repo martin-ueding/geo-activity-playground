@@ -23,26 +23,19 @@ def precompute_activity_distances(repository: ActivityRepository) -> None:
             raw_similarities, near_activities = pickle.load(f)
 
     missing_pairs = []
-    for first in repository.iter_activities():
+    for first in tqdm(repository.iter_activities(), desc="Finding new activity pairs"):
         for second in repository.iter_activities():
+            meters_per_degree = 100_000
+            threshold = 50 / meters_per_degree
+
             if (first.id, second.id) in raw_similarities:
                 continue
 
             if (
-                get_distance(
-                    first["start_latitude"],
-                    first["start_longitude"],
-                    second["start_latitude"],
-                    second["start_longitude"],
-                )
-                > 100
-                or get_distance(
-                    first["end_latitude"],
-                    first["end_longitude"],
-                    second["end_latitude"],
-                    second["end_longitude"],
-                )
-                > 100
+                abs(first["start_latitude"] - second["start_latitude"]) > threshold
+                or abs(first["start_longitude"] - second["start_longitude"]) > threshold
+                or abs(first["end_latitude"] - second["end_latitude"]) > threshold
+                or abs(first["end_latitude"] - second["end_latitude"]) > threshold
             ):
                 raw_similarities[(first.id, second.id)] = 0
                 raw_similarities[(second.id, first.id)] = 0
