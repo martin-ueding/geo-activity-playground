@@ -11,7 +11,12 @@
     <div class="col-8">
         <div id="activity-map" style="height: 500px;"></div>
         <script>
-            var map = L.map('activity-map', {
+            function onEachFeature(feature, layer) {
+                layer.bindPopup(`${feature.geometry.coordinates}`)
+            }
+
+
+            let map = L.map('activity-map', {
                 fullscreenControl: true
             });
             L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
@@ -19,9 +24,8 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
-            let geojson = L.geoJSON({{ activity_endpoints_geojson| safe }}).addTo(map)
-
-            var markers = L.markerClusterGroup();
+            let geojson = L.geoJSON({{ activity_endpoints_geojson| safe }}, { onEachFeature: onEachFeature })
+            let markers = L.markerClusterGroup();
             markers.addLayer(geojson);
             map.addLayer(markers);
 
