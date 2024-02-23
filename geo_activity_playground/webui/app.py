@@ -4,6 +4,7 @@ from flask import render_template
 from flask import request
 from flask import Response
 
+from .locations_controller import LocationsController
 from .search_controller import SearchController
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.webui.activity_controller import ActivityController
@@ -163,6 +164,14 @@ def route_heatmap(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
+def route_locations(app: Flask, repository: ActivityRepository) -> None:
+    controller = LocationsController(repository)
+
+    @app.route("/locations")
+    def locations_index():
+        return render_template("locations.html.j2", **controller.render_index())
+
+
 def route_search(app: Flask, repository: ActivityRepository) -> None:
     search_controller = SearchController(repository)
 
@@ -276,6 +285,7 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     route_equipment(app, repository)
     route_explorer(app, repository)
     route_heatmap(app, repository)
+    route_locations(app, repository)
     route_search(app, repository)
     route_square_planner(app, repository)
     route_start(app, repository)
