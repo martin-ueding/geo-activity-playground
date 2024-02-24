@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from .activities import ActivityRepository
 from .coordinates import get_distance
+from geo_activity_playground.core.tasks import stored_object
 
 
 fingerprint_path = pathlib.Path("Cache/activity_fingerprints.pickle")
@@ -25,40 +26,30 @@ def add_distance(distances, this, other, distance) -> None:
 
 
 def precompute_activity_distances(repository: ActivityRepository) -> None:
-    fingerprints: dict[int, int] = {}
-    if fingerprint_path.exists():
-        with open(fingerprint_path, "rb") as f:
-            fingerprints = pickle.load(f)
+    with stored_object(fingerprint_path, {}) as fingerprints, stored_object(
+        distances_path, {}
+    ) as distances:
+        activity_ids = repository.activity_ids
 
-    activity_ids = repository.activity_ids
+        activity_ids_without_fingerprint = [
+            activity_id
+            for activity_id in activity_ids
+            if activity_id not in fingerprints
+        ]
+        for activity_id in tqdm(
+            activity_ids_without_fingerprint, desc="Compute activity fingerprints"
+        ):
+            ts = repository.get_time_series(activity_id)
+            ts_hash = _compute_image_hash(ts)
+            fingerprints[activity_id] = ts_hash
 
-    activity_ids_without_fingerprint = [
-        activity_id for activity_id in activity_ids if activity_id not in fingerprints
-    ]
-    for activity_id in tqdm(
-        activity_ids_without_fingerprint, desc="Compute activity fingerprints"
-    ):
-        ts = repository.get_time_series(activity_id)
-        ts_hash = _compute_image_hash(ts)
-        fingerprints[activity_id] = ts_hash
-
-    distances = {}
-    if distances_path.exists():
-        with open(distances_path, "rb") as f:
-            distances = pickle.load(f)
-
-    for this in tqdm(
-        activity_ids_without_fingerprint, desc="Compute activity distances"
-    ):
-        for other in activity_ids:
-            distance = _hamming_distance(fingerprints[this], fingerprints[other])
-            add_distance(distances, this, other, distance)
-            add_distance(distances, other, this, distance)
-
-    with open(fingerprint_path, "wb") as f:
-        pickle.dump(fingerprints, f)
-    with open(distances_path, "wb") as f:
-        pickle.dump(distances, f)
+        for this in tqdm(
+            activity_ids_without_fingerprint, desc="Compute activity distances"
+        ):
+            for other in activity_ids:
+                distance = _hamming_distance(fingerprints[this], fingerprints[other])
+                add_distance(distances, this, other, distance)
+                add_distance(distances, other, this, distance)
 
 
 def asymmetric_activity_overlap(

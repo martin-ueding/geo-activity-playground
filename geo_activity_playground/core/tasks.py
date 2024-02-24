@@ -4,9 +4,30 @@ import pathlib
 import pickle
 from collections.abc import Iterable
 from typing import Any
+from typing import Generic
 from typing import Sequence
+from typing import TypeVar
 
 from geo_activity_playground.core.paths import cache_dir
+
+
+T = TypeVar("T")
+
+
+@contextlib.contextmanager
+def stored_object(path: pathlib.Path, default):
+    if path.exists():
+        with open(path, "rb") as f:
+            payload = pickle.load(f)
+    else:
+        payload = default
+
+    yield payload
+
+    temp_location = path.with_suffix(".tmp")
+    with open(temp_location, "wb") as f:
+        pickle.dump(payload, f)
+    temp_location.rename(path)
 
 
 def work_tracker_path(name: str) -> pathlib.Path:
