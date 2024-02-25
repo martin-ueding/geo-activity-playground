@@ -21,7 +21,4 @@ def get_config() -> dict:
     with open(config_path, "rb") as f:
         config = tomllib.load(f)
 
-    # Filter out empty config groups.
-    config = {key: value for key, value in config.items() if value}
-
     return config
