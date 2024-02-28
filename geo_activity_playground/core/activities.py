@@ -48,13 +48,27 @@ class ActivityRepository:
             self.meta = pd.DataFrame()
 
         self._loose_activities: list[ActivityMeta] = []
+        self._loose_activity_ids: set[int] = set()
 
     def __len__(self) -> int:
         return len(self.meta)
 
     def add_activity(self, activity_meta: ActivityMeta) -> None:
         _extend_metadata_from_timeseries(activity_meta)
+        if activity_meta["id"] in self._loose_activity_ids:
+            logger.error(f"Activity with the same file already exists. New activity:")
+            print(activity_meta)
+            print("Existing activity:")
+            print(
+                [
+                    activity
+                    for activity in self._loose_activities
+                    if activity["id"] == activity_meta["id"]
+                ]
+            )
+            raise ValueError("Activity with the same file already exists.")
         self._loose_activities.append(activity_meta)
+        self._loose_activity_ids.add(activity_meta["id"])
 
     def commit(self) -> None:
         if self._loose_activities:
