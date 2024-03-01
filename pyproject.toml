@@ -31,7 +31,7 @@ stravalib = "^1.3.3"
 tcxreader = "^0.4.5"
 tomli = { version = "^2.0.1", python = "<3.11" }
 tqdm = "^4.64.0"
-vegafusion = "^1.4.3"
+vegafusion = { version = "^1.4.3", extras = ["embed"] }
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
