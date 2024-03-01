@@ -191,7 +191,7 @@ def download_strava_time_series(activity_id: int, client: Client) -> pd.DataFram
         if name in streams:
             columns[name] = streams[name].data
     if "distance" in streams:
-        columns["distance_km"] = streams["distance"].data / 1000
+        columns["distance_km"] = pd.Series(streams["distance"].data) / 1000
 
     df = pd.DataFrame(columns)
     return df
