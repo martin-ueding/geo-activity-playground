@@ -18,11 +18,13 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102): Make dependency on `vegafusion[embed]` explicit in the dependencies.
 - [GH-103](https://github.com/martin-ueding/geo-activity-playground/issues/103): Delete old pickle file before moving the new one onto it.
 
-### Version 0.19.1
+### Version 0.19
+
+#### Version 0.19.1
 
 - Fix broken import of CSV files due to missing argument `opener`.
 
-### Version 0.19
+#### Version 0.19.0
 
 - [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. 
 - Add more tooltip information in the plot on the landing page.
