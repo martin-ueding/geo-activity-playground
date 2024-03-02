@@ -201,6 +201,10 @@ def convert_strava_checkout(
     print(activities)
 
     for _, row in tqdm(activities.iterrows(), desc="Import activity files"):
+        # Some people have manually added activities without position data. These don't have a file there. We'll skip these.
+        if not isinstance(row["Filename"], str):
+            continue
+
         activity_date = dateutil.parser.parse(row["Activity Date"])
         activity_name = row["Activity Name"]
         activity_kind = row["Activity Type"]
