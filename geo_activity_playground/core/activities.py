@@ -215,9 +215,8 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
                 "color": matplotlib.colors.to_hex(cmap(min(next["speed"] / 35, 1.0))),
             },
         )
-        for (_, row), (_, next) in zip(
-            time_series.iterrows(), time_series.iloc[1:].iterrows()
-        )
+        for _, group in time_series.groupby("segment_id")
+        for (_, row), (_, next) in zip(group.iterrows(), group.iloc[1:].iterrows())
     ]
     feature_collection = geojson.FeatureCollection(features)
     return geojson.dumps(feature_collection)
