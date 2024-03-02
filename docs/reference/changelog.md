@@ -16,6 +16,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98): Also accept boolean values in commute column of Strava's `activities.csv`.
 - [GH-100](https://github.com/martin-ueding/geo-activity-playground/issues/100): Protect fingerprint computation from bogus values
 - [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102): Make dependency on `vegafusion[embed]` explicit in the dependencies.
+- [GH-103](https://github.com/martin-ueding/geo-activity-playground/issues/103): Delete old pickle file before moving the new one onto it.
 
 ### Version 0.19.1
 
