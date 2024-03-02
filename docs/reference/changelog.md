@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Make dependency on `vegafusion[embed]` explicit in the dependencies. [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102)
 - Take time jumps into account in activity distance computation and the various plots of the activities. [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90)
 - Skip Strava export activities that don't have a file. [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99)
+- Also accept boolean values in commute column of Strava's `activities.csv`. [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98)
 
 ### Version 0.19.1
 
