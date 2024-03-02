@@ -27,6 +27,7 @@ def stored_object(path: pathlib.Path, default):
     temp_location = path.with_suffix(".tmp")
     with open(temp_location, "wb") as f:
         pickle.dump(payload, f)
+    path.unlink(missing_ok=True)
     temp_location.rename(path)
 
 
