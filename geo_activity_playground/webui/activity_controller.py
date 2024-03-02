@@ -16,7 +16,6 @@ from geo_activity_playground.core.activities import make_geojson_from_time_serie
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import crop_image_to_bounds
-from geo_activity_playground.core.heatmap import gaussian_filter
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
@@ -72,7 +71,11 @@ def speed_time_plot(time_series: pd.DataFrame) -> str:
     return (
         alt.Chart(time_series, title="Speed")
         .mark_line()
-        .encode(alt.X("time", title="Time"), alt.Y("speed", title="Speed / km/h"))
+        .encode(
+            alt.X("time", title="Time"),
+            alt.Y("speed", title="Speed / km/h"),
+            alt.Color("segment_id:N", title="Segment"),
+        )
         .interactive(bind_y=False)
         .to_json(format="vega")
     )
@@ -86,7 +89,7 @@ def speed_distribution_plot(time_series: pd.DataFrame) -> str:
         }
     ).dropna()
     return (
-        alt.Chart(df, title="Speed distribution")
+        alt.Chart(df.loc[df["speed"] > 0], title="Speed distribution")
         .mark_bar()
         .encode(
             alt.X("speed", bin=alt.Bin(step=5), title="Speed / km/h"),
@@ -101,7 +104,9 @@ def distance_time_plot(time_series: pd.DataFrame) -> str:
         alt.Chart(time_series, title="Distance")
         .mark_line()
         .encode(
-            alt.X("time", title="Time"), alt.Y("distance_km", title="Distance / km")
+            alt.X("time", title="Time"),
+            alt.Y("distance_km", title="Distance / km"),
+            alt.Color("segment_id:N", title="Segment"),
         )
         .interactive()
         .to_json(format="vega")
@@ -115,6 +120,7 @@ def altitude_time_plot(time_series: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y("altitude", scale=alt.Scale(zero=False), title="Altitude / m"),
+            alt.Color("segment_id:N", title="Segment"),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -128,6 +134,7 @@ def heartrate_time_plot(time_series: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y("heartrate", scale=alt.Scale(zero=False), title="Heart rate"),
+            alt.Color("segment_id:N", title="Segment"),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -156,23 +163,24 @@ def make_sharepic(time_series: pd.DataFrame) -> bytes:
     background = build_map_from_tiles(tile_bounds)
     # background = convert_to_grayscale(background)
 
-    xs, ys = compute_tile_float(
-        time_series["latitude"], time_series["longitude"], tile_bounds.zoom
-    )
-    yx = list(
-        (
-            int((x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-            int((y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-        )
-        for x, y in zip(xs, ys)
-    )
-
     img = Image.new("RGB", tile_bounds.shape[::-1])
     draw = ImageDraw.Draw(img)
-    draw.line(yx, fill="red", width=3)
+
+    for _, group in time_series.groupby("segment_id"):
+        xs, ys = compute_tile_float(
+            group["latitude"], group["longitude"], tile_bounds.zoom
+        )
+        yx = list(
+            (
+                int((x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+                int((y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+            )
+            for x, y in zip(xs, ys)
+        )
+
+        draw.line(yx, fill="red", width=4)
 
     aimg = np.array(img) / 255
-    aimg[:, :, 0] = gaussian_filter(aimg[:, :, 0], 1)
 
     weight = np.dstack([aimg[:, :, 0]] * 3)
 

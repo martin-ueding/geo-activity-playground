@@ -4,7 +4,6 @@ This code is based on https://github.com/remisalmon/Strava-local-heatmap.
 import dataclasses
 import logging
 
-import matplotlib.pyplot as pl
 import numpy as np
 
 from geo_activity_playground.core.tiles import compute_tile_float
@@ -146,33 +145,4 @@ def crop_image_to_bounds(
     max_x = int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
     max_y = int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
     image = image[min_y:max_y, min_x:max_x, :]
-    return image
-
-
-def gaussian_filter(image, sigma):
-    # returns image filtered with a gaussian function of variance sigma**2
-    #
-    # input: image = numpy.ndarray
-    #        sigma = float
-    # output: image = numpy.ndarray
-
-    i, j = np.meshgrid(
-        np.arange(image.shape[0]), np.arange(image.shape[1]), indexing="ij"
-    )
-
-    mu = (int(image.shape[0] / 2.0), int(image.shape[1] / 2.0))
-
-    gaussian = (
-        1.0
-        / (2.0 * np.pi * sigma * sigma)
-        * np.exp(-0.5 * (((i - mu[0]) / sigma) ** 2 + ((j - mu[1]) / sigma) ** 2))
-    )
-
-    gaussian = np.roll(gaussian, (-mu[0], -mu[1]), axis=(0, 1))
-
-    image_fft = np.fft.rfft2(image)
-    gaussian_fft = np.fft.rfft2(gaussian)
-
-    image = np.fft.irfft2(image_fft * gaussian_fft)
-
     return image
