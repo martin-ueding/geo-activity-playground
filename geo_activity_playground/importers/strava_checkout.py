@@ -208,7 +208,7 @@ def convert_strava_checkout(
         activity_date = dateutil.parser.parse(row["Activity Date"])
         activity_name = row["Activity Name"]
         activity_kind = row["Activity Type"]
-        is_commute = row["Commute"] == "true"
+        is_commute = row["Commute"] == "true" or row["Commute"] == True
         equipment = (
             nan_as_none(row["Activity Gear"])
             or nan_as_none(row["Bike"])
