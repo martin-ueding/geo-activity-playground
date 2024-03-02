@@ -74,6 +74,9 @@ def _compute_image_hash(time_series) -> int:
     y = time_series["y"] * 2**z
     xy_pixels = np.array([x - x.min(), y - y.min()]).T
     dim = xy_pixels.max(axis=0)
+    # Some activities have bogus data in them which makes them require a huge image. We just skip those outright and return a dummy hash value.
+    if max(dim) > 6000:
+        return 0
     im = Image.new("L", tuple(map(int, dim)))
     draw = ImageDraw.Draw(im)
     pixels = list(map(int, xy_pixels.flatten()))
