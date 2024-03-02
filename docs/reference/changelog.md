@@ -8,13 +8,14 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.20.0
 
-- Import altitude information from GPX files if available. [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91)
-- Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92).
-- Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`. [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88)
-- Make dependency on `vegafusion[embed]` explicit in the dependencies. [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102)
-- Take time jumps into account in activity distance computation and the various plots of the activities. [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90)
-- Skip Strava export activities that don't have a file. [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99)
-- Also accept boolean values in commute column of Strava's `activities.csv`. [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98)
+- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`. 
+- [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90): Take time jumps into account in activity distance computation and the various plots of the activities. 
+- [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91): Import altitude information from GPX files if available. 
+- [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92): Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. 
+- [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99): Skip Strava export activities that don't have a file. 
+- [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98): Also accept boolean values in commute column of Strava's `activities.csv`.
+- [GH-100](https://github.com/martin-ueding/geo-activity-playground/issues/100): Protect fingerprint computation from bogus values
+- [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102): Make dependency on `vegafusion[embed]` explicit in the dependencies.
 
 ### Version 0.19.1
 
