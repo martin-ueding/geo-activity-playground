@@ -14,6 +14,7 @@ import tcxreader.tcxreader
 import xmltodict
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.activities import embellish_single_time_series
 from geo_activity_playground.core.coordinates import get_distance
 
 logger = logging.getLogger(__name__)
@@ -74,18 +75,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
                 "It looks like the date parsing has gone wrong."
             ) from e
 
-        # Add distance column if missing.
-        if "distance_km" not in timeseries.columns:
-            distances = [0] + [
-                get_distance(lat_1, lon_1, lat_2, lon_2)
-                for lat_1, lon_1, lat_2, lon_2 in zip(
-                    timeseries["latitude"],
-                    timeseries["longitude"],
-                    timeseries["latitude"].iloc[1:],
-                    timeseries["longitude"].iloc[1:],
-                )
-            ]
-            timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
+        timeseries, changed = embellish_single_time_series(timeseries)
 
         # Extract some meta data from the time series.
         metadata["start"] = timeseries["time"].iloc[0]

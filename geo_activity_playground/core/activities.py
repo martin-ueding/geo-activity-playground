@@ -13,6 +13,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.paths import activities_path
 from geo_activity_playground.core.paths import activity_timeseries_path
 from geo_activity_playground.core.tasks import WorkTracker
@@ -149,45 +150,69 @@ def embellish_time_series(repository: ActivityRepository) -> None:
         path = activity_timeseries_path(activity_id)
         df = pd.read_parquet(path)
         df.name = id
-        changed = False
-        if pd.api.types.is_dtype_equal(df["time"].dtype, "int64"):
-            start = repository.get_activity_by_id(activity_id)["start"]
-            time = df["time"]
-            del df["time"]
-            df["time"] = [start + datetime.timedelta(seconds=t) for t in time]
-            changed = True
-        assert pd.api.types.is_dtype_equal(df["time"].dtype, "datetime64[ns, UTC]")
-
-        if "distance_km" in df.columns:
-            if "speed" not in df.columns:
-                df["speed"] = (
-                    df["distance_km"].diff()
-                    / (df["time"].diff().dt.total_seconds() + 1e-3)
-                    * 3600
-                )
-                changed = True
-
-            potential_jumps = (df["speed"] > 40) & (df["speed"].diff() > 10)
-            if np.any(potential_jumps):
-                df = df.loc[~potential_jumps]
-                changed = True
-
-        if "x" not in df.columns:
-            x, y = compute_tile_float(df["latitude"], df["longitude"], 0)
-            df["x"] = x
-            df["y"] = y
-            changed = True
-
-        if "segment_id" not in df.columns:
-            time_diff = (df["time"] - df["time"].shift(1)).dt.total_seconds()
-            jump_indices = time_diff >= 30
-            df["segment_id"] = np.cumsum(jump_indices)
-            changed = True
-
+        df, changed = embellish_single_time_series(
+            df, repository.get_activity_by_id(activity_id)["start"]
+        )
         if changed:
             df.to_parquet(path)
         work_tracker.mark_done(activity_id)
     work_tracker.close()
+
+
+def embellish_single_time_series(
+    timeseries: pd.DataFrame, start: Optional[datetime.datetime] = None
+) -> bool:
+    changed = False
+    time_diff_threshold_seconds = 30
+    time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
+    jump_indices = time_diff >= time_diff_threshold_seconds
+
+    if start is not None and pd.api.types.is_dtype_equal(
+        timeseries["time"].dtype, "int64"
+    ):
+        time = timeseries["time"]
+        del timeseries["time"]
+        timeseries["time"] = [start + datetime.timedelta(seconds=t) for t in time]
+        changed = True
+    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns, UTC]")
+
+    # Add distance column if missing.
+    if "distance_km" not in timeseries.columns:
+        distances = get_distance(
+            timeseries["latitude"].shift(1),
+            timeseries["longitude"].shift(1),
+            timeseries["latitude"],
+            timeseries["longitude"],
+        ).fillna(0.0)
+        distances.loc[jump_indices] = 0.0
+        timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
+        changed = True
+
+    if "distance_km" in timeseries.columns:
+        if "speed" not in timeseries.columns:
+            timeseries["speed"] = (
+                timeseries["distance_km"].diff()
+                / (timeseries["time"].diff().dt.total_seconds() + 1e-3)
+                * 3600
+            )
+            changed = True
+
+        potential_jumps = (timeseries["speed"] > 40) & (timeseries["speed"].diff() > 10)
+        if np.any(potential_jumps):
+            timeseries = timeseries.loc[~potential_jumps]
+            changed = True
+
+    if "x" not in timeseries.columns:
+        x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)
+        timeseries["x"] = x
+        timeseries["y"] = y
+        changed = True
+
+    if "segment_id" not in timeseries.columns:
+        timeseries["segment_id"] = np.cumsum(jump_indices)
+        changed = True
+
+    return timeseries, changed
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
