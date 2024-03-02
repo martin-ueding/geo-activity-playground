@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`. [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88)
 - Make dependency on `vegafusion[embed]` explicit in the dependencies. [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102)
 - Take time jumps into account in activity distance computation and the various plots of the activities. [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90)
+- Skip Strava export activities that don't have a file. [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99)
 
 ### Version 0.19.1
 
