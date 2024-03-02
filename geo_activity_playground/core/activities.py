@@ -191,13 +191,15 @@ def embellish_time_series(repository: ActivityRepository) -> None:
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
-    line = geojson.LineString(
-        [
-            (lon, lat)
-            for lat, lon in zip(time_series["latitude"], time_series["longitude"])
+    fc = geojson.FeatureCollection(
+        features=[
+            geojson.LineString(
+                [(lon, lat) for lat, lon in zip(group["latitude"], group["longitude"])]
+            )
+            for _, group in time_series.groupby("segment_id")
         ]
     )
-    return geojson.dumps(line)
+    return geojson.dumps(fc)
 
 
 def make_geojson_color_line(time_series: pd.DataFrame) -> str:
