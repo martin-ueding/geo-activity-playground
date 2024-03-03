@@ -20,7 +20,6 @@ from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
-from geo_activity_playground.core.similarity import distances_path
 from geo_activity_playground.core.tiles import compute_tile_float
 
 logger = logging.getLogger(__name__)
@@ -37,20 +36,12 @@ class ActivityController:
         time_series = self._repository.get_time_series(id)
         line_json = make_geojson_from_time_series(time_series)
 
-        with open(distances_path, "rb") as f:
-            distances = pickle.load(f)
-
-        similar_activities = {}
-        for distance in range(10):
-            activities = []
-            for activity_id in distances[activity.id].get(distance, set()):
-                try:
-                    activities.append(self._repository.get_activity_by_id(activity_id))
-                except KeyError as e:
-                    logger.warning(
-                        f"Activity {activity_id} is listed as similar activity but cannot be found. It will be ignored and this issue is resolved on the next cache update."
-                    )
-            similar_activities[distance] = activities
+        meta = self._repository.meta
+        similar_activities = meta.loc[
+            (meta.name == activity["name"]) & (meta.id != activity["id"])
+        ]
+        similar_activities = [row for _, row in similar_activities.iterrows()]
+        similar_activities.reverse()
 
         result = {
             "activity": activity,

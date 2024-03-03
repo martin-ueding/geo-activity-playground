@@ -36,7 +36,6 @@ vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
 charset-normalizer = "^3.3.2"
-imagehash = "^4.3.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"

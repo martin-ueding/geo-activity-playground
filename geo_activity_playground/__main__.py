@@ -6,7 +6,6 @@ import sys
 
 import coloredlogs
 
-from .core.similarity import precompute_activity_distances
 from .importers.strava_checkout import convert_strava_checkout
 from .importers.strava_checkout import import_from_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
@@ -116,7 +115,7 @@ def make_activity_repository(
     if pathlib.Path("Activities").exists():
         import_from_directory(
             repository,
-            config.get("metadata_extraction_regexes"),
+            config.get("metadata_extraction_regexes", []),
         )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)
@@ -124,7 +123,6 @@ def make_activity_repository(
         import_from_strava_api(repository)
 
     embellish_time_series(repository)
-    precompute_activity_distances(repository)
     compute_tile_visits(repository)
     compute_tile_evolution()
     return repository

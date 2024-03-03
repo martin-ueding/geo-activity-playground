@@ -17,17 +17,18 @@ from geo_activity_playground.core.tasks import WorkTracker
 
 logger = logging.getLogger(__name__)
 
+ACTIVITY_DIR = pathlib.Path("Activities")
+
 
 def import_from_directory(
-    repository: ActivityRepository, meta_data_extraction_regexes: list[str] = []
+    repository: ActivityRepository, metadata_extraction_regexes: list[str] = []
 ) -> None:
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
-    activity_dir = pathlib.Path("Activities")
 
     activity_paths = [
         path
-        for path in activity_dir.rglob("*.*")
+        for path in ACTIVITY_DIR.rglob("*.*")
         if path.is_file() and path.suffixes and not path.stem.startswith(".")
     ]
     new_activity_paths = work_tracker.filter(activity_paths)
@@ -74,11 +75,7 @@ def import_from_directory(
             equipment="Unknown",
         )
         activity_meta.update(activity_meta_from_file)
-        for regex in meta_data_extraction_regexes:
-            if m := re.search(regex, str(path.relative_to(activity_dir))):
-                activity_meta.update(m.groupdict())
-                break
-
+        activity_meta.update(_get_metadata_from_path(path, metadata_extraction_regexes))
         repository.add_activity(activity_meta)
 
     if paths_with_errors:
@@ -99,3 +96,12 @@ def _get_file_hash(path: pathlib.Path) -> int:
         while chunk := f.read(8192):
             file_hash.update(chunk)
     return int(file_hash.hexdigest(), 16) % 2**62
+
+
+def _get_metadata_from_path(
+    path: pathlib.Path, metadata_extraction_regexes: list[str]
+) -> dict[str, str]:
+    for regex in metadata_extraction_regexes:
+        if m := re.search(regex, str(path.relative_to(ACTIVITY_DIR))):
+            return m.groupdict()
+    return {}
