@@ -1,5 +1,6 @@
 import functools
 import io
+import logging
 import pickle
 
 import altair as alt
@@ -22,6 +23,8 @@ from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
 from geo_activity_playground.core.similarity import distances_path
 from geo_activity_playground.core.tiles import compute_tile_float
 
+logger = logging.getLogger(__name__)
+
 
 class ActivityController:
     def __init__(self, repository: ActivityRepository) -> None:
@@ -37,13 +40,17 @@ class ActivityController:
         with open(distances_path, "rb") as f:
             distances = pickle.load(f)
 
-        similar_activites = {
-            distance: [
-                self._repository.get_activity_by_id(activity_id)
-                for activity_id in distances[activity.id].get(distance, set())
-            ]
-            for distance in range(10)
-        }
+        similar_activities = {}
+        for distance in range(10):
+            activities = []
+            for activity_id in distances[activity.id].get(distance, set()):
+                try:
+                    activities.append(self._repository.get_activity_by_id(activity_id))
+                except KeyError as e:
+                    logger.warning(
+                        f"Activity {activity_id} is listed as similar activity but cannot be found. It will be ignored and this issue is resolved on the next cache update."
+                    )
+            similar_activities[distance] = activities
 
         result = {
             "activity": activity,
@@ -52,7 +59,7 @@ class ActivityController:
             "color_line_geojson": make_geojson_color_line(time_series),
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
-            "similar_activites": similar_activites,
+            "similar_activites": similar_activities,
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)
