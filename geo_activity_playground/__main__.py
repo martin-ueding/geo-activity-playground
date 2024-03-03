@@ -105,10 +105,19 @@ def make_activity_repository(
     apply_cache_migrations()
     config = get_config()
 
+    if not config.get("prefer_metadata_from_file", True):
+        logger.error(
+            "The config option `prefer_metadata_from_file` is deprecated. If you want to prefer extract metadata from the activity file paths, please use the new metadata extraction regular expressions."
+        )
+        sys.exit(1)
+
     repository = ActivityRepository()
 
     if pathlib.Path("Activities").exists():
-        import_from_directory(repository, config.get("prefer_metadata_from_file", True))
+        import_from_directory(
+            repository,
+            config.get("meta_data_extraction_regexes"),
+        )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)
     if "strava" in config and not skip_strava:

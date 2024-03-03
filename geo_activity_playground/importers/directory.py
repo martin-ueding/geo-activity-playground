@@ -2,6 +2,7 @@ import hashlib
 import logging
 import pathlib
 import pickle
+import re
 import sys
 import traceback
 
@@ -18,14 +19,15 @@ logger = logging.getLogger(__name__)
 
 
 def import_from_directory(
-    repository: ActivityRepository, prefer_metadata_from_file: bool
+    repository: ActivityRepository, meta_data_extraction_regexes: list[str] = []
 ) -> None:
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
+    activity_dir = pathlib.Path("Activities")
 
     activity_paths = [
         path
-        for path in pathlib.Path("Activities").rglob("*.*")
+        for path in activity_dir.rglob("*.*")
         if path.is_file() and path.suffixes and not path.stem.startswith(".")
     ]
     new_activity_paths = work_tracker.filter(activity_paths)
@@ -64,7 +66,6 @@ def import_from_directory(
                 activity_meta_from_file = pickle.load(f)
 
         activity_meta = ActivityMeta(
-            commute=path.parts[-2] == "Commute",
             id=activity_id,
             # https://stackoverflow.com/a/74718395/653152
             name=path.name.removesuffix("".join(path.suffixes)),
@@ -72,15 +73,12 @@ def import_from_directory(
             kind="Unknown",
             equipment="Unknown",
         )
-        if len(path.parts) >= 3 and path.parts[1] != "Commute":
-            activity_meta["kind"] = path.parts[1]
-        if len(path.parts) >= 4 and path.parts[2] != "Commute":
-            activity_meta["equipment"] = path.parts[2]
+        activity_meta.update(activity_meta_from_file)
+        for regex in meta_data_extraction_regexes:
+            if m := re.search(regex, str(path.relative_to(activity_dir))):
+                activity_meta.update(m.groupdict())
+                break
 
-        if prefer_metadata_from_file:
-            activity_meta = {**activity_meta, **activity_meta_from_file}
-        else:
-            activity_meta = {**activity_meta_from_file, **activity_meta}
         repository.add_activity(activity_meta)
 
     if paths_with_errors:
