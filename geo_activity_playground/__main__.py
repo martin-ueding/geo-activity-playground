@@ -107,7 +107,7 @@ def make_activity_repository(
 
     if not config.get("prefer_metadata_from_file", True):
         logger.error(
-            "The config option `prefer_metadata_from_file` is deprecated. If you want to prefer extract metadata from the activity file paths, please use the new metadata extraction regular expressions."
+            "The config option `prefer_metadata_from_file` is deprecated. If you want to prefer extract metadata from the activity file paths, please use the new `metadata_extraction_regexes` as explained at https://martin-ueding.github.io/geo-activity-playground/getting-started/using-activity-files/#directory-structure."
         )
         sys.exit(1)
 
@@ -116,7 +116,7 @@ def make_activity_repository(
     if pathlib.Path("Activities").exists():
         import_from_directory(
             repository,
-            config.get("meta_data_extraction_regexes"),
+            config.get("metadata_extraction_regexes"),
         )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)

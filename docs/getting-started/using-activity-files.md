@@ -8,58 +8,26 @@ Inside `Playground`, create another directory `Activities` where your activity f
 
 ## Directory structure
 
-Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. If you prefer to have the metadata from the path and filename to override what is inside the file, add the following line to the top of your configuration file:
+Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. By default only the stem of the path (the part without the suffix) will be used to derive the name of the activity. If you want, you can use a naming and directory structure to fill in more meta data using regular expressions.
+
+Each activity has the metadata fields `kind`, `equipment` and `name`. The kind and equipment are extracted from the activity file. If there nothing is found, it defaults to “Unknown”. Using a regular expression with named capture groups one can extract these fields also from the files. I for instance have the following file paths:
+
+- `Ride/Trekking Bike/Home to Bakery/2024-03-03-17-42-10.fit`
+- `Hike/Hiking Boots 2019/2024-03-03-11-03-18 Some nice place with Alice and Bob.fit`
+
+My structure is built such that the first directory level corresponds to the activity kind. The second level is the equipment used. Unique activities are directly in there as files. But there can also be a directory for the name and then just files with only the date as name. This way I can just put a lot of similar commutes there without having to name the files. In the first example I want it to take the name from the third directory. In either case I don't want to have the date to be part of the name.
+
+In order to extract this data, I specify a list of regular expressions with named capture groups like `(?P<name>…)` where `name` is the field that you want to populate and `…` some regular expression. The program will try to _search_ (not _match_) the whole relative path of the activity to the regular expressions in the order given in the list. When it finds a match, it will take the capture groups, populate the metadata and stop evaluating more of the expressions. In my case they look like this:
 
 ```toml
-prefer_metadata_from_file = false
+metadata_extraction_regexes = [
+    '(?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/]+)/',
+    '(?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$',
+    '(?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$',
+]
 ```
 
-With that disabled, you are free to do the following.
-
-Inside the `Activities` you can dump all your files in a flat fashion. If you want to add some more metadata, use the following directory layout.
-
-The first directory level will indicate the type of the activity. You can pick whatever make sense for you, classic options are _ride_, _run_, _walk_, _hike_. Then the second level will indicate your equipment. You can use terms like “rental bike”, the brand and make of your shoes or whatever you find sensible. Specifying the equipment allows to track the total distance traveled with a given equipment.
-
-At any level you can have a special directory `Commute`. All activities inside of that will be marked as commutes and not highlighted as much as non-commute activities. The idea is that you can find your cool activities along potentially many commutes.
-
-Other directory names on the third level will just be ignored, you can use those to organize your activities further in some sense.
-
-Let us take the following directory/file structure as an example:
-
-```
-Activities
-├── Commute
-│   └── From the Beach.gpx
-├── Ride
-│   └── Rental Bike
-│       ├── Beach Rides
-│       │   └── Breskens.gpx
-│       └── Zwin.gpx
-├── To Piazza.gpx
-└── Walk
-    ├── Commute
-    │   └── To the Beach.gpx
-    ├── New Balance Fresh Foam 860v11
-    │   ├── Beach Walk.gpx
-    │   └── Commute
-    │       └── From Piazza.gpx
-    └── Nieuvfliet.gpx
-```
-
-You can see that I have one file on the top level (`To Piazza.gpx`), a file on the first level (`Walk/Nieuvfliet.gpx`), some on the second level (`Ride/Rental Bike/Zwin.gpx`), one commute (`Walk/New Balance Fresh Foam 860v11/Commute/From Piazza.gpx`) and one with a group directory which isn't commuting (`Ride/Rental Bike/Dunes in Sluis/Breskens.gpx`). From this the program will extract the following metadata:
-
-Name | Type | Equipment | Commute
---- | --- | --- | ---
-From the Beach | _None_ | _None_ | Yes
-Breskens | Ride | Rental Bike | No
-Zwin | Ride | Rental Bike | No
-To Piazza | _None_ | _None_ | No
-To the Beach | Walk | _None_ | Yes
-Beach Walk | Walk | New Balance Fresh Foam 860v11 | No
-From Piazza | Walk | New Balance Fresh Foam 860v11 | Yes
-Nieuwvliet | Walk | _None_ | No
-
-The file name of your activity will become the name of the activity.
+Put something like that at the top of your `config.toml` in order to extract metadata from the files and have it override metadata from the within the files.
 
 ## Supported file formats
 
