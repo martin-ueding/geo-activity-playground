@@ -127,7 +127,7 @@
             <tbody>
                 {% for other_activity in similar_activites %}
                 <tr>
-                    <td><a href="/activity/{{ other_activity.id }}"></a>{{ other_activity.start }}</a></td>
+                    <td><a href="/activity/{{ other_activity.id }}">{{ other_activity.start }}</a></td>
                     <td>{{ other_activity.distance_km | round(1) }}</td>
                     <td>{{ other_activity.elapsed_time }}</td>
                     <td>{{ other_activity["equipment"] }}</td>
