@@ -117,7 +117,6 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
                     <th>Date</th>
                     <th>Distance / km</th>
                     <th>Elapsed time</th>
@@ -128,8 +127,7 @@
             <tbody>
                 {% for other_activity in similar_activites %}
                 <tr>
-                    <td><a href="/activity/{{ other_activity.id }}">{{ other_activity["name"] }}</a></td>
-                    <td>{{ other_activity.start }}</td>
+                    <td><a href="/activity/{{ other_activity.id }}"></a>{{ other_activity.start }}</a></td>
                     <td>{{ other_activity.distance_km | round(1) }}</td>
                     <td>{{ other_activity.elapsed_time }}</td>
                     <td>{{ other_activity["equipment"] }}</td>
