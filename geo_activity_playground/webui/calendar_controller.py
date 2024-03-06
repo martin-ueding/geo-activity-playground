@@ -91,11 +91,6 @@ class CalendarController:
         selection = meta["start"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
 
-        activities = [
-            self._repository.get_activity_by_id(activity_id)
-            for activity_id in activities_that_day["id"]
-        ]
-
         time_series = [
             self._repository.get_time_series(activity_id)
             for activity_id in activities_that_day["id"]
@@ -118,33 +113,16 @@ class CalendarController:
                     ),
                     properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
                 )
-                for i, (activity, ts) in enumerate(zip(activities, time_series))
+                for i, ts in enumerate(time_series)
             ]
         )
 
+        activities_list = activities_that_day.to_dict(orient="records")
+        for i, activity_record in enumerate(activities_list):
+            activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
+
         return {
-            "activities": activities_that_day.to_dict(orient="records"),
+            "activities": activities_list,
             "geojson": geojson.dumps(fc),
             "date": datetime.date(year, month, day).isoformat(),
         }
-
-
-def make_geojson_color_line(time_series: pd.DataFrame) -> str:
-    features = [
-        geojson.Feature(
-            geometry=geojson.LineString(
-                coordinates=[
-                    [row["longitude"], row["latitude"]],
-                    [next["longitude"], next["latitude"]],
-                ]
-            ),
-            properties={
-                "speed": next["speed"] if np.isfinite(next["speed"]) else 0.0,
-                "color": matplotlib.colors.to_hex(cmap(min(next["speed"] / 35, 1.0))),
-            },
-        )
-        for _, group in time_series.groupby("segment_id")
-        for (_, row), (_, next) in zip(group.iterrows(), group.iloc[1:].iterrows())
-    ]
-    feature_collection = geojson.FeatureCollection(features)
-    return geojson.dumps(feature_collection)

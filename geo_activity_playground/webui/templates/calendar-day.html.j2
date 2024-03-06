@@ -9,7 +9,7 @@
 
 
 <div class="row mb-3">
-    <div class="col">
+    <div class="col-md-9">
         <div id="activity-map" style="height: 500px;"></div>
         <script>
             var map = L.map('activity-map', {
@@ -25,6 +25,14 @@
             }).addTo(map)
             map.fitBounds(geojson.getBounds());
         </script>
+    </div>
+    <div class="col-md-3">
+        <ol>
+            {% for activity in activities %}
+            <li><span style="color: {{ activity['color'] }};">█</span> <a href="/activity/{{ activity.id }}">{{
+                    activity.name }}</a></li>
+            {% endfor %}
+        </ol>
     </div>
 </div>
 
@@ -46,7 +54,8 @@
             <tbody>
                 {% for activity in activities %}
                 <tr>
-                    <td><a href="/activity/{{ activity.id }}">{{ activity.name }}</a></td>
+                    <td><span style="color: {{ activity['color'] }};">█</span> <a href="/activity/{{ activity.id }}">{{
+                            activity.name }}</a></td>
                     <td>{{ activity.start }}</td>
                     <td>{{ activity.distance_km | round(1) }}</td>
                     <td>{{ activity.elapsed_time }}</td>
