@@ -2,6 +2,8 @@ import collections
 import datetime
 import functools
 
+import geojson
+import matplotlib
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -58,11 +60,12 @@ class CalendarController:
         ].sort_values("start")
 
         weeks = collections.defaultdict(dict)
-
+        day_of_month = collections.defaultdict(dict)
         date = datetime.datetime(year, month, 1)
         while date.month == month:
             iso = date.isocalendar()
             weeks[iso.week][iso.weekday] = []
+            day_of_month[iso.week][iso.weekday] = date.day
             date += datetime.timedelta(days=1)
 
         for index, row in filtered.iterrows():
@@ -76,4 +79,72 @@ class CalendarController:
                 }
             )
 
-        return {"year": year, "month": month, "weeks": weeks}
+        return {
+            "year": year,
+            "month": month,
+            "weeks": weeks,
+            "day_of_month": day_of_month,
+        }
+
+    def render_day(self, year: int, month: int, day: int) -> dict:
+        meta = self._repository.meta
+        selection = meta["start"].dt.date == datetime.date(year, month, day)
+        activities_that_day = meta.loc[selection]
+
+        activities = [
+            self._repository.get_activity_by_id(activity_id)
+            for activity_id in activities_that_day["id"]
+        ]
+
+        time_series = [
+            self._repository.get_time_series(activity_id)
+            for activity_id in activities_that_day["id"]
+        ]
+
+        cmap = matplotlib.colormaps["Dark2"]
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.MultiLineString(
+                        coordinates=[
+                            [
+                                [lon, lat]
+                                for lat, lon in zip(
+                                    group["latitude"], group["longitude"]
+                                )
+                            ]
+                            for _, group in ts.groupby("segment_id")
+                        ]
+                    ),
+                    properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
+                )
+                for i, (activity, ts) in enumerate(zip(activities, time_series))
+            ]
+        )
+
+        return {
+            "activities": activities_that_day.to_dict(orient="records"),
+            "geojson": geojson.dumps(fc),
+            "date": datetime.date(year, month, day).isoformat(),
+        }
+
+
+def make_geojson_color_line(time_series: pd.DataFrame) -> str:
+    features = [
+        geojson.Feature(
+            geometry=geojson.LineString(
+                coordinates=[
+                    [row["longitude"], row["latitude"]],
+                    [next["longitude"], next["latitude"]],
+                ]
+            ),
+            properties={
+                "speed": next["speed"] if np.isfinite(next["speed"]) else 0.0,
+                "color": matplotlib.colors.to_hex(cmap(min(next["speed"] / 35, 1.0))),
+            },
+        )
+        for _, group in time_series.groupby("segment_id")
+        for (_, row), (_, next) in zip(group.iterrows(), group.iloc[1:].iterrows())
+    ]
+    feature_collection = geojson.FeatureCollection(features)
+    return geojson.dumps(feature_collection)

@@ -53,10 +53,17 @@ def route_calendar(app: Flask, repository: ActivityRepository) -> None:
         )
 
     @app.route("/calendar/<year>/<month>")
-    def calendar_year_month(year: str, month: str):
+    def calendar_month(year: str, month: str):
         return render_template(
             "calendar-month.html.j2",
             **calendar_controller.render_month(int(year), int(month))
+        )
+
+    @app.route("/calendar/<year>/<month>/<day>")
+    def calendar_day(year: str, month: str, day: str):
+        return render_template(
+            "calendar-day.html.j2",
+            **calendar_controller.render_day(int(year), int(month), int(day))
         )
 
 
@@ -264,8 +271,7 @@ def route_tiles(app: Flask, repository: ActivityRepository) -> None:
     @app.route("/tile/color/<z>/<x>/<y>.png")
     def tile_color(x: str, y: str, z: str):
         return Response(
-            tile_controller.render_color(int(x), int(y), int(z)),
-            mimetype="image/png",
+            tile_controller.render_color(int(x), int(y), int(z)), mimetype="image/png"
         )
 
     @app.route("/tile/grayscale/<z>/<x>/<y>.png")
@@ -273,6 +279,12 @@ def route_tiles(app: Flask, repository: ActivityRepository) -> None:
         return Response(
             tile_controller.render_grayscale(int(x), int(y), int(z)),
             mimetype="image/png",
+        )
+
+    @app.route("/tile/pastel/<z>/<x>/<y>.png")
+    def tile_pastel(x: str, y: str, z: str):
+        return Response(
+            tile_controller.render_pastel(int(x), int(y), int(z)), mimetype="image/png"
         )
 
 
