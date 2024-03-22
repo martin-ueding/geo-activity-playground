@@ -51,6 +51,8 @@ class ActivityController:
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
+            "date": activity.start.date(),
+            "time": activity.start.time(),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)

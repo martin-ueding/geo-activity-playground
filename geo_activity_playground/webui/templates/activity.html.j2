@@ -21,7 +21,8 @@
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
             <dt>Start time</dt>
-            <dd>{{ activity.start }}</dd>
+            <dd><a href="/calendar/{{ date.year }}/{{ date.month }}/{{ date.day }}">{{ date }}</a> {{ time }}
+            </dd>
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
             <dt>Equipment</dt>
