@@ -3,6 +3,8 @@ import logging
 import pathlib
 import shutil
 import traceback
+from typing import Optional
+from typing import Union
 
 import dateutil.parser
 import numpy as np
@@ -116,6 +118,13 @@ EXPECTED_COLUMNS = [
 ]
 
 
+def float_or_none(x: Union[float, str]) -> Optional[float]:
+    try:
+        return float(x)
+    except ValueError:
+        return None
+
+
 def import_from_strava_checkout(repository: ActivityRepository) -> None:
     checkout_path = pathlib.Path("Strava Export")
     activities = pd.read_csv(checkout_path / "activities.csv")
@@ -143,7 +152,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
         row = activities.loc[activity_id]
         activity_file = checkout_path / row["Filename"]
         table_activity_meta = {
-            "calories": row["Calories"],
+            "calories": float_or_none(row["Calories"]),
             "commute": row["Commute"] == "true",
             "distance_km": row["Distance"],
             "elapsed_time": datetime.timedelta(seconds=int(row["Elapsed Time"])),
