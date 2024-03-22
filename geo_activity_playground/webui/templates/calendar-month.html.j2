@@ -29,7 +29,7 @@
                     {% for day in range(1, 8) %}
                     <td>
                         {% if weeks[week][day] %}
-                        <a href="/calendar/{{ year }}/{{ month }}/{{ day_of_month[week][day] }}"><b>{{
+                        <a href="/activity/day/{{ year }}/{{ month }}/{{ day_of_month[week][day] }}"><b>{{
                                 day_of_month[week][day] }}.</b></a>
                         {% elif day_of_month[week][day] %}
                         <b>{{ day_of_month[week][day] }}.</b>

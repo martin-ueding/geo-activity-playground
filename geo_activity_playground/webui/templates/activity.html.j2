@@ -21,7 +21,7 @@
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
             <dt>Start time</dt>
-            <dd><a href="/calendar/{{ date.year }}/{{ date.month }}/{{ date.day }}">{{ date }}</a> {{ time }}
+            <dd><a href="/activity/day/{{ date.year }}/{{ date.month }}/{{ date.day }}">{{ date }}</a> {{ time }}
             </dd>
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
@@ -114,6 +114,8 @@
 <div class="row mb-3">
     <div class="col">
         <h2>Activities with the same name</h2>
+
+        <p><a href="/activity/name/{{ activity['name']|urlencode() }}">Overview over these activities</a></p>
 
         <table class="table">
             <thead>
