@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - [GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105): Ignore similar activities that have vanished.
 - [GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106): Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now.
+- [GH-107](https://github.com/martin-ueding/geo-activity-playground/issues/107): Remove warning by fixing a Pandas slice assignment.
 
 ### Version 0.20.0
 
