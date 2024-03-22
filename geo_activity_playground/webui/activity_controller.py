@@ -113,11 +113,11 @@ class ActivityController:
     def render_name(self, name: str) -> dict:
         meta = self._repository.meta
         selection = meta["name"] == name
-        activities_that_day = meta.loc[selection]
+        activities_with_name = meta.loc[selection]
 
         time_series = [
             self._repository.get_time_series(activity_id)
-            for activity_id in activities_that_day["id"]
+            for activity_id in activities_with_name["id"]
         ]
 
         cmap = matplotlib.colormaps["Dark2"]
@@ -141,7 +141,7 @@ class ActivityController:
             ]
         )
 
-        activities_list = activities_that_day.to_dict(orient="records")
+        activities_list = activities_with_name.to_dict(orient="records")
         for i, activity_record in enumerate(activities_list):
             activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
 
@@ -149,6 +149,10 @@ class ActivityController:
             "activities": activities_list,
             "geojson": geojson.dumps(fc),
             "name": name,
+            "tick_plot": name_tick_plot(activities_with_name),
+            "equipment_plot": name_equipment_plot(activities_with_name),
+            "distance_plot": name_distance_plot(activities_with_name),
+            "minutes_plot": name_minutes_plot(activities_with_name),
         }
 
 
@@ -234,6 +238,51 @@ def heartrate_zone_plot(heart_zones: pd.DataFrame) -> str:
             alt.X("minutes", title="Duration / min"),
             alt.Y("heartzone:O", title="Zone"),
             alt.Color("heartzone:O", scale=alt.Scale(scheme="turbo"), title="Zone"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_tick_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Repetitions")
+        .mark_tick()
+        .encode(
+            alt.X("start", title="Date"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_equipment_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Equipment")
+        .mark_bar()
+        .encode(alt.X("count()", title="Count"), alt.Y("equipment", title="Equipment"))
+        .to_json(format="vega")
+    )
+
+
+def name_distance_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Distance")
+        .mark_bar()
+        .encode(
+            alt.X("distance_km", bin=True, title="Distance / km"),
+            alt.Y("count()", title="Count"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_minutes_plot(meta: pd.DataFrame) -> str:
+    minutes = meta["elapsed_time"].dt.total_seconds() / 60
+    return (
+        alt.Chart(pd.DataFrame({"minutes": minutes}), title="Elapsed time")
+        .mark_bar()
+        .encode(
+            alt.X("minutes", bin=True, title="Time / min"),
+            alt.Y("count()", title="Count"),
         )
         .to_json(format="vega")
     )
