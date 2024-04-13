@@ -228,6 +228,9 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
 
 
 def make_geojson_color_line(time_series: pd.DataFrame) -> str:
+    low, high = np.quantile(time_series["speed"].dropna(), [0.02, 0.98])
+    clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
+
     cmap = matplotlib.colormaps["viridis"]
     features = [
         geojson.Feature(
@@ -239,7 +242,7 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
             ),
             properties={
                 "speed": next["speed"] if np.isfinite(next["speed"]) else 0.0,
-                "color": matplotlib.colors.to_hex(cmap(min(next["speed"] / 35, 1.0))),
+                "color": matplotlib.colors.to_hex(cmap(clamp_speed(next["speed"]))),
             },
         )
         for _, group in time_series.groupby("segment_id")
@@ -247,6 +250,17 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
     ]
     feature_collection = geojson.FeatureCollection(features)
     return geojson.dumps(feature_collection)
+
+
+def make_speed_color_bar(time_series: pd.DataFrame) -> dict:
+    low, high = np.quantile(time_series["speed"].dropna(), [0.02, 0.98])
+    cmap = matplotlib.colormaps["viridis"]
+    clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
+    colors = [
+        (speed, matplotlib.colors.to_hex(cmap(clamp_speed(speed))))
+        for speed in range(0, int(high + 1), 5)
+    ]
+    return {"low": low, "high": high, "colors": colors}
 
 
 def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:

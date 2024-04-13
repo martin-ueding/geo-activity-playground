@@ -33,7 +33,7 @@
         </dl>
     </div>
     <div class="col-8">
-        <div id="activity-map" style="height: 500px;"></div>
+        <div id="activity-map" style="height: 500px;" class="mb-3"></div>
         <script>
             var map = L.map('activity-map', {
                 fullscreenControl: true
@@ -48,6 +48,24 @@
             }).addTo(map)
             map.fitBounds(geojson.getBounds());
         </script>
+
+
+        <style>
+            span.colorbar {
+                text-shadow: -1px -1px 0 black, -1px 0px 0 black, -1px 1px 0 black, 0px -1px 0 black, 0px 0px 0 black, 0px 1px 0 black, 1px -1px 0 black, 1px 0px 0 black, 1px 1px 0 black;
+                padding-left: 5px;
+                padding-right: 5px;
+                line-height: 130%;
+                color: white;
+            }
+        </style>
+
+        <div>
+            {% for speed, color in speed_color_bar.colors %}
+            <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ speed }}</span>
+            {% endfor %}
+            km/h
+        </div>
     </div>
 </div>
 

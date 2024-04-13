@@ -14,6 +14,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import extract_heart_rate_zones
 from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
+from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import crop_image_to_bounds
@@ -51,6 +52,7 @@ class ActivityController:
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
+            "speed_color_bar": make_speed_color_bar(time_series),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)
