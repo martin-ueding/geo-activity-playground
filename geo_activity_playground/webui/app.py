@@ -1,3 +1,5 @@
+import urllib
+
 from flask import Flask
 from flask import redirect
 from flask import render_template
@@ -42,6 +44,20 @@ def route_activity(app: Flask, repository: ActivityRepository) -> None:
             mimetype="image/png",
         )
 
+    @app.route("/activity/day/<year>/<month>/<day>")
+    def activity_day(year: str, month: str, day: str):
+        return render_template(
+            "activity-day.html.j2",
+            **activity_controller.render_day(int(year), int(month), int(day))
+        )
+
+    @app.route("/activity/name/<name>")
+    def activity_name(name: str):
+        return render_template(
+            "activity-name.html.j2",
+            **activity_controller.render_name(urllib.parse.unquote(name))
+        )
+
 
 def route_calendar(app: Flask, repository: ActivityRepository) -> None:
     calendar_controller = CalendarController(repository)
@@ -57,13 +73,6 @@ def route_calendar(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "calendar-month.html.j2",
             **calendar_controller.render_month(int(year), int(month))
-        )
-
-    @app.route("/calendar/<year>/<month>/<day>")
-    def calendar_day(year: str, month: str, day: str):
-        return render_template(
-            "calendar-day.html.j2",
-            **calendar_controller.render_day(int(year), int(month), int(day))
         )
 
 

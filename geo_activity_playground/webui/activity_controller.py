@@ -1,9 +1,12 @@
+import datetime
 import functools
 import io
 import logging
 import pickle
 
 import altair as alt
+import geojson
+import matplotlib
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
@@ -53,6 +56,8 @@ class ActivityController:
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
             "speed_color_bar": make_speed_color_bar(time_series),
+            "date": activity.start.date(),
+            "time": activity.start.time(),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)
@@ -65,6 +70,92 @@ class ActivityController:
     def render_sharepic(self, id: int) -> bytes:
         time_series = self._repository.get_time_series(id)
         return make_sharepic(time_series)
+
+    def render_day(self, year: int, month: int, day: int) -> dict:
+        meta = self._repository.meta
+        selection = meta["start"].dt.date == datetime.date(year, month, day)
+        activities_that_day = meta.loc[selection]
+
+        time_series = [
+            self._repository.get_time_series(activity_id)
+            for activity_id in activities_that_day["id"]
+        ]
+
+        cmap = matplotlib.colormaps["Dark2"]
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.MultiLineString(
+                        coordinates=[
+                            [
+                                [lon, lat]
+                                for lat, lon in zip(
+                                    group["latitude"], group["longitude"]
+                                )
+                            ]
+                            for _, group in ts.groupby("segment_id")
+                        ]
+                    ),
+                    properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
+                )
+                for i, ts in enumerate(time_series)
+            ]
+        )
+
+        activities_list = activities_that_day.to_dict(orient="records")
+        for i, activity_record in enumerate(activities_list):
+            activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
+
+        return {
+            "activities": activities_list,
+            "geojson": geojson.dumps(fc),
+            "date": datetime.date(year, month, day).isoformat(),
+        }
+
+    def render_name(self, name: str) -> dict:
+        meta = self._repository.meta
+        selection = meta["name"] == name
+        activities_with_name = meta.loc[selection]
+
+        time_series = [
+            self._repository.get_time_series(activity_id)
+            for activity_id in activities_with_name["id"]
+        ]
+
+        cmap = matplotlib.colormaps["Dark2"]
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.MultiLineString(
+                        coordinates=[
+                            [
+                                [lon, lat]
+                                for lat, lon in zip(
+                                    group["latitude"], group["longitude"]
+                                )
+                            ]
+                            for _, group in ts.groupby("segment_id")
+                        ]
+                    ),
+                    properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
+                )
+                for i, ts in enumerate(time_series)
+            ]
+        )
+
+        activities_list = activities_with_name.to_dict(orient="records")
+        for i, activity_record in enumerate(activities_list):
+            activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
+
+        return {
+            "activities": activities_list,
+            "geojson": geojson.dumps(fc),
+            "name": name,
+            "tick_plot": name_tick_plot(activities_with_name),
+            "equipment_plot": name_equipment_plot(activities_with_name),
+            "distance_plot": name_distance_plot(activities_with_name),
+            "minutes_plot": name_minutes_plot(activities_with_name),
+        }
 
 
 def speed_time_plot(time_series: pd.DataFrame) -> str:
@@ -149,6 +240,51 @@ def heartrate_zone_plot(heart_zones: pd.DataFrame) -> str:
             alt.X("minutes", title="Duration / min"),
             alt.Y("heartzone:O", title="Zone"),
             alt.Color("heartzone:O", scale=alt.Scale(scheme="turbo"), title="Zone"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_tick_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Repetitions")
+        .mark_tick()
+        .encode(
+            alt.X("start", title="Date"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_equipment_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Equipment")
+        .mark_bar()
+        .encode(alt.X("count()", title="Count"), alt.Y("equipment", title="Equipment"))
+        .to_json(format="vega")
+    )
+
+
+def name_distance_plot(meta: pd.DataFrame) -> str:
+    return (
+        alt.Chart(meta, title="Distance")
+        .mark_bar()
+        .encode(
+            alt.X("distance_km", bin=True, title="Distance / km"),
+            alt.Y("count()", title="Count"),
+        )
+        .to_json(format="vega")
+    )
+
+
+def name_minutes_plot(meta: pd.DataFrame) -> str:
+    minutes = meta["elapsed_time"].dt.total_seconds() / 60
+    return (
+        alt.Chart(pd.DataFrame({"minutes": minutes}), title="Elapsed time")
+        .mark_bar()
+        .encode(
+            alt.X("minutes", bin=True, title="Time / min"),
+            alt.Y("count()", title="Count"),
         )
         .to_json(format="vega")
     )

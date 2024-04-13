@@ -163,9 +163,6 @@ def embellish_single_time_series(
     timeseries: pd.DataFrame, start: Optional[datetime.datetime] = None
 ) -> bool:
     changed = False
-    time_diff_threshold_seconds = 30
-    time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
-    jump_indices = time_diff >= time_diff_threshold_seconds
 
     if start is not None and pd.api.types.is_dtype_equal(
         timeseries["time"].dtype, "int64"
@@ -176,40 +173,42 @@ def embellish_single_time_series(
         changed = True
     assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns, UTC]")
 
-    # Add distance column if missing.
-    if "distance_km" not in timeseries.columns:
-        distances = get_distance(
-            timeseries["latitude"].shift(1),
-            timeseries["longitude"].shift(1),
-            timeseries["latitude"],
-            timeseries["longitude"],
-        ).fillna(0.0)
-        distances.loc[jump_indices] = 0.0
+    distances = get_distance(
+        timeseries["latitude"].shift(1),
+        timeseries["longitude"].shift(1),
+        timeseries["latitude"],
+        timeseries["longitude"],
+    ).fillna(0.0)
+    time_diff_threshold_seconds = 30
+    time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
+    jump_indices = (time_diff >= time_diff_threshold_seconds) & (distances > 100)
+    distances.loc[jump_indices] = 0.0
+
+    if not "distance_km" in timeseries.columns:
         timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
         changed = True
 
-    if "distance_km" in timeseries.columns:
-        if "speed" not in timeseries.columns:
-            timeseries["speed"] = (
-                timeseries["distance_km"].diff()
-                / (timeseries["time"].diff().dt.total_seconds() + 1e-3)
-                * 3600
-            )
-            changed = True
+    if "speed" not in timeseries.columns:
+        timeseries["speed"] = (
+            timeseries["distance_km"].diff()
+            / (timeseries["time"].diff().dt.total_seconds() + 1e-3)
+            * 3600
+        )
+        changed = True
 
-        potential_jumps = (timeseries["speed"] > 40) & (timeseries["speed"].diff() > 10)
-        if np.any(potential_jumps):
-            timeseries = timeseries.loc[~potential_jumps]
-            changed = True
+    potential_jumps = (timeseries["speed"] > 40) & (timeseries["speed"].diff() > 10)
+    if np.any(potential_jumps):
+        timeseries = timeseries.loc[~potential_jumps].copy()
+        changed = True
+
+    if "segment_id" not in timeseries.columns:
+        timeseries["segment_id"] = np.cumsum(jump_indices)
+        changed = True
 
     if "x" not in timeseries.columns:
         x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)
         timeseries["x"] = x
         timeseries["y"] = y
-        changed = True
-
-    if "segment_id" not in timeseries.columns:
-        timeseries["segment_id"] = np.cumsum(jump_indices)
         changed = True
 
     return timeseries, changed

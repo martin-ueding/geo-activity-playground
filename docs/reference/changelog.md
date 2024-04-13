@@ -11,15 +11,16 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - **Breaking change:** New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the [documentation on activity files](../getting-started/using-activity-files.md) for the new way.
 
 - [GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105): Ignore similar activities that have vanished.
-
+- [GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106): Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now.
+- [GH-107](https://github.com/martin-ueding/geo-activity-playground/issues/107): Remove warning by fixing a Pandas slice assignment.
 
 ### Version 0.20.0
 
-- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`. 
-- [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90): Take time jumps into account in activity distance computation and the various plots of the activities. 
-- [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91): Import altitude information from GPX files if available. 
-- [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92): Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. 
-- [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99): Skip Strava export activities that don't have a file. 
+- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`.
+- [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90): Take time jumps into account in activity distance computation and the various plots of the activities.
+- [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91): Import altitude information from GPX files if available.
+- [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92): Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates.
+- [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99): Skip Strava export activities that don't have a file.
 - [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98): Also accept boolean values in commute column of Strava's `activities.csv`.
 - [GH-100](https://github.com/martin-ueding/geo-activity-playground/issues/100): Protect fingerprint computation from bogus values
 - [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102): Make dependency on `vegafusion[embed]` explicit in the dependencies.
@@ -33,7 +34,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 #### Version 0.19.0
 
-- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. 
+- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now.
 - Add more tooltip information in the plot on the landing page.
 - [GH-87](https://github.com/martin-ueding/geo-activity-playground/issues/87): Add `prefer_metadata_from_file` configuration option.
 - [GH-17](https://github.com/martin-ueding/geo-activity-playground/issues/17): Download calories from Strava via the detailed API.
