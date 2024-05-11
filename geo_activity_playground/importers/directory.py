@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import multiprocessing
 import pathlib
 import pickle
 import re
@@ -39,15 +40,17 @@ def import_from_directory(
     file_metadata_dir = pathlib.Path("Cache/Activity Metadata")
     file_metadata_dir.mkdir(exist_ok=True, parents=True)
 
-    for path in tqdm(new_activity_paths, desc="Parse activity files"):
-        activity_id = _get_file_hash(path)
-        timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
-        file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
-        work_tracker.mark_done(path)
+    with multiprocessing.Pool() as pool:
+        paths_with_errors = tqdm(
+            pool.imap(_cache_single_file, new_activity_paths),
+            desc="Parse activity metadata",
+            total=len(new_activity_paths),
+        )
+        paths_with_errors = [error for error in paths_with_errors if error]
 
-        error = _cache_single_file(path)
-        if error:
-            paths_with_errors.append(error)
+    for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
+        activity_id = _get_file_hash(path)
+        file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
 
         if not file_metadata_path.exists():
             continue
