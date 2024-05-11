@@ -5,6 +5,7 @@ import pickle
 import re
 import sys
 import traceback
+from typing import Optional
 
 import pandas as pd
 from tqdm import tqdm
@@ -44,27 +45,15 @@ def import_from_directory(
         file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
         work_tracker.mark_done(path)
 
-        if not timeseries_path.exists():
-            try:
-                activity_meta_from_file, timeseries = read_activity(path)
-            except ActivityParseError as e:
-                logger.error(f"Error while parsing file {path}:")
-                traceback.print_exc()
-                paths_with_errors.append((path, str(e)))
-                continue
-            except:
-                logger.error(f"Encountered a problem with {path=}, see details below.")
-                raise
+        error = _cache_single_file(path)
+        if error:
+            paths_with_errors.append(error)
 
-            if len(timeseries) == 0:
-                continue
+        if not file_metadata_path.exists():
+            continue
 
-            timeseries.to_parquet(timeseries_path)
-            with open(file_metadata_path, "wb") as f:
-                pickle.dump(activity_meta_from_file, f)
-        else:
-            with open(file_metadata_path, "rb") as f:
-                activity_meta_from_file = pickle.load(f)
+        with open(file_metadata_path, "rb") as f:
+            activity_meta_from_file = pickle.load(f)
 
         activity_meta = ActivityMeta(
             id=activity_id,
@@ -88,6 +77,33 @@ def import_from_directory(
     repository.commit()
 
     work_tracker.close()
+
+
+def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]:
+    activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
+    file_metadata_dir = pathlib.Path("Cache/Activity Metadata")
+
+    activity_id = _get_file_hash(path)
+    timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
+    file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
+
+    if not timeseries_path.exists():
+        try:
+            activity_meta_from_file, timeseries = read_activity(path)
+        except ActivityParseError as e:
+            logger.error(f"Error while parsing file {path}:")
+            traceback.print_exc()
+            return (path, str(e))
+        except:
+            logger.error(f"Encountered a problem with {path=}, see details below.")
+            raise
+
+        if len(timeseries) == 0:
+            return
+
+        timeseries.to_parquet(timeseries_path)
+        with open(file_metadata_path, "wb") as f:
+            pickle.dump(activity_meta_from_file, f)
 
 
 def _get_file_hash(path: pathlib.Path) -> int:
