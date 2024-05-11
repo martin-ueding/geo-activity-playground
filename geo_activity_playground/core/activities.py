@@ -37,6 +37,7 @@ class ActivityMeta(TypedDict):
     start_latitude: float
     start_longitude: float
     start: datetime.datetime
+    strides: int
 
 
 class ActivityRepository:
@@ -251,13 +252,13 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
     return geojson.dumps(feature_collection)
 
 
-def make_speed_color_bar(time_series: pd.DataFrame) -> dict:
+def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, str]:
     low, high = np.quantile(time_series["speed"].dropna(), [0.02, 0.98])
     cmap = matplotlib.colormaps["viridis"]
     clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
     colors = [
-        (speed, matplotlib.colors.to_hex(cmap(clamp_speed(speed))))
-        for speed in range(0, int(high + 1), 5)
+        (f"{speed:.1f}", matplotlib.colors.to_hex(cmap(clamp_speed(speed))))
+        for speed in np.linspace(low, high, 10)
     ]
     return {"low": low, "high": high, "colors": colors}
 
