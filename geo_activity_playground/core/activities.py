@@ -37,7 +37,7 @@ class ActivityMeta(TypedDict):
     start_latitude: float
     start_longitude: float
     start: datetime.datetime
-    strides: int
+    steps: int
 
 
 class ActivityRepository:

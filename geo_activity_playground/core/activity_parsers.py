@@ -171,7 +171,7 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                     if "total_calories" in fields:
                         metadata["calories"] = values["total_calories"]
                     if "total_strides" in fields:
-                        metadata["strides"] = values["total_strides"]
+                        metadata["steps"] = 2 * int(values["total_strides"])
 
     return metadata, pd.DataFrame(rows)
 
