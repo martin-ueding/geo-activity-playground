@@ -51,6 +51,7 @@ def import_from_directory(
     for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
         activity_id = _get_file_hash(path)
         file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
+        work_tracker.mark_done(activity_id)
 
         if not file_metadata_path.exists():
             continue
