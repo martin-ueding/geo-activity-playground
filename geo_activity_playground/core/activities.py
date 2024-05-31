@@ -228,7 +228,9 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
 
 
 def make_geojson_color_line(time_series: pd.DataFrame) -> str:
-    low, high = np.quantile(time_series["speed"].dropna(), [0.02, 0.98])
+    speed_without_na = time_series["speed"].dropna()
+    low = min(speed_without_na)
+    high = max(speed_without_na)
     clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
 
     cmap = matplotlib.colormaps["viridis"]
@@ -253,7 +255,9 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
 
 
 def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, str]:
-    low, high = np.quantile(time_series["speed"].dropna(), [0.02, 0.98])
+    speed_without_na = time_series["speed"].dropna()
+    low = min(speed_without_na)
+    high = max(speed_without_na)
     cmap = matplotlib.colormaps["viridis"]
     clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
     colors = [
