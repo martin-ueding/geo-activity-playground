@@ -31,6 +31,12 @@ from geo_activity_playground.webui.tile_controller import (
 def route_activity(app: Flask, repository: ActivityRepository) -> None:
     activity_controller = ActivityController(repository)
 
+    @app.route("/activity/all")
+    def activity_all():
+        return render_template(
+            "activity-lines.html.j2", **activity_controller.render_all()
+        )
+
     @app.route("/activity/<id>")
     def activity(id: str):
         return render_template(
