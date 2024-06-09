@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.21.2
+
+- Fix crash in search due to missing `distance/km`.
+
 ### Version 0.21.1
 
 - Add support for Python 3.12.
