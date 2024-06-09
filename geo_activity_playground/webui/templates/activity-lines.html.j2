@@ -1,0 +1,36 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>All Activity Lines</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div id="activity-map" style="height: 500px;"></div>
+        <script>
+            function onEachFeature(feature, layer) {
+                layer.bindPopup(`<a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>`)
+            }
+
+            var map = L.map('activity-map', {
+                fullscreenControl: true
+            });
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            let geojson = L.geoJSON({{ geojson| safe }}, {
+                style: function (feature) { return { color: feature.properties.color } },
+                onEachFeature: onEachFeature
+            }).addTo(map)
+            map.fitBounds(geojson.getBounds());
+        </script>
+    </div>
+</div>
+
+{% endblock %}

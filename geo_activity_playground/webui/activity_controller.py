@@ -112,6 +112,38 @@ class ActivityController:
             "date": datetime.date(year, month, day).isoformat(),
         }
 
+    def render_all(self) -> dict:
+        cmap = matplotlib.colormaps["Dark2"]
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.MultiLineString(
+                        coordinates=[
+                            [
+                                [lon, lat]
+                                for lat, lon in zip(
+                                    group["latitude"], group["longitude"]
+                                )
+                            ]
+                            for _, group in self._repository.get_time_series(
+                                activity["id"]
+                            ).groupby("segment_id")
+                        ]
+                    ),
+                    properties={
+                        "color": matplotlib.colors.to_hex(cmap(i % 8)),
+                        "activity_name": activity["name"],
+                        "activity_id": str(activity["id"]),
+                    },
+                )
+                for i, activity in enumerate(self._repository.iter_activities())
+            ]
+        )
+
+        return {
+            "geojson": geojson.dumps(fc),
+        }
+
     def render_name(self, name: str) -> dict:
         meta = self._repository.meta
         selection = meta["name"] == name
