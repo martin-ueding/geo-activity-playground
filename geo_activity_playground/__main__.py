@@ -122,6 +122,12 @@ def make_activity_repository(
     if "strava" in config and not skip_strava:
         import_from_strava_api(repository)
 
+    if len(repository) == 0:
+        logger.error(
+            f"No activities found. You need to either add activity files (GPX, FIT, …) to {basedir/'Activities'} or set up the Strava API. Starting without any activities is unfortunately not supported."
+        )
+        sys.exit(1)
+
     embellish_time_series(repository)
     compute_tile_visits(repository)
     compute_tile_evolution()
