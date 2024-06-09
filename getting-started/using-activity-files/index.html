@@ -887,95 +887,21 @@
 <p>Create a directory somewhere, this will be your <em>playground</em>. I have mine in <code>~/Dokumente/Karten/Playground</code>, but you can put yours wherever you would like.</p>
 <p>Inside <code>Playground</code>, create another directory <code>Activities</code> where your activity files will go. You will need to put at least one activity file in there, otherwise the program cannot start. The program will not modify files in that directory and treat them as read-only.</p>
 <h2 id="directory-structure">Directory structure</h2>
-<p>Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. If you prefer to have the metadata from the path and filename to override what is inside the file, add the following line to the top of your configuration file:</p>
-<div class="highlight"><pre><span></span><code><span class="n">prefer_metadata_from_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<p>Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. By default only the stem of the path (the part without the suffix) will be used to derive the name of the activity. If you want, you can use a naming and directory structure to fill in more meta data using regular expressions.</p>
+<p>Each activity has the metadata fields <code>kind</code>, <code>equipment</code> and <code>name</code>. The kind and equipment are extracted from the activity file. If there nothing is found, it defaults to “Unknown”. Using a regular expression with named capture groups one can extract these fields also from the files. I for instance have the following file paths:</p>
+<ul>
+<li><code>Ride/Trekking Bike/Home to Bakery/2024-03-03-17-42-10.fit</code></li>
+<li><code>Hike/Hiking Boots 2019/2024-03-03-11-03-18 Some nice place with Alice and Bob.fit</code></li>
+</ul>
+<p>My structure is built such that the first directory level corresponds to the activity kind. The second level is the equipment used. Unique activities are directly in there as files. But there can also be a directory for the name and then just files with only the date as name. This way I can just put a lot of similar commutes there without having to name the files. In the first example I want it to take the name from the third directory. In either case I don't want to have the date to be part of the name.</p>
+<p>In order to extract this data, I specify a list of regular expressions with named capture groups like <code>(?P&lt;name&gt;…)</code> where <code>name</code> is the field that you want to populate and <code>…</code> some regular expression. The program will try to <em>search</em> (not <em>match</em>) the whole relative path of the activity to the regular expressions in the order given in the list. When it finds a match, it will take the capture groups, populate the metadata and stop evaluating more of the expressions. In my case they look like this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">metadata_extraction_regexes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s1">&#39;(?P&lt;kind&gt;[^/]+)/(?P&lt;equipment&gt;[^/]+)/(?P&lt;name&gt;[^/]+)/&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;(?P&lt;kind&gt;[^/]+)/(?P&lt;equipment&gt;[^/]+)/[-\d_ ]+(?P&lt;name&gt;[^/]+)(?:\.\w+)+$&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;(?P&lt;kind&gt;[^/]+)/[-\d_ ]+(?P&lt;name&gt;[^/]+)(?:\.\w+)+$&#39;</span><span class="p">,</span>
+<span class="p">]</span>
 </code></pre></div>
-<p>With that disabled, you are free to do the following.</p>
-<p>Inside the <code>Activities</code> you can dump all your files in a flat fashion. If you want to add some more metadata, use the following directory layout.</p>
-<p>The first directory level will indicate the type of the activity. You can pick whatever make sense for you, classic options are <em>ride</em>, <em>run</em>, <em>walk</em>, <em>hike</em>. Then the second level will indicate your equipment. You can use terms like “rental bike”, the brand and make of your shoes or whatever you find sensible. Specifying the equipment allows to track the total distance traveled with a given equipment.</p>
-<p>At any level you can have a special directory <code>Commute</code>. All activities inside of that will be marked as commutes and not highlighted as much as non-commute activities. The idea is that you can find your cool activities along potentially many commutes.</p>
-<p>Other directory names on the third level will just be ignored, you can use those to organize your activities further in some sense.</p>
-<p>Let us take the following directory/file structure as an example:</p>
-<div class="highlight"><pre><span></span><code>Activities
-├── Commute
-│   └── From the Beach.gpx
-├── Ride
-│   └── Rental Bike
-│       ├── Beach Rides
-│       │   └── Breskens.gpx
-│       └── Zwin.gpx
-├── To Piazza.gpx
-└── Walk
-    ├── Commute
-    │   └── To the Beach.gpx
-    ├── New Balance Fresh Foam 860v11
-    │   ├── Beach Walk.gpx
-    │   └── Commute
-    │       └── From Piazza.gpx
-    └── Nieuvfliet.gpx
-</code></pre></div>
-<p>You can see that I have one file on the top level (<code>To Piazza.gpx</code>), a file on the first level (<code>Walk/Nieuvfliet.gpx</code>), some on the second level (<code>Ride/Rental Bike/Zwin.gpx</code>), one commute (<code>Walk/New Balance Fresh Foam 860v11/Commute/From Piazza.gpx</code>) and one with a group directory which isn't commuting (<code>Ride/Rental Bike/Dunes in Sluis/Breskens.gpx</code>). From this the program will extract the following metadata:</p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Equipment</th>
-<th>Commute</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>From the Beach</td>
-<td><em>None</em></td>
-<td><em>None</em></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Breskens</td>
-<td>Ride</td>
-<td>Rental Bike</td>
-<td>No</td>
-</tr>
-<tr>
-<td>Zwin</td>
-<td>Ride</td>
-<td>Rental Bike</td>
-<td>No</td>
-</tr>
-<tr>
-<td>To Piazza</td>
-<td><em>None</em></td>
-<td><em>None</em></td>
-<td>No</td>
-</tr>
-<tr>
-<td>To the Beach</td>
-<td>Walk</td>
-<td><em>None</em></td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Beach Walk</td>
-<td>Walk</td>
-<td>New Balance Fresh Foam 860v11</td>
-<td>No</td>
-</tr>
-<tr>
-<td>From Piazza</td>
-<td>Walk</td>
-<td>New Balance Fresh Foam 860v11</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>Nieuwvliet</td>
-<td>Walk</td>
-<td><em>None</em></td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<p>The file name of your activity will become the name of the activity.</p>
+<p>Put something like that at the top of your <code>config.toml</code> in order to extract metadata from the files and have it override metadata from the within the files.</p>
 <h2 id="supported-file-formats">Supported file formats</h2>
 <p>At the moment the following file formats are supported:</p>
 <ol>

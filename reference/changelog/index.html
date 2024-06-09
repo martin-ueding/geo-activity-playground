@@ -762,18 +762,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#version-0200" class="md-nav__link">
+  <a href="#version-0210" class="md-nav__link">
     <span class="md-ellipsis">
-      Version 0.20.0
+      Version 0.21.0
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#version-0191" class="md-nav__link">
+  <a href="#version-0200" class="md-nav__link">
     <span class="md-ellipsis">
-      Version 0.19.1
+      Version 0.20.0
     </span>
   </a>
   
@@ -785,6 +785,30 @@
       Version 0.19
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Version 0.19">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0191" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-0190" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1271,18 +1295,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#version-0200" class="md-nav__link">
+  <a href="#version-0210" class="md-nav__link">
     <span class="md-ellipsis">
-      Version 0.20.0
+      Version 0.21.0
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#version-0191" class="md-nav__link">
+  <a href="#version-0200" class="md-nav__link">
     <span class="md-ellipsis">
-      Version 0.19.1
+      Version 0.20.0
     </span>
   </a>
   
@@ -1294,6 +1318,30 @@
       Version 0.19
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Version 0.19">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-0191" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-0190" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1726,25 +1774,47 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-0210">Version 0.21.0</h3>
+<ul>
+<li>
+<p><strong>Breaking change:</strong> New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used <code>prefer_metadata_from_file</code> before, see the <a href="../../getting-started/using-activity-files/">documentation on activity files</a> for the new way.</p>
+</li>
+<li>
+<p><a href="https://github.com/martin-ueding/geo-activity-playground/issues/105">GH-105</a>: Ignore similar activities that have vanished.</p>
+</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/106">GH-106</a>: Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/107">GH-107</a>: Remove warning by fixing a Pandas slice assignment.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/108">GH-108</a>: Calories and steps are now extracted from FIT files.</li>
+<li>
+<p><a href="https://github.com/martin-ueding/geo-activity-playground/issues/109">GH-109</a>: Better error message when trying to start up without any activity files.</p>
+</li>
+<li>
+<p>Removed <code>imagehash</code> from the dependencies.</p>
+</li>
+<li>Single day overview is now linked from each activity.</li>
+<li>Parsing of activity files is now parallelized over all CPU cores and faster than before.</li>
+<li>The coloring of the speed along the activity line doesn't remove outliers any more.</li>
+</ul>
 <h3 id="version-0200">Version 0.20.0</h3>
 <ul>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>: Fix failure to import Strava distance stream due to <code>unsupported operand type(s) for /: 'list' and 'int'</code>. </li>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/90">GH-90</a>: Take time jumps into account in activity distance computation and the various plots of the activities. </li>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/pull/91">GH-91</a>: Import altitude information from GPX files if available. </li>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/92">GH-92</a>: Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. </li>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/99">GH-99</a>: Skip Strava export activities that don't have a file. </li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>: Fix failure to import Strava distance stream due to <code>unsupported operand type(s) for /: 'list' and 'int'</code>.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/90">GH-90</a>: Take time jumps into account in activity distance computation and the various plots of the activities.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/pull/91">GH-91</a>: Import altitude information from GPX files if available.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/92">GH-92</a>: Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/99">GH-99</a>: Skip Strava export activities that don't have a file.</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/98">GH-98</a>: Also accept boolean values in commute column of Strava's <code>activities.csv</code>.</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/100">GH-100</a>: Protect fingerprint computation from bogus values</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/102">GH-102</a>: Make dependency on <code>vegafusion[embed]</code> explicit in the dependencies.</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/103">GH-103</a>: Delete old pickle file before moving the new one onto it.</li>
 </ul>
-<h3 id="version-0191">Version 0.19.1</h3>
+<h3 id="version-019">Version 0.19</h3>
+<h4 id="version-0191">Version 0.19.1</h4>
 <ul>
 <li>Fix broken import of CSV files due to missing argument <code>opener</code>.</li>
 </ul>
-<h3 id="version-019">Version 0.19</h3>
+<h4 id="version-0190">Version 0.19.0</h4>
 <ul>
-<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>: Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field <code>distance_km</code> and everything is represented as kilometer internally now. </li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>: Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field <code>distance_km</code> and everything is represented as kilometer internally now.</li>
 <li>Add more tooltip information in the plot on the landing page.</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/87">GH-87</a>: Add <code>prefer_metadata_from_file</code> configuration option.</li>
 <li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/17">GH-17</a>: Download calories from Strava via the detailed API.</li>
