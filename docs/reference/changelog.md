@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.21.1
+
+- Add support for Python 3.12.
+
 ### Version 0.21.0
 
 - **Breaking change:** New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the [documentation on activity files](../getting-started/using-activity-files.md) for the new way.
