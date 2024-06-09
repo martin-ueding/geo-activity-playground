@@ -13,6 +13,13 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105): Ignore similar activities that have vanished.
 - [GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106): Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now.
 - [GH-107](https://github.com/martin-ueding/geo-activity-playground/issues/107): Remove warning by fixing a Pandas slice assignment.
+- [GH-108](https://github.com/martin-ueding/geo-activity-playground/issues/108): Calories and steps are now extracted from FIT files.
+- [GH-109](https://github.com/martin-ueding/geo-activity-playground/issues/109): Better error message when trying to start up without any activity files.
+
+- Removed `imagehash` from the dependencies.
+- Single day overview is now linked from each activity.
+- Parsing of activity files is now parallelized over all CPU cores and faster than before.
+- The coloring of the speed along the activity line doesn't remove outliers any more.
 
 ### Version 0.20.0
 
