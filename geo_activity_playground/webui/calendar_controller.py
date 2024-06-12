@@ -1,6 +1,5 @@
 import collections
 import datetime
-import functools
 
 from geo_activity_playground.core.activities import ActivityRepository
 
@@ -9,7 +8,6 @@ class CalendarController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
 
-    @functools.cache
     def render_overview(self) -> dict:
         meta = self._repository.meta.copy()
         meta["date"] = meta["start"].dt.date
@@ -41,7 +39,6 @@ class CalendarController:
             "yearly_distances": yearly_distances,
         }
 
-    @functools.cache
     def render_month(self, year: int, month: int) -> dict:
         meta = self._repository.meta.copy()
         meta["date"] = meta["start"].dt.date

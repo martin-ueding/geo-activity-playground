@@ -1,5 +1,4 @@
 import datetime
-import functools
 import itertools
 import pickle
 
@@ -33,7 +32,6 @@ class ExplorerController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
 
-    @functools.cache
     def render(self, zoom: int) -> dict:
         with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
             tile_evolution_states = pickle.load(f)

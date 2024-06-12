@@ -1,4 +1,3 @@
-import functools
 import pickle
 
 import geojson
@@ -79,11 +78,9 @@ class SquarePlannerController:
         elif suffix == "gpx":
             return make_grid_file_gpx(points)
 
-    @functools.cache
     def _get_explored_tiles(self, zoom: int) -> set[tuple[int, int]]:
         return set(self._tile_visits[zoom].keys())
 
-    @functools.cache
     def _get_explored_geojson(self, zoom: int) -> str:
         return geojson.dumps(
             geojson.FeatureCollection(

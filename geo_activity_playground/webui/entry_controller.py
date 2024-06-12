@@ -1,5 +1,4 @@
 import datetime
-import functools
 import itertools
 
 import altair as alt
@@ -13,7 +12,6 @@ class EntryController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
 
-    @functools.cache
     def render(self) -> dict:
         result = {
             "distance_last_30_days_plot": distance_last_30_days_meta_plot(

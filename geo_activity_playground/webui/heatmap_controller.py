@@ -1,11 +1,8 @@
-import functools
 import io
 import logging
 import pathlib
 import pickle
-import threading
 
-import matplotlib
 import matplotlib.pylab as pl
 import numpy as np
 import pandas as pd
@@ -45,7 +42,6 @@ class HeatmapController:
         with open(TILE_VISITS_PATH, "rb") as f:
             self.tile_visits = pickle.load(f)
 
-    @functools.cache
     def render(self) -> dict:
         zoom = 14
         tiles = self.tile_histories[zoom]

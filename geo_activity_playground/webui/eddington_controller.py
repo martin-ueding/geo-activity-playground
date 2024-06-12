@@ -1,5 +1,3 @@
-import functools
-
 import altair as alt
 import numpy as np
 import pandas as pd
@@ -11,7 +9,6 @@ class EddingtonController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
 
-    @functools.cache
     def render(self) -> dict:
         activities = self._repository.meta.copy()
         activities["day"] = [start.date() for start in activities["start"]]
