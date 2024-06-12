@@ -25,6 +25,27 @@ TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
 TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
 
 
+class TileVisitAccessor:
+    TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
+    TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
+    TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
+
+    def __init__(self) -> None:
+        self.tile_visits: dict[
+            int, dict[tuple[int, int], dict[str, Any]]
+        ] = try_load_pickle(TILE_VISITS_PATH) or collections.defaultdict(dict)
+        self.tile_history: dict[int, pd.DataFrame] = try_load_pickle(
+            TILE_HISTORIES_PATH
+        ) or collections.defaultdict(pd.DataFrame)
+
+    def save(self) -> None:
+        with open(TILE_VISITS_PATH, "wb") as f:
+            pickle.dump(self.tile_visits, f)
+
+        with open(TILE_HISTORIES_PATH, "wb") as f:
+            pickle.dump(self.tile_history, f)
+
+
 def compute_tile_visits(repository: ActivityRepository) -> None:
     tile_visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
         TILE_VISITS_PATH

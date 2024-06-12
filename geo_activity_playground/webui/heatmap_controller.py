@@ -33,7 +33,6 @@ OSM_TILE_SIZE = 256  # OSM tile size in pixel
 class HeatmapController:
     def __init__(self, repository: ActivityRepository) -> None:
         self._repository = repository
-        self._all_points = pd.DataFrame()
 
         with open(TILE_HISTORIES_PATH, "rb") as f:
             self.tile_histories = pickle.load(f)
@@ -54,11 +53,13 @@ class HeatmapController:
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
-                "bbox": bounding_box_for_biggest_cluster(
-                    cluster_state.clusters.values(), zoom
-                )
-                if len(cluster_state.memberships) > 0
-                else {},
+                "bbox": (
+                    bounding_box_for_biggest_cluster(
+                        cluster_state.clusters.values(), zoom
+                    )
+                    if len(cluster_state.memberships) > 0
+                    else {}
+                ),
             }
         }
 
