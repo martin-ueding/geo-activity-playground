@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import sys
 
@@ -37,7 +38,11 @@ class UploadController:
         self._config = config
 
     def render_form(self) -> dict:
-        return {}
+        directories = []
+        for root, dirs, files in os.walk("Activities"):
+            directories.append(root)
+        directories.sort()
+        return {"directories": directories}
 
     def receive(self) -> Response:
         # check if the post request has the file part
@@ -52,14 +57,25 @@ class UploadController:
             return redirect(request.url)
         if file:
             filename = secure_filename(file.filename)
-            file.save(pathlib.Path("Activities") / filename)
+            target_path = pathlib.Path(request.form["directory"]) / filename
+            assert target_path.suffix in [
+                ".csv",
+                ".fit",
+                ".gpx",
+                ".gz",
+                ".kml",
+                ".kmz",
+                ".tcx",
+            ]
+            assert target_path.is_relative_to("Activities")
+            file.save(target_path)
             scan_for_activities(
                 self._repository,
                 self._tile_visit_accessor,
                 self._config,
                 skip_strava=True,
             )
-            activity_id = get_file_hash(pathlib.Path("Activities") / filename)
+            activity_id = get_file_hash(target_path)
             return redirect(f"/activity/{activity_id}")
 
 
