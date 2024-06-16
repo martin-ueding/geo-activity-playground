@@ -9,6 +9,7 @@ from flask import Response
 from .locations_controller import LocationsController
 from .search_controller import SearchController
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.activity_controller import ActivityController
 from geo_activity_playground.webui.calendar_controller import CalendarController
 from geo_activity_playground.webui.config_controller import ConfigController
@@ -113,8 +114,10 @@ def route_equipment(app: Flask, repository: ActivityRepository) -> None:
         return render_template("equipment.html.j2", **equipment_controller.render())
 
 
-def route_explorer(app: Flask, repository: ActivityRepository) -> None:
-    explorer_controller = ExplorerController(repository)
+def route_explorer(
+    app: Flask, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+) -> None:
+    explorer_controller = ExplorerController(repository, tile_visit_accessor)
 
     @app.route("/explorer/<zoom>")
     def explorer(zoom: str):
@@ -159,8 +162,10 @@ def route_explorer(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
-def route_heatmap(app: Flask, repository: ActivityRepository) -> None:
-    heatmap_controller = HeatmapController(repository)
+def route_heatmap(
+    app: Flask, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+) -> None:
+    heatmap_controller = HeatmapController(repository, tile_visit_accessor)
 
     @app.route("/heatmap")
     def heatmap():
@@ -207,8 +212,10 @@ def route_search(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
-def route_square_planner(app: Flask, repository: ActivityRepository) -> None:
-    controller = SquarePlannerController(repository)
+def route_square_planner(
+    app: Flask, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+) -> None:
+    controller = SquarePlannerController(repository, tile_visit_accessor)
 
     @app.route("/square-planner/<zoom>/<x>/<y>/<size>")
     def square_planner_planner(zoom, x, y, size):
@@ -303,7 +310,12 @@ def route_tiles(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
-def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
+def webui_main(
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    host: str,
+    port: int,
+) -> None:
     app = Flask(__name__)
 
     route_activity(app, repository)
@@ -311,11 +323,11 @@ def webui_main(repository: ActivityRepository, host: str, port: int) -> None:
     route_config(app, repository)
     route_eddington(app, repository)
     route_equipment(app, repository)
-    route_explorer(app, repository)
-    route_heatmap(app, repository)
+    route_explorer(app, repository, tile_visit_accessor)
+    route_heatmap(app, repository, tile_visit_accessor)
     route_locations(app, repository)
     route_search(app, repository)
-    route_square_planner(app, repository)
+    route_square_planner(app, repository, tile_visit_accessor)
     route_start(app, repository)
     route_strava(app, host, port)
     route_summary(app, repository)

@@ -8,15 +8,17 @@ from geo_activity_playground.explorer.grid_file import make_explorer_tile
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
 from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 
 class SquarePlannerController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(
+        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    ) -> None:
         self._repository = repository
+        self._tile_visit_accessor = tile_visit_accessor
 
-        with open(TILE_VISITS_PATH, "rb") as f:
-            self._tile_visits = pickle.load(f)
+        self._tile_visits = self._tile_visit_accessor.visits
 
     def action_planner(
         self, zoom: int, square_x: int, square_y: int, square_size: int

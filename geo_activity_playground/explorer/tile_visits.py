@@ -20,10 +20,6 @@ from geo_activity_playground.core.tiles import interpolate_missing_tile
 
 logger = logging.getLogger(__name__)
 
-TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
-TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
-TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
-
 
 class TileVisitAccessor:
     TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
@@ -31,28 +27,32 @@ class TileVisitAccessor:
     TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
 
     def __init__(self) -> None:
-        self.tile_visits: dict[
-            int, dict[tuple[int, int], dict[str, Any]]
-        ] = try_load_pickle(TILE_VISITS_PATH) or collections.defaultdict(dict)
-        self.tile_history: dict[int, pd.DataFrame] = try_load_pickle(
-            TILE_HISTORIES_PATH
+        self.visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
+            self.TILE_VISITS_PATH
+        ) or collections.defaultdict(dict)
+
+        self.histories: dict[int, pd.DataFrame] = try_load_pickle(
+            self.TILE_HISTORIES_PATH
         ) or collections.defaultdict(pd.DataFrame)
 
+        self.states = try_load_pickle(
+            self.TILE_EVOLUTION_STATES_PATH
+        ) or collections.defaultdict(TileEvolutionState)
+
     def save(self) -> None:
-        with open(TILE_VISITS_PATH, "wb") as f:
-            pickle.dump(self.tile_visits, f)
+        with open(self.TILE_VISITS_PATH, "wb") as f:
+            pickle.dump(self.visits, f)
 
-        with open(TILE_HISTORIES_PATH, "wb") as f:
-            pickle.dump(self.tile_history, f)
+        with open(self.TILE_HISTORIES_PATH, "wb") as f:
+            pickle.dump(self.histories, f)
+
+        with open(self.TILE_EVOLUTION_STATES_PATH, "wb") as f:
+            pickle.dump(self.states, f)
 
 
-def compute_tile_visits(repository: ActivityRepository) -> None:
-    tile_visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
-        TILE_VISITS_PATH
-    ) or collections.defaultdict(dict)
-    tile_history: dict[int, pd.DataFrame] = try_load_pickle(
-        TILE_HISTORIES_PATH
-    ) or collections.defaultdict(pd.DataFrame)
+def compute_tile_visits(
+    repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
+) -> None:
 
     work_tracker = WorkTracker("tile-visits")
     activity_ids_to_process = work_tracker.filter(repository.activity_ids)
@@ -64,8 +64,8 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
         for zoom in range(20):
             for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
                 tile = (tile_x, tile_y)
-                if tile in tile_visits[zoom]:
-                    d = tile_visits[zoom][tile]
+                if tile in tile_visits_accessor.visits[zoom]:
+                    d = tile_visits_accessor.visits[zoom][tile]
                     if d["first_time"] > time:
                         d["first_time"] = time
                         d["first_id"] = activity_id
@@ -74,7 +74,7 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
                         d["last_id"] = activity_id
                     d["activity_ids"].add(activity_id)
                 else:
-                    tile_visits[zoom][tile] = {
+                    tile_visits_accessor.visits[zoom][tile] = {
                         "first_time": time,
                         "first_id": activity_id,
                         "last_time": time,
@@ -92,16 +92,14 @@ def compute_tile_visits(repository: ActivityRepository) -> None:
         work_tracker.mark_done(activity_id)
 
     if activity_ids_to_process:
-        with open(TILE_VISITS_PATH, "wb") as f:
-            pickle.dump(tile_visits, f)
-
         for zoom, new_rows in new_tile_history_rows.items():
             new_df = pd.DataFrame(new_rows)
             new_df.sort_values("time", inplace=True)
-            tile_history[zoom] = pd.concat([tile_history[zoom], new_df])
+            tile_visits_accessor.histories[zoom] = pd.concat(
+                [tile_visits_accessor.histories[zoom], new_df]
+            )
 
-        with open(TILE_HISTORIES_PATH, "wb") as f:
-            pickle.dump(tile_history, f)
+        tile_visits_accessor.save()
 
     work_tracker.close()
 
@@ -144,23 +142,19 @@ class TileEvolutionState:
         self.square_y: Optional[int] = None
 
 
-def compute_tile_evolution() -> None:
-    with open(TILE_HISTORIES_PATH, "rb") as f:
-        tile_histories = pickle.load(f)
-
-    states = try_load_pickle(TILE_EVOLUTION_STATES_PATH) or collections.defaultdict(
-        TileEvolutionState
-    )
-
+def compute_tile_evolution(tile_visits_accessor: TileVisitAccessor) -> None:
     zoom_levels = list(reversed(list(range(20))))
 
     for zoom in tqdm(zoom_levels, desc="Compute explorer cluster evolution"):
-        _compute_cluster_evolution(tile_histories[zoom], states[zoom])
+        _compute_cluster_evolution(
+            tile_visits_accessor.histories[zoom], tile_visits_accessor.states[zoom]
+        )
     for zoom in tqdm(zoom_levels, desc="Compute explorer square evolution"):
-        _compute_square_history(tile_histories[zoom], states[zoom])
+        _compute_square_history(
+            tile_visits_accessor.histories[zoom], tile_visits_accessor.states[zoom]
+        )
 
-    with open(TILE_EVOLUTION_STATES_PATH, "wb") as f:
-        pickle.dump(states, f)
+    tile_visits_accessor.save()
 
 
 def _compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> None:

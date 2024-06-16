@@ -16,9 +16,7 @@ from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.tile_visits import TILE_EVOLUTION_STATES_PATH
-from geo_activity_playground.explorer.tile_visits import TILE_HISTORIES_PATH
-from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.explorer_controller import (
     bounding_box_for_biggest_cluster,
 )
@@ -31,15 +29,15 @@ OSM_TILE_SIZE = 256  # OSM tile size in pixel
 
 
 class HeatmapController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(
+        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    ) -> None:
         self._repository = repository
+        self._tile_visit_accessor = tile_visit_accessor
 
-        with open(TILE_HISTORIES_PATH, "rb") as f:
-            self.tile_histories = pickle.load(f)
-        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
-            self.tile_evolution_states = pickle.load(f)
-        with open(TILE_VISITS_PATH, "rb") as f:
-            self.tile_visits = pickle.load(f)
+        self.tile_histories = self._tile_visit_accessor.histories
+        self.tile_evolution_states = self._tile_visit_accessor.states
+        self.tile_visits = self._tile_visit_accessor.visits
 
     def render(self) -> dict:
         zoom = 14

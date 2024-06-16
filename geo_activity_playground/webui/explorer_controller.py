@@ -19,26 +19,24 @@ from geo_activity_playground.explorer.grid_file import make_explorer_tile
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
 from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import TILE_EVOLUTION_STATES_PATH
-from geo_activity_playground.explorer.tile_visits import TILE_HISTORIES_PATH
-from geo_activity_playground.explorer.tile_visits import TILE_VISITS_PATH
 from geo_activity_playground.explorer.tile_visits import TileEvolutionState
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 
 alt.data_transformers.enable("vegafusion")
 
 
 class ExplorerController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(
+        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    ) -> None:
         self._repository = repository
+        self._tile_visit_accessor = tile_visit_accessor
 
     def render(self, zoom: int) -> dict:
-        with open(TILE_EVOLUTION_STATES_PATH, "rb") as f:
-            tile_evolution_states = pickle.load(f)
-        with open(TILE_VISITS_PATH, "rb") as f:
-            tile_visits = pickle.load(f)
-        with open(TILE_HISTORIES_PATH, "rb") as f:
-            tile_histories = pickle.load(f)
+        tile_evolution_states = self._tile_visit_accessor.states
+        tile_visits = self._tile_visit_accessor.visits
+        tile_histories = self._tile_visit_accessor.histories
 
         medians = tile_histories[zoom].median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
@@ -77,8 +75,7 @@ class ExplorerController:
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        with open(TILE_HISTORIES_PATH, "rb") as f:
-            tile_histories = pickle.load(f)
+        tile_histories = self._tile_visit_accessor.histories
         tiles = tile_histories[zoom]
         points = get_border_tiles(tiles, zoom, tile_bounds)
         if suffix == "geojson":
@@ -91,8 +88,7 @@ class ExplorerController:
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        with open(TILE_VISITS_PATH, "rb") as f:
-            tile_visits = pickle.load(f)
+        tile_visits = self._tile_visit_accessor.visits
         tiles = tile_visits[zoom]
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom

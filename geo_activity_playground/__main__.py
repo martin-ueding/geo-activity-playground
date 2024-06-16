@@ -14,6 +14,7 @@ from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.importers.strava_api import import_from_strava_api
@@ -68,7 +69,7 @@ def main() -> None:
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
         func=lambda options: webui_main(
-            make_activity_repository(options.basedir, options.skip_strava),
+            *make_activity_repository(options.basedir, options.skip_strava),
             host=options.host,
             port=options.port,
         )
@@ -99,7 +100,7 @@ def main() -> None:
 
 def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
-) -> ActivityRepository:
+) -> tuple[ActivityRepository, TileVisitAccessor]:
     os.chdir(basedir)
     apply_cache_migrations()
     config = get_config()
@@ -128,10 +129,12 @@ def make_activity_repository(
         )
         sys.exit(1)
 
+    tile_visits_accessor = TileVisitAccessor()
+
     embellish_time_series(repository)
-    compute_tile_visits(repository)
-    compute_tile_evolution()
-    return repository
+    compute_tile_visits(repository, tile_visits_accessor)
+    compute_tile_evolution(tile_visits_accessor)
+    return repository, tile_visits_accessor
 
 
 if __name__ == "__main__":
