@@ -98,6 +98,33 @@ def main() -> None:
     options.func(options)
 
 
+def scan_for_activities(
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: dict,
+    skip_strava: bool = False,
+) -> None:
+    if pathlib.Path("Activities").exists():
+        import_from_directory(
+            repository,
+            config.get("metadata_extraction_regexes", []),
+        )
+    if pathlib.Path("Strava Export").exists():
+        import_from_strava_checkout(repository)
+    if "strava" in config and not skip_strava:
+        import_from_strava_api(repository)
+
+    if len(repository) == 0:
+        logger.error(
+            f"No activities found. You need to either add activity files (GPX, FIT, …) to {pathlib.Path('Activities')} or set up the Strava API. Starting without any activities is unfortunately not supported."
+        )
+        sys.exit(1)
+
+    embellish_time_series(repository)
+    compute_tile_visits(repository, tile_visit_accessor)
+    compute_tile_evolution(tile_visit_accessor)
+
+
 def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
 ) -> tuple[ActivityRepository, TileVisitAccessor]:
@@ -112,28 +139,11 @@ def make_activity_repository(
         sys.exit(1)
 
     repository = ActivityRepository()
-    tile_visits_accessor = TileVisitAccessor()
+    tile_visit_accessor = TileVisitAccessor()
 
-    if pathlib.Path("Activities").exists():
-        import_from_directory(
-            repository,
-            config.get("metadata_extraction_regexes", []),
-        )
-    if pathlib.Path("Strava Export").exists():
-        import_from_strava_checkout(repository)
-    if "strava" in config and not skip_strava:
-        import_from_strava_api(repository)
+    scan_for_activities(repository, tile_visit_accessor, config, skip_strava)
 
-    if len(repository) == 0:
-        logger.error(
-            f"No activities found. You need to either add activity files (GPX, FIT, …) to {basedir/'Activities'} or set up the Strava API. Starting without any activities is unfortunately not supported."
-        )
-        sys.exit(1)
-
-    embellish_time_series(repository)
-    compute_tile_visits(repository, tile_visits_accessor)
-    compute_tile_evolution(tile_visits_accessor)
-    return repository, tile_visits_accessor
+    return repository, tile_visit_accessor
 
 
 if __name__ == "__main__":
