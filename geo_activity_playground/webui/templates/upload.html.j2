@@ -1,0 +1,16 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-1">
+    <div class="col">
+        <h1>Upload Activity</h1>
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

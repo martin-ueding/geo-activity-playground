@@ -27,6 +27,7 @@ from geo_activity_playground.webui.summary_controller import SummaryController
 from geo_activity_playground.webui.tile_controller import (
     TileController,
 )
+from geo_activity_playground.webui.upload_controller import UploadController
 
 
 def route_activity(app: Flask, repository: ActivityRepository) -> None:
@@ -310,6 +311,18 @@ def route_tiles(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
+def route_upload(app: Flask):
+    upload_controller = UploadController()
+
+    @app.route("/upload")
+    def form():
+        return render_template("upload.html.j2", **upload_controller.render_form())
+
+    @app.route("/upload/receive", methods=["POST"])
+    def receive():
+        upload_controller.receive()
+
+
 def webui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
@@ -332,5 +345,8 @@ def webui_main(
     route_strava(app, host, port)
     route_summary(app, repository)
     route_tiles(app, repository)
+    route_upload(app)
+
+    app.config["UPLOAD_FOLDER"] = "Activities"
 
     app.run(host=host, port=port)

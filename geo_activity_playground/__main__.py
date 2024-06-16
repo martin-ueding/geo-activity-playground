@@ -112,6 +112,7 @@ def make_activity_repository(
         sys.exit(1)
 
     repository = ActivityRepository()
+    tile_visits_accessor = TileVisitAccessor()
 
     if pathlib.Path("Activities").exists():
         import_from_directory(
@@ -128,8 +129,6 @@ def make_activity_repository(
             f"No activities found. You need to either add activity files (GPX, FIT, …) to {basedir/'Activities'} or set up the Strava API. Starting without any activities is unfortunately not supported."
         )
         sys.exit(1)
-
-    tile_visits_accessor = TileVisitAccessor()
 
     embellish_time_series(repository)
     compute_tile_visits(repository, tile_visits_accessor)
