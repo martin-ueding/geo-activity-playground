@@ -3,6 +3,7 @@ import math
 import pathlib
 from typing import Generator
 from typing import List
+from typing import Optional
 from typing import Set
 from typing import Tuple
 
@@ -23,8 +24,8 @@ def build_image(
     brightness: float = 1.0,
     width: int = 1920,
     height: int = 1080,
-    frame_counter: int = None,
-) -> Image.Image:
+    frame_counter: int = 0,
+) -> Optional[Image.Image]:
     path = pathlib.Path(f"video/{frame_counter:06d}.png")
     if path.exists():
         return None

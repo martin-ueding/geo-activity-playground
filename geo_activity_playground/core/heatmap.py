@@ -22,7 +22,7 @@ class GeoBounds:
     lon_max: float
 
 
-def get_bounds(lat_lon_data: np.array) -> GeoBounds:
+def get_bounds(lat_lon_data: np.ndarray) -> GeoBounds:
     return GeoBounds(*np.min(lat_lon_data, axis=0), *np.max(lat_lon_data, axis=0))
 
 
@@ -106,7 +106,7 @@ def get_sensible_zoom_level(
     )
 
 
-def build_map_from_tiles(tile_bounds: TileBounds) -> np.array:
+def build_map_from_tiles(tile_bounds: TileBounds) -> np.ndarray:
     background = np.zeros((*tile_bounds.shape, 3))
 
     for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):

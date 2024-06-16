@@ -13,6 +13,7 @@ python = "^3.9,<3.13"
 
 altair = "^5.1.2"
 appdirs = "^1.4.4"
+charset-normalizer = "^3.3.2"
 coloredlogs = "^15.0.1"
 fitdecode = "^0.10.0"
 flask = "^3.0.0"
@@ -35,22 +36,27 @@ vegafusion = { version = "^1.4.3", extras = ["embed"] }
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
-charset-normalizer = "^3.3.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
 mkdocs-material = "^9.4.1"
 mypy = "^1.10.0"
-pytest = "^7.1.2"
+pandas-stubs = "^2.2.2.240603"
 py-spy = "^0.3.14"
-types-pyyaml = "^6.0.12.12"
+pytest = "^7.1.2"
 types-decorator = "^5.1.8.20240106"
 types-paramiko = "^3.4.0.20240120"
 types-pycurl = "^7.45.2.20240106"
 types-pytz = "^2024.1.0.20240203"
+types-pyyaml = "^6.0.12.12"
 types-requests = "^2.31.0.20240125"
+types-tqdm = "^4.66.0.20240417"
 types-typed-ast = "^1.5.8.7"
+types-xmltodict = "^0.13.0.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+disable_error_code = "import-untyped"

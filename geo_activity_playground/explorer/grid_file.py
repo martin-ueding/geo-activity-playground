@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def get_border_tiles(
     tiles: pd.DataFrame, zoom: int, tile_bounds: Bounds
-) -> list[list[list[float]]]:
+) -> list[list[tuple[float, float]]]:
     logger.info("Generate border tiles …")
     tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
     border_tiles = set()
@@ -28,7 +28,9 @@ def get_border_tiles(
     return make_grid_points(border_tiles, zoom)
 
 
-def get_explored_tiles(tiles: pd.DataFrame, zoom: int) -> list[list[list[float]]]:
+def get_explored_tiles(
+    tiles: pd.DataFrame, zoom: int
+) -> list[list[tuple[float, float]]]:
     return make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]), zoom)
 
 
@@ -66,7 +68,7 @@ def make_explorer_rectangle(
 
 def make_grid_points(
     tiles: Iterable[tuple[int, int]], zoom: int
-) -> list[list[list[float]]]:
+) -> list[list[tuple[float, float]]]:
     result = []
     for tile_x, tile_y in tiles:
         tile = [
@@ -80,7 +82,7 @@ def make_grid_points(
     return result
 
 
-def make_grid_file_gpx(grid_points: list[list[list[float]]]) -> str:
+def make_grid_file_gpx(grid_points: list[list[tuple[float, float]]]) -> str:
     gpx = gpxpy.gpx.GPX()
     gpx_track = gpxpy.gpx.GPXTrack()
     gpx.tracks.append(gpx_track)
@@ -93,7 +95,7 @@ def make_grid_file_gpx(grid_points: list[list[list[float]]]) -> str:
     return gpx.to_xml()
 
 
-def make_grid_file_geojson(grid_points: list[list[list[float]]]) -> str:
+def make_grid_file_geojson(grid_points: list[list[tuple[float, float]]]) -> str:
     fc = geojson.FeatureCollection(
         [
             geojson.Feature(

@@ -103,12 +103,12 @@ def import_from_strava_api(repository: ActivityRepository) -> None:
         time.sleep(seconds_to_wait)
 
 
-def try_import_strava(repository: ActivityRepository) -> None:
-    get_after = (
-        repository.last_activity_date().isoformat().replace("+00:00", "Z")
-        if repository.last_activity_date() is not None
-        else "2000-01-01T00:00:00Z"
-    )
+def try_import_strava(repository: ActivityRepository) -> bool:
+    last = repository.last_activity_date()
+    if last is None:
+        get_after = "2000-01-01T00:00:00Z"
+    else:
+        get_after = last.isoformat().replace("+00:00", "Z")
 
     gear_names = {None: "None"}
 
