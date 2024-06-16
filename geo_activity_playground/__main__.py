@@ -7,18 +7,13 @@ import sys
 import coloredlogs
 
 from .importers.strava_checkout import convert_strava_checkout
-from .importers.strava_checkout import import_from_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import embellish_time_series
 from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
-from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
-from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
-from geo_activity_playground.importers.directory import import_from_directory
-from geo_activity_playground.importers.strava_api import import_from_strava_api
 from geo_activity_playground.webui.app import webui_main
+from geo_activity_playground.webui.upload_controller import scan_for_activities
 
 logger = logging.getLogger(__name__)
 
@@ -98,36 +93,9 @@ def main() -> None:
     options.func(options)
 
 
-def scan_for_activities(
-    repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config: dict,
-    skip_strava: bool = False,
-) -> None:
-    if pathlib.Path("Activities").exists():
-        import_from_directory(
-            repository,
-            config.get("metadata_extraction_regexes", []),
-        )
-    if pathlib.Path("Strava Export").exists():
-        import_from_strava_checkout(repository)
-    if "strava" in config and not skip_strava:
-        import_from_strava_api(repository)
-
-    if len(repository) == 0:
-        logger.error(
-            f"No activities found. You need to either add activity files (GPX, FIT, …) to {pathlib.Path('Activities')} or set up the Strava API. Starting without any activities is unfortunately not supported."
-        )
-        sys.exit(1)
-
-    embellish_time_series(repository)
-    compute_tile_visits(repository, tile_visit_accessor)
-    compute_tile_evolution(tile_visit_accessor)
-
-
 def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
-) -> tuple[ActivityRepository, TileVisitAccessor]:
+) -> tuple[ActivityRepository, TileVisitAccessor, dict]:
     os.chdir(basedir)
     apply_cache_migrations()
     config = get_config()
@@ -143,7 +111,7 @@ def make_activity_repository(
 
     scan_for_activities(repository, tile_visit_accessor, config, skip_strava)
 
-    return repository, tile_visit_accessor
+    return repository, tile_visit_accessor, config
 
 
 if __name__ == "__main__":

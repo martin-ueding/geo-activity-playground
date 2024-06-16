@@ -49,7 +49,7 @@ def import_from_directory(
         paths_with_errors = [error for error in paths_with_errors if error]
 
     for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
-        activity_id = _get_file_hash(path)
+        activity_id = get_file_hash(path)
         file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
         work_tracker.mark_done(path)
 
@@ -87,7 +87,7 @@ def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]
     activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
     file_metadata_dir = pathlib.Path("Cache/Activity Metadata")
 
-    activity_id = _get_file_hash(path)
+    activity_id = get_file_hash(path)
     timeseries_path = activity_stream_dir / f"{activity_id}.parquet"
     file_metadata_path = file_metadata_dir / f"{activity_id}.pickle"
 
@@ -110,7 +110,7 @@ def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]
             pickle.dump(activity_meta_from_file, f)
 
 
-def _get_file_hash(path: pathlib.Path) -> int:
+def get_file_hash(path: pathlib.Path) -> int:
     file_hash = hashlib.blake2s()
     with open(path, "rb") as f:
         while chunk := f.read(8192):

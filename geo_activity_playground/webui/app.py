@@ -311,8 +311,13 @@ def route_tiles(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
-def route_upload(app: Flask):
-    upload_controller = UploadController()
+def route_upload(
+    app: Flask,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: dict,
+):
+    upload_controller = UploadController(repository, tile_visit_accessor, config)
 
     @app.route("/upload")
     def form():
@@ -326,6 +331,7 @@ def route_upload(app: Flask):
 def webui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
+    config: dict,
     host: str,
     port: int,
 ) -> None:
@@ -345,7 +351,7 @@ def webui_main(
     route_strava(app, host, port)
     route_summary(app, repository)
     route_tiles(app, repository)
-    route_upload(app)
+    route_upload(app, repository, tile_visit_accessor, config)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
 
