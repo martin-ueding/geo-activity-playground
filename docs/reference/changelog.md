@@ -6,15 +6,22 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.21.2
+### Version 0.22
+
+- [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Allow uploading files from within the web UI and parse them directly after uploading.
+- Fix bug that lead to re-parsing of activity files during startup.
+
+### Version 0.21
+
+#### Version 0.21.2
 
 - Fix crash in search due to missing `distance/km`.
 
-### Version 0.21.1
+#### Version 0.21.1
 
 - Add support for Python 3.12.
 
-### Version 0.21.0
+#### Version 0.21.0
 
 - **Breaking change:** New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the [documentation on activity files](../getting-started/using-activity-files.md) for the new way.
 
@@ -29,7 +36,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Parsing of activity files is now parallelized over all CPU cores and faster than before.
 - The coloring of the speed along the activity line doesn't remove outliers any more.
 
-### Version 0.20.0
+### Version 0.20
 
 - [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`.
 - [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90): Take time jumps into account in activity distance computation and the various plots of the activities.
