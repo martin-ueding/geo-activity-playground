@@ -320,7 +320,7 @@ def route_upload(app: Flask):
 
     @app.route("/upload/receive", methods=["POST"])
     def receive():
-        upload_controller.receive()
+        return upload_controller.receive()
 
 
 def webui_main(

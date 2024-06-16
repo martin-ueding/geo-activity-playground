@@ -89,7 +89,7 @@ class ActivityRepository:
             self.meta = pd.concat([old_df, new_df])
             assert pd.api.types.is_dtype_equal(
                 self.meta["start"].dtype, "datetime64[ns, UTC]"
-            ), self.meta["start"].dtype
+            ), (self.meta["start"].dtype, self.meta["start"].iloc[0])
             self.save()
             self._loose_activities = []
 

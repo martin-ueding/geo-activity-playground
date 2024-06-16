@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 
 class UploadController:
     def render_form(self) -> dict:
-        pass
+        return {}
 
     def receive(self) -> None:
         # check if the post request has the file part
