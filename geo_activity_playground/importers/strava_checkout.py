@@ -2,6 +2,7 @@ import datetime
 import logging
 import pathlib
 import shutil
+import sys
 import traceback
 from typing import Optional
 from typing import Union
@@ -133,6 +134,13 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
         dayfirst = False
     if activities.columns[0] == "Aktivitäts-ID":
         activities = pd.read_csv(checkout_path / "activities.csv", decimal=",")
+        if len(activities.columns) != len(EXPECTED_COLUMNS):
+            logger.error(
+                f"You are trying to import a Strava checkout where the `activities.csv` contains German column headers. In order to import this, we need to map these to the English ones. Unfortunately Strava has changed the number of columns. Your file has {len(activities.columns)} but we expect {len(EXPECTED_COLUMNS)}. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
+            )
+            print(activities.columns)
+            print(activities.dtypes)
+            sys.exit(1)
         activities.columns = EXPECTED_COLUMNS
         dayfirst = True
 
