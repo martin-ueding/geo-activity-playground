@@ -7,7 +7,6 @@ from flask import flash
 from flask import redirect
 from flask import request
 from flask import Response
-from flask import url_for
 from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -50,18 +49,18 @@ class UploadController:
     def receive(self) -> Response:
         # check if the post request has the file part
         if "file" not in request.files:
-            flash("No file part")
+            flash("No file part", "warning")
             return redirect(request.url)
 
         if request.form["password"] != self._config["upload"]["password"]:
-            flash("Incorrect upload password")
+            flash("Incorrect upload password", "danger")
             return redirect(request.url)
 
         file = request.files["file"]
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == "":
-            flash("No selected file")
+            flash("No selected file", "warning")
             return redirect(request.url)
         if file:
             filename = secure_filename(file.filename)
@@ -84,6 +83,7 @@ class UploadController:
                 skip_strava=True,
             )
             activity_id = get_file_hash(target_path)
+            flash(f"Activity was saved with ID {activity_id}.", "success")
             return redirect(f"/activity/{activity_id}")
 
 
