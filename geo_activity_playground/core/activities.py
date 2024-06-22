@@ -78,6 +78,11 @@ class ActivityRepository:
                 f"Adding {len(self._loose_activities)} activities to the repository …"
             )
             new_df = pd.DataFrame(self._loose_activities)
+            if not pd.api.types.is_dtype_equal(
+                new_df["start"].dtype, "datetime64[ns, UTC]"
+            ):
+                new_df["start"] = new_df["start"].dt.tz_localize("UTC")
+                new_df["start"] = new_df["start"].dt.tz_convert("UTC")
             if len(self.meta):
                 new_ids_set = set(new_df["id"])
                 is_kept = [

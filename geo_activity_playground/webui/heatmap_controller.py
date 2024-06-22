@@ -1,11 +1,9 @@
 import io
 import logging
 import pathlib
-import pickle
 
 import matplotlib.pylab as pl
 import numpy as np
-import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
@@ -42,7 +40,7 @@ class HeatmapController:
     def render(self) -> dict:
         zoom = 14
         tiles = self.tile_histories[zoom]
-        medians = tiles.median()
+        medians = tiles.median(skipna=True)
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )

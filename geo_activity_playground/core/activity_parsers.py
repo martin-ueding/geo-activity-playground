@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
+from pandas._libs import NaTType
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import embellish_single_time_series
@@ -126,8 +127,12 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                         and values.get("position_long", None)
                     ):
                         time = values["timestamp"]
-                        assert isinstance(time, datetime.datetime)
-                        time = time.astimezone(datetime.timezone.utc)
+                        if isinstance(time, datetime.datetime):
+                            time = time.astimezone(datetime.timezone.utc)
+                        elif time is None or isinstance(time, int):
+                            time = pd.NaT
+                        else:
+                            raise RuntimeError(f"Cannot parse time: {time} in {path}.")
                         row = {
                             "time": time,
                             "latitude": values["position_lat"] / ((2**32) / 360),
@@ -202,10 +207,13 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
             for point in segment.points:
                 if isinstance(point.time, datetime.datetime):
                     time = point.time
-                else:
+                    time = time.astimezone(datetime.timezone.utc)
+                elif isinstance(point.time, str):
                     time = dateutil.parser.parse(str(point.time))
-                assert isinstance(time, datetime.datetime)
-                time = time.astimezone(datetime.timezone.utc)
+                    time = time.astimezone(datetime.timezone.utc)
+                else:
+                    time = pd.NaT
+                    time.tz_localize("UTC")
                 points.append((time, point.latitude, point.longitude, point.elevation))
 
     df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "altitude"])
@@ -233,6 +241,7 @@ def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
         content = f.read().strip()
 
     stripped_file = pathlib.Path("Cache/temp.tcx")
+    stripped_file.parent.mkdir(exist_ok=True)
     with open(stripped_file, "wb") as f:
         f.write(content)
     data = tcx_reader.read(str(stripped_file))

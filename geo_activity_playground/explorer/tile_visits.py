@@ -94,6 +94,11 @@ def compute_tile_visits(
     if activity_ids_to_process:
         for zoom, new_rows in new_tile_history_rows.items():
             new_df = pd.DataFrame(new_rows)
+            if not pd.api.types.is_dtype_equal(
+                new_df["time"].dtype, "datetime64[ns, UTC]"
+            ):
+                new_df["time"] = new_df["time"].dt.tz_localize("UTC")
+                new_df["time"] = new_df["time"].dt.tz_convert("UTC")
             new_df.sort_values("time", inplace=True)
             tile_visits_accessor.histories[zoom] = pd.concat(
                 [tile_visits_accessor.histories[zoom], new_df]
