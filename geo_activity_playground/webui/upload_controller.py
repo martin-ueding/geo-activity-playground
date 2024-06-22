@@ -49,19 +49,19 @@ class UploadController:
     def receive(self) -> Response:
         # check if the post request has the file part
         if "file" not in request.files:
-            flash("No file part", "warning")
-            return redirect(request.url)
+            flash("No file could be found. Did you select a file?", "warning")
+            return redirect("/upload")
 
         if request.form["password"] != self._config["upload"]["password"]:
-            flash("Incorrect upload password", "danger")
-            return redirect(request.url)
+            flash("Incorrect upload password!", "danger")
+            return redirect("/upload")
 
         file = request.files["file"]
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == "":
             flash("No selected file", "warning")
-            return redirect(request.url)
+            return redirect("/upload")
         if file:
             filename = secure_filename(file.filename)
             target_path = pathlib.Path(request.form["directory"]) / filename
