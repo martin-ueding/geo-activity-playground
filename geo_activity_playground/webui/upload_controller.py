@@ -42,13 +42,21 @@ class UploadController:
         for root, dirs, files in os.walk("Activities"):
             directories.append(root)
         directories.sort()
-        return {"directories": directories}
+        return {
+            "directories": directories,
+            "has_upload": "password" in self._config.get("upload", {}),
+        }
 
     def receive(self) -> Response:
         # check if the post request has the file part
         if "file" not in request.files:
             flash("No file part")
             return redirect(request.url)
+
+        if request.form["password"] != self._config["upload"]["password"]:
+            flash("Incorrect upload password")
+            return redirect(request.url)
+
         file = request.files["file"]
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
