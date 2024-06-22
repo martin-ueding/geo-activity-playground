@@ -125,10 +125,11 @@ class ActivityRepository:
     def activity_ids(self) -> set[int]:
         return set(self.meta.index)
 
-    def iter_activities(self, new_to_old=True) -> Iterator[ActivityMeta]:
+    def iter_activities(self, new_to_old=True, dropna=False) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
         for index, row in self.meta[::direction].iterrows():
-            yield row
+            if not dropna or not pd.isna(row["start"]):
+                yield row
 
     @functools.lru_cache()
     def get_activity_by_id(self, id: int) -> ActivityMeta:

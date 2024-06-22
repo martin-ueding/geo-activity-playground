@@ -112,8 +112,12 @@ def get_three_color_tiles(
     cmap_last = matplotlib.colormaps["plasma"]
     tile_dict = {}
     for tile, tile_data in tile_visits.items():
-        first_age_days = (today - tile_data["first_time"].date()).days
-        last_age_days = (today - tile_data["last_time"].date()).days
+        if not pd.isna(tile_data["first_time"]):
+            first_age_days = (today - tile_data["first_time"].date()).days
+            last_age_days = (today - tile_data["last_time"].date()).days
+        else:
+            first_age_days = 10000
+            last_age_days = 10000
         tile_dict[tile] = {
             "first_activity_id": str(tile_data["first_id"]),
             "first_activity_name": repository.get_activity_by_id(tile_data["first_id"])[

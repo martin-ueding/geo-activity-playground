@@ -20,7 +20,9 @@ class EntryController:
             "latest_activities": [],
         }
 
-        for activity in itertools.islice(self._repository.iter_activities(), 15):
+        for activity in itertools.islice(
+            self._repository.iter_activities(dropna=True), 15
+        ):
             time_series = self._repository.get_time_series(activity["id"])
             result["latest_activities"].append(
                 {
