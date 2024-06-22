@@ -1,8 +1,6 @@
 # Uploading activities
 
-The original way of using this software was as a sort of “directory viewer” where you had all your data locally and could then start this program. It has a web-based user interface because that works easiest among different platforms. Qt is nice, but I've tried that for my last project ([Vigilant Crypto Snatch](https://martin-ueding.github.io/vigilant-crypto-snatch/)) and there people rather asked for a web interface because they wanted to run the program as a service elsewhere. Therefore, I've started this with a web UI directly.
-
-Now users have asked for the option to upload activities. This becomes a potential security issue and it is protected with a password. This feature is only enabled when you have set a password in the configuration file.
+Some users don't want to restart the application each time they add new activities but run it on their home server. For this use case you can upload activities. Uploading files is a potential security issue and it is protected with a password. This feature is only enabled when you have set a password in the configuration file.
 
 Put the following into your configuration file:
 
