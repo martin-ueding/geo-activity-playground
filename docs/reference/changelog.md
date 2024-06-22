@@ -9,6 +9,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.23
 
 - [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Add password protection for upload.
+- Use Flask “flash” messages.
 
 ### Version 0.22
 
