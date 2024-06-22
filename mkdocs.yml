@@ -39,6 +39,7 @@ nav:
       - features/explorer-tiles.md
       - features/eddington.md
       - features/equipment.md
+      - features/upload.md
   - Reference:
       - reference/changelog.md
   - acknowledgments.md
