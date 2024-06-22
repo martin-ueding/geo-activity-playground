@@ -1,3 +1,6 @@
+import json
+import pathlib
+import secrets
 import urllib
 
 from flask import Flask
@@ -328,6 +331,18 @@ def route_upload(
         return upload_controller.receive()
 
 
+def get_secret_key():
+    secret_file = pathlib.Path("Cache/flask-secret.json")
+    if secret_file.exists():
+        with open(secret_file) as f:
+            secret = json.load(f)
+    else:
+        secret = secrets.token_hex()
+        with open(secret_file, "w") as f:
+            json.dump(secret, f)
+    return secret
+
+
 def webui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
@@ -354,5 +369,6 @@ def webui_main(
     route_upload(app, repository, tile_visit_accessor, config)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
+    app.secret_key = get_secret_key()
 
     app.run(host=host, port=port)
