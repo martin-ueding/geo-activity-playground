@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Add password protection for upload.
 - Use Flask “flash” messages.
+- [GH-110](https://github.com/martin-ueding/geo-activity-playground/issues/110): Support routes that don't have time information attached them. That might be useful if you haven't recorded some particular track but still want it to count towards your heatmap and explorer tiles.
 
 ### Version 0.22
 
