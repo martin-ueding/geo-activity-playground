@@ -17,7 +17,7 @@ from .eddington.blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
-from .heatmap_controller import HeatmapController
+from .heatmap.blueprint import make_heatmap_blueprint
 from .locations_controller import LocationsController
 from .search_controller import SearchController
 from .square_planner_controller import SquarePlannerController
@@ -25,7 +25,7 @@ from .strava_controller import StravaController
 from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.explorer.controller import ExplorerController
+from geo_activity_playground.webui.heatmap.heatmap_controller import HeatmapController
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -40,36 +40,6 @@ def route_config(app: Flask, repository: ActivityRepository) -> None:
         form_input = request.form
         return render_template(
             "config.html.j2", **config_controller.action_save(form_input)
-        )
-
-
-def route_heatmap(
-    app: Flask, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
-) -> None:
-    heatmap_controller = HeatmapController(repository, tile_visit_accessor)
-
-    @app.route("/heatmap")
-    def heatmap():
-        return render_template("heatmap.html.j2", **heatmap_controller.render())
-
-    @app.route("/heatmap/tile/<z>/<x>/<y>.png")
-    def heatmap_tile(x: str, y: str, z: str):
-        return Response(
-            heatmap_controller.render_tile(int(x), int(y), int(z)),
-            mimetype="image/png",
-        )
-
-    @app.route("/heatmap/download/<north>/<east>/<south>/<west>")
-    def heatmap_download(north: str, east: str, south: str, west: str):
-        return Response(
-            heatmap_controller.download_heatmap(
-                float(north),
-                float(east),
-                float(south),
-                float(west),
-            ),
-            mimetype="image/png",
-            headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
         )
 
 
@@ -190,7 +160,6 @@ def webui_main(
     app = Flask(__name__)
 
     route_config(app, repository)
-    route_heatmap(app, repository, tile_visit_accessor)
     route_locations(app, repository)
     route_search(app, repository)
     route_square_planner(app, repository, tile_visit_accessor)
@@ -211,6 +180,9 @@ def webui_main(
     )
     app.register_blueprint(
         make_explorer_blueprint(repository, tile_visit_accessor), url_prefix="/explorer"
+    )
+    app.register_blueprint(
+        make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(

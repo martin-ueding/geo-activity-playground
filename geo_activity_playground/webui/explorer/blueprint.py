@@ -10,9 +10,8 @@ from .controller import ExplorerController
 def make_explorer_blueprint(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> Blueprint:
-    blueprint = Blueprint("explorer", __name__, template_folder="templates")
-
     explorer_controller = ExplorerController(repository, tile_visit_accessor)
+    blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
     @blueprint.route("/<zoom>")
     def map(zoom: str):
