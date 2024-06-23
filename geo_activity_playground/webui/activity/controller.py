@@ -2,7 +2,6 @@ import datetime
 import functools
 import io
 import logging
-import pickle
 
 import altair as alt
 import geojson
@@ -56,8 +55,8 @@ class ActivityController:
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
             "speed_color_bar": make_speed_color_bar(time_series),
-            "date": activity.start.date(),
-            "time": activity.start.time(),
+            "date": activity["start"].date(),
+            "time": activity["start"].time(),
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)

@@ -21,7 +21,8 @@
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
             <dt>Start time</dt>
-            <dd><a href="/activity/day/{{ date.year }}/{{ date.month }}/{{ date.day }}">{{ date }}</a> {{ time }}
+            <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
+                {{ time }}
             </dd>
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
@@ -126,7 +127,7 @@
     <div class="col">
         <h2>Share picture</h2>
 
-        <img src="/activity/{{ activity.id }}/sharepic.png" />
+        <img src="{{ url_for('.sharepic', id=activity.id) }}/sharepic.png" />
     </div>
 </div>
 
@@ -135,7 +136,7 @@
     <div class="col">
         <h2>Activities with the same name</h2>
 
-        <p><a href="/activity/name/{{ activity['name']|urlencode() }}">Overview over these activities</a></p>
+        <p><a href="{{ url_for('.name', name=activity['name']) }}">Overview over these activities</a></p>
 
         <table class="table">
             <thead>
@@ -150,7 +151,7 @@
             <tbody>
                 {% for other_activity in similar_activites %}
                 <tr>
-                    <td><a href="/activity/{{ other_activity.id }}">{{ other_activity.start
+                    <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start
                             }}</a></td>
                     <td>{{ other_activity.distance_km | round(1) }}</td>
                     <td>{{ other_activity.elapsed_time }}</td>

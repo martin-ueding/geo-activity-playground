@@ -11,7 +11,7 @@ from flask import Response
 
 from ..core.activities import ActivityRepository
 from ..explorer.tile_visits import TileVisitAccessor
-from .activity_controller import ActivityController
+from .activity.blueprint import make_activity_blueprint
 from .calendar.blueprint import make_calendar_blueprint
 from .config_controller import ConfigController
 from .eddington.blueprint import make_eddington_blueprint
@@ -26,44 +26,7 @@ from .strava_controller import StravaController
 from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.upload.controller import UploadController
-
-
-def route_activity(app: Flask, repository: ActivityRepository) -> None:
-    activity_controller = ActivityController(repository)
-
-    @app.route("/activity/all")
-    def activity_all():
-        return render_template(
-            "activity-lines.html.j2", **activity_controller.render_all()
-        )
-
-    @app.route("/activity/<id>")
-    def activity(id: str):
-        return render_template(
-            "activity.html.j2", **activity_controller.render_activity(int(id))
-        )
-
-    @app.route("/activity/<id>/sharepic.png")
-    def activity_sharepic(id: str):
-        return Response(
-            activity_controller.render_sharepic(int(id)),
-            mimetype="image/png",
-        )
-
-    @app.route("/activity/day/<year>/<month>/<day>")
-    def activity_day(year: str, month: str, day: str):
-        return render_template(
-            "activity-day.html.j2",
-            **activity_controller.render_day(int(year), int(month), int(day))
-        )
-
-    @app.route("/activity/name/<name>")
-    def activity_name(name: str):
-        return render_template(
-            "activity-name.html.j2",
-            **activity_controller.render_name(urllib.parse.unquote(name))
-        )
+from geo_activity_playground.webui.activity.controller import ActivityController
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -283,7 +246,6 @@ def webui_main(
 ) -> None:
     app = Flask(__name__)
 
-    route_activity(app, repository)
     route_config(app, repository)
     route_equipment(app, repository)
     route_explorer(app, repository, tile_visit_accessor)
@@ -298,6 +260,7 @@ def webui_main(
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 
+    app.register_blueprint(make_activity_blueprint(repository), url_prefix="/activity")
     app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(
         make_eddington_blueprint(repository), url_prefix="/eddington"
