@@ -9,25 +9,23 @@ from flask import render_template
 from flask import request
 from flask import Response
 
+from ..core.activities import ActivityRepository
+from ..explorer.tile_visits import TileVisitAccessor
+from .activity_controller import ActivityController
+from .calendar_controller import CalendarController
+from .config_controller import ConfigController
+from .eddington.blueprint import make_eddington_blueprint
+from .entry_controller import EntryController
+from .equipment_controller import EquipmentController
+from .explorer_controller import ExplorerController
+from .heatmap_controller import HeatmapController
 from .locations_controller import LocationsController
+from .search_controller import SearchController
+from .square_planner_controller import SquarePlannerController
+from .strava_controller import StravaController
+from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.webui.activity_controller import ActivityController
-from geo_activity_playground.webui.calendar_controller import CalendarController
-from geo_activity_playground.webui.config_controller import ConfigController
-from geo_activity_playground.webui.eddington_controller import EddingtonController
-from geo_activity_playground.webui.entry_controller import EntryController
-from geo_activity_playground.webui.equipment_controller import EquipmentController
-from geo_activity_playground.webui.explorer_controller import ExplorerController
-from geo_activity_playground.webui.heatmap_controller import HeatmapController
-from geo_activity_playground.webui.search_controller import SearchController
-from geo_activity_playground.webui.square_planner_controller import (
-    SquarePlannerController,
-)
-from geo_activity_playground.webui.strava_controller import StravaController
-from geo_activity_playground.webui.summary_controller import SummaryController
-from geo_activity_playground.webui.upload_controller import UploadController
+from .upload_controller import UploadController
 
 
 def route_activity(app: Flask, repository: ActivityRepository) -> None:
@@ -97,14 +95,6 @@ def route_config(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "config.html.j2", **config_controller.action_save(form_input)
         )
-
-
-def route_eddington(app: Flask, repository: ActivityRepository) -> None:
-    eddington_controller = EddingtonController(repository)
-
-    @app.route("/eddington")
-    def eddington():
-        return render_template("eddington.html.j2", **eddington_controller.render())
 
 
 def route_equipment(app: Flask, repository: ActivityRepository) -> None:
@@ -329,7 +319,6 @@ def webui_main(
     route_activity(app, repository)
     route_calendar(app, repository)
     route_config(app, repository)
-    route_eddington(app, repository)
     route_equipment(app, repository)
     route_explorer(app, repository, tile_visit_accessor)
     route_heatmap(app, repository, tile_visit_accessor)
@@ -344,6 +333,9 @@ def webui_main(
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 
+    app.register_blueprint(
+        make_eddington_blueprint(repository), url_prefix="/eddington"
+    )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
 
     app.run(host=host, port=port)
