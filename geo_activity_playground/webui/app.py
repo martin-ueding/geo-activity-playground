@@ -18,16 +18,12 @@ from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .heatmap.blueprint import make_heatmap_blueprint
-from .locations_controller import LocationsController
 from .search_controller import SearchController
 from .square_planner.blueprint import make_square_planner_blueprint
 from .strava_controller import StravaController
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.square_planner.controller import (
-    SquarePlannerController,
-)
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -43,14 +39,6 @@ def route_config(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "config.html.j2", **config_controller.action_save(form_input)
         )
-
-
-def route_locations(app: Flask, repository: ActivityRepository) -> None:
-    controller = LocationsController(repository)
-
-    @app.route("/locations")
-    def locations_index():
-        return render_template("locations.html.j2", **controller.render_index())
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -126,7 +114,6 @@ def webui_main(
     app = Flask(__name__)
 
     route_config(app, repository)
-    route_locations(app, repository)
     route_search(app, repository)
     route_start(app, repository)
     route_strava(app, host, port)
