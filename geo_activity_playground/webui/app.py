@@ -10,7 +10,7 @@ from flask import request
 from flask import Response
 
 from .locations_controller import LocationsController
-from .search_controller import SearchController
+from .tile.blueprint import make_tile_blueprint
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.activity_controller import ActivityController
@@ -27,9 +27,6 @@ from geo_activity_playground.webui.square_planner_controller import (
 )
 from geo_activity_playground.webui.strava_controller import StravaController
 from geo_activity_playground.webui.summary_controller import SummaryController
-from geo_activity_playground.webui.tile_controller import (
-    TileController,
-)
 from geo_activity_playground.webui.upload_controller import UploadController
 
 
@@ -291,29 +288,6 @@ def route_summary(app: Flask, repository: ActivityRepository) -> None:
         return render_template("summary.html.j2", **summary_controller.render())
 
 
-def route_tiles(app: Flask, repository: ActivityRepository) -> None:
-    tile_controller = TileController()
-
-    @app.route("/tile/color/<z>/<x>/<y>.png")
-    def tile_color(x: str, y: str, z: str):
-        return Response(
-            tile_controller.render_color(int(x), int(y), int(z)), mimetype="image/png"
-        )
-
-    @app.route("/tile/grayscale/<z>/<x>/<y>.png")
-    def tile_grayscale(x: str, y: str, z: str):
-        return Response(
-            tile_controller.render_grayscale(int(x), int(y), int(z)),
-            mimetype="image/png",
-        )
-
-    @app.route("/tile/pastel/<z>/<x>/<y>.png")
-    def tile_pastel(x: str, y: str, z: str):
-        return Response(
-            tile_controller.render_pastel(int(x), int(y), int(z)), mimetype="image/png"
-        )
-
-
 def route_upload(
     app: Flask,
     repository: ActivityRepository,
@@ -365,10 +339,11 @@ def webui_main(
     route_start(app, repository)
     route_strava(app, host, port)
     route_summary(app, repository)
-    route_tiles(app, repository)
     route_upload(app, repository, tile_visit_accessor, config)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
+
+    app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
 
     app.run(host=host, port=port)
