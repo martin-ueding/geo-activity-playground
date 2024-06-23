@@ -16,7 +16,7 @@ from .config_controller import ConfigController
 from .eddington.blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
-from .explorer_controller import ExplorerController
+from .explorer.blueprint import make_explorer_blueprint
 from .heatmap_controller import HeatmapController
 from .locations_controller import LocationsController
 from .search_controller import SearchController
@@ -25,7 +25,7 @@ from .strava_controller import StravaController
 from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.equipment.controller import EquipmentController
+from geo_activity_playground.webui.explorer.controller import ExplorerController
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -40,54 +40,6 @@ def route_config(app: Flask, repository: ActivityRepository) -> None:
         form_input = request.form
         return render_template(
             "config.html.j2", **config_controller.action_save(form_input)
-        )
-
-
-def route_explorer(
-    app: Flask, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
-) -> None:
-    explorer_controller = ExplorerController(repository, tile_visit_accessor)
-
-    @app.route("/explorer/<zoom>")
-    def explorer(zoom: str):
-        return render_template(
-            "explorer.html.j2", **explorer_controller.render(int(zoom))
-        )
-
-    @app.route("/explorer/<zoom>/<north>/<east>/<south>/<west>/explored.<suffix>")
-    def explorer_download(
-        zoom: str, north: str, east: str, south: str, west: str, suffix: str
-    ):
-        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
-        return Response(
-            explorer_controller.export_explored_tiles(
-                int(zoom),
-                float(north),
-                float(east),
-                float(south),
-                float(west),
-                suffix,
-            ),
-            mimetype=mimetypes[suffix],
-            headers={"Content-disposition": "attachment"},
-        )
-
-    @app.route("/explorer/<zoom>/<north>/<east>/<south>/<west>/missing.<suffix>")
-    def explorer_missing(
-        zoom: str, north: str, east: str, south: str, west: str, suffix: str
-    ):
-        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
-        return Response(
-            explorer_controller.export_missing_tiles(
-                int(zoom),
-                float(north),
-                float(east),
-                float(south),
-                float(west),
-                suffix,
-            ),
-            mimetype=mimetypes[suffix],
-            headers={"Content-disposition": "attachment"},
         )
 
 
@@ -238,7 +190,6 @@ def webui_main(
     app = Flask(__name__)
 
     route_config(app, repository)
-    route_explorer(app, repository, tile_visit_accessor)
     route_heatmap(app, repository, tile_visit_accessor)
     route_locations(app, repository)
     route_search(app, repository)
@@ -257,6 +208,9 @@ def webui_main(
     )
     app.register_blueprint(
         make_equipment_blueprint(repository), url_prefix="/equipment"
+    )
+    app.register_blueprint(
+        make_explorer_blueprint(repository, tile_visit_accessor), url_prefix="/explorer"
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(

@@ -15,7 +15,7 @@ from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.webui.explorer_controller import (
+from geo_activity_playground.webui.explorer.controller import (
     bounding_box_for_biggest_cluster,
 )
 
