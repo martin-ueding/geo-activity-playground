@@ -6,13 +6,11 @@ from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import request
-from flask import Response
 
 from ..core.activities import ActivityRepository
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity.blueprint import make_activity_blueprint
 from .calendar.blueprint import make_calendar_blueprint
-from .config_controller import ConfigController
 from .eddington.blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
@@ -24,21 +22,6 @@ from .strava_controller import StravaController
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-
-
-def route_config(app: Flask, repository: ActivityRepository) -> None:
-    config_controller = ConfigController(repository)
-
-    @app.route("/config")
-    def config_index():
-        return render_template("config.html.j2", **config_controller.action_index())
-
-    @app.route("/config/save", methods=["POST"])
-    def config_save():
-        form_input = request.form
-        return render_template(
-            "config.html.j2", **config_controller.action_save(form_input)
-        )
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -113,7 +96,6 @@ def webui_main(
 ) -> None:
     app = Flask(__name__)
 
-    route_config(app, repository)
     route_search(app, repository)
     route_start(app, repository)
     route_strava(app, host, port)
