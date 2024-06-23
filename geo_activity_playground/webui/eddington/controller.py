@@ -2,7 +2,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 
-from geo_activity_playground.core.activities import ActivityRepository
+from ...core.activities import ActivityRepository
 
 
 class EddingtonController:
