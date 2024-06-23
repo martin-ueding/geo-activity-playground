@@ -22,10 +22,10 @@ from .locations_controller import LocationsController
 from .search_controller import SearchController
 from .square_planner_controller import SquarePlannerController
 from .strava_controller import StravaController
-from .summary_controller import SummaryController
+from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.heatmap.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.summary.controller import SummaryController
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -130,14 +130,6 @@ def route_strava(app: Flask, host: str, port: int) -> None:
         )
 
 
-def route_summary(app: Flask, repository: ActivityRepository) -> None:
-    summary_controller = SummaryController(repository)
-
-    @app.route("/summary")
-    def summary_statistics():
-        return render_template("summary.html.j2", **summary_controller.render())
-
-
 def get_secret_key():
     secret_file = pathlib.Path("Cache/flask-secret.json")
     if secret_file.exists():
@@ -165,7 +157,6 @@ def webui_main(
     route_square_planner(app, repository, tile_visit_accessor)
     route_start(app, repository)
     route_strava(app, host, port)
-    route_summary(app, repository)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
@@ -183,6 +174,10 @@ def webui_main(
     )
     app.register_blueprint(
         make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
+    )
+    app.register_blueprint(
+        make_summary_blueprint(repository),
+        url_prefix="/summary",
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(
