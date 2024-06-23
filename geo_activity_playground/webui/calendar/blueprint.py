@@ -12,12 +12,15 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
 
     @blueprint.route("/")
     def index():
-        return render_template("index.html.j2", **calendar_controller.render_overview())
+        return render_template(
+            "calendar/index.html.j2", **calendar_controller.render_overview()
+        )
 
     @blueprint.route("/<year>/<month>")
     def month(year: str, month: str):
         return render_template(
-            "month.html.j2", **calendar_controller.render_month(int(year), int(month))
+            "calendar/month.html.j2",
+            **calendar_controller.render_month(int(year), int(month))
         )
 
     return blueprint

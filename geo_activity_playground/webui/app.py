@@ -25,7 +25,8 @@ from .square_planner_controller import SquarePlannerController
 from .strava_controller import StravaController
 from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
-from .upload_controller import UploadController
+from .upload.blueprint import make_upload_blueprint
+from geo_activity_playground.webui.upload.controller import UploadController
 
 
 def route_activity(app: Flask, repository: ActivityRepository) -> None:
@@ -261,23 +262,6 @@ def route_summary(app: Flask, repository: ActivityRepository) -> None:
         return render_template("summary.html.j2", **summary_controller.render())
 
 
-def route_upload(
-    app: Flask,
-    repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config: dict,
-):
-    upload_controller = UploadController(repository, tile_visit_accessor, config)
-
-    @app.route("/upload")
-    def form():
-        return render_template("upload.html.j2", **upload_controller.render_form())
-
-    @app.route("/upload/receive", methods=["POST"])
-    def receive():
-        return upload_controller.receive()
-
-
 def get_secret_key():
     secret_file = pathlib.Path("Cache/flask-secret.json")
     if secret_file.exists():
@@ -310,7 +294,6 @@ def webui_main(
     route_start(app, repository)
     route_strava(app, host, port)
     route_summary(app, repository)
-    route_upload(app, repository, tile_visit_accessor, config)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
@@ -320,5 +303,9 @@ def webui_main(
         make_eddington_blueprint(repository), url_prefix="/eddington"
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
+    app.register_blueprint(
+        make_upload_blueprint(repository, tile_visit_accessor, config),
+        url_prefix="/upload",
+    )
 
     app.run(host=host, port=port)

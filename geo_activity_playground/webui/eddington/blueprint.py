@@ -12,6 +12,8 @@ def make_eddington_blueprint(repository: ActivityRepository) -> Blueprint:
 
     @blueprint.route("/")
     def index():
-        return render_template("eddington.html.j2", **eddington_controller.render())
+        return render_template(
+            "eddington/index.html.j2", **eddington_controller.render()
+        )
 
     return blueprint

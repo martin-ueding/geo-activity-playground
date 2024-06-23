@@ -13,7 +13,7 @@ from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.webui.app import webui_main
-from geo_activity_playground.webui.upload_controller import scan_for_activities
+from geo_activity_playground.webui.upload.controller import scan_for_activities
 
 logger = logging.getLogger(__name__)
 
