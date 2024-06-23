@@ -1,7 +1,7 @@
 import collections
 import datetime
 
-from geo_activity_playground.core.activities import ActivityRepository
+from ...core.activities import ActivityRepository
 
 
 class CalendarController:

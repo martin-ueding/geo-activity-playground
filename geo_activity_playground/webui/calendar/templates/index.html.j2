@@ -21,13 +21,14 @@
             </thead>
             <tbody>
                 {% for year, month_data in monthly_distances.items() %}
+                {% set year_int = year|round(0)|int %}
                 <tr>
-                    <td>{{ year|round(0)|int }}</td>
+                    <td>{{ year_int }}</td>
                     {% for month in range(1, 13) %}
                     <td align="right">
                         {% set distance = month_data[month] %}
                         {% if distance %}
-                        <a href="/calendar/{{ year|round(0)|int }}/{{ month }}">{{ distance|int() }} km</a>
+                        <a href="{{ url_for(".month", year=year_int, month=month) }}">{{ distance|int() }} km</a>
                         {% else %}
                         0 km
                         {% endif %}

@@ -12,7 +12,7 @@ from flask import Response
 from ..core.activities import ActivityRepository
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity_controller import ActivityController
-from .calendar_controller import CalendarController
+from .calendar.blueprint import make_calendar_blueprint
 from .config_controller import ConfigController
 from .eddington.blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
@@ -62,23 +62,6 @@ def route_activity(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "activity-name.html.j2",
             **activity_controller.render_name(urllib.parse.unquote(name))
-        )
-
-
-def route_calendar(app: Flask, repository: ActivityRepository) -> None:
-    calendar_controller = CalendarController(repository)
-
-    @app.route("/calendar")
-    def calendar():
-        return render_template(
-            "calendar.html.j2", **calendar_controller.render_overview()
-        )
-
-    @app.route("/calendar/<year>/<month>")
-    def calendar_month(year: str, month: str):
-        return render_template(
-            "calendar-month.html.j2",
-            **calendar_controller.render_month(int(year), int(month))
         )
 
 
@@ -236,7 +219,7 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
 
     @app.route("/")
     def index():
-        return render_template("index.html.j2", **entry_controller.render())
+        return render_template("home.html.j2", **entry_controller.render())
 
 
 def route_strava(app: Flask, host: str, port: int) -> None:
@@ -317,7 +300,6 @@ def webui_main(
     app = Flask(__name__)
 
     route_activity(app, repository)
-    route_calendar(app, repository)
     route_config(app, repository)
     route_equipment(app, repository)
     route_explorer(app, repository, tile_visit_accessor)
@@ -333,6 +315,7 @@ def webui_main(
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 
+    app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(
         make_eddington_blueprint(repository), url_prefix="/eddington"
     )
