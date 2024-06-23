@@ -29,7 +29,7 @@ def get_bounds(lat_lon_data: np.ndarray) -> GeoBounds:
 def add_margin(lower: float, upper: float) -> tuple[float, float]:
     spread = upper - lower
     margin = spread / 20
-    return max(0, lower - margin), upper + margin
+    return max(0.0, lower - margin), upper + margin
 
 
 def add_margin_to_geo_bounds(bounds: GeoBounds) -> GeoBounds:
