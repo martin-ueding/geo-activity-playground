@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.24
+
+- [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
+
 ### Version 0.23
 
 - [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Add password protection for upload.
