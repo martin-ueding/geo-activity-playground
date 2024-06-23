@@ -30,6 +30,7 @@ class TileVisitAccessor:
         self.visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
             self.TILE_VISITS_PATH
         ) or collections.defaultdict(dict)
+        "zoom → (tile_x, tile_y) → tile_info"
 
         self.histories: dict[int, pd.DataFrame] = try_load_pickle(
             self.TILE_HISTORIES_PATH

@@ -5,13 +5,16 @@ from flask import render_template
 from flask import Response
 
 from ...core.activities import ActivityRepository
+from ...explorer.tile_visits import TileVisitAccessor
 from .controller import ActivityController
 
 
-def make_activity_blueprint(repository: ActivityRepository) -> Blueprint:
+def make_activity_blueprint(
+    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
 
-    activity_controller = ActivityController(repository)
+    activity_controller = ActivityController(repository, tile_visit_accessor)
 
     @blueprint.route("/activity/all")
     def all():

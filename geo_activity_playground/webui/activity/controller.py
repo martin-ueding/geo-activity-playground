@@ -24,13 +24,17 @@ from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
 from geo_activity_playground.core.tiles import compute_tile_float
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
 
 
 class ActivityController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(
+        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    ) -> None:
         self._repository = repository
+        self._tile_visit_accessor = tile_visit_accessor
 
     @functools.lru_cache()
     def render_activity(self, id: int) -> dict:
@@ -46,6 +50,14 @@ class ActivityController:
         similar_activities = [row for _, row in similar_activities.iterrows()]
         similar_activities.reverse()
 
+        new_tiles = {
+            zoom: sum(
+                self._tile_visit_accessor.histories[zoom]["activity_id"]
+                == activity["id"]
+            )
+            for zoom in [14, 17]
+        }
+
         result = {
             "activity": activity,
             "line_json": line_json,
@@ -57,6 +69,7 @@ class ActivityController:
             "speed_color_bar": make_speed_color_bar(time_series),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
+            "new_tiles": new_tiles,
         }
         if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
             result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)

@@ -103,7 +103,9 @@ def webui_main(
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 
-    app.register_blueprint(make_activity_blueprint(repository), url_prefix="/activity")
+    app.register_blueprint(
+        make_activity_blueprint(repository, tile_visit_accessor), url_prefix="/activity"
+    )
     app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(
         make_eddington_blueprint(repository), url_prefix="/eddington"
