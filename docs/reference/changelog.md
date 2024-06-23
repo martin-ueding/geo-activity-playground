@@ -9,6 +9,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.24
 
 - [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
+- [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
+- Use Flask Blueprints to organize code.
 
 ### Version 0.23
 

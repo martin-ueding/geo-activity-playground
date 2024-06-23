@@ -29,7 +29,8 @@
     <div class="col-md-3">
         <ol>
             {% for activity in activities %}
-            <li><span style="color: {{ activity['color'] }};">█</span> <a href="{{ url_for('activity.show', id=activity.id) }}">{{
+            <li><span style="color: {{ activity['color'] }};">█</span> <a
+                    href="{{ url_for('activity.show', id=activity.id) }}">{{
                     activity.name }}</a></li>
             {% endfor %}
         </ol>
@@ -54,7 +55,8 @@
             <tbody>
                 {% for activity in activities %}
                 <tr>
-                    <td><span style="color: {{ activity['color'] }};">█</span> <a href="{{ url_for('activity.show', id=activity.id) }}">{{
+                    <td><span style="color: {{ activity['color'] }};">█</span> <a
+                            href="{{ url_for('activity.show', id=activity.id) }}">{{
                             activity.name }}</a></td>
                     <td>{{ activity.start }}</td>
                     <td>{{ activity.distance_km | round(1) }}</td>
@@ -63,6 +65,16 @@
                     <td>{{ activity["kind"] }}</td>
                 </tr>
                 {% endfor %}
+                {% if activities|length > 1 %}
+                <tr>
+                    <td><b>Total</b></td>
+                    <td></td>
+                    <td><b>{{ total_distance | round(1) }}</b></td>
+                    <td><b>{{ total_elapsed_time }}</b></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

@@ -109,6 +109,8 @@ class ActivityController:
             "activities": activities_list,
             "geojson": geojson.dumps(fc),
             "date": datetime.date(year, month, day).isoformat(),
+            "total_distance": activities_that_day["distance_km"].sum(),
+            "total_elapsed_time": activities_that_day["elapsed_time"].sum(),
         }
 
     def render_all(self) -> dict:
