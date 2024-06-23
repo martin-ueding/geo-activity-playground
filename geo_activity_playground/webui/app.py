@@ -1,7 +1,6 @@
 import json
 import pathlib
 import secrets
-import urllib
 
 from flask import Flask
 from flask import redirect
@@ -16,7 +15,7 @@ from .calendar.blueprint import make_calendar_blueprint
 from .config_controller import ConfigController
 from .eddington.blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
-from .equipment_controller import EquipmentController
+from .equipment.blueprint import make_equipment_blueprint
 from .explorer_controller import ExplorerController
 from .heatmap_controller import HeatmapController
 from .locations_controller import LocationsController
@@ -26,7 +25,7 @@ from .strava_controller import StravaController
 from .summary_controller import SummaryController
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
-from geo_activity_playground.webui.activity.controller import ActivityController
+from geo_activity_playground.webui.equipment.controller import EquipmentController
 
 
 def route_config(app: Flask, repository: ActivityRepository) -> None:
@@ -42,14 +41,6 @@ def route_config(app: Flask, repository: ActivityRepository) -> None:
         return render_template(
             "config.html.j2", **config_controller.action_save(form_input)
         )
-
-
-def route_equipment(app: Flask, repository: ActivityRepository) -> None:
-    equipment_controller = EquipmentController(repository)
-
-    @app.route("/equipment")
-    def equipment():
-        return render_template("equipment.html.j2", **equipment_controller.render())
 
 
 def route_explorer(
@@ -247,7 +238,6 @@ def webui_main(
     app = Flask(__name__)
 
     route_config(app, repository)
-    route_equipment(app, repository)
     route_explorer(app, repository, tile_visit_accessor)
     route_heatmap(app, repository, tile_visit_accessor)
     route_locations(app, repository)
@@ -264,6 +254,9 @@ def webui_main(
     app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(
         make_eddington_blueprint(repository), url_prefix="/eddington"
+    )
+    app.register_blueprint(
+        make_equipment_blueprint(repository), url_prefix="/equipment"
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(

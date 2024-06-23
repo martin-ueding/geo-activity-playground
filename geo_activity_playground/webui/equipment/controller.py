@@ -1,8 +1,8 @@
 import altair as alt
 import pandas as pd
 
-from ..core.config import get_config
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import get_config
 
 
 class EquipmentController:
@@ -18,7 +18,8 @@ class EquipmentController:
                         "time": group["start"],
                         "total_distance_km": group["distance_km"].cumsum(),
                     }
-                )
+                ),
+                include_groups=False,
             )
             .reset_index()
         )
@@ -52,7 +53,8 @@ class EquipmentController:
                         "last_use": group["start"].iloc[-1],
                     },
                     index=[0],
-                )
+                ),
+                include_groups=False,
             )
             .reset_index()
             .sort_values("last_use", ascending=False)
