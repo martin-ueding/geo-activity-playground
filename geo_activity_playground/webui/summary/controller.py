@@ -110,7 +110,7 @@ def plot_monthly_distance(meta: pd.DataFrame) -> str:
 
 def plot_yearly_distance(year_kind_total: pd.DataFrame) -> str:
     return (
-        alt.Chart(year_kind_total)
+        alt.Chart(year_kind_total, title="Total Distance per Year")
         .mark_bar()
         .encode(
             alt.X("year:O", title="Year"),
