@@ -1,21 +1,84 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<div class="row mb-1">
+
+
+<h1>Summary Statistics</h1>
+
+<h2>Distances</h2>
+
+<p>This is your weekly distance for the past rolling year, split by activity kind.</p>
+
+<div class="row mb-3">
     <div class="col">
-        <h1>Summary Statistics</h1>
+        {{ vega_direct("plot_weekly_distance", plot_weekly_distance) }}
     </div>
 </div>
 
-<div class="row mb-1">
+<p>Similarly, you find the same data but aggregated by whole months for the past two years. Also split by activity kind.
+</p>
+
+<div class="row mb-3">
     <div class="col">
-        {{ vega_direct("year_on_year_distance_meta_plot", year_on_year_distance_meta_plot) }}
+        {{ vega_direct("plot_monthly_distance", plot_monthly_distance) }}
     </div>
 </div>
 
-<div class="row mb-1">
+
+<p>How much distance have you covered in each year up to that time of the year? The first plot gives you each year as
+    one line. The second plot shows you how distance you have covered in each year and with which activity kinds.</p>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ vega_direct("plot_year_cumulative", plot_year_cumulative) }}
+    </div>
+    <div class="col-md-6">
+        {{ vega_direct("plot_yearly_distance", plot_yearly_distance) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <p>What's the average distance per activity? This naturally differs per activity and perhaps also varies with
+            the years. This table gives you all the mean values.</p>
+    </div>
+
+    <div class="col-md-8">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="text-align: right;">Year</th>
+                    {% for col in tabulate_year_kind_mean['columns'][1:] %}
+                    <th style="text-align: right;">{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in tabulate_year_kind_mean['data'] %}
+                <tr>
+                    {% for value in row %}
+                    <td align="right">
+                        {% if value == value %}
+                        {{ value | round(2) }}
+                        {% if not loop.first %}
+                        km
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p>Next we take one row per month, each column is a day-of-month. The brighter a box, the more distance you have covered
+    on that day. This makes it easy to spot those days where you really covered a lot of distance!</p>
+
+<div class="row mb-3">
     <div class="col">
-        {{ vega_direct("distance_heatmap_meta_plot", distance_heatmap_meta_plot) }}
+        {{ vega_direct("plot_distance_heatmap", plot_distance_heatmap) }}
     </div>
 </div>
 {% endblock %}
