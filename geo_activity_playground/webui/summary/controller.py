@@ -116,6 +116,11 @@ def plot_yearly_distance(year_kind_total: pd.DataFrame) -> str:
             alt.X("year:O", title="Year"),
             alt.Y("distance_km", title="Distance / km"),
             alt.Color("kind", title="Kind"),
+            [
+                alt.Tooltip("year:O", title="Year"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("distance_km", title="Distance / km"),
+            ],
         )
         .to_json(format="vega")
     )
@@ -135,14 +140,19 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
     )
 
     return (
-        alt.Chart(year_cumulative, title="Cumultative Distance per Year")
+        alt.Chart(year_cumulative, width=500, title="Cumultative Distance per Year")
         .mark_line()
         .encode(
             alt.X("week", title="Week"),
             alt.Y("distance_km", title="Distance / km"),
             alt.Color("year:N", title="Year"),
-            alt.Tooltip("year"),
+            [
+                alt.Tooltip("week", title="Week"),
+                alt.Tooltip("year:N", title="Year"),
+                alt.Tooltip("distance_km", title="Distance / km"),
+            ],
         )
+        .interactive()
         .to_json(format="vega")
     )
 
@@ -193,6 +203,11 @@ def plot_weekly_distance(df: pd.DataFrame) -> str:
             alt.X("year_week", title="Year and Week"),
             alt.Y("distance_km", title="Distance / km"),
             alt.Color("kind", title="Kind"),
+            [
+                alt.Tooltip("year_week", title="Year and Week"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("distance_km", title="Distance / km"),
+            ],
         )
         .to_json(format="vega")
     )
