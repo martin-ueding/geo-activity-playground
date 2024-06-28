@@ -94,7 +94,7 @@ def plot_monthly_distance(meta: pd.DataFrame) -> str:
                     )
                 )
             ],
-            title="Montly Distance",
+            title="Monthly Distance",
         )
         .mark_bar()
         .encode(
