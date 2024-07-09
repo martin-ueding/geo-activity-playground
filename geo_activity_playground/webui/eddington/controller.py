@@ -10,7 +10,9 @@ class EddingtonController:
         self._repository = repository
 
     def render(self) -> dict:
-        activities = self._repository.meta.copy()
+        activities = self._repository.meta.loc[
+            self._repository.meta["consider_for_achievements"]
+        ].copy()
         activities["day"] = [start.date() for start in activities["start"]]
 
         sum_per_day = activities.groupby("day").apply(
