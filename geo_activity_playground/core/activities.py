@@ -122,9 +122,11 @@ class ActivityRepository:
         else:
             return None
 
-    @property
-    def activity_ids(self) -> set[int]:
-        return set(self.meta.index)
+    def get_activity_ids(self, only_achievements: bool = False) -> set[int]:
+        if only_achievements:
+            return set(self.meta.loc[self.meta["consider_for_achievements"]].index)
+        else:
+            return set(self.meta.index)
 
     def iter_activities(self, new_to_old=True, dropna=False) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1
@@ -153,7 +155,7 @@ class ActivityRepository:
 
 def embellish_time_series(repository: ActivityRepository) -> None:
     work_tracker = WorkTracker("embellish-time-series")
-    activities_to_process = work_tracker.filter(repository.activity_ids)
+    activities_to_process = work_tracker.filter(repository.get_activity_ids())
     for activity_id in tqdm(activities_to_process, desc="Embellish time series data"):
         path = activity_timeseries_path(activity_id)
         df = pd.read_parquet(path)

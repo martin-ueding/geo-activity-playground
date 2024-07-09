@@ -29,7 +29,7 @@ def precompute_activity_distances(repository: ActivityRepository) -> None:
     with stored_object(fingerprint_path, {}) as fingerprints, stored_object(
         distances_path, {}
     ) as distances:
-        activity_ids = repository.activity_ids
+        activity_ids = repository.get_activity_ids()
 
         activity_ids_without_fingerprint = [
             activity_id

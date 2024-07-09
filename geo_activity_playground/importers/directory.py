@@ -69,6 +69,7 @@ def import_from_directory(
             path=str(path),
             kind="Unknown",
             equipment="Unknown",
+            consider_for_achievements=True,
         )
         activity_meta.update(activity_meta_from_file)
         activity_meta.update(_get_metadata_from_path(path, metadata_extraction_regexes))

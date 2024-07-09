@@ -56,7 +56,9 @@ def compute_tile_visits(
 ) -> None:
 
     work_tracker = WorkTracker("tile-visits")
-    activity_ids_to_process = work_tracker.filter(repository.activity_ids)
+    activity_ids_to_process = work_tracker.filter(
+        repository.get_activity_ids(only_achievements=True)
+    )
     new_tile_history_rows = collections.defaultdict(list)
     for activity_id in tqdm(
         activity_ids_to_process, desc="Extract explorer tile visits"
