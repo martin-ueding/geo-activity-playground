@@ -6,6 +6,7 @@ import pickle
 import re
 import sys
 import traceback
+from typing import Any
 from typing import Optional
 
 import pandas as pd
@@ -23,7 +24,9 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 
 
 def import_from_directory(
-    repository: ActivityRepository, metadata_extraction_regexes: list[str] = []
+    repository: ActivityRepository,
+    kind_defaults: dict[str, Any] = {},
+    metadata_extraction_regexes: list[str] = [],
 ) -> None:
     paths_with_errors = []
     work_tracker = WorkTracker("parse-activity-files")
@@ -69,6 +72,7 @@ def import_from_directory(
         )
         activity_meta.update(activity_meta_from_file)
         activity_meta.update(_get_metadata_from_path(path, metadata_extraction_regexes))
+        activity_meta.update(kind_defaults.get(activity_meta["kind"], {}))
         repository.add_activity(activity_meta)
 
     if paths_with_errors:
@@ -97,7 +101,7 @@ def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]
         except ActivityParseError as e:
             logger.error(f"Error while parsing file {path}:")
             traceback.print_exc()
-            return (path, str(e))
+            return path, str(e)
         except:
             logger.error(f"Encountered a problem with {path=}, see details below.")
             raise

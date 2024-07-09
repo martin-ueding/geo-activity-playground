@@ -96,6 +96,7 @@ def scan_for_activities(
     if pathlib.Path("Activities").exists():
         import_from_directory(
             repository,
+            config.get("kind", {}),
             config.get("metadata_extraction_regexes", []),
         )
     if pathlib.Path("Strava Export").exists():

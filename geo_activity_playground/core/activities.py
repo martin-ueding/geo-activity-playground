@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 class ActivityMeta(TypedDict):
     calories: float
     commute: bool
+    consider_for_achievements: bool
     distance_km: float
     elapsed_time: datetime.timedelta
     end_latitude: float

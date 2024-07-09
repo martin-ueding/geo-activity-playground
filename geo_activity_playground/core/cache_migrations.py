@@ -78,6 +78,17 @@ def convert_distances_to_km() -> None:
         time_series.to_parquet(time_series_path)
 
 
+def add_consider_for_achievements() -> None:
+    df = pd.read_parquet("Cache/activities.parquet")
+    if "consider_for_achievements" not in df.columns:
+        df["consider_for_achievements"] = True
+    else:
+        df.loc[
+            df["consider_for_achievements"].isna(), "consider_for_achievements"
+        ] = True
+    df.to_parquet("Cache/activities.parquet")
+
+
 def apply_cache_migrations() -> None:
     logger.info("Apply cache migration if needed …")
     cache_status_file = pathlib.Path("Cache/status.json")
@@ -98,6 +109,7 @@ def apply_cache_migrations() -> None:
         delete_activity_metadata,
         delete_tile_visits,
         delete_heatmap_cache,
+        add_consider_for_achievements,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:

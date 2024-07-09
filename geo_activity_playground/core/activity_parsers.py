@@ -8,15 +8,12 @@ import charset_normalizer
 import dateutil.parser
 import fitdecode
 import gpxpy
-import numpy as np
 import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
-from pandas._libs import NaTType
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import embellish_single_time_series
-from geo_activity_playground.core.coordinates import get_distance
 
 logger = logging.getLogger(__name__)
 
