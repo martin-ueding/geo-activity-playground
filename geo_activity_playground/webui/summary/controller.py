@@ -54,7 +54,7 @@ def plot_distance_heatmap(meta: pd.DataFrame) -> str:
                 (
                     meta["start"]
                     >= pd.to_datetime(
-                        datetime.datetime.now(datetime.UTC)
+                        datetime.datetime.now(datetime.timezone.utc)
                         - datetime.timedelta(days=2 * 365)
                     )
                 )
@@ -89,7 +89,7 @@ def plot_monthly_distance(meta: pd.DataFrame) -> str:
                 (
                     meta["start"]
                     >= pd.to_datetime(
-                        datetime.datetime.now(datetime.UTC)
+                        datetime.datetime.now(datetime.timezone.utc)
                         - datetime.timedelta(days=2 * 365)
                     )
                 )
