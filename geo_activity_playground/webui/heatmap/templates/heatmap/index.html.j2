@@ -18,7 +18,7 @@
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 12
             });
-            L.tileLayer('/heatmap/tile/{z}/{x}/{y}.png', {
+            L.tileLayer('/heatmap/tile/{z}/{x}/{y}/{{ kinds_str }}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map)
@@ -32,7 +32,7 @@
             function downloadAs() {
                 bounds = map.getBounds()
                 window.location.href =
-                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}`
+                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/{{ kinds_str }}`
             }
         </script>
     </div>

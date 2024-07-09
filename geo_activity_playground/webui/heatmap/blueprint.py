@@ -17,21 +17,18 @@ def make_heatmap_blueprint(
     def index():
         return render_template("heatmap/index.html.j2", **heatmap_controller.render())
 
-    @blueprint.route("/tile/<z>/<x>/<y>.png")
-    def tile(x: str, y: str, z: str):
+    @blueprint.route("/tile/<z>/<x>/<y>/<kinds>.png")
+    def tile(x: str, y: str, z: str, kinds: str):
         return Response(
-            heatmap_controller.render_tile(int(x), int(y), int(z)),
+            heatmap_controller.render_tile(int(x), int(y), int(z), kinds.split(";")),
             mimetype="image/png",
         )
 
-    @blueprint.route("/download/<north>/<east>/<south>/<west>")
-    def download(north: str, east: str, south: str, west: str):
+    @blueprint.route("/download/<north>/<east>/<south>/<west>/<kinds>")
+    def download(north: str, east: str, south: str, west: str, kinds: str):
         return Response(
             heatmap_controller.download_heatmap(
-                float(north),
-                float(east),
-                float(south),
-                float(west),
+                float(north), float(east), float(south), float(west), kinds.split(";")
             ),
             mimetype="image/png",
             headers={"Content-disposition": 'attachment; filename="heatmap.png"'},

@@ -37,7 +37,7 @@ class HeatmapController:
         self.tile_evolution_states = self._tile_visit_accessor.states
         self.tile_visits = self._tile_visit_accessor.visits
 
-    def render(self) -> dict:
+    def render(self, kinds: list[str] = []) -> dict:
         zoom = 14
         tiles = self.tile_histories[zoom]
         medians = tiles.median(skipna=True)
@@ -45,6 +45,10 @@ class HeatmapController:
             medians["tile_x"], medians["tile_y"], zoom
         )
         cluster_state = self.tile_evolution_states[zoom]
+
+        if not kinds:
+            kinds = self._repository.meta["kind"].unique()
+
         return {
             "center": {
                 "latitude": median_lat,
@@ -56,12 +60,14 @@ class HeatmapController:
                     if len(cluster_state.memberships) > 0
                     else {}
                 ),
-            }
+            },
+            "kinds": kinds,
+            "kinds_str": ";".join(kinds),
         }
 
-    def _render_tile_image(self, x: int, y: int, z: int) -> np.ndarray:
+    def _get_counts(self, x: int, y: int, z: int, kind: bool) -> np.ndarray:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
-        tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
+        tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{kind}/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():
             tile_counts = np.load(tile_count_cache_path)
         else:
@@ -76,6 +82,9 @@ class HeatmapController:
                     if activity_id in parsed_activities:
                         continue
                     parsed_activities.add(activity_id)
+                    activity = self._repository.get_activity_by_id(activity_id)
+                    if activity["kind"] != kind:
+                        continue
                     time_series = self._repository.get_time_series(activity_id)
                     for _, group in time_series.groupby("segment_id"):
                         xy_pixels = (
@@ -91,6 +100,16 @@ class HeatmapController:
                         aim = np.array(im)
                         tile_counts += aim
             np.save(tile_count_cache_path, tile_counts)
+        return tile_counts
+
+    def _render_tile_image(
+        self, x: int, y: int, z: int, kinds: list[str]
+    ) -> np.ndarray:
+        tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
+        tile_counts = np.zeros(tile_pixels)
+        for kind in kinds:
+            tile_counts += self._get_counts(x, y, z, kind)
+
         tile_counts = np.sqrt(tile_counts) / 5
         tile_counts[tile_counts > 1.0] = 1.0
 
@@ -107,12 +126,14 @@ class HeatmapController:
             ] + data_color[:, :, c]
         return map_tile
 
-    def render_tile(self, x: int, y: int, z: int) -> bytes:
+    def render_tile(self, x: int, y: int, z: int, kinds: list[str]) -> bytes:
         f = io.BytesIO()
-        pl.imsave(f, self._render_tile_image(x, y, z), format="png")
+        pl.imsave(f, self._render_tile_image(x, y, z, kinds), format="png")
         return bytes(f.getbuffer())
 
-    def download_heatmap(self, north, east, south, west) -> bytes:
+    def download_heatmap(
+        self, north: float, east: float, south: float, west: float, kinds: list[str]
+    ) -> bytes:
         geo_bounds = GeoBounds(south, west, north, east)
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
 
@@ -128,7 +149,7 @@ class HeatmapController:
                     i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
                     j * OSM_TILE_SIZE : (j + 1) * OSM_TILE_SIZE,
                     :,
-                ] = self._render_tile_image(x, y, tile_bounds.zoom)
+                ] = self._render_tile_image(x, y, tile_bounds.zoom, kinds)
 
         f = io.BytesIO()
         pl.imsave(f, background, format="png")

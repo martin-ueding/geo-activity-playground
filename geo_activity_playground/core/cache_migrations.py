@@ -111,6 +111,7 @@ def apply_cache_migrations() -> None:
         delete_heatmap_cache,
         add_consider_for_achievements,
         delete_tile_visits,
+        delete_heatmap_cache,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:
