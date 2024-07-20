@@ -65,7 +65,7 @@ class HeatmapController:
             "kinds_str": ";".join(kinds),
         }
 
-    def _get_counts(self, x: int, y: int, z: int, kind: bool) -> np.ndarray:
+    def _get_counts(self, x: int, y: int, z: int, kind: str) -> np.ndarray:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{kind}/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():

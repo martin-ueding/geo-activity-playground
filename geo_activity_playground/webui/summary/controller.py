@@ -1,10 +1,13 @@
+import collections
 import datetime
 import functools
+from typing import Optional
 
 import altair as alt
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activities import make_geojson_from_time_series
 
 
 class SummaryController:
@@ -31,7 +34,60 @@ class SummaryController:
             .reset_index()
             .to_dict(orient="split"),
             "plot_weekly_distance": plot_weekly_distance(df),
+            "nominations": [
+                (
+                    self._repository.get_activity_by_id(activity_id),
+                    reasons,
+                    make_geojson_from_time_series(
+                        self._repository.get_time_series(activity_id)
+                    ),
+                )
+                for activity_id, reasons in nominate_activities(
+                    self._repository.meta
+                ).items()
+            ],
         }
+
+
+def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
+    nominations: dict[int, list[str]] = collections.defaultdict(list)
+
+    subset = meta.loc[meta["consider_for_achievements"]]
+
+    i = subset["distance_km"].idxmax()
+    nominations[i].append(f"Greatest distance: {meta.loc[i].distance_km:.1f} km")
+
+    i = subset["elapsed_time"].idxmax()
+    nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
+
+    i = subset["calories"].idxmax()
+    nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:d} kcal")
+
+    i = subset["steps"].idxmax()
+    nominations[i].append(f"Most steps: {meta.loc[i].steps:d}")
+
+    for kind, group in meta.groupby("kind"):
+        for key, text in [
+            (
+                "distance_km",
+                lambda row: f"Greatest distance for {row.kind}: {row.distance_km:.1f} km",
+            ),
+            (
+                "elapsed_time",
+                lambda row: f"Longest elapsed time for {row.kind}: {row.elapsed_time}",
+            ),
+            (
+                "calories",
+                lambda row: f"Most calories burnt for {row.kind}: {row.calories:d} kcal",
+            ),
+            ("steps", lambda row: f"Most steps for {row.kind}: {row.steps:d}"),
+        ]:
+            series = group[key]
+            i = series.idxmax()
+            if not pd.isna(i):
+                nominations[i].append(text(meta.loc[i]))
+
+    return nominations
 
 
 def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
