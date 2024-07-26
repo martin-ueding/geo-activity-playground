@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-95](https://github.com/martin-ueding/geo-activity-playground/issues/05): Display the number of new explorer tiles and squadratinhos per activity.
 - [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
 - [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
+- [GH-115](https://github.com/martin-ueding/geo-activity-playground/issues/115): Add more summary statistics and add a "hall of fame" as well.
 - Use Flask Blueprints to organize code.
 - Remove half-finished "locations" feature from the navigation.
 
