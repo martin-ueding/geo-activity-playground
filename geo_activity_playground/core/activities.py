@@ -18,6 +18,7 @@ from geo_activity_playground.core.paths import activities_path
 from geo_activity_playground.core.paths import activity_timeseries_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.tiles import compute_tile_float
+from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +80,6 @@ class ActivityRepository:
                 f"Adding {len(self._loose_activities)} activities to the repository …"
             )
             new_df = pd.DataFrame(self._loose_activities)
-            if not pd.api.types.is_dtype_equal(
-                new_df["start"].dtype, "datetime64[ns, UTC]"
-            ):
-                new_df["start"] = new_df["start"].dt.tz_localize("UTC")
-                new_df["start"] = new_df["start"].dt.tz_convert("UTC")
             if len(self.meta):
                 new_ids_set = set(new_df["id"])
                 is_kept = [
@@ -94,7 +90,7 @@ class ActivityRepository:
                 old_df = self.meta
             self.meta = pd.concat([old_df, new_df])
             assert pd.api.types.is_dtype_equal(
-                self.meta["start"].dtype, "datetime64[ns, UTC]"
+                self.meta["start"].dtype, "datetime64[ns]"
             ), (self.meta["start"].dtype, self.meta["start"].iloc[0])
             self.save()
             self._loose_activities = []
@@ -179,9 +175,11 @@ def embellish_single_time_series(
     ):
         time = timeseries["time"]
         del timeseries["time"]
-        timeseries["time"] = [start + datetime.timedelta(seconds=t) for t in time]
+        timeseries["time"] = [
+            convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
+        ]
         changed = True
-    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns, UTC]")
+    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns]")
 
     distances = get_distance(
         timeseries["latitude"].shift(1),

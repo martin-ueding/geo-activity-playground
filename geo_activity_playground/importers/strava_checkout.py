@@ -16,6 +16,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activity_parsers import ActivityParseError
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.tasks import WorkTracker
+from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)
@@ -174,9 +175,9 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
             "id": activity_id,
             "name": row["Activity Name"],
             "path": str(activity_file),
-            "start": dateutil.parser.parse(
-                row["Activity Date"], dayfirst=dayfirst
-            ).astimezone(datetime.timezone.utc),
+            "start": convert_to_datetime_ns(
+                dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
+            ),
         }
 
         time_series_path = activity_stream_dir / f"{activity_id}.parquet"

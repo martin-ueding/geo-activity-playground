@@ -14,6 +14,7 @@ import xmltodict
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import embellish_single_time_series
+from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
 
@@ -55,24 +56,6 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
     if len(timeseries):
-        # Unify time zones to UTC.
-        try:
-            if timeseries["time"].dt.tz is not None:
-                timeseries["time"] = timeseries["time"].dt.tz_localize(None)
-            timeseries["time"] = timeseries["time"].dt.tz_localize("UTC")
-        except AttributeError as e:
-            print(timeseries)
-            print(timeseries.dtypes)
-            types = {}
-            for elem in timeseries["time"]:
-                t = str(type(elem))
-                if t not in types:
-                    types[t] = elem
-            print(types)
-            raise ActivityParseError(
-                "It looks like the date parsing has gone wrong."
-            ) from e
-
         timeseries, changed = embellish_single_time_series(timeseries)
 
         # Extract some meta data from the time series.
@@ -125,11 +108,12 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                     ):
                         time = values["timestamp"]
                         if isinstance(time, datetime.datetime):
-                            time = time.astimezone(datetime.timezone.utc)
+                            pass
                         elif time is None or isinstance(time, int):
                             time = pd.NaT
                         else:
                             raise RuntimeError(f"Cannot parse time: {time} in {path}.")
+                        time = convert_to_datetime_ns(time)
                         row = {
                             "time": time,
                             "latitude": values["position_lat"] / ((2**32) / 360),
@@ -204,13 +188,11 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
             for point in segment.points:
                 if isinstance(point.time, datetime.datetime):
                     time = point.time
-                    time = time.astimezone(datetime.timezone.utc)
                 elif isinstance(point.time, str):
                     time = dateutil.parser.parse(str(point.time))
-                    time = time.astimezone(datetime.timezone.utc)
                 else:
                     time = pd.NaT
-                    time.tz_localize("UTC")
+                time = convert_to_datetime_ns(time)
                 points.append((time, point.latitude, point.longitude, point.elevation))
 
     df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "altitude"])
@@ -248,7 +230,7 @@ def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
         if trackpoint.latitude and trackpoint.longitude:
             time = trackpoint.time
             assert isinstance(time, datetime.datetime)
-            time = time.astimezone(datetime.timezone.utc)
+            time = convert_to_datetime_ns(time)
             row = {
                 "time": time,
                 "latitude": trackpoint.latitude,
@@ -276,7 +258,8 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     track = placemark["gx:Track"]
     rows = []
     for when, where in zip(track["when"], track["gx:coord"]):
-        time = dateutil.parser.parse(when).astimezone(datetime.timezone.utc)
+        time = dateutil.parser.parse(when)
+        time = convert_to_datetime_ns(time)
         parts = where.split(" ")
         if len(parts) == 2:
             lon, lat = parts
@@ -295,11 +278,7 @@ def read_simra_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     data["time"] = data["timeStamp"].apply(
         lambda d: datetime.datetime.fromtimestamp(d / 1000)
     )
-    tz = (
-        datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-    )  # get local timezone
-    data["time"] = data["time"].dt.tz_localize(tz)
-    data["time"] = data["time"].dt.tz_convert("UTC")
+    data["time"] = convert_to_datetime_ns(data["time"])
     data = data.rename(columns={"lat": "latitude", "lon": "longitude"})
     return data.dropna(subset=["latitude"], ignore_index=True)[
         ["time", "latitude", "longitude"]

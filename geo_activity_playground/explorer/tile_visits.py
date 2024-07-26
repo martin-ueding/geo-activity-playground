@@ -111,11 +111,6 @@ def compute_tile_visits(
     if new_tile_history_rows:
         for zoom, new_rows in new_tile_history_rows.items():
             new_df = pd.DataFrame(new_rows)
-            if not pd.api.types.is_dtype_equal(
-                new_df["time"].dtype, "datetime64[ns, UTC]"
-            ):
-                new_df["time"] = new_df["time"].dt.tz_localize("UTC")
-                new_df["time"] = new_df["time"].dt.tz_convert("UTC")
             new_df.sort_values("time", inplace=True)
             tile_visits_accessor.histories[zoom] = pd.concat(
                 [tile_visits_accessor.histories[zoom], new_df]
@@ -129,7 +124,7 @@ def compute_tile_visits(
 def _tiles_from_points(
     time_series: pd.DataFrame, zoom: int
 ) -> Iterator[tuple[datetime.datetime, int, int]]:
-    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns, UTC]")
+    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns]")
     xf = time_series["x"] * 2**zoom
     yf = time_series["y"] * 2**zoom
     for t1, x1, y1, x2, y2, s1, s2 in zip(

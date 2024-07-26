@@ -35,7 +35,7 @@ class EntryController:
 
 def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
     before_30_days = pd.to_datetime(
-        datetime.datetime.utcnow() - datetime.timedelta(days=31), utc=True
+        datetime.datetime.now() - datetime.timedelta(days=31)
     )
     return (
         alt.Chart(
