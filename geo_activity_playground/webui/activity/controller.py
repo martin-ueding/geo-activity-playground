@@ -2,6 +2,7 @@ import datetime
 import functools
 import io
 import logging
+import re
 from collections.abc import Collection
 
 import altair as alt
@@ -94,6 +95,8 @@ class ActivityController:
         time_series = self._repository.get_time_series(id)
         for privacy_zone in self._privacy_zones:
             time_series = privacy_zone.filter_time_series(time_series)
+        if len(time_series) == 0:
+            time_series = self._repository.get_time_series(id)
         return make_sharepic(activity, time_series)
 
     def render_day(self, year: int, month: int, day: int) -> dict:
@@ -424,29 +427,8 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         :,
     ]
 
-    img = Image.fromarray((background * 256).astype("uint8"), "RGB")
+    img = Image.fromarray((background * 255).astype("uint8"), "RGB")
     draw = ImageDraw.Draw(img, mode="RGBA")
-    font = ImageFont.truetype("/usr/share/fonts/google-noto/NotoSans-Regular.ttf")
-    draw.font = font
-    draw.rectangle([0, 0, img.width, 70], fill=(0, 0, 0, 128))
-    draw.text(
-        (35, 10),
-        f"{activity['kind']} on 🗓️ {activity['start'].date()}",
-        font=font,
-        font_size=30,
-    )
-
-    draw.rectangle([0, img.height - 70, img.width, img.height], fill=(0, 0, 0, 128))
-    facts = [
-        f"📐 {activity['distance_km']:.1f} km",
-        f"⏱️ {activity['elapsed_time']}",
-    ]
-    if activity["calories"]:
-        facts.append(f"🔥 {activity['calories']:.0f} kcal")
-    if activity["steps"] and not pd.isna(activity["steps"]):
-        facts.append(f"👣 {activity['steps']:.0f} steps")
-
-    draw.text((35, img.height - 70 + 10), " — ".join(facts), font_size=30)
 
     for _, group in time_series.groupby("segment_id"):
         xs, ys = compute_tile_float(
@@ -461,6 +443,21 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         )
 
         draw.line(yx, fill="red", width=4)
+
+    draw.rectangle([0, img.height - 70, img.width, img.height], fill=(0, 0, 0, 128))
+    facts = [
+        f"{activity['kind']}",
+        f"{activity['start'].date()}",
+        f"{activity['equipment']}",
+        f"\n{activity['distance_km']:.1f} km",
+        re.sub(r"^0 days ", "", f"{activity['elapsed_time']}"),
+    ]
+    if activity["calories"]:
+        facts.append(f"{activity['calories']:.0f} kcal")
+    if activity["steps"] and not pd.isna(activity["steps"]):
+        facts.append(f"{activity['steps']:.0f} steps")
+
+    draw.text((35, img.height - 70 + 10), "      ".join(facts), font_size=20)
 
     # img_array = np.array(img) / 255
 
