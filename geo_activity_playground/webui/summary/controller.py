@@ -17,6 +17,7 @@ class SummaryController:
     @functools.cache
     def render(self) -> dict:
         df = embellished_activities(self._repository.meta)
+        df = df.loc[df["consider_for_achievements"]]
 
         year_kind_total = (
             df[["year", "kind", "distance_km", "hours"]]
@@ -61,10 +62,10 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
     nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
 
     i = subset["calories"].idxmax()
-    nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:d} kcal")
+    nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
 
     i = subset["steps"].idxmax()
-    nominations[i].append(f"Most steps: {meta.loc[i].steps:d}")
+    nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
 
     for kind, group in meta.groupby("kind"):
         for key, text in [
@@ -78,9 +79,9 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
             ),
             (
                 "calories",
-                lambda row: f"Most calories burnt for {row.kind}: {row.calories:d} kcal",
+                lambda row: f"Most calories burnt for {row.kind}: {row.calories:.0f} kcal",
             ),
-            ("steps", lambda row: f"Most steps for {row.kind}: {row.steps:d}"),
+            ("steps", lambda row: f"Most steps for {row.kind}: {row.steps:.0f}"),
         ]:
             series = group[key]
             i = series.idxmax()
