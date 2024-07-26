@@ -39,7 +39,7 @@ class EddingtonController:
                         width=1000,
                         title=f"Eddington Number {en}",
                     )
-                    .mark_bar()
+                    .mark_area(interpolate="step")
                     .encode(
                         alt.X(
                             "distance_km",
@@ -48,7 +48,7 @@ class EddingtonController:
                         ),
                         alt.Y(
                             "total",
-                            scale=alt.Scale(type="log"),
+                            scale=alt.Scale(domainMax=en + 10),
                             title="Days exceeding distance",
                         ),
                         [
@@ -64,8 +64,14 @@ class EddingtonController:
                     .encode(alt.X("distance_km"), alt.Y("total"))
                 )
             )
-            .interactive(bind_y=False)
+            .interactive()
             .to_json(format="vega")
         )
 
-        return {"eddington_number": en, "logarithmic_plot": logarithmic_plot}
+        return {
+            "eddington_number": en,
+            "logarithmic_plot": logarithmic_plot,
+            "eddington_table": eddington.loc[
+                (eddington["distance_km"] >= en) & (eddington["distance_km"] <= en + 10)
+            ].to_dict(orient="records"),
+        }
