@@ -8,6 +8,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.24
 
+- [GH-43](https://github.com/martin-ueding/geo-activity-playground/issues/43): Added nicer share pictures and privacy zones.
 - [GH-95](https://github.com/martin-ueding/geo-activity-playground/issues/05): Display the number of new explorer tiles and squadratinhos per activity.
 - [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
 - [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
