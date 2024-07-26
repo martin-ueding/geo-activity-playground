@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/upload/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/share-picture/">
       
       
-        <link rel="prev" href="../equipment/">
+        <link rel="prev" href="../upload/">
       
       
-        <link rel="next" href="../share-picture/">
+        <link rel="next" href="../../reference/changelog/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Uploading activities - Geo Activity Playground</title>
+        <title>Share Picture - Geo Activity Playground</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#uploading-activities" class="md-skip">
+        <a href="#share-picture" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Uploading activities
+              Share Picture
             
           </span>
         </div>
@@ -661,6 +661,27 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../upload/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Uploading activities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -673,29 +694,18 @@
         
       
       
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
   
   <span class="md-ellipsis">
-    Uploading activities
+    Share Picture
   </span>
   
 
-      </a>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../share-picture/" class="md-nav__link">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -704,6 +714,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#privacy-zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      Privacy zones
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -819,6 +858,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#privacy-zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      Privacy zones
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -832,17 +888,120 @@
                   
 
 
-<h1 id="uploading-activities">Uploading activities</h1>
-<p>Some users don't want to restart the application each time they add new activities but run it on their home server. For this use case you can upload activities. Uploading files is a potential security issue and it is protected with a password. This feature is only enabled when you have set a password in the configuration file.</p>
-<p>Put the following into your configuration file:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[upload]</span>
-<span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fb1c8d62-07a5-47bf-ada1-30aa66e41d8a&quot;</span>
+<h1 id="share-picture">Share Picture</h1>
+<p>On each activity page you will find a "share picture" like the following:</p>
+<p><img alt="" src="../share-picture.png" /></p>
+<h2 id="privacy-zones">Privacy zones</h2>
+<p>You might want to remove points that are close to your home, work or relatives. For this you can define arbitrary polygons as "privacy zones".</p>
+<p>To create such a polygon, go to <a href="https://geojson.io/">GeoJSON IO</a>. You will see a map similar to this one:</p>
+<p><img alt="" src="../geojson-io-1.png" /></p>
+<p>Select the polygon tool and click on the map to span the polygon.</p>
+<p><img alt="" src="../geojson-io-2.png" /></p>
+<p>Once you are done, press <kbd>Enter</kbd> to finish the polygon. In the left panel the GeoJSON output will appear:</p>
+<p><img alt="" src="../geojson-io-3.png" /></p>
+<p>For this case, we have this GeoJSON:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;features&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">      </span><span class="nt">&quot;geometry&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;coordinates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">[</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68272071401333</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.878628929151887</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.6819310903943</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8780142440226655</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68125883278765</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.879563587362242</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68022375065988</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.880599289703014</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68029311254671</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8814665851591315</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68102940933676</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.881542368256589</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.681723011688035</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8812729172415175</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.682176515374465</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68272071401333</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">          </span><span class="p">]</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Polygon&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
 </code></pre></div>
-<p>Be sure to choose your own password and not use the one from this documentation.</p>
-<p>Then you can go to the upload page and see this form:</p>
-<p><img alt="upload-form.png" src="../upload-form.png" /></p>
-<p>Select a file that you want to upload and a target directory within the “Activities” directory. Finally, enter the password from the configuration file.</p>
-<p>After you have uploaded the file, you will be redirected to the parsed activity.</p>
+<p>The relevant part here is only the coordinates and the list around it. We need just this:</p>
+<div class="highlight"><pre><span></span><code><span class="w">          </span><span class="p">[</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68272071401333</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.878628929151887</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.6819310903943</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8780142440226655</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68125883278765</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.879563587362242</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68022375065988</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.880599289703014</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68029311254671</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8814665851591315</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68102940933676</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.881542368256589</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.681723011688035</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.8812729172415175</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.682176515374465</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="p">[</span>
+<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
+<span class="w">              </span><span class="mf">50.68272071401333</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">          </span><span class="p">]</span>
+</code></pre></div>
+<p>Then optionally use a <a href="https://jsonformatter.org/">JSON formatter</a> to "minify" this a little bit. It will then look like this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">],[</span><span class="mf">6.878628929151887</span><span class="p">,</span><span class="mf">50.6819310903943</span><span class="p">],[</span><span class="mf">6.8780142440226655</span><span class="p">,</span><span class="mf">50.68125883278765</span><span class="p">],[</span><span class="mf">6.879563587362242</span><span class="p">,</span><span class="mf">50.68022375065988</span><span class="p">],[</span><span class="mf">6.880599289703014</span><span class="p">,</span><span class="mf">50.68029311254671</span><span class="p">],[</span><span class="mf">6.8814665851591315</span><span class="p">,</span><span class="mf">50.68102940933676</span><span class="p">],[</span><span class="mf">6.881542368256589</span><span class="p">,</span><span class="mf">50.681723011688035</span><span class="p">],[</span><span class="mf">6.8812729172415175</span><span class="p">,</span><span class="mf">50.682176515374465</span><span class="p">],[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">]]</span>
+</code></pre></div>
+<p>This is a list of coordinates that spans the polygon. Then go to your <code>config.toml</code> and add this stanza:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[privacy_zones]</span>
+<span class="n">my_zone_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">],[</span><span class="mf">6.878628929151887</span><span class="p">,</span><span class="mf">50.6819310903943</span><span class="p">],[</span><span class="mf">6.8780142440226655</span><span class="p">,</span><span class="mf">50.68125883278765</span><span class="p">],[</span><span class="mf">6.879563587362242</span><span class="p">,</span><span class="mf">50.68022375065988</span><span class="p">],[</span><span class="mf">6.880599289703014</span><span class="p">,</span><span class="mf">50.68029311254671</span><span class="p">],[</span><span class="mf">6.8814665851591315</span><span class="p">,</span><span class="mf">50.68102940933676</span><span class="p">],[</span><span class="mf">6.881542368256589</span><span class="p">,</span><span class="mf">50.681723011688035</span><span class="p">],[</span><span class="mf">6.8812729172415175</span><span class="p">,</span><span class="mf">50.682176515374465</span><span class="p">],[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">]]</span>
+</code></pre></div>
+<p>You can name the zone to help you remember what it encompasses. You can add multiple zones.</p>
+<p>Points that are within any of the privacy zones will not be shown in the share pictures. Except when <em>all</em> of the points are in the privacy zone, then all the points will be shown.</p>
 
 
 
