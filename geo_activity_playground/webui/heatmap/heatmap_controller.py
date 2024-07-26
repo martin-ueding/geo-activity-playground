@@ -47,8 +47,10 @@ class HeatmapController:
         )
         cluster_state = self.tile_evolution_states[zoom]
 
+        available_kinds = sorted(self._repository.meta["kind"].unique())
+
         if not kinds:
-            kinds = self._repository.meta["kind"].unique()
+            kinds = available_kinds
 
         return {
             "center": {
@@ -63,6 +65,7 @@ class HeatmapController:
                 ),
             },
             "kinds": kinds,
+            "available_kinds": available_kinds,
             "kinds_str": ";".join(kinds),
         }
 

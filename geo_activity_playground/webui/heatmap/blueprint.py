@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import render_template
+from flask import request
 from flask import Response
 
 from ...core.activities import ActivityRepository
@@ -15,7 +16,10 @@ def make_heatmap_blueprint(
 
     @blueprint.route("/")
     def index():
-        return render_template("heatmap/index.html.j2", **heatmap_controller.render())
+        return render_template(
+            "heatmap/index.html.j2",
+            **heatmap_controller.render(request.args.getlist("kind"))
+        )
 
     @blueprint.route("/tile/<z>/<x>/<y>/<kinds>.png")
     def tile(x: str, y: str, z: str, kinds: str):

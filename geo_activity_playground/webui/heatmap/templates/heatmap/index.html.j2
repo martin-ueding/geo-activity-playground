@@ -9,6 +9,21 @@
 
 <div class="row mb-3">
     <div class="col">
+        <form action="" method="GET">
+            {% for kind in available_kinds %}
+            <div class="form-check form-check-inline form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="{{ kind }}" name="kind"
+                    value="{{ kind }}" {{ 'checked' if kind in kinds else '' }} />
+                <label class="form-check-label" for="{{ kind }}">{{ kind }}</label>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Show selected kinds</button>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
         <div id="heatmap" style="height: 800px;"></div>
         <p><a href="#" onclick="downloadAs()">Download heatmap in visible area</a></p>
 
