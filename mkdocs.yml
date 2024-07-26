@@ -40,6 +40,7 @@ nav:
       - features/eddington.md
       - features/equipment.md
       - features/upload.md
+      - features/share-picture.md
   - Reference:
       - reference/changelog.md
   - acknowledgments.md
