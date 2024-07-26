@@ -21,11 +21,12 @@ from geo_activity_playground.core.activities import make_geojson_from_time_serie
 from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
-from geo_activity_playground.core.heatmap import crop_image_to_bounds
+from geo_activity_playground.core.heatmap import GeoBounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
-from geo_activity_playground.core.heatmap import make_bounds_square
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
+from geo_activity_playground.core.heatmap import PixelBounds
+from geo_activity_playground.core.heatmap import TileBounds
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
@@ -347,18 +348,85 @@ def name_minutes_plot(meta: pd.DataFrame) -> str:
     )
 
 
+def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
+    x_radius = (bounds.x_max - bounds.x_min) // 2
+    y_radius = (bounds.y_max - bounds.y_min) // 2
+    x_center = (bounds.x_max + bounds.x_min) // 2
+    y_center = (bounds.y_max + bounds.y_min) // 2
+
+    radius = max(x_radius, y_radius)
+
+    return PixelBounds(
+        x_min=x_center - radius,
+        y_min=y_center - radius,
+        x_max=x_center + radius,
+        y_max=y_center + radius,
+    )
+
+
+def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
+    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
+    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
+    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
+    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
+
+    radius = max(x_radius, y_radius)
+
+    return TileBounds(
+        zoom=bounds.zoom,
+        x_tile_min=int(x_center - radius),
+        y_tile_min=int(y_center - radius),
+        x_tile_max=int(np.ceil(x_center + radius)),
+        y_tile_max=int(np.ceil(y_center + radius)),
+    )
+
+
+def get_crop_mask(geo_bounds: GeoBounds, tile_bounds: TileBounds) -> PixelBounds:
+    min_x, min_y = compute_tile_float(
+        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
+    )
+    max_x, max_y = compute_tile_float(
+        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
+    )
+
+    crop_mask = PixelBounds(
+        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+    )
+    crop_mask = make_pixel_bounds_square(crop_mask)
+
+    return crop_mask
+
+
+def pixels_in_bounds(bounds: PixelBounds) -> int:
+    return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)
+
+
 def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
     lat_lon_data = np.array([time_series["latitude"], time_series["longitude"]]).T
 
     geo_bounds = get_bounds(lat_lon_data)
     geo_bounds = add_margin_to_geo_bounds(geo_bounds)
     tile_bounds = get_sensible_zoom_level(geo_bounds, (1500, 1500))
-    tile_bounds = make_bounds_square(tile_bounds)
+    tile_bounds = make_tile_bounds_square(tile_bounds)
     background = build_map_from_tiles(tile_bounds)
     # background = convert_to_grayscale(background)
 
-    img = Image.new("RGB", tile_bounds.shape[::-1])
+    crop_mask = get_crop_mask(geo_bounds, tile_bounds)
+    assert pixels_in_bounds(crop_mask) <= 10_000_000, crop_mask
+
+    background = background[
+        crop_mask.y_min : crop_mask.y_max,
+        crop_mask.x_min : crop_mask.x_max,
+        :,
+    ]
+
+    img = Image.new("RGB", crop_mask.shape[::-1])
     draw = ImageDraw.Draw(img)
+
+    draw.rectangle((0, 50, img.width, 50), fill="green")
 
     for _, group in time_series.groupby("segment_id"):
         xs, ys = compute_tile_float(
@@ -366,23 +434,23 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         )
         yx = list(
             (
-                int((x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-                int((y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+                int((x - tile_bounds.x_tile_min) * OSM_TILE_SIZE - crop_mask.x_min),
+                int((y - tile_bounds.y_tile_min) * OSM_TILE_SIZE - crop_mask.y_min),
             )
             for x, y in zip(xs, ys)
         )
 
+        print(f"{yx=}")
+
         draw.line(yx, fill="red", width=4)
 
-    aimg = np.array(img) / 255
+    img_array = np.array(img) / 255
 
-    weight = np.dstack([aimg[:, :, 0]] * 3)
+    weight = np.dstack([img_array[:, :, 0]] * 3)
 
-    background = (1 - weight) * background + aimg
+    background = (1 - weight) * background + img_array
     background[background > 1.0] = 1.0
     background[background < 0.0] = 0.0
-
-    background = crop_image_to_bounds(background, geo_bounds, tile_bounds)
 
     f = io.BytesIO()
     pl.imsave(f, background, format="png")

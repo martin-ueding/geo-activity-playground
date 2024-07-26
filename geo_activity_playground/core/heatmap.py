@@ -51,11 +51,28 @@ class TileBounds:
     y_tile_min: int
     y_tile_max: int
 
+
+@dataclasses.dataclass
+class PixelBounds:
+    x_min: int
+    x_max: int
+    y_min: int
+    y_max: int
+
+    @classmethod
+    def from_tile_bounds(cls, tile_bounds: TileBounds) -> "PixelBounds":
+        return cls(
+            int(tile_bounds.x_tile_min) * OSM_TILE_SIZE,
+            int(tile_bounds.x_tile_max) * OSM_TILE_SIZE,
+            int(tile_bounds.y_tile_min) * OSM_TILE_SIZE,
+            int(tile_bounds.y_tile_max) * OSM_TILE_SIZE,
+        )
+
     @property
     def shape(self) -> tuple[int, int]:
         return (
-            (self.y_tile_max - self.y_tile_min) * OSM_TILE_SIZE,
-            (self.x_tile_max - self.x_tile_min) * OSM_TILE_SIZE,
+            self.y_max - self.y_min,
+            self.x_max - self.x_min,
         )
 
 
@@ -107,7 +124,7 @@ def get_sensible_zoom_level(
 
 
 def build_map_from_tiles(tile_bounds: TileBounds) -> np.ndarray:
-    background = np.zeros((*tile_bounds.shape, 3))
+    background = np.zeros((*PixelBounds.from_tile_bounds(tile_bounds).shape, 3))
 
     for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
         for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
@@ -129,47 +146,3 @@ def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
     image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
     image = np.dstack((image, image, image))
     return image
-
-
-def crop_image_to_bounds(
-    image: np.ndarray, geo_bounds: GeoBounds, tile_bounds: TileBounds
-) -> np.ndarray:
-    min_x, min_y = compute_tile_float(
-        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
-    )
-    max_x, max_y = compute_tile_float(
-        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
-    )
-
-    crop_mask = TileBounds(
-        tile_bounds.zoom,
-        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-    )
-    crop_mask = make_bounds_square(crop_mask)
-
-    image = image[
-        crop_mask.y_tile_min : crop_mask.y_tile_max,
-        crop_mask.x_tile_min : crop_mask.x_tile_max,
-        :,
-    ]
-    return image
-
-
-def make_bounds_square(bounds: TileBounds) -> TileBounds:
-    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
-    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
-    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
-    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
-
-    radius = max(x_radius, y_radius)
-
-    return TileBounds(
-        x_tile_min=int(x_center - radius),
-        y_tile_min=int(y_center - radius),
-        x_tile_max=int(x_center + radius),
-        y_tile_max=int(y_center + radius),
-        zoom=bounds.zoom,
-    )
