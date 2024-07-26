@@ -36,6 +36,7 @@ class HeatmapController:
         self.tile_histories = self._tile_visit_accessor.histories
         self.tile_evolution_states = self._tile_visit_accessor.states
         self.tile_visits = self._tile_visit_accessor.visits
+        self.activities_per_tile = self._tile_visit_accessor.activities_per_tile
 
     def render(self, kinds: list[str] = []) -> dict:
         zoom = 14
@@ -73,7 +74,7 @@ class HeatmapController:
         else:
             tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        activity_ids = self.tile_visits[z].get((x, y), {}).get("activity_ids", set())
+        activity_ids = self.activities_per_tile[z].get((x, y), set())
         if activity_ids:
             with work_tracker(
                 tile_count_cache_path.with_suffix(".json")

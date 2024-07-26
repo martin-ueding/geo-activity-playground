@@ -25,6 +25,7 @@ class TileVisitAccessor:
     TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
     TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
     TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
+    ACTIVITIES_PER_TILE_PATH = pathlib.Path(f"Cache/activities-per-tile.pickle")
 
     def __init__(self) -> None:
         self.visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
@@ -40,6 +41,12 @@ class TileVisitAccessor:
             self.TILE_EVOLUTION_STATES_PATH
         ) or collections.defaultdict(TileEvolutionState)
 
+        self.activities_per_tile: dict[
+            int, dict[tuple[int, int], set[int]]
+        ] = try_load_pickle(self.ACTIVITIES_PER_TILE_PATH) or collections.defaultdict(
+            lambda: collections.defaultdict(set)
+        )
+
     def save(self) -> None:
         with open(self.TILE_VISITS_PATH, "wb") as f:
             pickle.dump(self.visits, f)
@@ -49,6 +56,27 @@ class TileVisitAccessor:
 
         with open(self.TILE_EVOLUTION_STATES_PATH, "wb") as f:
             pickle.dump(self.states, f)
+
+        with open(self.ACTIVITIES_PER_TILE_PATH, "wb") as f:
+            pickle.dump(self.activities_per_tile, f)
+
+
+def compute_activities_per_tile(
+    repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
+) -> None:
+    work_tracker = WorkTracker("activities-per-tile")
+    activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
+    for activity_id in tqdm(activity_ids_to_process, desc="Extract tiles per activity"):
+        time_series = repository.get_time_series(activity_id)
+        for zoom in range(20):
+            for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
+                tile_visits_accessor.activities_per_tile[zoom][(tile_x, tile_y)].add(
+                    activity_id
+                )
+        work_tracker.mark_done(activity_id)
+
+    tile_visits_accessor.save()
+    work_tracker.close()
 
 
 def compute_tile_visits(
