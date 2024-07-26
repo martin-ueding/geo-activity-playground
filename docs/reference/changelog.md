@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
 - [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
 - [GH-115](https://github.com/martin-ueding/geo-activity-playground/issues/115): Add more summary statistics and add a "hall of fame" as well.
+- [GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161): Show table for Eddington number, also update the plot to make it a bit easier to read.
 - [GH-118](https://github.com/martin-ueding/geo-activity-playground/issues/118): Fix links in search results.
 - [GH-121](https://github.com/martin-ueding/geo-activity-playground/issues/121): Fix link to share picture.
 - [GH-123](https://github.com/martin-ueding/geo-activity-playground/issues/123): Fix startup from empty cache. A cache migration assumed that `activities.parquet` exists. I've added a check.
