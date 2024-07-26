@@ -49,7 +49,7 @@
     <div class="container">
         <nav class="navbar navbar-expand-lg bg-body-secondary mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">Geo Actvitity Playground</a>
+                <a class="navbar-brand" href="{{ url_for('index') }}">Geo Actvitity Playground</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -57,32 +57,38 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('summary.index') }}">Summary</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("summary.index") }}">Summary</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('calendar.index') }}">Calendar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("calendar.index") }}">Calendar</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('explorer.map', zoom=14) }}">Explorer</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('explorer.map', zoom=14) }}">Explorer</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('explorer.map', zoom=17) }}">Squadratinhos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('explorer.map', zoom=17) }}">Squadratinhos</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('heatmap.index') }}">Heatmap</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("heatmap.index") }}">Heatmap</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('eddington.index') }}">Eddington</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("eddington.index") }}">Eddington</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('equipment.index') }}">Equipment</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("equipment.index") }}">Equipment</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for("upload.index") }}">Upload</a>
+                            <a class="nav-link active" aria-current="page"
+                                href="{{ url_for('upload.index') }}">Upload</a>
                         </li>
                     </ul>
                 </div>
