@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
+from PIL import ImageFont
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
@@ -423,10 +424,29 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         :,
     ]
 
-    img = Image.new("RGB", crop_mask.shape[::-1])
-    draw = ImageDraw.Draw(img)
+    img = Image.fromarray((background * 256).astype("uint8"), "RGB")
+    draw = ImageDraw.Draw(img, mode="RGBA")
+    font = ImageFont.truetype("/usr/share/fonts/google-noto/NotoSans-Regular.ttf")
+    draw.font = font
+    draw.rectangle([0, 0, img.width, 70], fill=(0, 0, 0, 128))
+    draw.text(
+        (35, 10),
+        f"{activity['kind']} on 🗓️ {activity['start'].date()}",
+        font=font,
+        font_size=30,
+    )
 
-    draw.rectangle((0, 50, img.width, 50), fill="green")
+    draw.rectangle([0, img.height - 70, img.width, img.height], fill=(0, 0, 0, 128))
+    facts = [
+        f"📐 {activity['distance_km']:.1f} km",
+        f"⏱️ {activity['elapsed_time']}",
+    ]
+    if activity["calories"]:
+        facts.append(f"🔥 {activity['calories']:.0f} kcal")
+    if activity["steps"] and not pd.isna(activity["steps"]):
+        facts.append(f"👣 {activity['steps']:.0f} steps")
+
+    draw.text((35, img.height - 70 + 10), " — ".join(facts), font_size=30)
 
     for _, group in time_series.groupby("segment_id"):
         xs, ys = compute_tile_float(
@@ -440,18 +460,17 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
             for x, y in zip(xs, ys)
         )
 
-        print(f"{yx=}")
-
         draw.line(yx, fill="red", width=4)
 
-    img_array = np.array(img) / 255
+    # img_array = np.array(img) / 255
 
-    weight = np.dstack([img_array[:, :, 0]] * 3)
+    # weight = np.dstack([img_array[:, :, 0]] * 3)
 
-    background = (1 - weight) * background + img_array
-    background[background > 1.0] = 1.0
-    background[background < 0.0] = 0.0
+    # background = (1 - weight) * background + img_array
+    # background[background > 1.0] = 1.0
+    # background[background < 0.0] = 0.0
 
     f = io.BytesIO()
-    pl.imsave(f, background, format="png")
+    img.save(f, format="png")
+    # pl.imsave(f, background, format="png")
     return bytes(f.getbuffer())

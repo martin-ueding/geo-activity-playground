@@ -2682,6 +2682,17 @@ files = [
 ]
 
 [[package]]
+name = "timedelta-nice-format"
+version = "0.1.0"
+description = "PYPI package with 2 functions to convert datetime.timedelta into string with nice format"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "timedelta_nice_format-0.1.0-py3-none-any.whl", hash = "sha256:1257b3cd5d20e3d560884b3a8b6e4a5179b6a50a5aa4a9a44d92f6313f5a0c38"},
+    {file = "timedelta_nice_format-0.1.0.tar.gz", hash = "sha256:5f231a646f3f39df520bb30d1fcd279925b5726079f56be63ebb63f9329c6f4c"},
+]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -3067,4 +3078,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9,<3.13"
-content-hash = "0c0e19584be6ad4e4aa58486262edd80183793d47e483cfb5267d770ca240de5"
+content-hash = "9bc41d7ad5cbaa0a0a47c75ff05ec855fe1eee7af657ffb1e3fabb7755d64cc4"
