@@ -7,14 +7,20 @@
     <div class="col-md-4">
         <h2>Definition</h2>
 
-        <p>Your Eddington number is {{ eddington_number }}.</p>
+        <p>Your Eddington number is <b>{{ eddington_number }}</b>.</p>
 
         <p>That means that on {{ eddington_number }} separate days you
-            have recorded activities exceeding {{ eddington_number }} km.</p>
+            have recorded activities exceeding {{ eddington_number }} km. Going far is one thing, going often is
+            another. But going far often is hard. Also if you increment the Eddington number, all days with less
+            distance will not count any more. It becomes increasingly hard to increment the Eddington number because you
+            don't only need to achieve a higher count, but all shorter activities don't count towards the bigger number.
+        </p>
     </div>
 
     <div class="col-md-8">
         <h2>Missing days</h2>
+
+        <p>How many more days do you need to increment your Eddington number?</p>
 
         <table class="table">
             <thead>
@@ -40,6 +46,9 @@
 <div class="row mb-1">
     <div class="col">
         <h2>Plot</h2>
+
+        <p>In a graphical representation, the Eddington number is the distance where the red line intersects with the
+            blue area.</p>
 
         {{ vega_direct("eddington-log", logarithmic_plot) }}
     </div>

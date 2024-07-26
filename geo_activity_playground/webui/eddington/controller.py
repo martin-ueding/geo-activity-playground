@@ -72,6 +72,6 @@ class EddingtonController:
             "eddington_number": en,
             "logarithmic_plot": logarithmic_plot,
             "eddington_table": eddington.loc[
-                (eddington["distance_km"] >= en) & (eddington["distance_km"] <= en + 10)
+                (eddington["distance_km"] > en) & (eddington["distance_km"] <= en + 10)
             ].to_dict(orient="records"),
         }
