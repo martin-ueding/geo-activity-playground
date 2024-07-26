@@ -9,6 +9,7 @@ from typing import Any
 
 import pandas as pd
 from stravalib import Client
+from stravalib.exc import Fault
 from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
@@ -173,6 +174,11 @@ def try_import_strava(repository: ActivityRepository) -> bool:
         limit_exceeded = False
     except RateLimitExceeded:
         limit_exceeded = True
+    except Fault as e:
+        if "Too Many Requests" in str(e):
+            limit_exceeded = True
+        else:
+            raise
 
     repository.commit()
 
