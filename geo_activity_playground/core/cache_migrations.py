@@ -34,6 +34,7 @@ def reset_time_series_embellishment() -> None:
 
 def delete_tile_visits() -> None:
     paths = [
+        pathlib.Path("Cache/activities-per-tile.pickle"),
         pathlib.Path("Cache/tile-evolution-state.pickle"),
         pathlib.Path("Cache/tile-history.pickle"),
         pathlib.Path("Cache/tile-visits.pickle"),
@@ -79,14 +80,16 @@ def convert_distances_to_km() -> None:
 
 
 def add_consider_for_achievements() -> None:
-    df = pd.read_parquet("Cache/activities.parquet")
-    if "consider_for_achievements" not in df.columns:
-        df["consider_for_achievements"] = True
-    else:
-        df.loc[
-            df["consider_for_achievements"].isna(), "consider_for_achievements"
-        ] = True
-    df.to_parquet("Cache/activities.parquet")
+    activities_path = pathlib.Path("Cache/activities.parquet")
+    if activities_path.exists():
+        df = pd.read_parquet(activities_path)
+        if "consider_for_achievements" not in df.columns:
+            df["consider_for_achievements"] = True
+        else:
+            df.loc[
+                df["consider_for_achievements"].isna(), "consider_for_achievements"
+            ] = True
+        df.to_parquet("Cache/activities.parquet")
 
 
 def apply_cache_migrations() -> None:
@@ -112,6 +115,7 @@ def apply_cache_migrations() -> None:
         add_consider_for_achievements,
         delete_tile_visits,
         delete_heatmap_cache,
+        delete_tile_visits,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:

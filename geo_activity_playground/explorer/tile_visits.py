@@ -44,7 +44,7 @@ class TileVisitAccessor:
         self.activities_per_tile: dict[
             int, dict[tuple[int, int], set[int]]
         ] = try_load_pickle(self.ACTIVITIES_PER_TILE_PATH) or collections.defaultdict(
-            lambda: collections.defaultdict(set)
+            dict
         )
 
     def save(self) -> None:
@@ -61,32 +61,12 @@ class TileVisitAccessor:
             pickle.dump(self.activities_per_tile, f)
 
 
-def compute_activities_per_tile(
-    repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
-) -> None:
-    work_tracker = WorkTracker("activities-per-tile")
-    activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
-    for activity_id in tqdm(activity_ids_to_process, desc="Extract tiles per activity"):
-        time_series = repository.get_time_series(activity_id)
-        for zoom in range(20):
-            for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
-                tile_visits_accessor.activities_per_tile[zoom][(tile_x, tile_y)].add(
-                    activity_id
-                )
-        work_tracker.mark_done(activity_id)
-
-    tile_visits_accessor.save()
-    work_tracker.close()
-
-
 def compute_tile_visits(
     repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
 ) -> None:
 
     work_tracker = WorkTracker("tile-visits")
-    activity_ids_to_process = work_tracker.filter(
-        repository.get_activity_ids(only_achievements=True)
-    )
+    activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
     new_tile_history_rows = collections.defaultdict(list)
     for activity_id in tqdm(
         activity_ids_to_process, desc="Extract explorer tile visits"
@@ -95,34 +75,40 @@ def compute_tile_visits(
         for zoom in range(20):
             for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
                 tile = (tile_x, tile_y)
-                if tile in tile_visits_accessor.visits[zoom]:
-                    d = tile_visits_accessor.visits[zoom][tile]
-                    if d["first_time"] > time:
-                        d["first_time"] = time
-                        d["first_id"] = activity_id
-                    if d["last_time"] < time:
-                        d["last_time"] = time
-                        d["last_id"] = activity_id
-                    d["activity_ids"].add(activity_id)
-                else:
-                    tile_visits_accessor.visits[zoom][tile] = {
-                        "first_time": time,
-                        "first_id": activity_id,
-                        "last_time": time,
-                        "last_id": activity_id,
-                        "activity_ids": {activity_id},
-                    }
-                    new_tile_history_rows[zoom].append(
-                        {
-                            "activity_id": activity_id,
-                            "time": time,
-                            "tile_x": tile_x,
-                            "tile_y": tile_y,
+                if not tile in tile_visits_accessor.activities_per_tile[zoom]:
+                    tile_visits_accessor.activities_per_tile[zoom][tile] = set()
+                tile_visits_accessor.activities_per_tile[zoom][tile].add(activity_id)
+
+                activity = repository.get_activity_by_id(activity_id)
+                if activity["consider_for_achievements"]:
+                    if tile in tile_visits_accessor.visits[zoom]:
+                        d = tile_visits_accessor.visits[zoom][tile]
+                        if d["first_time"] > time:
+                            d["first_time"] = time
+                            d["first_id"] = activity_id
+                        if d["last_time"] < time:
+                            d["last_time"] = time
+                            d["last_id"] = activity_id
+                        d["activity_ids"].add(activity_id)
+                    else:
+                        tile_visits_accessor.visits[zoom][tile] = {
+                            "first_time": time,
+                            "first_id": activity_id,
+                            "last_time": time,
+                            "last_id": activity_id,
+                            "activity_ids": {activity_id},
                         }
-                    )
+                        new_tile_history_rows[zoom].append(
+                            {
+                                "activity_id": activity_id,
+                                "time": time,
+                                "tile_x": tile_x,
+                                "tile_y": tile_y,
+                            }
+                        )
         work_tracker.mark_done(activity_id)
 
-    if activity_ids_to_process:
+    if new_tile_history_rows:
         for zoom, new_rows in new_tile_history_rows.items():
             new_df = pd.DataFrame(new_rows)
             if not pd.api.types.is_dtype_equal(

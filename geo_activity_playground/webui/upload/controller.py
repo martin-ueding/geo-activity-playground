@@ -11,7 +11,6 @@ from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import embellish_time_series
-from geo_activity_playground.explorer.tile_visits import compute_activities_per_tile
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
@@ -112,6 +111,5 @@ def scan_for_activities(
         sys.exit(1)
 
     embellish_time_series(repository)
-    compute_activities_per_tile(repository, tile_visit_accessor)
     compute_tile_visits(repository, tile_visit_accessor)
     compute_tile_evolution(tile_visit_accessor)
