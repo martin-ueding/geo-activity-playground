@@ -13,8 +13,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
 - [GH-115](https://github.com/martin-ueding/geo-activity-playground/issues/115): Add more summary statistics and add a "hall of fame" as well.
 - [GH-121](https://github.com/martin-ueding/geo-activity-playground/issues/121): Fix link to share picture.
+- [GH-123](https://github.com/martin-ueding/geo-activity-playground/issues/123): Fix startup from empty cache. A cache migration assumed that `activities.parquet` exists. I've added a check.
 - Use Flask Blueprints to organize code.
 - Remove half-finished "locations" feature from the navigation.
+- Allow filtering the heatmap by activity kinds.
 
 ### Version 0.23
 
