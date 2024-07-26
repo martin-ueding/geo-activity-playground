@@ -14,14 +14,6 @@ class SearchController:
         activities = []
         for _, row in self._repository.meta.iterrows():
             if name in row["name"]:
-                activities.append(
-                    {
-                        "name": row["name"],
-                        "start": row["start"].isoformat(),
-                        "kind": row["kind"],
-                        "distance_km": row["distance_km"],
-                        "elapsed_time": row["elapsed_time"],
-                    }
-                )
+                activities.append(row)
 
         return {"activities": activities}
