@@ -140,9 +140,36 @@ def crop_image_to_bounds(
     max_x, max_y = compute_tile_float(
         geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
     )
-    min_x = int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
-    min_y = int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
-    max_x = int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE)
-    max_y = int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE)
-    image = image[min_y:max_y, min_x:max_x, :]
+
+    crop_mask = TileBounds(
+        tile_bounds.zoom,
+        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+    )
+    crop_mask = make_bounds_square(crop_mask)
+
+    image = image[
+        crop_mask.y_tile_min : crop_mask.y_tile_max,
+        crop_mask.x_tile_min : crop_mask.x_tile_max,
+        :,
+    ]
     return image
+
+
+def make_bounds_square(bounds: TileBounds) -> TileBounds:
+    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
+    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
+    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
+    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
+
+    radius = max(x_radius, y_radius)
+
+    return TileBounds(
+        x_tile_min=int(x_center - radius),
+        y_tile_min=int(y_center - radius),
+        x_tile_max=int(x_center + radius),
+        y_tile_max=int(y_center + radius),
+        zoom=bounds.zoom,
+    )

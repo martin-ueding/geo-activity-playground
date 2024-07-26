@@ -13,6 +13,7 @@ import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
+from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import extract_heart_rate_zones
 from geo_activity_playground.core.activities import make_geojson_color_line
@@ -23,6 +24,7 @@ from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
+from geo_activity_playground.core.heatmap import make_bounds_square
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.tiles import compute_tile_float
@@ -86,10 +88,11 @@ class ActivityController:
         return result
 
     def render_sharepic(self, id: int) -> bytes:
+        activity = self._repository.get_activity_by_id(id)
         time_series = self._repository.get_time_series(id)
         for privacy_zone in self._privacy_zones:
             time_series = privacy_zone.filter_time_series(time_series)
-        return make_sharepic(time_series)
+        return make_sharepic(activity, time_series)
 
     def render_day(self, year: int, month: int, day: int) -> dict:
         meta = self._repository.meta
@@ -344,12 +347,13 @@ def name_minutes_plot(meta: pd.DataFrame) -> str:
     )
 
 
-def make_sharepic(time_series: pd.DataFrame) -> bytes:
+def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
     lat_lon_data = np.array([time_series["latitude"], time_series["longitude"]]).T
 
     geo_bounds = get_bounds(lat_lon_data)
     geo_bounds = add_margin_to_geo_bounds(geo_bounds)
     tile_bounds = get_sensible_zoom_level(geo_bounds, (1500, 1500))
+    tile_bounds = make_bounds_square(tile_bounds)
     background = build_map_from_tiles(tile_bounds)
     # background = convert_to_grayscale(background)
 
