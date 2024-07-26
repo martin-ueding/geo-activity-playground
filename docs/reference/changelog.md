@@ -16,6 +16,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161): Show table for Eddington number, also update the plot to make it a bit easier to read. Add some more explanatory text.
 - [GH-118](https://github.com/martin-ueding/geo-activity-playground/issues/118): Fix links in search results.
 - [GH-121](https://github.com/martin-ueding/geo-activity-playground/issues/121): Fix link to share picture.
+- [GH-122](https://github.com/martin-ueding/geo-activity-playground/issues/122): Convert everything to "timezone naive" dates in order to get rid of inconsistencies.
 - [GH-123](https://github.com/martin-ueding/geo-activity-playground/issues/123): Fix startup from empty cache. A cache migration assumed that `activities.parquet` exists. I've added a check.
 - Use Flask Blueprints to organize code.
 - Remove half-finished "locations" feature from the navigation.
