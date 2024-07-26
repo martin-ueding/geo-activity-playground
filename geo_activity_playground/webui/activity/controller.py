@@ -2,6 +2,7 @@ import datetime
 import functools
 import io
 import logging
+from collections.abc import Collection
 
 import altair as alt
 import geojson
@@ -23,6 +24,7 @@ from geo_activity_playground.core.heatmap import crop_image_to_bounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
+from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
@@ -31,10 +33,14 @@ logger = logging.getLogger(__name__)
 
 class ActivityController:
     def __init__(
-        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+        self,
+        repository: ActivityRepository,
+        tile_visit_accessor: TileVisitAccessor,
+        privacy_zones: Collection[PrivacyZone],
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
+        self._privacy_zones = privacy_zones
 
     @functools.lru_cache()
     def render_activity(self, id: int) -> dict:
@@ -81,6 +87,8 @@ class ActivityController:
 
     def render_sharepic(self, id: int) -> bytes:
         time_series = self._repository.get_time_series(id)
+        for privacy_zone in self._privacy_zones:
+            time_series = privacy_zone.filter_time_series(time_series)
         return make_sharepic(time_series)
 
     def render_day(self, year: int, month: int, day: int) -> dict:

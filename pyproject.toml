@@ -36,6 +36,7 @@ vegafusion = { version = "^1.4.3", extras = ["embed"] }
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
+shapely = "^2.0.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"

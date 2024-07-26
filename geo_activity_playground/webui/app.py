@@ -22,6 +22,7 @@ from .strava_controller import StravaController
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
+from geo_activity_playground.core.privacy_zones import PrivacyZone
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -104,7 +105,15 @@ def webui_main(
     app.secret_key = get_secret_key()
 
     app.register_blueprint(
-        make_activity_blueprint(repository, tile_visit_accessor), url_prefix="/activity"
+        make_activity_blueprint(
+            repository,
+            tile_visit_accessor,
+            [
+                PrivacyZone(points)
+                for points in config.get("privacy_zones", {}).values()
+            ],
+        ),
+        url_prefix="/activity",
     )
     app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(

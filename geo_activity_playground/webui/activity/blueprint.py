@@ -1,4 +1,5 @@
 import urllib.parse
+from collections.abc import Collection
 
 from flask import Blueprint
 from flask import render_template
@@ -7,14 +8,19 @@ from flask import Response
 from ...core.activities import ActivityRepository
 from ...explorer.tile_visits import TileVisitAccessor
 from .controller import ActivityController
+from geo_activity_playground.core.privacy_zones import PrivacyZone
 
 
 def make_activity_blueprint(
-    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    privacy_zones: Collection[PrivacyZone],
 ) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
 
-    activity_controller = ActivityController(repository, tile_visit_accessor)
+    activity_controller = ActivityController(
+        repository, tile_visit_accessor, privacy_zones
+    )
 
     @blueprint.route("/activity/all")
     def all():
