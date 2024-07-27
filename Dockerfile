@@ -14,7 +14,7 @@ COPY pyproject.toml poetry.lock /app/
 # Install poetry and project dependencies
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev
+    poetry install --only main
 
 # Copy the rest of the application code into the container
 COPY . /app/
