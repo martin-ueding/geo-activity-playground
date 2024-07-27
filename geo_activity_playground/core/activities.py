@@ -48,6 +48,10 @@ class ActivityRepository:
             self.meta = pd.read_parquet(activities_path())
             self.meta.index = self.meta["id"]
             self.meta.index.name = "index"
+            if not pd.api.types.is_dtype_equal(
+                self.meta["start"].dtype, "datetime64[ns]"
+            ):
+                self.meta["start"] = convert_to_datetime_ns(self.meta["start"])
         else:
             self.meta = pd.DataFrame()
 
@@ -88,6 +92,7 @@ class ActivityRepository:
                 old_df = self.meta.loc[is_kept]
             else:
                 old_df = self.meta
+
             self.meta = pd.concat([old_df, new_df])
             assert pd.api.types.is_dtype_equal(
                 self.meta["start"].dtype, "datetime64[ns]"

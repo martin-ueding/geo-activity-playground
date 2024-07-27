@@ -17,6 +17,7 @@ from tqdm import tqdm
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import cache_dir
+from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)
@@ -165,7 +166,7 @@ def try_import_strava(repository: ActivityRepository) -> bool:
                         "distance_km": activity.distance.magnitude / 1000,
                         "name": activity.name,
                         "kind": str(activity.type),
-                        "start": activity.start_date,
+                        "start": convert_to_datetime_ns(activity.start_date),
                         "elapsed_time": activity.elapsed_time,
                         "equipment": gear_names[activity.gear_id],
                         "calories": detailed_activity.calories,
