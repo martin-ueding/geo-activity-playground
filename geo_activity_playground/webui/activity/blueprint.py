@@ -22,7 +22,7 @@ def make_activity_blueprint(
         repository, tile_visit_accessor, privacy_zones
     )
 
-    @blueprint.route("/activity/all")
+    @blueprint.route("/all")
     def all():
         return render_template(
             "activity/lines.html.j2", **activity_controller.render_all()
