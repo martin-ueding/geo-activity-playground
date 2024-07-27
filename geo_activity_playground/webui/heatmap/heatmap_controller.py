@@ -11,6 +11,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.heatmap import GeoBounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
+from geo_activity_playground.core.heatmap import PixelBounds
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -140,8 +141,9 @@ class HeatmapController:
     ) -> bytes:
         geo_bounds = GeoBounds(south, west, north, east)
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
+        pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
 
-        background = np.zeros((*tile_bounds.shape, 3))
+        background = np.zeros((*pixel_bounds.shape, 3))
         for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
             for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
                 tile = np.array(get_tile(tile_bounds.zoom, x, y)) / 255

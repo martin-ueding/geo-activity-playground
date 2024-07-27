@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - [GH-124](https://github.com/martin-ueding/geo-activity-playground/issues/124): Add more timezone handling for Strava API.
 - [GH-125](https://github.com/martin-ueding/geo-activity-playground/issues/125): Fix building of Docker container.
+- [GH-126](https://github.com/martin-ueding/geo-activity-playground/issues/126): Fix heatmap download.
 
 #### Version 0.24.0
 
