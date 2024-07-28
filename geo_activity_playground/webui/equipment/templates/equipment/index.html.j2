@@ -36,13 +36,22 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Usage over time</h2>
+        <h2>Details for each equipment</h2>
     </div>
 </div>
 
+{% for equipment, data in equipment_variables.items() %}
+<h3>{{ equipment }}</h3>
 <div class="row mb-3">
-    <div class="col">
-        {{ vega_direct("total_distances_plot", total_distances_plot) }}
+    <div class="col-md-4">
+        {{ vega_direct(data.total_distances_plot_id, data.total_distances_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(data.yearly_distance_plot_id, data.yearly_distance_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(data.usages_plot_id, data.usages_plot) }}
     </div>
 </div>
+{% endfor %}
 {% endblock %}
