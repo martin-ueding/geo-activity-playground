@@ -24,6 +24,13 @@ class EquipmentController:
             .reset_index()
         )
 
+        kind_per_equipment = self._repository.meta.groupby("equipment").apply(
+            lambda group: group.groupby("kind")
+            .apply(lambda group2: sum(group2["distance_km"]), include_groups=False)
+            .idxmax(),
+            include_groups=False,
+        )
+
         plot = (
             alt.Chart(
                 total_distances,
@@ -46,28 +53,30 @@ class EquipmentController:
         equipment_summary = (
             self._repository.meta.groupby("equipment")
             .apply(
-                lambda group: pd.DataFrame(
+                lambda group: pd.Series(
                     {
                         "total_distance_km": group["distance_km"].sum(),
                         "first_use": group["start"].iloc[0],
                         "last_use": group["start"].iloc[-1],
                     },
-                    index=[0],
                 ),
                 include_groups=False,
             )
-            .reset_index()
             .sort_values("last_use", ascending=False)
         )
+
+        equipment_summary["primarily_used_for"] = None
+        for equipment, kind in kind_per_equipment.items():
+            equipment_summary.loc[equipment, "primarily_used_for"] = kind
 
         config = get_config()
         if "offsets" in config:
             for equipment, offset in config["offsets"].items():
-                equipment_summary.loc[
-                    equipment_summary["equipment"] == equipment, "total_distance_km"
-                ] += offset
+                equipment_summary.loc[equipment, "total_distance_km"] += offset
 
         return {
             "total_distances_plot": plot,
-            "equipment_summary": equipment_summary.to_dict(orient="records"),
+            "equipment_summary": equipment_summary.reset_index().to_dict(
+                orient="records"
+            ),
         }
