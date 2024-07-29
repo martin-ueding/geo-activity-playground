@@ -61,11 +61,13 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
     i = subset["elapsed_time"].idxmax()
     nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
 
-    i = subset["calories"].idxmax()
-    nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
+    if "calories" in subset.columns:
+        i = subset["calories"].idxmax()
+        nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
 
-    i = subset["steps"].idxmax()
-    nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
+    if "steps" in subset:
+        i = subset["steps"].idxmax()
+        nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
 
     for kind, group in meta.groupby("kind"):
         for key, text in [
@@ -83,10 +85,11 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
             ),
             ("steps", lambda row: f"Most steps for {row.kind}: {row.steps:.0f}"),
         ]:
-            series = group[key]
-            i = series.idxmax()
-            if not pd.isna(i):
-                nominations[i].append(text(meta.loc[i]))
+            if key in group.columns:
+                series = group[key]
+                i = series.idxmax()
+                if not pd.isna(i):
+                    nominations[i].append(text(meta.loc[i]))
 
     return nominations
 
