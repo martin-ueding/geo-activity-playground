@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.24
 
+#### Version 0.24.2
+
+- [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the summary statistics.
+
 #### Version 0.24.1
 
 - [GH-124](https://github.com/martin-ueding/geo-activity-playground/issues/124): Add more timezone handling for Strava API.
