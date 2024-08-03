@@ -452,9 +452,9 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         f"\n{activity['distance_km']:.1f} km",
         re.sub(r"^0 days ", "", f"{activity['elapsed_time']}"),
     ]
-    if activity["calories"] and not pd.isna(activity["calories"]):
+    if activity.get("calories", 0) and not pd.isna(activity["calories"]):
         facts.append(f"{activity['calories']:.0f} kcal")
-    if activity["steps"] and not pd.isna(activity["steps"]):
+    if activity.get("steps", 0) and not pd.isna(activity["steps"]):
         facts.append(f"{activity['steps']:.0f} steps")
 
     draw.text((35, img.height - 70 + 10), "      ".join(facts), font_size=20)
