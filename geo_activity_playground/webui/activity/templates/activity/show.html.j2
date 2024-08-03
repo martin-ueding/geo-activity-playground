@@ -20,6 +20,8 @@
             <dd>{{ activity.distance_km|round(1) }} km</dd>
             <dt>Elapsed time</dt>
             <dd>{{ activity.elapsed_time }}</dd>
+            <dt>Moving time</dt>
+            <dd>{{ activity.moving_time }}</dd>
             <dt>Start time</dt>
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }}

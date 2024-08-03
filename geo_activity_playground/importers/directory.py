@@ -15,6 +15,7 @@ from tqdm import tqdm
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activity_parsers import ActivityParseError
+from geo_activity_playground.core.activity_parsers import compute_moving_time
 from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.tasks import WorkTracker
 
@@ -72,6 +73,11 @@ def import_from_directory(
             consider_for_achievements=True,
         )
         activity_meta.update(activity_meta_from_file)
+        activity_meta.update(
+            _get_metadata_from_timeseries(
+                pd.read_parquet(activity_stream_dir / f"{activity_id}.parquet")
+            )
+        )
         activity_meta.update(_get_metadata_from_path(path, metadata_extraction_regexes))
         activity_meta.update(kind_defaults.get(activity_meta["kind"], {}))
         repository.add_activity(activity_meta)
@@ -130,3 +136,17 @@ def _get_metadata_from_path(
         if m := re.search(regex, str(path.relative_to(ACTIVITY_DIR))):
             return m.groupdict()
     return {}
+
+
+def _get_metadata_from_timeseries(timeseries: pd.DataFrame) -> ActivityMeta:
+    metadata = ActivityMeta()
+
+    # Extract some meta data from the time series.
+    metadata["start"] = timeseries["time"].iloc[0]
+    metadata["elapsed_time"] = timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
+    metadata["distance_km"] = timeseries["distance_km"].iloc[-1]
+    if "calories" in timeseries.columns:
+        metadata["calories"] = timeseries["calories"].iloc[-1]
+    metadata["moving_time"] = compute_moving_time(timeseries)
+
+    return metadata

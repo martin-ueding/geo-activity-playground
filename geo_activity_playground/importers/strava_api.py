@@ -170,6 +170,7 @@ def try_import_strava(repository: ActivityRepository) -> bool:
                         "elapsed_time": activity.elapsed_time,
                         "equipment": gear_names[activity.gear_id],
                         "calories": detailed_activity.calories,
+                        "moving_time": activity.moving_time,
                     }
                 )
         limit_exceeded = False

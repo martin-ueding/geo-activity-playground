@@ -58,16 +58,18 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     if len(timeseries):
         timeseries, changed = embellish_single_time_series(timeseries)
 
-        # Extract some meta data from the time series.
-        metadata["start"] = timeseries["time"].iloc[0]
-        metadata["elapsed_time"] = (
-            timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
-        )
-        metadata["distance_km"] = timeseries["distance_km"].iloc[-1]
-        if "calories" in timeseries.columns:
-            metadata["calories"] = timeseries["calories"].iloc[-1]
-
     return metadata, timeseries
+
+
+def compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:
+    def moving_time(group) -> datetime.timedelta:
+        selection = group["speed"] > 1.0
+        time_diff = group["time"].diff().loc[selection]
+        return time_diff.sum()
+
+    return (
+        time_series.groupby("segment_id").apply(moving_time, include_groups=False).sum()
+    )
 
 
 def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFrame]:

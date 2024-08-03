@@ -34,6 +34,7 @@ class ActivityMeta(TypedDict):
     equipment: str
     id: int
     kind: str
+    moving_time: datetime.timedelta
     name: str
     path: str
     start_latitude: float
