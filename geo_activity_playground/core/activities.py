@@ -195,7 +195,7 @@ def embellish_single_time_series(
     ).fillna(0.0)
     time_diff_threshold_seconds = 30
     time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
-    jump_indices = (time_diff >= time_diff_threshold_seconds) & (distances > 100)
+    jump_indices = time_diff >= time_diff_threshold_seconds
     distances.loc[jump_indices] = 0.0
 
     if not "distance_km" in timeseries.columns:
