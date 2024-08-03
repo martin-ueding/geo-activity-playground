@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.24
 
+#### Version 0.24.3
+
+- [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
+
 #### Version 0.24.2
 
 - [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the summary statistics.
