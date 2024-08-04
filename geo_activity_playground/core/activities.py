@@ -85,6 +85,8 @@ def build_activity_meta() -> None:
         meta["start"].iloc[0],
     )
 
+    meta.sort_values("start", inplace=True)
+
     meta.to_parquet(activities_file())
 
 
