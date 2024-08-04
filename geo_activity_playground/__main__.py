@@ -97,7 +97,6 @@ def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
 ) -> tuple[ActivityRepository, TileVisitAccessor, dict]:
     os.chdir(basedir)
-    apply_cache_migrations()
     config = get_config()
 
     if not config.get("prefer_metadata_from_file", True):

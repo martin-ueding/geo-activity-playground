@@ -120,7 +120,6 @@ def apply_cache_migrations() -> None:
         delete_heatmap_cache,
         delete_tile_visits,
         delete_everything,
-        delete_activity_metadata,
     ]
 
     for migration in migrations[cache_status["num_applied_migrations"] :]:
