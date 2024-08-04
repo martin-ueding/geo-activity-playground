@@ -10,6 +10,7 @@ from flask import Response
 from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activities import build_activity_meta
 from geo_activity_playground.core.enrichment import enrich_activities
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
@@ -94,13 +95,15 @@ def scan_for_activities(
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
-        import_from_directory(repository, config.get("metadata_extraction_regexes", []))
+        import_from_directory(config.get("metadata_extraction_regexes", []))
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(repository)
     if "strava" in config and not skip_strava:
         import_from_strava_api(repository)
 
     enrich_activities(config.get("kind", {}))
+    build_activity_meta()
+    repository.reload()
 
     if len(repository) == 0:
         logger.error(

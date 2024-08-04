@@ -1,6 +1,7 @@
 import datetime
 import functools
 import logging
+import pickle
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -9,10 +10,12 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activities_file
-from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
+from geo_activity_playground.core.paths import activity_enriched_meta_dir
+from geo_activity_playground.core.paths import activity_enriched_time_series_dir
 
 logger = logging.getLogger(__name__)
 
@@ -37,68 +40,61 @@ class ActivityMeta(TypedDict):
     steps: int
 
 
+def build_activity_meta() -> None:
+    if activities_file().exists():
+        meta = pd.read_parquet(activities_file())
+        present_ids = set(meta["id"])
+    else:
+        meta = pd.DataFrame()
+        present_ids = set()
+
+    available_ids = {
+        int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
+    }
+    new_ids = available_ids - present_ids
+    deleted_ids = present_ids - available_ids
+
+    # Remove updated activities and read these again.
+    if activities_file().exists():
+        meta_mtime = activities_file().stat().st_mtime
+        updated_ids = [
+            int(path.stem)
+            for path in activity_enriched_meta_dir().glob("*.pickle")
+            if path.stat().st_mtime > meta_mtime
+        ]
+        new_ids.update(updated_ids)
+        deleted_ids.update(updated_ids)
+
+    meta = meta.loc[~pd.Series(sorted(deleted_ids))].copy()
+
+    rows = []
+    for new_id in tqdm(new_ids, desc="Register new activities"):
+        with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
+            rows.append(pickle.load(f))
+
+    new_shard = pd.DataFrame(rows)
+    new_shard.index = new_shard["id"]
+    new_shard.index.name = "index"
+
+    meta = pd.concat([meta, new_shard])
+
+    assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
+        meta["start"].dtype,
+        meta["start"].iloc[0],
+    )
+
+    meta.to_parquet(activities_file())
+
+
 class ActivityRepository:
     def __init__(self) -> None:
-        if activities_file().exists():
-            self.meta = pd.read_parquet(activities_file())
-            self.meta.index = self.meta["id"]
-            self.meta.index.name = "index"
-            if not pd.api.types.is_dtype_equal(
-                self.meta["start"].dtype, "datetime64[ns]"
-            ):
-                self.meta["start"] = convert_to_datetime_ns(self.meta["start"])
-        else:
-            self.meta = pd.DataFrame()
-
-        self._loose_activities: list[ActivityMeta] = []
-        self._loose_activity_ids: set[int] = set()
+        self.meta = None
 
     def __len__(self) -> int:
         return len(self.meta)
 
-    def add_activity(self, activity_meta: ActivityMeta) -> None:
-        if activity_meta["id"] in self._loose_activity_ids:
-            logger.error(f"Activity with the same file already exists. New activity:")
-            print(activity_meta)
-            print("Existing activity:")
-            print(
-                [
-                    activity
-                    for activity in self._loose_activities
-                    if activity["id"] == activity_meta["id"]
-                ]
-            )
-            raise ValueError("Activity with the same file already exists.")
-        self._loose_activities.append(activity_meta)
-        self._loose_activity_ids.add(activity_meta["id"])
-
-    def commit(self) -> None:
-        if self._loose_activities:
-            logger.debug(
-                f"Adding {len(self._loose_activities)} activities to the repository …"
-            )
-            new_df = pd.DataFrame(self._loose_activities)
-            if len(self.meta):
-                new_ids_set = set(new_df["id"])
-                is_kept = [
-                    activity_id not in new_ids_set for activity_id in self.meta["id"]
-                ]
-                old_df = self.meta.loc[is_kept]
-            else:
-                old_df = self.meta
-
-            self.meta = pd.concat([old_df, new_df])
-            assert pd.api.types.is_dtype_equal(
-                self.meta["start"].dtype, "datetime64[ns]"
-            ), (self.meta["start"].dtype, self.meta["start"].iloc[0])
-            self.save()
-            self._loose_activities = []
-
-    def save(self) -> None:
-        self.meta.index = self.meta["id"]
-        self.meta.index.name = "index"
-        self.meta.sort_values("start", inplace=True)
-        self.meta.to_parquet(activities_path())
+    def reload(self) -> None:
+        self.meta = pd.read_parquet(activities_file())
 
     def has_activity(self, activity_id: int) -> bool:
         if len(self.meta):
@@ -137,7 +133,7 @@ class ActivityRepository:
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
-        path = activity_timeseries_path(id)
+        path = activity_enriched_time_series_dir() / f"{id}.parquet"
         try:
             df = pd.read_parquet(path)
         except OSError as e:

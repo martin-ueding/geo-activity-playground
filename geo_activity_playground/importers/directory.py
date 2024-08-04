@@ -5,19 +5,15 @@ import pathlib
 import pickle
 import re
 import traceback
-from typing import Any
 from typing import Optional
 
-import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.paths import activity_extracted_dir
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
 from geo_activity_playground.core.tasks import stored_object
-from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.importers.activity_parsers import ActivityParseError
 from geo_activity_playground.importers.activity_parsers import read_activity
@@ -27,9 +23,7 @@ logger = logging.getLogger(__name__)
 ACTIVITY_DIR = pathlib.Path("Activities")
 
 
-def import_from_directory(
-    repository: ActivityRepository, metadata_extraction_regexes: list[str] = []
-) -> None:
+def import_from_directory(metadata_extraction_regexes: list[str] = []) -> None:
 
     activity_paths = [
         path
@@ -90,8 +84,6 @@ def import_from_directory(
         )
         for path, error in paths_with_errors:
             logger.error(f"{path}: {error}")
-
-    repository.commit()
 
     work_tracker.close()
 
