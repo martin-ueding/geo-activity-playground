@@ -50,8 +50,8 @@ def work_tracker(path: pathlib.Path):
 
 
 class WorkTracker:
-    def __init__(self, name: str) -> None:
-        self._path = work_tracker_path(name)
+    def __init__(self, path: pathlib.Path) -> None:
+        self._path = path
 
         if self._path.exists():
             with open(self._path, "rb") as f:
@@ -59,7 +59,7 @@ class WorkTracker:
         else:
             self._done = set()
 
-    def filter(self, ids: Iterable[int]) -> set[int]:
+    def filter(self, ids: Iterable) -> set:
         return set(ids) - self._done
 
     def mark_done(self, id: int) -> None:

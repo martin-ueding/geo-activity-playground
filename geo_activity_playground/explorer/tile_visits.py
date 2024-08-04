@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.tasks import try_load_pickle
+from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.tiles import adjacent_to
 from geo_activity_playground.core.tiles import interpolate_missing_tile
@@ -65,7 +66,7 @@ def compute_tile_visits(
     repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
 ) -> None:
 
-    work_tracker = WorkTracker("tile-visits")
+    work_tracker = WorkTracker(work_tracker_path("tile-visits"))
     activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
     new_tile_history_rows = collections.defaultdict(list)
     for activity_id in tqdm(

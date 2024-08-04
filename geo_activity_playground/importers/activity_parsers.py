@@ -13,7 +13,6 @@ import tcxreader.tcxreader
 import xmltodict
 
 from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import embellish_single_time_series
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
@@ -55,21 +54,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
-    if len(timeseries):
-        timeseries, changed = embellish_single_time_series(timeseries)
-
     return metadata, timeseries
-
-
-def compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:
-    def moving_time(group) -> datetime.timedelta:
-        selection = group["speed"] > 1.0
-        time_diff = group["time"].diff().loc[selection]
-        return time_diff.sum()
-
-    return (
-        time_series.groupby("segment_id").apply(moving_time, include_groups=False).sum()
-    )
 
 
 def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFrame]:

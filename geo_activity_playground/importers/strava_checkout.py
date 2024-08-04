@@ -13,10 +13,10 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activity_parsers import ActivityParseError
-from geo_activity_playground.core.activity_parsers import read_activity
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
+from geo_activity_playground.importers.activity_parsers import ActivityParseError
+from geo_activity_playground.importers.activity_parsers import read_activity
 
 
 logger = logging.getLogger(__name__)
@@ -146,7 +146,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
         dayfirst = True
 
     activities.index = activities["Activity ID"]
-    work_tracker = WorkTracker("import-strava-checkout-activities")
+    work_tracker = WorkTracker(work_tracker_path("import-strava-checkout-activities"))
     activities_ids_to_parse = work_tracker.filter(activities["Activity ID"])
     activities_ids_to_parse = [
         activity_id

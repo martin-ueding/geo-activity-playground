@@ -1,7 +1,6 @@
 import datetime
 import functools
 import logging
-import pathlib
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -10,14 +9,9 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 from geo_activity_playground.core.config import get_config
-from geo_activity_playground.core.coordinates import get_distance
-from geo_activity_playground.core.paths import activities_path
-from geo_activity_playground.core.paths import activity_timeseries_path
-from geo_activity_playground.core.tasks import WorkTracker
-from geo_activity_playground.core.tiles import compute_tile_float
+from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
@@ -45,8 +39,8 @@ class ActivityMeta(TypedDict):
 
 class ActivityRepository:
     def __init__(self) -> None:
-        if activities_path().exists():
-            self.meta = pd.read_parquet(activities_path())
+        if activities_file().exists():
+            self.meta = pd.read_parquet(activities_file())
             self.meta.index = self.meta["id"]
             self.meta.index.name = "index"
             if not pd.api.types.is_dtype_equal(
@@ -63,7 +57,6 @@ class ActivityRepository:
         return len(self.meta)
 
     def add_activity(self, activity_meta: ActivityMeta) -> None:
-        _extend_metadata_from_timeseries(activity_meta)
         if activity_meta["id"] in self._loose_activity_ids:
             logger.error(f"Activity with the same file already exists. New activity:")
             print(activity_meta)
@@ -153,79 +146,6 @@ class ActivityRepository:
             raise
 
         return df
-
-
-def embellish_time_series(repository: ActivityRepository) -> None:
-    work_tracker = WorkTracker("embellish-time-series")
-    activities_to_process = work_tracker.filter(repository.get_activity_ids())
-    for activity_id in tqdm(activities_to_process, desc="Embellish time series data"):
-        path = activity_timeseries_path(activity_id)
-        df = pd.read_parquet(path)
-        df.name = id
-        df, changed = embellish_single_time_series(
-            df, repository.get_activity_by_id(activity_id)["start"]
-        )
-        if changed:
-            df.to_parquet(path)
-        work_tracker.mark_done(activity_id)
-    work_tracker.close()
-
-
-def embellish_single_time_series(
-    timeseries: pd.DataFrame, start: Optional[datetime.datetime] = None
-) -> bool:
-    changed = False
-
-    if start is not None and pd.api.types.is_dtype_equal(
-        timeseries["time"].dtype, "int64"
-    ):
-        time = timeseries["time"]
-        del timeseries["time"]
-        timeseries["time"] = [
-            convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
-        ]
-        changed = True
-    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns]")
-
-    distances = get_distance(
-        timeseries["latitude"].shift(1),
-        timeseries["longitude"].shift(1),
-        timeseries["latitude"],
-        timeseries["longitude"],
-    ).fillna(0.0)
-    time_diff_threshold_seconds = 30
-    time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
-    jump_indices = time_diff >= time_diff_threshold_seconds
-    distances.loc[jump_indices] = 0.0
-
-    if not "distance_km" in timeseries.columns:
-        timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
-        changed = True
-
-    if "speed" not in timeseries.columns:
-        timeseries["speed"] = (
-            timeseries["distance_km"].diff()
-            / (timeseries["time"].diff().dt.total_seconds() + 1e-3)
-            * 3600
-        )
-        changed = True
-
-    potential_jumps = (timeseries["speed"] > 40) & (timeseries["speed"].diff() > 10)
-    if np.any(potential_jumps):
-        timeseries = timeseries.loc[~potential_jumps].copy()
-        changed = True
-
-    if "segment_id" not in timeseries.columns:
-        timeseries["segment_id"] = np.cumsum(jump_indices)
-        changed = True
-
-    if "x" not in timeseries.columns:
-        x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)
-        timeseries["x"] = x
-        timeseries["y"] = y
-        changed = True
-
-    return timeseries, changed
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
@@ -320,14 +240,3 @@ def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame
             duration_per_zone.loc[i] = 0.0
     result = duration_per_zone.reset_index()
     return result
-
-
-def _extend_metadata_from_timeseries(metadata: ActivityMeta) -> None:
-    timeseries = pd.read_parquet(
-        pathlib.Path("Cache/Activity Timeseries") / f"{metadata['id']}.parquet"
-    )
-
-    metadata["start_latitude"] = timeseries["latitude"].iloc[0]
-    metadata["end_latitude"] = timeseries["latitude"].iloc[-1]
-    metadata["start_longitude"] = timeseries["longitude"].iloc[0]
-    metadata["end_longitude"] = timeseries["longitude"].iloc[-1]
