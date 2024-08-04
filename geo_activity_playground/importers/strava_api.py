@@ -14,8 +14,11 @@ from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
+from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.paths import activity_extracted_meta_dir
+from geo_activity_playground.core.paths import activity_extracted_time_series_dir
 from geo_activity_playground.core.paths import cache_dir
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
@@ -40,13 +43,6 @@ def strava_api_dir() -> pathlib.Path:
     result = pathlib.Path.cwd() / "Strava API"
     result.mkdir(exist_ok=True, parents=True)
     return result
-
-
-@functools.cache
-def activity_stream_dir() -> pathlib.Path:
-    path = pathlib.Path("Cache/Activity Timeseries")
-    path.mkdir(exist_ok=True, parents=True)
-    return path
 
 
 def get_current_access_token() -> str:
@@ -124,18 +120,22 @@ def try_import_strava(repository: ActivityRepository) -> bool:
             if repository.has_activity(activity.id):
                 continue
             cache_file = (
-                pathlib.Path("Cache") / "Activity Metadata" / f"{activity.id}.pickle"
+                pathlib.Path("Cache")
+                / "Strava Activity Metadata"
+                / f"{activity.id}.pickle"
             )
             cache_file.parent.mkdir(exist_ok=True, parents=True)
             with open(cache_file, "wb") as f:
                 pickle.dump(activity, f)
-            if not activity.gear_id in gear_names:
+            if activity.gear_id not in gear_names:
                 gear = client.get_gear(activity.gear_id)
                 gear_names[activity.gear_id] = (
                     f"{gear.name}" or f"{gear.brand_name} {gear.model_name}"
                 )
 
-            time_series_path = activity_stream_dir() / f"{activity.id}.parquet"
+            time_series_path = (
+                activity_extracted_time_series_dir() / f"{activity.id}.parquet"
+            )
             if time_series_path.exists():
                 time_series = pd.read_parquet(time_series_path)
             else:
@@ -159,8 +159,8 @@ def try_import_strava(repository: ActivityRepository) -> bool:
             detailed_activity = get_detailed_activity(activity.id, client)
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
-                repository.add_activity(
-                    {
+                activity_meta = ActivityMeta(
+                    **{
                         "id": activity.id,
                         "commute": activity.commute,
                         "distance_km": activity.distance.magnitude / 1000,
@@ -173,6 +173,10 @@ def try_import_strava(repository: ActivityRepository) -> bool:
                         "moving_time": activity.moving_time,
                     }
                 )
+                with open(
+                    activity_extracted_meta_dir() / f"{activity.id}.pickle", "wb"
+                ) as f:
+                    pickle.dump(activity_meta, f)
         limit_exceeded = False
     except RateLimitExceeded:
         limit_exceeded = True
