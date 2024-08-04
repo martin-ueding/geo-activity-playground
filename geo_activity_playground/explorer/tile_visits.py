@@ -12,6 +12,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.paths import tiles_per_time_series
 from geo_activity_playground.core.tasks import try_load_pickle
 from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
@@ -62,63 +63,81 @@ class TileVisitAccessor:
             pickle.dump(self.activities_per_tile, f)
 
 
+def _cached_tiles_from_points(
+    repository: ActivityRepository, activity_id: int, zoom: int
+) -> list[tuple[datetime.datetime, int, int]]:
+    cache_path = tiles_per_time_series() / f"{activity_id}.pickle"
+    if cache_path.exists():
+        with open(cache_path, "rb") as f:
+            return pickle.load(f)
+    else:
+        data = list(_tiles_from_points(repository.get_time_series(activity_id), zoom))
+        with open(cache_path, "wb") as f:
+            pickle.dump(data, f)
+        return data
+
+
 def compute_tile_visits(
     repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
 ) -> None:
-
+    present_activity_ids = repository.get_activity_ids()
     work_tracker = WorkTracker(work_tracker_path("tile-visits"))
+
+    changed_zoom_tile = set()
+
+    # Delete visits from removed activities.
+    for zoom, activities_per_tile in tile_visits_accessor.activities_per_tile.items():
+        for tile, activity_ids in activities_per_tile.items():
+            deleted_ids = activity_ids - present_activity_ids
+            if deleted_ids:
+                logger.debug(
+                    f"Removing activities {deleted_ids} from tile {tile} at {zoom=}."
+                )
+                for activity_id in deleted_ids:
+                    activity_ids.remove(activity_id)
+                    work_tracker.discard(activity_id)
+                    changed_zoom_tile.add((zoom, tile))
+
+    # Add visits from new activities.
     activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
-    new_tile_history_rows = collections.defaultdict(list)
     for activity_id in tqdm(
         activity_ids_to_process, desc="Extract explorer tile visits"
     ):
-        time_series = repository.get_time_series(activity_id)
         for zoom in range(20):
-            for time, tile_x, tile_y in _tiles_from_points(time_series, zoom):
+            for time, tile_x, tile_y in _cached_tiles_from_points(
+                repository, activity_id, zoom
+            ):
                 tile = (tile_x, tile_y)
-                if not tile in tile_visits_accessor.activities_per_tile[zoom]:
+                if tile not in tile_visits_accessor.activities_per_tile[zoom]:
                     tile_visits_accessor.activities_per_tile[zoom][tile] = set()
                 tile_visits_accessor.activities_per_tile[zoom][tile].add(activity_id)
-
-                activity = repository.get_activity_by_id(activity_id)
-                if activity["consider_for_achievements"]:
-                    if tile in tile_visits_accessor.visits[zoom]:
-                        d = tile_visits_accessor.visits[zoom][tile]
-                        if d["first_time"] > time:
-                            d["first_time"] = time
-                            d["first_id"] = activity_id
-                        if d["last_time"] < time:
-                            d["last_time"] = time
-                            d["last_id"] = activity_id
-                        d["activity_ids"].add(activity_id)
-                    else:
-                        tile_visits_accessor.visits[zoom][tile] = {
-                            "first_time": time,
-                            "first_id": activity_id,
-                            "last_time": time,
-                            "last_id": activity_id,
-                            "activity_ids": {activity_id},
-                        }
-                        new_tile_history_rows[zoom].append(
-                            {
-                                "activity_id": activity_id,
-                                "time": time,
-                                "tile_x": tile_x,
-                                "tile_y": tile_y,
-                            }
-                        )
+                changed_zoom_tile.add((zoom, tile))
         work_tracker.mark_done(activity_id)
 
-    if new_tile_history_rows:
-        for zoom, new_rows in new_tile_history_rows.items():
-            new_df = pd.DataFrame(new_rows)
-            new_df.sort_values("time", inplace=True)
-            tile_visits_accessor.histories[zoom] = pd.concat(
-                [tile_visits_accessor.histories[zoom], new_df]
-            )
+    # Update tile visits structure.
+    for zoom, tile in changed_zoom_tile:
+        activity_ids = tile_visits_accessor.activities_per_tile[zoom][tile]
+        activities = [
+            repository.get_activity_by_id(activity_id) for activity_id in activity_ids
+        ]
+        activities_to_consider = [
+            activity for activity in activities if activity["consider_for_achievements"]
+        ]
+        activities_to_consider.sort(key=lambda activity: activity["start"])
 
-        tile_visits_accessor.save()
+        if activities_to_consider:
+            tile_visits_accessor.visits[zoom][tile] = {
+                "first_time": activities_to_consider[0]["start"],
+                "first_id": activities_to_consider[0]["id"],
+                "last_time": activities_to_consider[-1]["start"],
+                "last_id": activities_to_consider[-1]["id"],
+                "activity_ids": {activity["id"] for activity in activities_to_consider},
+            }
+        else:
+            if tile in tile_visits_accessor.visits[zoom]:
+                del tile_visits_accessor.visits[zoom][tile]
 
+    tile_visits_accessor.save()
     work_tracker.close()
 
 

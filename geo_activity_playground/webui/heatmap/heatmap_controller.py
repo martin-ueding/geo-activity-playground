@@ -83,6 +83,12 @@ class HeatmapController:
             with work_tracker(
                 tile_count_cache_path.with_suffix(".json")
             ) as parsed_activities:
+                if parsed_activities - activity_ids:
+                    logger.warning(
+                        f"Resetting heatmap cache for {kind=}/{x=}/{y=}/{z=} because activities have been removed."
+                    )
+                    tile_counts = np.zeros(tile_pixels, dtype=np.int32)
+                    parsed_activities.clear()
                 for activity_id in activity_ids:
                     if activity_id in parsed_activities:
                         continue

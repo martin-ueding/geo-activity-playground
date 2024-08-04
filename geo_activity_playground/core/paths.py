@@ -17,6 +17,8 @@ _activity_enriched_meta_dir = _activity_enriched_dir / "Meta"
 _activity_enriched_time_series_dir = _activity_enriched_dir / "Time Series"
 _activities_file = _activity_dir / "activities.parquet"
 
+_tiles_per_time_series = _cache_dir / "Tiles" / "Tiles Per Time Series"
+
 
 def dir_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
     @functools.cache
@@ -43,4 +45,6 @@ activity_extracted_meta_dir = dir_wrapper(_activity_extracted_meta_dir)
 activity_extracted_time_series_dir = dir_wrapper(_activity_extracted_time_series_dir)
 activity_enriched_meta_dir = dir_wrapper(_activity_enriched_meta_dir)
 activity_enriched_time_series_dir = dir_wrapper(_activity_enriched_time_series_dir)
+tiles_per_time_series = dir_wrapper(_tiles_per_time_series)
+
 activities_file = file_wrapper(_activities_file)

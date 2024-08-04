@@ -112,4 +112,4 @@ def scan_for_activities(
         sys.exit(1)
 
     compute_tile_visits(repository, tile_visit_accessor)
-    compute_tile_evolution(tile_visit_accessor)
+    # compute_tile_evolution(tile_visit_accessor)

@@ -42,8 +42,20 @@ def import_from_directory(metadata_extraction_regexes: list[str] = []) -> None:
         deleted_files = set(file_hashes.keys()) - set(activity_paths)
         deleted_hashes = [file_hashes[path] for path in deleted_files]
         for deleted_hash in deleted_hashes:
-            (activity_extracted_time_series_dir() / f"{deleted_hash}.parquet").unlink()
-            (activity_extracted_meta_dir() / f"{deleted_hash}.pickle").unlink()
+            activity_extracted_meta_path = (
+                activity_extracted_meta_dir() / f"{deleted_hash}.pickle"
+            )
+            activity_extracted_time_series_path = (
+                activity_extracted_time_series_dir() / f"{deleted_hash}.parquet"
+            )
+            logger.warning(f"Deleting {activity_extracted_meta_path}")
+            logger.warning(f"Deleting {activity_extracted_time_series_path}")
+            activity_extracted_meta_path.unlink(missing_ok=True)
+            activity_extracted_time_series_path.unlink(missing_ok=True)
+        for deleted_file in deleted_files:
+            logger.warning(f"Deleting {deleted_file}")
+            del file_hashes[deleted_file]
+            work_tracker.discard(deleted_file)
 
     with multiprocessing.Pool() as pool:
         paths_with_errors = tqdm(

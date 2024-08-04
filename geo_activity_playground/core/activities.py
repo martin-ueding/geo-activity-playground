@@ -57,26 +57,28 @@ def build_activity_meta() -> None:
     # Remove updated activities and read these again.
     if activities_file().exists():
         meta_mtime = activities_file().stat().st_mtime
-        updated_ids = [
+        updated_ids = {
             int(path.stem)
             for path in activity_enriched_meta_dir().glob("*.pickle")
             if path.stat().st_mtime > meta_mtime
-        ]
+        }
         new_ids.update(updated_ids)
-        deleted_ids.update(updated_ids)
+        deleted_ids.update(updated_ids & present_ids)
 
-    meta = meta.loc[~pd.Series(sorted(deleted_ids))].copy()
+    if deleted_ids:
+        logger.debug(f"Removing activities {deleted_ids} from repository.")
+        meta.drop(sorted(deleted_ids), axis="index", inplace=True)
 
     rows = []
     for new_id in tqdm(new_ids, desc="Register new activities"):
         with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
             rows.append(pickle.load(f))
 
-    new_shard = pd.DataFrame(rows)
-    new_shard.index = new_shard["id"]
-    new_shard.index.name = "index"
-
-    meta = pd.concat([meta, new_shard])
+    if rows:
+        new_shard = pd.DataFrame(rows)
+        new_shard.index = new_shard["id"]
+        new_shard.index.name = "index"
+        meta = pd.concat([meta, new_shard])
 
     assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
         meta["start"].dtype,

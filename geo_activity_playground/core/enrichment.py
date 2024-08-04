@@ -1,4 +1,5 @@
 import datetime
+import logging
 import pickle
 from typing import Any
 from typing import Optional
@@ -16,12 +17,23 @@ from geo_activity_playground.core.paths import activity_extracted_time_series_di
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
+logger = logging.getLogger(__name__)
+
 
 def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
     # Delete removed activities.
     for enriched_metadata_path in activity_enriched_meta_dir().glob("*.pickle"):
         if not (activity_extracted_meta_dir() / enriched_metadata_path.name).exists():
+            logger.warning(f"Deleting {enriched_metadata_path}")
             enriched_metadata_path.unlink()
+    for enriched_time_series_path in activity_enriched_time_series_dir().glob(
+        "*.parquet"
+    ):
+        if not (
+            activity_extracted_time_series_dir() / enriched_time_series_path.name
+        ).exists():
+            logger.warning(f"Deleting {enriched_time_series_path}")
+            enriched_time_series_path.unlink()
 
     # Get new metadata paths.
     new_extracted_metadata_paths = []
