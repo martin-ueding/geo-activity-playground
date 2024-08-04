@@ -108,7 +108,9 @@ def compute_tile_visits(
         work_tracker.mark_done(activity_id)
 
     # Update tile visits structure.
-    for zoom, changed_tiles in changed_zoom_tile.items():
+    for zoom, changed_tiles in tqdm(
+        changed_zoom_tile.items(), desc="Incorporate changes in tiles"
+    ):
         soa = {"activity_id": [], "time": [], "tile_x": [], "tile_y": []}
 
         for tile in changed_tiles:
