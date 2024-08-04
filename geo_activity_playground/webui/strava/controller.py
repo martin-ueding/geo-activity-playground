@@ -3,13 +3,16 @@ from typing import Optional
 
 
 class StravaController:
-    def __init__(self) -> None:
+    def __init__(self, host: str, port: int) -> None:
+        self._host = host
+        self._port = port
+
         self._client_secret: Optional[str] = None
 
-    def action_connect(self) -> dict:
-        return {}
+    def connect(self) -> dict:
+        return {"host": self._host, "port": self._port}
 
-    def action_authorize(
+    def authorize(
         self, host: str, port: int, client_id: str, client_secret: str
     ) -> str:
         self._client_secret = client_secret

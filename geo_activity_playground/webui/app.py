@@ -18,11 +18,12 @@ from .explorer.blueprint import make_explorer_blueprint
 from .heatmap.blueprint import make_heatmap_blueprint
 from .search_controller import SearchController
 from .square_planner.blueprint import make_square_planner_blueprint
-from .strava_controller import StravaController
+from .strava.blueprint import make_strava_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
 from geo_activity_playground.core.privacy_zones import PrivacyZone
+from geo_activity_playground.webui.strava.controller import StravaController
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -43,37 +44,6 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
     @app.route("/")
     def index():
         return render_template("home.html.j2", **entry_controller.render())
-
-
-def route_strava(app: Flask, host: str, port: int) -> None:
-    strava_controller = StravaController()
-
-    @app.route("/strava/connect")
-    def strava_connect():
-        return render_template(
-            "strava-connect.html.j2",
-            host=host,
-            port=port,
-            **strava_controller.action_connect()
-        )
-
-    @app.route("/strava/authorize")
-    def strava_authorize():
-        client_id = request.form["client_id"]
-        client_secret = request.form["client_secret"]
-        return redirect(
-            strava_controller.action_authorize(host, port, client_id, client_secret)
-        )
-
-    @app.route("/strava/callback")
-    def strava_callback():
-        code = request.args.get("code", type=str)
-        return render_template(
-            "strava-connect.html.j2",
-            host=host,
-            port=port,
-            **strava_controller.action_connect()
-        )
 
 
 def get_secret_key():
@@ -99,7 +69,6 @@ def webui_main(
 
     route_search(app, repository)
     route_start(app, repository)
-    route_strava(app, host, port)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
@@ -135,6 +104,10 @@ def webui_main(
     app.register_blueprint(
         make_summary_blueprint(repository),
         url_prefix="/summary",
+    )
+    app.register_blueprint(
+        make_strava_blueprint(host, port),
+        url_prefix="/strava",
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(
