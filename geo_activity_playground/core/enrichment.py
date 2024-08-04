@@ -119,7 +119,7 @@ def _embellish_single_time_series(
     jump_indices = time_diff >= time_diff_threshold_seconds
     distances.loc[jump_indices] = 0.0
 
-    if not "distance_km" in timeseries.columns:
+    if "distance_km" not in timeseries.columns:
         timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
 
     if "speed" not in timeseries.columns:
