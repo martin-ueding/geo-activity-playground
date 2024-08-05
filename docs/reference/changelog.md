@@ -6,9 +6,7 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.24
-
-#### Next
+### Version 0.25
 
 - Add an web interface to connect to Strava API using a shared application such that it becomes much simpler to set up.
 - Restructure the way that activities are imported to realize a couple of benefits:
@@ -19,6 +17,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
 - [GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131): Update to the column names in the Strava export.
 - [GH-133](https://github.com/martin-ueding/geo-activity-playground/issues/133): Cope with manually recorded activities in Strava export.
+
+### Version 0.24
 
 #### Version 0.24.2
 
