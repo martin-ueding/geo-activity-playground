@@ -165,7 +165,11 @@ def import_from_strava_checkout() -> None:
     ]
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
+        work_tracker.mark_done(activity_id)
         row = activities.loc[activity_id]
+        # Some manually recorded activities have no file name. Pandas reads that as a float. We skip those.
+        if isinstance(row["Filename"], float):
+            continue
         activity_file = checkout_path / row["Filename"]
         table_activity_meta = {
             "calories": float_or_none(row["Calories"]),
@@ -205,8 +209,6 @@ def import_from_strava_checkout() -> None:
                     f"Encountered a problem with {activity_file=}, see details below."
                 )
                 raise
-
-        work_tracker.mark_done(activity_id)
 
         if not len(time_series):
             continue
