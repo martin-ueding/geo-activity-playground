@@ -8,9 +8,16 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.24
 
-#### Version 0.24.3
+#### Next
+
+- Add an web interface to connect to Strava API using a shared application such that it becomes much simpler to set up.
+- Restructure the way that activities are imported to realize a couple of benefits:
+  - Deleting activities is detected now, they are removed from the heatmap.
+  - If the code is changed, not everything has to be parsed again. This is especially helpful with regard to the rate-limited Strava API.
+  - Some code is deduplicated that had accumulated between activity file parsing and the Strava API.
 
 - [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
+- [GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131): Update to the column names in the Strava export.
 
 #### Version 0.24.2
 
