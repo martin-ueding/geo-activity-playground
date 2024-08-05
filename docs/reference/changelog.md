@@ -9,6 +9,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Version 0.26
 
 - Add automatic dark mode.
+- Add some more explanation for the Strava connection.
+- [GH-138](https://github.com/martin-ueding/geo-activity-playground/issues/138): Fix import from Strava archive that was broken in 0.25.0.
 
 ### Version 0.25
 
