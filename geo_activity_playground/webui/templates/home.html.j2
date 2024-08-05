@@ -4,6 +4,7 @@
 <div class="row mb-3">
 </div>
 
+{% if latest_activities %}
 <div class="row mb-3">
     <div class="col-md-9">
         <h2>Last 30 days</h2>
@@ -63,5 +64,9 @@
     {% endfor %}
 </div>
 {% endfor %}
+{% else %}
+<p>You don't have activities yet. Either put some files into a directory <tt>Activities</tt> or <a
+        href="{{ url_for('strava.setup') }}">set up Strava API</a>.</p>
+{% endif %}
 
 {% endblock %}

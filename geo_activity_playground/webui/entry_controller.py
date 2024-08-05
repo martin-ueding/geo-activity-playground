@@ -13,12 +13,12 @@ class EntryController:
         self._repository = repository
 
     def render(self) -> dict:
-        result = {
-            "distance_last_30_days_plot": distance_last_30_days_meta_plot(
+        result = {"latest_activities": []}
+
+        if len(self._repository):
+            result["distance_last_30_days_plot"] = distance_last_30_days_meta_plot(
                 self._repository.meta
-            ),
-            "latest_activities": [],
-        }
+            )
 
         for activity in itertools.islice(
             self._repository.iter_activities(dropna=True), 15
