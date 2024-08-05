@@ -1,6 +1,7 @@
 import datetime
 import logging
 import pathlib
+import pickle
 import shutil
 import sys
 import traceback
@@ -12,7 +13,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.paths import activity_extracted_meta_dir
+from geo_activity_playground.core.paths import activity_extracted_time_series_dir
+from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 from geo_activity_playground.importers.activity_parsers import ActivityParseError
@@ -127,7 +130,7 @@ def float_or_none(x: Union[float, str]) -> Optional[float]:
         return None
 
 
-def import_from_strava_checkout(repository: ActivityRepository) -> None:
+def import_from_strava_checkout() -> None:
     checkout_path = pathlib.Path("Strava Export")
     activities = pd.read_csv(checkout_path / "activities.csv")
 
@@ -151,11 +154,8 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
     activities_ids_to_parse = [
         activity_id
         for activity_id in activities_ids_to_parse
-        if not repository.has_activity(activity_id)
+        if not (activity_extracted_meta_dir() / f"{activity_id.pickle}").exists()
     ]
-
-    activity_stream_dir = pathlib.Path("Cache/Activity Timeseries")
-    activity_stream_dir.mkdir(exist_ok=True, parents=True)
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
         row = activities.loc[activity_id]
@@ -179,8 +179,11 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
                 dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
             ),
         }
+        meta_path = activity_extracted_meta_dir / f"{activity_id}.pickle"
+        with open(meta_path, "wb") as f:
+            pickle.dump(table_activity_meta, meta_path)
 
-        time_series_path = activity_stream_dir / f"{activity_id}.parquet"
+        time_series_path = activity_extracted_time_series_dir / f"{activity_id}.parquet"
         if time_series_path.exists():
             time_series = pd.read_parquet(time_series_path)
         else:
@@ -205,10 +208,6 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
             continue
 
         time_series.to_parquet(time_series_path)
-
-        repository.add_activity(table_activity_meta)
-
-    repository.commit()
     work_tracker.close()
 
 
