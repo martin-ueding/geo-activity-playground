@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
   - If the code is changed, not everything has to be parsed again. This is especially helpful with regard to the rate-limited Strava API.
   - Some code is deduplicated that had accumulated between activity file parsing and the Strava API.
 
+- [GH-41](https://github.com/martin-ueding/geo-activity-playground/issues/41): Compute moving time.
 - [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
 - [GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131): Update to the column names in the Strava export.
 - [GH-133](https://github.com/martin-ueding/geo-activity-playground/issues/133): Cope with manually recorded activities in Strava export.
