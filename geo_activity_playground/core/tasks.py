@@ -46,7 +46,7 @@ def work_tracker(path: pathlib.Path):
     yield s
 
     with open(path, "w") as f:
-        json.dump(list(s), f)
+        json.dump(list(s), f, indent=2, sort_keys=True)
 
 
 class WorkTracker:
