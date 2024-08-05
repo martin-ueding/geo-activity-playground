@@ -7,6 +7,7 @@ import xml
 import charset_normalizer
 import dateutil.parser
 import fitdecode
+import fitdecode.exceptions
 import gpxpy
 import pandas as pd
 import tcxreader.tcxreader
@@ -42,7 +43,10 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
         except UnicodeDecodeError as e:
             raise ActivityParseError(f"Encoding issue") from e
     elif file_type == ".fit":
-        metadata, timeseries = read_fit_activity(path, opener)
+        try:
+            metadata, timeseries = read_fit_activity(path, opener)
+        except fitdecode.exceptions.FitError as e:
+            raise ActivityParseError(f"Error in FIT file") from e
     elif file_type == ".tcx":
         try:
             timeseries = read_tcx_activity(path, opener)
