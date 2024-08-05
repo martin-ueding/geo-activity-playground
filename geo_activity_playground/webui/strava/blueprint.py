@@ -10,19 +10,24 @@ def make_strava_blueprint(host: str, port: int) -> Blueprint:
     strava_controller = StravaController(host, port)
     blueprint = Blueprint("strava", __name__, template_folder="templates")
 
-    @blueprint.route("/connect")
-    def connect():
-        return render_template("strava/connect.html.j2", **strava_controller.connect())
+    @blueprint.route("/client-id-form")
+    def client_id_form():
+        return render_template(
+            "strava/client-id.html.j2", **strava_controller.set_client_id()
+        )
 
-    @blueprint.route("/authorize")
-    def strava_authorize():
+    @blueprint.route("/post-client-id", methods=["POST"])
+    def post_client_id():
         client_id = request.form["client_id"]
         client_secret = request.form["client_secret"]
-        return redirect(strava_controller.authorize(client_id, client_secret))
+        url = strava_controller.save_client_id(client_id, client_secret)
+        return redirect(url)
 
     @blueprint.route("/callback")
     def strava_callback():
         code = request.args.get("code", type=str)
-        return render_template("strava/connect.html.j2", **strava_controller.connect())
+        return render_template(
+            "strava/connected.html.j2", **strava_controller.save_code(code)
+        )
 
     return blueprint

@@ -6,21 +6,17 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        <form action="/strava/authorize" method="POST">
+        <form action="/strava/post-client-id" method="POST">
             <div class="mb-3">
                 <label for="client_id" class="form-label">Client ID</label>
-                <input type="text" class="form-control" id="client_id" name="client_id" placeholder="814722" />
+                <input type="text" class="form-control" id="client_id" name="client_id" value="131693" />
             </div>
             <div class="mb-3">
                 <label for="client_secret" class="form-label">Client Secret</label>
                 <input type="text" class="form-control" id="client_secret" name="client_secret"
-                    placeholder="ed9d766e135d95c79dbfca4379d09661a72ebdfd" />
+                    value="0ccc0100a2c218512a7ef0cea3b0e322fb4b4365" />
             </div>
 
-
-            <input type="hidden" name="redirect_uri" value="http://{{ host }}:{{ port }}/strava/callback" />
-            <input type="hidden" name="response_type" value="code" />
-            <input type="hidden" name="scope" value="activity:read_all" />
             <input type="submit" value="Connect to Strava" />
         </form>
     </div>

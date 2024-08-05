@@ -19,7 +19,8 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.paths import cache_dir
+from geo_activity_playground.core.paths import strava_api_dir
+from geo_activity_playground.core.paths import strava_dynamic_config_path
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 
@@ -38,24 +39,22 @@ def set_state(path: pathlib.Path, state: Any) -> None:
         json.dump(state, f, indent=2, sort_keys=True, ensure_ascii=False)
 
 
-@functools.cache
-def strava_api_dir() -> pathlib.Path:
-    result = pathlib.Path.cwd() / "Strava API"
-    result.mkdir(exist_ok=True, parents=True)
-    return result
-
-
 def get_current_access_token() -> str:
-    config = get_config()
+    if strava_dynamic_config_path().exists():
+        with open(strava_dynamic_config_path()) as f:
+            strava_config = json.load(f)
+    else:
+        config = get_config()
+        strava_config = config["strava"]
 
     tokens = get_state(strava_api_dir() / "strava_tokens.json")
     if not tokens:
         logger.info("Create Strava access token …")
         client = Client()
         token_response = client.exchange_code_for_token(
-            client_id=config["strava"]["client_id"],
-            client_secret=config["strava"]["client_secret"],
-            code=config["strava"]["code"],
+            client_id=strava_config["client_id"],
+            client_secret=strava_config["client_secret"],
+            code=strava_config["code"],
         )
         tokens = {
             "access": token_response["access_token"],
@@ -67,8 +66,8 @@ def get_current_access_token() -> str:
         logger.info("Renew Strava access token …")
         client = Client()
         token_response = client.refresh_access_token(
-            client_id=config["strava"]["client_id"],
-            client_secret=config["strava"]["client_secret"],
+            client_id=strava_config["client_id"],
+            client_secret=strava_config["client_secret"],
             refresh_token=tokens["refresh"],
         )
         tokens = {
@@ -90,8 +89,8 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
-def import_from_strava_api(repository: ActivityRepository) -> None:
-    while try_import_strava(repository):
+def import_from_strava_api() -> None:
+    while try_import_strava():
         now = datetime.datetime.now()
         next_quarter = round_to_next_quarter_hour(now)
         seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -101,12 +100,13 @@ def import_from_strava_api(repository: ActivityRepository) -> None:
         time.sleep(seconds_to_wait)
 
 
-def try_import_strava(repository: ActivityRepository) -> bool:
-    last = repository.last_activity_date()
-    if last is None:
-        get_after = "2000-01-01T00:00:00Z"
+def try_import_strava() -> bool:
+    last_activity_date_path = strava_api_dir() / "last-activity-date.json"
+    if last_activity_date_path.exists():
+        with open(last_activity_date_path) as f:
+            get_after = json.load(f)
     else:
-        get_after = last.isoformat().replace("+00:00", "Z")
+        get_after = "2000-01-01T00:00:00Z"
 
     gear_names = {None: "None"}
 
@@ -116,14 +116,14 @@ def try_import_strava(repository: ActivityRepository) -> bool:
         for activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
         ):
-            # Sometimes we still get an activity here although it has already been imported from the Strava checkout.
-            if repository.has_activity(activity.id):
-                continue
             cache_file = (
                 pathlib.Path("Cache")
                 / "Strava Activity Metadata"
                 / f"{activity.id}.pickle"
             )
+            # Sometimes we still get an activity here although it has already been imported from the Strava checkout.
+            if cache_file.exists():
+                continue
             cache_file.parent.mkdir(exist_ok=True, parents=True)
             with open(cache_file, "wb") as f:
                 pickle.dump(activity, f)
@@ -177,6 +177,10 @@ def try_import_strava(repository: ActivityRepository) -> bool:
                     activity_extracted_meta_dir() / f"{activity.id}.pickle", "wb"
                 ) as f:
                     pickle.dump(activity_meta, f)
+
+            with open(last_activity_date_path, "w") as f:
+                json.dump(activity.start_date.isoformat().replace("+00:00", "Z"), f)
+
         limit_exceeded = False
     except RateLimitExceeded:
         limit_exceeded = True
@@ -185,8 +189,6 @@ def try_import_strava(repository: ActivityRepository) -> bool:
             limit_exceeded = True
         else:
             raise
-
-    repository.commit()
 
     return limit_exceeded
 

@@ -149,9 +149,9 @@ def compute_tile_visits(
         if len(df) > 0:
             df = pd.concat([tile_visits_accessor.histories[zoom], df])
             df.sort_values("time", inplace=True)
-            tile_visits_accessor.histories[zoom] = (
-                df.groupby(["tile_x", "tile_y"]).head(1).reset_index()
-            )
+            tile_visits_accessor.histories[zoom] = df.groupby(
+                ["tile_x", "tile_y"]
+            ).head(1)
 
     tile_visits_accessor.save()
     work_tracker.close()

@@ -45,7 +45,7 @@ def build_activity_meta() -> None:
         meta = pd.read_parquet(activities_file())
         present_ids = set(meta["id"])
     else:
-        meta = pd.DataFrame()
+        meta = pd.DataFrame(columns=["id"])
         present_ids = set()
 
     available_ids = {
@@ -80,12 +80,13 @@ def build_activity_meta() -> None:
         new_shard.index.name = "index"
         meta = pd.concat([meta, new_shard])
 
-    assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
-        meta["start"].dtype,
-        meta["start"].iloc[0],
-    )
+    if len(meta):
+        assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
+            meta["start"].dtype,
+            meta["start"].iloc[0],
+        )
 
-    meta.sort_values("start", inplace=True)
+        meta.sort_values("start", inplace=True)
 
     meta.to_parquet(activities_file())
 
