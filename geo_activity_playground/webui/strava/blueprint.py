@@ -10,8 +10,8 @@ def make_strava_blueprint(host: str, port: int) -> Blueprint:
     strava_controller = StravaController(host, port)
     blueprint = Blueprint("strava", __name__, template_folder="templates")
 
-    @blueprint.route("/client-id-form")
-    def client_id_form():
+    @blueprint.route("/setup")
+    def setup():
         return render_template(
             "strava/client-id.html.j2", **strava_controller.set_client_id()
         )
