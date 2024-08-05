@@ -8,7 +8,6 @@ import coloredlogs
 
 from .importers.strava_checkout import convert_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.cache_migrations import apply_cache_migrations
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
