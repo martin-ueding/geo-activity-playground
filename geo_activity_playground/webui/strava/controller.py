@@ -42,6 +42,8 @@ class StravaController:
                     "code": self._code,
                 },
                 f,
+                indent=2,
+                sort_keys=True,
             )
 
         return {}
