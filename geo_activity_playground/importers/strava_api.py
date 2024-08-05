@@ -15,10 +15,10 @@ from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
+from geo_activity_playground.core.paths import cache_dir
 from geo_activity_playground.core.paths import strava_api_dir
 from geo_activity_playground.core.paths import strava_dynamic_config_path
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
@@ -101,7 +101,7 @@ def import_from_strava_api() -> None:
 
 
 def try_import_strava() -> bool:
-    last_activity_date_path = strava_api_dir() / "last-activity-date.json"
+    last_activity_date_path = cache_dir() / "strava-last-activity-date.json"
     if last_activity_date_path.exists():
         with open(last_activity_date_path) as f:
             get_after = json.load(f)

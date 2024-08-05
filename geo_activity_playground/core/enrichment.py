@@ -9,6 +9,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.activities import make_activity_meta
 from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
@@ -58,7 +59,10 @@ def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
         )
         time_series = pd.read_parquet(extracted_time_series_path)
         with open(extracted_metadata_path, "rb") as f:
-            metadata = pickle.load(f)
+            extracted_metadata = pickle.load(f)
+
+        metadata = make_activity_meta()
+        metadata.update(extracted_metadata)
 
         # Enrich time series.
         metadata.update(kind_defaults.get(metadata["kind"], {}))
@@ -118,7 +122,11 @@ def _embellish_single_time_series(
         timeseries["time"] = [
             convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
         ]
-    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns]")
+    timeseries["time"] = convert_to_datetime_ns(timeseries["time"])
+    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns]"), (
+        timeseries["time"].dtype,
+        timeseries["time"].iloc[0],
+    )
 
     distances = get_distance(
         timeseries["latitude"].shift(1),

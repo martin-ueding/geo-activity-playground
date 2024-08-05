@@ -40,6 +40,17 @@ class ActivityMeta(TypedDict):
     steps: int
 
 
+def make_activity_meta() -> ActivityMeta:
+    return ActivityMeta(
+        calories=None,
+        commute=False,
+        consider_for_achievements=True,
+        equipment="Unknown",
+        kind="Unknown",
+        steps=None,
+    )
+
+
 def build_activity_meta() -> None:
     if activities_file().exists():
         meta = pd.read_parquet(activities_file())
