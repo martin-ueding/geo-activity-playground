@@ -46,6 +46,12 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
         return render_template("home.html.j2", **entry_controller.render())
 
 
+def route_settings(app: Flask) -> None:
+    @app.route("/settings")
+    def settings():
+        return render_template("settings.html.j2")
+
+
 def get_secret_key():
     secret_file = pathlib.Path("Cache/flask-secret.json")
     if secret_file.exists():
@@ -69,6 +75,7 @@ def webui_main(
 
     route_search(app, repository)
     route_start(app, repository)
+    route_settings(app)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()

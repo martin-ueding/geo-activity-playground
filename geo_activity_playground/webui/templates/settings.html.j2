@@ -1,0 +1,15 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Settings</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <p><a href="{{ url_for('strava.setup') }}">Set up Strava API</a>.</p>
+    </div>
+</div>
+{% endblock %}
