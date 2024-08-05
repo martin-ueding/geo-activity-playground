@@ -17,6 +17,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
 - [GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131): Update to the column names in the Strava export.
 - [GH-133](https://github.com/martin-ueding/geo-activity-playground/issues/133): Cope with manually recorded activities in Strava export.
+- [GH-134](https://github.com/martin-ueding/geo-activity-playground/issues/134): Cope with broken FIT files.
 
 ### Version 0.24
 
