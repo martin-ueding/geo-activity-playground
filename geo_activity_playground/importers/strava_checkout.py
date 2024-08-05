@@ -119,6 +119,13 @@ EXPECTED_COLUMNS = [
     "Newly Explored Dirt Distance",
     "Activity Count",
     "Total Steps",
+    "Carbon Saved",
+    "Pool Length",
+    "Training Load",
+    "Intensity",
+    "Average Grade Adjusted Pace",
+    "Timer Time",
+    "Total Cycles",
     "Media",
 ]
 
