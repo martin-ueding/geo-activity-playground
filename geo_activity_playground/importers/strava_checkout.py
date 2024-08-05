@@ -178,6 +178,7 @@ def import_from_strava_checkout(repository: ActivityRepository) -> None:
             "start": convert_to_datetime_ns(
                 dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
             ),
+            "consider_for_achievements": True,
         }
 
         time_series_path = activity_stream_dir / f"{activity_id}.parquet"
