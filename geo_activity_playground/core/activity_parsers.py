@@ -47,6 +47,8 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
             metadata, timeseries = read_fit_activity(path, opener)
         except fitdecode.exceptions.FitError as e:
             raise ActivityParseError(f"Error in FIT file") from e
+        except KeyError as e:
+            raise ActivityParseError(f"Key error while parsing FIT file") from e
     elif file_type == ".tcx":
         try:
             timeseries = read_tcx_activity(path, opener)
