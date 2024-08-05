@@ -804,6 +804,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-025" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.25
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-024" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.24
@@ -1430,6 +1439,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-025" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.25
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-024" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.24
@@ -2002,6 +2020,24 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-025">Version 0.25</h3>
+<ul>
+<li>Restructure the way that activities are imported to realize a couple of benefits:</li>
+<li>Deleting activities is detected now, they are removed from the heatmap.</li>
+<li>If the code is changed, not everything has to be parsed again. This is especially helpful with regard to the rate-limited Strava API.</li>
+<li>Some code is deduplicated that had accumulated between activity file parsing and the Strava API.</li>
+<li>Unfortunately it means that everything needs to parsed again into the new format. I'm sorry about that, especially to you Strava users that need to deal with the rate limiting!</li>
+<li>
+<p>Add an web interface to connect to Strava API using a shared application such that it becomes much simpler to set up.</p>
+</li>
+<li>
+<p><a href="https://github.com/martin-ueding/geo-activity-playground/issues/41">GH-41</a>: Compute moving time.</p>
+</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/127">GH-127</a>: Make calories and steps optional for the share picture.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/131">GH-131</a>: Update to the column names in the Strava export.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/133">GH-133</a>: Cope with manually recorded activities in Strava export.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/134">GH-134</a>: Cope with broken FIT files.</li>
+</ul>
 <h3 id="version-024">Version 0.24</h3>
 <h4 id="version-0242">Version 0.24.2</h4>
 <ul>
