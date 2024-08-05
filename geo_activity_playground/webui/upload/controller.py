@@ -98,7 +98,7 @@ def scan_for_activities(
     if pathlib.Path("Activities").exists():
         import_from_directory(config.get("metadata_extraction_regexes", []))
     if pathlib.Path("Strava Export").exists():
-        import_from_strava_checkout(repository)
+        import_from_strava_checkout()
     if (_strava_dynamic_config_path.exists() or "strava" in config) and not skip_strava:
         import_from_strava_api()
 
