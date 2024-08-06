@@ -87,15 +87,16 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
         ]:
             if key in group.columns:
                 series = group[key]
-                i = series.idxmax()
-                if not pd.isna(i):
-                    nominations[i].append(text(meta.loc[i]))
+                if not pd.isna(series).all():
+                    i = series.idxmax()
+                    if not pd.isna(i):
+                        nominations[i].append(text(meta.loc[i]))
 
     return nominations
 
 
 def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
-    df = meta.copy()
+    df = meta.loc[~pd.isna(meta["start"])].copy()
     df["year"] = [start.year for start in df["start"]]
     df["month"] = [start.month for start in df["start"]]
     df["day"] = [start.day for start in df["start"]]
