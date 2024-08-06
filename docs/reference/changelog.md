@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.26
 
+#### Version 0.26.2
+
+- Start with a test suite for the web server that also tests importing.
+  - Already fixed a few little bugs with that.
+- [GH-141](https://github.com/martin-ueding/geo-activity-playground/issues/14): Fix summary page if there are no activities with steps.
+
 #### Version 0.26.1
 
 - [GH-139](https://github.com/martin-ueding/geo-activity-playground/issues/139), [GH-140](https://github.com/martin-ueding/geo-activity-playground/issues/140): More fixes for Strava archive importer.
