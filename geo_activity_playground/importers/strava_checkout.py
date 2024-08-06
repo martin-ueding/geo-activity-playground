@@ -161,7 +161,7 @@ def import_from_strava_checkout() -> None:
     activities_ids_to_parse = [
         activity_id
         for activity_id in activities_ids_to_parse
-        if not (activity_extracted_meta_dir() / f"{activity_id.pickle}").exists()
+        if not (activity_extracted_meta_dir() / f"{activity_id}.pickle").exists()
     ]
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
@@ -190,11 +190,11 @@ def import_from_strava_checkout() -> None:
                 dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
             ),
         }
-        meta_path = activity_extracted_meta_dir / f"{activity_id}.pickle"
+        meta_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
         with open(meta_path, "wb") as f:
-            pickle.dump(table_activity_meta, meta_path)
+            pickle.dump(table_activity_meta, f)
 
-        time_series_path = activity_extracted_time_series_dir / f"{activity_id}.parquet"
+        time_series_path = activity_extracted_time_series_dir() / f"{activity_id}.parquet"
         if time_series_path.exists():
             time_series = pd.read_parquet(time_series_path)
         else:
