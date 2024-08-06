@@ -1,9 +1,9 @@
+import importlib
 import json
 import pathlib
 import secrets
 
 from flask import Flask
-from flask import redirect
 from flask import render_template
 from flask import request
 
@@ -23,7 +23,6 @@ from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
 from geo_activity_playground.core.privacy_zones import PrivacyZone
-from geo_activity_playground.webui.strava.controller import StravaController
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -121,5 +120,12 @@ def webui_main(
         make_upload_blueprint(repository, tile_visit_accessor, config),
         url_prefix="/upload",
     )
+
+    @app.context_processor
+    def inject_global_variables() -> dict:
+        return {
+            "version": importlib.metadata.version("geo-activity-playground"),
+            "num_activities": len(repository),
+        }
 
     app.run(host=host, port=port)
