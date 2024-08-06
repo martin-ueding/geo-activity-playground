@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- track-length = 872 filtered ascend = 14 plain-ascend = 6 cost=1192 energy=0.0kwh time=2m 46s -->
+<gpx 
+ xmlns="http://www.topografix.com/GPX/1/1" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" 
+ version="1.1" 
+ creator="bikerouter.de 2024.20">
+ <trk>
+  <name>Berlin (0,9 km)</name>
+  <link href="https://bikerouter.de/#map=16/52.5180/13.3736/standard,terrarium-hillshading&amp;lonlats=13.372065,52.520279;13.375177,52.518582;13.377484,52.516259&amp;profile=trekking">
+   <text>bikerouter.de</text>
+  </link>
+  <trkseg>
+   <trkpt lat="52.520279" lon="13.37208"><ele>32.5</ele></trkpt>
+   <trkpt lat="52.519643" lon="13.372084"><ele>32</ele></trkpt>
+   <trkpt lat="52.519573" lon="13.372085"><ele>31.75</ele></trkpt>
+   <trkpt lat="52.519403" lon="13.372086"><ele>31.75</ele></trkpt>
+   <trkpt lat="52.519402" lon="13.372259"><ele>31.5</ele></trkpt>
+   <trkpt lat="52.519402" lon="13.3723"><ele>31.5</ele></trkpt>
+   <trkpt lat="52.5194" lon="13.373512"><ele>31.75</ele></trkpt>
+   <trkpt lat="52.5194" lon="13.373686"><ele>32.5</ele></trkpt>
+   <trkpt lat="52.5194" lon="13.374435"><ele>36</ele></trkpt>
+   <trkpt lat="52.5194" lon="13.374593"><ele>36.5</ele></trkpt>
+   <trkpt lat="52.5194" lon="13.374959"><ele>38.25</ele></trkpt>
+   <trkpt lat="52.519327" lon="13.375001"><ele>38.25</ele></trkpt>
+   <trkpt lat="52.519241" lon="13.37505"><ele>38.25</ele></trkpt>
+   <trkpt lat="52.518988" lon="13.375145"><ele>39</ele></trkpt>
+   <trkpt lat="52.518875" lon="13.375164"><ele>39.25</ele></trkpt>
+   <trkpt lat="52.518592" lon="13.375169"><ele>40.25</ele></trkpt>
+   <trkpt lat="52.518581" lon="13.375169"><ele>40.75</ele></trkpt>
+   <trkpt lat="52.518471" lon="13.37517"><ele>40.75</ele></trkpt>
+   <trkpt lat="52.518314" lon="13.375157"><ele>41</ele></trkpt>
+   <trkpt lat="52.518204" lon="13.375135"><ele>40.5</ele></trkpt>
+   <trkpt lat="52.518092" lon="13.375098"><ele>40.25</ele></trkpt>
+   <trkpt lat="52.51798" lon="13.375047"><ele>39.75</ele></trkpt>
+   <trkpt lat="52.517931" lon="13.375012"><ele>39.5</ele></trkpt>
+   <trkpt lat="52.517884" lon="13.374978"><ele>39.25</ele></trkpt>
+   <trkpt lat="52.517764" lon="13.374891"><ele>38.75</ele></trkpt>
+   <trkpt lat="52.517763" lon="13.375399"><ele>40.75</ele></trkpt>
+   <trkpt lat="52.517759" lon="13.376686"><ele>46.25</ele></trkpt>
+   <trkpt lat="52.517759" lon="13.376766"><ele>46.25</ele></trkpt>
+   <trkpt lat="52.517758" lon="13.376834"><ele>46.25</ele></trkpt>
+   <trkpt lat="52.517658" lon="13.376888"><ele>45.25</ele></trkpt>
+   <trkpt lat="52.517192" lon="13.377117"><ele>41.25</ele></trkpt>
+   <trkpt lat="52.516996" lon="13.377196"><ele>40</ele></trkpt>
+   <trkpt lat="52.516918" lon="13.377211"><ele>39.5</ele></trkpt>
+   <trkpt lat="52.516824" lon="13.377222"><ele>38.75</ele></trkpt>
+   <trkpt lat="52.516762" lon="13.377197"><ele>38.25</ele></trkpt>
+   <trkpt lat="52.516688" lon="13.377136"><ele>37.25</ele></trkpt>
+   <trkpt lat="52.516649" lon="13.37707"><ele>36.75</ele></trkpt>
+   <trkpt lat="52.516579" lon="13.376924"><ele>36</ele></trkpt>
+   <trkpt lat="52.516538" lon="13.376858"><ele>35.75</ele></trkpt>
+   <trkpt lat="52.516445" lon="13.376764"><ele>35.5</ele></trkpt>
+   <trkpt lat="52.516389" lon="13.376728"><ele>35.5</ele></trkpt>
+   <trkpt lat="52.516265" lon="13.376706"><ele>35.5</ele></trkpt>
+   <trkpt lat="52.516156" lon="13.376726"><ele>35.5</ele></trkpt>
+   <trkpt lat="52.516169" lon="13.376916"><ele>36</ele></trkpt>
+   <trkpt lat="52.516114" lon="13.377041"><ele>36.25</ele></trkpt>
+   <trkpt lat="52.516122" lon="13.377149"><ele>36.25</ele></trkpt>
+   <trkpt lat="52.516142" lon="13.377426"><ele>36.75</ele></trkpt>
+   <trkpt lat="52.516254" lon="13.377403"><ele>37.25</ele></trkpt>
+   <trkpt lat="52.516258" lon="13.377483"><ele>37.5</ele></trkpt>
+  </trkseg>
+ </trk>
+</gpx>

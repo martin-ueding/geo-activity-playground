@@ -46,7 +46,7 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
 
 
 def route_settings(app: Flask) -> None:
-    @app.route("/settings")
+    @app.route("/settings/")
     def settings():
         return render_template("settings.html.j2")
 
