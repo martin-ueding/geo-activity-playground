@@ -61,11 +61,11 @@ def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
     i = subset["elapsed_time"].idxmax()
     nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
 
-    if "calories" in subset.columns:
+    if "calories" in subset.columns and not pd.isna(subset["calories"]).all():
         i = subset["calories"].idxmax()
         nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
 
-    if "steps" in subset:
+    if "steps" in subset.columns and not pd.isna(subset["steps"]).all():
         i = subset["steps"].idxmax()
         nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
 
