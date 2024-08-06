@@ -17,13 +17,14 @@ urls = [
     "/heatmap/",
     "/eddington/",
     "/equipment/",
-    "/settings/",
+    "/settings",
 ]
 
 
 def test_local_files(tmp_path) -> None:
     copy_testdata_to_basedir("Local Files", tmp_path)
-    with webserver(tmp_path):
+    with webserver(tmp_path) as output:
         for url in urls:
             r = requests.get(base + url)
+            print(output.read())
             assert r.ok, url

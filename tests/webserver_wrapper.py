@@ -1,4 +1,5 @@
 import contextlib
+import os
 import pathlib
 import shutil
 import subprocess
@@ -14,16 +15,17 @@ def webserver(basedir: pathlib.Path):
         "--port",
         "5005",
     ]
-    print(command)
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8"
     )
+
     try:
         for line in process.stderr:
-            print(f"[Webserver]: {line}", end="")
+            print(line, end="")
             if "Press CTRL+C to quit" in line:
-                yield
-                process.terminate()
+                os.set_blocking(process.stdout.fileno(), False)
+                os.set_blocking(process.stderr.fileno(), False)
+                yield process.stderr
     finally:
         process.terminate()
 
