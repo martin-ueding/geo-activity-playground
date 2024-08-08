@@ -6,12 +6,12 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Next
+### Version 0.26
+
+#### Version 0.26.3
 
 - [GH-142](https://github.com/martin-ueding/geo-activity-playground/issues/142): Require `pandas >= 2.2.0` to make sure that it knows about `include_groups`.
 - [GH-144](https://github.com/martin-ueding/geo-activity-playground/issues/144): Ignore activities without time series when using the Strava Checkout import.
-
-### Version 0.26
 
 #### Version 0.26.2
 
