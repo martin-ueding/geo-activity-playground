@@ -6,13 +6,17 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Next
+
+- [GH-142](https://github.com/martin-ueding/geo-activity-playground/issues/142): Require `pandas >= 2.2.0` to make sure that it knows about `include_groups`.
+
 ### Version 0.26
 
 #### Version 0.26.2
 
 - Start with a test suite for the web server that also tests importing.
   - Already fixed a few little bugs with that.
-- [GH-141](https://github.com/martin-ueding/geo-activity-playground/issues/14): Fix summary page if there are no activities with steps.
+- [GH-141](https://github.com/martin-ueding/geo-activity-playground/issues/141): Fix summary page if there are no activities with steps.
 
 #### Version 0.26.1
 
