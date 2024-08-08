@@ -32,7 +32,7 @@ def test_local_files(tmp_path) -> None:
 def test_strava_export(tmp_path) -> None:
     copy_testdata_to_basedir("Strava Export", tmp_path)
     with webserver(tmp_path) as output:
-        for url in urls:
+        for url in urls + ["/activity/12070555079"]:
             r = requests.get(base + url)
             print(output.read())
             assert r.ok, url
