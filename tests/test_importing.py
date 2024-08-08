@@ -11,7 +11,6 @@ urls = [
     "/calendar/",
     "/calendar/2024/5",
     "/activity/day/2024/5/10",
-    "/activity/4120089735679315160",
     "/explorer/14",
     "/explorer/17",
     "/heatmap/",
@@ -24,7 +23,7 @@ urls = [
 def test_local_files(tmp_path) -> None:
     copy_testdata_to_basedir("Local Files", tmp_path)
     with webserver(tmp_path) as output:
-        for url in urls:
+        for url in urls + ["/activity/4120089735679315160"]:
             r = requests.get(base + url)
             print(output.read())
             assert r.ok, url

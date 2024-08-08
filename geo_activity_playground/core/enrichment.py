@@ -47,7 +47,17 @@ def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
             or enriched_metadata_path.stat().st_mtime
             < extracted_metadata_path.stat().st_mtime
         ):
-            new_extracted_metadata_paths.append(extracted_metadata_path)
+            extracted_time_series_path = (
+                activity_extracted_time_series_dir()
+                / f"{extracted_metadata_path.stem}.parquet"
+            )
+            if extracted_time_series_path.exists():
+                new_extracted_metadata_paths.append(extracted_metadata_path)
+            else:
+                logger.error(
+                    f"Extracted activity metadata {extracted_metadata_path} is lacking the corresponding time series path {extracted_time_series_path}. Likely that is an activity without location data. Deleting this."
+                )
+                extracted_metadata_path.unlink()
 
     for extracted_metadata_path in tqdm(
         new_extracted_metadata_paths, desc="Enrich new activity data"
