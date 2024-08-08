@@ -190,11 +190,10 @@ def import_from_strava_checkout() -> None:
                 dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
             ),
         }
-        meta_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
-        with open(meta_path, "wb") as f:
-            pickle.dump(table_activity_meta, f)
 
-        time_series_path = activity_extracted_time_series_dir() / f"{activity_id}.parquet"
+        time_series_path = (
+            activity_extracted_time_series_dir() / f"{activity_id}.parquet"
+        )
         if time_series_path.exists():
             time_series = pd.read_parquet(time_series_path)
         else:
@@ -216,6 +215,9 @@ def import_from_strava_checkout() -> None:
         if "latitude" not in time_series.columns:
             continue
 
+        meta_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
+        with open(meta_path, "wb") as f:
+            pickle.dump(table_activity_meta, f)
         time_series.to_parquet(time_series_path)
     work_tracker.close()
 
