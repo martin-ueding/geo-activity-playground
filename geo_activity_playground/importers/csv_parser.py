@@ -1,13 +1,20 @@
 """
+CSV parser that can handle newlines in cells.
+
+In the Strava export there is a file `activities.csv`. With CSV being a horrible format, there are of course issues with it. One is that the activity description can have newlines in it, they are in the CSV file in verbatim. Therefore we need to have a CSV parser that can handle it. `pandas.read_csv` cannot do it.
 
 The grammar that we have looks like this:
 
-    document ::= line "\\n" ...
+    document ::= line [line ...]
 
-    line ::= cell [ "," cell ...]
+    line ::= cell [ "," cell ...] "\n"
 
-    cell ::= '"' text '"' | text
+    cell ::= '"' text_with_comma '"' | text_without_comma
 
+    text_with_comma ::= (token | '\\n' | ',') ...
+    text_without_comma ::= token ...
+
+This module implements a "recursive descent parser" that parses this grammar.
 """
 
 
