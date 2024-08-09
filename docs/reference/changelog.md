@@ -6,6 +6,11 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+- [GH-128](https://github.com/martin-ueding/geo-activity-playground/issues/128): Let the Strava Checkout importer set the file `strava-last-activity-date.json` which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout.
+- [GH-146](https://github.com/martin-ueding/geo-activity-playground/issues/146): Make multiprocessing optional with `num_processes = 1` in the configuration.
+- [GH-147](https://github.com/martin-ueding/geo-activity-playground/issues/147): Add another safeguard against activities that don't have latitude/longitude data.
+
+
 ### Version 0.26
 
 #### Version 0.26.3
