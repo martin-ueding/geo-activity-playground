@@ -5,7 +5,6 @@ import logging
 import pathlib
 import pickle
 import time
-from typing import Any
 
 import pandas as pd
 from stravalib import Client
@@ -18,25 +17,15 @@ from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.paths import cache_dir
 from geo_activity_playground.core.paths import strava_api_dir
 from geo_activity_playground.core.paths import strava_dynamic_config_path
+from geo_activity_playground.core.paths import strava_last_activity_date_path
+from geo_activity_playground.core.tasks import get_state
+from geo_activity_playground.core.tasks import set_state
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)
-
-
-def get_state(path: pathlib.Path) -> Any:
-    if path.exists():
-        with open(path) as f:
-            return json.load(f)
-
-
-def set_state(path: pathlib.Path, state: Any) -> None:
-    path.parent.mkdir(exist_ok=True, parents=True)
-    with open(path, "w") as f:
-        json.dump(state, f, indent=2, sort_keys=True, ensure_ascii=False)
 
 
 def get_current_access_token() -> str:
@@ -47,7 +36,7 @@ def get_current_access_token() -> str:
         config = get_config()
         strava_config = config["strava"]
 
-    tokens = get_state(strava_api_dir() / "strava_tokens.json")
+    tokens = get_state(strava_api_dir() / "strava_tokens.json", None)
     if not tokens:
         logger.info("Create Strava access token …")
         client = Client()
@@ -101,12 +90,7 @@ def import_from_strava_api() -> None:
 
 
 def try_import_strava() -> bool:
-    last_activity_date_path = cache_dir() / "strava-last-activity-date.json"
-    if last_activity_date_path.exists():
-        with open(last_activity_date_path) as f:
-            get_after = json.load(f)
-    else:
-        get_after = "2000-01-01T00:00:00Z"
+    get_after = get_state(strava_last_activity_date_path(), "2000-01-01T00:00:00Z")
 
     gear_names = {None: "None"}
 
@@ -178,8 +162,10 @@ def try_import_strava() -> bool:
                 ) as f:
                     pickle.dump(activity_meta, f)
 
-            with open(last_activity_date_path, "w") as f:
-                json.dump(activity.start_date.isoformat().replace("+00:00", "Z"), f)
+            set_state(
+                strava_last_activity_date_path(),
+                activity.start_date.isoformat().replace("+00:00", "Z"),
+            )
 
         limit_exceeded = False
     except RateLimitExceeded:

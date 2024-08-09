@@ -100,3 +100,17 @@ class TransformVersion:
     def write(self) -> None:
         with open(self._path, "w") as f:
             json.dump(self._code_version, f)
+
+
+def get_state(path: pathlib.Path, default: Any) -> Any:
+    if path.exists():
+        with open(path) as f:
+            return json.load(f)
+    else:
+        return default
+
+
+def set_state(path: pathlib.Path, state: Any) -> None:
+    path.parent.mkdir(exist_ok=True, parents=True)
+    with open(path, "w") as f:
+        json.dump(state, f, indent=2, sort_keys=True, ensure_ascii=False)

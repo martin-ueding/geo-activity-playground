@@ -36,7 +36,7 @@ class ActivityMeta(TypedDict):
     path: str
     start_latitude: float
     start_longitude: float
-    start: datetime.datetime
+    start: np.datetime64
     steps: int
 
 

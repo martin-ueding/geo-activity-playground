@@ -13,8 +13,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
+from geo_activity_playground.core.paths import strava_last_activity_date_path
+from geo_activity_playground.core.tasks import get_state
+from geo_activity_playground.core.tasks import set_state
 from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
@@ -171,7 +175,8 @@ def import_from_strava_checkout() -> None:
         if isinstance(row["Filename"], float):
             continue
         activity_file = checkout_path / row["Filename"]
-        table_activity_meta = {
+        start_datetime = dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
+        table_activity_meta: ActivityMeta = {
             "calories": float_or_none(row["Calories"]),
             "commute": row["Commute"] == "true",
             "distance_km": row["Distance"],
@@ -186,9 +191,7 @@ def import_from_strava_checkout() -> None:
             "id": activity_id,
             "name": row["Activity Name"],
             "path": str(activity_file),
-            "start": convert_to_datetime_ns(
-                dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
-            ),
+            "start": convert_to_datetime_ns(start_datetime),
         }
 
         time_series_path = (
@@ -219,6 +222,13 @@ def import_from_strava_checkout() -> None:
         with open(meta_path, "wb") as f:
             pickle.dump(table_activity_meta, f)
         time_series.to_parquet(time_series_path)
+
+        start_str = (
+            pd.Timestamp(table_activity_meta["start"]).to_pydatetime().isoformat() + "Z"
+        )
+        latest_start_str = get_state(strava_last_activity_date_path(), start_str)
+        set_state(strava_last_activity_date_path(), max(start_str, latest_start_str))
+
     work_tracker.close()
 
 

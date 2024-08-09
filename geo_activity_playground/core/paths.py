@@ -41,6 +41,8 @@ _tiles_per_time_series = _cache_dir / "Tiles" / "Tiles Per Time Series"
 _strava_api_dir = pathlib.Path("Strava API")
 _strava_dynamic_config_path = _strava_api_dir / "strava-client-id.json"
 
+_strava_last_activity_date_path = _cache_dir / "strava-last-activity-date.json"
+
 
 cache_dir = dir_wrapper(_cache_dir)
 
@@ -54,3 +56,4 @@ strava_api_dir = dir_wrapper(_strava_api_dir)
 
 activities_file = file_wrapper(_activities_file)
 strava_dynamic_config_path = file_wrapper(_strava_dynamic_config_path)
+strava_last_activity_date_path = file_wrapper(_strava_last_activity_date_path)
