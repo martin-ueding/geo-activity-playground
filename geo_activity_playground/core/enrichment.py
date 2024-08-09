@@ -74,6 +74,13 @@ def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
         metadata = make_activity_meta()
         metadata.update(extracted_metadata)
 
+        # Skip activities that don't have geo information attached to them. This shouldn't happen, though.
+        if "latitude" not in time_series.columns:
+            logger.warning(
+                f"Activity {metadata} doesn't have latitude/longitude information. Ignoring this one."
+            )
+            continue
+
         # Enrich time series.
         metadata.update(kind_defaults.get(metadata["kind"], {}))
         time_series = _embellish_single_time_series(
