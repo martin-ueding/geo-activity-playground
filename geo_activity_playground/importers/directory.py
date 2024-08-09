@@ -23,7 +23,9 @@ logger = logging.getLogger(__name__)
 ACTIVITY_DIR = pathlib.Path("Activities")
 
 
-def import_from_directory(metadata_extraction_regexes: list[str] = []) -> None:
+def import_from_directory(
+    metadata_extraction_regexes: list[str], num_processes: Optional[int]
+) -> None:
 
     activity_paths = [
         path
@@ -57,13 +59,20 @@ def import_from_directory(metadata_extraction_regexes: list[str] = []) -> None:
             del file_hashes[deleted_file]
             work_tracker.discard(deleted_file)
 
-    with multiprocessing.Pool() as pool:
-        paths_with_errors = tqdm(
-            pool.imap(_cache_single_file, new_activity_paths),
-            desc="Parse activity metadata",
-            total=len(new_activity_paths),
-        )
-        paths_with_errors = [error for error in paths_with_errors if error]
+    if num_processes == 1:
+        paths_with_errors = []
+        for path in tqdm(new_activity_paths, desc="Parse activity metadata"):
+            errors = _cache_single_file(path)
+            if errors:
+                paths_with_errors.append(errors)
+    else:
+        with multiprocessing.Pool(num_processes) as pool:
+            paths_with_errors = tqdm(
+                pool.imap(_cache_single_file, new_activity_paths),
+                desc="Parse activity metadata (concurrently)",
+                total=len(new_activity_paths),
+            )
+            paths_with_errors = [error for error in paths_with_errors if error]
 
     for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
         activity_id = get_file_hash(path)
