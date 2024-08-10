@@ -34,7 +34,7 @@ class SettingsController:
                 offset = float(offset_str)
             except ValueError as e:
                 flash(
-                    f"Cannot parse number {offset_str} for {equipment}.",
+                    f"Cannot parse number {offset_str} for {equipment}: {e}",
                     category="danger",
                 )
                 continue
