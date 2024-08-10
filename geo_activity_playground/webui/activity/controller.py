@@ -49,6 +49,7 @@ class ActivityController:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
         self._privacy_zones = privacy_zones
+        self._config = config
         self._heart_rate_zone_computer = HeartRateZoneComputer(config)
 
     def render_activity(self, id: int) -> dict:
@@ -100,7 +101,8 @@ class ActivityController:
     def render_sharepic(self, id: int) -> bytes:
         activity = self._repository.get_activity_by_id(id)
         time_series = self._repository.get_time_series(id)
-        for privacy_zone in self._privacy_zones:
+        for coordinates in self._config.privacy_zones.values():
+            privacy_zone = PrivacyZone(coordinates)
             time_series = privacy_zone.filter_time_series(time_series)
         if len(time_series) == 0:
             time_series = self._repository.get_time_series(id)
