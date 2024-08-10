@@ -53,6 +53,16 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             "settings/heart-rate.html.j2", **settings_controller.render_heart_rate()
         )
 
+    @blueprint.route("/metadata-extraction", methods=["GET", "POST"])
+    def metadata_extraction():
+        if request.method == "POST":
+            regexes = request.form.getlist("regex")
+            settings_controller.save_metadata_extraction(regexes)
+        return render_template(
+            "settings/metadata-extraction.html.j2",
+            **settings_controller.render_metadata_extraction(),
+        )
+
     @blueprint.route("/privacy-zones", methods=["GET", "POST"])
     def privacy_zones():
         if request.method == "POST":

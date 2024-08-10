@@ -1,4 +1,5 @@
 import json
+import re
 import urllib.parse
 from typing import Optional
 
@@ -64,6 +65,32 @@ class SettingsController:
         self._config_accessor().heart_rate_maximum = heart_rate_maximum
         self._config_accessor.save()
         flash("Updated heart rate data.", category="success")
+
+    def render_metadata_extraction(self) -> dict:
+        return {
+            "metadata_extraction_regexes": self._config_accessor().metadata_extraction_regexes,
+        }
+
+    def save_metadata_extraction(
+        self,
+        metadata_extraction_regexes: list[str],
+    ) -> None:
+        new_metadata_extraction_regexes = []
+        for regex in metadata_extraction_regexes:
+            try:
+                re.compile(regex)
+            except re.error as e:
+                flash(
+                    f"Cannot parse regex {regex} due to error: {e}", category="danger"
+                )
+            else:
+                new_metadata_extraction_regexes.append(regex)
+
+        self._config_accessor().metadata_extraction_regexes = (
+            new_metadata_extraction_regexes
+        )
+        self._config_accessor.save()
+        flash("Updated metadata extraction settings.", category="success")
 
     def render_privacy_zones(self) -> dict:
         return {

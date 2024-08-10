@@ -32,6 +32,17 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
+                    <h5 class="card-title">Metadata extraction</h5>
+                    <p class="card-text">When using activity files, one might want to extract metadata from the paths or
+                        set defaults.</p>
+                    <a href="{{ url_for('.metadata_extraction') }}" class="btn btn-primary">Set up metadata
+                        extraction</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
                     <h5 class="card-title">Privacy zones</h5>
                     <p class="card-text">Define geographic zones that shall be excluded from share pictures.</p>
                     <a href="{{ url_for('.privacy_zones') }}" class="btn btn-primary">Set up privacy zones</a>
