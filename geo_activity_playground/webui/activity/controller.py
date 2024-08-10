@@ -4,23 +4,23 @@ import io
 import logging
 import re
 from collections.abc import Collection
+from typing import Optional
 
 import altair as alt
 import geojson
 import matplotlib
-import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
-from PIL import ImageFont
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import extract_heart_rate_zones
+from geo_activity_playground.core.activities import logger
 from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.activities import make_speed_color_bar
+from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import GeoBounds
@@ -34,6 +34,48 @@ from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
+
+
+def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
+    if "heartrate" not in time_series:
+        return None
+    config = get_config()
+    try:
+        heart_config = config["heart"]
+    except KeyError:
+        logger.warning(
+            "Missing config entry `heart`, cannot determine heart rate zones."
+        )
+        return None
+
+    birth_year = heart_config.get("birthyear", None)
+    maximum = heart_config.get("maximum", None)
+    resting = heart_config.get("resting", None)
+
+    if not maximum and birth_year:
+        age = time_series["time"].iloc[0].year - birth_year
+        maximum = 220 - age
+    if not resting:
+        resting = 0
+    if not maximum:
+        logger.warning(
+            "Missing config entry `heart.maximum` or `heart.birthyear`, cannot determine heart rate zones."
+        )
+        return None
+
+    zones: pd.Series = (time_series["heartrate"] - resting) * 10 // (
+        maximum - resting
+    ) - 4
+    zones.loc[zones < 0] = 0
+    zones.loc[zones > 5] = 5
+    df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
+    duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
+    duration_per_zone.name = "minutes"
+    for i in range(6):
+        if i not in duration_per_zone:
+            duration_per_zone.loc[i] = 0.0
+    result = duration_per_zone.reset_index()
+    return result
 
 
 class ActivityController:

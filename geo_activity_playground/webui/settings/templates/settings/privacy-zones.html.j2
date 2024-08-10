@@ -1,0 +1,104 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Privacy Zones</h1>
+
+<p>You might want to remove points that are close to your home, work or relatives. For this you can define
+    arbitrary polygons as "privacy zones". Go to <a href="https://geojson.io/" target="_blank">GeoJSON.io</a> to have a
+    nice interactive tool for creating overlays. Create a single polygon, rectangle or circle to define a privacy zone.
+    You can define as many zones as you want, but each zone must only consist of a single area. When you are done, copy
+    the JSON output from the left into the text box below.</p>
+
+<p>You can change the name on an existing privacy zone. To delete a zone, delete the name or the GeoJSON. Zones without
+    a name will be deleted.</p>
+
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(`map-${id}`, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map)
+
+        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        map.fitBounds(geojson_layer.getBounds())
+        return map
+    }
+</script>
+
+{% for activity_batch in latest_activities|batch(3) %}
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+    {% for elem in activity_batch %}
+    <div class="col">
+        <div class="card {{ '' if elem.activity.commute else 'border-primary' }}">
+            <div class="card-img-top" id="map-{{ elem.activity.id }}" style="height: 200px; width: 100%;"></div>
+            <script>
+                let map{{ elem.activity.id }} = add_map("{{ elem.activity.id }}", {{ elem.line_geojson | safe }})
+            </script>
+            <div class="card-body">
+                <a href="{{ url_for('activity.show', id=elem.activity.id) }}">
+                    <h5 class="card-title">{{ elem.activity["name"] }}</h5>
+                </a>
+                <p class="card-text">{{ elem.activity.kind }} with {{ (elem.activity.distance_km)|round(1) }} km in {{
+                    elem.activity.elapsed_time }}</p>
+                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start }}</small></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+
+<form method="POST">
+    {% if privacy_zones %}
+    <h2 class="mb-3">Existing zones</h2>
+
+    <div class="row mb-3">
+        {% for zone_name, zone_geojson in privacy_zones.items() %}
+
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="zone_name_{{ loop.index }}" class="form-label">Name</label>
+                <input type="text" class="form-control" id="zone_name_{{ loop.index }}" name="zone_name"
+                    value="{{ zone_name }}" />
+            </div>
+            <div class="mb-3">
+                <label for="zone_geojson_{{ loop.index }}" class="form-label">GeoJSON</label>
+                <textarea class="form-control" id="zone_geojson_{{ loop.index }}" name="zone_geojson"
+                    rows="10">{{ zone_geojson|tojson(indent=2) }}</textarea>
+            </div>
+            <div class="card-img-top" id="map-{{ loop.index }}" style="height: 300px; width: 100%;"></div>
+            <script>
+                let map{{ loop.index }} = add_map("{{ loop.index }}", {{ zone_geojson | safe }})
+            </script>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="mb-3">New zone</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="new_zone_name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="new_zone_name" name="zone_name" />
+            </div>
+            <div class="mb-3">
+                <label for="new_zone_geojson" class="form-label">GeoJSON</label>
+                <textarea class="form-control" id="new_zone_geojson" name="zone_geojson" rows="10"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+
+    <input type="submit" value="Save" />
+</form>
+
+
+{% endblock %}

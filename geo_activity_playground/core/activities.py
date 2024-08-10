@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
@@ -210,45 +209,3 @@ def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, str]:
         for speed in np.linspace(low, high, 10)
     ]
     return {"low": low, "high": high, "colors": colors}
-
-
-def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
-    if "heartrate" not in time_series:
-        return None
-    config = get_config()
-    try:
-        heart_config = config["heart"]
-    except KeyError:
-        logger.warning(
-            "Missing config entry `heart`, cannot determine heart rate zones."
-        )
-        return None
-
-    birthyear = heart_config.get("birthyear", None)
-    maximum = heart_config.get("maximum", None)
-    resting = heart_config.get("resting", None)
-
-    if not maximum and birthyear:
-        age = time_series["time"].iloc[0].year - birthyear
-        maximum = 220 - age
-    if not resting:
-        resting = 0
-    if not maximum:
-        logger.warning(
-            "Missing config entry `heart.maximum` or `heart.birthyear`, cannot determine heart rate zones."
-        )
-        return None
-
-    zones: pd.Series = (time_series["heartrate"] - resting) * 10 // (
-        maximum - resting
-    ) - 4
-    zones.loc[zones < 0] = 0
-    zones.loc[zones > 5] = 5
-    df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
-    duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
-    duration_per_zone.name = "minutes"
-    for i in range(6):
-        if i not in duration_per_zone:
-            duration_per_zone.loc[i] = 0.0
-    result = duration_per_zone.reset_index()
-    return result

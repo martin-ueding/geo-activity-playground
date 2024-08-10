@@ -8,6 +8,7 @@ import coloredlogs
 
 from .importers.strava_checkout import convert_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
@@ -94,7 +95,7 @@ def main() -> None:
 
 def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
-) -> tuple[ActivityRepository, TileVisitAccessor, dict]:
+) -> tuple[ActivityRepository, TileVisitAccessor, dict, ConfigAccessor]:
     os.chdir(basedir)
     config = get_config()
 
@@ -106,10 +107,11 @@ def make_activity_repository(
 
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
+    config_accessor = ConfigAccessor()
 
     scan_for_activities(repository, tile_visit_accessor, config, skip_strava)
 
-    return repository, tile_visit_accessor, config
+    return repository, tile_visit_accessor, config, config_accessor
 
 
 if __name__ == "__main__":

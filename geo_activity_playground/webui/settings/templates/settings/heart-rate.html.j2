@@ -1,0 +1,102 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Heart Rate</h1>
+
+<p>If you have recorded activities with heart rate data, you can also let it display the heart rate zones.</p>
+
+<p>The definition of the heart rate zones is not standardized. Usually there are five zones and they have the same
+    names. What differs is how their ranges are computed and there is some chaos around that.</p>
+
+<p>All definitions that I found take the maximum heart rate as the upper limit. One can measure this as part of a
+    professional training or just use the <em>220 minus age</em> prescription which at least for me matches close
+    enough. What they differ on is how they use a lower bound. It seems that <a
+        href="https://www.polar.com/blog/running-heart-rate-zones-basics/">Polar</a> or <a
+        href="https://www.rei.com/learn/expert-advice/how-to-train-with-a-heart-rate-monitor.html">REI</a> basically use
+    0 as the lower bound. My Garmin system also uses 0 as the lower bound. But as one can see in <a
+        href="https://theathleteblog.com/heart-rate-zones/">this blog</a>, one can also use the resting heart rate as
+    the lower bound.</p>
+
+<p>Based on the maximum and resting heart rate we will then compute the heart rate zones using certain percentages of
+    <em>effort</em>. We can compute the heart rate as the following:
+</p>
+
+<blockquote>
+    <p>rate = effort × (maximum – minimum) + minimum</p>
+</blockquote>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="birth_year" class="form-label">Birth year</label>
+                <input type="text" class="form-control" id="birth_year" name="birth_year"
+                    value="{{ birth_year or '' }}" />
+            </div>
+            <div class="mb-3">
+                <label for="heart_rate_maximum" class="form-label">Maximum heart rate</label>
+                <input type="text" class="form-control" id="heart_rate_maximum" name="heart_rate_maximum"
+                    value="{{ heart_rate_maximum or '' }}" />
+            </div>
+            <div class="mb-3">
+                <label for="heart_rate_resting" class="form-label">Resting heart rate</label>
+                <input type="text" class="form-control" id="heart_rate_resting" name="heart_rate_resting"
+                    value="{{ heart_rate_resting or '' }}" />
+            </div>
+            <input type="submit" value="Save" />
+        </form>
+    </div>
+
+    {% if zone_boundaries %}
+    <div class="col-md-8">
+        <p>Your heart rate zone boundaries:</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Zone</td>
+                    <td>Percentage</td>
+                    <td>Heart rate</td>
+                    <td>Training</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>50 to 60 %</td>
+                    <td>{{ zone_boundaries[0][0] }} to {{ zone_boundaries[0][1] }} Hz</td>
+                    <td>Warmup/Recovery</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>60 to 70 %</td>
+                    <td>{{ zone_boundaries[1][0] }} to {{ zone_boundaries[1][1] }} Hz</td>
+                    <td>Base Fitness</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>70 to 80 %</td>
+                    <td>{{ zone_boundaries[2][0] }} to {{ zone_boundaries[2][1] }} Hz</td>
+                    <td>Aerobic Endurance</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>80 to 90 %</td>
+                    <td>{{ zone_boundaries[3][0] }} to {{ zone_boundaries[3][1] }} Hz</td>
+                    <td>Anerobic Capacity</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>90 to 100 %</td>
+                    <td>{{ zone_boundaries[4][0] }} to {{ zone_boundaries[4][1] }} Hz</td>
+                    <td>Speed Training</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

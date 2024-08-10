@@ -22,7 +22,9 @@ from .strava.blueprint import make_strava_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
+from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.privacy_zones import PrivacyZone
+from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -45,12 +47,6 @@ def route_start(app: Flask, repository: ActivityRepository) -> None:
         return render_template("home.html.j2", **entry_controller.render())
 
 
-def route_settings(app: Flask) -> None:
-    @app.route("/settings/")
-    def settings():
-        return render_template("settings.html.j2")
-
-
 def get_secret_key():
     secret_file = pathlib.Path("Cache/flask-secret.json")
     if secret_file.exists():
@@ -67,6 +63,7 @@ def webui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: dict,
+    config_accessor: ConfigAccessor,
     host: str,
     port: int,
 ) -> None:
@@ -74,7 +71,6 @@ def webui_main(
 
     route_search(app, repository)
     route_start(app, repository)
-    route_settings(app)
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
@@ -102,6 +98,10 @@ def webui_main(
     )
     app.register_blueprint(
         make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
+    )
+    app.register_blueprint(
+        make_settings_blueprint(config_accessor),
+        url_prefix="/settings",
     )
     app.register_blueprint(
         make_square_planner_blueprint(repository, tile_visit_accessor),

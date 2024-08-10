@@ -1,0 +1,41 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Settings</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Heart rate</h5>
+                    <p class="card-text">Specify maximum heart rate to derive heart rate zones.</p>
+                    <a href="{{ url_for('settings.heart_rate') }}" class="btn btn-primary">Set up heart rate</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Privacy zones</h5>
+                    <p class="card-text">Define geographic zones that shall be excluded from share pictures.</p>
+                    <a href="{{ url_for('settings.privacy_zones') }}" class="btn btn-primary">Set up privacy zones</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Strava API</h5>
+                    <p class="card-text">Connect to the Strava API to download activities from there.</p>
+                    <a href="{{ url_for('strava.setup') }}" class="btn btn-primary">Set up Strava API</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
