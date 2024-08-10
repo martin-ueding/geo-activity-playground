@@ -18,7 +18,6 @@ from .explorer.blueprint import make_explorer_blueprint
 from .heatmap.blueprint import make_heatmap_blueprint
 from .search_controller import SearchController
 from .square_planner.blueprint import make_square_planner_blueprint
-from .strava.blueprint import make_strava_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
@@ -111,10 +110,6 @@ def webui_main(
     app.register_blueprint(
         make_summary_blueprint(repository),
         url_prefix="/summary",
-    )
-    app.register_blueprint(
-        make_strava_blueprint(host, port),
-        url_prefix="/strava",
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(

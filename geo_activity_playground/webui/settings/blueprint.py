@@ -2,8 +2,10 @@ from typing import Optional
 
 from flask import Blueprint
 from flask import flash
+from flask import redirect
 from flask import render_template
 from flask import request
+from flask import url_for
 
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.webui.settings.controller import SettingsController
@@ -50,5 +52,24 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             "settings/privacy-zones.html.j2",
             **settings_controller.render_privacy_zones(),
         )
+
+    @blueprint.route("/strava", methods=["GET", "POST"])
+    def strava():
+        if request.method == "POST":
+            strava_client_id = request.form["strava_client_id"]
+            strava_client_secret = request.form["strava_client_secret"]
+            url = settings_controller.save_strava(
+                strava_client_id, strava_client_secret
+            )
+            return redirect(url)
+        return render_template(
+            "settings/strava.html.j2", **settings_controller.render_strava()
+        )
+
+    @blueprint.route("/strava-callback")
+    def strava_callback():
+        code = request.args.get("code", type=str)
+        settings_controller.save_strava_code(code)
+        return redirect(url_for(".strava"))
 
     return blueprint

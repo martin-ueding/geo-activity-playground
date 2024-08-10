@@ -13,18 +13,28 @@
             button. If you don't want to share the API limits with other people, go the <a
                 href="https://www.strava.com/settings/api">Strava API page</a> and create your own app. Then fill in
             "client ID" and "client secret" in the form.</p>
+
+        <p>
+            Status:
+            {% if strava_client_code %}
+            <span class="badge text-bg-success">Connected</span>
+            {% else %}
+            <span class="badge text-bg-secondary">Not connected</span>
+            {% endif %}
+        </p>
     </div>
 
     <div class="col-md-6">
-        <form action="/strava/post-client-id" method="POST">
+        <form action="" method="POST">
             <div class="mb-3">
-                <label for="client_id" class="form-label">Client ID</label>
-                <input type="text" class="form-control" id="client_id" name="client_id" value="131693" />
+                <label for="strava_client_id" class="form-label">Client ID</label>
+                <input type="text" class="form-control" id="strava_client_id" name="strava_client_id"
+                    value="{{ strava_client_id }}" />
             </div>
             <div class="mb-3">
-                <label for="client_secret" class="form-label">Client Secret</label>
-                <input type="text" class="form-control" id="client_secret" name="client_secret"
-                    value="0ccc0100a2c218512a7ef0cea3b0e322fb4b4365" />
+                <label for="strava_client_secret" class="form-label">Client Secret</label>
+                <input type="text" class="form-control" id="strava_client_secret" name="strava_client_secret"
+                    value="{{ strava_client_secret }}" />
             </div>
 
             <input type="submit" value="Connect to Strava" />

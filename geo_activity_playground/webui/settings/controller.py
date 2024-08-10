@@ -1,7 +1,9 @@
 import json
+import urllib.parse
 from typing import Optional
 
 from flask import flash
+from flask import url_for
 
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
@@ -105,6 +107,36 @@ class SettingsController:
         self._config_accessor().privacy_zones = new_zone_config
         self._config_accessor.save()
         flash("Updated privacy zones.", category="success")
+
+    def render_strava(self) -> dict:
+        return {
+            "strava_client_id": self._config_accessor().strava_client_id,
+            "strava_client_secret": self._config_accessor().strava_client_secret,
+            "strava_client_code": self._config_accessor().strava_client_code,
+        }
+
+    def save_strava(self, client_id: str, client_secret: str) -> str:
+        self._strava_client_id = client_id
+        self._strava_client_secret = client_secret
+
+        payload = {
+            "client_id": client_id,
+            "redirect_uri": url_for(".strava_callback", _external=True),
+            "response_type": "code",
+            "scope": "activity:read_all",
+        }
+
+        arg_string = "&".join(
+            f"{key}={urllib.parse.quote(value)}" for key, value in payload.items()
+        )
+        return f"https://www.strava.com/oauth/authorize?{arg_string}"
+
+    def save_strava_code(self, code: str) -> None:
+        self._config_accessor().strava_client_id = self._strava_client_id
+        self._config_accessor().strava_client_secret = self._strava_client_secret
+        self._config_accessor().strava_client_code = code
+        self._config_accessor.save()
+        flash("Connected to Strava API", category="success")
 
 
 def _wrap_coordinates(coordinates: list[list[float]]) -> dict:
