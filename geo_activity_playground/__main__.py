@@ -78,9 +78,7 @@ def main() -> None:
     subparser.add_argument("--skip-strava", action=argparse.BooleanOptionalAction)
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
-    subparser.set_defaults(
-        func=lambda options: make_activity_repository(options.basedir, False)
-    )
+    subparser.set_defaults(func=lambda options: main_cache(options.basedir))
 
     options = parser.parse_args()
     coloredlogs.install(
@@ -109,11 +107,14 @@ def make_activity_repository(
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
 
-    scan_for_activities(
-        repository, tile_visit_accessor, config, config_accessor(), skip_strava
-    )
-
     return repository, tile_visit_accessor, config, config_accessor
+
+
+def main_cache(basedir: pathlib.Path) -> None:
+    repository, tile_visit_accessor, config, config_accessor = make_activity_repository(
+        basedir
+    )
+    scan_for_activities(repository, tile_visit_accessor, config, config_accessor())
 
 
 if __name__ == "__main__":
