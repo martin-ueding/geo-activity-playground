@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import build_activity_meta
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.enrichment import enrich_activities
 from geo_activity_playground.core.paths import _strava_dynamic_config_path
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
@@ -32,10 +33,12 @@ class UploadController:
         self,
         repository: ActivityRepository,
         tile_visit_accessor: TileVisitAccessor,
-        config: dict,
+        old_config: dict,
+        config: Config,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
+        self._old_config = old_config
         self._config = config
 
     def render_form(self) -> dict:
@@ -45,7 +48,7 @@ class UploadController:
         directories.sort()
         return {
             "directories": directories,
-            "has_upload": "password" in self._config.get("upload", {}),
+            "has_upload": "password" in self._old_config.get("upload", {}),
         }
 
     def receive(self) -> Response:
@@ -54,7 +57,7 @@ class UploadController:
             flash("No file could be found. Did you select a file?", "warning")
             return redirect("/upload")
 
-        if request.form["password"] != self._config["upload"]["password"]:
+        if request.form["password"] != self._old_config["upload"]["password"]:
             flash("Incorrect upload password!", "danger")
             return redirect("/upload")
 
@@ -81,6 +84,7 @@ class UploadController:
             scan_for_activities(
                 self._repository,
                 self._tile_visit_accessor,
+                self._old_config,
                 self._config,
                 skip_strava=True,
             )
@@ -92,20 +96,21 @@ class UploadController:
 def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    config: dict,
+    old_config: dict,
+    config: Config,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
         import_from_directory(
-            config.get("metadata_extraction_regexes", []),
-            config.get("num_processes", None),
+            old_config.get("metadata_extraction_regexes", []),
+            old_config.get("num_processes", None),
         )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout()
-    if (_strava_dynamic_config_path.exists() or "strava" in config) and not skip_strava:
-        import_from_strava_api()
+    if config.strava_client_code and not skip_strava:
+        import_from_strava_api(config)
 
-    enrich_activities(config.get("kind", {}))
+    enrich_activities(old_config.get("kind", {}))
     build_activity_meta()
     repository.reload()
 

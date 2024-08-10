@@ -14,6 +14,7 @@ from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
@@ -28,22 +29,15 @@ from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 logger = logging.getLogger(__name__)
 
 
-def get_current_access_token() -> str:
-    if strava_dynamic_config_path().exists():
-        with open(strava_dynamic_config_path()) as f:
-            strava_config = json.load(f)
-    else:
-        config = get_config()
-        strava_config = config["strava"]
-
+def get_current_access_token(config: Config) -> str:
     tokens = get_state(strava_api_dir() / "strava_tokens.json", None)
     if not tokens:
         logger.info("Create Strava access token …")
         client = Client()
         token_response = client.exchange_code_for_token(
-            client_id=strava_config["client_id"],
-            client_secret=strava_config["client_secret"],
-            code=strava_config["code"],
+            client_id=config.strava_client_id,
+            client_secret=config.strava_client_secret,
+            code=config.strava_client_code,
         )
         tokens = {
             "access": token_response["access_token"],
@@ -55,8 +49,8 @@ def get_current_access_token() -> str:
         logger.info("Renew Strava access token …")
         client = Client()
         token_response = client.refresh_access_token(
-            client_id=strava_config["client_id"],
-            client_secret=strava_config["client_secret"],
+            client_id=config.strava_client_id,
+            client_secret=config.strava_client_secret,
             refresh_token=tokens["refresh"],
         )
         tokens = {
@@ -78,8 +72,8 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
-def import_from_strava_api() -> None:
-    while try_import_strava():
+def import_from_strava_api(config: Config) -> None:
+    while try_import_strava(config):
         now = datetime.datetime.now()
         next_quarter = round_to_next_quarter_hour(now)
         seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -89,12 +83,12 @@ def import_from_strava_api() -> None:
         time.sleep(seconds_to_wait)
 
 
-def try_import_strava() -> bool:
+def try_import_strava(config: Config) -> bool:
     get_after = get_state(strava_last_activity_date_path(), "2000-01-01T00:00:00Z")
 
     gear_names = {None: "None"}
 
-    client = Client(access_token=get_current_access_token())
+    client = Client(access_token=get_current_access_token(config))
 
     try:
         for activity in tqdm(

@@ -109,7 +109,9 @@ def make_activity_repository(
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
 
-    scan_for_activities(repository, tile_visit_accessor, config, skip_strava)
+    scan_for_activities(
+        repository, tile_visit_accessor, config, config_accessor(), skip_strava
+    )
 
     return repository, tile_visit_accessor, config, config_accessor
 
