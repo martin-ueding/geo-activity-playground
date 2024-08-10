@@ -35,6 +35,7 @@ class SettingsController:
         self._config_accessor().heart_rate_resting = heart_rate_resting
         self._config_accessor().heart_rate_maximum = heart_rate_maximum
         self._config_accessor.save()
+        flash("Updated heart rate data.", category="success")
 
     def render_privacy_zones(self) -> dict:
         return {
@@ -103,6 +104,7 @@ class SettingsController:
 
         self._config_accessor().privacy_zones = new_zone_config
         self._config_accessor.save()
+        flash("Updated privacy zones.", category="success")
 
 
 def _wrap_coordinates(coordinates: list[list[float]]) -> dict:
