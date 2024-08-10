@@ -27,6 +27,9 @@ class SettingsController:
         assert len(equipments) == len(offsets)
         new_equipment_offsets = {}
         for equipment, offset_str in zip(equipments, offsets):
+            if not equipment or not offset_str:
+                continue
+
             try:
                 offset = float(offset_str)
             except ValueError as e:
@@ -34,6 +37,10 @@ class SettingsController:
                     f"Cannot parse number {offset_str} for {equipment}.",
                     category="danger",
                 )
+                continue
+
+            if not offset:
+                continue
 
             new_equipment_offsets[equipment] = offset
         self._config_accessor().equipment_offsets = new_equipment_offsets
