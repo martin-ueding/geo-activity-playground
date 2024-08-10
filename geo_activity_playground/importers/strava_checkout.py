@@ -24,6 +24,7 @@ from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 from geo_activity_playground.importers.activity_parsers import ActivityParseError
 from geo_activity_playground.importers.activity_parsers import read_activity
+from geo_activity_playground.importers.csv_parser import parse_csv
 
 
 logger = logging.getLogger(__name__)
@@ -134,34 +135,41 @@ EXPECTED_COLUMNS = [
 ]
 
 
-def float_or_none(x: Union[float, str]) -> Optional[float]:
-    try:
-        return float(x)
-    except ValueError:
-        return None
+def float_with_comma_or_period(x: str) -> Optional[float]:
+    if len(x) == 0:
+        return 0
+
+    if "," in x:
+        x = x.replace(",", ".")
+    return float(x)
 
 
 def import_from_strava_checkout() -> None:
     checkout_path = pathlib.Path("Strava Export")
-    activities = pd.read_csv(checkout_path / "activities.csv")
+    with open(checkout_path / "activities.csv") as f:
+        rows = parse_csv(f.read())
+    header = rows[0]
 
-    if activities.columns[0] == EXPECTED_COLUMNS[0]:
+    if len(header) != len(EXPECTED_COLUMNS):
+        logger.error(
+            f"You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. Your file has {len(header)} but we expect {len(EXPECTED_COLUMNS)}. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
+        )
+        print(header)
+        sys.exit(1)
+
+    if header[0] == EXPECTED_COLUMNS[0]:
         dayfirst = False
-    if activities.columns[0] == "Aktivitäts-ID":
-        activities = pd.read_csv(checkout_path / "activities.csv", decimal=",")
-        if len(activities.columns) != len(EXPECTED_COLUMNS):
-            logger.error(
-                f"You are trying to import a Strava checkout where the `activities.csv` contains German column headers. In order to import this, we need to map these to the English ones. Unfortunately Strava has changed the number of columns. Your file has {len(activities.columns)} but we expect {len(EXPECTED_COLUMNS)}. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
-            )
-            print(activities.columns)
-            print(activities.dtypes)
-            sys.exit(1)
-        activities.columns = EXPECTED_COLUMNS
+    if header[0] == "Aktivitäts-ID":
+        header = EXPECTED_COLUMNS
         dayfirst = True
 
-    activities.index = activities["Activity ID"]
+    table = {
+        header[i]: [rows[r][i] for r in range(1, len(rows))] for i in range(len(header))
+    }
+    all_activity_ids = [int(value) for value in table["Activity ID"]]
+
     work_tracker = WorkTracker(work_tracker_path("import-strava-checkout-activities"))
-    activities_ids_to_parse = work_tracker.filter(activities["Activity ID"])
+    activities_ids_to_parse = work_tracker.filter(all_activity_ids)
     activities_ids_to_parse = [
         activity_id
         for activity_id in activities_ids_to_parse
@@ -170,17 +178,23 @@ def import_from_strava_checkout() -> None:
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
         work_tracker.mark_done(activity_id)
-        row = activities.loc[activity_id]
+        index = all_activity_ids.index(activity_id)
+        row = {column: table[column][index] for column in header}
+
         # Some manually recorded activities have no file name. Pandas reads that as a float. We skip those.
-        if isinstance(row["Filename"], float):
+        if not row["Filename"]:
             continue
-        activity_file = checkout_path / row["Filename"]
+
         start_datetime = dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
+
+        activity_file = checkout_path / row["Filename"]
         table_activity_meta: ActivityMeta = {
-            "calories": float_or_none(row["Calories"]),
+            "calories": float_with_comma_or_period(row["Calories"]),
             "commute": row["Commute"] == "true",
             "distance_km": row["Distance"],
-            "elapsed_time": datetime.timedelta(seconds=int(row["Elapsed Time"])),
+            "elapsed_time": datetime.timedelta(
+                seconds=float_with_comma_or_period(row["Elapsed Time"])
+            ),
             "equipment": str(
                 nan_as_none(row["Activity Gear"])
                 or nan_as_none(row["Bike"])

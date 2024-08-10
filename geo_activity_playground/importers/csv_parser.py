@@ -18,19 +18,17 @@ This module implements a "recursive descent parser" that parses this grammar.
 """
 
 
-def parse_csv(text: str) -> dict[str, list]:
+def parse_csv(text: str) -> list[list]:
     text = text.strip() + "\n"
     result = {}
     index = 0
-    columns, index = _parse_line(text, index)
-    result = {column: [] for column in columns}
+    result = []
     while index < len(text):
         line, index = _parse_line(text, index)
+        result.append(line)
         assert len(line) == len(
-            columns
-        ), f"Expected {len(columns)} columns at {index=}, got {len(line)} columns"
-        for col, cell in zip(columns, line):
-            result[col].append(cell)
+            result[0]
+        ), f"Expected {len(result[0])} columns at {index=}, got {len(line)} columns"
 
     return result
 
@@ -46,7 +44,7 @@ def _parse_line(text: str, start: int) -> tuple[list, int]:
         else:
             assert text[index] == ",", f"Expected ',' at {index=}, got {text[index]}"
             index += 1
-    assert False, "We should never get here"
+    return result, index
 
 
 def _parse_cell(text: str, start: int) -> tuple[str, int]:

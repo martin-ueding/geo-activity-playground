@@ -1,3 +1,5 @@
+import pytest
+
 from geo_activity_playground.importers.csv_parser import _parse_cell
 from geo_activity_playground.importers.csv_parser import _parse_line
 from geo_activity_playground.importers.csv_parser import parse_csv
@@ -10,7 +12,7 @@ a,"b,b",c
 d,"e
 f",g
 """
-    expected = {"A": ["a", "d"], "B": ["b,b", "e\nf"], "C": ["c", "g"]}
+    expected = [["A", "B", "C"], ["a", "b,b", "c"], ["d", "e\nf", "g"]]
     assert parse_csv(data) == expected
 
 
@@ -30,5 +32,18 @@ def test_parse_cell_with_newline() -> None:
     assert _parse_cell('"f\noo"', 0) == ("f\noo", 6)
 
 
-def test_parse_line_newline() -> None:
+def test_parse_cell_empty() -> None:
+    assert _parse_cell("", 0) == ("", 0)
+
+
+def test_parse_line() -> None:
     assert _parse_line("a,b,c\n", 0) == (["a", "b", "c"], 6)
+
+
+def test_parse_line_empty_cell() -> None:
+    assert _parse_line("a,,c\n", 0) == (["a", "", "c"], 5)
+
+
+@pytest.mark.xfail
+def test_parse_line_empty_cell_at_end() -> None:
+    assert _parse_line("a,b,\n", 0) == (["a", "b", ""], 5)
