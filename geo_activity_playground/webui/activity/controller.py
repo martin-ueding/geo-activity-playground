@@ -20,7 +20,9 @@ from geo_activity_playground.core.activities import logger
 from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.activities import make_speed_color_bar
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import get_config
+from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import GeoBounds
@@ -36,60 +38,19 @@ from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 logger = logging.getLogger(__name__)
 
 
-def extract_heart_rate_zones(time_series: pd.DataFrame) -> Optional[pd.DataFrame]:
-    if "heartrate" not in time_series:
-        return None
-    config = get_config()
-    try:
-        heart_config = config["heart"]
-    except KeyError:
-        logger.warning(
-            "Missing config entry `heart`, cannot determine heart rate zones."
-        )
-        return None
-
-    birth_year = heart_config.get("birthyear", None)
-    maximum = heart_config.get("maximum", None)
-    resting = heart_config.get("resting", None)
-
-    if not maximum and birth_year:
-        age = time_series["time"].iloc[0].year - birth_year
-        maximum = 220 - age
-    if not resting:
-        resting = 0
-    if not maximum:
-        logger.warning(
-            "Missing config entry `heart.maximum` or `heart.birthyear`, cannot determine heart rate zones."
-        )
-        return None
-
-    zones: pd.Series = (time_series["heartrate"] - resting) * 10 // (
-        maximum - resting
-    ) - 4
-    zones.loc[zones < 0] = 0
-    zones.loc[zones > 5] = 5
-    df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
-    duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
-    duration_per_zone.name = "minutes"
-    for i in range(6):
-        if i not in duration_per_zone:
-            duration_per_zone.loc[i] = 0.0
-    result = duration_per_zone.reset_index()
-    return result
-
-
 class ActivityController:
     def __init__(
         self,
         repository: ActivityRepository,
         tile_visit_accessor: TileVisitAccessor,
         privacy_zones: Collection[PrivacyZone],
+        config: Config,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
         self._privacy_zones = privacy_zones
+        self._heart_rate_zone_computer = HeartRateZoneComputer(config)
 
-    @functools.lru_cache()
     def render_activity(self, id: int) -> dict:
         activity = self._repository.get_activity_by_id(id)
 
@@ -124,12 +85,16 @@ class ActivityController:
             "time": activity["start"].time(),
             "new_tiles": new_tiles,
         }
-        if (heart_zones := extract_heart_rate_zones(time_series)) is not None:
-            result["heart_zones_plot"] = heartrate_zone_plot(heart_zones)
+        if (
+            heart_zones := _extract_heart_rate_zones(
+                time_series, self._heart_rate_zone_computer
+            )
+        ) is not None:
+            result["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
         if "altitude" in time_series.columns:
             result["altitude_time_plot"] = altitude_time_plot(time_series)
         if "heartrate" in time_series.columns:
-            result["heartrate_time_plot"] = heartrate_time_plot(time_series)
+            result["heartrate_time_plot"] = heart_rate_time_plot(time_series)
         return result
 
     def render_sharepic(self, id: int) -> bytes:
@@ -322,7 +287,7 @@ def altitude_time_plot(time_series: pd.DataFrame) -> str:
     )
 
 
-def heartrate_time_plot(time_series: pd.DataFrame) -> str:
+def heart_rate_time_plot(time_series: pd.DataFrame) -> str:
     return (
         alt.Chart(time_series, title="Heart Rate")
         .mark_line()
@@ -336,7 +301,7 @@ def heartrate_time_plot(time_series: pd.DataFrame) -> str:
     )
 
 
-def heartrate_zone_plot(heart_zones: pd.DataFrame) -> str:
+def heart_rate_zone_plot(heart_zones: pd.DataFrame) -> str:
     return (
         alt.Chart(heart_zones, title="Heart Rate Zones")
         .mark_bar()
@@ -513,3 +478,26 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
     img.save(f, format="png")
     # pl.imsave(f, background, format="png")
     return bytes(f.getbuffer())
+
+
+def _extract_heart_rate_zones(
+    time_series: pd.DataFrame, heart_rate_zone_computer: HeartRateZoneComputer
+) -> Optional[pd.DataFrame]:
+    if "heartrate" not in time_series:
+        return
+
+    try:
+        zones = heart_rate_zone_computer.compute_zones(
+            time_series["heartrate"], time_series["time"].iloc[0].year
+        )
+    except RuntimeError:
+        return
+
+    df = pd.DataFrame({"heartzone": zones, "step": time_series["time"].diff()}).dropna()
+    duration_per_zone = df.groupby("heartzone").sum()["step"].dt.total_seconds() / 60
+    duration_per_zone.name = "minutes"
+    for i in range(6):
+        if i not in duration_per_zone:
+            duration_per_zone.loc[i] = 0.0
+    result = duration_per_zone.reset_index()
+    return result

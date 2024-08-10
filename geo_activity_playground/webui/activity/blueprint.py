@@ -8,6 +8,7 @@ from flask import Response
 from ...core.activities import ActivityRepository
 from ...explorer.tile_visits import TileVisitAccessor
 from .controller import ActivityController
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 
 
@@ -15,11 +16,12 @@ def make_activity_blueprint(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     privacy_zones: Collection[PrivacyZone],
+    config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
 
     activity_controller = ActivityController(
-        repository, tile_visit_accessor, privacy_zones
+        repository, tile_visit_accessor, privacy_zones, config
     )
 
     @blueprint.route("/all")

@@ -83,6 +83,7 @@ def webui_main(
                 PrivacyZone(points)
                 for points in config.get("privacy_zones", {}).values()
             ],
+            config_accessor(),
         ),
         url_prefix="/activity",
     )

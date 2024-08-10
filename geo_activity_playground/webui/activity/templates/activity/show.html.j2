@@ -121,11 +121,15 @@
     <div class="col-md-4">
         {{ vega_direct("heartrate_time_plot", heartrate_time_plot) }}
     </div>
-    {% if heart_zones_plot is defined %}
     <div class="col-md-4">
+        {% if heart_zones_plot is defined %}
         {{ vega_direct("heart_zones_plot", heart_zones_plot) }}
+        {% else %}
+        <p>Your activity has heart data, but this program doesn't know your maximum heart rate (or birth year) and
+            therefore cannot compute the heart rate zones. Go to the <a
+                href="{{ url_for('settings.heart_rate') }}">settings</a>.</p>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 {% endif %}
 
