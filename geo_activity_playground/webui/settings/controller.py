@@ -18,11 +18,7 @@ class SettingsController:
             "heart_rate_maximum": self._config_accessor().heart_rate_maximum,
         }
 
-        self._heart_rate_computer = HeartRateZoneComputer(
-            self._config_accessor().birth_year,
-            self._config_accessor().heart_rate_resting,
-            self._config_accessor().heart_rate_maximum,
-        )
+        self._heart_rate_computer = HeartRateZoneComputer(self._config_accessor())
         try:
             result["zone_boundaries"] = self._heart_rate_computer.zone_boundaries()
         except RuntimeError as e:
