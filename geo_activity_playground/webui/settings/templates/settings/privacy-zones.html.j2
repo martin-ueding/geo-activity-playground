@@ -29,35 +29,13 @@
     }
 </script>
 
-{% for activity_batch in latest_activities|batch(3) %}
-<div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
-    {% for elem in activity_batch %}
-    <div class="col">
-        <div class="card {{ '' if elem.activity.commute else 'border-primary' }}">
-            <div class="card-img-top" id="map-{{ elem.activity.id }}" style="height: 200px; width: 100%;"></div>
-            <script>
-                let map{{ elem.activity.id }} = add_map("{{ elem.activity.id }}", {{ elem.line_geojson | safe }})
-            </script>
-            <div class="card-body">
-                <a href="{{ url_for('activity.show', id=elem.activity.id) }}">
-                    <h5 class="card-title">{{ elem.activity["name"] }}</h5>
-                </a>
-                <p class="card-text">{{ elem.activity.kind }} with {{ (elem.activity.distance_km)|round(1) }} km in {{
-                    elem.activity.elapsed_time }}</p>
-                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start }}</small></p>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endfor %}
 
 
 <form method="POST">
     {% if privacy_zones %}
     <h2 class="mb-3">Existing zones</h2>
 
-    <div class="row mb-3">
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
         {% for zone_name, zone_geojson in privacy_zones.items() %}
 
         <div class="col-md-4">

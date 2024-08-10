@@ -2,12 +2,14 @@ import altair as alt
 import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import get_config
 
 
 class EquipmentController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(self, repository: ActivityRepository, config: Config) -> None:
         self._repository = repository
+        self._config = config
 
     def render(self) -> dict:
         kind_per_equipment = self._repository.meta.groupby("equipment").apply(
@@ -101,10 +103,8 @@ class EquipmentController:
                 "usages_plot_id": f"usages_plot_{hash(equipment)}",
             }
 
-        config = get_config()
-        if "offsets" in config:
-            for equipment, offset in config["offsets"].items():
-                equipment_summary.loc[equipment, "total_distance_km"] += offset
+        for equipment, offset in self._config.equipment_offsets.items():
+            equipment_summary.loc[equipment, "total_distance_km"] += offset
 
         return {
             "equipment_variables": equipment_variables,

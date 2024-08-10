@@ -91,7 +91,7 @@ def webui_main(
         make_eddington_blueprint(repository), url_prefix="/eddington"
     )
     app.register_blueprint(
-        make_equipment_blueprint(repository), url_prefix="/equipment"
+        make_equipment_blueprint(repository, config_accessor()), url_prefix="/equipment"
     )
     app.register_blueprint(
         make_explorer_blueprint(repository, tile_visit_accessor), url_prefix="/explorer"

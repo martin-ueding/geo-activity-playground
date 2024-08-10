@@ -1,14 +1,25 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<div class="row mb-3">
+<div class="row">
     <div class="col">
         <h1>Settings</h1>
     </div>
 </div>
 
+<p>Here are various settings that control how activities are gathered, analyzed and visualized.</p>
+
 <div class="row mb-3">
     <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Equipment offsets</h5>
+                    <p class="card-text">Not all activities with a given equipment are recorded? Just set an offset.</p>
+                    <a href="{{ url_for('.equipment_offsets') }}" class="btn btn-primary">Set up equipment offsets</a>
+                </div>
+            </div>
+        </div>
         <div class="col">
             <div class="card">
                 <div class="card-body">

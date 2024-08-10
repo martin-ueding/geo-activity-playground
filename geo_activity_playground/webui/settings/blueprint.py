@@ -27,6 +27,17 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
     def index():
         return render_template("settings/index.html.j2")
 
+    @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
+    def equipment_offsets():
+        if request.method == "POST":
+            equipments = request.form.getlist("equipment")
+            offsets = request.form.getlist("offset")
+            settings_controller.save_equipment_offsets(equipments, offsets)
+        return render_template(
+            "settings/equipment-offsets.html.j2",
+            **settings_controller.render_equipment_offsets(),
+        )
+
     @blueprint.route("/heart-rate", methods=["GET", "POST"])
     def heart_rate():
         if request.method == "POST":

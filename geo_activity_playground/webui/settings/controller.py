@@ -13,6 +13,32 @@ class SettingsController:
     def __init__(self, config_accessor: ConfigAccessor) -> None:
         self._config_accessor = config_accessor
 
+    def render_equipment_offsets(self) -> dict:
+        return {
+            "equipment_offsets": self._config_accessor().equipment_offsets,
+        }
+
+    def save_equipment_offsets(
+        self,
+        equipments: list[str],
+        offsets: list[str],
+    ) -> None:
+        assert len(equipments) == len(offsets)
+        new_equipment_offsets = {}
+        for equipment, offset_str in zip(equipments, offsets):
+            try:
+                offset = float(offset_str)
+            except ValueError as e:
+                flash(
+                    f"Cannot parse number {offset_str} for {equipment}.",
+                    category="danger",
+                )
+
+            new_equipment_offsets[equipment] = offset
+        self._config_accessor().equipment_offsets = new_equipment_offsets
+        self._config_accessor.save()
+        flash("Updated equipment offsets.", category="success")
+
     def render_heart_rate(self) -> dict:
         result = {
             "birth_year": self._config_accessor().birth_year,
