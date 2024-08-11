@@ -1,6 +1,4 @@
 import datetime
-import functools
-import json
 import logging
 import pathlib
 import pickle
@@ -15,11 +13,9 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
 from geo_activity_playground.core.paths import strava_api_dir
-from geo_activity_playground.core.paths import strava_dynamic_config_path
 from geo_activity_playground.core.paths import strava_last_activity_date_path
 from geo_activity_playground.core.tasks import get_state
 from geo_activity_playground.core.tasks import set_state

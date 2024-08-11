@@ -1,7 +1,6 @@
 import logging
 import os
 import pathlib
-import sys
 
 from flask import flash
 from flask import redirect
@@ -14,7 +13,6 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import build_activity_meta
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.enrichment import enrich_activities
-from geo_activity_playground.core.paths import _strava_dynamic_config_path
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor

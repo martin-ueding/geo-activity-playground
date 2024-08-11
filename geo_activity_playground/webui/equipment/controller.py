@@ -3,7 +3,6 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.config import get_config
 
 
 class EquipmentController:

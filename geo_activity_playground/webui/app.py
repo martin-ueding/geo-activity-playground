@@ -22,7 +22,6 @@ from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
 from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
 
 
