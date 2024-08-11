@@ -10,14 +10,11 @@ from geo_activity_playground.core.config import Config
 def make_upload_blueprint(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    old_config: dict,
     config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("upload", __name__, template_folder="templates")
 
-    upload_controller = UploadController(
-        repository, tile_visit_accessor, old_config, config
-    )
+    upload_controller = UploadController(repository, tile_visit_accessor, config)
 
     @blueprint.route("/")
     def index():

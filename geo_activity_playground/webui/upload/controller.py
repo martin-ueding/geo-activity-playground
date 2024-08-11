@@ -34,12 +34,10 @@ class UploadController:
         self,
         repository: ActivityRepository,
         tile_visit_accessor: TileVisitAccessor,
-        old_config: dict,
         config: Config,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
-        self._old_config = old_config
         self._config = config
 
     def render_form(self) -> dict:
@@ -49,7 +47,7 @@ class UploadController:
         directories.sort()
         return {
             "directories": directories,
-            "has_upload": "password" in self._old_config.get("upload", {}),
+            "has_upload": self._config.upload_password,
         }
 
     def receive(self) -> Response:
@@ -58,7 +56,7 @@ class UploadController:
             flash("No file could be found. Did you select a file?", "warning")
             return redirect("/upload")
 
-        if request.form["password"] != self._old_config["upload"]["password"]:
+        if request.form["password"] != self._config.upload_password:
             flash("Incorrect upload password!", "danger")
             return redirect("/upload")
 
@@ -85,7 +83,6 @@ class UploadController:
             scan_for_activities(
                 self._repository,
                 self._tile_visit_accessor,
-                self._old_config,
                 self._config,
                 skip_strava=True,
             )
@@ -97,7 +94,6 @@ class UploadController:
         scan_for_activities(
             self._repository,
             self._tile_visit_accessor,
-            self._old_config,
             self._config,
             skip_strava=True,
         )
@@ -108,14 +104,13 @@ class UploadController:
 def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    old_config: dict,
     config: Config,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
         import_from_directory(
             config.metadata_extraction_regexes,
-            old_config.get("num_processes", None),
+            None,
         )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout()

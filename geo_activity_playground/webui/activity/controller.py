@@ -43,12 +43,10 @@ class ActivityController:
         self,
         repository: ActivityRepository,
         tile_visit_accessor: TileVisitAccessor,
-        privacy_zones: Collection[PrivacyZone],
         config: Config,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
-        self._privacy_zones = privacy_zones
         self._config = config
         self._heart_rate_zone_computer = HeartRateZoneComputer(config)
 

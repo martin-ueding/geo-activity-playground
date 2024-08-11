@@ -61,7 +61,6 @@ def get_secret_key():
 def web_ui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    old_config: dict,
     config_accessor: ConfigAccessor,
     host: str,
     port: int,
@@ -79,10 +78,6 @@ def web_ui_main(
         make_activity_blueprint(
             repository,
             tile_visit_accessor,
-            [
-                PrivacyZone(points)
-                for points in old_config.get("privacy_zones", {}).values()
-            ],
             config_accessor(),
         ),
         url_prefix="/activity",
@@ -114,9 +109,7 @@ def web_ui_main(
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(
-        make_upload_blueprint(
-            repository, tile_visit_accessor, old_config, config_accessor()
-        ),
+        make_upload_blueprint(repository, tile_visit_accessor, config_accessor()),
         url_prefix="/upload",
     )
 

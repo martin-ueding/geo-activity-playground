@@ -94,29 +94,20 @@ def main() -> None:
 
 def make_activity_repository(
     basedir: pathlib.Path, skip_strava: bool
-) -> tuple[ActivityRepository, TileVisitAccessor, dict, ConfigAccessor]:
+) -> tuple[ActivityRepository, TileVisitAccessor, ConfigAccessor]:
     os.chdir(basedir)
-    config = get_config()
-
-    if not config.get("prefer_metadata_from_file", True):
-        logger.error(
-            "The config option `prefer_metadata_from_file` is deprecated. If you want to prefer extract metadata from the activity file paths, please use the new `metadata_extraction_regexes` as explained at https://martin-ueding.github.io/geo-activity-playground/getting-started/using-activity-files/#directory-structure."
-        )
-        sys.exit(1)
 
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
 
-    return repository, tile_visit_accessor, config, config_accessor
+    return repository, tile_visit_accessor, config_accessor
 
 
 def main_cache(basedir: pathlib.Path) -> None:
-    repository, tile_visit_accessor, config, config_accessor = make_activity_repository(
-        basedir
-    )
-    scan_for_activities(repository, tile_visit_accessor, config, config_accessor())
+    repository, tile_visit_accessor, config_accessor = make_activity_repository(basedir)
+    scan_for_activities(repository, tile_visit_accessor, config_accessor())
 
 
 if __name__ == "__main__":
