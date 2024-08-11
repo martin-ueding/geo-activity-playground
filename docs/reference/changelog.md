@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-143](https://github.com/martin-ueding/geo-activity-playground/issues/143): Use custom CSV parser to read activities that have newlines in their descriptions.
 - [GH-146](https://github.com/martin-ueding/geo-activity-playground/issues/146): Make multiprocessing optional with `num_processes = 1` in the configuration.
 - [GH-147](https://github.com/martin-ueding/geo-activity-playground/issues/147): Add another safeguard against activities that don't have latitude/longitude data.
+- [GH-149](https://github.com/martin-ueding/geo-activity-playground/issues/149): Only pre-compute explorer maps for zoom 14 and 17 by default. Other ones just have to be enabled once. This saves a bit of computing time for most people that don't need to go down to zoom 19.
 - [GH-151](https://github.com/martin-ueding/geo-activity-playground/issues/151): Do not fail if version cannot be determined.
 - Add settings menu where one can configure various things:
   - Equipment offsets
