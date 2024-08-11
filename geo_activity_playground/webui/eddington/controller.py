@@ -16,7 +16,7 @@ class EddingtonController:
         activities["day"] = [start.date() for start in activities["start"]]
 
         sum_per_day = activities.groupby("day").apply(
-            lambda group: int(sum(group["distance_km"]))
+            lambda group: int(sum(group["distance_km"])), include_groups=False
         )
         counts = dict(zip(*np.unique(sorted(sum_per_day), return_counts=True)))
         eddington = pd.DataFrame(
