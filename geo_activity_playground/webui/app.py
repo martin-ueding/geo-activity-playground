@@ -136,8 +136,15 @@ def web_ui_main(
     @app.context_processor
     def inject_global_variables() -> dict:
         return {
-            "version": importlib.metadata.version("geo-activity-playground"),
+            "version": _try_get_version(),
             "num_activities": len(repository),
         }
 
     app.run(host=host, port=port)
+
+
+def _try_get_version():
+    try:
+        return importlib.metadata.version("geo-activity-playground")
+    except importlib.metadata.PackageNotFoundError:
+        pass
