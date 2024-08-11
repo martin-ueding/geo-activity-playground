@@ -431,27 +431,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/config-file/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Configuration file
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -834,9 +813,10 @@
 
 <h1 id="uploading-activities">Uploading activities</h1>
 <p>Some users don't want to restart the application each time they add new activities but run it on their home server. For this use case you can upload activities. Uploading files is a potential security issue and it is protected with a password. This feature is only enabled when you have set a password in the configuration file.</p>
-<p>Put the following into your configuration file:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[upload]</span>
-<span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fb1c8d62-07a5-47bf-ada1-30aa66e41d8a&quot;</span>
+<p>Put the following into your <code>config.json</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;upload_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fb1c8d62-07a5-47bf-ada1-30aa66e41d8a&quot;</span>
+<span class="p">}</span>
 </code></pre></div>
 <p>Be sure to choose your own password and not use the one from this documentation.</p>
 <p>Then you can go to the upload page and see this form:</p>

@@ -56,11 +56,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/config-file/</loc>
-         <lastmod>2024-08-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://martin-ueding.github.io/geo-activity-playground/getting-started/docker/</loc>
          <lastmod>2024-08-11</lastmod>
          <changefreq>daily</changefreq>

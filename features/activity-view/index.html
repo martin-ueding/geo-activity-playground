@@ -431,27 +431,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/config-file/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Configuration file
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -1011,17 +990,6 @@
 </tbody>
 </table>
 <p>You can decide how you want to do work with that. If you want to have the same definitions that say Garmin uses, you need to just enter your birth year and we can compute the rest. If you want to use a lower bound, you need to specify that.</p>
-<p>For this create a configuration file at <code>Playground/config.toml</code> and enter a stanza in there, like this:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[heart]</span>
-<span class="n">birthyear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">19</span><span class="p">..</span>
-</code></pre></div>
-<p>If you know your maximum heart rate, you can also write <code>maximum = 187</code>. If you want to use the lower bound, write <code>resting = 48</code> as well. So it might look like this:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[heart]</span>
-<span class="n">maximum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">187</span>
-<span class="n">resting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">48</span>
-</code></pre></div>
-<p>You can also combine <code>birthyear</code> and <code>resting</code> and leave out <code>maximum</code>.</p>
-<p>If you are not happy with this prescription, please let me know.</p>
 
 
 

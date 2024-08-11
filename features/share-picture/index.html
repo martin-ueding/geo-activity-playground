@@ -431,27 +431,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/config-file/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Configuration file
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../getting-started/starting-the-webserver/" class="md-nav__link">
         
   
@@ -893,7 +872,7 @@
 <p><img alt="" src="../share-picture.png" /></p>
 <h2 id="privacy-zones">Privacy zones</h2>
 <p>You might want to remove points that are close to your home, work or relatives. For this you can define arbitrary polygons as "privacy zones".</p>
-<p>To create such a polygon, go to <a href="https://geojson.io/">GeoJSON IO</a>. You will see a map similar to this one:</p>
+<p>To create such a polygon, go to <a href="https://geojson.io/">GeoJSON.io</a>. You will see a map similar to this one:</p>
 <p><img alt="" src="../geojson-io-1.png" /></p>
 <p>Select the polygon tool and click on the map to span the polygon.</p>
 <p><img alt="" src="../geojson-io-2.png" /></p>
@@ -953,53 +932,7 @@
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>The relevant part here is only the coordinates and the list around it. We need just this:</p>
-<div class="highlight"><pre><span></span><code><span class="w">          </span><span class="p">[</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68272071401333</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.878628929151887</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.6819310903943</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8780142440226655</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68125883278765</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.879563587362242</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68022375065988</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.880599289703014</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68029311254671</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8814665851591315</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68102940933676</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.881542368256589</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.681723011688035</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8812729172415175</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.682176515374465</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68272071401333</span>
-<span class="w">            </span><span class="p">]</span>
-<span class="w">          </span><span class="p">]</span>
-</code></pre></div>
-<p>Then optionally use a <a href="https://jsonformatter.org/">JSON formatter</a> to "minify" this a little bit. It will then look like this:</p>
-<div class="highlight"><pre><span></span><code><span class="p">[[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">],[</span><span class="mf">6.878628929151887</span><span class="p">,</span><span class="mf">50.6819310903943</span><span class="p">],[</span><span class="mf">6.8780142440226655</span><span class="p">,</span><span class="mf">50.68125883278765</span><span class="p">],[</span><span class="mf">6.879563587362242</span><span class="p">,</span><span class="mf">50.68022375065988</span><span class="p">],[</span><span class="mf">6.880599289703014</span><span class="p">,</span><span class="mf">50.68029311254671</span><span class="p">],[</span><span class="mf">6.8814665851591315</span><span class="p">,</span><span class="mf">50.68102940933676</span><span class="p">],[</span><span class="mf">6.881542368256589</span><span class="p">,</span><span class="mf">50.681723011688035</span><span class="p">],[</span><span class="mf">6.8812729172415175</span><span class="p">,</span><span class="mf">50.682176515374465</span><span class="p">],[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">]]</span>
-</code></pre></div>
-<p>This is a list of coordinates that spans the polygon. Then go to your <code>config.toml</code> and add this stanza:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[privacy_zones]</span>
-<span class="n">my_zone_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">],[</span><span class="mf">6.878628929151887</span><span class="p">,</span><span class="mf">50.6819310903943</span><span class="p">],[</span><span class="mf">6.8780142440226655</span><span class="p">,</span><span class="mf">50.68125883278765</span><span class="p">],[</span><span class="mf">6.879563587362242</span><span class="p">,</span><span class="mf">50.68022375065988</span><span class="p">],[</span><span class="mf">6.880599289703014</span><span class="p">,</span><span class="mf">50.68029311254671</span><span class="p">],[</span><span class="mf">6.8814665851591315</span><span class="p">,</span><span class="mf">50.68102940933676</span><span class="p">],[</span><span class="mf">6.881542368256589</span><span class="p">,</span><span class="mf">50.681723011688035</span><span class="p">],[</span><span class="mf">6.8812729172415175</span><span class="p">,</span><span class="mf">50.682176515374465</span><span class="p">],[</span><span class="mf">6.87987514009842</span><span class="p">,</span><span class="mf">50.68272071401333</span><span class="p">]]</span>
-</code></pre></div>
+<p>Paste this in the appropriate settings menu.</p>
 <p>You can name the zone to help you remember what it encompasses. You can add multiple zones.</p>
 <p>Points that are within any of the privacy zones will not be shown in the share pictures. Except when <em>all</em> of the points are in the privacy zone, then all the points will be shown.</p>
 
