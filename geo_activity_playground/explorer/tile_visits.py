@@ -13,6 +13,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.paths import tiles_per_time_series
 from geo_activity_playground.core.tasks import try_load_pickle
 from geo_activity_playground.core.tasks import work_tracker_path
@@ -195,29 +196,36 @@ class TileEvolutionState:
         self.square_y: Optional[int] = None
 
 
-def compute_tile_evolution(tile_visits_accessor: TileVisitAccessor) -> None:
-    zoom_levels = list(reversed(list(range(20))))
-
-    for zoom in tqdm(zoom_levels, desc="Compute explorer cluster evolution"):
+def compute_tile_evolution(
+    tile_visits_accessor: TileVisitAccessor, config: Config
+) -> None:
+    for zoom in config.explorer_zoom_levels:
         _compute_cluster_evolution(
-            tile_visits_accessor.histories[zoom], tile_visits_accessor.states[zoom]
+            tile_visits_accessor.histories[zoom],
+            tile_visits_accessor.states[zoom],
+            zoom,
         )
-    for zoom in tqdm(zoom_levels, desc="Compute explorer square evolution"):
         _compute_square_history(
-            tile_visits_accessor.histories[zoom], tile_visits_accessor.states[zoom]
+            tile_visits_accessor.histories[zoom],
+            tile_visits_accessor.states[zoom],
+            zoom,
         )
 
     tile_visits_accessor.save()
 
 
-def _compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
+def _compute_cluster_evolution(
+    tiles: pd.DataFrame, s: TileEvolutionState, zoom: int
+) -> None:
     if len(s.cluster_evolution) > 0:
         max_cluster_so_far = s.cluster_evolution["max_cluster_size"].iloc[-1]
     else:
         max_cluster_so_far = 0
 
     rows = []
-    for index, row in tiles.iloc[s.cluster_start :].iterrows():
+    for index, row in tqdm(
+        tiles.iloc[s.cluster_start :].iterrows(), desc=f"Cluster evolution for {zoom=}"
+    ):
         new_clusters = False
         # Current tile.
         tile = (row["tile_x"], row["tile_y"])
@@ -288,9 +296,13 @@ def _compute_cluster_evolution(tiles: pd.DataFrame, s: TileEvolutionState) -> No
     s.cluster_start = len(tiles)
 
 
-def _compute_square_history(tiles: pd.DataFrame, s: TileEvolutionState) -> None:
+def _compute_square_history(
+    tiles: pd.DataFrame, s: TileEvolutionState, zoom: int
+) -> None:
     rows = []
-    for index, row in tiles.iloc[s.square_start :].iterrows():
+    for index, row in tqdm(
+        tiles.iloc[s.square_start :].iterrows(), desc=f"Square evolution for {zoom=}"
+    ):
         tile = (row["tile_x"], row["tile_y"])
         x, y = tile
         s.visited_tiles.add(tile)

@@ -121,4 +121,4 @@ def scan_for_activities(
 
     if len(repository) > 0:
         compute_tile_visits(repository, tile_visit_accessor)
-        compute_tile_evolution(tile_visit_accessor)
+        compute_tile_evolution(tile_visit_accessor, config)

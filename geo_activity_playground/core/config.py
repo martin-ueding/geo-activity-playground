@@ -21,10 +21,12 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class Config:
     birth_year: Optional[int] = None
+    equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
+    explorer_zoom_levels: list[int] = dataclasses.field(
+        default_factory=lambda: [14, 17]
+    )
     heart_rate_resting: int = 0
     heart_rate_maximum: Optional[int] = None
-
-    equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
     metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
     num_processes: Optional[int] = None

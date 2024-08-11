@@ -1,9 +1,19 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
+
+<h1>Explorer Tiles</h1>
+
+{% if zoom_level_not_generated %}
+<p>You try to access explorer tiles for a level that hasn't been generated before. That is not a problem, we just don't
+    generate all levels to save a bit of time. If you want to have it, just enable it!</p>
+
+<a href="{{ url_for('.enable_zoom_level', zoom=zoom_level_not_generated) }}" class="btn btn-primary">Enable Zoom {{
+    zoom_level_not_generated }}</a>
+{% else %}
+
 <div class="row mb-3">
     <div class="col">
-        <h1>Explorer Tiles</h1>
         <p>You have {{ explored.num_tiles }} explored tiles. There are {{ explored.num_cluster_tiles }} cluster tiles in
             total. Your largest cluster consists of {{ explored.max_cluster_size }} tiles. Your largest square has size
             {{
@@ -154,4 +164,5 @@
     </div>
 </div>
 
+{% endif %}
 {% endblock %}

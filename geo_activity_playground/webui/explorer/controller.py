@@ -7,8 +7,10 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+from flask import flash
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.coordinates import Bounds
 from geo_activity_playground.core.tiles import compute_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -19,6 +21,7 @@ from geo_activity_playground.explorer.grid_file import make_explorer_tile
 from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
 from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
 from geo_activity_playground.explorer.grid_file import make_grid_points
+from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import TileEvolutionState
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
@@ -28,12 +31,29 @@ alt.data_transformers.enable("vegafusion")
 
 class ExplorerController:
     def __init__(
-        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+        self,
+        repository: ActivityRepository,
+        tile_visit_accessor: TileVisitAccessor,
+        config_accessor: ConfigAccessor,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
+        self._config_accessor = config_accessor
+
+    def enable_zoom_level(self, zoom: int) -> None:
+        if 0 <= zoom <= 19:
+            self._config_accessor().explorer_zoom_levels.append(zoom)
+            self._config_accessor().explorer_zoom_levels.sort()
+            self._config_accessor.save()
+            compute_tile_evolution(self._tile_visit_accessor, self._config_accessor())
+            flash(f"Enabled {zoom=} for explorer tiles.", category="success")
+        else:
+            flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
 
     def render(self, zoom: int) -> dict:
+        if zoom not in self._config_accessor().explorer_zoom_levels:
+            return {"zoom_level_not_generated": zoom}
+
         tile_evolution_states = self._tile_visit_accessor.states
         tile_visits = self._tile_visit_accessor.visits
         tile_histories = self._tile_visit_accessor.histories

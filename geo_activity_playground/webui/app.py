@@ -89,7 +89,8 @@ def web_ui_main(
         make_equipment_blueprint(repository, config_accessor()), url_prefix="/equipment"
     )
     app.register_blueprint(
-        make_explorer_blueprint(repository, tile_visit_accessor), url_prefix="/explorer"
+        make_explorer_blueprint(repository, tile_visit_accessor, config_accessor),
+        url_prefix="/explorer",
     )
     app.register_blueprint(
         make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
