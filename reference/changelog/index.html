@@ -804,6 +804,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-027" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-026" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.26
@@ -1490,6 +1499,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-027" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-026" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.26
@@ -2122,6 +2140,23 @@
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-027">Version 0.27</h3>
+<ul>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/128">GH-128</a>: Let the Strava Checkout importer set the file <code>strava-last-activity-date.json</code> which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/143">GH-143</a>: Use custom CSV parser to read activities that have newlines in their descriptions.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/146">GH-146</a>: Make multiprocessing optional with <code>num_processes = 1</code> in the configuration.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/147">GH-147</a>: Add another safeguard against activities that don't have latitude/longitude data.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/149">GH-149</a>: Only pre-compute explorer maps for zoom 14 and 17 by default. Other ones just have to be enabled once. This saves a bit of computing time for most people that don't need to go down to zoom 19.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/151">GH-151</a>: Do not fail if version cannot be determined.</li>
+<li>Add settings menu where one can configure various things:</li>
+<li>Equipment offsets</li>
+<li>Maximum heart rate for heart rate zones</li>
+<li>Metadata extractions from paths</li>
+<li>Privacy zones</li>
+<li>Strava connection</li>
+<li>The <code>config.json</code> replaces the <code>config.toml</code> and will automatically be generated.</li>
+<li>Fix bug in explorer tile interpolation that likely doesn't have an effect in practice.</li>
+</ul>
 <h3 id="version-026">Version 0.26</h3>
 <h4 id="version-0263">Version 0.26.3</h4>
 <ul>
