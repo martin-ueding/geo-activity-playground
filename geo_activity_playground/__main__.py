@@ -64,7 +64,7 @@ def main() -> None:
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
         func=lambda options: web_ui_main(
-            *make_activity_repository(options.basedir, options.skip_strava),
+            *make_activity_repository(options.basedir, options.skip_reload),
             host=options.host,
             port=options.port,
         )
@@ -75,7 +75,7 @@ def main() -> None:
     subparser.add_argument(
         "--port", default=5000, type=int, help="the port to run listen on"
     )
-    subparser.add_argument("--skip-strava", action=argparse.BooleanOptionalAction)
+    subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
     subparser.set_defaults(func=lambda options: main_cache(options.basedir))
@@ -92,7 +92,7 @@ def main() -> None:
 
 
 def make_activity_repository(
-    basedir: pathlib.Path, skip_strava: bool
+    basedir: pathlib.Path, skip_reload: bool
 ) -> tuple[ActivityRepository, TileVisitAccessor, ConfigAccessor]:
     os.chdir(basedir)
 
@@ -101,6 +101,9 @@ def make_activity_repository(
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
     import_old_strava_config(config_accessor)
+
+    if not skip_reload:
+        scan_for_activities(repository, tile_visit_accessor, config_accessor())
 
     return repository, tile_visit_accessor, config_accessor
 
