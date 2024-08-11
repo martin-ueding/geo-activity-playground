@@ -63,7 +63,7 @@ def get_secret_key():
     return secret
 
 
-def webui_main(
+def web_ui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     old_config: dict,

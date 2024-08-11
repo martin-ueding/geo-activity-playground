@@ -12,7 +12,7 @@ from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.config import get_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
-from geo_activity_playground.webui.app import webui_main
+from geo_activity_playground.webui.app import web_ui_main
 from geo_activity_playground.webui.upload.controller import scan_for_activities
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def main() -> None:
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
-        func=lambda options: webui_main(
+        func=lambda options: web_ui_main(
             *make_activity_repository(options.basedir, options.skip_strava),
             host=options.host,
             port=options.port,
