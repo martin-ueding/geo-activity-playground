@@ -29,4 +29,12 @@ def make_upload_blueprint(
     def receive():
         return upload_controller.receive()
 
+    @blueprint.route("/refresh")
+    def reload():
+        return render_template("upload/reload.html.j2")
+
+    @blueprint.route("/execute-reload")
+    def execute_reload():
+        return upload_controller.execute_reload()
+
     return blueprint

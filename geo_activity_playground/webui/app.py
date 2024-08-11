@@ -3,12 +3,9 @@ import json
 import pathlib
 import secrets
 
-from flask import flash
 from flask import Flask
-from flask import redirect
 from flask import render_template
 from flask import request
-from flask import url_for
 
 from ..core.activities import ActivityRepository
 from ..explorer.tile_visits import TileVisitAccessor
@@ -25,10 +22,8 @@ from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
 from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.config import get_config
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
-from geo_activity_playground.webui.upload.controller import scan_for_activities
 
 
 def route_search(app: Flask, repository: ActivityRepository) -> None:
@@ -124,14 +119,6 @@ def web_ui_main(
         ),
         url_prefix="/upload",
     )
-
-    @app.route("/refresh")
-    def refresh():
-        scan_for_activities(
-            repository, tile_visit_accessor, get_config(), config_accessor()
-        )
-        flash("Scanned for new activities.", category="success")
-        return redirect(url_for("index"))
 
     @app.context_processor
     def inject_global_variables() -> dict:

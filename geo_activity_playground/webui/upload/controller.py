@@ -7,6 +7,7 @@ from flask import flash
 from flask import redirect
 from flask import request
 from flask import Response
+from flask import url_for
 from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
@@ -91,6 +92,17 @@ class UploadController:
             activity_id = get_file_hash(target_path)
             flash(f"Activity was saved with ID {activity_id}.", "success")
             return redirect(f"/activity/{activity_id}")
+
+    def execute_reload(self) -> None:
+        scan_for_activities(
+            self._repository,
+            self._tile_visit_accessor,
+            self._old_config,
+            self._config,
+            skip_strava=True,
+        )
+        flash("Scanned for new activities.", category="success")
+        return redirect(url_for("index"))
 
 
 def scan_for_activities(
