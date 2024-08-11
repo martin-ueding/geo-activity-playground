@@ -73,6 +73,22 @@ class SettingsController:
         self._config_accessor.save()
         flash("Updated heart rate data.", category="success")
 
+    def render_kinds_without_achievements(self) -> dict:
+        return {
+            "kinds_without_achievements": self._config_accessor().kinds_without_achievements,
+        }
+
+    def save_kinds_without_achievements(
+        self,
+        kinds: list[str],
+    ) -> None:
+        new_kinds = [kind.strip() for kind in kinds if kind.strip()]
+        new_kinds.sort()
+
+        self._config_accessor().kinds_without_achievements = new_kinds
+        self._config_accessor.save()
+        flash("Updated kinds without achievements.", category="success")
+
     def render_metadata_extraction(self) -> dict:
         return {
             "metadata_extraction_regexes": self._config_accessor().metadata_extraction_regexes,

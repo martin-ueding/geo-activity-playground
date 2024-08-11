@@ -53,6 +53,16 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             "settings/heart-rate.html.j2", **settings_controller.render_heart_rate()
         )
 
+    @blueprint.route("/kinds-without-achievements", methods=["GET", "POST"])
+    def kinds_without_achievements():
+        if request.method == "POST":
+            kinds = request.form.getlist("kind")
+            settings_controller.save_kinds_without_achievements(kinds)
+        return render_template(
+            "settings/kinds-without-achievements.html.j2",
+            **settings_controller.render_kinds_without_achievements(),
+        )
+
     @blueprint.route("/metadata-extraction", methods=["GET", "POST"])
     def metadata_extraction():
         if request.method == "POST":

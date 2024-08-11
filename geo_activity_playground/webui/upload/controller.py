@@ -122,7 +122,7 @@ def scan_for_activities(
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(config)
 
-    enrich_activities(old_config.get("kind", {}))
+    enrich_activities(config)
     build_activity_meta()
     repository.reload()
 

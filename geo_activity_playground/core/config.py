@@ -25,7 +25,7 @@ class Config:
     heart_rate_maximum: Optional[int] = None
 
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
-    kind_defaults: dict[str, ActivityMeta] = dataclasses.field(default_factory=dict)
+    kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
     metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
     num_processes: Optional[int] = None
     privacy_zones: dict[str, list[list[float]]] = dataclasses.field(

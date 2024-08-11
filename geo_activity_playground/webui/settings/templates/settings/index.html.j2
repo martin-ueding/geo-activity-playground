@@ -32,6 +32,17 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
+                    <h5 class="card-title">Kinds without achievements</h5>
+                    <p class="card-text">Recorded car rides that shouldn't count towards the explorer tiles? Exempt
+                        activity kinds from consideration.</p>
+                    <a href="{{ url_for('.kinds_without_achievements') }}" class="btn btn-primary">Set up kinds without
+                        achievements</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
                     <h5 class="card-title">Metadata extraction</h5>
                     <p class="card-text">When using activity files, one might want to extract metadata from the paths or
                         set defaults.</p>

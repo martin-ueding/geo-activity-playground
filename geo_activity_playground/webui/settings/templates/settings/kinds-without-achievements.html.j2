@@ -1,0 +1,30 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Kinds without Achievements</h1>
+
+<p>Apart from bicycle rides and runs, you might also record your car and train rides. If you don't want to include these
+    for achievements like explorer tiles, you can enter the activity kinds that should not be considered here.</p>
+
+<form method="POST">
+    <div class="row">
+        <div class="col-md-6">
+            {% for kind in kinds_without_achievements %}
+            <div class="mb-3">
+                <label for="kind_{{ loop.index }}" class="form-label">Kind</label>
+                <input type="text" class="form-control" id="kind_{{ loop.index }}" name="kind" value="{{ kind }}" />
+            </div>
+            {% endfor %}
+            <div class="mb-3">
+                <label for="regex_new" class="form-label">Kind</label>
+                <input type="text" class="form-control" id="kind_new" name="kind" />
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

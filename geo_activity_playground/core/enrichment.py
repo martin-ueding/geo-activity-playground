@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import make_activity_meta
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
@@ -21,7 +22,7 @@ from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
 logger = logging.getLogger(__name__)
 
 
-def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
+def enrich_activities(config: Config) -> None:
     # Delete removed activities.
     for enriched_metadata_path in activity_enriched_meta_dir().glob("*.pickle"):
         if not (activity_extracted_meta_dir() / enriched_metadata_path.name).exists():
@@ -82,7 +83,8 @@ def enrich_activities(kind_defaults: dict[dict[str, Any]]) -> None:
             continue
 
         # Enrich time series.
-        metadata.update(kind_defaults.get(metadata["kind"], {}))
+        if metadata["kind"] in config.kinds_without_achievements:
+            metadata["consider_for_achievements"] = False
         time_series = _embellish_single_time_series(
             time_series, metadata.get("start", None)
         )
