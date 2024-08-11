@@ -17,6 +17,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
   - Metadata extractions from paths
   - Privacy zones
   - Strava connection
+- The `config.json` replaces the `config.toml` and will automatically be generated.
 
 ### Version 0.26
 
