@@ -19,12 +19,10 @@ My structure is built such that the first directory level corresponds to the act
 
 In order to extract this data, I specify a list of regular expressions with named capture groups like `(?P<name>…)` where `name` is the field that you want to populate and `…` some regular expression. The program will try to _search_ (not _match_) the whole relative path of the activity to the regular expressions in the order given in the list. When it finds a match, it will take the capture groups, populate the metadata and stop evaluating more of the expressions. In my case they look like this:
 
-```toml
-metadata_extraction_regexes = [
-    '(?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/]+)/',
-    '(?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$',
-    '(?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$',
-]
+```
+(?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/]+)/
+(?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
+(?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
 ```
 
 Put something like that at the top of your `config.toml` in order to extract metadata from the files and have it override metadata from the within the files.

@@ -67,22 +67,3 @@ Zone | Effort | Training
 5 | 90 to 100 % | Speed Training
 
 You can decide how you want to do work with that. If you want to have the same definitions that say Garmin uses, you need to just enter your birth year and we can compute the rest. If you want to use a lower bound, you need to specify that.
-
-For this create a configuration file at `Playground/config.toml` and enter a stanza in there, like this:
-
-```toml
-[heart]
-birthyear = 19..
-```
-
-If you know your maximum heart rate, you can also write `maximum = 187`. If you want to use the lower bound, write `resting = 48` as well. So it might look like this:
-
-```toml
-[heart]
-maximum = 187
-resting = 48
-```
-
-You can also combine `birthyear` and `resting` and leave out `maximum`.
-
-If you are not happy with this prescription, please let me know.
