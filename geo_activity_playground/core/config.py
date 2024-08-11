@@ -5,7 +5,6 @@ import logging
 import pathlib
 from typing import Optional
 
-from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.paths import new_config_file
 
 
@@ -69,3 +68,49 @@ def get_config() -> dict:
         config = tomllib.load(f)
 
     return config
+
+
+def import_old_config(config_accessor: ConfigAccessor) -> None:
+    old_config_path = pathlib.Path("config.toml")
+    if not old_config_path.exists():
+        return
+
+    if new_config_file().exists():
+        logger.warning(
+            "You have an old 'config.toml' which is now superseded by the 'config.json'. You can check the contents of the new 'config.json' and then delete the old 'config.toml'."
+        )
+        return
+
+    old_config = get_config()
+    config = config_accessor()
+
+    if "metadata_extraction_regexes" in old_config:
+        config.metadata_extraction_regexes = old_config["metadata_extraction_regexes"]
+
+    if "heart" in old_config:
+        if "birthyear" in old_config["heart"]:
+            config.birth_year = old_config["heart"]["birthyear"]
+        if "resting" in old_config["heart"]:
+            config.heart_rate_resting = old_config["heart"]["resting"]
+        if "maximum" in old_config["heart"]:
+            config.heart_rate_maximum = old_config["heart"]["maximum"]
+
+    if "strava" in old_config:
+        if "client_id" in old_config["strava"]:
+            config.strava_client_id = old_config["strava"]["client_id"]
+        if "client_secret" in old_config["strava"]:
+            config.strava_client_secret = old_config["strava"]["client_secret"]
+        if "code" in old_config["strava"]:
+            config.strava_client_code = old_config["strava"]["code"]
+
+    if "offsets" in old_config:
+        config.equipment_offsets = old_config["offsets"]
+
+    if "upload" in old_config:
+        if "password" in old_config["upload"]:
+            config.upload_password = old_config["upload"]["password"]
+
+    if "privacy_zones" in old_config:
+        config.privacy_zones = old_config["privacy_zones"]
+
+    config_accessor.save()
