@@ -6,6 +6,7 @@ import pathlib
 from typing import Optional
 
 from geo_activity_playground.core.paths import new_config_file
+from geo_activity_playground.core.paths import strava_dynamic_config_path
 
 
 try:
@@ -114,3 +115,19 @@ def import_old_config(config_accessor: ConfigAccessor) -> None:
         config.privacy_zones = old_config["privacy_zones"]
 
     config_accessor.save()
+
+
+def import_old_strava_config(config_accessor: ConfigAccessor) -> None:
+    if not strava_dynamic_config_path().exists():
+        return
+
+    with open(strava_dynamic_config_path()) as f:
+        strava_dynamic_config = json.load(f)
+
+    config = config_accessor()
+    config.strava_client_id = strava_dynamic_config["client_id"]
+    config.strava_client_secret = strava_dynamic_config["client_secret"]
+    config.strava_client_code = strava_dynamic_config["code"]
+
+    config_accessor.save()
+    strava_dynamic_config_path().unlink()

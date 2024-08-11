@@ -9,6 +9,7 @@ from .importers.strava_checkout import convert_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.config import import_old_config
+from geo_activity_playground.core.config import import_old_strava_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.webui.app import web_ui_main
@@ -99,6 +100,7 @@ def make_activity_repository(
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
+    import_old_strava_config(config_accessor)
 
     return repository, tile_visit_accessor, config_accessor
 
