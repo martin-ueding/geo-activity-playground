@@ -19,6 +19,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
   - Privacy zones
   - Strava connection
 - The `config.json` replaces the `config.toml` and will automatically be generated.
+- Fix bug in explorer tile interpolation that likely doesn't have an effect in practice.
 
 ### Version 0.26
 
