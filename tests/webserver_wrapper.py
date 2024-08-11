@@ -7,6 +7,16 @@ import subprocess
 
 @contextlib.contextmanager
 def webserver(basedir: pathlib.Path):
+    subprocess.run(
+        [
+            "geo-activity-playground",
+            "--basedir",
+            str(basedir),
+            "cache",
+        ],
+        check=True,
+    )
+
     command = [
         "geo-activity-playground",
         "--basedir",

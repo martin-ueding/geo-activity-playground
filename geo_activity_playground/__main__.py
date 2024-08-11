@@ -106,7 +106,9 @@ def make_activity_repository(
 
 
 def main_cache(basedir: pathlib.Path) -> None:
-    repository, tile_visit_accessor, config_accessor = make_activity_repository(basedir)
+    repository, tile_visit_accessor, config_accessor = make_activity_repository(
+        basedir, False
+    )
     scan_for_activities(repository, tile_visit_accessor, config_accessor())
 
 
