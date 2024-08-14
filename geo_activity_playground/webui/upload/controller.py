@@ -108,7 +108,7 @@ def scan_for_activities(
     if pathlib.Path("Activities").exists():
         import_from_directory(
             config.metadata_extraction_regexes,
-            None,
+            config.num_processes,
         )
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout()

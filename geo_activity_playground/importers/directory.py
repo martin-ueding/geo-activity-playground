@@ -61,7 +61,7 @@ def import_from_directory(
 
     if num_processes == 1:
         paths_with_errors = []
-        for path in tqdm(new_activity_paths, desc="Parse activity metadata"):
+        for path in tqdm(new_activity_paths, desc="Parse activity metadata (serially)"):
             errors = _cache_single_file(path)
             if errors:
                 paths_with_errors.append(errors)
