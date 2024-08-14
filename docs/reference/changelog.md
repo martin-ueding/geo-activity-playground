@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.27
 
+#### Version 0.27.1
+
+- Fix `num_processes` option.
+
+#### Version 0.27.0
+
 - [GH-128](https://github.com/martin-ueding/geo-activity-playground/issues/128): Let the Strava Checkout importer set the file `strava-last-activity-date.json` which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout.
 - [GH-143](https://github.com/martin-ueding/geo-activity-playground/issues/143): Use custom CSV parser to read activities that have newlines in their descriptions.
 - [GH-146](https://github.com/martin-ueding/geo-activity-playground/issues/146): Make multiprocessing optional with `num_processes = 1` in the configuration.
