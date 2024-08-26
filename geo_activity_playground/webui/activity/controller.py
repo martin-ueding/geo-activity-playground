@@ -100,7 +100,9 @@ class ActivityController:
             time_series = privacy_zone.filter_time_series(time_series)
         if len(time_series) == 0:
             time_series = self._repository.get_time_series(id)
-        return make_sharepic(activity, time_series)
+        return make_sharepic(
+            activity, time_series, self._config.sharepic_suppressed_fields
+        )
 
     def render_day(self, year: int, month: int, day: int) -> dict:
         meta = self._repository.meta
@@ -411,7 +413,11 @@ def pixels_in_bounds(bounds: PixelBounds) -> int:
     return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)
 
 
-def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
+def make_sharepic(
+    activity: ActivityMeta,
+    time_series: pd.DataFrame,
+    sharepic_suppressed_fields: list[str],
+) -> bytes:
     lat_lon_data = np.array([time_series["latitude"], time_series["longitude"]]).T
 
     geo_bounds = get_bounds(lat_lon_data)
@@ -448,19 +454,27 @@ def make_sharepic(activity: ActivityMeta, time_series: pd.DataFrame) -> bytes:
         draw.line(yx, fill="red", width=4)
 
     draw.rectangle([0, img.height - 70, img.width, img.height], fill=(0, 0, 0, 128))
-    facts = [
-        f"{activity['kind']}",
-        f"{activity['start'].date()}",
-        f"{activity['equipment']}",
-        f"\n{activity['distance_km']:.1f} km",
-        re.sub(r"^0 days ", "", f"{activity['elapsed_time']}"),
-    ]
-    if activity.get("calories", 0) and not pd.isna(activity["calories"]):
-        facts.append(f"{activity['calories']:.0f} kcal")
-    if activity.get("steps", 0) and not pd.isna(activity["steps"]):
-        facts.append(f"{activity['steps']:.0f} steps")
 
-    draw.text((35, img.height - 70 + 10), "      ".join(facts), font_size=20)
+    facts = {
+        "kind": f"{activity['kind']}",
+        "start": f"{activity['start'].date()}",
+        "equipment": f"{activity['equipment']}",
+        "distance_km": f"\n{activity['distance_km']:.1f} km",
+        "elapsed_time": re.sub(r"^0 days ", "", f"{activity['elapsed_time']}"),
+    }
+
+    if activity.get("calories", 0) and not pd.isna(activity["calories"]):
+        facts["calories"] = f"{activity['calories']:.0f} kcal"
+    if activity.get("steps", 0) and not pd.isna(activity["steps"]):
+        facts["steps"] = f"{activity['steps']:.0f} steps"
+
+    facts = {
+        key: value
+        for key, value in facts.items()
+        if not key in sharepic_suppressed_fields
+    }
+
+    draw.text((35, img.height - 70 + 10), "      ".join(facts.values()), font_size=20)
 
     # img_array = np.array(img) / 255
 

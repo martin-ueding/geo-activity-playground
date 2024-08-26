@@ -10,6 +10,18 @@ from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 
 
+SHAREPIC_FIELDS = {
+    "calories": "Calories",
+    "distance_km": "Distance",
+    "elapsed_time": "Elapsed time",
+    "equipment": "Equipment",
+    "kind": "Kind",
+    "name": "Name",
+    "start": "Date",
+    "Steps": "Steps",
+}
+
+
 class SettingsController:
     def __init__(self, config_accessor: ConfigAccessor) -> None:
         self._config_accessor = config_accessor
@@ -183,6 +195,27 @@ class SettingsController:
         self._config_accessor().privacy_zones = new_zone_config
         self._config_accessor.save()
         flash("Updated privacy zones.", category="success")
+
+    def render_sharepic(self) -> dict:
+
+        return {
+            "names": [
+                (
+                    name,
+                    label,
+                    name not in self._config_accessor().sharepic_suppressed_fields,
+                )
+                for name, label in SHAREPIC_FIELDS.items()
+            ]
+        }
+
+    def save_sharepic(self, names: list[str]) -> None:
+        self._config_accessor().sharepic_suppressed_fields = list(
+            set(SHAREPIC_FIELDS) - set(names)
+        )
+        self._config_accessor.save()
+        flash("Updated sharepic preferences.", category="success")
+        pass
 
     def render_strava(self) -> dict:
         return {

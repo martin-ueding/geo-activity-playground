@@ -1,0 +1,22 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Share Picture</h1>
+
+<p>What data fields shall be displayed on the share picture?</p>
+
+<form method="POST">
+    {% for name, label, checked in names %}
+    <div class="form-check form-check-inline form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="{{ name }}" name="name" value="{{ name }}"
+            {{ 'checked' if checked else '' }} />
+        <label class="form-check-label" for="{{ name }}">{{ label }}</label>
+    </div>
+    {% endfor %}
+    <div class="clearfix mb-3"></div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

@@ -84,6 +84,16 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             **settings_controller.render_privacy_zones(),
         )
 
+    @blueprint.route("/sharepic", methods=["GET", "POST"])
+    def sharepic():
+        if request.method == "POST":
+            names = request.form.getlist("name")
+            settings_controller.save_sharepic(names)
+        return render_template(
+            "settings/sharepic.html.j2",
+            **settings_controller.render_sharepic(),
+        )
+
     @blueprint.route("/strava", methods=["GET", "POST"])
     def strava():
         if request.method == "POST":

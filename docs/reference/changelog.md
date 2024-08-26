@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Next
+
+- Add settings menu to suppress fields from share pictures.
+
 ### Version 0.27
 
 #### Version 0.27.1

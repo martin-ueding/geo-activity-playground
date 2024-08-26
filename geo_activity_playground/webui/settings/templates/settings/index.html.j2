@@ -63,6 +63,15 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
+                    <h5 class="card-title">Share picture</h5>
+                    <p class="card-text">Select which metadata shall be displayed on share pictures.</p>
+                    <a href="{{ url_for('.sharepic') }}" class="btn btn-primary">Set up share picture</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
                     <h5 class="card-title">Strava API</h5>
                     <p class="card-text">Connect to the Strava API to download activities from there.</p>
                     <a href="{{ url_for('.strava') }}" class="btn btn-primary">Set up Strava API</a>

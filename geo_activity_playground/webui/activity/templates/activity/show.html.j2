@@ -111,11 +111,7 @@
 </div>
 
 {% if heartrate_time_plot is defined %}
-<div class="row mb-3">
-    <div class="col">
-        <h2>Heart rate</h2>
-    </div>
-</div>
+<h2>Heart rate</h2>
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -133,13 +129,12 @@
 </div>
 {% endif %}
 
-<div class="row mb-3">
-    <div class="col">
-        <h2>Share picture</h2>
+<h2>Share picture</h2>
 
-        <img src="{{ url_for('.sharepic', id=activity.id) }}" />
-    </div>
-</div>
+<p><img src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
+
+<p>Not happy with the displayed data? <a href="{{ url_for('settings.sharepic') }}">Change share picture
+        settings</a>.</p>
 
 {% if similar_activites|length > 0 %}
 <div class="row mb-3">
