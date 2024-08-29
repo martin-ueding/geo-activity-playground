@@ -10,8 +10,13 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+import sqlalchemy as sa
+import sqlalchemy.orm
 from tqdm import tqdm
 
+from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import Equipment
+from geo_activity_playground.core.datamodel import Kind
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
@@ -99,6 +104,71 @@ def build_activity_meta() -> None:
         meta.sort_values("start", inplace=True)
 
     meta.to_parquet(activities_file())
+
+
+def build_activity_meta_sql(session: sqlalchemy.orm.Session) -> None:
+    present_ids = set()
+    last_update = datetime.datetime(2000, 1, 1)
+
+    for activity in session.scalars(sa.select(Activity)):
+        present_ids.add(activity.id)
+        last_update = max(last_update, activity.updated)
+
+    available_ids = {
+        int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
+    }
+    new_ids = available_ids - present_ids
+    deleted_ids = present_ids - available_ids
+
+    # Remove updated activities and read these again.
+    updated_ids = {
+        int(path.stem)
+        for path in activity_enriched_meta_dir().glob("*.pickle")
+        if datetime.datetime.fromtimestamp(path.stat().st_mtime) > last_update
+    }
+    new_ids.update(updated_ids)
+    deleted_ids.update(updated_ids & present_ids)
+
+    # if deleted_ids:
+    #     logger.debug(f"Removing activities {deleted_ids} from repository.")
+    #     meta.drop(sorted(deleted_ids), axis="index", inplace=True)
+
+    equipments = {
+        equipment.name: equipment for equipment in session.scalars(sa.select(Equipment))
+    }
+    kinds = {kind.name: kind for kind in session.scalars(sa.select(Kind))}
+
+    print(equipments)
+    print(kinds)
+
+    for new_id in tqdm(new_ids, desc="Register new activities"):
+        with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
+            metadata: ActivityMeta = pickle.load(f)
+
+            if metadata["kind"] not in kinds:
+                kind = Kind(name=metadata["kind"])
+                kinds[metadata["kind"]] = kind
+                session.add(kind)
+            else:
+                kind = kinds[metadata["kind"]]
+
+            if metadata["equipment"] not in equipments:
+                equipment = Equipment(name=metadata["equipment"])
+                equipments[metadata["equipment"]] = equipment
+                session.add(equipment)
+            else:
+                equipment = equipments[metadata["equipment"]]
+
+            metadata["kind"] = kind
+            metadata["equipment"] = equipment
+            metadata["updated"] = datetime.datetime.now()
+            if "commute" in metadata:
+                del metadata["commute"]
+
+            activity = Activity(**metadata)
+            session.add(activity)
+
+        session.commit()
 
 
 class ActivityRepository:

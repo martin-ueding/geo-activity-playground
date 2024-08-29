@@ -1,6 +1,7 @@
 import datetime
 
 import sqlalchemy as sa
+from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
@@ -36,7 +37,11 @@ class Activity(Base):
     start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=False)
     steps: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
+    equipment_id: Mapped[int] = mapped_column(
+        ForeignKey("equipments.id", name="equipment_id")
+    )
     equipment: Mapped["Equipment"] = relationship(back_populates="activities")
+    kind_id: Mapped[int] = mapped_column(ForeignKey("kinds.id", name="kind_id"))
     kind: Mapped["Kind"] = relationship(back_populates="activities")
     tile_visits: Mapped[list["TileVisit"]] = relationship(
         back_populates="activity", cascade="all, delete-orphan"
@@ -55,6 +60,8 @@ class Equipment(Base):
         back_populates="equipment", cascade="all, delete-orphan"
     )
 
+    __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
+
 
 class Kind(Base):
     __tablename__ = "kinds"
@@ -67,6 +74,8 @@ class Kind(Base):
         back_populates="kind", cascade="all, delete-orphan"
     )
 
+    __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
+
 
 class Tile(Base):
     __tablename__ = "tiles"
@@ -77,6 +86,9 @@ class Tile(Base):
     x: Mapped[int] = mapped_column(sa.Integer, index=True, nullable=False)
     y: Mapped[int] = mapped_column(sa.Integer, index=True, nullable=False)
 
+    first_visit_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="first_visit_id")
+    )
     first_visit: Mapped["Activity"] = relationship(back_populates="new_tiles")
     tile_visits: Mapped[list["TileVisit"]] = relationship(
         back_populates="tile", cascade="all, delete-orphan"
@@ -88,5 +100,9 @@ class TileVisit(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="activity_id")
+    )
     activity: Mapped["Activity"] = relationship(back_populates="tile_visits")
+    tile_id: Mapped[int] = mapped_column(ForeignKey("tiles.id", name="tile_id"))
     tile: Mapped["Tile"] = relationship(back_populates="tile_visits")

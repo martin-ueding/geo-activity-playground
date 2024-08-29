@@ -80,6 +80,8 @@ def try_load_pickle(path: pathlib.Path) -> Any:
                 return pickle.load(f)
         except ModuleNotFoundError:
             pass
+        except EOFError:
+            pass
 
 
 class TransformVersion:

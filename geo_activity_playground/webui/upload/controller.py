@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import build_activity_meta
+from geo_activity_playground.core.activities import build_activity_meta_sql
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.enrichment import enrich_activities
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
@@ -122,6 +123,7 @@ def scan_for_activities(
         import_from_strava_api(config)
 
     enrich_activities(config)
+    build_activity_meta_sql(db_session)
     build_activity_meta()
     repository.reload()
 
