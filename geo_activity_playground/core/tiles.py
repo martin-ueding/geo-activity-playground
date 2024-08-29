@@ -1,3 +1,4 @@
+import datetime
 import functools
 import logging
 import math
@@ -7,6 +8,7 @@ from typing import Iterator
 from typing import Optional
 
 import numpy as np
+import pandas as pd
 import requests
 from PIL import Image
 
@@ -113,3 +115,26 @@ def adjacent_to(tile: tuple[int, int]) -> Iterator[tuple[int, int]]:
     yield (x - 1, y)
     yield (x, y + 1)
     yield (x, y - 1)
+
+
+def tiles_from_points(
+    time_series: pd.DataFrame, zoom: int
+) -> Iterator[tuple[datetime.datetime, int, int]]:
+    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns]")
+    xf = time_series["x"] * 2**zoom
+    yf = time_series["y"] * 2**zoom
+    for t1, x1, y1, x2, y2, s1, s2 in zip(
+        time_series["time"],
+        xf,
+        yf,
+        xf.shift(1),
+        yf.shift(1),
+        time_series["segment_id"],
+        time_series["segment_id"].shift(1),
+    ):
+        yield (t1, int(x1), int(y1))
+        # We don't want to interpolate over segment boundaries.
+        if s1 == s2:
+            interpolated = interpolate_missing_tile(x1, y1, x2, y2)
+            if interpolated is not None:
+                yield (t1,) + interpolated

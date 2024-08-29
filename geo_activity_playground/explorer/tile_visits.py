@@ -5,7 +5,6 @@ import logging
 import pathlib
 import pickle
 from typing import Any
-from typing import Iterator
 from typing import Optional
 from typing import TypedDict
 
@@ -19,7 +18,7 @@ from geo_activity_playground.core.tasks import try_load_pickle
 from geo_activity_playground.core.tasks import work_tracker_path
 from geo_activity_playground.core.tasks import WorkTracker
 from geo_activity_playground.core.tiles import adjacent_to
-from geo_activity_playground.core.tiles import interpolate_missing_tile
+from geo_activity_playground.core.tiles import tiles_from_points
 
 
 logger = logging.getLogger(__name__)
@@ -98,7 +97,7 @@ def compute_tile_visits(
         activity_ids_to_process, desc="Extract explorer tile visits"
     ):
         for zoom in range(20):
-            for time, tile_x, tile_y in _tiles_from_points(
+            for time, tile_x, tile_y in tiles_from_points(
                 repository.get_time_series(activity_id), zoom
             ):
                 tile = (tile_x, tile_y)
@@ -156,29 +155,6 @@ def compute_tile_visits(
 
     tile_visits_accessor.save()
     work_tracker.close()
-
-
-def _tiles_from_points(
-    time_series: pd.DataFrame, zoom: int
-) -> Iterator[tuple[datetime.datetime, int, int]]:
-    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns]")
-    xf = time_series["x"] * 2**zoom
-    yf = time_series["y"] * 2**zoom
-    for t1, x1, y1, x2, y2, s1, s2 in zip(
-        time_series["time"],
-        xf,
-        yf,
-        xf.shift(1),
-        yf.shift(1),
-        time_series["segment_id"],
-        time_series["segment_id"].shift(1),
-    ):
-        yield (t1, int(x1), int(y1))
-        # We don't want to interpolate over segment boundaries.
-        if s1 == s2:
-            interpolated = interpolate_missing_tile(x1, y1, x2, y2)
-            if interpolated is not None:
-                yield (t1,) + interpolated
 
 
 class TileEvolutionState:

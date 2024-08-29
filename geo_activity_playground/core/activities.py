@@ -17,9 +17,11 @@ from tqdm import tqdm
 from geo_activity_playground.core.datamodel import Activity
 from geo_activity_playground.core.datamodel import Equipment
 from geo_activity_playground.core.datamodel import Kind
+from geo_activity_playground.core.datamodel import Tile
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
+from geo_activity_playground.core.tiles import tiles_from_points
 
 logger = logging.getLogger(__name__)
 
@@ -129,9 +131,13 @@ def build_activity_meta_sql(session: sqlalchemy.orm.Session) -> None:
     new_ids.update(updated_ids)
     deleted_ids.update(updated_ids & present_ids)
 
-    # if deleted_ids:
-    #     logger.debug(f"Removing activities {deleted_ids} from repository.")
-    #     meta.drop(sorted(deleted_ids), axis="index", inplace=True)
+    if deleted_ids:
+        logger.debug(f"Removing activities {deleted_ids} from the database.")
+        for activity_id in deleted_ids:
+            activity = session.scalar(
+                sa.select(Activity).where(Activity.id == activity_id)
+            )
+            session.delete(activity)
 
     equipments = {
         equipment.name: equipment for equipment in session.scalars(sa.select(Equipment))
@@ -142,28 +148,47 @@ def build_activity_meta_sql(session: sqlalchemy.orm.Session) -> None:
         with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
             metadata: ActivityMeta = pickle.load(f)
 
-            if metadata["kind"] not in kinds:
-                kind = Kind(name=metadata["kind"])
-                kinds[metadata["kind"]] = kind
-                session.add(kind)
-            else:
-                kind = kinds[metadata["kind"]]
+        if metadata["kind"] not in kinds:
+            kind = Kind(name=metadata["kind"])
+            kinds[metadata["kind"]] = kind
+            session.add(kind)
+        else:
+            kind = kinds[metadata["kind"]]
 
-            if metadata["equipment"] not in equipments:
-                equipment = Equipment(name=metadata["equipment"])
-                equipments[metadata["equipment"]] = equipment
-                session.add(equipment)
-            else:
-                equipment = equipments[metadata["equipment"]]
+        if metadata["equipment"] not in equipments:
+            equipment = Equipment(name=metadata["equipment"])
+            equipments[metadata["equipment"]] = equipment
+            session.add(equipment)
+        else:
+            equipment = equipments[metadata["equipment"]]
 
-            metadata["kind"] = kind
-            metadata["equipment"] = equipment
-            metadata["updated"] = datetime.datetime.now()
-            if "commute" in metadata:
-                del metadata["commute"]
+        metadata["kind"] = kind
+        metadata["equipment"] = equipment
+        metadata["updated"] = datetime.datetime.now()
+        if "commute" in metadata:
+            del metadata["commute"]
 
-            activity = Activity(**metadata)
-            session.add(activity)
+        activity = Activity(**metadata)
+        session.add(activity)
+
+        for zoom in range(20):
+            handled_tiles = set()
+            for time, tile_x, tile_y in tiles_from_points(
+                get_time_series(activity.id), zoom
+            ):
+                if (tile_x, tile_y) in handled_tiles:
+                    continue
+                handled_tiles.add((tile_x, tile_y))
+
+                stmt = sa.select(Tile).where(
+                    Tile.zoom == zoom, Tile.x == tile_x, Tile.y == tile_y
+                )
+                if (tile := session.scalar(stmt)) is None:
+                    tile = Tile(zoom=zoom, x=tile_x, y=tile_y, first_visit=activity)
+                    session.add(tile)
+                if tile.first_visit.start > activity.start:
+                    tile.first_visit = activity
+                activity.tile_visits.append(tile)
 
         session.commit()
 
@@ -224,6 +249,19 @@ class ActivityRepository:
             raise
 
         return df
+
+
+@functools.lru_cache(maxsize=3000)
+def get_time_series(id: int) -> pd.DataFrame:
+    path = activity_enriched_time_series_dir() / f"{id}.parquet"
+    try:
+        df = pd.read_parquet(path)
+    except OSError as e:
+        logger.error(f"Error while reading {path}, deleting cache file …")
+        path.unlink(missing_ok=True)
+        raise
+
+    return df
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:

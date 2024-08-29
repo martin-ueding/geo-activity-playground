@@ -58,7 +58,7 @@ class Activity(Base):
     tile_visits: Mapped[list["Tile"]] = relationship(
         back_populates="tile_visits", secondary=tile_visits_table
     )
-    new_tiles: Mapped["Tile"] = relationship(back_populates="first_visit")
+    new_tiles: Mapped[list["Tile"]] = relationship(back_populates="first_visit")
 
 
 class Equipment(Base):
@@ -101,7 +101,9 @@ class Tile(Base):
     first_visit_id: Mapped[int] = mapped_column(
         ForeignKey("activities.id", name="first_visit_id")
     )
-    first_visit: Mapped["Activity"] = relationship(back_populates="new_tiles")
+    first_visit: Mapped["Activity"] = relationship(
+        back_populates="new_tiles", foreign_keys=[first_visit_id]
+    )
     tile_visits: Mapped[list["Activity"]] = relationship(
         back_populates="tile_visits", secondary=tile_visits_table
     )
