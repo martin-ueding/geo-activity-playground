@@ -16,6 +16,7 @@ class Activity(Base):
     __tablename__ = "activities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    updated: Mapped[datetime.timedelta] = mapped_column(sa.DateTime, nullable=False)
 
     calories: Mapped[int] = mapped_column(sa.Integer, nullable=True)
     consider_for_achievements: Mapped[bool] = mapped_column(

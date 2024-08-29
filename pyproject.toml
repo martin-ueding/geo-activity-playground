@@ -38,6 +38,7 @@ vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
 shapely = "^2.0.5"
 sqlalchemy = "^2.0.32"
+alembic = "^1.13.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
