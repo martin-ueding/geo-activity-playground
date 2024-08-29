@@ -1,3 +1,4 @@
+import sqlalchemy.orm
 from flask import Blueprint
 from flask import render_template
 
@@ -11,10 +12,13 @@ def make_upload_blueprint(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    db_session: sqlalchemy.orm.Session,
 ) -> Blueprint:
     blueprint = Blueprint("upload", __name__, template_folder="templates")
 
-    upload_controller = UploadController(repository, tile_visit_accessor, config)
+    upload_controller = UploadController(
+        repository, tile_visit_accessor, config, db_session
+    )
 
     @blueprint.route("/")
     def index():

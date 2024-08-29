@@ -3,6 +3,7 @@ import json
 import pathlib
 import secrets
 
+import sqlalchemy.orm
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -61,6 +62,7 @@ def web_ui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config_accessor: ConfigAccessor,
+    db_session: sqlalchemy.orm.Session,
     host: str,
     port: int,
 ) -> None:
@@ -110,7 +112,9 @@ def web_ui_main(
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(
-        make_upload_blueprint(repository, tile_visit_accessor, config_accessor()),
+        make_upload_blueprint(
+            repository, tile_visit_accessor, config_accessor(), db_session
+        ),
         url_prefix="/upload",
     )
 

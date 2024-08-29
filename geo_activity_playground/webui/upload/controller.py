@@ -2,6 +2,7 @@ import logging
 import os
 import pathlib
 
+import sqlalchemy.orm
 from flask import flash
 from flask import redirect
 from flask import request
@@ -33,10 +34,12 @@ class UploadController:
         repository: ActivityRepository,
         tile_visit_accessor: TileVisitAccessor,
         config: Config,
+        db_session: sqlalchemy.orm.Session,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
         self._config = config
+        self._db_session = db_session
 
     def render_form(self) -> dict:
         directories = []
@@ -82,6 +85,7 @@ class UploadController:
                 self._repository,
                 self._tile_visit_accessor,
                 self._config,
+                self._db_session,
                 skip_strava=True,
             )
             activity_id = get_file_hash(target_path)
@@ -93,6 +97,7 @@ class UploadController:
             self._repository,
             self._tile_visit_accessor,
             self._config,
+            self._db_session,
             skip_strava=True,
         )
         flash("Scanned for new activities.", category="success")
@@ -103,6 +108,7 @@ def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    db_session: sqlalchemy.orm.Session,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
