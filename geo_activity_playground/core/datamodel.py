@@ -1,8 +1,10 @@
 import datetime
 
 import sqlalchemy as sa
+from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
+from sqlalchemy import Table
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -11,6 +13,16 @@ from sqlalchemy.orm import relationship
 
 class Base(DeclarativeBase):
     pass
+
+
+tile_visits_table = Table(
+    "tile_visits_auto",
+    Base.metadata,
+    Column(
+        "activity_id", ForeignKey("activities.id", name="activity_id"), primary_key=True
+    ),
+    Column("tile_id", ForeignKey("tiles.id", name="tile_id"), primary_key=True),
+)
 
 
 class Activity(Base):
@@ -93,16 +105,3 @@ class Tile(Base):
     tile_visits: Mapped[list["TileVisit"]] = relationship(
         back_populates="tile", cascade="all, delete-orphan"
     )
-
-
-class TileVisit(Base):
-    __tablename__ = "tile_visits"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    activity_id: Mapped[int] = mapped_column(
-        ForeignKey("activities.id", name="activity_id")
-    )
-    activity: Mapped["Activity"] = relationship(back_populates="tile_visits")
-    tile_id: Mapped[int] = mapped_column(ForeignKey("tiles.id", name="tile_id"))
-    tile: Mapped["Tile"] = relationship(back_populates="tile_visits")
