@@ -138,9 +138,6 @@ def build_activity_meta_sql(session: sqlalchemy.orm.Session) -> None:
     }
     kinds = {kind.name: kind for kind in session.scalars(sa.select(Kind))}
 
-    print(equipments)
-    print(kinds)
-
     for new_id in tqdm(new_ids, desc="Register new activities"):
         with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
             metadata: ActivityMeta = pickle.load(f)
