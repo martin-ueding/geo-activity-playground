@@ -99,7 +99,7 @@ def make_activity_repository(
 ) -> tuple[ActivityRepository, TileVisitAccessor, ConfigAccessor]:
     os.chdir(basedir)
 
-    engine = sa.create_engine("sqlite:///Cache/database.sqlite", echo=True)
+    engine = sa.create_engine("sqlite:///Cache/database.sqlite", echo=False)
     Base.metadata.create_all(engine)
     db_session = sqlalchemy.orm.Session(engine)
 
@@ -118,13 +118,7 @@ def make_activity_repository(
 
 
 def main_cache(basedir: pathlib.Path) -> None:
-    (
-        repository,
-        tile_visit_accessor,
-        config_accessor,
-        db_session,
-    ) = make_activity_repository(basedir, False)
-    scan_for_activities(repository, tile_visit_accessor, config_accessor(), db_session)
+    make_activity_repository(basedir, False)
 
 
 if __name__ == "__main__":
