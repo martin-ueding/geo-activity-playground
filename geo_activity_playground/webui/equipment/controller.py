@@ -103,7 +103,8 @@ class EquipmentController:
             }
 
         for equipment, offset in self._config.equipment_offsets.items():
-            equipment_summary.loc[equipment, "total_distance_km"] += offset
+            if equipment in equipment_summary.index:
+                equipment_summary.loc[equipment, "total_distance_km"] += offset
 
         return {
             "equipment_variables": equipment_variables,
