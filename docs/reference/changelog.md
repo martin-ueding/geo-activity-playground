@@ -6,7 +6,7 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Next
+### Version 0.28
 
 - Add settings menu to suppress fields from share pictures.
 - Fix spelling mistake in navigation bar.
