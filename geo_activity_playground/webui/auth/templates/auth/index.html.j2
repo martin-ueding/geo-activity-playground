@@ -1,0 +1,19 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1>Authentication</h1>
+
+{% if is_authenticated %}
+<p>You are either logged in or don't have a password set. You can do everything.</p>
+{% else %}
+<form method="POST">
+    <div class="mb-3"></div>
+    <label for="password" class="form-label">Password</label>
+    <input type="password" class="form-control" id="password" name="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Log In</button>
+</form>
+{% endif %}
+
+{% endblock %}

@@ -22,6 +22,8 @@ from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
 from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint
+from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
 
 
@@ -73,6 +75,13 @@ def web_ui_main(
 
     route_search(app, repository)
     route_start(app, repository)
+
+    app.register_blueprint(
+        make_auth_blueprint(
+            Authenticator(config_accessor()),
+        ),
+        url_prefix="/auth",
+    )
 
     app.register_blueprint(
         make_activity_blueprint(
