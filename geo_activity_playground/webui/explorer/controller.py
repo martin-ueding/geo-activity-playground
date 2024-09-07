@@ -54,9 +54,9 @@ class ExplorerController:
         if zoom not in self._config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
-        tile_evolution_states = self._tile_visit_accessor.states
-        tile_visits = self._tile_visit_accessor.visits
-        tile_histories = self._tile_visit_accessor.histories
+        tile_evolution_states = self._tile_visit_accessor.tile_state["evolution_state"]
+        tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
+        tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
 
         medians = tile_histories[zoom].median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(

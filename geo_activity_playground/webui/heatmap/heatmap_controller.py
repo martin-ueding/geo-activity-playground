@@ -34,10 +34,14 @@ class HeatmapController:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
 
-        self.tile_histories = self._tile_visit_accessor.histories
-        self.tile_evolution_states = self._tile_visit_accessor.states
-        self.tile_visits = self._tile_visit_accessor.visits
-        self.activities_per_tile = self._tile_visit_accessor.activities_per_tile
+        self.tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
+        self.tile_evolution_states = self._tile_visit_accessor.tile_state[
+            "evolution_state"
+        ]
+        self.tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
+        self.activities_per_tile = self._tile_visit_accessor.tile_state[
+            "activities_per_tile"
+        ]
 
     def render(self, kinds: list[str] = []) -> dict:
         zoom = 14

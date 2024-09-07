@@ -61,7 +61,9 @@ class ActivityController:
 
         new_tiles = {
             zoom: sum(
-                self._tile_visit_accessor.histories[zoom]["activity_id"]
+                self._tile_visit_accessor.tile_state["tile_history"][zoom][
+                    "activity_id"
+                ]
                 == activity["id"]
             )
             for zoom in [14, 17]

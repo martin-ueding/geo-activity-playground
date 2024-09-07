@@ -18,7 +18,7 @@ class SquarePlannerController:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
 
-        self._tile_visits = self._tile_visit_accessor.visits
+        self._tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
 
     def action_planner(
         self, zoom: int, square_x: int, square_y: int, square_size: int

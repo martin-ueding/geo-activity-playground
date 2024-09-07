@@ -40,18 +40,34 @@ class TileHistoryRow(TypedDict):
     tile_y: int
 
 
+class TileEvolutionState:
+    def __init__(self) -> None:
+        self.num_neighbors: dict[tuple[int, int], int] = {}
+        self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
+        self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
+        self.cluster_evolution = pd.DataFrame()
+        self.square_start = 0
+        self.cluster_start = 0
+        self.max_square_size = 0
+        self.visited_tiles: set[tuple[int, int]] = set()
+        self.square_evolution = pd.DataFrame()
+        self.square_x: Optional[int] = None
+        self.square_y: Optional[int] = None
+
+
 class TileState(TypedDict):
     tile_visits: dict[int, dict[tuple[int, int], TileInfo]]
     tile_history: dict[int, pd.DataFrame]
     activities_per_tile: dict[int, set[int]]
     processed_activities: set[int]
+    evolution_state: dict[int, TileEvolutionState]
     version: int
 
 
-TILE_STATE_VERSION = 1
+TILE_STATE_VERSION = 2
 
 
-class TileVisitAccessor2:
+class TileVisitAccessor:
     PATH = pathlib.Path("Cache/tile-state-2.pickle")
 
     def __init__(self) -> None:
@@ -61,6 +77,7 @@ class TileVisitAccessor2:
             or self.tile_state.get("version", None) != TILE_STATE_VERSION
         ):
             self.tile_state = make_tile_state()
+            # TODO: Reset work tracker
 
     def save(self) -> None:
         tmp_path = self.PATH.with_suffix(".tmp")
@@ -83,13 +100,14 @@ def make_tile_state() -> TileState:
         "tile_history": collections.defaultdict(pd.DataFrame),
         "activities_per_tile": collections.defaultdict(make_defaultdict_set),
         "processed_activities": set(),
+        "evolution_state": collections.defaultdict(TileEvolutionState),
         "version": TILE_STATE_VERSION,
     }
     return tile_state
 
 
 def compute_tile_visits_new(
-    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor2
+    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
     work_tracker = WorkTracker(work_tracker_path("tile-state"))
     for activity_id in tqdm(
@@ -126,8 +144,6 @@ def do_tile_stuff(
             activity_tiles["time"],
             zip(activity_tiles["tile_x"], activity_tiles["tile_y"]),
         ):
-            activities_per_tile[tile].add(activity_id)
-
             if activity["consider_for_achievements"]:
                 if tile not in activities_per_tile:
                     new_tile_history_soa["activity_id"].append(activity_id)
@@ -150,6 +166,8 @@ def do_tile_stuff(
                     tile_visit["last_id"] = activity_id
                     tile_visit["last_time"] = time
 
+            activities_per_tile[tile].add(activity_id)
+
         if new_tile_history_soa["activity_id"]:
             tile_state["tile_history"][zoom] = pd.concat(
                 [tile_state["tile_history"][zoom], pd.DataFrame(new_tile_history_soa)]
@@ -158,133 +176,6 @@ def do_tile_stuff(
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
         activity_tiles["tile_y"] //= 2
-
-
-class TileVisitAccessor:
-    TILE_EVOLUTION_STATES_PATH = pathlib.Path("Cache/tile-evolution-state.pickle")
-    TILE_HISTORIES_PATH = pathlib.Path(f"Cache/tile-history.pickle")
-    TILE_VISITS_PATH = pathlib.Path(f"Cache/tile-visits.pickle")
-    ACTIVITIES_PER_TILE_PATH = pathlib.Path(f"Cache/activities-per-tile.pickle")
-
-    def __init__(self) -> None:
-        self.visits: dict[int, dict[tuple[int, int], dict[str, Any]]] = try_load_pickle(
-            self.TILE_VISITS_PATH
-        ) or collections.defaultdict(dict)
-        "zoom → (tile_x, tile_y) → tile_info"
-
-        self.histories: dict[int, pd.DataFrame] = try_load_pickle(
-            self.TILE_HISTORIES_PATH
-        ) or collections.defaultdict(pd.DataFrame)
-
-        self.states = try_load_pickle(
-            self.TILE_EVOLUTION_STATES_PATH
-        ) or collections.defaultdict(TileEvolutionState)
-
-        self.activities_per_tile: dict[
-            int, dict[tuple[int, int], set[int]]
-        ] = try_load_pickle(self.ACTIVITIES_PER_TILE_PATH) or collections.defaultdict(
-            dict
-        )
-
-    def save(self) -> None:
-        with open(self.TILE_VISITS_PATH, "wb") as f:
-            pickle.dump(self.visits, f)
-
-        with open(self.TILE_HISTORIES_PATH, "wb") as f:
-            pickle.dump(self.histories, f)
-
-        with open(self.TILE_EVOLUTION_STATES_PATH, "wb") as f:
-            pickle.dump(self.states, f)
-
-        with open(self.ACTIVITIES_PER_TILE_PATH, "wb") as f:
-            pickle.dump(self.activities_per_tile, f)
-
-
-def compute_tile_visits(
-    repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
-) -> None:
-    present_activity_ids = set(repository.get_activity_ids())
-    work_tracker = WorkTracker(work_tracker_path("tile-visits"))
-
-    changed_zoom_tile = collections.defaultdict(set)
-
-    # Delete visits from removed activities.
-    for zoom, activities_per_tile in tile_visits_accessor.activities_per_tile.items():
-        for tile, activity_ids in activities_per_tile.items():
-            deleted_ids = activity_ids - present_activity_ids
-            if deleted_ids:
-                logger.debug(
-                    f"Removing activities {deleted_ids} from tile {tile} at {zoom=}."
-                )
-                for activity_id in deleted_ids:
-                    activity_ids.remove(activity_id)
-                    work_tracker.discard(activity_id)
-                    changed_zoom_tile[zoom].add(tile)
-
-    # Add visits from new activities.
-    activity_ids_to_process = work_tracker.filter(repository.get_activity_ids())
-    for activity_id in tqdm(
-        activity_ids_to_process, desc="Extract explorer tile visits"
-    ):
-        for zoom in range(20):
-            for time, tile_x, tile_y in _tiles_from_points(
-                repository.get_time_series(activity_id), zoom
-            ):
-                tile = (tile_x, tile_y)
-                if tile not in tile_visits_accessor.activities_per_tile[zoom]:
-                    tile_visits_accessor.activities_per_tile[zoom][tile] = set()
-                tile_visits_accessor.activities_per_tile[zoom][tile].add(activity_id)
-                changed_zoom_tile[zoom].add(tile)
-        work_tracker.mark_done(activity_id)
-
-    # Update tile visits structure.
-    for zoom, changed_tiles in tqdm(
-        changed_zoom_tile.items(), desc="Incorporate changes in tiles"
-    ):
-        soa = {"activity_id": [], "time": [], "tile_x": [], "tile_y": []}
-
-        for tile in changed_tiles:
-            activity_ids = tile_visits_accessor.activities_per_tile[zoom][tile]
-            activities = [
-                repository.get_activity_by_id(activity_id)
-                for activity_id in activity_ids
-            ]
-            activities_to_consider = [
-                activity
-                for activity in activities
-                if activity["consider_for_achievements"]
-            ]
-            activities_to_consider.sort(key=lambda activity: activity["start"])
-
-            if activities_to_consider:
-                tile_visits_accessor.visits[zoom][tile] = {
-                    "first_time": activities_to_consider[0]["start"],
-                    "first_id": activities_to_consider[0]["id"],
-                    "last_time": activities_to_consider[-1]["start"],
-                    "last_id": activities_to_consider[-1]["id"],
-                    "activity_ids": {
-                        activity["id"] for activity in activities_to_consider
-                    },
-                }
-
-                soa["activity_id"].append(activities_to_consider[0]["id"])
-                soa["time"].append(activities_to_consider[0]["start"])
-                soa["tile_x"].append(tile[0])
-                soa["tile_y"].append(tile[1])
-            else:
-                if tile in tile_visits_accessor.visits[zoom]:
-                    del tile_visits_accessor.visits[zoom][tile]
-
-        df = pd.DataFrame(soa)
-        if len(df) > 0:
-            df = pd.concat([tile_visits_accessor.histories[zoom], df])
-            df.sort_values("time", inplace=True)
-            tile_visits_accessor.histories[zoom] = df.groupby(
-                ["tile_x", "tile_y"]
-            ).head(1)
-
-    tile_visits_accessor.save()
-    work_tracker.close()
 
 
 def _tiles_from_points(
@@ -310,37 +201,18 @@ def _tiles_from_points(
                 yield (t1,) + interpolated
 
 
-class TileEvolutionState:
-    def __init__(self) -> None:
-        self.num_neighbors: dict[tuple[int, int], int] = {}
-        self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
-        self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
-        self.cluster_evolution = pd.DataFrame()
-        self.square_start = 0
-        self.cluster_start = 0
-        self.max_square_size = 0
-        self.visited_tiles: set[tuple[int, int]] = set()
-        self.square_evolution = pd.DataFrame()
-        self.square_x: Optional[int] = None
-        self.square_y: Optional[int] = None
-
-
-def compute_tile_evolution(
-    tile_visits_accessor: TileVisitAccessor, config: Config
-) -> None:
+def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
     for zoom in config.explorer_zoom_levels:
         _compute_cluster_evolution(
-            tile_visits_accessor.histories[zoom],
-            tile_visits_accessor.states[zoom],
+            tile_state["tile_history"][zoom],
+            tile_state["evolution_state"][zoom],
             zoom,
         )
         _compute_square_history(
-            tile_visits_accessor.histories[zoom],
-            tile_visits_accessor.states[zoom],
+            tile_state["tile_history"][zoom],
+            tile_state["evolution_state"][zoom],
             zoom,
         )
-
-    tile_visits_accessor.save()
 
 
 def _compute_cluster_evolution(
