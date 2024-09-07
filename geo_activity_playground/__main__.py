@@ -11,6 +11,7 @@ from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.config import import_old_config
 from geo_activity_playground.core.config import import_old_strava_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor2
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.webui.app import web_ui_main
 from geo_activity_playground.webui.upload.controller import scan_for_activities
@@ -93,26 +94,31 @@ def main() -> None:
 
 def make_activity_repository(
     basedir: pathlib.Path, skip_reload: bool
-) -> tuple[ActivityRepository, TileVisitAccessor, ConfigAccessor]:
+) -> tuple[ActivityRepository, TileVisitAccessor, TileVisitAccessor2, ConfigAccessor]:
     os.chdir(basedir)
 
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
+    tile_visit_accessor2 = TileVisitAccessor2()
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
     import_old_strava_config(config_accessor)
 
     if not skip_reload:
-        scan_for_activities(repository, tile_visit_accessor, config_accessor())
+        scan_for_activities(
+            repository, tile_visit_accessor, tile_visit_accessor2, config_accessor()
+        )
 
-    return repository, tile_visit_accessor, config_accessor
+    return repository, tile_visit_accessor, tile_visit_accessor2, config_accessor
 
 
 def main_cache(basedir: pathlib.Path) -> None:
-    repository, tile_visit_accessor, config_accessor = make_activity_repository(
-        basedir, False
-    )
-    scan_for_activities(repository, tile_visit_accessor, config_accessor())
+    (
+        repository,
+        tile_visit_accessor,
+        tile_visit_accessor2,
+        config_accessor,
+    ) = make_activity_repository(basedir, False)
 
 
 if __name__ == "__main__":

@@ -128,11 +128,11 @@ class ActivityRepository:
         else:
             return None
 
-    def get_activity_ids(self, only_achievements: bool = False) -> set[int]:
+    def get_activity_ids(self, only_achievements: bool = False) -> list[int]:
         if only_achievements:
-            return set(self.meta.loc[self.meta["consider_for_achievements"]].index)
+            return list(self.meta.loc[self.meta["consider_for_achievements"]].index)
         else:
-            return set(self.meta.index)
+            return list(self.meta.index)
 
     def iter_activities(self, new_to_old=True, dropna=False) -> Iterator[ActivityMeta]:
         direction = -1 if new_to_old else 1

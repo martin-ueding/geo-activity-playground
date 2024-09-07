@@ -15,7 +15,9 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.enrichment import enrich_activities
 from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
 from geo_activity_playground.explorer.tile_visits import compute_tile_visits
+from geo_activity_playground.explorer.tile_visits import compute_tile_visits_new
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor2
 from geo_activity_playground.importers.directory import get_file_hash
 from geo_activity_playground.importers.directory import import_from_directory
 from geo_activity_playground.importers.strava_api import import_from_strava_api
@@ -102,6 +104,7 @@ class UploadController:
 def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
+    tile_visit_accessor2: TileVisitAccessor2,
     config: Config,
     skip_strava: bool = False,
 ) -> None:
@@ -121,4 +124,5 @@ def scan_for_activities(
 
     if len(repository) > 0:
         compute_tile_visits(repository, tile_visit_accessor)
+        compute_tile_visits_new(repository, tile_visit_accessor2)
         compute_tile_evolution(tile_visit_accessor, config)

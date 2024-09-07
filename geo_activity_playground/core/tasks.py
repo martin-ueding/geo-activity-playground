@@ -59,8 +59,8 @@ class WorkTracker:
         else:
             self._done = set()
 
-    def filter(self, ids: Iterable) -> set:
-        return set(ids) - self._done
+    def filter(self, ids: Iterable) -> list:
+        return [elem for elem in ids if elem not in self._done]
 
     def mark_done(self, id: int) -> None:
         self._done.add(id)

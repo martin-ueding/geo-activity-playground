@@ -25,10 +25,139 @@ from geo_activity_playground.core.tiles import interpolate_missing_tile
 logger = logging.getLogger(__name__)
 
 
+class TileInfo(TypedDict):
+    activity_ids: set[int]
+    first_time: datetime.datetime
+    first_id: int
+    last_time: datetime.datetime
+    last_id: int
+
+
 class TileHistoryRow(TypedDict):
+    activity_id: int
     time: datetime.datetime
     tile_x: int
     tile_y: int
+
+
+class TileState(TypedDict):
+    tile_visits: dict[int, dict[tuple[int, int], TileInfo]]
+    tile_history: dict[int, pd.DataFrame]
+    activities_per_tile: dict[int, set[int]]
+    processed_activities: set[int]
+    version: int
+
+
+TILE_STATE_VERSION = 1
+
+
+class TileVisitAccessor2:
+    PATH = pathlib.Path("Cache/tile-state-2.pickle")
+
+    def __init__(self) -> None:
+        self.tile_state: TileState = try_load_pickle(self.PATH)
+        if (
+            self.tile_state is None
+            or self.tile_state.get("version", None) != TILE_STATE_VERSION
+        ):
+            self.tile_state = make_tile_state()
+
+    def save(self) -> None:
+        tmp_path = self.PATH.with_suffix(".tmp")
+        with open(tmp_path, "wb") as f:
+            pickle.dump(self.tile_state, f)
+        tmp_path.rename(self.PATH)
+
+
+def make_defaultdict_dict():
+    return collections.defaultdict(dict)
+
+
+def make_defaultdict_set():
+    return collections.defaultdict(set)
+
+
+def make_tile_state() -> TileState:
+    tile_state: TileState = {
+        "tile_visits": collections.defaultdict(make_defaultdict_dict),
+        "tile_history": collections.defaultdict(pd.DataFrame),
+        "activities_per_tile": collections.defaultdict(make_defaultdict_set),
+        "processed_activities": set(),
+        "version": TILE_STATE_VERSION,
+    }
+    return tile_state
+
+
+def compute_tile_visits_new(
+    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor2
+) -> None:
+    work_tracker = WorkTracker(work_tracker_path("tile-state"))
+    for activity_id in tqdm(
+        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits (new)"
+    ):
+        do_tile_stuff(repository, tile_visit_accessor.tile_state, activity_id)
+        work_tracker.mark_done(activity_id)
+    tile_visit_accessor.save()
+    work_tracker.close()
+
+
+def do_tile_stuff(
+    repository: ActivityRepository, tile_state: TileState, activity_id: int
+) -> None:
+    activity = repository.get_activity_by_id(activity_id)
+    time_series = repository.get_time_series(activity_id)
+
+    activity_tiles = pd.DataFrame(
+        _tiles_from_points(time_series, 19), columns=["time", "tile_x", "tile_y"]
+    )
+    for zoom in reversed(range(20)):
+        activities_per_tile = tile_state["activities_per_tile"][zoom]
+
+        new_tile_history_soa = {
+            "activity_id": [],
+            "time": [],
+            "tile_x": [],
+            "tile_y": [],
+        }
+
+        activity_tiles = activity_tiles.groupby(["tile_x", "tile_y"]).head(1)
+
+        for time, tile in zip(
+            activity_tiles["time"],
+            zip(activity_tiles["tile_x"], activity_tiles["tile_y"]),
+        ):
+            activities_per_tile[tile].add(activity_id)
+
+            if activity["consider_for_achievements"]:
+                if tile not in activities_per_tile:
+                    new_tile_history_soa["activity_id"].append(activity_id)
+                    new_tile_history_soa["time"].append(time)
+                    new_tile_history_soa["tile_x"].append(tile[0])
+                    new_tile_history_soa["tile_y"].append(tile[1])
+
+                tile_visit = tile_state["tile_visits"][zoom][tile]
+                if not tile_visit:
+                    tile_visit["activity_ids"] = {activity_id}
+                else:
+                    tile_visit["activity_ids"].add(activity_id)
+
+                first_time = tile_visit.get("first_time", None)
+                last_time = tile_visit.get("last_time", None)
+                if first_time is None or time < first_time:
+                    tile_visit["first_id"] = activity_id
+                    tile_visit["first_time"] = time
+                if last_time is None or time > last_time:
+                    tile_visit["last_id"] = activity_id
+                    tile_visit["last_time"] = time
+
+        if new_tile_history_soa["activity_id"]:
+            tile_state["tile_history"][zoom] = pd.concat(
+                [tile_state["tile_history"][zoom], pd.DataFrame(new_tile_history_soa)]
+            )
+
+        # Move up one layer in the quad-tree.
+        activity_tiles["tile_x"] //= 2
+        activity_tiles["tile_y"] //= 2
 
 
 class TileVisitAccessor:
@@ -74,7 +203,7 @@ class TileVisitAccessor:
 def compute_tile_visits(
     repository: ActivityRepository, tile_visits_accessor: TileVisitAccessor
 ) -> None:
-    present_activity_ids = repository.get_activity_ids()
+    present_activity_ids = set(repository.get_activity_ids())
     work_tracker = WorkTracker(work_tracker_path("tile-visits"))
 
     changed_zoom_tile = collections.defaultdict(set)
