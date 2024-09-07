@@ -8,6 +8,8 @@ from flask import request
 from flask import url_for
 
 from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.webui.authenticator import Authenticator
+from geo_activity_playground.webui.authenticator import needs_authentication
 from geo_activity_playground.webui.settings.controller import SettingsController
 
 
@@ -19,15 +21,29 @@ def int_or_none(s: str) -> Optional[int]:
             flash(f"Cannot parse integer from {s}: {e}", category="danger")
 
 
-def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
+def make_settings_blueprint(
+    config_accessor: ConfigAccessor, authenticator: Authenticator
+) -> Blueprint:
     settings_controller = SettingsController(config_accessor)
     blueprint = Blueprint("settings", __name__, template_folder="templates")
 
     @blueprint.route("/")
+    @needs_authentication(authenticator)
     def index():
         return render_template("settings/index.html.j2")
 
+    @blueprint.route("/admin-password", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def admin_password():
+        if request.method == "POST":
+            settings_controller.save_admin_password(request.form["password"])
+        return render_template(
+            "settings/admin-password.html.j2",
+            **settings_controller.render_admin_password(),
+        )
+
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def equipment_offsets():
         if request.method == "POST":
             equipments = request.form.getlist("equipment")
@@ -39,6 +55,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/heart-rate", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def heart_rate():
         if request.method == "POST":
             birth_year = int_or_none(request.form["birth_year"])
@@ -54,6 +71,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/kinds-without-achievements", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def kinds_without_achievements():
         if request.method == "POST":
             kinds = request.form.getlist("kind")
@@ -64,6 +82,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/metadata-extraction", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def metadata_extraction():
         if request.method == "POST":
             regexes = request.form.getlist("regex")
@@ -74,6 +93,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/privacy-zones", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def privacy_zones():
         if request.method == "POST":
             zone_names = request.form.getlist("zone_name")
@@ -85,6 +105,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/sharepic", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def sharepic():
         if request.method == "POST":
             names = request.form.getlist("name")
@@ -95,6 +116,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/strava", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
     def strava():
         if request.method == "POST":
             strava_client_id = request.form["strava_client_id"]
@@ -108,6 +130,7 @@ def make_settings_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
         )
 
     @blueprint.route("/strava-callback")
+    @needs_authentication(authenticator)
     def strava_callback():
         code = request.args.get("code", type=str)
         settings_controller.save_strava_code(code)

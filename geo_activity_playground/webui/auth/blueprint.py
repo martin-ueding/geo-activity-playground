@@ -1,6 +1,8 @@
 from flask import Blueprint
+from flask import redirect
 from flask import render_template
 from flask import request
+from flask import url_for
 
 from geo_activity_playground.webui.authenticator import Authenticator
 
@@ -16,5 +18,10 @@ def make_auth_blueprint(authenticator: Authenticator) -> Blueprint:
             "auth/index.html.j2",
             is_authenticated=authenticator.is_authenticated(),
         )
+
+    @blueprint.route("/logout")
+    def logout():
+        authenticator.logout()
+        return redirect(url_for(".index"))
 
     return blueprint

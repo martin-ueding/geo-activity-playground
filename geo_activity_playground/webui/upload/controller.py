@@ -45,17 +45,12 @@ class UploadController:
         directories.sort()
         return {
             "directories": directories,
-            "has_upload": self._config.upload_password,
         }
 
     def receive(self) -> Response:
         # check if the post request has the file part
         if "file" not in request.files:
             flash("No file could be found. Did you select a file?", "warning")
-            return redirect("/upload")
-
-        if request.form["password"] != self._config.upload_password:
-            flash("Incorrect upload password!", "danger")
             return redirect("/upload")
 
         file = request.files["file"]

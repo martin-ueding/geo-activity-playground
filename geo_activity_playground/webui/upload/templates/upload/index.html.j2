@@ -1,37 +1,21 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<div class="row mb-1">
-    <div class="col">
-        <h1>Upload Activity</h1>
+<h1>Upload Activity</h1>
 
-        {% if has_upload %}
-        <form method="post" enctype="multipart/form-data" action="{{ url_for(".receive") }}">
-            <div class="mb-3">
-                <label for="file1" class="form-label">Activity file</label>
-                <input type="file" name="file" id="file1" class="form-control">
-            </div>
-            <div class="mb-3">
-                <label for="directory" class="form-label">Target directory</label>
-                <select name="directory" id="directory" class="form-select" aria-label="Default select example">
-                    {% for directory in directories %}
-                    <option>{{ directory }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" id="password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
-        {% else %}
-        <p>You don't have an upload password set. In order to use this feature, add the following to your configuration
-            file:</p>
-        <code><pre>[upload]
-password = "your unique password here"</pre></code>
-        {% endif %}
+<form method="post" enctype="multipart/form-data" action="{{ url_for('.receive') }}">
+    <div class="mb-3">
+        <label for="file1" class="form-label">Activity file</label>
+        <input type="file" name="file" id="file1" class="form-control">
     </div>
-</div>
-
+    <div class="mb-3">
+        <label for="directory" class="form-label">Target directory</label>
+        <select name="directory" id="directory" class="form-select" aria-label="Default select example">
+            {% for directory in directories %}
+            <option>{{ directory }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
 {% endblock %}

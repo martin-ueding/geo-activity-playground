@@ -73,15 +73,12 @@ def web_ui_main(
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 
+    authenticator = Authenticator(config_accessor())
+
     route_search(app, repository)
     route_start(app, repository)
 
-    app.register_blueprint(
-        make_auth_blueprint(
-            Authenticator(config_accessor()),
-        ),
-        url_prefix="/auth",
-    )
+    app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
 
     app.register_blueprint(
         make_activity_blueprint(
@@ -106,7 +103,7 @@ def web_ui_main(
         make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
     )
     app.register_blueprint(
-        make_settings_blueprint(config_accessor),
+        make_settings_blueprint(config_accessor, authenticator),
         url_prefix="/settings",
     )
     app.register_blueprint(
@@ -119,7 +116,9 @@ def web_ui_main(
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
     app.register_blueprint(
-        make_upload_blueprint(repository, tile_visit_accessor, config_accessor()),
+        make_upload_blueprint(
+            repository, tile_visit_accessor, config_accessor(), authenticator
+        ),
         url_prefix="/upload",
     )
 
