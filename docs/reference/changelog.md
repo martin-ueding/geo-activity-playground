@@ -9,6 +9,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 ### Next
 
 - Add settings menu to suppress fields from share pictures.
+- Fix spelling mistake in navigation bar.
+- Accelerate the tile visit computation.
+- Ignore equipment offsets of equipments that don't exist.
+- Reset corrupt heatmap cache files.
 
 ### Version 0.27
 
