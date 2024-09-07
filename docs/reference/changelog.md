@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Ignore equipment offsets of equipments that don't exist.
 - Reset corrupt heatmap cache files.
 - [GH-159](https://github.com/martin-ueding/geo-activity-playground/issues/159): Improve password mechanism to protect both upload and settings.
+- Document the use of Open Street Map uMap for missing explorer tiles on the go.
 
 ### Version 0.27
 
