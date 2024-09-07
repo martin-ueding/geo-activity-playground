@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Accelerate the tile visit computation.
 - Ignore equipment offsets of equipments that don't exist.
 - Reset corrupt heatmap cache files.
+- [GH-159](https://github.com/martin-ueding/geo-activity-playground/issues/159): Improve password mechanism to protect both upload and settings.
 
 ### Version 0.27
 
