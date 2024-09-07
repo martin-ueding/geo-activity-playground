@@ -78,7 +78,14 @@ class HeatmapController:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{kind}/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():
-            tile_counts = np.load(tile_count_cache_path)
+            try:
+                tile_counts = np.load(tile_count_cache_path)
+            except ValueError:
+                logger.warning(
+                    f"Heatmap count file {tile_count_cache_path} is corrupted, deleting."
+                )
+                tile_count_cache_path.unlink()
+                tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         else:
             tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -114,7 +121,9 @@ class HeatmapController:
                         draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
                         aim = np.array(im)
                         tile_counts += aim
-            np.save(tile_count_cache_path, tile_counts)
+            tmp_path = tile_count_cache_path.with_suffix(".tmp.npy")
+            np.save(tmp_path, tile_counts)
+            tmp_path.rename(tile_count_cache_path)
         return tile_counts
 
     def _render_tile_image(
