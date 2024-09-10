@@ -63,41 +63,62 @@
 
                         {% if num_activities > 0 %}
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('summary.index') }}">Summary</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ url_for('calendar.index') }}">Calendar</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page"
-                                href="{{ url_for('explorer.map', zoom=14) }}">Explorer</a>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Statistics
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('summary.index') }}">Summary
+                                        Statistics</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('eddington.index') }}">Eddington
+                                        Number</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('equipment.index') }}">Equipment</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page"
-                                href="{{ url_for('explorer.map', zoom=17) }}">Squadratinhos</a>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Explorer
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('explorer.map', zoom=14) }}">Explorer
+                                        Tiles (Zoom 14)</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('explorer.map', zoom=17) }}">Squadratinhos
+                                        (Zoom 17)</a></li>
+                            </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ url_for('heatmap.index') }}">Heatmap</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page"
-                                href="{{ url_for('eddington.index') }}">Eddington</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page"
-                                href="{{ url_for('equipment.index') }}">Equipment</a>
-                        </li>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('upload.index') }}">Upload</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('upload.reload') }}">Refresh</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('settings.index') }}">Settings</a>
-                        </li>
 
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('upload.index') }}">Upload Activities</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('upload.reload') }}">Scan New
+                                        Activities</a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li><a class="dropdown-item" href="{{ url_for('settings.index') }}">Settings</a></li>
+                            </ul>
+                        </li>
 
                         <li class="nav-item dropdown">
                             <button
