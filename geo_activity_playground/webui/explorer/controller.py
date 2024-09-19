@@ -161,6 +161,7 @@ def get_three_color_tiles(
             "last_visit": tile_data["last_time"].date().isoformat(),
             "num_visits": len(tile_data["activity_ids"]),
             "square": False,
+            "tile": f"({zoom}, {tile[0]}, {tile[1]})",
         }
 
     # Mark biggest square.

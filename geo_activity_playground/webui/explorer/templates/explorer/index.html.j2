@@ -48,6 +48,8 @@
             function onEachFeature(feature, layer) {
                 if (feature.properties && feature.properties.first_visit) {
                     let lines = [
+                        `<dt>Tile</dt>`,
+                        `<dd>${feature.properties.tile}</dd>`,
                         `<dt>First visit</dt>`,
                         `<dd>${feature.properties.first_visit}</br><a href=/activity/${feature.properties.first_activity_id}>${feature.properties.first_activity_name}</a></dd>`,
                         `<dt>Last visit</dt>`,
