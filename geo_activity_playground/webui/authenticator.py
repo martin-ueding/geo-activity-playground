@@ -14,9 +14,6 @@ class Authenticator:
         self._config = config
 
     def is_authenticated(self) -> bool:
-        print(
-            f"Password={self._config.upload_password}, Session={session.get('is_authenticated', False)}"
-        )
         return not self._config.upload_password or session.get(
             "is_authenticated", False
         )
