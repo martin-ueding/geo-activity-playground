@@ -79,6 +79,9 @@ class TileVisitAccessor:
             self.tile_state = make_tile_state()
             # TODO: Reset work tracker
 
+    def reset(self) -> None:
+        self.tile_state = make_tile_state()
+
     def save(self) -> None:
         tmp_path = self.PATH.with_suffix(".tmp")
         with open(tmp_path, "wb") as f:
@@ -106,20 +109,52 @@ def make_tile_state() -> TileState:
     return tile_state
 
 
+def _consistency_check(
+    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+) -> bool:
+    present_activity_ids = set(repository.get_activity_ids())
+
+    for zoom, activities_per_tile in tile_visit_accessor.tile_state[
+        "activities_per_tile"
+    ].items():
+        for tile, tile_activity_ids in activities_per_tile.items():
+            deleted_activity_ids = tile_activity_ids - present_activity_ids
+            if deleted_activity_ids:
+                logger.info(f"Activities {deleted_activity_ids} have been deleted.")
+                return False
+
+    for zoom, tile_visits in tile_visit_accessor.tile_state["tile_visits"].items():
+        for tile, meta in tile_visits.items():
+            if meta["first_id"] not in present_activity_ids:
+                logger.info(f"Activity {meta['first_id']} have been deleted.")
+                return False
+            if meta["last_id"] not in present_activity_ids:
+                logger.info(f"Activity {meta['last_id']} have been deleted.")
+                return False
+
+    return True
+
+
 def compute_tile_visits_new(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
     work_tracker = WorkTracker(work_tracker_path("tile-state"))
+
+    if not _consistency_check(repository, tile_visit_accessor):
+        logger.warning("Need to recompute Explorer Tiles due to deleted activities.")
+        tile_visit_accessor.reset()
+        work_tracker.reset()
+
     for activity_id in tqdm(
         work_tracker.filter(repository.get_activity_ids()), desc="Tile visits (new)"
     ):
-        do_tile_stuff(repository, tile_visit_accessor.tile_state, activity_id)
+        _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)
     tile_visit_accessor.save()
     work_tracker.close()
 
 
-def do_tile_stuff(
+def _process_activity(
     repository: ActivityRepository, tile_state: TileState, activity_id: int
 ) -> None:
     activity = repository.get_activity_by_id(activity_id)

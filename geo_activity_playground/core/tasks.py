@@ -68,6 +68,9 @@ class WorkTracker:
     def discard(self, id) -> None:
         self._done.discard(id)
 
+    def reset(self) -> None:
+        self._done = set()
+
     def close(self) -> None:
         with open(self._path, "wb") as f:
             pickle.dump(self._done, f)
