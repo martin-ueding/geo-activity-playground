@@ -1,6 +1,7 @@
 """
 Paths within the playground and cache.
 """
+import contextlib
 import functools
 import pathlib
 import typing
@@ -22,6 +23,15 @@ def file_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
         return path
 
     return wrapper
+
+
+@contextlib.contextmanager
+def atomic_open(path: pathlib.Path, mode: str):
+    temp_path = path.with_stem(path.stem + "-temp")
+    with open(temp_path, mode) as f:
+        yield f
+    path.unlink(missing_ok=True)
+    temp_path.rename(path)
 
 
 _cache_dir = pathlib.Path("Cache")

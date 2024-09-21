@@ -123,6 +123,7 @@ class HeatmapController:
                         tile_counts += aim
             tmp_path = tile_count_cache_path.with_suffix(".tmp.npy")
             np.save(tmp_path, tile_counts)
+            tile_count_cache_path.unlink(missing_ok=True)
             tmp_path.rename(tile_count_cache_path)
         return tile_counts
 

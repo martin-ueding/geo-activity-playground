@@ -8,6 +8,7 @@ from typing import Generic
 from typing import Sequence
 from typing import TypeVar
 
+from geo_activity_playground.core.paths import atomic_open
 from geo_activity_playground.core.paths import cache_dir
 
 
@@ -24,11 +25,8 @@ def stored_object(path: pathlib.Path, default):
 
     yield payload
 
-    temp_location = path.with_suffix(".tmp")
-    with open(temp_location, "wb") as f:
+    with atomic_open(path, "wb") as f:
         pickle.dump(payload, f)
-    path.unlink(missing_ok=True)
-    temp_location.rename(path)
 
 
 def work_tracker_path(name: str) -> pathlib.Path:

@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.paths import atomic_open
 from geo_activity_playground.core.paths import tiles_per_time_series
 from geo_activity_playground.core.tasks import try_load_pickle
 from geo_activity_playground.core.tasks import work_tracker_path
@@ -83,10 +84,8 @@ class TileVisitAccessor:
         self.tile_state = make_tile_state()
 
     def save(self) -> None:
-        tmp_path = self.PATH.with_suffix(".tmp")
-        with open(tmp_path, "wb") as f:
+        with atomic_open(self.PATH, "wb") as f:
             pickle.dump(self.tile_state, f)
-        tmp_path.rename(self.PATH)
 
 
 def make_defaultdict_dict():
