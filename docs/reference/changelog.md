@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Use dropdown menus to make navigation a bit smaller.
 - [GH-163](https://github.com/martin-ueding/geo-activity-playground/issues/163): Recompute explorer tiles when there are deleted activities. Previously this would lead to `KeyError` when trying to use the heatmap or the explorer tile maps.
 - [GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161): Fix explorer tile clusters and square if one has activities that are not to be considered for achievements.
+- [GH-164](https://github.com/martin-ueding/geo-activity-playground/issues/164): Create new function to handle write-and-replace on Windows.
 
 ### Version 0.28
 
