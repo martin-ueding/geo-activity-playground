@@ -31,7 +31,7 @@ class SummaryController:
         )
 
         return {
-            "plot_distance_heatmap": plot_distance_heatmap(df),
+            "plot_distance_heatmap": plot_distance_heatmap(df, self._config),
             "plot_monthly_distance": plot_monthly_distance(df, kind_scale),
             "plot_yearly_distance": plot_yearly_distance(year_kind_total, kind_scale),
             "plot_year_cumulative": plot_year_cumulative(df),
@@ -112,7 +112,7 @@ def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def plot_distance_heatmap(meta: pd.DataFrame) -> str:
+def plot_distance_heatmap(meta: pd.DataFrame, config: Config) -> str:
     return (
         alt.Chart(
             meta.loc[
@@ -133,7 +133,10 @@ def plot_distance_heatmap(meta: pd.DataFrame) -> str:
                 scale=alt.Scale(reverse=True),
                 title="Year and month",
             ),
-            alt.Color("sum(distance_km)", scale=alt.Scale(scheme="viridis")),
+            alt.Color(
+                "sum(distance_km)",
+                scale=alt.Scale(scheme=config.color_scheme_for_counts),
+            ),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip(

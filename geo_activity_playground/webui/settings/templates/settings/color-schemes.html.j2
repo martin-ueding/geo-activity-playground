@@ -1,0 +1,33 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Color Schemes for Plots</h1>
+
+<p>Don't like color schemes in the plots? Have a look at the <a href="https://vega.github.io/vega/docs/schemes/"
+        target="_blank">colors schemes of Vega</a> and pick one that you like.</p>
+
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Color scheme for activity kinds</label>
+        <select class="form-select" aria-label="Color scheme for activity kinds" name="color_scheme_for_kind">
+            {% for cs in color_scheme_for_kind_avail %}
+            <option {% if cs==color_scheme_for_kind %} selected {% endif %}>{{ cs }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Color scheme for heatmaps</label>
+        <select class="form-select" aria-label="Color scheme for heatmaps" name="color_scheme_for_counts">
+            {% for cs in color_scheme_for_counts_avail %}
+            <option {% if cs==color_scheme_for_counts %} selected {% endif %}>{{ cs }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

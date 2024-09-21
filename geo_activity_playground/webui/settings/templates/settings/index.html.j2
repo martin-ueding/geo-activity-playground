@@ -23,6 +23,15 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
+                    <h5 class="card-title">Color schemes</h5>
+                    <p class="card-text">Don't like the colors in the plots?</p>
+                    <a href="{{ url_for('.color_schemes') }}" class="btn btn-primary">Set up color schemes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
                     <h5 class="card-title">Equipment offsets</h5>
                     <p class="card-text">Not all activities with a given equipment are recorded? Just set an offset.</p>
                     <a href="{{ url_for('.equipment_offsets') }}" class="btn btn-primary">Set up equipment offsets</a>

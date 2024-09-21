@@ -42,6 +42,73 @@ def make_settings_blueprint(
             **settings_controller.render_admin_password(),
         )
 
+    @blueprint.route("/color-schemes", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def color_schemes():
+        if request.method == "POST":
+            config_accessor().color_scheme_for_counts = request.form[
+                "color_scheme_for_counts"
+            ]
+            config_accessor().color_scheme_for_kind = request.form[
+                "color_scheme_for_kind"
+            ]
+            config_accessor.save()
+            flash("Updated color schemes.", category="success")
+        return render_template(
+            "settings/color-schemes.html.j2",
+            color_scheme_for_counts=config_accessor().color_scheme_for_counts,
+            color_scheme_for_counts_avail=[
+                "viridis",
+                "magma",
+                "inferno",
+                "plasma",
+                "cividis",
+                "turbo",
+                "bluegreen",
+                "bluepurple",
+                "goldgreen",
+                "goldorange",
+                "goldred",
+                "greenblue",
+                "orangered",
+                "purplebluegreen",
+                "purpleblue",
+                "purplered",
+                "redpurple",
+                "yellowgreenblue",
+                "yellowgreen",
+                "yelloworangebrown",
+                "yelloworangered",
+                "darkblue",
+                "darkgold",
+                "darkgreen",
+                "darkmulti",
+                "darkred",
+                "lightgreyred",
+                "lightgreyteal",
+                "lightmulti",
+                "lightorange",
+                "lighttealblue",
+            ],
+            color_scheme_for_kind=config_accessor().color_scheme_for_kind,
+            color_scheme_for_kind_avail=[
+                "accent",
+                "category10",
+                "category20",
+                "category20b",
+                "category20c",
+                "dark2",
+                "paired",
+                "pastel1",
+                "pastel2",
+                "set1",
+                "set2",
+                "set3",
+                "tableau10",
+                "tableau20",
+            ],
+        )
+
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def equipment_offsets():

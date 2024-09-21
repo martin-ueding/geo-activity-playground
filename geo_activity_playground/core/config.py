@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class Config:
     birth_year: Optional[int] = None
-    color_scheme_for_counts = "viridis"
-    color_scheme_for_kind = "category10"
+    color_scheme_for_counts: str = "viridis"
+    color_scheme_for_kind: str = "category10"
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     explorer_zoom_levels: list[int] = dataclasses.field(
         default_factory=lambda: [14, 17]
@@ -54,6 +54,7 @@ class ConfigAccessor:
         return self._config
 
     def save(self) -> None:
+        print(self._config)
         with open(new_config_file(), "w") as f:
             json.dump(
                 dataclasses.asdict(self._config),
