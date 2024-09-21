@@ -8,16 +8,18 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
 class SummaryController:
-    def __init__(self, repository: ActivityRepository) -> None:
+    def __init__(self, repository: ActivityRepository, config: Config) -> None:
         self._repository = repository
+        self._config = config
 
     @functools.cache
     def render(self) -> dict:
-        kind_scale = make_kind_scale(self._repository.meta)
+        kind_scale = make_kind_scale(self._repository.meta, self._config)
         df = embellished_activities(self._repository.meta)
         df = df.loc[df["consider_for_achievements"]]
 

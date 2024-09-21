@@ -21,6 +21,7 @@ from .square_planner.blueprint import make_square_planner_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
 from .upload.blueprint import make_upload_blueprint
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint
 from geo_activity_playground.webui.authenticator import Authenticator
@@ -39,8 +40,8 @@ def route_search(app: Flask, repository: ActivityRepository) -> None:
         )
 
 
-def route_start(app: Flask, repository: ActivityRepository) -> None:
-    entry_controller = EntryController(repository)
+def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
+    entry_controller = EntryController(repository, config)
 
     @app.route("/")
     def index():
@@ -76,7 +77,7 @@ def web_ui_main(
     authenticator = Authenticator(config_accessor())
 
     route_search(app, repository)
-    route_start(app, repository)
+    route_start(app, repository, config_accessor())
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
 
@@ -111,7 +112,7 @@ def web_ui_main(
         url_prefix="/square-planner",
     )
     app.register_blueprint(
-        make_summary_blueprint(repository),
+        make_summary_blueprint(repository, config_accessor()),
         url_prefix="/summary",
     )
     app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")

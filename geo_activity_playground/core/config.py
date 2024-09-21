@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class Config:
     birth_year: Optional[int] = None
+    color_scheme_for_counts = "viridis"
+    color_scheme_for_kind = "category10"
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     explorer_zoom_levels: list[int] = dataclasses.field(
         default_factory=lambda: [14, 17]
