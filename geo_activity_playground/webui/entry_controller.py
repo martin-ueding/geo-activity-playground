@@ -6,6 +6,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
+from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
 class EntryController:
@@ -48,7 +49,7 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame) -> str:
         .encode(
             alt.X("yearmonthdate(start)", title="Date"),
             alt.Y("sum(distance_km)", title="Distance / km"),
-            alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
+            alt.Color("kind", scale=make_kind_scale(meta), title="Kind"),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),

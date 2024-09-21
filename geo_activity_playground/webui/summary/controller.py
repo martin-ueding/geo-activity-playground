@@ -8,6 +8,7 @@ import pandas as pd
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
+from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
 class SummaryController:
@@ -16,6 +17,7 @@ class SummaryController:
 
     @functools.cache
     def render(self) -> dict:
+        kind_scale = make_kind_scale(self._repository.meta)
         df = embellished_activities(self._repository.meta)
         df = df.loc[df["consider_for_achievements"]]
 
@@ -28,13 +30,13 @@ class SummaryController:
 
         return {
             "plot_distance_heatmap": plot_distance_heatmap(df),
-            "plot_monthly_distance": plot_monthly_distance(df),
-            "plot_yearly_distance": plot_yearly_distance(year_kind_total),
+            "plot_monthly_distance": plot_monthly_distance(df, kind_scale),
+            "plot_yearly_distance": plot_yearly_distance(year_kind_total, kind_scale),
             "plot_year_cumulative": plot_year_cumulative(df),
             "tabulate_year_kind_mean": tabulate_year_kind_mean(df)
             .reset_index()
             .to_dict(orient="split"),
-            "plot_weekly_distance": plot_weekly_distance(df),
+            "plot_weekly_distance": plot_weekly_distance(df, kind_scale),
             "nominations": [
                 (
                     self._repository.get_activity_by_id(activity_id),
@@ -142,7 +144,7 @@ def plot_distance_heatmap(meta: pd.DataFrame) -> str:
     )
 
 
-def plot_monthly_distance(meta: pd.DataFrame) -> str:
+def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
     return (
         alt.Chart(
             meta.loc[
@@ -159,7 +161,7 @@ def plot_monthly_distance(meta: pd.DataFrame) -> str:
         .encode(
             alt.X("month(start)", title="Month"),
             alt.Y("sum(distance_km)", title="Distance / km"),
-            alt.Color("kind", scale=alt.Scale(scheme="category10"), title="Kind"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
         )
         .resolve_axis(x="independent")
@@ -167,14 +169,14 @@ def plot_monthly_distance(meta: pd.DataFrame) -> str:
     )
 
 
-def plot_yearly_distance(year_kind_total: pd.DataFrame) -> str:
+def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -> str:
     return (
         alt.Chart(year_kind_total, title="Total Distance per Year")
         .mark_bar()
         .encode(
             alt.X("year:O", title="Year"),
             alt.Y("distance_km", title="Distance / km"),
-            alt.Color("kind", title="Kind"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year:O", title="Year"),
                 alt.Tooltip("kind", title="Kind"),
@@ -231,7 +233,7 @@ def tabulate_year_kind_mean(df: pd.DataFrame) -> pd.DataFrame:
     return year_kind_mean_distance
 
 
-def plot_weekly_distance(df: pd.DataFrame) -> str:
+def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
     week_kind_total_distance = (
         df[["year", "week", "kind", "distance_km"]]
         .groupby(["year", "week", "kind"])
@@ -261,7 +263,7 @@ def plot_weekly_distance(df: pd.DataFrame) -> str:
         .encode(
             alt.X("year_week", title="Year and Week"),
             alt.Y("distance_km", title="Distance / km"),
-            alt.Color("kind", title="Kind"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year_week", title="Year and Week"),
                 alt.Tooltip("kind", title="Kind"),
