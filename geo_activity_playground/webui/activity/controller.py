@@ -12,6 +12,8 @@ import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
+from ...explorer.grid_file import make_grid_file_geojson
+from ...explorer.grid_file import make_grid_points
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_color_line
@@ -66,8 +68,26 @@ class ActivityController:
                 ]
                 == activity["id"]
             )
-            for zoom in [14, 17]
+            for zoom in sorted(self._config.explorer_zoom_levels)
         }
+
+        new_tiles_geojson = {}
+        for zoom in sorted(self._config.explorer_zoom_levels):
+            new_tiles = self._tile_visit_accessor.tile_state["tile_history"][zoom].loc[
+                self._tile_visit_accessor.tile_state["tile_history"][zoom][
+                    "activity_id"
+                ]
+                == activity["id"]
+            ]
+            if len(new_tiles):
+                points = make_grid_points(
+                    (
+                        (row["tile_x"], row["tile_y"])
+                        for index, row in new_tiles.iterrows()
+                    ),
+                    zoom,
+                )
+                new_tiles_geojson[zoom] = make_grid_file_geojson(points)
 
         result = {
             "activity": activity,
@@ -81,6 +101,7 @@ class ActivityController:
             "date": activity["start"].date(),
             "time": activity["start"].time(),
             "new_tiles": new_tiles,
+            "new_tiles_geojson": new_tiles_geojson,
         }
         if (
             heart_zones := _extract_heart_rate_zones(

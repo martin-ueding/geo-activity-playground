@@ -136,6 +136,39 @@
 <p>Not happy with the displayed data? <a href="{{ url_for('settings.sharepic') }}">Change share picture
         settings</a>.</p>
 
+{% if new_tiles_geojson %}
+<h2>New explorer tiles</h2>
+<p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective zoom
+    levels.</p>
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(`map-${id}`, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map)
+
+        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        map.fitBounds(geojson_layer.getBounds())
+        return map
+    }
+</script>
+
+<div class="row mb-3">
+    {% for zoom, geojson in new_tiles_geojson.items() %}
+    <div class="col-md-6">
+        <h3>Zoom {{ zoom }}</h3>
+        <div id="map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
+        <script>
+            let map{{ zoom }} = add_map("{{ zoom }}", {{ geojson | safe }})
+        </script>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% if similar_activites|length > 0 %}
 <div class="row mb-3">
     <div class="col">
