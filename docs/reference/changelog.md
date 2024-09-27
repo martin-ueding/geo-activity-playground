@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-164](https://github.com/martin-ueding/geo-activity-playground/issues/164): Create new function to handle write-and-replace on Windows.
 - [GH-155](https://github.com/martin-ueding/geo-activity-playground/issues/155): Use the same scale for all plots with kind, make this configurable in the settings menu.
 - Rewrite the documentation start page to make it more appealing and reflect the work in the web interface.
+- [GH-166](https://github.com/martin-ueding/geo-activity-playground/issues/166): Add map with new explorer tiles to activity view.
 
 ### Version 0.28
 
