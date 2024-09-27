@@ -9,7 +9,7 @@ First we need to install Python because that doesn't ship with Windows. Fortunat
 
 ![](windows-installation-01.png)
 
-Type “Python” into the search bar at the top. In the search results you likely see different Python versions like 3.11 and 3.10. The project is compatible with 3.11, 3.10 and 3.9; I'd suggest to just go with 3.11. In case that you have already installed one of the other compatible versions, you can skip this step.
+Type “Python” into the search bar at the top. In the search results you likely see different Python versions like 3.11 and 3.10. The project is compatible with 3.10 to 3.12; I'd suggest to just go with 3.12. In case that you have already installed one of the other compatible versions, you can skip this step.
 
 Here we select Python 3.11.
 
