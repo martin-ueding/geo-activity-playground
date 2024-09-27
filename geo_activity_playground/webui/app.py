@@ -5,7 +5,6 @@ import secrets
 
 from flask import Flask
 from flask import render_template
-from flask import request
 
 from ..core.activities import ActivityRepository
 from ..explorer.tile_visits import TileVisitAccessor
@@ -16,7 +15,7 @@ from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .heatmap.blueprint import make_heatmap_blueprint
-from .search_controller import SearchController
+from .search.blueprint import make_search_blueprint
 from .square_planner.blueprint import make_square_planner_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
@@ -26,18 +25,6 @@ from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint
 from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
-
-
-def route_search(app: Flask, repository: ActivityRepository) -> None:
-    search_controller = SearchController(repository)
-
-    @app.route("/search", methods=["POST"])
-    def search():
-        form_input = request.form
-        return render_template(
-            "search.html.j2",
-            **search_controller.render_search_results(form_input["name"])
-        )
 
 
 def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
@@ -67,7 +54,6 @@ def web_ui_main(
     host: str,
     port: int,
 ) -> None:
-
     repository.reload()
 
     app = Flask(__name__)
@@ -76,7 +62,6 @@ def web_ui_main(
 
     authenticator = Authenticator(config_accessor())
 
-    route_search(app, repository)
     route_start(app, repository, config_accessor())
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
@@ -110,6 +95,10 @@ def web_ui_main(
     app.register_blueprint(
         make_square_planner_blueprint(repository, tile_visit_accessor),
         url_prefix="/square-planner",
+    )
+    app.register_blueprint(
+        make_search_blueprint(repository),
+        url_prefix="/search",
     )
     app.register_blueprint(
         make_summary_blueprint(repository, config_accessor()),
