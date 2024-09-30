@@ -15,6 +15,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-155](https://github.com/martin-ueding/geo-activity-playground/issues/155): Use the same scale for all plots with kind, make this configurable in the settings menu.
 - Rewrite the documentation start page to make it more appealing and reflect the work in the web interface.
 - [GH-166](https://github.com/martin-ueding/geo-activity-playground/issues/166): Add map with new explorer tiles to activity view.
+- [GH-160](https://github.com/martin-ueding/geo-activity-playground/issues/160): Update version of `stravalib` and with that also `pydantic`. That fixes a bug with `recursive_guard`.
 
 ### Version 0.28
 
