@@ -6,7 +6,7 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Next
+### Version 0.29
 
 - Use dropdown menus to make navigation a bit smaller.
 - [GH-163](https://github.com/martin-ueding/geo-activity-playground/issues/163): Recompute explorer tiles when there are deleted activities. Previously this would lead to `KeyError` when trying to use the heatmap or the explorer tile maps.
