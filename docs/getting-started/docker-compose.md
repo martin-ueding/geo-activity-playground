@@ -26,9 +26,6 @@ services:
       - /docker/geo-activity-playground/playground:/data  # optional: change left side to your desired playground directory
     ports:
       - 5000:5000 # optional: change the exposed port on the left side
-    #labels:
-      #- com.centurylinklabs.watchtower.enable=true
-      # optional: automatic updates wiith watchtower container
     restart: unless-stopped
 ```
 
