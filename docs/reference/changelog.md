@@ -6,7 +6,7 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Next
+### Version 0.29
 
 - Use dropdown menus to make navigation a bit smaller.
 - [GH-163](https://github.com/martin-ueding/geo-activity-playground/issues/163): Recompute explorer tiles when there are deleted activities. Previously this would lead to `KeyError` when trying to use the heatmap or the explorer tile maps.
@@ -15,6 +15,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-155](https://github.com/martin-ueding/geo-activity-playground/issues/155): Use the same scale for all plots with kind, make this configurable in the settings menu.
 - Rewrite the documentation start page to make it more appealing and reflect the work in the web interface.
 - [GH-166](https://github.com/martin-ueding/geo-activity-playground/issues/166): Add map with new explorer tiles to activity view.
+- [GH-160](https://github.com/martin-ueding/geo-activity-playground/issues/160): Update version of `stravalib` and with that also `pydantic`. That fixes a bug with `recursive_guard`.
 
 ### Version 0.28
 
