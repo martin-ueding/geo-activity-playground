@@ -108,7 +108,7 @@ class ExplorerController:
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_visits = self._tile_visit_accessor.visits
+        tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
         tiles = tile_visits[zoom]
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
