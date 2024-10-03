@@ -25,7 +25,7 @@ In order to extract this data, I specify a list of regular expressions with name
 (?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
 ```
 
-Put something like that at the top of your `config.toml` in order to extract metadata from the files and have it override metadata from the within the files.
+Put something like these regular expressions into the settings menu.
 
 ## Supported file formats
 
