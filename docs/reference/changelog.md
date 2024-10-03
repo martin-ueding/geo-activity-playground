@@ -10,7 +10,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 #### Version 0.29.1
 
-- [GH-167](https://github.com/martin-ueding/geo-activity-playground/issues/167): Fix explorer tile export
+- [GH-167](https://github.com/martin-ueding/geo-activity-playground/issues/167): Fix explorer tile export.
+- [GH-169](https://github.com/martin-ueding/geo-activity-playground/issues/169): Fix import of KML files with waypoints.
 
 #### Version 0.29.0
 

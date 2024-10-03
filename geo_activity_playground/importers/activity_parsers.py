@@ -3,10 +3,10 @@ import gzip
 import logging
 import pathlib
 import xml
+from collections.abc import Iterator
 
 import charset_normalizer
 import dateutil.parser
-import fitdecode
 import fitdecode.exceptions
 import gpxpy
 import pandas as pd
@@ -246,24 +246,35 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     with opener(path, "rb") as f:
         kml_dict = xmltodict.parse(f)
     doc = kml_dict["kml"]["Document"]
-    keypoint_folder = doc["Folder"]
-    placemark = keypoint_folder["Placemark"]
-    track = placemark["gx:Track"]
     rows = []
-    for when, where in zip(track["when"], track["gx:coord"]):
-        time = dateutil.parser.parse(when)
-        time = convert_to_datetime_ns(time)
-        parts = where.split(" ")
-        if len(parts) == 2:
-            lon, lat = parts
-            alt = None
-        if len(parts) == 3:
-            lon, lat, alt = parts
-        row = {"time": time, "latitude": float(lat), "longitude": float(lon)}
-        if alt is not None:
-            row["altitude"] = float(alt)
-        rows.append(row)
+    for keypoint_folder in _list_or_scalar(doc["Folder"]):
+        for placemark in _list_or_scalar(keypoint_folder["Placemark"]):
+            for track in _list_or_scalar(placemark.get("gx:Track", [])):
+                for when, where in zip(track["when"], track["gx:coord"]):
+                    time = dateutil.parser.parse(when)
+                    time = convert_to_datetime_ns(time)
+                    parts = where.split(" ")
+                    if len(parts) == 2:
+                        lon, lat = parts
+                        alt = None
+                    if len(parts) == 3:
+                        lon, lat, alt = parts
+                    row = {
+                        "time": time,
+                        "latitude": float(lat),
+                        "longitude": float(lon),
+                    }
+                    if alt is not None:
+                        row["altitude"] = float(alt)
+                    rows.append(row)
     return pd.DataFrame(rows)
+
+
+def _list_or_scalar(thing) -> Iterator:
+    if isinstance(thing, list):
+        yield from thing
+    else:
+        yield thing
 
 
 def read_simra_activity(path: pathlib.Path, opener) -> pd.DataFrame:
