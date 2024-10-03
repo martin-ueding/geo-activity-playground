@@ -79,6 +79,8 @@ class SquarePlannerController:
             return make_grid_file_geojson(points)
         elif suffix == "gpx":
             return make_grid_file_gpx(points)
+        else:
+            raise RuntimeError(f"Unsupported suffix {suffix}.")
 
     def _get_explored_tiles(self, zoom: int) -> set[tuple[int, int]]:
         return set(self._tile_visits[zoom].keys())

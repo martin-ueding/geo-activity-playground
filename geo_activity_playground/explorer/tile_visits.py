@@ -59,7 +59,7 @@ class TileEvolutionState:
 class TileState(TypedDict):
     tile_visits: dict[int, dict[tuple[int, int], TileInfo]]
     tile_history: dict[int, pd.DataFrame]
-    activities_per_tile: dict[int, set[int]]
+    activities_per_tile: dict[int, dict[tuple[int, int], set[int]]]
     processed_activities: set[int]
     evolution_state: dict[int, TileEvolutionState]
     version: int
@@ -165,7 +165,7 @@ def _process_activity(
     for zoom in reversed(range(20)):
         activities_per_tile = tile_state["activities_per_tile"][zoom]
 
-        new_tile_history_soa = {
+        new_tile_history_soa: dict[str, list] = {
             "activity_id": [],
             "time": [],
             "tile_x": [],

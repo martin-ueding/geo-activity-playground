@@ -20,9 +20,8 @@ This module implements a "recursive descent parser" that parses this grammar.
 
 def parse_csv(text: str) -> list[list]:
     text = text.strip() + "\n"
-    result = {}
     index = 0
-    result = []
+    result: list[list] = []
     while index < len(text):
         line, index = _parse_line(text, index)
         result.append(line)

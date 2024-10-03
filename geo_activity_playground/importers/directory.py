@@ -126,11 +126,12 @@ def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]
             raise
 
         if len(timeseries) == 0:
-            return
+            return None
 
         timeseries.to_parquet(timeseries_path)
         with open(file_metadata_path, "wb") as f:
             pickle.dump(activity_meta_from_file, f)
+    return None
 
 
 def get_file_hash(path: pathlib.Path) -> int:

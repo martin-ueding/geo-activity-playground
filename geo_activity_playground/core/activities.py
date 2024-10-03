@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 import pickle
+from typing import Any
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -103,7 +104,7 @@ def build_activity_meta() -> None:
 
 class ActivityRepository:
     def __init__(self) -> None:
-        self.meta = None
+        self.meta = pd.DataFrame()
 
     def __len__(self) -> int:
         return len(self.meta)
@@ -114,10 +115,6 @@ class ActivityRepository:
     def has_activity(self, activity_id: int) -> bool:
         if len(self.meta):
             if activity_id in self.meta["id"]:
-                return True
-
-        for activity_meta in self._loose_activities:
-            if activity_meta["id"] == activity_id:
                 return True
 
         return False
@@ -198,7 +195,7 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
     return geojson.dumps(feature_collection)
 
 
-def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, str]:
+def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, Any]:
     speed_without_na = time_series["speed"].dropna()
     low = min(speed_without_na)
     high = max(speed_without_na)

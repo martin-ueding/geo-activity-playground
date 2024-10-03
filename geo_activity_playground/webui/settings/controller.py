@@ -1,6 +1,7 @@
 import json
 import re
 import urllib.parse
+from typing import Any
 from typing import Optional
 
 from flask import flash
@@ -70,7 +71,7 @@ class SettingsController:
         flash("Updated equipment offsets.", category="success")
 
     def render_heart_rate(self) -> dict:
-        result = {
+        result: dict[str, Any] = {
             "birth_year": self._config_accessor().birth_year,
             "heart_rate_resting": self._config_accessor().heart_rate_resting,
             "heart_rate_maximum": self._config_accessor().heart_rate_maximum,
@@ -90,7 +91,7 @@ class SettingsController:
         heart_rate_maximum: Optional[int],
     ) -> None:
         self._config_accessor().birth_year = birth_year
-        self._config_accessor().heart_rate_resting = heart_rate_resting
+        self._config_accessor().heart_rate_resting = heart_rate_resting or 0
         self._config_accessor().heart_rate_maximum = heart_rate_maximum
         self._config_accessor.save()
         flash("Updated heart rate data.", category="success")
@@ -251,7 +252,7 @@ class SettingsController:
         return f"https://www.strava.com/oauth/authorize?{arg_string}"
 
     def save_strava_code(self, code: str) -> None:
-        self._config_accessor().strava_client_id = self._strava_client_id
+        self._config_accessor().strava_client_id = int(self._strava_client_id)
         self._config_accessor().strava_client_secret = self._strava_client_secret
         self._config_accessor().strava_client_code = code
         self._config_accessor.save()
