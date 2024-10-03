@@ -95,7 +95,7 @@ class ExplorerController:
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_histories = self._tile_visit_accessor.histories
+        tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
         tiles = tile_histories[zoom]
         points = get_border_tiles(tiles, zoom, tile_bounds)
         if suffix == "geojson":
