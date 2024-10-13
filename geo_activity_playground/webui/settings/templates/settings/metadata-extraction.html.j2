@@ -4,8 +4,7 @@
 
 <h1 class="mb-3">Metadata Extraction</h1>
 
-<p>There are a few metadata fields that can be populated with information from the path of the activity file or by a
-    default value. These are:</p>
+<p>If the current activity metadata is not to your liking, you can adjust how these fields are populated:</p>
 
 <ul>
     <li><tt>kind</tt>: The kind of the activity, like "Ride" or "Run".</li>
@@ -13,8 +12,9 @@
     <li><tt>name</tt>: Name for the activity, like "Ride with Friends".</li>
 </ul>
 
-<p>By default these fields are populated with information from within the activity files. In case one hasn't set these
-    values correctly, it can be nice to override this data.</p>
+<p>By default these fields are extracted from files that contain this data. Otherwise the filename is set as <tt>name</tt>.
+    You can overwrite this by setting up a directory structure with corresponding regular expressions using named capture groups.</p>
+
 
 <form method="POST">
     <div class="row">
@@ -32,19 +32,18 @@
         </div>
 
         <div class="col-md-6">
-            <p>To give an example of what is possible, consider a directory structure where we have
-                <tt>{kind}/{equipment}/{date} {name}.{ext}</tt>. Such an activity could be <tt>Ride/Red
-                    Roadbike/2024-08-10 11-45-00 Ride with Friends.fit</tt>. In order to extract this, we could use the
-                following regular expression:
-            </p>
+            <p>Consider a directory structure <tt>Ride/Red Roadbike/2024-08-10 11-45-00 Ride with Friends.fit</tt> under Activities. 
+                You can extract <tt>kind</tt>: "Ride", <tt>equipment</tt>: "Red Roadbike", <tt>name</tt>: "Ride with Friends" 
+                with the following regular expression:</p>
 
             <div class="code">
                 <pre
                     class="code literal-block">(?P&lt;kind&gt;[^/]+)/(?P&lt;equipment&gt;[^/]+)/[-\d_ .]+(?P&lt;name&gt;[^/\.]+)</pre>
             </div>
 
-            <p>This uses "capture groups". Have a look at the <a href="https://docs.python.org/3/library/re.html">Python
-                    regex documentation</a> if you want to build your own.</p>
+            <p>Have a look at the documentation 
+                <a href="https://martin-ueding.github.io/geo-activity-playground/getting-started/advanced-metadata-extraction">Advanced Metadata Extraction</a> 
+                for explanations and examples.</p>
         </div>
     </div>
 
