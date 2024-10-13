@@ -1,40 +1,46 @@
 # Using Activity Files
 
-Outdoor activities are usually recorded as GPX or FIT files. Some apps like OsmAnd give you these files.
-
-Create a directory somewhere, this will be your _playground_. I have mine in `~/Dokumente/Karten/Playground`, but you can put yours wherever you would like.
-
-Inside `Playground`, create another directory `Activities` where your activity files will go. You will need to put at least one activity file in there, otherwise the program cannot start. The program will not modify files in that directory and treat them as read-only.
-
-## Directory structure
-
-Some activity file formats contain metadata. You can also add metadata via the file name and by putting into a directory. By default only the stem of the path (the part without the suffix) will be used to derive the name of the activity. If you want, you can use a naming and directory structure to fill in more meta data using regular expressions.
-
-Each activity has the metadata fields `kind`, `equipment` and `name`. The kind and equipment are extracted from the activity file. If there nothing is found, it defaults to “Unknown”. Using a regular expression with named capture groups one can extract these fields also from the files. I for instance have the following file paths:
-
-- `Ride/Trekking Bike/Home to Bakery/2024-03-03-17-42-10.fit`
-- `Hike/Hiking Boots 2019/2024-03-03-11-03-18 Some nice place with Alice and Bob.fit`
-
-My structure is built such that the first directory level corresponds to the activity kind. The second level is the equipment used. Unique activities are directly in there as files. But there can also be a directory for the name and then just files with only the date as name. This way I can just put a lot of similar commutes there without having to name the files. In the first example I want it to take the name from the third directory. In either case I don't want to have the date to be part of the name.
-
-In order to extract this data, I specify a list of regular expressions with named capture groups like `(?P<name>…)` where `name` is the field that you want to populate and `…` some regular expression. The program will try to _search_ (not _match_) the whole relative path of the activity to the regular expressions in the order given in the list. When it finds a match, it will take the capture groups, populate the metadata and stop evaluating more of the expressions. In my case they look like this:
-
-```
-(?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/]+)/
-(?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
-(?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
-```
-
-Put something like these regular expressions into the settings menu.
+Outdoor activities are usually recorded as `.GPX` or `.FIT` files. Some apps like [OsmAnd](https://osmand.net/) , [OpenTracks](https://opentracksapp.com/) or [Organic Maps](https://organicmaps.app/), GPS handhelds, smartwatches or cycling computers give you these files.
 
 ## Supported file formats
 
-At the moment the following file formats are supported:
+- FIT
+- GPX
+- TCX
+- KML
+- KMZ
+- [Simra](https://www.digital-future.berlin/forschung/projekte/simra/) CSV export
 
-1. FIT
-2. GPX
-3. TCX
+# Add Activity Files
+
+Before starting the service you need to create a folder for your activities and put at least one activity file in there.
+
+Create a `Playground` folder on your storage somewhere and add a subfolder `Activities`. There you can add your activity files.
+For example:
+
+```
+~/
+├─ Documents[or other location]/
+│  ├─ Playground/
+│  │  ├─ Activities/
+│  │  │  ├─ 2024-03-03-17-42-10 Home to Bakery.gpx
+```
+
+The program will treat the files as read-only and does not modify them.
+
+Once the service is running you can use the [Uploader](https://martin-ueding.github.io/geo-activity-playground/features/upload/) to add your files.
+You can manually rename, move or delete your activity files, but the program needs to reload to respect these changes.
+You can restart the program or visit `Scan New Activities` in the admin menu of the WebUI.
+
+# Metadata extraction
+
+Most activity file formats contain basic data like `date`, `time` and `track points`. Each activity in geo-activity-playground also has the metadata fields `kind`, `equipment` and `name`. They can be extracted from files that contain them.
+
+If no metadata is found, `kind` and `equipment` default to `Unknown`. The `name` is then extracted from the file name (without the suffix).
+So for `Activities/2024-03-03-17-42-10 Home to Bakery.gpx` the `name` is `2024-03-03-17-42-10 Home to Bakery`.
 
 ## Next steps
 
 Once you have your files put into the directory, you're all set and can proceed with the next steps.
+
+You can extend the directory structure to categorize your activities, see [Advanced Metadata Extraction](https://martin-ueding.github.io/geo-activity-playground/getting-started/advanced-metadata-extraction).
