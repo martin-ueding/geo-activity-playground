@@ -26,6 +26,7 @@ nav:
       - getting-started/installing-stable-on-windows.md
       - getting-started/installing-git-on-linux.md
       - getting-started/docker.md
+      - getting-started/docker-compose-tailscale.md
       - getting-started/using-activity-files.md
       - getting-started/using-strava-api.md
       - getting-started/moving-from-strava.md
