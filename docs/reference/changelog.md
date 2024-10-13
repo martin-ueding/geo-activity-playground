@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-184](https://github.com/martin-ueding/geo-activity-playground/issues/184): Use Python 3.12 in Docker.
 - [GH-178](https://github.com/martin-ueding/geo-activity-playground/issues/178): Fix display of number of new tiles in activity view.
 - [GH-177](https://github.com/martin-ueding/geo-activity-playground/issues/177): Fix distance from new `stravalib` version
+- [GH-179](https://github.com/martin-ueding/geo-activity-playground/issues/179): Work around Pandas deprecation message
 
 ### Version 0.29
 

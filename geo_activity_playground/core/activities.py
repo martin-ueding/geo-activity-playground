@@ -89,7 +89,10 @@ def build_activity_meta() -> None:
         new_shard = pd.DataFrame(rows)
         new_shard.index = new_shard["id"]
         new_shard.index.name = "index"
-        meta = pd.concat([meta, new_shard])
+        if len(meta):
+            meta = pd.concat([meta, new_shard])
+        else:
+            meta = new_shard
 
     if len(meta):
         assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
