@@ -46,9 +46,9 @@ Activities/
 (?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/.]+)
 ```
 
-- kind = `Ride`
-- equipment = `Trekking Bike`
-- name = `2024-03-03-17-42-10 Home to Bakery`
+- kind: `Ride`
+- equipment: `Trekking Bike`
+- name: `2024-03-03-17-42-10 Home to Bakery`
 
 ### Filename without date as Name (useful for OsmAnd naming)
 
@@ -68,9 +68,9 @@ Activities/
 (?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
 ```
 
-- kind = `Ride`
-- equipment = `Trekking Bike`
-- names = `Home to Bakery` ; ` ` ; `Sun OsmAnd default track` ; `Mon`
+- kind: `Ride`
+- equipment: `Trekking Bike`
+- names: `Home to Bakery` ; ` ` ; `Sun OsmAnd default track` ; `Mon`
 
 Attention, name may be empty if it is not included in the file name.
 For OsmAnd default naming the weekday is included in the name.
@@ -92,9 +92,9 @@ Activities/
 (?P<kind>[^/]+)/(?P<equipment>[^/]+)/\S+ ?(?P<name>[^/\.]*)
 ```
 
-- kind = `Ride`
-- equipment = `Trekking Bike`
-- names = `Home to Bakery` ; ` ` ; `OsmAnd default track`
+- kind: `Ride`
+- equipment: `Trekking Bike`
+- names: `Home to Bakery` ; ` ` ; `OsmAnd default track`
 
 Attention, name may be empty if it is not included in the file name (also for OsmAnd default naming).
 
@@ -115,9 +115,9 @@ Activities/
 (?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/]+)/
 ```
 
-- kind = Ride
-- equipment = Trekking Bike
-- name = Commute (for all activities in Commute directory )
+- kind: `Ride`
+- equipment: `Trekking Bike`
+- name: `Commute` (for all activities in Commute directory )
 
 ### Activities without equipment
 
@@ -134,9 +134,9 @@ Activities/
 (?P<kind>[^/]+)/[-\d_ ]+(?P<name>[^/]+)(?:\.\w+)+$
 ```
 
-- kind = Run
-- equipment = Unknown
-- names = To the lake , To the top of the hill
+- kind: `Run`
+- equipment: `Unknown`
+- names: `To the lake` ; `To the top of the hill`
 
 ## Next Steps
 
