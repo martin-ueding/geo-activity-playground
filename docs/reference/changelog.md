@@ -14,6 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-177](https://github.com/martin-ueding/geo-activity-playground/issues/177): Fix distance from new `stravalib` version.
 - [GH-179](https://github.com/martin-ueding/geo-activity-playground/issues/179): Work around Pandas deprecation message.
 - [GH-176](https://github.com/martin-ueding/geo-activity-playground/issues/176): Do not modify filename on upload any more.
+- [GH-175](https://github.com/martin-ueding/geo-activity-playground/issues/175): Mention Organic Maps.
 
 ### Version 0.29
 
