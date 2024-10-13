@@ -20,10 +20,11 @@ The program uses regular expressions to search for patterns in the relative path
 
 You can use python to test your regular expressions. Read the [python re documentation](https://docs.python.org/3/library/re.html) for some help.
 
-```
+```python
 import re
 re.search(r'(?P<kind>[^/]+)/(?P<equipment>[^/]+)/(?P<name>[^/.]+)', '/Ride/Trekking Bike/2024-03-03-17-42-10 Home to Bakery.gpx').groupdict()
-
+```
+```
 {'kind': 'Ride', 'equipment': 'Trekking Bike', 'name': '2024-03-03-17-42-10 Home to Bakery'}
 ```
 
