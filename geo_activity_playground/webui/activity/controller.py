@@ -72,6 +72,7 @@ class ActivityController:
         }
 
         new_tiles_geojson = {}
+        new_tiles_per_zoom = {}
         for zoom in sorted(self._config.explorer_zoom_levels):
             new_tiles = self._tile_visit_accessor.tile_state["tile_history"][zoom].loc[
                 self._tile_visit_accessor.tile_state["tile_history"][zoom][
@@ -88,6 +89,7 @@ class ActivityController:
                     zoom,
                 )
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
+            new_tiles_per_zoom[zoom] = len(new_tiles)
 
         result = {
             "activity": activity,
@@ -100,7 +102,7 @@ class ActivityController:
             "speed_color_bar": make_speed_color_bar(time_series),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
-            "new_tiles": new_tiles,
+            "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
         }
         if (
