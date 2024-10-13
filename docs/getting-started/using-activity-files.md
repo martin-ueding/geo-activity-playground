@@ -34,7 +34,7 @@ You can restart the program or visit `Scan New Activities` in the admin menu of 
 
 # Metadata extraction
 
-Most activity file formats contain basic data like `date`, `time` and `track points`. Each activity in geo-activity-playground also has the metadata fields `kind`, `equipment`and`name`. They can be extracted from files that contain them.
+Most activity file formats contain basic data like `date`, `time` and `track points`. Each activity in geo-activity-playground also has the metadata fields `kind`, `equipment` and `name`. They can be extracted from files that contain them.
 
 If no metadata is found, `kind` and `equipment` default to `Unknown`. The `name` is then extracted from the file name (without the suffix).
 So for `Activities/2024-03-03-17-42-10 Home to Bakery.gpx` the `name` is `2024-03-03-17-42-10 Home to Bakery`.
