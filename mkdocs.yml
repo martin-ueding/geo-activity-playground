@@ -27,6 +27,7 @@ nav:
       - getting-started/installing-git-on-linux.md
       - getting-started/docker.md
       - getting-started/using-activity-files.md
+      - getting-started/advanced-metadata-extraction.md
       - getting-started/using-strava-api.md
       - getting-started/moving-from-strava.md
       - getting-started/starting-the-webserver.md
