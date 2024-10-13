@@ -18,7 +18,7 @@ Activities/
 
 The program uses regular expressions to search for patterns in the relative path (in Activities) and extracts the relevant parts with named capture groups `(?P<kind>)`, `(?P<equipment>)`, `(?P<name>)`.
 
-You can use python to test your regular expressions. Read the [python re documentation](https://docs.python.org/3/library/re.html) for some help.
+You can use python to test your regular expressions. Read the [python re documentation](https://docs.python.org/3/library/re.html) for help.
 
 ```python
 import re
