@@ -60,7 +60,7 @@ class UploadController:
             flash("No selected file", "warning")
             return redirect("/upload")
         if file:
-            filename = secure_filename(file.filename)
+            filename = file.filename
             target_path = pathlib.Path(request.form["directory"]) / filename
             assert target_path.suffix in [
                 ".csv",
