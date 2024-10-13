@@ -1,6 +1,6 @@
 # Using Activity Files
 
-Outdoor activities are usually recorded as `.GPX` or `.FIT` files. Some apps like [OsmAnd](https://osmand.net/) , [OpenTracks](https://opentracksapp.com/) or [Organic Maps](https://organicmaps.app/) give you these files.
+Outdoor activities are usually recorded as `.GPX` or `.FIT` files. Some apps like [OsmAnd](https://osmand.net/) , [OpenTracks](https://opentracksapp.com/) or [Organic Maps](https://organicmaps.app/), GPS handhelds, smartwatches or cycling computers give you these files.
 
 ## Supported file formats
 
