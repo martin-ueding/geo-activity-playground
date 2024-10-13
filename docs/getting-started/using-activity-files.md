@@ -11,7 +11,7 @@ Outdoor activities are usually recorded as `.GPX` or `.FIT` files. Some apps lik
 - KMZ
 - [Simra](https://www.digital-future.berlin/forschung/projekte/simra/) CSV export
 
-# Add Activity Files
+## Add Activity Files
 
 Before starting the service you need to create a folder for your activities and put at least one activity file in there.
 
@@ -32,7 +32,7 @@ Once the service is running you can use the [Uploader](https://martin-ueding.git
 You can manually rename, move or delete your activity files, but the program needs to reload to respect these changes.
 You can restart the program or visit `Scan New Activities` in the admin menu of the WebUI.
 
-# Metadata extraction
+## Metadata extraction
 
 Most activity file formats contain basic data like `date`, `time` and `track points`. Each activity in geo-activity-playground also has the metadata fields `kind`, `equipment` and `name`. They can be extracted from files that contain them.
 
