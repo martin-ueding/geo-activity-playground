@@ -1,5 +1,5 @@
 # Use the official Python image for ARM64
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app
