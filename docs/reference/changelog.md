@@ -11,6 +11,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - Documentation improvements by [beautiful-orca](https://github.com/beautiful-orca): [GH-180](https://github.com/martin-ueding/geo-activity-playground/pull/180), [GH-181](https://github.com/martin-ueding/geo-activity-playground/pull/181), [GH-182](https://github.com/martin-ueding/geo-activity-playground/pull/182), [GH-183](https://github.com/martin-ueding/geo-activity-playground/pull/183), [GH-185](https://github.com/martin-ueding/geo-activity-playground/pull/185)
 - [GH-184](https://github.com/martin-ueding/geo-activity-playground/issues/184): Use Python 3.12 in Docker.
 - [GH-178](https://github.com/martin-ueding/geo-activity-playground/issues/178): Fix display of number of new tiles in activity view.
+- [GH-177](https://github.com/martin-ueding/geo-activity-playground/issues/177): Fix distance from new `stravalib` version
 
 ### Version 0.29
 
