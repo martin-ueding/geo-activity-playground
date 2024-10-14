@@ -126,7 +126,7 @@ docker compose build
 docker compose up -d
 ```
 
-This will start the webserver and expose it via your tailnet on <https://[HOSTNAME].[YourTailnetName].ts.net/>, eg. <https://geo-activity-playground.tail41a3.ts.net/>.
+This will start the webserver and expose it via your tailnet on `https://[HOSTNAME].[YourTailnetName].ts.net/`, eg. `https://geo-activity-playground.tail41a3.ts.net/`.
 In order to access your instance via that domain, you have to install and authenticate the Tailscale client app on your device you want to open it from.
 
 ## Updating the image
