@@ -368,11 +368,74 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting-started/docker-compose/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker Compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/docker-compose-tailscale/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker Compose and Tailscale VPN
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting-started/using-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Using Activity Files
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/advanced-metadata-extraction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Metadata extraction
   </span>
   
 
@@ -1008,10 +1071,11 @@
 <p>Then plan a route that goes through as many tiles as possible. Download the route as GPX and use an app like OsmAnd to ride along it.</p>
 <h3 id="missing-tiles-on-the-go">Missing tiles on the go</h3>
 <p>The above is nice to plan the route, perhaps you also want to take the missing tiles along to do spontaneous tile hunting.</p>
-<p>One method is to use Open Street Map uMap, either the one hosted in <a href="https://umap.openstreetmap.de/">Germany</a> or <a href="https://umap.openstreetmap.fr/">France</a>. Then you can create a new personal map (consider limiting the access rights, default is public) and upload the GeoJSON file. Then you can use that map on the code to see your position and the missing tiles:</p>
+<p>A possibility should be <a href="https://organicmaps.app/">Organic Maps</a> which is a FOSS app that can display offline maps and also show GPX files.</p>
+<p>Another method is to use Open Street Map uMap, either the one hosted in <a href="https://umap.openstreetmap.de/">Germany</a> or <a href="https://umap.openstreetmap.fr/">France</a>. Then you can create a new personal map (consider limiting the access rights, default is public) and upload the GeoJSON file. Then you can use that map on the code to see your position and the missing tiles:</p>
 <p><img alt="" src="../umap-with-tiles.jpg" /></p>
-<p>Another option is <a href="https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps">Offline Maps</a>. That is able to display GeoJSON on Android, though one needs to buy the add-on for like 5 EUR.</p>
-<p>On Android I use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately <a href="https://osmand.net/docs/technical/osmand-file-formats/">GeoJSON is not supported</a>, therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:</p>
+<p>Yet another option is <a href="https://play.google.com/store/apps/details?id=net.psyberia.offlinemaps">Offline Maps</a>. That is able to display GeoJSON on Android, though one needs to buy the add-on for like 5 EUR.</p>
+<p>On Android one can use the OsmAnd app to display tracks and also try to visualize the missing tiles. Unfortunately <a href="https://osmand.net/docs/technical/osmand-file-formats/">GeoJSON is not supported</a>, therefore one has to play some tricks. The missing tiles are also exported as a GPX file with a track for each missing tile. This looks strange, but it is a bit helpful with OsmAnd. This is how the file looks like in GPXSee:</p>
 <p><img alt="" src="../explorer-sint-annaland-missing-gpx.png" /></p>
 <p>And on OsmAnd such files look like this:</p>
 <p><img alt="" src="../explorer-osmand.jpg" /></p>
