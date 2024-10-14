@@ -6,7 +6,9 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.30
+### Version 0.29
+
+#### Version 0.29.2
 
 - Documentation improvements by [beautiful-orca](https://github.com/beautiful-orca): [GH-180](https://github.com/martin-ueding/geo-activity-playground/pull/180), [GH-181](https://github.com/martin-ueding/geo-activity-playground/pull/181), [GH-182](https://github.com/martin-ueding/geo-activity-playground/pull/182), [GH-183](https://github.com/martin-ueding/geo-activity-playground/pull/183), [GH-185](https://github.com/martin-ueding/geo-activity-playground/pull/185)
 - [GH-184](https://github.com/martin-ueding/geo-activity-playground/issues/184): Use Python 3.12 in Docker.
@@ -15,8 +17,6 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-179](https://github.com/martin-ueding/geo-activity-playground/issues/179): Work around Pandas deprecation message.
 - [GH-176](https://github.com/martin-ueding/geo-activity-playground/issues/176): Do not modify filename on upload any more.
 - [GH-175](https://github.com/martin-ueding/geo-activity-playground/issues/175): Mention Organic Maps.
-
-### Version 0.29
 
 #### Version 0.29.1
 
