@@ -6,6 +6,8 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+- [GH-187](https://github.com/martin-ueding/geo-activity-playground/issues/187): Update favicon to new logo.
+
 ### Version 0.29
 
 #### Version 0.29.2
