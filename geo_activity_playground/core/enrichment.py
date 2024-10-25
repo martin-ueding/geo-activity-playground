@@ -86,7 +86,7 @@ def enrich_activities(config: Config) -> None:
         if metadata["kind"] in config.kinds_without_achievements:
             metadata["consider_for_achievements"] = False
         time_series = _embellish_single_time_series(
-            time_series, metadata.get("start", None)
+            time_series, metadata.get("start", None), config.time_diff_threshold_seconds
         )
         metadata.update(_get_metadata_from_timeseries(time_series))
 
@@ -131,7 +131,9 @@ def _compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:
 
 
 def _embellish_single_time_series(
-    timeseries: pd.DataFrame, start: Optional[datetime.datetime] = None
+    timeseries: pd.DataFrame,
+    start: Optional[datetime.datetime],
+    time_diff_threshold_seconds: int,
 ) -> pd.DataFrame:
     if start is not None and pd.api.types.is_dtype_equal(
         timeseries["time"].dtype, "int64"
@@ -153,10 +155,12 @@ def _embellish_single_time_series(
         timeseries["latitude"],
         timeseries["longitude"],
     ).fillna(0.0)
-    time_diff_threshold_seconds = 30
-    time_diff = (timeseries["time"] - timeseries["time"].shift(1)).dt.total_seconds()
-    jump_indices = time_diff >= time_diff_threshold_seconds
-    distances.loc[jump_indices] = 0.0
+    if time_diff_threshold_seconds:
+        time_diff = (
+            timeseries["time"] - timeseries["time"].shift(1)
+        ).dt.total_seconds()
+        jump_indices = time_diff >= time_diff_threshold_seconds
+        distances.loc[jump_indices] = 0.0
 
     if "distance_km" not in timeseries.columns:
         timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
@@ -173,7 +177,10 @@ def _embellish_single_time_series(
         timeseries = timeseries.loc[~potential_jumps].copy()
 
     if "segment_id" not in timeseries.columns:
-        timeseries["segment_id"] = np.cumsum(jump_indices)
+        if time_diff_threshold_seconds:
+            timeseries["segment_id"] = np.cumsum(jump_indices)
+        else:
+            timeseries["segment_id"] = 0
 
     if "x" not in timeseries.columns:
         x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)

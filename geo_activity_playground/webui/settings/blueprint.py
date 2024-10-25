@@ -173,6 +173,19 @@ def make_settings_blueprint(
             **settings_controller.render_privacy_zones(),
         )
 
+    @blueprint.route("/segmentation", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def segmentation():
+        if request.method == "POST":
+            threshold = int(request.form.get("threshold", 0))
+            config_accessor().time_diff_threshold_seconds = threshold
+            config_accessor.save()
+            flash(f"Threshold set to {threshold}.", category="success")
+        return render_template(
+            "settings/segmentation.html.j2",
+            threshold=config_accessor().time_diff_threshold_seconds,
+        )
+
     @blueprint.route("/sharepic", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def sharepic():

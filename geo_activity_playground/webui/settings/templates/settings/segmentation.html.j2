@@ -1,0 +1,27 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Track segmentation</h1>
+
+<p>Some activity tracking apps or devices automatically pause the recording when there is no movement for a while. Other
+    trackers do not record new points when one goes in a straight line. And some users manually pause the activity,
+    forget to resume and resume after having moved for a while.</p>
+
+<p>Depending on the usage patterns one wants to segment the tracks into segments or really keep them as one long track.
+    In order to cater for different use cases, this can be changed with a setting.</p>
+
+<p>In the following you can enter a threshold. If these many seconds elapse between two subsequent points in the track,
+    these will be considered different segments and not be connected with a straight line. Entering "0" disabled
+    segmentation.</p>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="threshold" class="form-label">Threshold / s</label>
+        <input type="text" class="form-control" id="threshold" name="threshold" value="{{ threshold }}" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}
