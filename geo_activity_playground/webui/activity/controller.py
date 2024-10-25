@@ -115,6 +115,8 @@ class ActivityController:
             result["altitude_time_plot"] = altitude_time_plot(time_series)
         if "heartrate" in time_series.columns:
             result["heartrate_time_plot"] = heart_rate_time_plot(time_series)
+        if "cadence" in time_series.columns:
+            result["cadence_time_plot"] = cadence_time_plot(time_series)
         return result
 
     def render_sharepic(self, id: int) -> bytes:
@@ -317,6 +319,20 @@ def heart_rate_time_plot(time_series: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y("heartrate", scale=alt.Scale(zero=False), title="Heart rate"),
+            alt.Color("segment_id:N", title="Segment"),
+        )
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
+
+
+def cadence_time_plot(time_series: pd.DataFrame) -> str:
+    return (
+        alt.Chart(time_series, title="Cadence")
+        .mark_line()
+        .encode(
+            alt.X("time", title="Time"),
+            alt.Y("cadence", title="Cadence"),
             alt.Color("segment_id:N", title="Segment"),
         )
         .interactive(bind_y=False)
