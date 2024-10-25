@@ -1,0 +1,25 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Kind renaming</h1>
+
+<p>If you have used different apps for tracking, you might have that your bike rides have <i>kind</i> "ride", "Ride",
+    "Radfahrt" and so on. In order to unify these, you can specify mappings from old to new names.</p>
+
+<p>If you want to unify these to "Ride", enter the following:</p>
+
+<pre><code>
+ride =&gt; Ride
+Radfahrt =&gt; Ride
+</code></pre>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="rules" class="form-label">Rules</label>
+        <textarea class="form-control" id=rules" cols="80" rows="10" name="rules_str">{{ rules_str }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}
