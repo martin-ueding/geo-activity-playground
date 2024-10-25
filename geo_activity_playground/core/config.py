@@ -39,7 +39,7 @@ class Config:
     strava_client_id: int = 131693
     strava_client_secret: str = "0ccc0100a2c218512a7ef0cea3b0e322fb4b4365"
     strava_client_code: Optional[str] = None
-    time_diff_threshold_seconds: Optional[int] = 0
+    time_diff_threshold_seconds: Optional[int] = 30
     upload_password: Optional[str] = None
 
 
