@@ -8,7 +8,6 @@ import typing
 
 
 def dir_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
-    @functools.cache
     def wrapper() -> pathlib.Path:
         path.mkdir(exist_ok=True, parents=True)
         return path
@@ -17,7 +16,6 @@ def dir_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
 
 
 def file_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
-    @functools.cache
     def wrapper() -> pathlib.Path:
         path.parent.mkdir(exist_ok=True, parents=True)
         return path

@@ -1,3 +1,4 @@
+import shutil
 from typing import Optional
 
 from flask import Blueprint
@@ -8,6 +9,7 @@ from flask import request
 from flask import url_for
 
 from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.core.paths import _activity_enriched_dir
 from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.authenticator import needs_authentication
 from geo_activity_playground.webui.settings.controller import SettingsController
@@ -181,6 +183,8 @@ def make_settings_blueprint(
             config_accessor().time_diff_threshold_seconds = threshold
             config_accessor.save()
             flash(f"Threshold set to {threshold}.", category="success")
+            shutil.rmtree(_activity_enriched_dir)
+            return redirect(url_for("upload.reload"))
         return render_template(
             "settings/segmentation.html.j2",
             threshold=config_accessor().time_diff_threshold_seconds,
