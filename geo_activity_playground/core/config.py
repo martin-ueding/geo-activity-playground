@@ -29,6 +29,7 @@ class Config:
     )
     heart_rate_resting: int = 0
     heart_rate_maximum: Optional[int] = None
+    kind_renames: dict[str, str] = dataclasses.field(default_factory=dict)
     kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
     metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
     num_processes: Optional[int] = 1

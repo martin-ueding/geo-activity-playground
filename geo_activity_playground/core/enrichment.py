@@ -82,6 +82,10 @@ def enrich_activities(config: Config) -> None:
             )
             continue
 
+        # Rename kinds if needed.
+        if metadata["kind"] in config.kind_renames:
+            metadata["kind"] = config.kind_renames[metadata["kind"]]
+
         # Enrich time series.
         if metadata["kind"] in config.kinds_without_achievements:
             metadata["consider_for_achievements"] = False
