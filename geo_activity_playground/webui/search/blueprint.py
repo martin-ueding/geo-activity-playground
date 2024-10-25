@@ -75,33 +75,17 @@ def make_search_blueprint(repository: ActivityRepository) -> Blueprint:
                 selection = activities["start"] < end_dt
                 activities = activities.loc[selection]
 
-        sortkey = request.args.get("sortkey_value", "start")
-        ascending = bool(request.args.get("ascending", False))
-        activities = activities.sort_values(sortkey, ascending=ascending)
+        activities = activities.sort_values("start", ascending=False)
 
         return render_template(
             "search/index.html.j2",
             activities=list(activities.iterrows()),
-            ascending=ascending,
             equipments=request.args.getlist("equipment"),
             equipments_avail=sorted(equipments_avail),
             kinds=request.args.getlist("kind"),
             kinds_avail=sorted(kinds_avail),
             name=name,
             name_exact=name_exact,
-            sortkeys=sorted(
-                {
-                    "start": "Starting time",
-                    "distance_km": "Distance",
-                    "name": "Name",
-                    "kind": "Kind",
-                    "calories": "Calories",
-                    "elapsed_time": "Elapsed time",
-                    "equipment": "Equipment",
-                    "steps": "Steps",
-                }.items()
-            ),
-            sortkey_selected=sortkey,
             begin=begin,
             end=end,
         )

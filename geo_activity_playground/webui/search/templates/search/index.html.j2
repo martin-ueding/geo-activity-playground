@@ -52,33 +52,12 @@
                 {% endfor %}
             </div>
 
-            <div class="mb-3">
-                <label for="sortby" class="form-label">Sort by</label>
-                <select id="sortby" name="sortkey_value">
-                    {% for sortkey_value, sortkey_name in sortkeys %}
-                    <option value="{{ sortkey_value }}" {% if sortkey_value==sortkey_selected %} selected {% endif %}>{{
-                        sortkey_name
-                        }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="ascending" value="ascending" id="ascending" {%
-                        if ascending %} checked {% endif %}>
-                    <label class="form-check-label" for="ascending">
-                        Ascending
-                    </label>
-                </div>
-            </div>
-
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
     </div>
 
     <div class="col-md-10">
-        <table class="table">
+        <table class="table table-sort table-arrows">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -86,7 +65,6 @@
                     <th>Kind</th>
                     <th>Distance</th>
                     <th>Elapsed time</th>
-                    <th>Commute</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,7 +75,6 @@
                     <td>{{ activity['kind'] }}</td>
                     <td>{{ '%.1f' % activity["distance_km"] }} km</td>
                     <td>{{ activity.elapsed_time }}</td>
-                    <td>{{ activity.commute }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

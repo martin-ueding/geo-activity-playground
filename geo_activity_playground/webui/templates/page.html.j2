@@ -32,9 +32,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
-
     <script src="/static/bootstrap-dark-mode.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/table-sort-js/table-sort.min.js"></script>
 
     <!-- Favicon. -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
@@ -68,7 +68,8 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ url_for('calendar.index') }}">Calendar</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('search.index') }}">Overview & Search</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('search.index') }}">Overview & Search</a>
+                                </li>
                             </ul>
                         </li>
 
