@@ -141,6 +141,33 @@ def make_settings_blueprint(
             "settings/heart-rate.html.j2", **settings_controller.render_heart_rate()
         )
 
+    @blueprint.route("/kind-renames", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def kind_renames():
+        if request.method == "POST":
+            rules_str = request.form["rules_str"]
+            rules = {}
+            try:
+                for line in rules_str.strip().split("\n"):
+                    first, second = line.split(" => ")
+                    rules[first.strip()] = second.strip()
+                config_accessor().kind_renames = rules
+                config_accessor.save()
+                flash(f"Kind renames updated.", category="success")
+                shutil.rmtree(_activity_enriched_dir)
+                return redirect(url_for("upload.reload"))
+            except ValueError as e:
+                flash(f"Cannot parse this. Please try again.", category="danger")
+        else:
+            rules_str = "\n".join(
+                f"{key} =&gt; {value}"
+                for key, value in config_accessor().kind_renames.items()
+            )
+        return render_template(
+            "settings/kind-renames.html.j2",
+            rules_str=rules_str,
+        )
+
     @blueprint.route("/kinds-without-achievements", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def kinds_without_achievements():
