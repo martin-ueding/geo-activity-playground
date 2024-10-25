@@ -12,6 +12,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-174](https://github.com/martin-ueding/geo-activity-playground/issues/174): Add new search functionality that also serves as an overview over all activities.
 - [GH-168](https://github.com/martin-ueding/geo-activity-playground/issues/168): Clicking on table headers will sort the tables now.
 - [GH-162](https://github.com/martin-ueding/geo-activity-playground/issues/162): Make track segmentation configurable with a configuration setting.
+- Visualize cadence on the activity page.
 
 ### Version 0.29
 
