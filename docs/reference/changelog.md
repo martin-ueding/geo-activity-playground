@@ -6,7 +6,12 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.30.0
+
 - [GH-187](https://github.com/martin-ueding/geo-activity-playground/issues/187): Update favicon to new logo.
+- [GH-174](https://github.com/martin-ueding/geo-activity-playground/issues/174): Add new search functionality that also serves as an overview over all activities.
+- [GH-168](https://github.com/martin-ueding/geo-activity-playground/issues/168): Clicking on table headers will sort the tables now.
+- [GH-162](https://github.com/martin-ueding/geo-activity-playground/issues/162): Make track segmentation configurable with a configuration setting. The new default is to not use segmentation. Before it was a 30 s default.
 
 ### Version 0.29
 
