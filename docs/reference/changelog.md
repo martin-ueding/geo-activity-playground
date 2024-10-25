@@ -13,6 +13,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-168](https://github.com/martin-ueding/geo-activity-playground/issues/168): Clicking on table headers will sort the tables now.
 - [GH-162](https://github.com/martin-ueding/geo-activity-playground/issues/162): Make track segmentation configurable with a configuration setting.
 - Visualize cadence on the activity page.
+- [GH-188](https://github.com/martin-ueding/geo-activity-playground/issues/188): Remove `root=` prefix in activity kind when importing from Strava.
 
 ### Version 0.29
 
