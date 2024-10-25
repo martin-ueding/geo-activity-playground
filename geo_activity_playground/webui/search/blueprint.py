@@ -41,11 +41,18 @@ def make_search_blueprint(repository: ActivityRepository) -> Blueprint:
             activities = activities.loc[selection]
 
         name_exact = bool(request.args.get("name_exact", False))
+        name_casing = bool(request.args.get("name_casing", False))
         if name := request.args.get("name", ""):
-            if name_exact:
-                selection = activities["name"] == name
+            if name_casing:
+                haystack = activities["name"]
+                needle = name
             else:
-                selection = [name in an for an in activities["name"]]
+                haystack = activities["name"].str.lower()
+                needle = name.lower()
+            if name_exact:
+                selection = haystack == needle
+            else:
+                selection = [needle in an for an in haystack]
             activities = activities.loc[selection]
 
         begin = request.args.get("begin", "")
@@ -86,6 +93,7 @@ def make_search_blueprint(repository: ActivityRepository) -> Blueprint:
             kinds_avail=sorted(kinds_avail),
             name=name,
             name_exact=name_exact,
+            name_casing=name_casing,
             begin=begin,
             end=end,
         )
