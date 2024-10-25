@@ -139,7 +139,7 @@ def try_import_strava(config: Config) -> bool:
                         "commute": activity.commute,
                         "distance_km": activity.distance / 1000,
                         "name": activity.name,
-                        "kind": str(activity.type),
+                        "kind": str(activity.type.root),
                         "start": convert_to_datetime_ns(activity.start_date),
                         "elapsed_time": activity.elapsed_time,
                         "equipment": gear_names[activity.gear_id],
