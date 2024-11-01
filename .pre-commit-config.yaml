@@ -1,5 +1,5 @@
 default_stages:
-  - commit
+  - pre-commit
 fail_fast: true
 repos:
   - repo: https://github.com/asottile/reorder_python_imports
