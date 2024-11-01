@@ -66,9 +66,9 @@
                 <tr>
                     <td><span style="color: {{ activity['color'] }};">█</span> <a href="{{ url_for('activity.show', id=activity.id) }}">{{
                             activity.name }}</a></td>
-                    <td>{{ activity.start }}</td>
+                    <td>{{ activity.start|dt }}</td>
                     <td>{{ activity.distance_km | round(1) }}</td>
-                    <td>{{ activity.elapsed_time }}</td>
+                    <td>{{ activity.elapsed_time|td }}</td>
                     <td>{{ activity["equipment"] }}</td>
                     <td>{{ activity["kind"] }}</td>
                 </tr>

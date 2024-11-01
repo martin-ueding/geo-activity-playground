@@ -49,8 +49,8 @@
                     <h5 class="card-title">{{ elem.activity["name"] }}</h5>
                 </a>
                 <p class="card-text">{{ elem.activity.kind }} with {{ (elem.activity.distance_km)|round(1) }} km in {{
-                    elem.activity.elapsed_time }}</p>
-                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start }}</small></p>
+                    elem.activity.elapsed_time|td }}</p>
+                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start|dt }}</small></p>
             </div>
         </div>
     </div>

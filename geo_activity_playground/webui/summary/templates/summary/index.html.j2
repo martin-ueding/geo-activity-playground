@@ -123,7 +123,7 @@
                 </p>
                 <p class="card-text"><small class="text-body-secondary"></small>{{ activity.kind }} with {{
                     (activity.distance_km)|round(1) }} km in {{
-                    activity.elapsed_time }} on {{ activity.start }}</small></p>
+                    activity.elapsed_time|td }} on {{ activity.start|dt }}</small></p>
             </div>
         </div>
     </div>

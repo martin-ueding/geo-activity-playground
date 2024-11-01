@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import json
 import pathlib
@@ -59,6 +60,18 @@ def web_ui_main(
     app = Flask(__name__)
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
+
+    @app.template_filter()
+    def dt(value: datetime.datetime):
+        return value.strftime("%Y-%m-%d %H:%M")
+
+    @app.template_filter()
+    def td(v: datetime.timedelta):
+        seconds = v.total_seconds()
+        h = int(seconds // 3600)
+        m = int(seconds // 60 % 60)
+        s = int(seconds // 1 % 60)
+        return f"{h}:{m:02d}:{s:02d}"
 
     authenticator = Authenticator(config_accessor())
 

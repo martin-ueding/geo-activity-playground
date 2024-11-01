@@ -19,9 +19,9 @@
             <dt>Distance</dt>
             <dd>{{ activity.distance_km|round(1) }} km</dd>
             <dt>Elapsed time</dt>
-            <dd>{{ activity.elapsed_time }}</dd>
+            <dd>{{ activity.elapsed_time|td }}</dd>
             <dt>Moving time</dt>
-            <dd>{{ activity.moving_time }}</dd>
+            <dd>{{ activity.moving_time|td }}</dd>
             <dt>Start time</dt>
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }}
@@ -201,10 +201,10 @@
             <tbody>
                 {% for other_activity in similar_activites %}
                 <tr>
-                    <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start
+                    <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start|dt
                             }}</a></td>
                     <td>{{ other_activity.distance_km | round(1) }}</td>
-                    <td>{{ other_activity.elapsed_time }}</td>
+                    <td>{{ other_activity.elapsed_time|td }}</td>
                     <td>{{ other_activity["equipment"] }}</td>
                     <td>{{ other_activity["kind"] }}</td>
                 </tr>
