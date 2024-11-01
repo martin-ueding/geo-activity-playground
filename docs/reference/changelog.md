@@ -10,6 +10,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 - [GH-189](https://github.com/martin-ueding/geo-activity-playground/issues/189): Fix heatmap tile cache expiry in cases where the activity kind has changed.
 - Make date and time formats better to read.
+- [GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156): Add metadata editing functionality with override files.
 
 ### Version 0.30.0
 
