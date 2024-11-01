@@ -90,23 +90,25 @@ class HeatmapController:
             tile_counts = np.zeros(tile_pixels, dtype=np.int32)
         tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
         activity_ids = self.activities_per_tile[z].get((x, y), set())
-        if activity_ids:
+        activity_ids_kind = set()
+        for activity_id in activity_ids:
+            activity = self._repository.get_activity_by_id(activity_id)
+            if activity["kind"] == kind:
+                activity_ids_kind.add(activity_id)
+        if activity_ids_kind:
             with work_tracker(
                 tile_count_cache_path.with_suffix(".json")
             ) as parsed_activities:
-                if parsed_activities - activity_ids:
+                if parsed_activities - activity_ids_kind:
                     logger.warning(
                         f"Resetting heatmap cache for {kind=}/{x=}/{y=}/{z=} because activities have been removed."
                     )
                     tile_counts = np.zeros(tile_pixels, dtype=np.int32)
                     parsed_activities.clear()
-                for activity_id in activity_ids:
+                for activity_id in activity_ids_kind:
                     if activity_id in parsed_activities:
                         continue
                     parsed_activities.add(activity_id)
-                    activity = self._repository.get_activity_by_id(activity_id)
-                    if activity["kind"] != kind:
-                        continue
                     time_series = self._repository.get_time_series(activity_id)
                     for _, group in time_series.groupby("segment_id"):
                         xy_pixels = (
