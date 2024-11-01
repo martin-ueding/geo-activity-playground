@@ -1,5 +1,6 @@
 import datetime
 import functools
+import json
 import logging
 import pickle
 from typing import Any
@@ -16,6 +17,7 @@ from tqdm import tqdm
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
+from geo_activity_playground.core.paths import activity_meta_override_dir
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +85,12 @@ def build_activity_meta() -> None:
     rows = []
     for new_id in tqdm(new_ids, desc="Register new activities"):
         with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
-            rows.append(pickle.load(f))
+            data = pickle.load(f)
+        override_file = activity_meta_override_dir() / f"{new_id}.json"
+        if override_file.exists():
+            with open(override_file) as f:
+                data.update(json.load(f))
+        rows.append(data)
 
     if rows:
         new_shard = pd.DataFrame(rows)
@@ -140,7 +147,6 @@ class ActivityRepository:
             if not dropna or not pd.isna(row["start"]):
                 yield row
 
-    @functools.lru_cache()
     def get_activity_by_id(self, id: int) -> ActivityMeta:
         activity = self.meta.loc[id]
         assert isinstance(activity["name"], str), activity["name"]
@@ -157,6 +163,9 @@ class ActivityRepository:
             raise
 
         return df
+
+    def save(self) -> None:
+        self._meta.to_parquet(activities_file())
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:

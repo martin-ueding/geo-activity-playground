@@ -81,9 +81,7 @@ def web_ui_main(
 
     app.register_blueprint(
         make_activity_blueprint(
-            repository,
-            tile_visit_accessor,
-            config_accessor(),
+            repository, tile_visit_accessor, config_accessor(), authenticator
         ),
         url_prefix="/activity",
     )

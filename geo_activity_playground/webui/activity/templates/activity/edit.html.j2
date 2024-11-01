@@ -1,0 +1,42 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Edit Activity</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ override['name'] }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="kind" class="form-label">Kind</label>
+        <input type="text" class="form-control" id="kind" name="kind" value="{{ override['kind'] }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="equipment" class="form-label">Equipment</label>
+        <input type="text" class="form-control" id="equipment" name="equipment" value="{{ override['equipment'] }}" />
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="commute" name="commute" {% if override['commute'] %}
+                checked {% endif %} />
+            <label for="commute" class="form-check-label">Commute</label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="consider_for_achievements"
+                name="consider_for_achievements" {% if override['consider_for_achievements'] %} checked {% endif %} />
+            <label for="consider_for_achievements" class="form-check-label">Consider for achievements</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}

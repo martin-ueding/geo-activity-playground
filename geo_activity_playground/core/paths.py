@@ -53,6 +53,8 @@ _strava_last_activity_date_path = _cache_dir / "strava-last-activity-date.json"
 
 _new_config_file = pathlib.Path("config.json")
 
+_activity_meta_override_dir = pathlib.Path("Metadata Override")
+
 
 cache_dir = dir_wrapper(_cache_dir)
 
@@ -63,6 +65,7 @@ activity_enriched_meta_dir = dir_wrapper(_activity_enriched_meta_dir)
 activity_enriched_time_series_dir = dir_wrapper(_activity_enriched_time_series_dir)
 tiles_per_time_series = dir_wrapper(_tiles_per_time_series)
 strava_api_dir = dir_wrapper(_strava_api_dir)
+activity_meta_override_dir = dir_wrapper(_activity_meta_override_dir)
 
 activities_file = file_wrapper(_activities_file)
 strava_dynamic_config_path = file_wrapper(_strava_dynamic_config_path)
