@@ -23,9 +23,11 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
 from geo_activity_playground.core.heatmap import build_map_from_tiles
+from geo_activity_playground.core.heatmap import build_map_from_tiles_around_center
 from geo_activity_playground.core.heatmap import GeoBounds
 from geo_activity_playground.core.heatmap import get_bounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
+from geo_activity_playground.core.heatmap import OSM_MAX_ZOOM
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
 from geo_activity_playground.core.heatmap import PixelBounds
 from geo_activity_playground.core.heatmap import TileBounds
@@ -459,42 +461,56 @@ def make_sharepic(
     time_series: pd.DataFrame,
     sharepic_suppressed_fields: list[str],
 ) -> bytes:
-    lat_lon_data = np.array([time_series["latitude"], time_series["longitude"]]).T
+    print(time_series.dtypes)
+    tile_x = time_series["x"]
+    tile_y = time_series["y"]
+    tile_width = tile_x.max() - tile_x.min()
+    tile_height = tile_y.max() - tile_y.min()
 
-    geo_bounds = get_bounds(lat_lon_data)
-    geo_bounds = add_margin_to_geo_bounds(geo_bounds)
-    tile_bounds = get_sensible_zoom_level(geo_bounds, (1500, 1500))
-    tile_bounds = make_tile_bounds_square(tile_bounds)
-    background = build_map_from_tiles(tile_bounds)
-    # background = convert_to_grayscale(background)
+    target_width = 600
+    target_height = 600
+    footer_height = 100
+    target_map_height = target_height - footer_height
 
-    crop_mask = get_crop_mask(geo_bounds, tile_bounds)
-    assert pixels_in_bounds(crop_mask) <= 10_000_000, crop_mask
+    zoom = int(
+        min(
+            np.log2(target_width / tile_width / OSM_TILE_SIZE),
+            np.log2(target_map_height / tile_height / OSM_TILE_SIZE),
+            OSM_MAX_ZOOM,
+        )
+    )
 
-    background = background[
-        crop_mask.y_min : crop_mask.y_max,
-        crop_mask.x_min : crop_mask.x_max,
-        :,
-    ]
+    tile_xz = tile_x * 2**zoom
+    tile_yz = tile_y * 2**zoom
+
+    tile_xz_center = (
+        (tile_xz.max() + tile_xz.min()) / 2,
+        (tile_yz.max() + tile_yz.min()) / 2,
+    )
+
+    background = build_map_from_tiles_around_center(
+        tile_xz_center,
+        zoom,
+        (target_width, target_height),
+        (target_width, target_map_height),
+    )
 
     img = Image.fromarray((background * 255).astype("uint8"), "RGB")
     draw = ImageDraw.Draw(img, mode="RGBA")
 
     for _, group in time_series.groupby("segment_id"):
-        xs, ys = compute_tile_float(
-            group["latitude"], group["longitude"], tile_bounds.zoom
-        )
         yx = list(
-            (
-                int((x - tile_bounds.x_tile_min) * OSM_TILE_SIZE - crop_mask.x_min),
-                int((y - tile_bounds.y_tile_min) * OSM_TILE_SIZE - crop_mask.y_min),
+            zip(
+                (tile_xz - tile_xz_center[0]) * OSM_TILE_SIZE + target_width / 2,
+                (tile_yz - tile_xz_center[1]) * OSM_TILE_SIZE + target_map_height / 2,
             )
-            for x, y in zip(xs, ys)
         )
 
         draw.line(yx, fill="red", width=4)
 
-    draw.rectangle([0, img.height - 70, img.width, img.height], fill=(0, 0, 0, 128))
+    draw.rectangle(
+        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 128)
+    )
 
     facts = {
         "kind": f"{activity['kind']}",
@@ -515,19 +531,20 @@ def make_sharepic(
         if not key in sharepic_suppressed_fields
     }
 
-    draw.text((35, img.height - 70 + 10), "      ".join(facts.values()), font_size=20)
+    draw.text(
+        (35, img.height - footer_height + 10),
+        "      ".join(facts.values()),
+        font_size=20,
+    )
 
-    # img_array = np.array(img) / 255
-
-    # weight = np.dstack([img_array[:, :, 0]] * 3)
-
-    # background = (1 - weight) * background + img_array
-    # background[background > 1.0] = 1.0
-    # background[background < 0.0] = 0.0
+    draw.text(
+        (img.width - 250, img.height - 20),
+        "Map: © Open Street Map Contributors",
+        font_size=14,
+    )
 
     f = io.BytesIO()
     img.save(f, format="png")
-    # pl.imsave(f, background, format="png")
     return bytes(f.getbuffer())
 
 

@@ -142,6 +142,69 @@ def build_map_from_tiles(tile_bounds: TileBounds) -> np.ndarray:
     return background
 
 
+def build_map_from_tiles_around_center(
+    center: tuple[float, float],
+    zoom: int,
+    target: tuple[int, int],
+    inner_target: tuple[int, int],
+) -> np.ndarray:
+    background = np.zeros((target[1], target[0], 3))
+
+    # We will work with the center point and have it in terms of tiles `t` and also in terms of pixels `p`. At the start we know that the tile center must be in the middle of the image.
+    t = np.array(center)
+    p = np.array([inner_target[0] / 2, inner_target[1] / 2])
+
+    # Shift both such that they are in the top-left corner of an even tile.
+    t_offset = np.array([center[0] % 1, center[1] % 1])
+    t -= t_offset
+    p -= t_offset * OSM_TILE_SIZE
+
+    # Shift until we have left the image.
+    shift = np.ceil(p / OSM_TILE_SIZE)
+    p -= shift * OSM_TILE_SIZE
+    t -= shift
+
+    num_tiles = np.ceil(np.array(target) / OSM_TILE_SIZE) + 1
+
+    for x in range(int(t[0]), int(t[0] + num_tiles[0])):
+        for y in range(int(t[1]), int(t[1]) + int(num_tiles[1])):
+            source_x_min = 0
+            source_y_min = 0
+            source_x_max = source_x_min + OSM_TILE_SIZE
+            source_y_max = source_y_min + OSM_TILE_SIZE
+
+            target_x_min = (x - int(t[0])) * OSM_TILE_SIZE + int(p[0])
+            target_y_min = (y - int(t[1])) * OSM_TILE_SIZE + int(p[1])
+            target_x_max = target_x_min + OSM_TILE_SIZE
+            target_y_max = target_y_min + OSM_TILE_SIZE
+
+            if target_x_min < 0:
+                source_x_min -= target_x_min
+                target_x_min = 0
+            if target_y_min < 0:
+                source_y_min -= target_y_min
+                target_y_min = 0
+            if target_x_max > target[0]:
+                a = target_x_max - target[0]
+                target_x_max -= a
+                source_x_max -= a
+            if target_y_max > target[1]:
+                a = target_y_max - target[1]
+                target_y_max -= a
+                source_y_max -= a
+
+            if source_x_max < 0 or source_y_max < 0:
+                continue
+
+            tile = np.array(get_tile(zoom, x, y)) / 255
+
+            background[target_y_min:target_y_max, target_x_min:target_x_max] = tile[
+                source_y_min:source_y_max, source_x_min:source_x_max, :3
+            ]
+
+    return background
+
+
 def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
     image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
     image = np.dstack((image, image, image))
