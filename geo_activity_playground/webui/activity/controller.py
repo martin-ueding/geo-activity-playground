@@ -509,7 +509,7 @@ def make_sharepic(
         draw.line(yx, fill="red", width=4)
 
     draw.rectangle(
-        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 128)
+        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
     )
 
     facts = {
