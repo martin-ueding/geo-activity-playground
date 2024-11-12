@@ -461,7 +461,6 @@ def make_sharepic(
     time_series: pd.DataFrame,
     sharepic_suppressed_fields: list[str],
 ) -> bytes:
-    print(time_series.dtypes)
     tile_x = time_series["x"]
     tile_y = time_series["y"]
     tile_width = tile_x.max() - tile_x.min()
