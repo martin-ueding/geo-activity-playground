@@ -6,6 +6,13 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.32.0
+
+- [GH-173](https://github.com/martin-ueding/geo-activity-playground/issues/173): Add config option `ignore_suffixes` which can be set to something like `[".kml"]` to ignore certain file types.
+- Include all activities in the summary, even those which are not to be considered for achievements.
+- Remove debug print.
+- Make share picture always the same size independent of the content.
+
 ### Version 0.31.0
 
 - [GH-189](https://github.com/martin-ueding/geo-activity-playground/issues/189): Fix heatmap tile cache expiry in cases where the activity kind has changed.
