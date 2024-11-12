@@ -21,7 +21,7 @@ class SummaryController:
     def render(self) -> dict:
         kind_scale = make_kind_scale(self._repository.meta, self._config)
         df = embellished_activities(self._repository.meta)
-        df = df.loc[df["consider_for_achievements"]]
+        # df = df.loc[df["consider_for_achievements"]]
 
         year_kind_total = (
             df[["year", "kind", "distance_km", "hours"]]
