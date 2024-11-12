@@ -10,6 +10,7 @@ from typing import Optional
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.paths import activity_extracted_dir
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
@@ -24,13 +25,16 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 
 
 def import_from_directory(
-    metadata_extraction_regexes: list[str], num_processes: Optional[int]
+    metadata_extraction_regexes: list[str], num_processes: Optional[int], config: Config
 ) -> None:
 
     activity_paths = [
         path
         for path in ACTIVITY_DIR.rglob("*.*")
-        if path.is_file() and path.suffixes and not path.stem.startswith(".")
+        if path.is_file()
+        and path.suffixes
+        and not path.stem.startswith(".")
+        and not path.suffix in config.ignore_suffixes
     ]
     work_tracker = WorkTracker(activity_extracted_dir() / "work-tracker-extract.pickle")
     new_activity_paths = work_tracker.filter(activity_paths)
