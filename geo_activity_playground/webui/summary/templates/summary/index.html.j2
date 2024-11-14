@@ -77,7 +77,7 @@
     on that day. This makes it easy to spot those days where you really covered a lot of distance!</p>
 
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     {% for year, plot in plot_distance_heatmaps.items() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link {% if loop.last %} active {% endif %}" id="heatmap-{{ year }}" data-bs-toggle="tab"
@@ -86,7 +86,8 @@
     </li>
     {% endfor %}
 </ul>
-<div class="tab-content" id="myTabContent">
+
+<div class="tab-content mb-3" id="myTabContent">
     {% for year, plot in plot_distance_heatmaps.items() %}
     <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-{{ year }}-pane" role="tabpanel"
         aria-labelledby="heatmap-{{ year }}" tabindex="0">
@@ -94,16 +95,6 @@
     </div>
     {% endfor %}
 </div>
-
-
-
-
-<div class="row mb-3">
-    <div class="col">
-
-    </div>
-</div>
-
 
 <h2>Hall of Fame</h2>
 
