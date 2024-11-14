@@ -8,7 +8,9 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.33.0
 
-- Make heatmap colormap configurable.
+- Make heatmap colormap configurable via web UI.
+- [GH-196](https://github.com/martin-ueding/geo-activity-playground/issues/196): Make tile map URL configurable via configuration file.
+- Make daily pulse plot per year in tabs.
 
 ### Version 0.32.0
 
