@@ -16,40 +16,24 @@ from geo_activity_playground.webui.settings.controller import SettingsController
 
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
-    "bluegreen",
-    "bluepurple",
-    "cividis",
-    "darkblue",
-    "darkgold",
-    "darkgreen",
-    "darkmulti",
-    "darkred",
-    "goldgreen",
-    "goldorange",
-    "goldred",
-    "greenblue",
-    "inferno",
     "lightgreyred",
     "lightgreyteal",
     "lightmulti",
     "lightorange",
     "lighttealblue",
-    "magma",
-    "orangered",
-    "plasma",
-    "purpleblue",
-    "purplebluegreen",
-    "purplered",
-    "redpurple",
-    "turbo",
-    "viridis",
-    "yellowgreen",
-    "yellowgreenblue",
-    "yelloworangebrown",
-    "yelloworangered",
+    "blues",
+    "tealblues",
+    "teals",
+    "greens",
+    "browns",
+    "oranges",
+    "reds",
+    "purples",
+    "warmgreys",
+    "greys",
 ]
 
-VEGA_COLOR_SCHEMES_CONTINUOUS = [
+MATPLOTLIB_COLOR_SCHEMES_CONTINUOUS = [
     "afmhot",
     "bone",
     "cividis",
@@ -137,7 +121,7 @@ def make_settings_blueprint(
                 "tableau20",
             ],
             color_scheme_for_heatmap=config_accessor().color_scheme_for_heatmap,
-            color_scheme_for_heatmap_avail=VEGA_COLOR_SCHEMES_CONTINUOUS,
+            color_scheme_for_heatmap_avail=MATPLOTLIB_COLOR_SCHEMES_CONTINUOUS,
         )
 
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])

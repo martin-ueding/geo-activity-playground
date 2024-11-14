@@ -76,9 +76,31 @@
 <p>Next we take one row per month, each column is a day-of-month. The brighter a box, the more distance you have covered
     on that day. This makes it easy to spot those days where you really covered a lot of distance!</p>
 
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    {% for year, plot in plot_distance_heatmaps.items() %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.last %} active {% endif %}" id="heatmap-{{ year }}" data-bs-toggle="tab"
+            data-bs-target="#heatmap-{{ year }}-pane" type="button" role="tab" aria-controls="heatmap-{{ year }}-pane"
+            aria-selected="{{ loop.last }}">{{ year }}</button>
+    </li>
+    {% endfor %}
+</ul>
+<div class="tab-content" id="myTabContent">
+    {% for year, plot in plot_distance_heatmaps.items() %}
+    <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-{{ year }}-pane" role="tabpanel"
+        aria-labelledby="heatmap-{{ year }}" tabindex="0">
+        {{ vega_direct("plot_distance_heatmap_%d"|format(year), plot) }}
+    </div>
+    {% endfor %}
+</div>
+
+
+
+
 <div class="row mb-3">
     <div class="col">
-        {{ vega_direct("plot_distance_heatmap", plot_distance_heatmap) }}
+
     </div>
 </div>
 

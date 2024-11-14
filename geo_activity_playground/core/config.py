@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class Config:
     birth_year: Optional[int] = None
-    color_scheme_for_counts: str = "viridis"
+    color_scheme_for_counts: str = "teals"
     color_scheme_for_kind: str = "category10"
     color_scheme_for_heatmap: str = "hot"
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)

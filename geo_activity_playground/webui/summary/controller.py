@@ -31,7 +31,7 @@ class SummaryController:
         )
 
         return {
-            "plot_distance_heatmap": plot_distance_heatmap(df, self._config),
+            "plot_distance_heatmaps": plot_distance_heatmaps(df, self._config),
             "plot_monthly_distance": plot_monthly_distance(df, kind_scale),
             "plot_yearly_distance": plot_yearly_distance(year_kind_total, kind_scale),
             "plot_year_cumulative": plot_year_cumulative(df),
@@ -112,17 +112,10 @@ def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def plot_distance_heatmap(meta: pd.DataFrame, config: Config) -> str:
-    return (
-        alt.Chart(
-            meta.loc[
-                (
-                    meta["start"]
-                    >= pd.to_datetime(
-                        datetime.datetime.now() - datetime.timedelta(days=2 * 365)
-                    )
-                )
-            ],
+def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]:
+    return {
+        year: alt.Chart(
+            meta.loc[(meta["year"] == year)],
             title="Daily Distance Heatmap",
         )
         .mark_rect()
@@ -130,7 +123,7 @@ def plot_distance_heatmap(meta: pd.DataFrame, config: Config) -> str:
             alt.X("date(start):O", title="Day of month"),
             alt.Y(
                 "yearmonth(start):O",
-                scale=alt.Scale(reverse=True),
+                # scale=alt.Scale(reverse=True),
                 title="Year and month",
             ),
             alt.Color(
@@ -146,7 +139,8 @@ def plot_distance_heatmap(meta: pd.DataFrame, config: Config) -> str:
             ],
         )
         .to_json(format="vega")
-    )
+        for year in sorted(meta["year"].unique())
+    }
 
 
 def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
