@@ -97,7 +97,8 @@ def web_ui_main(
         url_prefix="/explorer",
     )
     app.register_blueprint(
-        make_heatmap_blueprint(repository, tile_visit_accessor), url_prefix="/heatmap"
+        make_heatmap_blueprint(repository, tile_visit_accessor, config_accessor()),
+        url_prefix="/heatmap",
     )
     app.register_blueprint(
         make_settings_blueprint(config_accessor, authenticator),

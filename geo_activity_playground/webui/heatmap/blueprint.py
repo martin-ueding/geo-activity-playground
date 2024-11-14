@@ -6,12 +6,15 @@ from flask import Response
 from ...core.activities import ActivityRepository
 from ...explorer.tile_visits import TileVisitAccessor
 from .heatmap_controller import HeatmapController
+from geo_activity_playground.core.config import Config
 
 
 def make_heatmap_blueprint(
-    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: Config,
 ) -> Blueprint:
-    heatmap_controller = HeatmapController(repository, tile_visit_accessor)
+    heatmap_controller = HeatmapController(repository, tile_visit_accessor, config)
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
 
     @blueprint.route("/")

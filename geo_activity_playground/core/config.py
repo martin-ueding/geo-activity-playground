@@ -23,6 +23,7 @@ class Config:
     birth_year: Optional[int] = None
     color_scheme_for_counts: str = "viridis"
     color_scheme_for_kind: str = "category10"
+    color_scheme_for_heatmap: str = "hot"
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     explorer_zoom_levels: list[int] = dataclasses.field(
         default_factory=lambda: [14, 17]

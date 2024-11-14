@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.33.0
+
+- Make heatmap colormap configurable.
+
 ### Version 0.32.0
 
 - [GH-173](https://github.com/martin-ueding/geo-activity-playground/issues/173): Add config option `ignore_suffixes` which can be set to something like `[".kml"]` to ignore certain file types.

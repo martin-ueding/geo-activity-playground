@@ -18,8 +18,17 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Color scheme for heatmaps</label>
-        <select class="form-select" aria-label="Color scheme for heatmaps" name="color_scheme_for_counts">
+        <label class="form-label">Color scheme for interactive heatmap</label>
+        <select class="form-select" aria-label="Color scheme for heatmaps" name="color_scheme_for_heatmap">
+            {% for cs in color_scheme_for_heatmap_avail %}
+            <option {% if cs==color_scheme_for_heatmap %} selected {% endif %}>{{ cs }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Color scheme for count plots</label>
+        <select class="form-select" aria-label="Color scheme for count plots" name="color_scheme_for_counts">
             {% for cs in color_scheme_for_counts_avail %}
             <option {% if cs==color_scheme_for_counts %} selected {% endif %}>{{ cs }}</option>
             {% endfor %}

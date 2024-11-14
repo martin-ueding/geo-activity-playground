@@ -15,6 +15,59 @@ from geo_activity_playground.webui.authenticator import needs_authentication
 from geo_activity_playground.webui.settings.controller import SettingsController
 
 
+VEGA_COLOR_SCHEMES_CONTINUOUS = [
+    "bluegreen",
+    "bluepurple",
+    "cividis",
+    "darkblue",
+    "darkgold",
+    "darkgreen",
+    "darkmulti",
+    "darkred",
+    "goldgreen",
+    "goldorange",
+    "goldred",
+    "greenblue",
+    "inferno",
+    "lightgreyred",
+    "lightgreyteal",
+    "lightmulti",
+    "lightorange",
+    "lighttealblue",
+    "magma",
+    "orangered",
+    "plasma",
+    "purpleblue",
+    "purplebluegreen",
+    "purplered",
+    "redpurple",
+    "turbo",
+    "viridis",
+    "yellowgreen",
+    "yellowgreenblue",
+    "yelloworangebrown",
+    "yelloworangered",
+]
+
+VEGA_COLOR_SCHEMES_CONTINUOUS = [
+    "afmhot",
+    "bone",
+    "cividis",
+    "copper",
+    "gist_gray",
+    "gist_heat",
+    "gnuplot2",
+    "gray",
+    "Greys_r",
+    "hot",
+    "inferno",
+    "magma",
+    "pink",
+    "plasma",
+    "viridis",
+]
+
+
 def int_or_none(s: str) -> Optional[int]:
     if s:
         try:
@@ -56,44 +109,16 @@ def make_settings_blueprint(
             config_accessor().color_scheme_for_kind = request.form[
                 "color_scheme_for_kind"
             ]
+            config_accessor().color_scheme_for_heatmap = request.form[
+                "color_scheme_for_heatmap"
+            ]
             config_accessor.save()
             flash("Updated color schemes.", category="success")
+
         return render_template(
             "settings/color-schemes.html.j2",
             color_scheme_for_counts=config_accessor().color_scheme_for_counts,
-            color_scheme_for_counts_avail=[
-                "viridis",
-                "magma",
-                "inferno",
-                "plasma",
-                "cividis",
-                "turbo",
-                "bluegreen",
-                "bluepurple",
-                "goldgreen",
-                "goldorange",
-                "goldred",
-                "greenblue",
-                "orangered",
-                "purplebluegreen",
-                "purpleblue",
-                "purplered",
-                "redpurple",
-                "yellowgreenblue",
-                "yellowgreen",
-                "yelloworangebrown",
-                "yelloworangered",
-                "darkblue",
-                "darkgold",
-                "darkgreen",
-                "darkmulti",
-                "darkred",
-                "lightgreyred",
-                "lightgreyteal",
-                "lightmulti",
-                "lightorange",
-                "lighttealblue",
-            ],
+            color_scheme_for_counts_avail=VEGA_COLOR_SCHEMES_CONTINUOUS,
             color_scheme_for_kind=config_accessor().color_scheme_for_kind,
             color_scheme_for_kind_avail=[
                 "accent",
@@ -111,6 +136,8 @@ def make_settings_blueprint(
                 "tableau10",
                 "tableau20",
             ],
+            color_scheme_for_heatmap=config_accessor().color_scheme_for_heatmap,
+            color_scheme_for_heatmap_avail=VEGA_COLOR_SCHEMES_CONTINUOUS,
         )
 
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])

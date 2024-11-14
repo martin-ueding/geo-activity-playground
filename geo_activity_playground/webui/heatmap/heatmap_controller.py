@@ -8,6 +8,7 @@ from PIL import Image
 from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heatmap import convert_to_grayscale
 from geo_activity_playground.core.heatmap import GeoBounds
 from geo_activity_playground.core.heatmap import get_sensible_zoom_level
@@ -29,10 +30,14 @@ OSM_TILE_SIZE = 256  # OSM tile size in pixel
 
 class HeatmapController:
     def __init__(
-        self, repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
+        self,
+        repository: ActivityRepository,
+        tile_visit_accessor: TileVisitAccessor,
+        config: Config,
     ) -> None:
         self._repository = repository
         self._tile_visit_accessor = tile_visit_accessor
+        self._config = config
 
         self.tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
         self.tile_evolution_states = self._tile_visit_accessor.tile_state[
@@ -140,7 +145,7 @@ class HeatmapController:
         tile_counts = np.sqrt(tile_counts) / 5
         tile_counts[tile_counts > 1.0] = 1.0
 
-        cmap = pl.get_cmap("hot")
+        cmap = pl.get_cmap(self._config.color_scheme_for_heatmap)
         data_color = cmap(tile_counts)
         data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 
