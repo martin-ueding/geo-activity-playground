@@ -26,7 +26,7 @@
         })
         L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution: '{{ map_tile_attribution|safe }}'
         }).addTo(map)
 
         let geojson_layer = L.geoJSON(geojson).addTo(map)

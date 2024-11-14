@@ -73,7 +73,7 @@
             })
             L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href=" http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '{{ map_tile_attribution|safe }}'
             }).addTo(map)
             let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
                 style: function (feature) {
@@ -87,58 +87,34 @@
             let explorer_layer_first_age_color = L.geoJSON(explorer_geojson, {
                 style: function (feature) {
                     return {
-                        color: "#440154", fillColor: feature.properties.first_age_color,
-                        weight: 0.5
+                        color: " #440154", fillColor: feature.properties.first_age_color, weight: 0.5
                     }
                 },
                 onEachFeature: onEachFeature
-            })
-            let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
-                style: function (feature) {
-                    return {
-                        color: "#440154", fillColor: feature.properties.last_age_color, weight:
-                            0.5
-                    }
-                },
-                onEachFeature: onEachFeature
-            })
-
-            let bbox = {{ center.bbox| safe }}
-            if (bbox) {
-                map.fitBounds(L.geoJSON(bbox).getBounds())
-            }
-
-            let explorer_square_layer = L.geoJSON(square_geojson,
-                {
-                    style: function (feature) {
+            }) let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
+                style:
+                    function (feature) {
                         return {
-                            color: "blue", fill: false, weight: 2
+                            color: "#440154", fillColor: feature.properties.last_age_color, weight:
+                                0.5
                         }
-                    }
-                }
-            ).addTo(map)
-
-            active_layer = explorer_layer_cluster_color
-
-            function changeColor(method) {
+                    }, onEachFeature: onEachFeature
+            }) let bbox = {{ center.bbox| safe }} if (bbox) {
+                map.fitBounds(L.geoJSON(bbox).getBounds())
+            } let explorer_square_layer = L.geoJSON(square_geojson, {
+                style: function (feature) { return { color: "blue", fill: false, weight: 2 } }
+            }).addTo(map)
+            active_layer = explorer_layer_cluster_color function changeColor(method) {
                 map.removeLayer(active_layer)
-                if (method == "cluster") {
-                    active_layer = explorer_layer_cluster_color
-                } else if (method == "first") {
+                if (method == "cluster") { active_layer = explorer_layer_cluster_color } else if (method == "first") {
                     active_layer = explorer_layer_first_age_color
                 } else if (method == "last") {
                     active_layer = explorer_layer_last_age_color
-                }
-                map.addLayer(active_layer)
-            }
-
-            function downloadAs(suffix) {
-                bounds = map.getBounds()
-                zoom = "{{ zoom }}"
-                window.location.href =
-                    `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
-            }
-        </script>
+                } map.addLayer(active_layer)
+            } function downloadAs(suffix) {
+                bounds = map.getBounds() zoom = "{{ zoom }}"
+                window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
+            } </script>
     </div>
 </div>
 

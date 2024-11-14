@@ -3,6 +3,7 @@ import logging
 import math
 import pathlib
 import time
+import urllib.parse
 from typing import Iterator
 from typing import Optional
 
@@ -13,8 +14,10 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def osm_tile_path(x: int, y: int, zoom: int) -> pathlib.Path:
-    path = pathlib.Path("Open Street Map Tiles") / f"{zoom}/{x}/{y}.png"
+def osm_tile_path(x: int, y: int, zoom: int, url_template: str) -> pathlib.Path:
+    base_dir = pathlib.Path("Open Street Map Tiles")
+    dir_for_source = base_dir / urllib.parse.quote_plus(url_template)
+    path = dir_for_source / f"{zoom}/{x}/{y}.png"
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -62,11 +65,11 @@ def download_file(url: str, destination: pathlib.Path):
 
 
 @functools.lru_cache()
-def get_tile(zoom: int, x: int, y: int) -> Image.Image:
-    destination = osm_tile_path(x, y, zoom)
+def get_tile(zoom: int, x: int, y: int, url_template: str) -> Image.Image:
+    destination = osm_tile_path(x, y, zoom, url_template)
     if not destination.exists():
         logger.info(f"Downloading OSM tile {x=}, {y=}, {zoom=} …")
-        url = f"https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
+        url = url_template.format(x=x, y=y, zoom=zoom)
         download_file(url, destination)
     with Image.open(destination) as image:
         image.load()

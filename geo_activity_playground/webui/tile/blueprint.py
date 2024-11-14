@@ -2,12 +2,13 @@ from flask import Blueprint
 from flask import Response
 
 from .controller import TileController
+from geo_activity_playground.core.config import Config
 
 
-def make_tile_blueprint() -> Blueprint:
+def make_tile_blueprint(config: Config) -> Blueprint:
     blueprint = Blueprint("tiles", __name__, template_folder="templates")
 
-    tile_controller = TileController()
+    tile_controller = TileController(config)
 
     @blueprint.route("/color/<z>/<x>/<y>.png")
     def tile_color(x: str, y: str, z: str):

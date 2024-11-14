@@ -149,7 +149,7 @@ class HeatmapController:
         data_color = cmap(tile_counts)
         data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 
-        map_tile = np.array(get_tile(z, x, y)) / 255
+        map_tile = np.array(get_tile(z, x, y, self._config.map_tile_url)) / 255
         map_tile = convert_to_grayscale(map_tile)
         map_tile = 1.0 - map_tile  # invert colors
         for c in range(3):
@@ -173,7 +173,12 @@ class HeatmapController:
         background = np.zeros((*pixel_bounds.shape, 3))
         for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
             for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
-                tile = np.array(get_tile(tile_bounds.zoom, x, y)) / 255
+                tile = (
+                    np.array(
+                        get_tile(tile_bounds.zoom, x, y, self._config.map_tile_url)
+                    )
+                    / 255
+                )
 
                 i = y - tile_bounds.y_tile_min
                 j = x - tile_bounds.x_tile_min

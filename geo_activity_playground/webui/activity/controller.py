@@ -21,12 +21,8 @@ from geo_activity_playground.core.activities import make_geojson_from_time_serie
 from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
-from geo_activity_playground.core.heatmap import add_margin_to_geo_bounds
-from geo_activity_playground.core.heatmap import build_map_from_tiles
 from geo_activity_playground.core.heatmap import build_map_from_tiles_around_center
 from geo_activity_playground.core.heatmap import GeoBounds
-from geo_activity_playground.core.heatmap import get_bounds
-from geo_activity_playground.core.heatmap import get_sensible_zoom_level
 from geo_activity_playground.core.heatmap import OSM_MAX_ZOOM
 from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
 from geo_activity_playground.core.heatmap import PixelBounds
@@ -130,7 +126,7 @@ class ActivityController:
         if len(time_series) == 0:
             time_series = self._repository.get_time_series(id)
         return make_sharepic(
-            activity, time_series, self._config.sharepic_suppressed_fields
+            activity, time_series, self._config.sharepic_suppressed_fields, self._config
         )
 
     def render_day(self, year: int, month: int, day: int) -> dict:
@@ -460,6 +456,7 @@ def make_sharepic(
     activity: ActivityMeta,
     time_series: pd.DataFrame,
     sharepic_suppressed_fields: list[str],
+    config: Config,
 ) -> bytes:
     tile_x = time_series["x"]
     tile_y = time_series["y"]
@@ -492,6 +489,7 @@ def make_sharepic(
         zoom,
         (target_width, target_height),
         (target_width, target_map_height),
+        config,
     )
 
     img = Image.fromarray((background * 255).astype("uint8"), "RGB")

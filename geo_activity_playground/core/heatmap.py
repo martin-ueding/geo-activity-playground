@@ -6,6 +6,7 @@ import logging
 
 import numpy as np
 
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -123,30 +124,12 @@ def get_sensible_zoom_level(
     )
 
 
-def build_map_from_tiles(tile_bounds: TileBounds) -> np.ndarray:
-    background = np.zeros((*PixelBounds.from_tile_bounds(tile_bounds).shape, 3))
-
-    for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
-        for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
-            tile = np.array(get_tile(tile_bounds.zoom, x, y)) / 255
-
-            i = y - tile_bounds.y_tile_min
-            j = x - tile_bounds.x_tile_min
-
-            background[
-                i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
-                j * OSM_TILE_SIZE : (j + 1) * OSM_TILE_SIZE,
-                :,
-            ] = tile[:, :, :3]
-
-    return background
-
-
 def build_map_from_tiles_around_center(
     center: tuple[float, float],
     zoom: int,
     target: tuple[int, int],
     inner_target: tuple[int, int],
+    config: Config,
 ) -> np.ndarray:
     background = np.zeros((target[1], target[0], 3))
 
@@ -196,7 +179,7 @@ def build_map_from_tiles_around_center(
             if source_x_max < 0 or source_y_max < 0:
                 continue
 
-            tile = np.array(get_tile(zoom, x, y)) / 255
+            tile = np.array(get_tile(zoom, x, y, config.map_tile_url)) / 255
 
             background[target_y_min:target_y_max, target_x_min:target_x_max] = tile[
                 source_y_min:source_y_max, source_x_min:source_x_max, :3

@@ -3,6 +3,8 @@ import importlib
 import json
 import pathlib
 import secrets
+import shutil
+import urllib.parse
 
 from flask import Flask
 from flask import render_template
@@ -116,7 +118,7 @@ def web_ui_main(
         make_summary_blueprint(repository, config_accessor()),
         url_prefix="/summary",
     )
-    app.register_blueprint(make_tile_blueprint(), url_prefix="/tile")
+    app.register_blueprint(make_tile_blueprint(config_accessor()), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator
@@ -124,11 +126,20 @@ def web_ui_main(
         url_prefix="/upload",
     )
 
+    base_dir = pathlib.Path("Open Street Map Tiles")
+    dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)
+    if base_dir.exists() and not dir_for_source.exists():
+        subdirs = base_dir.glob("*")
+        dir_for_source.mkdir()
+        for subdir in subdirs:
+            shutil.move(subdir, dir_for_source)
+
     @app.context_processor
     def inject_global_variables() -> dict:
         return {
             "version": _try_get_version(),
             "num_activities": len(repository),
+            "map_tile_attribution": config_accessor().map_tile_attribution,
         }
 
     app.run(host=host, port=port)

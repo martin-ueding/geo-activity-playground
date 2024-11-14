@@ -35,7 +35,7 @@
             });
             L.tileLayer('/heatmap/tile/{z}/{x}/{y}/{{ kinds_str }}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '{{ map_tile_attribution|safe }}'
             }).addTo(map)
 
             let bbox = {{ center.bbox| safe }}

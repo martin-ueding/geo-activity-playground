@@ -17,7 +17,7 @@
             });
             L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '{{ map_tile_attribution|safe }}'
             }).addTo(map);
 
             let geojson = L.geoJSON({{ geojson| safe }}, {
@@ -64,7 +64,8 @@
             <tbody>
                 {% for activity in activities %}
                 <tr>
-                    <td><span style="color: {{ activity['color'] }};">█</span> <a href="{{ url_for('activity.show', id=activity.id) }}">{{
+                    <td><span style="color: {{ activity['color'] }};">█</span> <a
+                            href="{{ url_for('activity.show', id=activity.id) }}">{{
                             activity.name }}</a></td>
                     <td>{{ activity.start|dt }}</td>
                     <td>{{ activity.distance_km | round(1) }}</td>
