@@ -165,7 +165,7 @@ class ActivityRepository:
         return df
 
     def save(self) -> None:
-        self._meta.to_parquet(activities_file())
+        self.meta.to_parquet(activities_file())
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
