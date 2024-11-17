@@ -91,7 +91,7 @@
                     }
                 },
                 onEachFeature: onEachFeature
-            }) let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
+            }); let explorer_layer_last_age_color = L.geoJSON(explorer_geojson, {
                 style:
                     function (feature) {
                         return {
@@ -99,12 +99,12 @@
                                 0.5
                         }
                     }, onEachFeature: onEachFeature
-            }) let bbox = {{ center.bbox| safe }} if (bbox) {
+            }); let bbox = {{ center.bbox| safe }}; if (bbox) {
                 map.fitBounds(L.geoJSON(bbox).getBounds())
-            } let explorer_square_layer = L.geoJSON(square_geojson, {
+            }; let explorer_square_layer = L.geoJSON(square_geojson, {
                 style: function (feature) { return { color: "blue", fill: false, weight: 2 } }
             }).addTo(map)
-            active_layer = explorer_layer_cluster_color function changeColor(method) {
+            active_layer = explorer_layer_cluster_color; function changeColor(method) {
                 map.removeLayer(active_layer)
                 if (method == "cluster") { active_layer = explorer_layer_cluster_color } else if (method == "first") {
                     active_layer = explorer_layer_first_age_color
@@ -112,7 +112,7 @@
                     active_layer = explorer_layer_last_age_color
                 } map.addLayer(active_layer)
             } function downloadAs(suffix) {
-                bounds = map.getBounds() zoom = "{{ zoom }}"
+                bounds = map.getBounds(); zoom = "{{ zoom }}"
                 window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
             } </script>
     </div>
