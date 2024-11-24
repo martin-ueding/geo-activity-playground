@@ -58,8 +58,9 @@
 </div>
 {% endfor %}
 {% else %}
-<p>You don't have activities yet. Either put some files into a directory <tt>Activities</tt> or <a
-        href="{{ url_for('settings.strava') }}">set up Strava API</a>.</p>
+<p>You don't have activities yet. Either put some files into a directory <tt>Activities</tt>, <a
+        href="{{ url_for('upload.index') }}">upload activities</a> or <a href="{{ url_for('settings.strava') }}">set up
+        Strava API</a>.</p>
 {% endif %}
 
 {% endblock %}
