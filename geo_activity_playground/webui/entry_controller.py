@@ -16,10 +16,10 @@ class EntryController:
         self._config = config
 
     def render(self) -> dict:
-        kind_scale = make_kind_scale(self._repository.meta, self._config)
         result = {"latest_activities": []}
 
         if len(self._repository):
+            kind_scale = make_kind_scale(self._repository.meta, self._config)
             result["distance_last_30_days_plot"] = distance_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
