@@ -8,6 +8,11 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.33
 
+#### Version 0.33.3
+
+- [GH-200](https://github.com/martin-ueding/geo-activity-playground/issues/200): Fix startup without any activities.
+- Fix upload when there is no `Activities` directory.
+
 #### Version 0.33.2
 
 - [GH-198](https://github.com/martin-ueding/geo-activity-playground/issues/198): Fix explorer map. The problem was that VS Code auto-formatted the embedded JavaScript and created syntax errors.
