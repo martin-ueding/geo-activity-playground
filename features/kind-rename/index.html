@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/upload/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/features/kind-rename/">
       
       
-        <link rel="prev" href="../equipment/">
+        <link rel="prev" href="../share-picture/">
       
       
-        <link rel="next" href="../share-picture/">
+        <link rel="next" href="../../reference/changelog/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Uploading activities - Geo Activity Playground</title>
+        <title>Kind rename - Geo Activity Playground</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#uploading-activities" class="md-skip">
+        <a href="#kind-rename" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Uploading activities
+              Kind rename
             
           </span>
         </div>
@@ -703,19 +703,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../upload/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -724,7 +715,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -755,10 +745,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../kind-rename/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -767,6 +766,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -895,18 +895,16 @@
                   
 
 
-<h1 id="uploading-activities">Uploading activities</h1>
-<p>Some users don't want to restart the application each time they add new activities but run it on their home server. For this use case you can upload activities. Uploading files is a potential security issue and it is protected with a password. This feature is only enabled when you have set a password in the configuration file.</p>
-<p>Put the following into your <code>config.json</code> file:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;upload_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fb1c8d62-07a5-47bf-ada1-30aa66e41d8a&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>Be sure to choose your own password and not use the one from this documentation.</p>
-<p>Then you can go to the upload page and see this form:</p>
-<p><img alt="upload-form.png" src="../upload-form.png" /></p>
-<p>Select a file that you want to upload and a target directory within the “Activities” directory. Finally, enter the password from the configuration file.</p>
-<p>After you have uploaded the file, you will be redirected to the parsed activity.</p>
+<h1 id="kind-rename">Kind rename</h1>
+<p>Metadata and importing from several sources can be messy and in some cases Strava will export its acivity types/activity kinds under names like root='Ride' and not "Ride". That can lead to issues with tagging and the heatmap - in this case we have multiple, overlapping activity kinds for the same activity kinds.</p>
+<p>To fix this, go to Admin -&gt; Settings -&gt; Kind rename</p>
+<ul>
+<li>Type in the box to define how you want to reprocess your activities</li>
+<li>The Format is <code>Existing name =&gt; New name</code></li>
+<li>f.e. to rename <code>root='Ride'</code> to <code>'Ride'</code> put in <code>root='Ride' =&gt; Ride</code></li>
+<li>Click on "Save", the system will then reprocess all affected activities</li>
+<li>This can take a few minutes depending on the amount of activities</li>
+</ul>
 
 
 
