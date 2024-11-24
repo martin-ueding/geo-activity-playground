@@ -43,6 +43,7 @@ nav:
       - features/equipment.md
       - features/upload.md
       - features/share-picture.md
+      - features/kind-rename.md
   - Reference:
       - reference/changelog.md
   - acknowledgments.md
