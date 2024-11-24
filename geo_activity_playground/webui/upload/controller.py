@@ -39,6 +39,7 @@ class UploadController:
         self._config = config
 
     def render_form(self) -> dict:
+        pathlib.Path("Activities").mkdir(exist_ok=True, parents=True)
         directories = []
         for root, dirs, files in os.walk("Activities"):
             directories.append(root)
