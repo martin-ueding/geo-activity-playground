@@ -22,7 +22,7 @@ from .search.blueprint import make_search_blueprint
 from .square_planner.blueprint import make_square_planner_blueprint
 from .summary.blueprint import make_summary_blueprint
 from .tile.blueprint import make_tile_blueprint
-from .upload.blueprint import make_upload_blueprint
+from .upload_blueprint import make_upload_blueprint
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint

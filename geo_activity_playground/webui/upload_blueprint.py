@@ -8,11 +8,11 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from ...core.activities import ActivityRepository
-from ...core.activities import build_activity_meta
-from ...explorer.tile_visits import compute_tile_evolution
-from ...explorer.tile_visits import compute_tile_visits_new
-from ...explorer.tile_visits import TileVisitAccessor
+from ..core.activities import ActivityRepository
+from ..core.activities import build_activity_meta
+from ..explorer.tile_visits import compute_tile_evolution
+from ..explorer.tile_visits import compute_tile_visits_new
+from ..explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.enrichment import enrich_activities
 from geo_activity_playground.importers.directory import get_file_hash

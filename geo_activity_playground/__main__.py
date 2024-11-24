@@ -13,7 +13,7 @@ from geo_activity_playground.core.config import import_old_strava_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.webui.app import web_ui_main
-from geo_activity_playground.webui.upload.blueprint import scan_for_activities
+from geo_activity_playground.webui.upload_blueprint import scan_for_activities
 
 logger = logging.getLogger(__name__)
 
