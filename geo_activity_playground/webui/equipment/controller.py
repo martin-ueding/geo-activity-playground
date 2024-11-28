@@ -87,7 +87,7 @@ class EquipmentController:
                 )
                 .mark_bar()
                 .encode(
-                    alt.X("kind", title="Year"),
+                    alt.X("kind", title="Kind"),
                     alt.Y("sum(distance_km)", title="Distance / km"),
                 )
                 .to_json(format="vega")
