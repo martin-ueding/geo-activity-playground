@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.33
 
+#### Version 0.33.4
+
+- Add compatibility for Python 3.13.
+
 #### Version 0.33.3
 
 - [GH-200](https://github.com/martin-ueding/geo-activity-playground/issues/200): Fix startup without any activities.

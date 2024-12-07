@@ -9,12 +9,13 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-import scipy.interpolate
 from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
 from ..core.tiles import get_tile
+
+# import scipy.interpolate
 
 
 def build_image(
