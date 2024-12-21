@@ -55,6 +55,13 @@ def make_activity_blueprint(
             **activity_controller.render_day(int(year), int(month), int(day)),
         )
 
+    @blueprint.route("/day-sharepic/<year>/<month>/<day>/sharepic.png")
+    def day_sharepic(year: str, month: str, day: str):
+        return Response(
+            activity_controller.render_day_sharepic(int(year), int(month), int(day)),
+            mimetype="image/png",
+        )
+
     @blueprint.route("/name/<name>")
     def name(name: str):
         return render_template(

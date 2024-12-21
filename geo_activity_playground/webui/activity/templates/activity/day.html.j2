@@ -30,7 +30,7 @@
         <ol>
             {% for activity in activities %}
             <li><span style="color: {{ activity['color'] }};">█</span> <a
-                    href="{{ url_for('activity.show', id=activity.id) }}">{{
+                    href="{{ url_for('.show', id=activity.id) }}">{{
                     activity.name }}</a></li>
             {% endfor %}
         </ol>
@@ -79,5 +79,9 @@
         </table>
     </div>
 </div>
+
+<h2>Share picture</h2>
+
+<p><img src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
 
 {% endblock %}

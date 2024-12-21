@@ -170,7 +170,23 @@ class ActivityController:
             "date": datetime.date(year, month, day).isoformat(),
             "total_distance": activities_that_day["distance_km"].sum(),
             "total_elapsed_time": activities_that_day["elapsed_time"].sum(),
+            "day": day,
+            "month": month,
+            "year": year,
         }
+
+    def render_day_sharepic(self, year: int, month: int, day: int) -> bytes:
+        meta = self._repository.meta
+        selection = meta["start"].dt.date == datetime.date(year, month, day)
+        activities_that_day = meta.loc[selection]
+
+        time_series = [
+            self._repository.get_time_series(activity_id)
+            for activity_id in activities_that_day["id"]
+        ]
+        assert len(activities_that_day) > 0
+        assert len(time_series) > 0
+        return (make_day_sharepic(activities_that_day, time_series, self._config),)
 
     def render_all(self) -> dict:
         cmap = matplotlib.colormaps["Dark2"]
@@ -452,14 +468,10 @@ def pixels_in_bounds(bounds: PixelBounds) -> int:
     return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)
 
 
-def make_sharepic(
-    activity: ActivityMeta,
-    time_series: pd.DataFrame,
-    sharepic_suppressed_fields: list[str],
-    config: Config,
-) -> bytes:
-    tile_x = time_series["x"]
-    tile_y = time_series["y"]
+def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
+    all_time_series = pd.concat(time_series_list)
+    tile_x = all_time_series["x"]
+    tile_y = all_time_series["y"]
     tile_width = tile_x.max() - tile_x.min()
     tile_height = tile_y.max() - tile_y.min()
 
@@ -495,16 +507,32 @@ def make_sharepic(
     img = Image.fromarray((background * 255).astype("uint8"), "RGB")
     draw = ImageDraw.Draw(img, mode="RGBA")
 
-    for _, group in time_series.groupby("segment_id"):
-        yx = list(
-            zip(
-                (tile_xz - tile_xz_center[0]) * OSM_TILE_SIZE + target_width / 2,
-                (tile_yz - tile_xz_center[1]) * OSM_TILE_SIZE + target_map_height / 2,
+    for time_series in time_series_list:
+        for _, group in time_series.groupby("segment_id"):
+            yx = list(
+                zip(
+                    (tile_xz - tile_xz_center[0]) * OSM_TILE_SIZE + target_width / 2,
+                    (tile_yz - tile_xz_center[1]) * OSM_TILE_SIZE
+                    + target_map_height / 2,
+                )
             )
-        )
 
-        draw.line(yx, fill="red", width=4)
+            draw.line(yx, fill="red", width=4)
 
+    return img
+
+
+def make_sharepic(
+    activity: ActivityMeta,
+    time_series: pd.DataFrame,
+    sharepic_suppressed_fields: list[str],
+    config: Config,
+) -> bytes:
+    footer_height = 100
+
+    img = make_sharepic_base([time_series], config)
+
+    draw = ImageDraw.Draw(img, mode="RGBA")
     draw.rectangle(
         [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
     )
@@ -526,6 +554,48 @@ def make_sharepic(
         key: value
         for key, value in facts.items()
         if not key in sharepic_suppressed_fields
+    }
+
+    draw.text(
+        (35, img.height - footer_height + 10),
+        "      ".join(facts.values()),
+        font_size=20,
+    )
+
+    draw.text(
+        (img.width - 250, img.height - 20),
+        "Map: © Open Street Map Contributors",
+        font_size=14,
+    )
+
+    f = io.BytesIO()
+    img.save(f, format="png")
+    return bytes(f.getbuffer())
+
+
+def make_day_sharepic(
+    activities: pd.DataFrame,
+    time_series_list: list[pd.DataFrame],
+    config: Config,
+) -> bytes:
+    footer_height = 100
+
+    img = make_sharepic_base(time_series_list, config)
+
+    draw = ImageDraw.Draw(img, mode="RGBA")
+    draw.rectangle(
+        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
+    )
+
+    date = activities.iloc[0]["start"].date()
+    distance_km = activities["distance_km"].sum()
+    elapsed_time: pd.Timedelta = activities["elapsed_time"].sum()
+    elapsed_time = elapsed_time.round("s")
+
+    facts = {
+        "date": f"{date}",
+        "distance_km": f"{distance_km:.1f} km",
+        "elapsed_time": re.sub(r"^0 days ", "", f"{elapsed_time}"),
     }
 
     draw.text(
