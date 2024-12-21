@@ -14,7 +14,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Make CSV header parsing a bit more robust.
 - [GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201): Correct label for equipment "kinds" plot.
 - [GH-203](https://github.com/martin-ueding/geo-activity-playground/issues/203): Fix documentation, remove `--skip-strava` and replace it with `--skip-reload`.
-
+- [GH-205](https://github.com/martin-ueding/geo-activity-playground/issues/205): Fix mismatch between ISO week and regular year.
 
 #### Version 0.33.4
 

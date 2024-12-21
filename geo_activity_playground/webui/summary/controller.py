@@ -105,6 +105,7 @@ def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
     df["month"] = [start.month for start in df["start"]]
     df["day"] = [start.day for start in df["start"]]
     df["week"] = [start.isocalendar().week for start in df["start"]]
+    df["iso_year"] = [start.isocalendar().year for start in df["start"]]
     df["hours"] = [
         elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
     ]
@@ -188,8 +189,8 @@ def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -
 
 def plot_year_cumulative(df: pd.DataFrame) -> str:
     year_cumulative = (
-        df[["year", "week", "distance_km"]]
-        .groupby("year")
+        df[["iso_year", "week", "distance_km"]]
+        .groupby("iso_year")
         .apply(
             lambda group: pd.DataFrame(
                 {"week": group["week"], "distance_km": group["distance_km"].cumsum()}
@@ -205,10 +206,10 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
         .encode(
             alt.X("week", title="Week"),
             alt.Y("distance_km", title="Distance / km"),
-            alt.Color("year:N", title="Year"),
+            alt.Color("iso_year:N", title="Year"),
             [
                 alt.Tooltip("week", title="Week"),
-                alt.Tooltip("year:N", title="Year"),
+                alt.Tooltip("iso_year:N", title="Year"),
                 alt.Tooltip("distance_km", title="Distance / km"),
             ],
         )
@@ -234,26 +235,26 @@ def tabulate_year_kind_mean(df: pd.DataFrame) -> pd.DataFrame:
 
 def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
     week_kind_total_distance = (
-        df[["year", "week", "kind", "distance_km"]]
-        .groupby(["year", "week", "kind"])
+        df[["iso_year", "week", "kind", "distance_km"]]
+        .groupby(["iso_year", "week", "kind"])
         .sum()
         .reset_index()
     )
     week_kind_total_distance["year_week"] = [
         f"{year}-{week:02d}"
         for year, week in zip(
-            week_kind_total_distance["year"], week_kind_total_distance["week"]
+            week_kind_total_distance["iso_year"], week_kind_total_distance["week"]
         )
     ]
 
-    last_year = week_kind_total_distance["year"].iloc[-1]
+    last_year = week_kind_total_distance["iso_year"].iloc[-1]
     last_week = week_kind_total_distance["week"].iloc[-1]
 
     return (
         alt.Chart(
             week_kind_total_distance.loc[
-                (week_kind_total_distance["year"] == last_year)
-                | (week_kind_total_distance["year"] == last_year - 1)
+                (week_kind_total_distance["iso_year"] == last_year)
+                | (week_kind_total_distance["iso_year"] == last_year - 1)
                 & (week_kind_total_distance["week"] >= last_week)
             ],
             title="Weekly Distance",
