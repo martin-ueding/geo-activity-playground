@@ -6,16 +6,16 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.33
-
-#### Version 0.33.5
+### Version 0.34
 
 - [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export.
 - [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Make CSV header parsing a bit more robust.
 - [GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201): Correct label for equipment "kinds" plot.
 - [GH-203](https://github.com/martin-ueding/geo-activity-playground/issues/203): Fix documentation, remove `--skip-strava` and replace it with `--skip-reload`.
 - [GH-205](https://github.com/martin-ueding/geo-activity-playground/issues/205): Fix mismatch between ISO week and regular year.
-- [GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157): Fix mismatch between ISO week and regular year.
+- [GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157): Add a share picture per day.
+
+### Version 0.33
 
 #### Version 0.33.4
 
