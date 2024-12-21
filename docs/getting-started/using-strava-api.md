@@ -28,4 +28,4 @@ Therefore it is recommended to use a Strava export in order to get started quick
 
 ## Skip Strava download
 
-If you don't want to download new activities from Strava, use `--skip-strava` to have the webserver start right away.
+If you don't want to download new activities from Strava, use `--skip-reload` to have the webserver start right away.
