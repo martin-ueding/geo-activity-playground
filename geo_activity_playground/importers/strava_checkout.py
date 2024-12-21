@@ -146,7 +146,7 @@ def float_with_comma_or_period(x: str) -> Optional[float]:
 
 def import_from_strava_checkout() -> None:
     checkout_path = pathlib.Path("Strava Export")
-    with open(checkout_path / "activities.csv") as f:
+    with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
     header = rows[0]
 
@@ -159,9 +159,15 @@ def import_from_strava_checkout() -> None:
 
     if header[0] == EXPECTED_COLUMNS[0]:
         dayfirst = False
-    if header[0] == "Aktivitäts-ID":
+    elif header[0] == "Aktivitäts-ID":
         header = EXPECTED_COLUMNS
         dayfirst = True
+    else:
+        logger.error(
+            f"You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
+        )
+        print(header)
+        sys.exit(1)
 
     table = {
         header[i]: [rows[r][i] for r in range(1, len(rows))] for i in range(len(header))

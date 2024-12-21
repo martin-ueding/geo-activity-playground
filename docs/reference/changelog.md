@@ -8,6 +8,11 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.33
 
+#### Version 0.33.5
+
+- [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export.
+- [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Make CSV header parsing a bit more robust.
+
 #### Version 0.33.4
 
 - Add compatibility for Python 3.13.
