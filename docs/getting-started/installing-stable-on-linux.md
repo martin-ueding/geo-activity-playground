@@ -2,13 +2,41 @@
 
 In this how-to guide I will show you how you can install the latest stable version of this project on Linux.
 
-Using PIP, you can install the latest version using this command:
+## PIPX method
+
+The ideal way to install this project, is using `pipx`. First ensure that you have it installed:
+
+| Distribution | Command |
+| --- | --- |
+| Ubuntu, Debian | `sudo apt install pipx` |
+| Fedora, RedHat | `sudo dnf install pipx` |
+| Arch, Manjaro | `sudo pacman -Syu python-pipx` |
+
+Using PIPX, you can then install the latest version using this command:
+
+```bash
+pipx install geo-activity-playground
+```
+
+That should be it. You might need to ensure that the `$PATH` is correct. For that see the section below.
+
+## PIP method
+
+If you don't want to use PIPX, you can also use regular PIP. First install PIP:
+
+| Distribution | Command |
+| --- | --- |
+| Ubuntu, Debian | `sudo apt install python3-pip` |
+| Fedora, RedHat | `sudo dnf install python3-pip` |
+| Arch, Manjaro | `sudo dnf install python-pip` |
+
+Then install the package into your user directory.
 
 ```bash
 pip install --user geo-activity-playground
 ```
 
-If you get an error about the command `pip` not found, you will need to install that first. On Ubuntu or Debian use `sudo apt install python3-pip`, on Fedora or RedHat use `sudo dnf install python3-pip`. After you have installed PIP, repeat the above command.
+That should be it. You might need to ensure that the `$PATH` is correct. For that see the section below.
 
 ## Ensure that the PATH is correct
 
@@ -34,8 +62,14 @@ This adds the path to your shell environment. This becomes active after you log 
 
 ## Upgrading to the latest version
 
-At some later point you likely want to upgrade to the latest version. For this use this command:
+At some later point you likely want to upgrade to the latest version. For this use this command if you used PIPX:
 
-```python
+```bash
+pipx upgrade geo-activity-playground
+```
+
+If you used PIP, use this:
+
+```bash
 pip install --user --upgrade geo-activity-playground
 ```
