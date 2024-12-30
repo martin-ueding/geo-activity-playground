@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.34
 
+#### Version 0.34.1
+
+- Host all assets locally to avoid using CDNs.
+
+#### Version 0.34.0
+
 - [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export.
 - [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Make CSV header parsing a bit more robust.
 - [GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201): Correct label for equipment "kinds" plot.
