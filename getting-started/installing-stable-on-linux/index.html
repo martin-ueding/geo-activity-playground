@@ -332,6 +332,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#pipx-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      PIPX method
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pip-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      PIP method
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
     <span class="md-ellipsis">
       Ensure that the PATH is correct
@@ -937,6 +955,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#pipx-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      PIPX method
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pip-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      PIP method
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ensure-that-the-path-is-correct" class="md-nav__link">
     <span class="md-ellipsis">
       Ensure that the PATH is correct
@@ -971,10 +1007,62 @@
 
 <h1 id="installing-stable-on-linux">Installing Stable On Linux</h1>
 <p>In this how-to guide I will show you how you can install the latest stable version of this project on Linux.</p>
-<p>Using PIP, you can install the latest version using this command:</p>
+<h2 id="pipx-method">PIPX method</h2>
+<p>The ideal way to install this project, is using <code>pipx</code>. First ensure that you have it installed:</p>
+<table>
+<thead>
+<tr>
+<th>Distribution</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ubuntu, Debian</td>
+<td><code>sudo apt install pipx</code></td>
+</tr>
+<tr>
+<td>Fedora, RedHat</td>
+<td><code>sudo dnf install pipx</code></td>
+</tr>
+<tr>
+<td>Arch, Manjaro</td>
+<td><code>sudo pacman -Syu python-pipx</code></td>
+</tr>
+</tbody>
+</table>
+<p>Using PIPX, you can then install the latest version using this command:</p>
+<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
+</code></pre></div>
+<p>That should be it. You might need to ensure that the <code>$PATH</code> is correct. For that see the section below.</p>
+<h2 id="pip-method">PIP method</h2>
+<p>If you don't want to use PIPX, you can also use regular PIP. First install PIP:</p>
+<table>
+<thead>
+<tr>
+<th>Distribution</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ubuntu, Debian</td>
+<td><code>sudo apt install python3-pip</code></td>
+</tr>
+<tr>
+<td>Fedora, RedHat</td>
+<td><code>sudo dnf install python3-pip</code></td>
+</tr>
+<tr>
+<td>Arch, Manjaro</td>
+<td><code>sudo dnf install python-pip</code></td>
+</tr>
+</tbody>
+</table>
+<p>Then install the package into your user directory.</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>geo-activity-playground
 </code></pre></div>
-<p>If you get an error about the command <code>pip</code> not found, you will need to install that first. On Ubuntu or Debian use <code>sudo apt install python3-pip</code>, on Fedora or RedHat use <code>sudo dnf install python3-pip</code>. After you have installed PIP, repeat the above command.</p>
+<p>That should be it. You might need to ensure that the <code>$PATH</code> is correct. For that see the section below.</p>
 <h2 id="ensure-that-the-path-is-correct">Ensure that the PATH is correct</h2>
 <p>Next you can try to start the program by just entering the following into the terminal:</p>
 <div class="highlight"><pre><span></span><code>geo-activity-playground<span class="w"> </span>--help
@@ -987,8 +1075,11 @@
 </code></pre></div>
 <p>This adds the path to your shell environment. This becomes active after you log in again. In order to apply it also to your current shell session, execute <code>export PATH=$PATH:$HOME/.local/bin</code> in the terminal window. Try the first command in this section again, you should see the help message now.</p>
 <h2 id="upgrading-to-the-latest-version">Upgrading to the latest version</h2>
-<p>At some later point you likely want to upgrade to the latest version. For this use this command:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">geo</span><span class="o">-</span><span class="n">activity</span><span class="o">-</span><span class="n">playground</span>
+<p>At some later point you likely want to upgrade to the latest version. For this use this command if you used PIPX:</p>
+<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>upgrade<span class="w"> </span>geo-activity-playground
+</code></pre></div>
+<p>If you used PIP, use this:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--upgrade<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 
 
