@@ -8,6 +8,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.34
 
+#### Version 0.34.2
+
+- Host another JavaScript asset locally.
+
 #### Version 0.34.1
 
 - Host all assets locally to avoid using CDNs.
