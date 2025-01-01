@@ -12,6 +12,7 @@ from geo_activity_playground.core.config import import_old_config
 from geo_activity_playground.core.config import import_old_strava_config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
+from geo_activity_playground.heatmap_video import main_heatmap_video
 from geo_activity_playground.webui.app import web_ui_main
 from geo_activity_playground.webui.upload_blueprint import scan_for_activities
 
@@ -79,6 +80,17 @@ def main() -> None:
 
     subparser = subparsers.add_parser("cache", help="Cache stuff")
     subparser.set_defaults(func=lambda options: main_cache(options.basedir))
+
+    subparser = subparsers.add_parser(
+        "heatmap-video", help="Create a video with the evolution of the heatmap"
+    )
+    subparser.add_argument("latitude", type=float)
+    subparser.add_argument("longitude", type=float)
+    subparser.add_argument("zoom", type=int)
+    subparser.add_argument("--decay", type=float, default=0.05)
+    subparser.add_argument("--video-width", type=int, default=1920)
+    subparser.add_argument("--video-height", type=int, default=1080)
+    subparser.set_defaults(func=main_heatmap_video)
 
     options = parser.parse_args()
     coloredlogs.install(
