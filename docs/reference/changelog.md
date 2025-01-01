@@ -6,6 +6,10 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.35
+
+- Add button to explorer tile map to remove map background.
+
 ### Version 0.34
 
 #### Version 0.34.2

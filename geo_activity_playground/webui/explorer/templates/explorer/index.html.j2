@@ -34,16 +34,15 @@
 <div class="row mb-3">
     <div class="col">
         <div class="btn-group mb-3" role="group">
-            <button type="button" class="btn btn-secondary" onclick="changeColor('cluster')">Cluster</button>
-            <button type="button" class="btn btn-secondary" onclick="changeColor('first')">First Visit</button>
-            <button type="button" class="btn btn-secondary" onclick="changeColor('last')">Last Visit</button>
+            <button type="button" class="btn btn-primary" onclick="changeColor('cluster')">Cluster</button>
+            <button type="button" class="btn btn-primary" onclick="changeColor('first')">First Visit</button>
+            <button type="button" class="btn btn-primary" onclick="changeColor('last')">Last Visit</button>
         </div>
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
         <p>Download tiles in visible area: <a href="#" onclick="downloadAs('explored.geojson')">Explored as GeoJSON</a>,
             <a href="#" onclick="downloadAs('explored.gpx')"">Explored as GPX</a>, <a href=" #"
                 onclick="downloadAs('missing.geojson')">Missing as GeoJSON</a> or <a href="#"
                 onclick="downloadAs('missing.gpx')"">Missing as GPX</a>.</p>
-
         <script>
             function onEachFeature(feature, layer) {
                 if (feature.properties && feature.properties.first_visit) {
@@ -71,10 +70,11 @@
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 10
             })
-            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+            let tile_layer = L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '{{ map_tile_attribution|safe }}'
-            }).addTo(map)
+            });
+            tile_layer.addTo(map)
             let explorer_layer_cluster_color = L.geoJSON(explorer_geojson, {
                 style: function (feature) {
                     return {
@@ -115,6 +115,8 @@
                 bounds = map.getBounds(); zoom = "{{ zoom }}"
                 window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
             } </script>
+                <p></p><button type="button" class="btn btn-secondary btn-sm"
+                    onclick="map.removeLayer(tile_layer)">Remove map background</button>
     </div>
 </div>
 
