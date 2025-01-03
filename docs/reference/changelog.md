@@ -11,6 +11,8 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 #### Version 0.35.1
 
 - [GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208): Support activity files with uppercase suffix.
+- Do some internal changes to the map background generation for share pictures.
+- Do some refactoring in the web code.
 
 #### Version 0.35.0
 
