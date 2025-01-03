@@ -1,17 +1,11 @@
 from flask import Blueprint
 from flask import render_template
 
-from ...core.activities import ActivityRepository
-from .controller import EquipmentController
-from geo_activity_playground.core.config import Config
+from geo_activity_playground.webui.equipment.controller import EquipmentController
 
 
-def make_equipment_blueprint(
-    repository: ActivityRepository, config: Config
-) -> Blueprint:
+def make_equipment_blueprint(equipment_controller: EquipmentController) -> Blueprint:
     blueprint = Blueprint("equipment", __name__, template_folder="templates")
-
-    equipment_controller = EquipmentController(repository, config)
 
     @blueprint.route("/")
     def index():

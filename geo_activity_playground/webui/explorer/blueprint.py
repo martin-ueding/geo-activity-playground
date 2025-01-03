@@ -4,20 +4,12 @@ from flask import render_template
 from flask import Response
 from flask import url_for
 
-from ...core.activities import ActivityRepository
-from ...explorer.tile_visits import TileVisitAccessor
-from .controller import ExplorerController
-from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.webui.explorer.controller import ExplorerController
 
 
 def make_explorer_blueprint(
-    repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config_accessor: ConfigAccessor,
+    explorer_controller: ExplorerController,
 ) -> Blueprint:
-    explorer_controller = ExplorerController(
-        repository, tile_visit_accessor, config_accessor
-    )
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
     @blueprint.route("/<zoom>")

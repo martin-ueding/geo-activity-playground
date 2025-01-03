@@ -9,23 +9,18 @@ from flask import Response
 from flask import url_for
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.paths import activity_meta_override_dir
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.activity.controller import ActivityController
 from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.authenticator import needs_authentication
 
 
 def make_activity_blueprint(
+    activity_controller: ActivityController,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config: Config,
     authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
-
-    activity_controller = ActivityController(repository, tile_visit_accessor, config)
 
     @blueprint.route("/all")
     def all():

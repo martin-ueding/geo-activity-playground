@@ -1,14 +1,11 @@
 from flask import Blueprint
 from flask import render_template
 
-from ...core.activities import ActivityRepository
-from .controller import CalendarController
+from geo_activity_playground.webui.calendar.controller import CalendarController
 
 
-def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
+def make_calendar_blueprint(calendar_controller: CalendarController) -> Blueprint:
     blueprint = Blueprint("calendar", __name__, template_folder="templates")
-
-    calendar_controller = CalendarController(repository)
 
     @blueprint.route("/")
     def index():

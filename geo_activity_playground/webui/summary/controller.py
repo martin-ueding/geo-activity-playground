@@ -1,7 +1,6 @@
 import collections
 import datetime
 import functools
-from typing import Optional
 
 import altair as alt
 import pandas as pd

@@ -9,25 +9,34 @@ import urllib.parse
 from flask import Flask
 from flask import render_template
 
-from ..core.activities import ActivityRepository
-from ..explorer.tile_visits import TileVisitAccessor
-from .activity.blueprint import make_activity_blueprint
-from .calendar.blueprint import make_calendar_blueprint
-from .eddington.blueprint import make_eddington_blueprint
-from .entry_controller import EntryController
-from .equipment.blueprint import make_equipment_blueprint
-from .explorer.blueprint import make_explorer_blueprint
-from .heatmap.blueprint import make_heatmap_blueprint
-from .search.blueprint import make_search_blueprint
-from .square_planner.blueprint import make_square_planner_blueprint
-from .summary.blueprint import make_summary_blueprint
-from .tile.blueprint import make_tile_blueprint
-from .upload_blueprint import make_upload_blueprint
+from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from geo_activity_playground.webui.activity.blueprint import make_activity_blueprint
+from geo_activity_playground.webui.activity.controller import ActivityController
 from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint
 from geo_activity_playground.webui.authenticator import Authenticator
+from geo_activity_playground.webui.calendar.blueprint import make_calendar_blueprint
+from geo_activity_playground.webui.calendar.controller import CalendarController
+from geo_activity_playground.webui.eddington.blueprint import make_eddington_blueprint
+from geo_activity_playground.webui.eddington.controller import EddingtonController
+from geo_activity_playground.webui.entry_controller import EntryController
+from geo_activity_playground.webui.equipment.blueprint import make_equipment_blueprint
+from geo_activity_playground.webui.equipment.controller import EquipmentController
+from geo_activity_playground.webui.explorer.blueprint import make_explorer_blueprint
+from geo_activity_playground.webui.explorer.controller import ExplorerController
+from geo_activity_playground.webui.heatmap.blueprint import make_heatmap_blueprint
+from geo_activity_playground.webui.search.blueprint import make_search_blueprint
 from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
+from geo_activity_playground.webui.square_planner.blueprint import (
+    make_square_planner_blueprint,
+)
+from geo_activity_playground.webui.summary.blueprint import make_summary_blueprint
+from geo_activity_playground.webui.summary.controller import SummaryController
+from geo_activity_playground.webui.tile.blueprint import make_tile_blueprint
+from geo_activity_playground.webui.tile.controller import TileController
+from geo_activity_playground.webui.upload_blueprint import make_upload_blueprint
 
 
 def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
@@ -77,26 +86,35 @@ def web_ui_main(
 
     authenticator = Authenticator(config_accessor())
 
+    config = config_accessor()
+    summary_controller = SummaryController(repository, config)
+    tile_controller = TileController(config)
+    activity_controller = ActivityController(repository, tile_visit_accessor, config)
+    calendar_controller = CalendarController(repository)
+    equipment_controller = EquipmentController(repository, config)
+    eddington_controller = EddingtonController(repository)
+    explorer_controller = ExplorerController(
+        repository, tile_visit_accessor, config_accessor
+    )
+
     route_start(app, repository, config_accessor())
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
-
     app.register_blueprint(
-        make_activity_blueprint(
-            repository, tile_visit_accessor, config_accessor(), authenticator
-        ),
+        make_activity_blueprint(activity_controller, repository, authenticator),
         url_prefix="/activity",
     )
-    app.register_blueprint(make_calendar_blueprint(repository), url_prefix="/calendar")
     app.register_blueprint(
-        make_eddington_blueprint(repository), url_prefix="/eddington"
+        make_calendar_blueprint(calendar_controller), url_prefix="/calendar"
     )
     app.register_blueprint(
-        make_equipment_blueprint(repository, config_accessor()), url_prefix="/equipment"
+        make_eddington_blueprint(eddington_controller), url_prefix="/eddington"
     )
     app.register_blueprint(
-        make_explorer_blueprint(repository, tile_visit_accessor, config_accessor),
-        url_prefix="/explorer",
+        make_equipment_blueprint(equipment_controller), url_prefix="/equipment"
+    )
+    app.register_blueprint(
+        make_explorer_blueprint(explorer_controller), url_prefix="/explorer"
     )
     app.register_blueprint(
         make_heatmap_blueprint(repository, tile_visit_accessor, config_accessor()),
@@ -115,10 +133,10 @@ def web_ui_main(
         url_prefix="/search",
     )
     app.register_blueprint(
-        make_summary_blueprint(repository, config_accessor()),
-        url_prefix="/summary",
+        make_summary_blueprint(summary_controller), url_prefix="/summary"
     )
-    app.register_blueprint(make_tile_blueprint(config_accessor()), url_prefix="/tile")
+
+    app.register_blueprint(make_tile_blueprint(tile_controller), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator
