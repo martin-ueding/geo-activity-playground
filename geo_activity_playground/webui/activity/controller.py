@@ -21,13 +21,13 @@ from geo_activity_playground.core.activities import make_geojson_from_time_serie
 from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
-from geo_activity_playground.core.heatmap import build_map_from_tiles_around_center
-from geo_activity_playground.core.heatmap import GeoBounds
-from geo_activity_playground.core.heatmap import OSM_MAX_ZOOM
-from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
-from geo_activity_playground.core.heatmap import PixelBounds
-from geo_activity_playground.core.heatmap import TileBounds
 from geo_activity_playground.core.privacy_zones import PrivacyZone
+from geo_activity_playground.core.raster_map import build_map_from_tiles_around_center
+from geo_activity_playground.core.raster_map import GeoBounds
+from geo_activity_playground.core.raster_map import OSM_MAX_ZOOM
+from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
+from geo_activity_playground.core.raster_map import PixelBounds
+from geo_activity_playground.core.raster_map import TileBounds
 from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 

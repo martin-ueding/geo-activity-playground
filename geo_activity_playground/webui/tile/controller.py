@@ -4,7 +4,7 @@ import matplotlib.pyplot as pl
 import numpy as np
 
 from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.tiles import get_tile
+from geo_activity_playground.core.raster_map import get_tile
 
 
 class TileController:

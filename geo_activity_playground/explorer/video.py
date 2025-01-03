@@ -13,7 +13,7 @@ from PIL import Image
 from PIL import ImageEnhance
 from tqdm import tqdm
 
-from ..core.tiles import get_tile
+from ..core.raster_map import get_tile
 
 # import scipy.interpolate
 

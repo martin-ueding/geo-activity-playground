@@ -9,12 +9,12 @@ from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.heatmap import convert_to_grayscale
-from geo_activity_playground.core.heatmap import GeoBounds
-from geo_activity_playground.core.heatmap import get_sensible_zoom_level
-from geo_activity_playground.core.heatmap import PixelBounds
+from geo_activity_playground.core.raster_map import convert_to_grayscale
+from geo_activity_playground.core.raster_map import GeoBounds
+from geo_activity_playground.core.raster_map import get_sensible_zoom_level
+from geo_activity_playground.core.raster_map import get_tile
+from geo_activity_playground.core.raster_map import PixelBounds
 from geo_activity_playground.core.tasks import work_tracker
-from geo_activity_playground.core.tiles import get_tile
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.explorer.controller import (
@@ -117,9 +117,7 @@ class HeatmapController:
                     time_series = self._repository.get_time_series(activity_id)
                     for _, group in time_series.groupby("segment_id"):
                         xy_pixels = (
-                            np.array(
-                                [group["x"] * 2**z - x, group["y"] * 2**z - y]
-                            ).T
+                            np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
                             * OSM_TILE_SIZE
                         )
                         im = Image.new("L", tile_pixels)

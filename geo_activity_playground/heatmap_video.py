@@ -12,9 +12,9 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.heatmap import build_map_from_tiles_around_center
-from geo_activity_playground.core.heatmap import convert_to_grayscale
-from geo_activity_playground.core.heatmap import OSM_TILE_SIZE
+from geo_activity_playground.core.raster_map import build_map_from_tiles_around_center
+from geo_activity_playground.core.raster_map import convert_to_grayscale
+from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
 from geo_activity_playground.core.tiles import compute_tile_float
 
 
