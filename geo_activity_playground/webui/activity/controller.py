@@ -23,12 +23,8 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.raster_map import build_map_from_tiles_around_center
-from geo_activity_playground.core.raster_map import GeoBounds
 from geo_activity_playground.core.raster_map import OSM_MAX_ZOOM
 from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.core.raster_map import PixelBounds
-from geo_activity_playground.core.raster_map import TileBounds
-from geo_activity_playground.core.tiles import compute_tile_float
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
@@ -410,62 +406,6 @@ def name_minutes_plot(meta: pd.DataFrame) -> str:
         )
         .to_json(format="vega")
     )
-
-
-def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
-    x_radius = (bounds.x_max - bounds.x_min) // 2
-    y_radius = (bounds.y_max - bounds.y_min) // 2
-    x_center = (bounds.x_max + bounds.x_min) // 2
-    y_center = (bounds.y_max + bounds.y_min) // 2
-
-    radius = max(x_radius, y_radius)
-
-    return PixelBounds(
-        x_min=x_center - radius,
-        y_min=y_center - radius,
-        x_max=x_center + radius,
-        y_max=y_center + radius,
-    )
-
-
-def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
-    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
-    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
-    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
-    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
-
-    radius = max(x_radius, y_radius)
-
-    return TileBounds(
-        zoom=bounds.zoom,
-        x_tile_min=int(x_center - radius),
-        y_tile_min=int(y_center - radius),
-        x_tile_max=int(np.ceil(x_center + radius)),
-        y_tile_max=int(np.ceil(y_center + radius)),
-    )
-
-
-def get_crop_mask(geo_bounds: GeoBounds, tile_bounds: TileBounds) -> PixelBounds:
-    min_x, min_y = compute_tile_float(
-        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
-    )
-    max_x, max_y = compute_tile_float(
-        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
-    )
-
-    crop_mask = PixelBounds(
-        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-    )
-    crop_mask = make_pixel_bounds_square(crop_mask)
-
-    return crop_mask
-
-
-def pixels_in_bounds(bounds: PixelBounds) -> int:
-    return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)
 
 
 def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):

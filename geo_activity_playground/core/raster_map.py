@@ -1,3 +1,4 @@
+import collections
 import dataclasses
 import functools
 import logging
@@ -28,22 +29,6 @@ class GeoBounds:
     lon_min: float
     lat_max: float
     lon_max: float
-
-
-def get_bounds(lat_lon_data: np.ndarray) -> GeoBounds:
-    return GeoBounds(*np.min(lat_lon_data, axis=0), *np.max(lat_lon_data, axis=0))
-
-
-def add_margin(lower: float, upper: float) -> tuple[float, float]:
-    spread = upper - lower
-    margin = spread / 20
-    return max(0.0, lower - margin), upper + margin
-
-
-def add_margin_to_geo_bounds(bounds: GeoBounds) -> GeoBounds:
-    lat_min, lat_max = add_margin(bounds.lat_min, bounds.lat_max)
-    lon_min, lon_max = add_margin(bounds.lon_min, bounds.lon_max)
-    return GeoBounds(lat_min, lon_min, lat_max, lon_max)
 
 
 @dataclasses.dataclass
@@ -77,16 +62,6 @@ class PixelBounds:
             self.y_max - self.y_min,
             self.x_max - self.x_min,
         )
-
-
-def geo_bounds_from_tile_bounds(tile_bounds: TileBounds) -> GeoBounds:
-    lat_max, lon_min = get_tile_upper_left_lat_lon(
-        tile_bounds.x_tile_min, tile_bounds.y_tile_min, tile_bounds.zoom
-    )
-    lat_min, lon_max = get_tile_upper_left_lat_lon(
-        tile_bounds.x_tile_max, tile_bounds.y_tile_max, tile_bounds.zoom
-    )
-    return GeoBounds(lat_min, lon_min, lat_max, lon_max)
 
 
 def get_sensible_zoom_level(
@@ -209,22 +184,6 @@ def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
     return image
 
 
-@dataclasses.dataclass
-class Rectangle:
-    x1: float
-    x2: float
-    y1: float
-    y2: float
-
-
-@dataclasses.dataclass
-class RasterMapImage:
-    image: np.ndarray
-    zomm: int
-    geo_bounds: Rectangle
-    tile_bounds: Rectangle
-
-
 def osm_tile_path(x: int, y: int, zoom: int, url_template: str) -> pathlib.Path:
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(url_template)
@@ -245,3 +204,115 @@ def download_file(url: str, destination: pathlib.Path):
     with open(destination, "wb") as f:
         f.write(r.content)
     time.sleep(0.1)
+
+
+@dataclasses.dataclass
+class Point:
+    x: float
+    y: float
+
+
+@dataclasses.dataclass
+class Rectangle:
+    nw: Point
+    se: Point
+
+
+@dataclasses.dataclass
+class GeoPoint:
+    latitude: float
+    longitude: float
+
+
+@dataclasses.dataclass
+class GeoRectangle:
+    nw: GeoPoint
+    se: GeoPoint
+
+
+@dataclasses.dataclass
+class RasterMapImage:
+    image: np.ndarray
+    zoom: int
+    tile_rectangle: Rectangle
+    geo_rectangle: GeoRectangle
+
+
+def tile_point_from_geo_point(geo_point: GeoPoint, zoom: int) -> Point:
+    x, y = compute_tile_float(geo_point.latitude, geo_point.longitude, zoom)
+    return Point(x, y)
+
+
+def rectangle_from_geo_rectangle(geo_rectangle: GeoRectangle, zoom: int) -> Rectangle:
+    return Rectangle(
+        tile_point_from_geo_point(geo_rectangle.nw, zoom),
+        tile_point_from_geo_point(geo_rectangle.se, zoom),
+    )
+
+
+def add_margin(lower: float, upper: float, margin: float = 0.05) -> tuple[float, float]:
+    spread = upper - lower
+    margin = spread * margin
+    return lower - margin, upper + margin
+
+
+def rectangle_add_margin(rectangle: Rectangle, margin: float) -> Rectangle:
+    x1, x2 = add_margin(rectangle.nw.x, rectangle.se.x, margin)
+    y1, y2 = add_margin(rectangle.nw.y, rectangle.se.y, margin)
+    return Rectangle(Point(x1, y1), Point(x2, y2))
+
+
+def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
+    x_radius = (bounds.x_max - bounds.x_min) // 2
+    y_radius = (bounds.y_max - bounds.y_min) // 2
+    x_center = (bounds.x_max + bounds.x_min) // 2
+    y_center = (bounds.y_max + bounds.y_min) // 2
+
+    radius = max(x_radius, y_radius)
+
+    return PixelBounds(
+        x_min=x_center - radius,
+        y_min=y_center - radius,
+        x_max=x_center + radius,
+        y_max=y_center + radius,
+    )
+
+
+def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
+    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
+    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
+    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
+    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
+
+    radius = max(x_radius, y_radius)
+
+    return TileBounds(
+        zoom=bounds.zoom,
+        x_tile_min=int(x_center - radius),
+        y_tile_min=int(y_center - radius),
+        x_tile_max=int(np.ceil(x_center + radius)),
+        y_tile_max=int(np.ceil(y_center + radius)),
+    )
+
+
+def get_crop_mask(geo_bounds: GeoBounds, tile_bounds: TileBounds) -> PixelBounds:
+    min_x, min_y = compute_tile_float(
+        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
+    )
+    max_x, max_y = compute_tile_float(
+        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
+    )
+
+    crop_mask = PixelBounds(
+        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
+        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
+    )
+    crop_mask = make_pixel_bounds_square(crop_mask)
+
+    return crop_mask
+
+
+def pixels_in_bounds(bounds: PixelBounds) -> int:
+    return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)
