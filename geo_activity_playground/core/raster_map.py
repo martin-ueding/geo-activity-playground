@@ -22,9 +22,17 @@ OSM_TILE_SIZE = 256  # OSM tile size in pixel
 OSM_MAX_ZOOM = 19  # OSM maximum zoom level
 MAX_TILE_COUNT = 2000  # maximum number of tiles to download
 
+## Basic data types ##
+
 
 @dataclasses.dataclass
 class GeoBounds:
+    """
+    Models an area on the globe as a rectangle of latitude and longitude.
+
+    Latitude goes from South Pole (-90°) to North Pole (+90°). Longitude goes from West (-180°) to East (+180°). Be careful when converting latitude to Y-coordinates as increasing latitude will mean decreasing Y.
+    """
+
     lat_min: float
     lon_min: float
     lat_max: float
@@ -34,34 +42,88 @@ class GeoBounds:
 @dataclasses.dataclass
 class TileBounds:
     zoom: int
-    x_tile_min: int
-    x_tile_max: int
-    y_tile_min: int
-    y_tile_max: int
+    x1: int
+    y1: int
+    x2: int
+    y2: int
 
 
 @dataclasses.dataclass
 class PixelBounds:
-    x_min: int
-    x_max: int
-    y_min: int
-    y_max: int
+    x1: int
+    y1: int
+    x2: int
+    y2: int
 
     @classmethod
     def from_tile_bounds(cls, tile_bounds: TileBounds) -> "PixelBounds":
-        return cls(
-            int(tile_bounds.x_tile_min) * OSM_TILE_SIZE,
-            int(tile_bounds.x_tile_max) * OSM_TILE_SIZE,
-            int(tile_bounds.y_tile_min) * OSM_TILE_SIZE,
-            int(tile_bounds.y_tile_max) * OSM_TILE_SIZE,
-        )
+        return pixel_bounds_from_tile_bounds(tile_bounds)
 
     @property
     def shape(self) -> tuple[int, int]:
         return (
-            self.y_max - self.y_min,
-            self.x_max - self.x_min,
+            self.y2 - self.y1,
+            self.x2 - self.x1,
         )
+
+
+@dataclasses.dataclass
+class RasterMapImage:
+    image: np.ndarray
+    tile_bounds: TileBounds
+    geo_bounds: GeoBounds
+
+
+## Converter functions ##
+
+
+def tile_bounds_from_geo_bounds(geo_bounds: GeoBounds) -> TileBounds:
+    x1, y1 = compute_tile_float(geo_bounds.lat_max, geo_bounds.lon_min)
+    x2, y2 = compute_tile_float(geo_bounds.lat_min, geo_bounds.lon_min)
+    return TileBounds(x1, y1, x2, y2)
+
+
+def pixel_bounds_from_tile_bounds(tile_bounds: TileBounds) -> PixelBounds:
+    return PixelBounds(
+        int(tile_bounds.x1) * OSM_TILE_SIZE,
+        int(tile_bounds.y1) * OSM_TILE_SIZE,
+        int(tile_bounds.x2) * OSM_TILE_SIZE,
+        int(tile_bounds.y2) * OSM_TILE_SIZE,
+    )
+
+
+## Utility functions for manipulating bounds ##
+
+
+def _square_rectangle(
+    x1: float, y1: float, x2: float, y2: float
+) -> tuple[float, float, float, float]:
+    x_radius = (x2 - x1) // 2
+    y_radius = (y2 - y1) // 2
+    x_center = (x2 + x1) // 2
+    y_center = (y2 + y1) // 2
+
+    radius = max(x_radius, y_radius)
+
+    return (
+        x_center - radius,
+        y_center - radius,
+        x_center + radius,
+        y_center + radius,
+    )
+
+
+def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
+    x1, y1, x2, y2 = _square_rectangle(bounds.x1, bounds.y1, bounds.x2, bounds.y2)
+    return PixelBounds(x1, y1, x2, y2)
+
+
+def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
+    x1, y1, x2, y2 = _square_rectangle(bounds.x1, bounds.y1, bounds.x2, bounds.y2)
+    return TileBounds(bounds.zoom, int(x1), int(y1), int(np.ceil(x2)), int(np.ceil(y2)))
+
+
+# ---
 
 
 def get_sensible_zoom_level(
@@ -92,13 +154,7 @@ def get_sensible_zoom_level(
     if tile_count > MAX_TILE_COUNT:
         raise RuntimeError("Zoom value too high, too many tiles to download")
 
-    return TileBounds(
-        zoom=zoom,
-        x_tile_min=x_tile_min,
-        x_tile_max=x_tile_max,
-        y_tile_min=y_tile_min,
-        y_tile_max=y_tile_max,
-    )
+    return TileBounds(zoom, x_tile_min, y_tile_min, x_tile_max, y_tile_max)
 
 
 @functools.lru_cache()
@@ -204,115 +260,3 @@ def download_file(url: str, destination: pathlib.Path):
     with open(destination, "wb") as f:
         f.write(r.content)
     time.sleep(0.1)
-
-
-@dataclasses.dataclass
-class Point:
-    x: float
-    y: float
-
-
-@dataclasses.dataclass
-class Rectangle:
-    nw: Point
-    se: Point
-
-
-@dataclasses.dataclass
-class GeoPoint:
-    latitude: float
-    longitude: float
-
-
-@dataclasses.dataclass
-class GeoRectangle:
-    nw: GeoPoint
-    se: GeoPoint
-
-
-@dataclasses.dataclass
-class RasterMapImage:
-    image: np.ndarray
-    zoom: int
-    tile_rectangle: Rectangle
-    geo_rectangle: GeoRectangle
-
-
-def tile_point_from_geo_point(geo_point: GeoPoint, zoom: int) -> Point:
-    x, y = compute_tile_float(geo_point.latitude, geo_point.longitude, zoom)
-    return Point(x, y)
-
-
-def rectangle_from_geo_rectangle(geo_rectangle: GeoRectangle, zoom: int) -> Rectangle:
-    return Rectangle(
-        tile_point_from_geo_point(geo_rectangle.nw, zoom),
-        tile_point_from_geo_point(geo_rectangle.se, zoom),
-    )
-
-
-def add_margin(lower: float, upper: float, margin: float = 0.05) -> tuple[float, float]:
-    spread = upper - lower
-    margin = spread * margin
-    return lower - margin, upper + margin
-
-
-def rectangle_add_margin(rectangle: Rectangle, margin: float) -> Rectangle:
-    x1, x2 = add_margin(rectangle.nw.x, rectangle.se.x, margin)
-    y1, y2 = add_margin(rectangle.nw.y, rectangle.se.y, margin)
-    return Rectangle(Point(x1, y1), Point(x2, y2))
-
-
-def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
-    x_radius = (bounds.x_max - bounds.x_min) // 2
-    y_radius = (bounds.y_max - bounds.y_min) // 2
-    x_center = (bounds.x_max + bounds.x_min) // 2
-    y_center = (bounds.y_max + bounds.y_min) // 2
-
-    radius = max(x_radius, y_radius)
-
-    return PixelBounds(
-        x_min=x_center - radius,
-        y_min=y_center - radius,
-        x_max=x_center + radius,
-        y_max=y_center + radius,
-    )
-
-
-def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
-    x_radius = (bounds.x_tile_max - bounds.x_tile_min) / 2
-    y_radius = (bounds.y_tile_max - bounds.y_tile_min) / 2
-    x_center = (bounds.x_tile_max + bounds.x_tile_min) / 2
-    y_center = (bounds.y_tile_max + bounds.y_tile_min) / 2
-
-    radius = max(x_radius, y_radius)
-
-    return TileBounds(
-        zoom=bounds.zoom,
-        x_tile_min=int(x_center - radius),
-        y_tile_min=int(y_center - radius),
-        x_tile_max=int(np.ceil(x_center + radius)),
-        y_tile_max=int(np.ceil(y_center + radius)),
-    )
-
-
-def get_crop_mask(geo_bounds: GeoBounds, tile_bounds: TileBounds) -> PixelBounds:
-    min_x, min_y = compute_tile_float(
-        geo_bounds.lat_max, geo_bounds.lon_min, tile_bounds.zoom
-    )
-    max_x, max_y = compute_tile_float(
-        geo_bounds.lat_min, geo_bounds.lon_max, tile_bounds.zoom
-    )
-
-    crop_mask = PixelBounds(
-        int((min_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((max_x - tile_bounds.x_tile_min) * OSM_TILE_SIZE),
-        int((min_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-        int((max_y - tile_bounds.y_tile_min) * OSM_TILE_SIZE),
-    )
-    crop_mask = make_pixel_bounds_square(crop_mask)
-
-    return crop_mask
-
-
-def pixels_in_bounds(bounds: PixelBounds) -> int:
-    return (bounds.x_max - bounds.x_min) * (bounds.y_max - bounds.y_min)

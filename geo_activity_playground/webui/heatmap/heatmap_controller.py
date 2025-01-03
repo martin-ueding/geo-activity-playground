@@ -169,8 +169,8 @@ class HeatmapController:
         pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
 
         background = np.zeros((*pixel_bounds.shape, 3))
-        for x in range(tile_bounds.x_tile_min, tile_bounds.x_tile_max):
-            for y in range(tile_bounds.y_tile_min, tile_bounds.y_tile_max):
+        for x in range(tile_bounds.x1, tile_bounds.x2):
+            for y in range(tile_bounds.y1, tile_bounds.y2):
                 tile = (
                     np.array(
                         get_tile(tile_bounds.zoom, x, y, self._config.map_tile_url)
@@ -178,8 +178,8 @@ class HeatmapController:
                     / 255
                 )
 
-                i = y - tile_bounds.y_tile_min
-                j = x - tile_bounds.x_tile_min
+                i = y - tile_bounds.y1
+                j = x - tile_bounds.x1
 
                 background[
                     i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
