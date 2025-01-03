@@ -106,40 +106,6 @@ def pixel_bounds_from_tile_bounds(tile_bounds: TileBounds) -> PixelBounds:
     )
 
 
-## Utility functions for manipulating bounds ##
-
-
-def _square_rectangle(
-    x1: float, y1: float, x2: float, y2: float
-) -> tuple[float, float, float, float]:
-    x_radius = (x2 - x1) // 2
-    y_radius = (y2 - y1) // 2
-    x_center = (x2 + x1) // 2
-    y_center = (y2 + y1) // 2
-
-    radius = max(x_radius, y_radius)
-
-    return (
-        x_center - radius,
-        y_center - radius,
-        x_center + radius,
-        y_center + radius,
-    )
-
-
-def make_pixel_bounds_square(bounds: PixelBounds) -> PixelBounds:
-    x1, y1, x2, y2 = _square_rectangle(bounds.x1, bounds.y1, bounds.x2, bounds.y2)
-    return PixelBounds(x1, y1, x2, y2)
-
-
-def make_tile_bounds_square(bounds: TileBounds) -> TileBounds:
-    x1, y1, x2, y2 = _square_rectangle(bounds.x1, bounds.y1, bounds.x2, bounds.y2)
-    return TileBounds(bounds.zoom, int(x1), int(y1), int(np.ceil(x2)), int(np.ceil(y2)))
-
-
-# ---
-
-
 def get_sensible_zoom_level(
     bounds: GeoBounds, picture_size: tuple[int, int]
 ) -> TileBounds:
