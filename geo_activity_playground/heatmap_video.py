@@ -1,5 +1,4 @@
 import collections
-import datetime
 import os
 import pathlib
 
@@ -12,9 +11,10 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.raster_map import build_map_from_tiles_around_center
 from geo_activity_playground.core.raster_map import convert_to_grayscale
+from geo_activity_playground.core.raster_map import map_image_from_tile_bounds
 from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
+from geo_activity_playground.core.raster_map import tile_bounds_around_center
 from geo_activity_playground.core.tiles import compute_tile_float
 
 
@@ -31,13 +31,9 @@ def main_heatmap_video(options) -> None:
 
     center_xy = compute_tile_float(options.latitude, options.longitude, zoom)
 
-    background = build_map_from_tiles_around_center(
-        center_xy,
-        zoom,
-        video_size,
-        video_size,
-        config_accessor(),
-    )
+    tile_bounds = tile_bounds_around_center(center_xy, video_size, zoom)
+    background = map_image_from_tile_bounds(tile_bounds, config_accessor())
+
     background = convert_to_grayscale(background)
     background = 1.0 - background  # invert colors
 

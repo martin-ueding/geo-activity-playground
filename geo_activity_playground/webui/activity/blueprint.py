@@ -1,6 +1,5 @@
 import json
 import urllib.parse
-from collections.abc import Collection
 
 from flask import Blueprint
 from flask import redirect
@@ -9,12 +8,11 @@ from flask import request
 from flask import Response
 from flask import url_for
 
-from ...core.activities import ActivityRepository
-from ...explorer.tile_visits import TileVisitAccessor
-from .controller import ActivityController
+from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.paths import activity_meta_override_dir
-from geo_activity_playground.core.privacy_zones import PrivacyZone
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from geo_activity_playground.webui.activity.controller import ActivityController
 from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.authenticator import needs_authentication
 
