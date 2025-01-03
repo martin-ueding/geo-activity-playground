@@ -23,8 +23,10 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.raster_map import build_map_from_tiles_around_center
+from geo_activity_playground.core.raster_map import map_image_from_tile_bounds
 from geo_activity_playground.core.raster_map import OSM_MAX_ZOOM
 from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
+from geo_activity_playground.core.raster_map import tile_bounds_around_center
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
@@ -436,13 +438,19 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
         (tile_yz.max() + tile_yz.min()) / 2,
     )
 
-    background = build_map_from_tiles_around_center(
-        tile_xz_center,
-        zoom,
-        (target_width, target_height),
-        (target_width, target_map_height),
-        config,
+    tile_bounds = tile_bounds_around_center(
+        tile_xz_center, (target_width, target_height - footer_height), zoom
     )
+    tile_bounds.y2 += footer_height / OSM_TILE_SIZE
+    background = map_image_from_tile_bounds(tile_bounds, config)
+
+    # background = build_map_from_tiles_around_center(
+    #     tile_xz_center,
+    #     zoom,
+    #     (target_width, target_height),
+    #     (target_width, target_map_height),
+    #     config,
+    # )
 
     img = Image.fromarray((background * 255).astype("uint8"), "RGB")
     draw = ImageDraw.Draw(img, mode="RGBA")

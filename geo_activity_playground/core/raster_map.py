@@ -3,8 +3,8 @@ import dataclasses
 import functools
 import logging
 import pathlib
+import time
 import urllib.parse
-from datetime import time
 
 import numpy as np
 import requests
@@ -47,6 +47,14 @@ class TileBounds:
     x2: int
     y2: int
 
+    @property
+    def width(self) -> int:
+        return self.x2 - self.x1
+
+    @property
+    def height(self) -> int:
+        return self.y2 - self.y1
+
 
 @dataclasses.dataclass
 class PixelBounds:
@@ -60,11 +68,16 @@ class PixelBounds:
         return pixel_bounds_from_tile_bounds(tile_bounds)
 
     @property
+    def width(self) -> int:
+        return self.x2 - self.x1
+
+    @property
+    def height(self) -> int:
+        return self.y2 - self.y1
+
+    @property
     def shape(self) -> tuple[int, int]:
-        return (
-            self.y2 - self.y1,
-            self.x2 - self.x1,
-        )
+        return self.height, self.width
 
 
 @dataclasses.dataclass
@@ -72,6 +85,7 @@ class RasterMapImage:
     image: np.ndarray
     tile_bounds: TileBounds
     geo_bounds: GeoBounds
+    pixel_bounds: PixelBounds
 
 
 ## Converter functions ##
@@ -85,10 +99,10 @@ def tile_bounds_from_geo_bounds(geo_bounds: GeoBounds) -> TileBounds:
 
 def pixel_bounds_from_tile_bounds(tile_bounds: TileBounds) -> PixelBounds:
     return PixelBounds(
-        int(tile_bounds.x1) * OSM_TILE_SIZE,
-        int(tile_bounds.y1) * OSM_TILE_SIZE,
-        int(tile_bounds.x2) * OSM_TILE_SIZE,
-        int(tile_bounds.y2) * OSM_TILE_SIZE,
+        int(tile_bounds.x1 * OSM_TILE_SIZE),
+        int(tile_bounds.y1 * OSM_TILE_SIZE),
+        int(tile_bounds.x2 * OSM_TILE_SIZE),
+        int(tile_bounds.y2 * OSM_TILE_SIZE),
     )
 
 
@@ -168,6 +182,78 @@ def get_tile(zoom: int, x: int, y: int, url_template: str) -> Image.Image:
         image.load()
         image = image.convert("RGB")
     return image
+
+
+def tile_bounds_around_center(
+    tile_center: tuple[float, float], pixel_size: tuple[int, int], zoom: int
+) -> TileBounds:
+    x, y = tile_center
+    width = pixel_size[0] / OSM_TILE_SIZE
+    height = pixel_size[1] / OSM_TILE_SIZE
+    return TileBounds(
+        zoom, x - width / 2, y - height / 2, x + width / 2, y + height / 2
+    )
+
+
+def _paste_array(
+    target: np.ndarray, source: np.ndarray, offset_0: int, offset_1: int
+) -> None:
+    source_min_0 = 0
+    source_min_1 = 0
+    source_max_0 = source.shape[0]
+    source_max_1 = source.shape[1]
+
+    target_min_0 = offset_0
+    target_min_1 = offset_1
+    target_max_0 = offset_0 + source.shape[0]
+    target_max_1 = offset_1 + source.shape[1]
+
+    if target_min_1 < 0:
+        source_min_1 -= target_min_1
+        target_min_1 = 0
+    if target_min_0 < 0:
+        source_min_0 -= target_min_0
+        target_min_0 = 0
+    if target_max_1 > target.shape[1]:
+        a = target_max_1 - target.shape[1]
+        target_max_1 -= a
+        source_max_1 -= a
+    if target_max_0 > target.shape[0]:
+        a = target_max_0 - target.shape[0]
+        target_max_0 -= a
+        source_max_0 -= a
+
+    if source_max_1 < 0 or source_max_0 < 0:
+        return
+
+    target[target_min_0:target_max_0, target_min_1:target_max_1] = source[
+        source_min_0:source_max_0, source_min_1:source_max_1
+    ]
+
+
+def map_image_from_tile_bounds(tile_bounds: TileBounds, config: Config) -> np.ndarray:
+    pixel_bounds = pixel_bounds_from_tile_bounds(tile_bounds)
+    background = np.zeros((pixel_bounds.height, pixel_bounds.width, 3))
+
+    north_west = np.array([tile_bounds.x1, tile_bounds.y1])
+    offset = north_west % 1
+    tile_anchor = north_west - offset
+    pixel_anchor = np.array([0, 0]) - np.array(offset * OSM_TILE_SIZE, dtype=np.int64)
+
+    num_tile_x = int(np.ceil(tile_bounds.width)) + 1
+    num_tile_y = int(np.ceil(tile_bounds.height)) + 1
+
+    for x in range(int(tile_anchor[0]), int(tile_anchor[0] + num_tile_x)):
+        for y in range(int(tile_anchor[1]), int(tile_anchor[1]) + num_tile_y):
+            tile = np.array(get_tile(tile_bounds.zoom, x, y, config.map_tile_url)) / 255
+            _paste_array(
+                background,
+                tile,
+                (y - int(tile_anchor[1])) * OSM_TILE_SIZE + int(pixel_anchor[1]),
+                (x - int(tile_anchor[0])) * OSM_TILE_SIZE + int(pixel_anchor[0]),
+            )
+
+    return background
 
 
 def build_map_from_tiles_around_center(
