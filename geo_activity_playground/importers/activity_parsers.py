@@ -24,7 +24,7 @@ class ActivityParseError(BaseException):
 
 
 def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
-    suffixes = path.suffixes
+    suffixes = [s.lower() for s in path.suffixes]
     metadata = ActivityMeta()
 
     if suffixes[-1] == ".gz":

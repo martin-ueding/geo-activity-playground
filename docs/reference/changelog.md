@@ -8,6 +8,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.35
 
+#### Version 0.35.1
+
+- [GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208): Support activity files with uppercase suffix.
+
+#### Version 0.35.0
+
 - Add button to explorer tile map to remove map background.
 
 ### Version 0.34
