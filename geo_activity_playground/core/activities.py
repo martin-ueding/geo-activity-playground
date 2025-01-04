@@ -3,6 +3,7 @@ import functools
 import json
 import logging
 import pickle
+from collections.abc import Callable
 from typing import Any
 from typing import Iterator
 from typing import Optional
@@ -180,41 +181,48 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
     return geojson.dumps(fc)
 
 
-def make_geojson_color_line(time_series: pd.DataFrame) -> str:
-    speed_without_na = time_series["speed"].dropna()
-    low = min(speed_without_na)
-    high = max(speed_without_na)
-    clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
+def inter_quartile_range(values):
+    return np.quantile(values, 0.75) - np.quantile(values, 0.25)
 
+
+def make_geojson_color_line(time_series: pd.DataFrame) -> str:
+    low, high, clamp_speed = _make_speed_clamp(time_series["speed"])
     cmap = matplotlib.colormaps["viridis"]
     features = [
         geojson.Feature(
             geometry=geojson.LineString(
                 coordinates=[
                     [row["longitude"], row["latitude"]],
-                    [next["longitude"], next["latitude"]],
+                    [next_row["longitude"], next_row["latitude"]],
                 ]
             ),
             properties={
-                "speed": next["speed"] if np.isfinite(next["speed"]) else 0.0,
-                "color": matplotlib.colors.to_hex(cmap(clamp_speed(next["speed"]))),
+                "speed": next_row["speed"] if np.isfinite(next_row["speed"]) else 0.0,
+                "color": matplotlib.colors.to_hex(cmap(clamp_speed(next_row["speed"]))),
             },
         )
         for _, group in time_series.groupby("segment_id")
-        for (_, row), (_, next) in zip(group.iterrows(), group.iloc[1:].iterrows())
+        for (_, row), (_, next_row) in zip(group.iterrows(), group.iloc[1:].iterrows())
     ]
     feature_collection = geojson.FeatureCollection(features)
     return geojson.dumps(feature_collection)
 
 
 def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, Any]:
-    speed_without_na = time_series["speed"].dropna()
-    low = min(speed_without_na)
-    high = max(speed_without_na)
+    low, high, clamp_speed = _make_speed_clamp(time_series["speed"])
     cmap = matplotlib.colormaps["viridis"]
-    clamp_speed = lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
     colors = [
         (f"{speed:.1f}", matplotlib.colors.to_hex(cmap(clamp_speed(speed))))
         for speed in np.linspace(low, high, 10)
     ]
     return {"low": low, "high": high, "colors": colors}
+
+
+def _make_speed_clamp(speeds: pd.Series) -> Callable:
+    speed_without_na = speeds.dropna()
+    low = min(speed_without_na)
+    high = min(
+        max(speed_without_na),
+        np.median(speed_without_na) + 1.5 * inter_quartile_range(speed_without_na),
+    )
+    return low, high, lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
