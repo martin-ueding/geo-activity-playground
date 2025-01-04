@@ -6,7 +6,18 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+
+<!-- 
+- [GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000):
+-->
+
 ### Version 0.35
+
+#### Version 0.35.2
+
+- [GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214): Start to simplify the controller structure.
+- [GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211): Clip speed coloring with IQR to remove outliers.
+- [GH-213](https://github.com/martin-ueding/geo-activity-playground/issues/213): Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols.
 
 #### Version 0.35.1
 
