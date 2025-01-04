@@ -25,7 +25,7 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 
 
 def import_from_directory(
-    metadata_extraction_regexes: list[str], num_processes: Optional[int], config: Config
+    metadata_extraction_regexes: list[str], config: Config
 ) -> None:
 
     activity_paths = [
@@ -63,20 +63,11 @@ def import_from_directory(
             del file_hashes[deleted_file]
             work_tracker.discard(deleted_file)
 
-    if num_processes == 1:
-        paths_with_errors = []
-        for path in tqdm(new_activity_paths, desc="Parse activity metadata (serially)"):
-            errors = _cache_single_file(path)
-            if errors:
-                paths_with_errors.append(errors)
-    else:
-        with multiprocessing.Pool(num_processes) as pool:
-            paths_with_errors = tqdm(
-                pool.imap(_cache_single_file, new_activity_paths),
-                desc="Parse activity metadata (concurrently)",
-                total=len(new_activity_paths),
-            )
-            paths_with_errors = [error for error in paths_with_errors if error]
+    paths_with_errors = []
+    for path in tqdm(new_activity_paths, desc="Parse activity metadata (serially)"):
+        errors = _cache_single_file(path)
+        if errors:
+            paths_with_errors.append(errors)
 
     for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
         activity_id = get_file_hash(path)

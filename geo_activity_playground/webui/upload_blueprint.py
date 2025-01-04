@@ -108,9 +108,7 @@ def scan_for_activities(
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
-        import_from_directory(
-            config.metadata_extraction_regexes, config.num_processes, config
-        )
+        import_from_directory(config.metadata_extraction_regexes, config)
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout()
     if config.strava_client_code and not skip_strava:
