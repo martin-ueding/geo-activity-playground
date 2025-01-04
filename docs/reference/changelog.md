@@ -16,6 +16,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 - [GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211): Clip speed coloring with IQR to remove outliers.
 - [GH-213](https://github.com/martin-ueding/geo-activity-playground/issues/213): Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols.
 - [GH-212](https://github.com/martin-ueding/geo-activity-playground/issues/212): Add date filter to heatmap.
+- [GH-209](https://github.com/martin-ueding/geo-activity-playground/issues/209): Add square planner to navigation.
 
 ### Version 0.35
 
