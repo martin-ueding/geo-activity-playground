@@ -48,12 +48,20 @@ def make_heatmap_blueprint(
         )
 
     @blueprint.route(
-        "/download/<float:north>/<float:east>/<float:south>/<float:west>/<kinds>"
+        "/download/<float:north>/<float:east>/<float:south>/<float:west>/heatmap.png"
     )
-    def download(north: float, east: float, south: float, west: float, kinds: str):
+    def download(north: float, east: float, south: float, west: float):
         return Response(
             heatmap_controller.download_heatmap(
-                north, east, south, west, kinds.split(";")
+                north,
+                east,
+                south,
+                west,
+                [int(k) for k in request.args.getlist("kind")],
+                request.args.get(
+                    "date-start", type=dateutil.parser.parse, default=None
+                ),
+                request.args.get("date-end", type=dateutil.parser.parse, default=None),
             ),
             mimetype="image/png",
             headers={"Content-disposition": 'attachment; filename="heatmap.png"'},

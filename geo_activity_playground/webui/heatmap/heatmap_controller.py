@@ -222,20 +222,27 @@ class HeatmapController:
         x: int,
         y: int,
         z: int,
-        kinds: list[int],
+        kind_ids: list[int],
         date_start: Optional[datetime.date],
         date_end: Optional[datetime.date],
     ) -> bytes:
         f = io.BytesIO()
         pl.imsave(
             f,
-            self._render_tile_image(x, y, z, kinds, date_start, date_end),
+            self._render_tile_image(x, y, z, kind_ids, date_start, date_end),
             format="png",
         )
         return bytes(f.getbuffer())
 
     def download_heatmap(
-        self, north: float, east: float, south: float, west: float, kinds: list[str]
+        self,
+        north: float,
+        east: float,
+        south: float,
+        west: float,
+        kind_ids: list[int],
+        date_start: Optional[datetime.date],
+        date_end: Optional[datetime.date],
     ) -> bytes:
         geo_bounds = GeoBounds(south, west, north, east)
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
@@ -258,7 +265,9 @@ class HeatmapController:
                     i * OSM_TILE_SIZE : (i + 1) * OSM_TILE_SIZE,
                     j * OSM_TILE_SIZE : (j + 1) * OSM_TILE_SIZE,
                     :,
-                ] = self._render_tile_image(x, y, tile_bounds.zoom, kinds)
+                ] = self._render_tile_image(
+                    x, y, tile_bounds.zoom, kind_ids, date_start, date_end
+                )
 
         f = io.BytesIO()
         pl.imsave(f, background, format="png")

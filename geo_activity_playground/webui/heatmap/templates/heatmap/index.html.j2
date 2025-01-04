@@ -65,7 +65,7 @@
             function downloadAs() {
                 bounds = map.getBounds()
                 window.location.href =
-                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/{{ kinds_str }}`
+                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/heatmap.png?{{ extra_args|safe }}`
             }
         </script>
     </div>
