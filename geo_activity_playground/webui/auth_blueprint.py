@@ -4,7 +4,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from geo_activity_playground.webui.authenticator import Authenticator
+from .authenticator import Authenticator
 
 
 def make_auth_blueprint(authenticator: Authenticator) -> Blueprint:

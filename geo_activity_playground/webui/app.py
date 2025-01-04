@@ -9,34 +9,31 @@ import urllib.parse
 from flask import Flask
 from flask import render_template
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.webui.activity.blueprint import make_activity_blueprint
-from geo_activity_playground.webui.activity.controller import ActivityController
-from geo_activity_playground.webui.auth.blueprint import make_auth_blueprint
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.calendar.blueprint import make_calendar_blueprint
-from geo_activity_playground.webui.calendar.controller import CalendarController
-from geo_activity_playground.webui.eddington.blueprint import make_eddington_blueprint
-from geo_activity_playground.webui.eddington.controller import EddingtonController
-from geo_activity_playground.webui.entry_controller import EntryController
-from geo_activity_playground.webui.equipment.blueprint import make_equipment_blueprint
-from geo_activity_playground.webui.equipment.controller import EquipmentController
-from geo_activity_playground.webui.explorer.blueprint import make_explorer_blueprint
-from geo_activity_playground.webui.explorer.controller import ExplorerController
-from geo_activity_playground.webui.heatmap.blueprint import make_heatmap_blueprint
-from geo_activity_playground.webui.search.blueprint import make_search_blueprint
-from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
-from geo_activity_playground.webui.square_planner.blueprint import (
-    make_square_planner_blueprint,
-)
-from geo_activity_playground.webui.summary.blueprint import make_summary_blueprint
-from geo_activity_playground.webui.summary.controller import SummaryController
-from geo_activity_playground.webui.tile.blueprint import make_tile_blueprint
-from geo_activity_playground.webui.tile.controller import TileController
-from geo_activity_playground.webui.upload_blueprint import make_upload_blueprint
+from ..core.activities import ActivityRepository
+from ..core.config import Config
+from ..core.config import ConfigAccessor
+from ..explorer.tile_visits import TileVisitAccessor
+from .activity.blueprint import make_activity_blueprint
+from .activity.controller import ActivityController
+from .auth_blueprint import make_auth_blueprint
+from .authenticator import Authenticator
+from .calendar.blueprint import make_calendar_blueprint
+from .calendar.controller import CalendarController
+from .eddington.blueprint import make_eddington_blueprint
+from .eddington.controller import EddingtonController
+from .entry_controller import EntryController
+from .equipment.blueprint import make_equipment_blueprint
+from .equipment.controller import EquipmentController
+from .explorer.blueprint import make_explorer_blueprint
+from .explorer.controller import ExplorerController
+from .heatmap.blueprint import make_heatmap_blueprint
+from .search.blueprint import make_search_blueprint
+from .settings.blueprint import make_settings_blueprint
+from .square_planner.blueprint import make_square_planner_blueprint
+from .summary.blueprint import make_summary_blueprint
+from .summary.controller import SummaryController
+from .tile_blueprint import make_tile_blueprint
+from .upload_blueprint import make_upload_blueprint
 
 
 def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
@@ -88,7 +85,6 @@ def web_ui_main(
 
     config = config_accessor()
     summary_controller = SummaryController(repository, config)
-    tile_controller = TileController(config)
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     equipment_controller = EquipmentController(repository, config)
@@ -136,7 +132,7 @@ def web_ui_main(
         make_summary_blueprint(summary_controller), url_prefix="/summary"
     )
 
-    app.register_blueprint(make_tile_blueprint(tile_controller), url_prefix="/tile")
+    app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator
