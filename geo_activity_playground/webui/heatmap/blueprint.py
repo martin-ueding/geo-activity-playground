@@ -24,18 +24,20 @@ def make_heatmap_blueprint(
             **heatmap_controller.render(request.args.getlist("kind"))
         )
 
-    @blueprint.route("/tile/<z>/<x>/<y>/<kinds>.png")
-    def tile(x: str, y: str, z: str, kinds: str):
+    @blueprint.route("/tile/<int:z>/<int:x>/<int:y>/<kinds>.png")
+    def tile(x: int, y: int, z: int, kinds: str):
         return Response(
-            heatmap_controller.render_tile(int(x), int(y), int(z), kinds.split(";")),
+            heatmap_controller.render_tile(x, y, z, kinds.split(";")),
             mimetype="image/png",
         )
 
-    @blueprint.route("/download/<north>/<east>/<south>/<west>/<kinds>")
-    def download(north: str, east: str, south: str, west: str, kinds: str):
+    @blueprint.route(
+        "/download/<float:north>/<float:east>/<float:south>/<float:west>/<kinds>"
+    )
+    def download(north: float, east: float, south: float, west: float, kinds: str):
         return Response(
             heatmap_controller.download_heatmap(
-                float(north), float(east), float(south), float(west), kinds.split(";")
+                north, east, south, west, kinds.split(";")
             ),
             mimetype="image/png",
             headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
