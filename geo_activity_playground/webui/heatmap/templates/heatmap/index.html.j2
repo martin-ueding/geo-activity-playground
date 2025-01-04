@@ -17,10 +17,17 @@
                 <label class="form-check-label" for="kind{{ loop.index0 }}">{{ kind }}</label>
             </div>
             {% endfor %}
-            <button type="submit" class="btn btn-primary">Show selected kinds</button>
+
+            <input type="date" id="date-start" name="date-start" />
+            <input type="date" id="date-end" name="date-end" />
+
+            <button type="submit" class="btn btn-primary">Filter heatmap</button>
         </form>
     </div>
 </div>
+
+
+
 
 <div class="row mb-3">
     <div class="col">
