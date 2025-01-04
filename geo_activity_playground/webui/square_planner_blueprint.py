@@ -1,7 +1,9 @@
 import geojson
 from flask import Blueprint
+from flask import redirect
 from flask import render_template
 from flask import Response
+from flask import url_for
 
 from geo_activity_playground.explorer.grid_file import make_explorer_rectangle
 from geo_activity_playground.explorer.grid_file import make_explorer_tile
@@ -15,6 +17,19 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
     tile_visits = tile_visit_accessor.tile_state["tile_visits"]
 
     blueprint = Blueprint("square_planner", __name__, template_folder="templates")
+
+    @blueprint.route("/<int:zoom>")
+    def landing(zoom: int):
+        explored = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        return redirect(
+            url_for(
+                "square_planner.index",
+                zoom=zoom,
+                x=explored.square_x,
+                y=explored.square_y,
+                size=explored.max_square_size,
+            )
+        )
 
     @blueprint.route("/<int:zoom>/<int:x>/<int:y>/<int:size>")
     def index(zoom: int, x: int, y: int, size: int):
