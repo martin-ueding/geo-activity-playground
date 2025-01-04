@@ -1,3 +1,4 @@
+import dateutil.parser
 from flask import Blueprint
 from flask import render_template
 from flask import request
@@ -21,13 +22,28 @@ def make_heatmap_blueprint(
     def index():
         return render_template(
             "heatmap/index.html.j2",
-            **heatmap_controller.render([int(k) for k in request.args.getlist("kind")])
+            **heatmap_controller.render(
+                [int(k) for k in request.args.getlist("kind")],
+                request.args.get(
+                    "date-start", type=dateutil.parser.parse, default=None
+                ),
+                request.args.get("date-end", type=dateutil.parser.parse, default=None),
+            )
         )
 
-    @blueprint.route("/tile/<int:z>/<int:x>/<int:y>/<kinds>.png")
-    def tile(x: int, y: int, z: int, kinds: str):
+    @blueprint.route("/tile/<int:z>/<int:x>/<int:y>.png")
+    def tile(x: int, y: int, z: int):
         return Response(
-            heatmap_controller.render_tile(x, y, z, [int(k) for k in kinds.split(";")]),
+            heatmap_controller.render_tile(
+                x,
+                y,
+                z,
+                [int(k) for k in request.args.getlist("kind")],
+                request.args.get(
+                    "date-start", type=dateutil.parser.parse, default=None
+                ),
+                request.args.get("date-end", type=dateutil.parser.parse, default=None),
+            ),
             mimetype="image/png",
         )
 

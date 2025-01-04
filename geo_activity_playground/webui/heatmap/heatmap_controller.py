@@ -1,6 +1,8 @@
+import datetime
 import io
 import logging
 import pathlib
+from typing import Optional
 
 import matplotlib.pylab as pl
 import numpy as np
@@ -46,7 +48,12 @@ class HeatmapController:
             "activities_per_tile"
         ]
 
-    def render(self, kinds: list[int] = []) -> dict:
+    def render(
+        self,
+        kinds: list[int],
+        date_start: Optional[datetime.date],
+        date_end: Optional[datetime.date],
+    ) -> dict:
         zoom = 14
         tiles = self.tile_histories[zoom]
         medians = tiles.median(skipna=True)
@@ -59,6 +66,14 @@ class HeatmapController:
 
         if not kinds:
             kinds = list(range(len(available_kinds)))
+
+        extra_args = []
+        if date_start is not None:
+            extra_args.append(f"date-start={date_start.isoformat()}")
+        if date_end is not None:
+            extra_args.append(f"date-end={date_end.isoformat()}")
+        for kind in kinds:
+            extra_args.append(f"kind={kind}")
 
         return {
             "center": {
@@ -74,7 +89,7 @@ class HeatmapController:
             },
             "kinds": kinds,
             "available_kinds": available_kinds,
-            "kinds_str": ";".join(map(str, kinds)),
+            "extra_args": "&".join(extra_args),
         }
 
     def _get_counts(self, x: int, y: int, z: int, kind: str) -> np.ndarray:
@@ -131,13 +146,13 @@ class HeatmapController:
         return tile_counts
 
     def _render_tile_image(
-        self, x: int, y: int, z: int, kinds_ids: list[str]
+        self, x: int, y: int, z: int, kinds_ids: list[int]
     ) -> np.ndarray:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_counts = np.zeros(tile_pixels)
         available_kinds = sorted(self._repository.meta["kind"].unique())
         for kind_id in kinds_ids:
-            kind = available_kinds[int(kind_id)]
+            kind = available_kinds[kind_id]
             tile_counts += self._get_counts(x, y, z, kind)
 
         tile_counts = np.sqrt(tile_counts) / 5
@@ -156,7 +171,15 @@ class HeatmapController:
             ] + data_color[:, :, c]
         return map_tile
 
-    def render_tile(self, x: int, y: int, z: int, kinds: list[str]) -> bytes:
+    def render_tile(
+        self,
+        x: int,
+        y: int,
+        z: int,
+        kinds: list[int],
+        date_start: Optional[datetime.date],
+        date_end: Optional[datetime.date],
+    ) -> bytes:
         f = io.BytesIO()
         pl.imsave(f, self._render_tile_image(x, y, z, kinds), format="png")
         return bytes(f.getbuffer())
