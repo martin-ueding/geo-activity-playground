@@ -27,7 +27,7 @@ from .equipment.controller import EquipmentController
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .heatmap.blueprint import make_heatmap_blueprint
-from .search.blueprint import make_search_blueprint
+from .search_blueprint import make_search_blueprint
 from .settings.blueprint import make_settings_blueprint
 from .square_planner.blueprint import make_square_planner_blueprint
 from .summary.blueprint import make_summary_blueprint
