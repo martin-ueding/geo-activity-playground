@@ -13,6 +13,7 @@ from geo_activity_playground.core.raster_map import convert_to_grayscale
 from geo_activity_playground.core.raster_map import GeoBounds
 from geo_activity_playground.core.raster_map import get_sensible_zoom_level
 from geo_activity_playground.core.raster_map import get_tile
+from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
 from geo_activity_playground.core.raster_map import PixelBounds
 from geo_activity_playground.core.tasks import work_tracker
 from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
@@ -23,9 +24,6 @@ from geo_activity_playground.webui.explorer.controller import (
 
 
 logger = logging.getLogger(__name__)
-
-
-OSM_TILE_SIZE = 256  # OSM tile size in pixel
 
 
 class HeatmapController:
@@ -48,7 +46,7 @@ class HeatmapController:
             "activities_per_tile"
         ]
 
-    def render(self, kinds: list[str] = []) -> dict:
+    def render(self, kinds: list[int] = []) -> dict:
         zoom = 14
         tiles = self.tile_histories[zoom]
         medians = tiles.median(skipna=True)
@@ -60,7 +58,7 @@ class HeatmapController:
         available_kinds = sorted(self._repository.meta["kind"].unique())
 
         if not kinds:
-            kinds = available_kinds
+            kinds = list(range(len(available_kinds)))
 
         return {
             "center": {
@@ -76,7 +74,7 @@ class HeatmapController:
             },
             "kinds": kinds,
             "available_kinds": available_kinds,
-            "kinds_str": ";".join(kinds),
+            "kinds_str": ";".join(map(str, kinds)),
         }
 
     def _get_counts(self, x: int, y: int, z: int, kind: str) -> np.ndarray:
@@ -133,11 +131,13 @@ class HeatmapController:
         return tile_counts
 
     def _render_tile_image(
-        self, x: int, y: int, z: int, kinds: list[str]
+        self, x: int, y: int, z: int, kinds_ids: list[str]
     ) -> np.ndarray:
         tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
         tile_counts = np.zeros(tile_pixels)
-        for kind in kinds:
+        available_kinds = sorted(self._repository.meta["kind"].unique())
+        for kind_id in kinds_ids:
+            kind = available_kinds[int(kind_id)]
             tile_counts += self._get_counts(x, y, z, kind)
 
         tile_counts = np.sqrt(tile_counts) / 5

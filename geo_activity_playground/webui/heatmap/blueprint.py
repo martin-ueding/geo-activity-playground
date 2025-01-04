@@ -21,13 +21,13 @@ def make_heatmap_blueprint(
     def index():
         return render_template(
             "heatmap/index.html.j2",
-            **heatmap_controller.render(request.args.getlist("kind"))
+            **heatmap_controller.render([int(k) for k in request.args.getlist("kind")])
         )
 
     @blueprint.route("/tile/<int:z>/<int:x>/<int:y>/<kinds>.png")
     def tile(x: int, y: int, z: int, kinds: str):
         return Response(
-            heatmap_controller.render_tile(x, y, z, kinds.split(";")),
+            heatmap_controller.render_tile(x, y, z, [int(k) for k in kinds.split(";")]),
             mimetype="image/png",
         )
 

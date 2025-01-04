@@ -12,9 +12,9 @@
         <form action="" method="GET">
             {% for kind in available_kinds %}
             <div class="form-check form-check-inline form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="{{ kind }}" name="kind"
-                    value="{{ kind }}" {{ 'checked' if kind in kinds else '' }} />
-                <label class="form-check-label" for="{{ kind }}">{{ kind }}</label>
+                <input class="form-check-input" type="checkbox" role="switch" id="kind{{ loop.index0 }}" name="kind"
+                    value="{{ loop.index0 }}" {{ 'checked' if loop.index0 in kinds else '' }} />
+                <label class="form-check-label" for="kind{{ loop.index0 }}">{{ kind }}</label>
             </div>
             {% endfor %}
             <button type="submit" class="btn btn-primary">Show selected kinds</button>
