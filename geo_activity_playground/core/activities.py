@@ -218,7 +218,7 @@ def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, Any]:
     return {"low": low, "high": high, "colors": colors}
 
 
-def _make_speed_clamp(speeds: pd.Series) -> Callable:
+def _make_speed_clamp(speeds: pd.Series) -> tuple[float, float, Callable]:
     speed_without_na = speeds.dropna()
     low = min(speed_without_na)
     high = min(

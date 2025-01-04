@@ -42,17 +42,17 @@ class GeoBounds:
 @dataclasses.dataclass
 class TileBounds:
     zoom: int
-    x1: int
-    y1: int
-    x2: int
-    y2: int
+    x1: float
+    y1: float
+    x2: float
+    y2: float
 
     @property
-    def width(self) -> int:
+    def width(self) -> float:
         return self.x2 - self.x1
 
     @property
-    def height(self) -> int:
+    def height(self) -> float:
         return self.y2 - self.y1
 
 
@@ -89,12 +89,6 @@ class RasterMapImage:
 
 
 ## Converter functions ##
-
-
-def tile_bounds_from_geo_bounds(geo_bounds: GeoBounds) -> TileBounds:
-    x1, y1 = compute_tile_float(geo_bounds.lat_max, geo_bounds.lon_min)
-    x2, y2 = compute_tile_float(geo_bounds.lat_min, geo_bounds.lon_min)
-    return TileBounds(x1, y1, x2, y2)
 
 
 def pixel_bounds_from_tile_bounds(tile_bounds: TileBounds) -> PixelBounds:
@@ -204,7 +198,9 @@ def map_image_from_tile_bounds(tile_bounds: TileBounds, config: Config) -> np.nd
     north_west = np.array([tile_bounds.x1, tile_bounds.y1])
     offset = north_west % 1
     tile_anchor = north_west - offset
-    pixel_anchor = np.array([0, 0]) - np.array(offset * OSM_TILE_SIZE, dtype=np.int64)
+    pixel_anchor: np.ndarray = np.array([0, 0]) - np.array(
+        offset * OSM_TILE_SIZE, dtype=np.int64
+    )
 
     num_tile_x = int(np.ceil(tile_bounds.width)) + 1
     num_tile_y = int(np.ceil(tile_bounds.height)) + 1

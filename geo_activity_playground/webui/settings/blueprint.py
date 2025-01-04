@@ -58,8 +58,7 @@ def int_or_none(s: str) -> Optional[int]:
             return int(s)
         except ValueError as e:
             flash(f"Cannot parse integer from {s}: {e}", category="danger")
-    else:
-        return None
+    return None
 
 
 def make_settings_blueprint(
