@@ -1,17 +1,19 @@
 import altair as alt
 import numpy as np
 import pandas as pd
+from flask import Blueprint
+from flask import render_template
 
-from ...core.activities import ActivityRepository
+from geo_activity_playground.core.activities import ActivityRepository
 
 
-class EddingtonController:
-    def __init__(self, repository: ActivityRepository) -> None:
-        self._repository = repository
+def make_eddington_blueprint(repository: ActivityRepository) -> Blueprint:
+    blueprint = Blueprint("eddington", __name__, template_folder="templates")
 
-    def render(self) -> dict:
-        activities = self._repository.meta.loc[
-            self._repository.meta["consider_for_achievements"]
+    @blueprint.route("/")
+    def index():
+        activities = repository.meta.loc[
+            repository.meta["consider_for_achievements"]
         ].copy()
         activities["day"] = [start.date() for start in activities["start"]]
 
@@ -67,11 +69,13 @@ class EddingtonController:
             .interactive()
             .to_json(format="vega")
         )
-
-        return {
-            "eddington_number": en,
-            "logarithmic_plot": logarithmic_plot,
-            "eddington_table": eddington.loc[
+        return render_template(
+            "eddington/index.html.j2",
+            eddington_number=en,
+            logarithmic_plot=logarithmic_plot,
+            eddington_table=eddington.loc[
                 (eddington["distance_km"] > en) & (eddington["distance_km"] <= en + 10)
             ].to_dict(orient="records"),
-        }
+        )
+
+    return blueprint

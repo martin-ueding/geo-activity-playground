@@ -19,8 +19,7 @@ from .auth_blueprint import make_auth_blueprint
 from .authenticator import Authenticator
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
-from .eddington.blueprint import make_eddington_blueprint
-from .eddington.controller import EddingtonController
+from .eddington_blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
 from .equipment.blueprint import make_equipment_blueprint
 from .equipment.controller import EquipmentController
@@ -88,7 +87,6 @@ def web_ui_main(
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     equipment_controller = EquipmentController(repository, config)
-    eddington_controller = EddingtonController(repository)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
     )
@@ -104,7 +102,7 @@ def web_ui_main(
         make_calendar_blueprint(calendar_controller), url_prefix="/calendar"
     )
     app.register_blueprint(
-        make_eddington_blueprint(eddington_controller), url_prefix="/eddington"
+        make_eddington_blueprint(repository), url_prefix="/eddington"
     )
     app.register_blueprint(
         make_equipment_blueprint(equipment_controller), url_prefix="/equipment"
