@@ -1,9 +1,10 @@
 import collections
 import datetime
-import functools
 
 import altair as alt
 import pandas as pd
+from flask import Blueprint
+from flask import render_template
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
@@ -11,15 +12,13 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
-class SummaryController:
-    def __init__(self, repository: ActivityRepository, config: Config) -> None:
-        self._repository = repository
-        self._config = config
+def make_summary_blueprint(repository: ActivityRepository, config: Config) -> Blueprint:
+    blueprint = Blueprint("summary", __name__, template_folder="templates")
 
-    @functools.cache
-    def render(self) -> dict:
-        kind_scale = make_kind_scale(self._repository.meta, self._config)
-        df = embellished_activities(self._repository.meta)
+    @blueprint.route("/")
+    def index():
+        kind_scale = make_kind_scale(repository.meta, config)
+        df = embellished_activities(repository.meta)
         # df = df.loc[df["consider_for_achievements"]]
 
         year_kind_total = (
@@ -29,28 +28,29 @@ class SummaryController:
             .reset_index()
         )
 
-        return {
-            "plot_distance_heatmaps": plot_distance_heatmaps(df, self._config),
-            "plot_monthly_distance": plot_monthly_distance(df, kind_scale),
-            "plot_yearly_distance": plot_yearly_distance(year_kind_total, kind_scale),
-            "plot_year_cumulative": plot_year_cumulative(df),
-            "tabulate_year_kind_mean": tabulate_year_kind_mean(df)
+        return render_template(
+            "summary/index.html.j2",
+            plot_distance_heatmaps=plot_distance_heatmaps(df, config),
+            plot_monthly_distance=plot_monthly_distance(df, kind_scale),
+            plot_yearly_distance=plot_yearly_distance(year_kind_total, kind_scale),
+            plot_year_cumulative=plot_year_cumulative(df),
+            tabulate_year_kind_mean=tabulate_year_kind_mean(df)
             .reset_index()
             .to_dict(orient="split"),
-            "plot_weekly_distance": plot_weekly_distance(df, kind_scale),
-            "nominations": [
+            plot_weekly_distance=plot_weekly_distance(df, kind_scale),
+            nominations=[
                 (
-                    self._repository.get_activity_by_id(activity_id),
+                    repository.get_activity_by_id(activity_id),
                     reasons,
                     make_geojson_from_time_series(
-                        self._repository.get_time_series(activity_id)
+                        repository.get_time_series(activity_id)
                     ),
                 )
-                for activity_id, reasons in nominate_activities(
-                    self._repository.meta
-                ).items()
+                for activity_id, reasons in nominate_activities(repository.meta).items()
             ],
-        }
+        )
+
+    return blueprint
 
 
 def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:

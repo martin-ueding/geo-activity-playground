@@ -29,8 +29,7 @@ from .heatmap.blueprint import make_heatmap_blueprint
 from .search_blueprint import make_search_blueprint
 from .settings.blueprint import make_settings_blueprint
 from .square_planner.blueprint import make_square_planner_blueprint
-from .summary.blueprint import make_summary_blueprint
-from .summary.controller import SummaryController
+from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import make_tile_blueprint
 from .upload_blueprint import make_upload_blueprint
 
@@ -83,7 +82,6 @@ def web_ui_main(
     authenticator = Authenticator(config_accessor())
 
     config = config_accessor()
-    summary_controller = SummaryController(repository, config)
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     equipment_controller = EquipmentController(repository, config)
@@ -127,7 +125,7 @@ def web_ui_main(
         url_prefix="/search",
     )
     app.register_blueprint(
-        make_summary_blueprint(summary_controller), url_prefix="/summary"
+        make_summary_blueprint(repository, config), url_prefix="/summary"
     )
 
     app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
