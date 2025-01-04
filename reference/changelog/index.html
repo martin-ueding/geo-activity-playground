@@ -867,6 +867,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-036" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-035" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.35
@@ -1799,6 +1808,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#version-036" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#version-035" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.35
@@ -2674,9 +2692,25 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<!-- 
+- [GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000):
+-->
+
 <p>This is the log of high-level changes that I have done in the various versions.</p>
 <h2 id="version-0">Version 0</h2>
 <p>This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.</p>
+<h3 id="version-036">Version 0.36</h3>
+<ul>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/212">GH-212</a>: Add date filter to heatmap.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/209">GH-209</a>: Add square planner to navigation.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/211">GH-211</a>: Clip speed coloring with IQR to remove outliers.</li>
+</ul>
+<p>Internal stuff:</p>
+<ul>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/206">GH-206</a>: Remove multiprocessing for parsing activities due to warnings about multithreading. This unfortunately slows down initial processing.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/214">GH-214</a>: Start to simplify the controller structure.</li>
+<li><a href="https://github.com/martin-ueding/geo-activity-playground/issues/213">GH-213</a>: Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols.</li>
+</ul>
 <h3 id="version-035">Version 0.35</h3>
 <h4 id="version-0351">Version 0.35.1</h4>
 <ul>
