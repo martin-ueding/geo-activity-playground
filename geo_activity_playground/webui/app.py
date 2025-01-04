@@ -28,7 +28,7 @@ from .explorer.controller import ExplorerController
 from .heatmap.blueprint import make_heatmap_blueprint
 from .search_blueprint import make_search_blueprint
 from .settings.blueprint import make_settings_blueprint
-from .square_planner.blueprint import make_square_planner_blueprint
+from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import make_tile_blueprint
 from .upload_blueprint import make_upload_blueprint
@@ -117,7 +117,7 @@ def web_ui_main(
         url_prefix="/settings",
     )
     app.register_blueprint(
-        make_square_planner_blueprint(repository, tile_visit_accessor),
+        make_square_planner_blueprint(tile_visit_accessor),
         url_prefix="/square-planner",
     )
     app.register_blueprint(
