@@ -12,6 +12,12 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.36
 
+#### Version 0.36.1
+
+- [GH-216](https://github.com/martin-ueding/geo-activity-playground/issues/216): Remove integrity from assets.
+
+#### Version 0.36.0
+
 - [GH-212](https://github.com/martin-ueding/geo-activity-playground/issues/212): Add date filter to heatmap.
 - [GH-209](https://github.com/martin-ueding/geo-activity-playground/issues/209): Add square planner to navigation.
 - [GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211): Clip speed coloring with IQR to remove outliers.
