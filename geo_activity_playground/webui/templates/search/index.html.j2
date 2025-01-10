@@ -78,7 +78,11 @@
                 {% for index, activity in activities %}
                 <tr>
                     <td><a href="{{ url_for('activity.show', id=activity['id']) }}">{{ activity['name'] }}</a></td>
-                    <td>{{ activity['start']|dt }}</td>
+                    <td>
+                        {% if activity['start'] is defined %}
+                        {{ activity['start']|dt }}
+                        {% endif %}
+                    </td>
                     <td>{{ activity['kind'] }}</td>
                     <td>{{ '%.1f' % activity["distance_km"] }} km</td>
                     <td>{{ activity.elapsed_time|td }}</td>
