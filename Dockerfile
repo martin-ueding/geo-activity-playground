@@ -14,10 +14,13 @@ COPY pyproject.toml poetry.lock /app/
 # Install poetry and project dependencies
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --only main
+    poetry install --only main --no-root
 
 # Copy the rest of the application code into the container
 COPY . /app/
+
+# Install the actual project.
+RUN poetry install --only main
 
 RUN mkdir /data
 
