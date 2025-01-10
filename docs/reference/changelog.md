@@ -12,6 +12,10 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 
 ### Version 0.36
 
+#### Version 0.36.2
+
+- [GH-217](https://github.com/martin-ueding/geo-activity-playground/issues/217): Try to fix search view for routes without time information.
+
 #### Version 0.36.1
 
 - [GH-216](https://github.com/martin-ueding/geo-activity-playground/issues/216): Remove integrity from assets.
