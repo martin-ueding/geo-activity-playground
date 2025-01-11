@@ -13,7 +13,6 @@
             <thead>
                 <tr>
                     <th>Equipment</th>
-                    <th>Primarily used for</th>
                     <th style="text-align: right;">Distance / km</th>
                     <th style="text-align: right;">First use</th>
                     <th style="text-align: right;">Last use</th>
@@ -23,10 +22,9 @@
                 {% for equipment in equipment_summary %}
                 <tr>
                     <td>{{ equipment.equipment }}</td>
-                    <td>{{ equipment.primarily_used_for }}</td>
-                    <td style="text-align: right;">{{ equipment.total_distance_km|int }}</td>
-                    <td style="text-align: right;">{{ equipment.first_use.date() }}</td>
-                    <td style="text-align: right;">{{ equipment.last_use.date() }}</td>
+                    <td style="text-align: right;">{{ equipment.total_distance_km }}</td>
+                    <td style="text-align: right;">{{ equipment.first_use }}</td>
+                    <td style="text-align: right;">{{ equipment.last_use }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -5,6 +5,7 @@ from flask import render_template
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.summary_stats import get_equipment_use_table
 
 
 def make_equipment_blueprint(
@@ -14,34 +15,12 @@ def make_equipment_blueprint(
 
     @blueprint.route("/")
     def index():
-        kind_per_equipment = repository.meta.groupby("equipment").apply(
-            lambda group: group.groupby("kind")
-            .apply(lambda group2: sum(group2["distance_km"]), include_groups=False)
-            .idxmax(),
-            include_groups=False,
+        equipment_summary = get_equipment_use_table(
+            repository.meta, config.equipment_offsets
         )
-
-        equipment_summary = (
-            repository.meta.groupby("equipment")
-            .apply(
-                lambda group: pd.Series(
-                    {
-                        "total_distance_km": group["distance_km"].sum(),
-                        "first_use": group["start"].iloc[0],
-                        "last_use": group["start"].iloc[-1],
-                    },
-                ),
-                include_groups=False,
-            )
-            .sort_values("last_use", ascending=False)
-        )
-
-        equipment_summary["primarily_used_for"] = None
-        for equipment, kind in kind_per_equipment.items():
-            equipment_summary.loc[equipment, "primarily_used_for"] = kind
 
         equipment_variables = {}
-        for equipment in equipment_summary.index:
+        for equipment in repository.meta["equipment"].unique():
             selection = repository.meta.loc[repository.meta["equipment"] == equipment]
             total_distances = pd.DataFrame(
                 {
@@ -103,15 +82,9 @@ def make_equipment_blueprint(
                 "usages_plot_id": f"usages_plot_{hash(equipment)}",
             }
 
-        for equipment, offset in config.equipment_offsets.items():
-            if equipment in equipment_summary.index:
-                equipment_summary.loc[equipment, "total_distance_km"] += offset
-
         variables = {
             "equipment_variables": equipment_variables,
-            "equipment_summary": equipment_summary.reset_index().to_dict(
-                orient="records"
-            ),
+            "equipment_summary": equipment_summary,
         }
 
         return render_template("equipment/index.html.j2", **variables)

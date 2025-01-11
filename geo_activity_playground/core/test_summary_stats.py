@@ -88,6 +88,8 @@ def test_equipment_use_table(activity_meta) -> None:
         }
     )
 
+    offsets = {"A": 4.0}
+
     expected = [
         {
             "equipment": "B",
@@ -97,10 +99,10 @@ def test_equipment_use_table(activity_meta) -> None:
         },
         {
             "equipment": "A",
-            "total_distance_km": 10,
+            "total_distance_km": 14,
             "first_use": "2024-12-24",
             "last_use": "2024-12-24",
         },
     ]
-    actual = get_equipment_use_table(activity_meta)
+    actual = get_equipment_use_table(activity_meta, offsets)
     assert actual == expected
