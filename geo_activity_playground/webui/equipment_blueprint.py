@@ -1,17 +1,20 @@
 import altair as alt
 import pandas as pd
+from flask import Blueprint
+from flask import render_template
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
 
 
-class EquipmentController:
-    def __init__(self, repository: ActivityRepository, config: Config) -> None:
-        self._repository = repository
-        self._config = config
+def make_equipment_blueprint(
+    repository: ActivityRepository, config: Config
+) -> Blueprint:
+    blueprint = Blueprint("equipment", __name__, template_folder="templates")
 
-    def render(self) -> dict:
-        kind_per_equipment = self._repository.meta.groupby("equipment").apply(
+    @blueprint.route("/")
+    def index():
+        kind_per_equipment = repository.meta.groupby("equipment").apply(
             lambda group: group.groupby("kind")
             .apply(lambda group2: sum(group2["distance_km"]), include_groups=False)
             .idxmax(),
@@ -19,7 +22,7 @@ class EquipmentController:
         )
 
         equipment_summary = (
-            self._repository.meta.groupby("equipment")
+            repository.meta.groupby("equipment")
             .apply(
                 lambda group: pd.Series(
                     {
@@ -39,9 +42,7 @@ class EquipmentController:
 
         equipment_variables = {}
         for equipment in equipment_summary.index:
-            selection = self._repository.meta.loc[
-                self._repository.meta["equipment"] == equipment
-            ]
+            selection = repository.meta.loc[repository.meta["equipment"] == equipment]
             total_distances = pd.DataFrame(
                 {
                     "time": selection["start"],
@@ -102,13 +103,17 @@ class EquipmentController:
                 "usages_plot_id": f"usages_plot_{hash(equipment)}",
             }
 
-        for equipment, offset in self._config.equipment_offsets.items():
+        for equipment, offset in config.equipment_offsets.items():
             if equipment in equipment_summary.index:
                 equipment_summary.loc[equipment, "total_distance_km"] += offset
 
-        return {
+        variables = {
             "equipment_variables": equipment_variables,
             "equipment_summary": equipment_summary.reset_index().to_dict(
                 orient="records"
             ),
         }
+
+        return render_template("equipment/index.html.j2", **variables)
+
+    return blueprint

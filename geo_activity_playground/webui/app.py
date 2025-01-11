@@ -21,8 +21,7 @@ from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
 from .entry_controller import EntryController
-from .equipment.blueprint import make_equipment_blueprint
-from .equipment.controller import EquipmentController
+from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .heatmap.blueprint import make_heatmap_blueprint
@@ -84,7 +83,6 @@ def web_ui_main(
     config = config_accessor()
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
-    equipment_controller = EquipmentController(repository, config)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
     )
@@ -103,7 +101,7 @@ def web_ui_main(
         make_eddington_blueprint(repository), url_prefix="/eddington"
     )
     app.register_blueprint(
-        make_equipment_blueprint(equipment_controller), url_prefix="/equipment"
+        make_equipment_blueprint(repository, config), url_prefix="/equipment"
     )
     app.register_blueprint(
         make_explorer_blueprint(explorer_controller), url_prefix="/explorer"
