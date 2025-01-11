@@ -74,6 +74,20 @@ def test_activity_meta(activity_meta) -> None:
 
 
 def test_equipment_use_table(activity_meta) -> None:
+    activity_meta = pd.DataFrame(
+        {
+            "distance_km": pd.Series([9.8, 4.4, 4.3]),
+            "equipment": pd.Series(["A", "B", "B"]),
+            "start": pd.Series(
+                [
+                    datetime.datetime(2024, 12, 24, 10),
+                    datetime.datetime(2025, 1, 1, 10),
+                    None,
+                ]
+            ),
+        }
+    )
+
     expected = [
         {
             "equipment": "B",
