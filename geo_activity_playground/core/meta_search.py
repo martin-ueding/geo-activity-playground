@@ -1,6 +1,7 @@
 import dataclasses
 import datetime
 import re
+import urllib.parse
 from typing import Optional
 
 import numpy as np
@@ -12,7 +13,6 @@ class SearchQuery:
     equipment: list[str] = dataclasses.field(default_factory=list)
     kind: list[str] = dataclasses.field(default_factory=list)
     name: Optional[str] = None
-    name_exact: bool = False
     name_case_sensitive: bool = False
     start_begin: Optional[datetime.date] = None
     start_end: Optional[datetime.date] = None
@@ -28,18 +28,34 @@ class SearchQuery:
         )
 
     def to_jinja(self) -> dict:
-        result = {
+        return {
             "equipment": self.equipment,
             "kind": self.kind,
             "name": self.name or "",
-            "name_exact": self.name_exact,
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
             "start_end": _format_optional_date(self.start_end),
             "active": self.active,
         }
-        print(f"to_jinja: {result=}")
-        return result
+
+    def to_url_str(self) -> str:
+        variables = []
+        for equipment in self.equipment:
+            variables.append(("equipment", equipment))
+        for kind in self.kind:
+            variables.append(("kind", kind))
+        if self.name:
+            variables.append(("name", self.name))
+        if self.name_case_sensitive:
+            variables.append(("name_case_sensitive", "true"))
+        if self.start_begin:
+            variables.append(("start_begin", self.start_begin.isoformat()))
+        if self.start_end:
+            variables.append(("start_end", self.start_end.isoformat()))
+
+        return "&".join(
+            f"{key}={urllib.parse.quote_plus(value)}" for key, value in variables
+        )
 
 
 def _format_optional_date(date: Optional[datetime.date]) -> str:
@@ -52,7 +68,6 @@ def _format_optional_date(date: Optional[datetime.date]) -> str:
 def apply_search_query(
     activity_meta: pd.DataFrame, search_query: SearchQuery
 ) -> pd.DataFrame:
-    print(search_query)
     mask = _make_mask(activity_meta.index, True)
 
     if search_query.equipment:
@@ -62,13 +77,16 @@ def apply_search_query(
     if search_query.name:
         mask &= pd.Series(
             [
-                re.search(
-                    search_query.name,
-                    activity_name,
-                    0 if search_query.name_case_sensitive else re.IGNORECASE,
+                bool(
+                    re.search(
+                        search_query.name,
+                        activity_name,
+                        0 if search_query.name_case_sensitive else re.IGNORECASE,
+                    )
                 )
-                for activity_name in activity_meta["name"].dt.date()
-            ]
+                for activity_name in activity_meta["name"]
+            ],
+            index=activity_meta.index,
         )
     if search_query.start_begin is not None:
         start_begin = datetime.datetime.combine(
@@ -80,21 +98,6 @@ def apply_search_query(
         mask &= activity_meta["start"] <= start_end
 
     return activity_meta.loc[mask]
-
-    # name_exact = bool(request.args.get("name_exact", False))
-    # name_casing = bool(request.args.get("name_casing", False))
-    # if name := request.args.get("name", ""):
-    #     if name_casing:
-    #         haystack = activities["name"]
-    #         needle = name
-    #     else:
-    #         haystack = activities["name"].str.lower()
-    #         needle = name.lower()
-    #     if name_exact:
-    #         selection = haystack == needle
-    #     else:
-    #         selection = [needle in an for an in haystack]
-    #     activities = activities.loc[selection]
 
 
 def _make_mask(

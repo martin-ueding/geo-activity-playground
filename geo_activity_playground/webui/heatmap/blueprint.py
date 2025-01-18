@@ -8,6 +8,7 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.heatmap.heatmap_controller import HeatmapController
+from geo_activity_playground.webui.search_util import search_query_from_form
 
 
 def make_heatmap_blueprint(
@@ -20,30 +21,16 @@ def make_heatmap_blueprint(
 
     @blueprint.route("/")
     def index():
+        query = search_query_from_form(request.args)
         return render_template(
-            "heatmap/index.html.j2",
-            **heatmap_controller.render(
-                [int(k) for k in request.args.getlist("kind")],
-                request.args.get(
-                    "date-start", type=dateutil.parser.parse, default=None
-                ),
-                request.args.get("date-end", type=dateutil.parser.parse, default=None),
-            )
+            "heatmap/index.html.j2", **heatmap_controller.render(query)
         )
 
     @blueprint.route("/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(x: int, y: int, z: int):
+        query = search_query_from_form(request.args)
         return Response(
-            heatmap_controller.render_tile(
-                x,
-                y,
-                z,
-                [int(k) for k in request.args.getlist("kind")],
-                request.args.get(
-                    "date-start", type=dateutil.parser.parse, default=None
-                ),
-                request.args.get("date-end", type=dateutil.parser.parse, default=None),
-            ),
+            heatmap_controller.render_tile(x, y, z, query),
             mimetype="image/png",
         )
 
@@ -51,18 +38,9 @@ def make_heatmap_blueprint(
         "/download/<float:north>/<float:east>/<float:south>/<float:west>/heatmap.png"
     )
     def download(north: float, east: float, south: float, west: float):
+        query = search_query_from_form(request.args)
         return Response(
-            heatmap_controller.download_heatmap(
-                north,
-                east,
-                south,
-                west,
-                [int(k) for k in request.args.getlist("kind")],
-                request.args.get(
-                    "date-start", type=dateutil.parser.parse, default=None
-                ),
-                request.args.get("date-end", type=dateutil.parser.parse, default=None),
-            ),
+            heatmap_controller.download_heatmap(north, east, south, west, query),
             mimetype="image/png",
             headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
         )

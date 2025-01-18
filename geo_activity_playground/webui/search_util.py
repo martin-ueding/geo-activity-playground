@@ -13,7 +13,6 @@ def search_query_from_form(args: MultiDict) -> SearchQuery:
         kind=args.getlist("kind"),
         name=args.get("name", None),
         name_case_sensitive=_parse_bool(args.get("name_case_sensitive", "false")),
-        name_exact=_parse_bool(args.get("name_exact", "false")),
         start_begin=_parse_date_or_none(args.get("start_begin", None)),
         start_end=_parse_date_or_none(args.get("start_end", None)),
     )
