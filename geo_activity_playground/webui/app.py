@@ -144,11 +144,17 @@ def web_ui_main(
 
     @app.context_processor
     def inject_global_variables() -> dict:
-        return {
+        variables = {
             "version": _try_get_version(),
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
         }
+        if len(repository):
+            variables["equipments_avail"] = sorted(
+                repository.meta["equipment"].unique()
+            )
+            variables["kinds_avail"] = sorted(repository.meta["kind"].unique())
+        return variables
 
     app.run(host=host, port=port)
 

@@ -1,4 +1,5 @@
 {% extends "page.html.j2" %}
+{% from "search_form.html.j2" import search_form %}
 
 {% block container %}
 
@@ -6,61 +7,7 @@
 
 <div class="row mb-3">
     <div class="col-md-2">
-        <form>
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ name }}">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="name_exact" value="true" id="name_exact" {% if
-                        name_exact %} checked {% endif %}>
-                    <label class="form-check-label" for="name_exact">
-                        Exact match
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="name_casing" value="true" id="name_casing" {%
-                        if name_casing %} checked {% endif %}>
-                    <label class="form-check-label" for="name_casing">
-                        Case sensitive
-                    </label>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="begin" class="form-label">After</label>
-                <input type="text" class="form-control" id="begin" name="begin" value="{{ begin }}">
-                <label for="end" class="form-label">Until</label>
-                <input type="text" class="form-control" id="end" name="end" value="{{ end }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="" class="form-label">Kind</label>
-                {% for kind in kinds_avail %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="kind" value="{{ kind }}" id="kind_{{ kind }}"
-                        {% if kind in kinds %} checked {% endif %}>
-                    <label class="form-check-label" for="kind_{{ kind }}">
-                        {{ kind }}
-                    </label>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="mb-3">
-                <label for="" class="form-label">Equipment</label>
-                {% for equipment in equipments_avail %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="equipment" value="{{ equipment }}"
-                        id="equipment_{{ equipment }}" {% if equipment in equipments %} checked {% endif %}>
-                    <label class="form-check-label" for="equipment_{{ equipment }}">
-                        {{ equipment }}
-                    </label>
-                </div>
-                {% endfor %}
-            </div>
-
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
+        {{ search_form(query, equipments_avail, kinds_avail) }}
     </div>
 
     <div class="col-md-10">

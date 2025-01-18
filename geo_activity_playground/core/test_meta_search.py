@@ -48,5 +48,6 @@ def test_equipment_query() -> None:
 
 
 def test_make_mask() -> None:
-    assert (_make_mask(2, True) == pd.Series([True, True])).all()
-    assert (_make_mask(2, False) == pd.Series([False, False])).all()
+    index = [1, 2]
+    assert (_make_mask(index, True) == pd.Series([True, True], index=index)).all()
+    assert (_make_mask(index, False) == pd.Series([False, False], index=index)).all()
