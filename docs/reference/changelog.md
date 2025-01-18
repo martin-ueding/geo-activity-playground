@@ -10,6 +10,17 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.37.0
+
+New features:
+
+- [GH-215](https://github.com/martin-ueding/geo-activity-playground/issues/215): Add unified activity filter for activity overview, heatmap, Eddington number, summary statistics.
+
+Fixes:
+
+- [GH-218](https://github.com/martin-ueding/geo-activity-playground/issues/218): Fix Docker build with Poetry 2.0.
+- [GH-219](https://github.com/martin-ueding/geo-activity-playground/issues/219): Fix equipment summary when routes are present.
+
 ### Version 0.36
 
 #### Version 0.36.2
