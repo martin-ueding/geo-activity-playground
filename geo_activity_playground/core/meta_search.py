@@ -28,7 +28,7 @@ class SearchQuery:
         )
 
     def to_jinja(self) -> dict:
-        return {
+        result = {
             "equipment": self.equipment,
             "kind": self.kind,
             "name": self.name or "",
@@ -38,6 +38,8 @@ class SearchQuery:
             "start_end": _format_optional_date(self.start_end),
             "active": self.active,
         }
+        print(f"to_jinja: {result=}")
+        return result
 
 
 def _format_optional_date(date: Optional[datetime.date]) -> str:
@@ -60,14 +62,22 @@ def apply_search_query(
     if search_query.name:
         mask &= pd.Series(
             [
-                re.search(search_query.name, activity_name, re.IGNORECASE)
+                re.search(
+                    search_query.name,
+                    activity_name,
+                    0 if search_query.name_case_sensitive else re.IGNORECASE,
+                )
                 for activity_name in activity_meta["name"].dt.date()
             ]
         )
     if search_query.start_begin is not None:
-        mask &= search_query.start_begin <= activity_meta["start"]
+        start_begin = datetime.datetime.combine(
+            search_query.start_begin, datetime.time.min
+        )
+        mask &= start_begin <= activity_meta["start"]
     if search_query.start_end is not None:
-        mask &= activity_meta["start"] <= search_query.start_end
+        start_end = datetime.datetime.combine(search_query.start_end, datetime.time.max)
+        mask &= activity_meta["start"] <= start_end
 
     return activity_meta.loc[mask]
 
