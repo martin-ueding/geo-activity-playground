@@ -5,38 +5,34 @@
 
 <h1 class="row mb-3">Activities Overview & Search</h1>
 
-<div class="row mb-3">
-    <div class="col-md-2">
-        {{ search_form(query, equipments_avail, kinds_avail) }}
-    </div>
-
-    <div class="col-md-10">
-        <table class="table table-sort table-arrows">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Start</th>
-                    <th>Kind</th>
-                    <th class="numeric-sort">Distance</th>
-                    <th>Elapsed time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for index, activity in activities %}
-                <tr>
-                    <td><a href="{{ url_for('activity.show', id=activity['id']) }}">{{ activity['name'] }}</a></td>
-                    <td>
-                        {% if activity['start'] is defined %}
-                        {{ activity['start']|dt }}
-                        {% endif %}
-                    </td>
-                    <td>{{ activity['kind'] }}</td>
-                    <td>{{ '%.1f' % activity["distance_km"] }} km</td>
-                    <td>{{ activity.elapsed_time|td }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="mb-3">
+    {{ search_form(query, equipments_avail, kinds_avail) }}
 </div>
+
+<table class="table table-sort table-arrows">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Start</th>
+            <th>Kind</th>
+            <th class="numeric-sort">Distance</th>
+            <th>Elapsed time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for index, activity in activities %}
+        <tr>
+            <td><a href="{{ url_for('activity.show', id=activity['id']) }}">{{ activity['name'] }}</a></td>
+            <td>
+                {% if activity['start'] is defined %}
+                {{ activity['start']|dt }}
+                {% endif %}
+            </td>
+            <td>{{ activity['kind'] }}</td>
+            <td>{{ '%.1f' % activity["distance_km"] }} km</td>
+            <td>{{ activity.elapsed_time|td }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

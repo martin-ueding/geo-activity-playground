@@ -17,6 +17,16 @@ class SearchQuery:
     start_begin: Optional[datetime.date] = None
     start_end: Optional[datetime.date] = None
 
+    @property
+    def active(self) -> bool:
+        return (
+            self.equipment
+            or self.kind
+            or self.name
+            or self.start_begin
+            or self.start_end
+        )
+
     def to_jinja(self) -> dict:
         return {
             "equipment": self.equipment,
@@ -26,6 +36,7 @@ class SearchQuery:
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
             "start_end": _format_optional_date(self.start_end),
+            "active": self.active,
         }
 
 
