@@ -3,8 +3,11 @@ import numpy as np
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
+from flask import request
 
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.meta_search import apply_search_query
+from geo_activity_playground.webui.search_util import search_query_from_form
 
 
 def make_eddington_blueprint(repository: ActivityRepository) -> Blueprint:
@@ -12,9 +15,10 @@ def make_eddington_blueprint(repository: ActivityRepository) -> Blueprint:
 
     @blueprint.route("/")
     def index():
-        activities = repository.meta.loc[
-            repository.meta["consider_for_achievements"]
-        ].copy()
+        query = search_query_from_form(request.args)
+        activities = apply_search_query(repository.meta, query)
+        activities = activities.loc[activities["consider_for_achievements"]].copy()
+
         activities["day"] = [start.date() for start in activities["start"]]
 
         sum_per_day = activities.groupby("day").apply(
@@ -76,6 +80,7 @@ def make_eddington_blueprint(repository: ActivityRepository) -> Blueprint:
             eddington_table=eddington.loc[
                 (eddington["distance_km"] > en) & (eddington["distance_km"] <= en + 10)
             ].to_dict(orient="records"),
+            query=query.to_jinja(),
         )
 
     return blueprint
