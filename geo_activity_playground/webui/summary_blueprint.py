@@ -5,11 +5,14 @@ import altair as alt
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
+from flask import request
 
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.meta_search import apply_search_query
 from geo_activity_playground.webui.plot_util import make_kind_scale
+from geo_activity_playground.webui.search_util import search_query_from_form
 
 
 def make_summary_blueprint(repository: ActivityRepository, config: Config) -> Blueprint:
@@ -17,8 +20,11 @@ def make_summary_blueprint(repository: ActivityRepository, config: Config) -> Bl
 
     @blueprint.route("/")
     def index():
+        query = search_query_from_form(request.args)
+        activities = apply_search_query(repository.meta, query)
+
         kind_scale = make_kind_scale(repository.meta, config)
-        df = embellished_activities(repository.meta)
+        df = embellished_activities(activities)
         # df = df.loc[df["consider_for_achievements"]]
 
         year_kind_total = (
@@ -46,8 +52,9 @@ def make_summary_blueprint(repository: ActivityRepository, config: Config) -> Bl
                         repository.get_time_series(activity_id)
                     ),
                 )
-                for activity_id, reasons in nominate_activities(repository.meta).items()
+                for activity_id, reasons in nominate_activities(df).items()
             ],
+            query=query.to_jinja(),
         )
 
     return blueprint
@@ -56,20 +63,18 @@ def make_summary_blueprint(repository: ActivityRepository, config: Config) -> Bl
 def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
     nominations: dict[int, list[str]] = collections.defaultdict(list)
 
-    subset = meta.loc[meta["consider_for_achievements"]]
-
-    i = subset["distance_km"].idxmax()
+    i = meta["distance_km"].idxmax()
     nominations[i].append(f"Greatest distance: {meta.loc[i].distance_km:.1f} km")
 
-    i = subset["elapsed_time"].idxmax()
+    i = meta["elapsed_time"].idxmax()
     nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
 
-    if "calories" in subset.columns and not pd.isna(subset["calories"]).all():
-        i = subset["calories"].idxmax()
+    if "calories" in meta.columns and not pd.isna(meta["calories"]).all():
+        i = meta["calories"].idxmax()
         nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
 
-    if "steps" in subset.columns and not pd.isna(subset["steps"]).all():
-        i = subset["steps"].idxmax()
+    if "steps" in meta.columns and not pd.isna(meta["steps"]).all():
+        i = meta["steps"].idxmax()
         nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
 
     for kind, group in meta.groupby("kind"):
@@ -108,7 +113,6 @@ def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
     df["hours"] = [
         elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
     ]
-    del df["elapsed_time"]
     return df
 
 

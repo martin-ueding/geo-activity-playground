@@ -81,6 +81,21 @@ def apply_search_query(
 
     return activity_meta.loc[mask]
 
+    # name_exact = bool(request.args.get("name_exact", False))
+    # name_casing = bool(request.args.get("name_casing", False))
+    # if name := request.args.get("name", ""):
+    #     if name_casing:
+    #         haystack = activities["name"]
+    #         needle = name
+    #     else:
+    #         haystack = activities["name"].str.lower()
+    #         needle = name.lower()
+    #     if name_exact:
+    #         selection = haystack == needle
+    #     else:
+    #         selection = [needle in an for an in haystack]
+    #     activities = activities.loc[selection]
+
 
 def _make_mask(
     index: pd.Index,

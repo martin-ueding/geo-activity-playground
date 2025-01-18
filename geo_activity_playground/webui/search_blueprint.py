@@ -26,25 +26,7 @@ def make_search_blueprint(repository: ActivityRepository) -> Blueprint:
 
     @blueprint.route("/")
     def index():
-        print(request.args)
-
         query = search_query_from_form(request.args)
-
-        # name_exact = bool(request.args.get("name_exact", False))
-        # name_casing = bool(request.args.get("name_casing", False))
-        # if name := request.args.get("name", ""):
-        #     if name_casing:
-        #         haystack = activities["name"]
-        #         needle = name
-        #     else:
-        #         haystack = activities["name"].str.lower()
-        #         needle = name.lower()
-        #     if name_exact:
-        #         selection = haystack == needle
-        #     else:
-        #         selection = [needle in an for an in haystack]
-        #     activities = activities.loc[selection]
-
         activities = apply_search_query(repository.meta, query)
 
         return render_template(
