@@ -1,9 +1,8 @@
-import datetime
 from typing import Optional
 
-import dateutil.parser
 from werkzeug.datastructures import MultiDict
 
+from geo_activity_playground.core.meta_search import _parse_date_or_none
 from geo_activity_playground.core.meta_search import SearchQuery
 
 
@@ -18,13 +17,6 @@ def search_query_from_form(args: MultiDict) -> SearchQuery:
     )
 
     return query
-
-
-def _parse_date_or_none(s: Optional[str]) -> Optional[datetime.date]:
-    if not s:
-        return None
-    else:
-        return dateutil.parser.parse(s).date()
 
 
 def _parse_bool(s: str) -> bool:

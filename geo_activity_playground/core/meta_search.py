@@ -4,6 +4,7 @@ import re
 import urllib.parse
 from typing import Optional
 
+import dateutil.parser
 import numpy as np
 import pandas as pd
 
@@ -27,7 +28,7 @@ class SearchQuery:
             or self.start_end
         )
 
-    def to_jinja(self) -> dict:
+    def to_primitives(self) -> dict:
         return {
             "equipment": self.equipment,
             "kind": self.kind,
@@ -35,8 +36,23 @@ class SearchQuery:
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
             "start_end": _format_optional_date(self.start_end),
-            "active": self.active,
         }
+
+    @classmethod
+    def from_primitives(cls, d: dict) -> "SearchQuery":
+        return cls(
+            equipment=d.get("equipment", []),
+            kind=d.get("kind", []),
+            name=d.get("name", None),
+            name_case_sensitive=d.get("name_case_sensitive", False),
+            start_begin=_parse_date_or_none(d.get("start_begin", None)),
+            start_end=_parse_date_or_none(d.get("start_end", None)),
+        )
+
+    def to_jinja(self) -> dict:
+        result = self.to_primitives()
+        result["active"] = self.active
+        return result
 
     def to_url_str(self) -> str:
         variables = []
@@ -115,3 +131,10 @@ def _filter_column(column: pd.Series, values: list):
     for equipment in values:
         sub_mask |= column == equipment
     return sub_mask
+
+
+def _parse_date_or_none(s: Optional[str]) -> Optional[datetime.date]:
+    if not s:
+        return None
+    else:
+        return dateutil.parser.parse(s).date()

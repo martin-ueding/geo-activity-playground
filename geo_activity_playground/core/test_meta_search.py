@@ -89,3 +89,12 @@ def test_make_mask() -> None:
     index = [1, 2]
     assert (_make_mask(index, True) == pd.Series([True, True], index=index)).all()
     assert (_make_mask(index, False) == pd.Series([False, False], index=index)).all()
+
+
+def test_search_query_from_primitives() -> None:
+    search_query = SearchQuery.from_primitives(
+        {"start_end": "2025-01-04", "equipment": ["A", "B"]}
+    )
+    assert search_query.start_end == datetime.date(2025, 1, 4)
+    assert search_query.equipment == ["A", "B"]
+    assert search_query.kind == []
