@@ -18,6 +18,23 @@ class SearchQuery:
     start_begin: Optional[datetime.date] = None
     start_end: Optional[datetime.date] = None
 
+    def __str__(self) -> str:
+        bits = []
+        if self.name:
+            bits.append(f"name is “{self.name}”")
+        if self.equipment:
+            bits.append(
+                "equipment is "
+                + (" or ".join(f"“{equipment}”" for equipment in self.equipment))
+            )
+        if self.kind:
+            bits.append("kind is " + (" or ".join(f"“{kind}”" for kind in self.kind)))
+        if self.start_begin:
+            bits.append(f"after “{self.start_begin.isoformat()}”")
+        if self.start_end:
+            bits.append(f"until “{self.start_end.isoformat()}”")
+        return " and ".join(bits)
+
     @property
     def active(self) -> bool:
         return (
