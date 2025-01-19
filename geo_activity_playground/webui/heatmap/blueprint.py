@@ -9,12 +9,14 @@ from geo_activity_playground.core.config import Config
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.webui.heatmap.heatmap_controller import HeatmapController
 from geo_activity_playground.webui.search_util import search_query_from_form
+from geo_activity_playground.webui.search_util import SearchQueryHistory
 
 
 def make_heatmap_blueprint(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    search_query_history: SearchQueryHistory,
 ) -> Blueprint:
     heatmap_controller = HeatmapController(repository, tile_visit_accessor, config)
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
@@ -22,6 +24,7 @@ def make_heatmap_blueprint(
     @blueprint.route("/")
     def index():
         query = search_query_from_form(request.args)
+        search_query_history.register_query(query)
         return render_template(
             "heatmap/index.html.j2", **heatmap_controller.render(query)
         )

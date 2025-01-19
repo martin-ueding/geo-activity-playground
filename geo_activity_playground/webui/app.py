@@ -100,7 +100,7 @@ def web_ui_main(
         make_calendar_blueprint(calendar_controller), url_prefix="/calendar"
     )
     app.register_blueprint(
-        make_eddington_blueprint(repository),
+        make_eddington_blueprint(repository, search_query_history),
         url_prefix="/eddington",
     )
     app.register_blueprint(
@@ -110,7 +110,9 @@ def web_ui_main(
         make_explorer_blueprint(explorer_controller), url_prefix="/explorer"
     )
     app.register_blueprint(
-        make_heatmap_blueprint(repository, tile_visit_accessor, config_accessor()),
+        make_heatmap_blueprint(
+            repository, tile_visit_accessor, config_accessor(), search_query_history
+        ),
         url_prefix="/heatmap",
     )
     app.register_blueprint(
@@ -126,7 +128,8 @@ def web_ui_main(
         url_prefix="/search",
     )
     app.register_blueprint(
-        make_summary_blueprint(repository, config), url_prefix="/summary"
+        make_summary_blueprint(repository, config, search_query_history),
+        url_prefix="/summary",
     )
 
     app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
