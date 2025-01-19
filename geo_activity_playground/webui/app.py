@@ -8,6 +8,7 @@ import urllib.parse
 
 from flask import Flask
 from flask import render_template
+from flask import request
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
@@ -124,7 +125,9 @@ def web_ui_main(
         url_prefix="/square-planner",
     )
     app.register_blueprint(
-        make_search_blueprint(repository, search_query_history),
+        make_search_blueprint(
+            repository, search_query_history, authenticator, config_accessor
+        ),
         url_prefix="/search",
     )
     app.register_blueprint(
@@ -156,6 +159,7 @@ def web_ui_main(
             "map_tile_attribution": config_accessor().map_tile_attribution,
             "search_query_favorites": search_query_history.prepare_favorites(),
             "search_query_last": search_query_history.prepare_last(),
+            "request_url": urllib.parse.quote_plus(request.url),
         }
         if len(repository):
             variables["equipments_avail"] = sorted(

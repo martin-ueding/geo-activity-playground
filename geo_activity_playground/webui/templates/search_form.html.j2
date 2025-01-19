@@ -1,4 +1,4 @@
-{% macro search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last) %}
+{% macro search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last, request_url) %}
 <div class="accordion" id="search_form_accordion">
     <div class="accordion-item">
         <h2 class="accordion-header">
@@ -83,14 +83,14 @@
                         <h5 class="mb-3">Favorite queries</h5>
                         <ul class="mb-3">
                             {% for description, url_parameters in search_query_favorites %}
-                            {{ _show_search_query(description, url_parameters, True) }}
+                            {{ _show_search_query(description, url_parameters, True, request_url) }}
                             {% endfor %}
                         </ul>
 
                         <h5 class="mb-3">Last queries</h5>
                         <ol class="mb-3">
                             {% for description, url_parameters in search_query_last %}
-                            {{ _show_search_query(description, url_parameters, False) }}
+                            {{ _show_search_query(description, url_parameters, False, request_url) }}
                             {% endfor %}
                         </ol>
                     </div>
@@ -101,13 +101,13 @@
 </div>
 {% endmacro %}
 
-{% macro _show_search_query(description, url_parameters, is_favorite) %}
+{% macro _show_search_query(description, url_parameters, is_favorite, request_url) %}
 <li>
     <a href="?{{ url_parameters }}">{{ description }}</a>
     {% if is_favorite %}
-    <a href="?{{ url_parameters }}">🗑️</a>
+    <a href="{{ url_for('search.delete_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">🗑️</a>
     {% else %}
-    <a href="?{{ url_parameters }}">💾</a>
+    <a href="{{ url_for('search.save_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">💾</a>
     {% endif %}
 </li>
 {% endmacro %}
