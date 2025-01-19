@@ -21,7 +21,6 @@ def make_eddington_blueprint(
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
         activities = apply_search_query(repository.meta, query)
-        activities = activities.loc[activities["consider_for_achievements"]].copy()
 
         activities["day"] = [start.date() for start in activities["start"]]
 
