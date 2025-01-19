@@ -31,6 +31,7 @@ from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import make_tile_blueprint
 from .upload_blueprint import make_upload_blueprint
+from geo_activity_playground.webui.search_util import SearchQueryHistory
 
 
 def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
@@ -79,6 +80,7 @@ def web_ui_main(
         return f"{h}:{m:02d}:{s:02d}"
 
     authenticator = Authenticator(config_accessor())
+    search_query_history = SearchQueryHistory(config_accessor, authenticator)
 
     config = config_accessor()
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
@@ -98,7 +100,8 @@ def web_ui_main(
         make_calendar_blueprint(calendar_controller), url_prefix="/calendar"
     )
     app.register_blueprint(
-        make_eddington_blueprint(repository), url_prefix="/eddington"
+        make_eddington_blueprint(repository),
+        url_prefix="/eddington",
     )
     app.register_blueprint(
         make_equipment_blueprint(repository, config), url_prefix="/equipment"
@@ -119,7 +122,7 @@ def web_ui_main(
         url_prefix="/square-planner",
     )
     app.register_blueprint(
-        make_search_blueprint(repository),
+        make_search_blueprint(repository, search_query_history),
         url_prefix="/search",
     )
     app.register_blueprint(
@@ -148,6 +151,8 @@ def web_ui_main(
             "version": _try_get_version(),
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
+            "search_query_favorites": search_query_history.prepare_favorites(),
+            "search_query_last": search_query_history.prepare_last(),
         }
         if len(repository):
             variables["equipments_avail"] = sorted(

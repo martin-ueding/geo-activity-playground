@@ -45,7 +45,12 @@ class Config:
     time_diff_threshold_seconds: Optional[int] = 30
     upload_password: Optional[str] = None
     map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
-    map_tile_attribution: str = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
+    map_tile_attribution: str = (
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
+    )
+    search_queries_favorites: list[dict] = dataclasses.field(default_factory=list)
+    search_queries_last: list[dict] = dataclasses.field(default_factory=list)
+    search_queries_num_keep: int = 10
 
 
 class ConfigAccessor:
@@ -60,7 +65,6 @@ class ConfigAccessor:
         return self._config
 
     def save(self) -> None:
-        print(self._config)
         with open(new_config_file(), "w") as f:
             json.dump(
                 dataclasses.asdict(self._config),

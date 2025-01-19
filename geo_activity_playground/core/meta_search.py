@@ -91,13 +91,6 @@ class SearchQuery:
         )
 
 
-def _format_optional_date(date: Optional[datetime.date]) -> str:
-    if date is None:
-        return ""
-    else:
-        return date.isoformat()
-
-
 def apply_search_query(
     activity_meta: pd.DataFrame, search_query: SearchQuery
 ) -> pd.DataFrame:
@@ -131,6 +124,13 @@ def apply_search_query(
         mask &= activity_meta["start"] <= start_end
 
     return activity_meta.loc[mask]
+
+
+def _format_optional_date(date: Optional[datetime.date]) -> str:
+    if date is None:
+        return ""
+    else:
+        return date.isoformat()
 
 
 def _make_mask(
