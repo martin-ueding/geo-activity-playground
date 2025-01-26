@@ -27,6 +27,7 @@ Pillow = "^11.0.0"
 pyarrow = "^18.1.0"
 python-dateutil = "^2.8.2"
 requests = "^2.28.1"
+shapely = "^2.0.5"
 stravalib = "^2.0"
 tcxreader = "^0.4.5"
 tomli = { version = "^2.0.1", python = "<3.11" }
@@ -35,12 +36,13 @@ vegafusion = { version = "^1.4.3", extras = ["embed"] }
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
-shapely = "^2.0.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"
+ipykernel = "^6.29.5"
 mkdocs-material = "^9.4.1"
 mypy = "^1.10.0"
+notebook = "^7.2.2"
 pandas-stubs = "^2.2.2.240603"
 py-spy = "^0.3.14"
 pytest = "^8.0"
@@ -53,8 +55,6 @@ types-requests = "^2.31.0.20240125"
 types-tqdm = "^4.66.0.20240417"
 types-typed-ast = "^1.5.8.7"
 types-xmltodict = "^0.13.0.3"
-ipykernel = "^6.29.5"
-notebook = "^7.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
