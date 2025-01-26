@@ -108,7 +108,8 @@ def web_ui_main(
         make_equipment_blueprint(repository, config), url_prefix="/equipment"
     )
     app.register_blueprint(
-        make_explorer_blueprint(explorer_controller), url_prefix="/explorer"
+        make_explorer_blueprint(explorer_controller, authenticator),
+        url_prefix="/explorer",
     )
     app.register_blueprint(
         make_heatmap_blueprint(

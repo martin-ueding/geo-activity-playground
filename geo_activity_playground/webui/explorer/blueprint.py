@@ -4,11 +4,14 @@ from flask import render_template
 from flask import Response
 from flask import url_for
 
+from geo_activity_playground.webui.authenticator import Authenticator
+from geo_activity_playground.webui.authenticator import needs_authentication
 from geo_activity_playground.webui.explorer.controller import ExplorerController
 
 
 def make_explorer_blueprint(
     explorer_controller: ExplorerController,
+    authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
@@ -19,6 +22,7 @@ def make_explorer_blueprint(
         )
 
     @blueprint.route("/enable-zoom-level/<zoom>")
+    @needs_authentication(authenticator)
     def enable_zoom_level(zoom: str):
         explorer_controller.enable_zoom_level(int(zoom))
         return redirect(url_for(".map", zoom=zoom))
