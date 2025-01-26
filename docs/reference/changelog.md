@@ -20,6 +20,7 @@ New features:
 Fixes:
 
 - [GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225): Sort activities by date descending in the search view.
+- [GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224): Replace empty strings in kind and equipment with literal "Unknown".
 
 ### Version 0.37.0
 

@@ -110,6 +110,9 @@ def build_activity_meta() -> None:
 
         meta.sort_values("start", inplace=True)
 
+        meta.loc[meta["kind"] == "", "kind"] = "Unknown"
+        meta.loc[meta["equipment"] == "", "equipment"] = "Unknown"
+
     meta.to_parquet(activities_file())
 
 
