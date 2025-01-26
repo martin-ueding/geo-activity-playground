@@ -36,6 +36,8 @@
             <dd>{{ activity.calories }}</dd>
             <dt>Steps</dt>
             <dd>{{ activity.steps }}</dd>
+            <dt>Elevation gain</dt>
+            <dd>{{ activity.elevation_gain|round(0) }} m</dd>
             <dt>Equipment</dt>
             <dd>{{ activity['equipment'] }}</dd>
             <dt>New Explorer Tiles</dt>
@@ -106,6 +108,7 @@
     </div>
 </div>
 
+{% if altitude_time_plot is defined %}
 <div class="row mb-3">
     <div class="col">
         <h2>Altitude</h2>
@@ -116,7 +119,13 @@
     <div class="col-md-4">
         {{ vega_direct("altitude_time_plot", altitude_time_plot) }}
     </div>
+    {% if elevation_gain_cum_plot is defined %}
+    <div class="col-md-4">
+        {{ vega_direct("elevation_gain_cum_plot", elevation_gain_cum_plot) }}
+    </div>
+    {% endif %}
 </div>
+{% endif %}
 
 {% if heartrate_time_plot is defined %}
 <h2>Heart rate</h2>

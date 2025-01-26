@@ -30,6 +30,7 @@ class ActivityMeta(TypedDict):
     consider_for_achievements: bool
     distance_km: float
     elapsed_time: datetime.timedelta
+    elevation_gain: float
     end_latitude: float
     end_longitude: float
     equipment: str

@@ -120,6 +120,8 @@ def _get_metadata_from_timeseries(timeseries: pd.DataFrame) -> ActivityMeta:
     metadata["start_longitude"] = timeseries["longitude"].iloc[0]
     metadata["end_longitude"] = timeseries["longitude"].iloc[-1]
 
+    metadata["elevation_gain"] = timeseries["elevation_gain_cum"].iloc[-1]
+
     return metadata
 
 
@@ -190,5 +192,12 @@ def _embellish_single_time_series(
         x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)
         timeseries["x"] = x
         timeseries["y"] = y
+
+    if "altitude" in timeseries.columns:
+        altitude_diff = timeseries["altitude"].diff()
+        altitude_diff = altitude_diff.ewm(span=5, min_periods=5).mean()
+        altitude_diff.loc[altitude_diff.abs() > 30] = 0
+        altitude_diff.loc[altitude_diff < 0] = 0
+        timeseries["elevation_gain_cum"] = altitude_diff.cumsum()
 
     return timeseries

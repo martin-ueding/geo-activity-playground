@@ -108,6 +108,8 @@ class ActivityController:
             result["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
         if "altitude" in time_series.columns:
             result["altitude_time_plot"] = altitude_time_plot(time_series)
+        if "elevation_gain_cum" in time_series.columns:
+            result["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
         if "heartrate" in time_series.columns:
             result["heartrate_time_plot"] = heart_rate_time_plot(time_series)
         if "cadence" in time_series.columns:
@@ -316,6 +318,24 @@ def altitude_time_plot(time_series: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y("altitude", scale=alt.Scale(zero=False), title="Altitude / m"),
+            alt.Color("segment_id:N", title="Segment"),
+        )
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
+
+
+def elevation_gain_cum_plot(time_series: pd.DataFrame) -> str:
+    return (
+        alt.Chart(time_series, title="Altitude Gain")
+        .mark_line()
+        .encode(
+            alt.X("time", title="Time"),
+            alt.Y(
+                "elevation_gain_cum",
+                scale=alt.Scale(zero=False),
+                title="Altitude gain / m",
+            ),
             alt.Color("segment_id:N", title="Segment"),
         )
         .interactive(bind_y=False)
