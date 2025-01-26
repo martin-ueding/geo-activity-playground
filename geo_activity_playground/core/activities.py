@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class ActivityMeta(TypedDict):
+    average_speed_moving_kmh: float
     calories: float
     commute: bool
     consider_for_achievements: bool
@@ -112,6 +113,12 @@ def build_activity_meta() -> None:
 
         meta.loc[meta["kind"] == "", "kind"] = "Unknown"
         meta.loc[meta["equipment"] == "", "equipment"] = "Unknown"
+        meta["average_speed_moving_kmh"] = meta["distance_km"] / (
+            meta["moving_time"].dt.total_seconds() / 3_600
+        )
+        meta["average_speed_elapsed_kmh"] = meta["distance_km"] / (
+            meta["elapsed_time"].dt.total_seconds() / 3_600
+        )
 
     meta.to_parquet(activities_file())
 

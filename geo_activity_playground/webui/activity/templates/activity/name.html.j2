@@ -57,6 +57,7 @@
                     <th>Date</th>
                     <th class="numeric-sort">Distance / km</th>
                     <th>Elapsed time</th>
+                    <th>Speed / km/h</th>
                     <th>Equipment</th>
                     <th>Kind</th>
                 </tr>
@@ -70,6 +71,7 @@
                     <td>{{ activity.start|dt }}</td>
                     <td>{{ activity.distance_km | round(1) }}</td>
                     <td>{{ activity.elapsed_time|td }}</td>
+                    <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
                     <td>{{ activity["equipment"] }}</td>
                     <td>{{ activity["kind"] }}</td>
                 </tr>

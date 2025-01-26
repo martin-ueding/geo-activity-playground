@@ -16,6 +16,7 @@ New features:
 
 - Show history of recent filters.
 - Allow saving filters as favorites.
+- [GH-192](https://github.com/martin-ueding/geo-activity-playground/issues/192): Add average speed to various views.
 
 Fixes:
 
