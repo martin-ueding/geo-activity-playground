@@ -84,6 +84,36 @@ def make_eddington_blueprint(
                 (eddington["distance_km"] > en) & (eddington["distance_km"] <= en + 10)
             ].to_dict(orient="records"),
             query=query.to_jinja(),
+            yearly_eddington=get_yearly_eddington(activities),
         )
 
     return blueprint
+
+
+def get_eddington_number(distances: pd.Series) -> int:
+    if len(distances) == 1:
+        if distances.iloc[0] >= 1:
+            return 1
+        else:
+            0
+
+    sorted_distances = sorted(distances, reverse=True)
+    for en, distance in enumerate(sorted_distances, 1):
+        if distance < en:
+            return en - 1
+
+
+def get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
+    meta = meta.dropna(subset=["start", "distance_km"]).copy()
+    meta["year"] = [start.year for start in meta["start"]]
+    meta["date"] = [start.date() for start in meta["start"]]
+
+    yearly_eddington = meta.groupby("year").apply(
+        lambda group: get_eddington_number(
+            group.groupby("date").apply(
+                lambda group2: int(group2["distance_km"].sum()), include_groups=False
+            )
+        ),
+        include_groups=False,
+    )
+    return yearly_eddington.to_dict()
