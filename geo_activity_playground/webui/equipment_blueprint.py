@@ -21,7 +21,7 @@ def make_equipment_blueprint(
         )
 
         equipment_variables = {}
-        for equipment in repository.meta["equipment"].unique():
+        for equipment in equipment_summary["equipment"]:
             selection = repository.meta.loc[repository.meta["equipment"] == equipment]
             total_distances = pd.DataFrame(
                 {
@@ -93,7 +93,7 @@ def make_equipment_blueprint(
 
         variables = {
             "equipment_variables": equipment_variables,
-            "equipment_summary": equipment_summary,
+            "equipment_summary": equipment_summary.to_dict(orient="records"),
         }
 
         return render_template("equipment/index.html.j2", **variables)

@@ -27,4 +27,4 @@ def get_equipment_use_table(
     result["first_use"] = [date.date().isoformat() for date in result["first_use"]]
     result["last_use"] = [date.date().isoformat() for date in result["last_use"]]
 
-    return result.reset_index().to_dict(orient="records")
+    return result.reset_index()
