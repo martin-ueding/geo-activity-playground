@@ -43,7 +43,7 @@ def make_search_blueprint(
 
         return render_template(
             "search/index.html.j2",
-            activities=list(activities.iterrows()),
+            activities=reversed(list(activities.iterrows())),
             query=query.to_jinja(),
         )
 

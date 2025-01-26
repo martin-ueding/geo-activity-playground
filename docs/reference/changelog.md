@@ -17,6 +17,10 @@ New features:
 - Show history of recent filters.
 - Allow saving filters as favorites.
 
+Fixes:
+
+- [GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225): Sort activities by date descending in the search view.
+
 ### Version 0.37.0
 
 New features:
