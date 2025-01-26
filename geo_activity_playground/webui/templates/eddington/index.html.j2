@@ -90,4 +90,39 @@
     </table>
 </div>
 
+
+<h2 class="mb-3">Eddington number per Week</h2>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        {{ vega_direct("eddington_per_week_plot", eddington_per_week_plot) }}
+    </div>
+
+    <div class="col-md-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Distance / km</th>
+                    <th>Count</th>
+                    <th>Missing weeks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in eddington_table_weeks %}
+                <tr>
+                    <td>{{ row['distance_km'] }}</td>
+                    <td>{{ row['total'] }}</td>
+                    <td>{{ row['missing'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mb-1">
+
+</div>
+
+
 {% endblock %}

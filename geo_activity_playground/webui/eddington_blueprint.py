@@ -22,78 +22,113 @@ def make_eddington_blueprint(
     def index():
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        activities = apply_search_query(repository.meta, query).copy()
-
-        activities["day"] = [start.date() for start in activities["start"]]
-
-        sum_per_day = activities.groupby("day").apply(
-            lambda group: int(sum(group["distance_km"])), include_groups=False
+        activities = (
+            apply_search_query(repository.meta, query)
+            .dropna(subset=["start", "distance_km"])
+            .copy()
         )
-        counts = dict(zip(*np.unique(sorted(sum_per_day), return_counts=True)))
-        eddington = pd.DataFrame(
-            {"distance_km": d, "count": counts.get(d, 0)}
-            for d in range(max(counts.keys()) + 1)
-        )
-        eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
-        x = list(range(1, max(eddington["distance_km"]) + 1))
-        en = eddington.loc[eddington["total"] >= eddington["distance_km"]][
-            "distance_km"
-        ].iloc[-1]
-        eddington["missing"] = eddington["distance_km"] - eddington["total"]
 
-        logarithmic_plot = (
-            (
-                (
-                    alt.Chart(
-                        eddington,
-                        height=500,
-                        width=1000,
-                        title=f"Eddington Number {en}",
-                    )
-                    .mark_area(interpolate="step")
-                    .encode(
-                        alt.X(
-                            "distance_km",
-                            scale=alt.Scale(domainMin=0),
-                            title="Distance / km",
-                        ),
-                        alt.Y(
-                            "total",
-                            scale=alt.Scale(domainMax=en + 10),
-                            title="Days exceeding distance",
-                        ),
-                        [
-                            alt.Tooltip("distance_km", title="Distance / km"),
-                            alt.Tooltip("total", title="Days exceeding distance"),
-                            alt.Tooltip("missing", title="Days missing for next"),
-                        ],
-                    )
-                )
-                + (
-                    alt.Chart(pd.DataFrame({"distance_km": x, "total": x}))
-                    .mark_line(color="red")
-                    .encode(alt.X("distance_km"), alt.Y("total"))
-                )
-            )
-            .interactive()
-            .to_json(format="vega")
+        activities["year"] = [start.year for start in activities["start"]]
+        activities["date"] = [start.date() for start in activities["start"]]
+        activities["isoyear"] = [
+            start.isocalendar().year for start in activities["start"]
+        ]
+        activities["isoweek"] = [
+            start.isocalendar().week for start in activities["start"]
+        ]
+
+        en_per_day, eddington_df_per_day = _get_distances_per_group(
+            activities.groupby("date")
         )
+        en_per_week, eddington_df_per_week = _get_distances_per_group(
+            activities.groupby(["isoyear", "isoweek"])
+        )
+
         return render_template(
             "eddington/index.html.j2",
-            eddington_number=en,
-            logarithmic_plot=logarithmic_plot,
-            eddington_table=eddington.loc[
-                (eddington["distance_km"] > en) & (eddington["distance_km"] <= en + 10)
+            eddington_number=en_per_day,
+            logarithmic_plot=_make_eddington_plot(
+                eddington_df_per_day, en_per_day, "Days"
+            ),
+            eddington_per_week=en_per_week,
+            eddington_per_week_plot=_make_eddington_plot(
+                eddington_df_per_week, en_per_week, "Weeks"
+            ),
+            eddington_table=eddington_df_per_day.loc[
+                (eddington_df_per_day["distance_km"] > en_per_day)
+                & (eddington_df_per_day["distance_km"] <= en_per_day + 10)
+            ].to_dict(orient="records"),
+            eddington_table_weeks=eddington_df_per_week.loc[
+                (eddington_df_per_week["distance_km"] > en_per_week)
+                & (eddington_df_per_week["distance_km"] <= en_per_week + 10)
             ].to_dict(orient="records"),
             query=query.to_jinja(),
-            yearly_eddington=get_yearly_eddington(activities),
-            eddington_number_history_plot=get_eddington_number_history(activities),
+            yearly_eddington=_get_yearly_eddington(activities),
+            eddington_number_history_plot=_get_eddington_number_history(activities),
         )
 
     return blueprint
 
 
-def get_eddington_number(distances: pd.Series) -> int:
+def _get_distances_per_group(grouped) -> tuple[int, pd.DataFrame]:
+    sum_per_group = grouped.apply(
+        lambda group: int(sum(group["distance_km"])), include_groups=False
+    )
+    counts = dict(zip(*np.unique(sorted(sum_per_group), return_counts=True)))
+    eddington = pd.DataFrame(
+        {"distance_km": d, "count": counts.get(d, 0)}
+        for d in range(max(counts.keys()) + 1)
+    )
+    eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
+    en = eddington.loc[eddington["total"] >= eddington["distance_km"]][
+        "distance_km"
+    ].iloc[-1]
+    eddington["missing"] = eddington["distance_km"] - eddington["total"]
+    return en, eddington
+
+
+def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> dict:
+    x = list(range(1, max(eddington_df["distance_km"]) + 1))
+    return (
+        (
+            (
+                alt.Chart(
+                    eddington_df,
+                    height=500,
+                    width=800,
+                    title=f"Eddington Number {en}",
+                )
+                .mark_area(interpolate="step")
+                .encode(
+                    alt.X(
+                        "distance_km",
+                        scale=alt.Scale(domainMin=0),
+                        title="Distance / km",
+                    ),
+                    alt.Y(
+                        "total",
+                        scale=alt.Scale(domainMax=en + 10),
+                        title=f"{interval} exceeding distance",
+                    ),
+                    [
+                        alt.Tooltip("distance_km", title="Distance / km"),
+                        alt.Tooltip("total", title=f"{interval} exceeding distance"),
+                        alt.Tooltip("missing", title=f"{interval} missing for next"),
+                    ],
+                )
+            )
+            + (
+                alt.Chart(pd.DataFrame({"distance_km": x, "total": x}))
+                .mark_line(color="red")
+                .encode(alt.X("distance_km"), alt.Y("total"))
+            )
+        )
+        .interactive()
+        .to_json(format="vega")
+    )
+
+
+def _get_eddington_number(distances: pd.Series) -> int:
     if len(distances) == 1:
         if distances.iloc[0] >= 1:
             return 1
@@ -106,13 +141,13 @@ def get_eddington_number(distances: pd.Series) -> int:
             return en - 1
 
 
-def get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
+def _get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
     meta = meta.dropna(subset=["start", "distance_km"]).copy()
     meta["year"] = [start.year for start in meta["start"]]
     meta["date"] = [start.date() for start in meta["start"]]
 
     yearly_eddington = meta.groupby("year").apply(
-        lambda group: get_eddington_number(
+        lambda group: _get_eddington_number(
             group.groupby("date").apply(
                 lambda group2: int(group2["distance_km"].sum()), include_groups=False
             )
@@ -122,10 +157,7 @@ def get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
     return yearly_eddington.to_dict()
 
 
-def get_eddington_number_history(meta: pd.DataFrame) -> dict:
-    meta = meta.dropna(subset=["start", "distance_km"]).copy()
-    meta["year"] = [start.year for start in meta["start"]]
-    meta["date"] = [start.date() for start in meta["start"]]
+def _get_eddington_number_history(meta: pd.DataFrame) -> dict:
 
     daily_distances = meta.groupby("date").apply(
         lambda group2: int(group2["distance_km"].sum()), include_groups=False

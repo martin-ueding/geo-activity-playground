@@ -19,8 +19,9 @@ New features:
 - [GH-192](https://github.com/martin-ueding/geo-activity-playground/issues/192): Add average speed to various views.
 - [GH-199](https://github.com/martin-ueding/geo-activity-playground/issues/199): Add elevation gain extraction. Be aware that this is very noisy for most GPS devices as they lack a barometer.
 - "Hall of Fame" includes additional nominations per equipment used.
-- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add yearly Eddington number.
+- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add Eddington number with activities from just single years.
 - [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add time evolution of Eddington number.
+- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add Eddington number but grouped by weeks instead of days.
 
 Fixes:
 
