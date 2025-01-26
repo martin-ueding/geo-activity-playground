@@ -55,29 +55,39 @@
         <p>In a graphical representation, the Eddington number is the distance where the red line intersects with the
             blue area.</p>
 
-        {{ vega_direct("eddington-log", logarithmic_plot) }}
+        {{ vega_direct("logarithmic_plot", logarithmic_plot) }}
     </div>
 </div>
 
-<h2 class="mb-3">Yearly Eddington number</h2>
+<div class="mb-3">
+    <h2 class="mb-3">Eddington number history</h2>
 
-<p>If we only consider the activities within one calendar year for the Eddington number, we get the following:</p>
+    <p>How did the Eddington number evolve over time?</p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Year</th>
-            <th>Eddington number</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for year, eddington in yearly_eddington.items() %}
-        <tr>
-            <td>{{ year }}</td>
-            <td>{{ eddington }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    {{ vega_direct("eddington_number_history_plot", eddington_number_history_plot) }}
+</div>
+
+<div class="mb-3">
+    <h2 class="mb-3">Yearly Eddington number</h2>
+
+    <p>If we only consider the activities within one calendar year for the Eddington number, we get the following:</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Eddington number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, eddington in yearly_eddington.items() %}
+            <tr>
+                <td>{{ year }}</td>
+                <td>{{ eddington }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

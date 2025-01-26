@@ -1,3 +1,5 @@
+import datetime
+
 import altair as alt
 import numpy as np
 import pandas as pd
@@ -20,7 +22,7 @@ def make_eddington_blueprint(
     def index():
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        activities = apply_search_query(repository.meta, query)
+        activities = apply_search_query(repository.meta, query).copy()
 
         activities["day"] = [start.date() for start in activities["start"]]
 
@@ -85,6 +87,7 @@ def make_eddington_blueprint(
             ].to_dict(orient="records"),
             query=query.to_jinja(),
             yearly_eddington=get_yearly_eddington(activities),
+            eddington_number_history_plot=get_eddington_number_history(activities),
         )
 
     return blueprint
@@ -117,3 +120,39 @@ def get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
         include_groups=False,
     )
     return yearly_eddington.to_dict()
+
+
+def get_eddington_number_history(meta: pd.DataFrame) -> dict:
+    meta = meta.dropna(subset=["start", "distance_km"]).copy()
+    meta["year"] = [start.year for start in meta["start"]]
+    meta["date"] = [start.date() for start in meta["start"]]
+
+    daily_distances = meta.groupby("date").apply(
+        lambda group2: int(group2["distance_km"].sum()), include_groups=False
+    )
+
+    eddington_number_history = {"date": [], "eddington_number": []}
+    top_days = []
+    for date, distance in daily_distances.items():
+        if len(top_days) == 0:
+            top_days.append(distance)
+        else:
+            if distance >= top_days[0]:
+                top_days.append(distance)
+                top_days.sort()
+        while top_days[0] < len(top_days):
+            top_days.pop(0)
+        eddington_number_history["date"].append(
+            datetime.datetime.combine(date, datetime.datetime.min.time())
+        )
+        eddington_number_history["eddington_number"].append(len(top_days))
+    history = pd.DataFrame(eddington_number_history)
+
+    return (
+        alt.Chart(history)
+        .mark_line(interpolate="step-after")
+        .encode(
+            alt.X("date", title="Date"),
+            alt.Y("eddington_number", title="Eddington number"),
+        )
+    ).to_json(format="vega")
