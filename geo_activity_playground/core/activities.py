@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class ActivityMeta(TypedDict):
+    average_speed_elapsed_kmh: float
     average_speed_moving_kmh: float
     calories: float
     commute: bool

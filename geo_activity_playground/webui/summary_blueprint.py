@@ -69,44 +69,35 @@ def make_summary_blueprint(
 def nominate_activities(meta: pd.DataFrame) -> dict[int, list[str]]:
     nominations: dict[int, list[str]] = collections.defaultdict(list)
 
-    i = meta["distance_km"].idxmax()
-    nominations[i].append(f"Greatest distance: {meta.loc[i].distance_km:.1f} km")
-
-    i = meta["elapsed_time"].idxmax()
-    nominations[i].append(f"Longest elapsed time: {meta.loc[i].elapsed_time}")
-
-    if "calories" in meta.columns and not pd.isna(meta["calories"]).all():
-        i = meta["calories"].idxmax()
-        nominations[i].append(f"Most calories burnt: {meta.loc[i].calories:.0f} kcal")
-
-    if "steps" in meta.columns and not pd.isna(meta["steps"]).all():
-        i = meta["steps"].idxmax()
-        nominations[i].append(f"Most steps: {meta.loc[i].steps:.0f}")
+    _nominate_activities_inner(meta, "", nominations)
 
     for kind, group in meta.groupby("kind"):
-        for key, text in [
-            (
-                "distance_km",
-                lambda row: f"Greatest distance for {row.kind}: {row.distance_km:.1f} km",
-            ),
-            (
-                "elapsed_time",
-                lambda row: f"Longest elapsed time for {row.kind}: {row.elapsed_time}",
-            ),
-            (
-                "calories",
-                lambda row: f"Most calories burnt for {row.kind}: {row.calories:.0f} kcal",
-            ),
-            ("steps", lambda row: f"Most steps for {row.kind}: {row.steps:.0f}"),
-        ]:
-            if key in group.columns:
-                series = group[key]
-                if not pd.isna(series).all():
-                    i = series.idxmax()
-                    if not pd.isna(i):
-                        nominations[i].append(text(meta.loc[i]))
+        _nominate_activities_inner(group, f" for {kind}", nominations)
+    for equipment, group in meta.groupby("equipment"):
+        _nominate_activities_inner(group, f" with {equipment}", nominations)
 
     return nominations
+
+
+def _nominate_activities_inner(
+    meta: pd.DataFrame, title_suffix: str, nominations: dict[int, list[str]]
+) -> None:
+    ratings = [
+        ("distance_km", "Greatest distance", "{:.1f} km"),
+        ("elapsed_time", "Longest elapsed time", "{}"),
+        ("average_speed_moving_kmh", "Highest average moving speed", "{:.1f} km/h"),
+        ("average_speed_elapsed_kmh", "Highest average elapsed speed", "{:.1f} km/h"),
+        ("calories", "Most calories burnt", "{:.0f}"),
+        ("steps", "Most steps", "{:.0f}"),
+        ("elevation_gain", "Largest elevation gain", "{:.0f} m"),
+    ]
+
+    for variable, title, format_str in ratings:
+        if variable in meta.columns and not pd.isna(meta[variable]).all():
+            i = meta[variable].idxmax()
+            value = meta.loc[i, variable]
+            format_applied = format_str.format(value)
+            nominations[i].append(f"{title}{title_suffix}: {format_applied}")
 
 
 def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
