@@ -10,6 +10,13 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
+### Version 0.38.0
+
+New features:
+
+- Show history of recent filters.
+- Allow saving filters as favorites.
+
 ### Version 0.37.0
 
 New features:
