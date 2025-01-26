@@ -36,8 +36,10 @@
             <dd>{{ activity.calories }}</dd>
             <dt>Steps</dt>
             <dd>{{ activity.steps }}</dd>
+            {% if activity.elevation_gain is defined %}
             <dt>Elevation gain</dt>
             <dd>{{ activity.elevation_gain|round(0) }} m</dd>
+            {% endif %}
             <dt>Equipment</dt>
             <dd>{{ activity['equipment'] }}</dd>
             <dt>New Explorer Tiles</dt>
