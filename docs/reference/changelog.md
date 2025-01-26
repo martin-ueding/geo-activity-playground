@@ -21,6 +21,7 @@ Fixes:
 
 - [GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225): Sort activities by date descending in the search view.
 - [GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224): Replace empty strings in kind and equipment with literal "Unknown".
+- [GH-223](https://github.com/martin-ueding/geo-activity-playground/issues/223): Remove duplicate legend for day overview.
 
 ### Version 0.37.0
 
