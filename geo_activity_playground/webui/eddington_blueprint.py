@@ -123,7 +123,7 @@ def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> 
                 .encode(alt.X("distance_km"), alt.Y("total"))
             )
         )
-        .interactive()
+        .interactive(bind_x=False)
         .to_json(format="vega")
     )
 
