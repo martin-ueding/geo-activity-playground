@@ -6,6 +6,7 @@ from flask import render_template
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.summary_stats import get_equipment_use_table
+from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
 def make_equipment_blueprint(
@@ -55,6 +56,11 @@ def make_equipment_blueprint(
                 .encode(
                     alt.X("year(start):O", title="Year"),
                     alt.Y("sum(distance_km)", title="Distance / km"),
+                    alt.Color(
+                        "kind",
+                        scale=make_kind_scale(repository.meta, config),
+                        title="Kind",
+                    ),
                 )
                 .to_json(format="vega")
             )
@@ -67,7 +73,10 @@ def make_equipment_blueprint(
                 )
                 .mark_bar()
                 .encode(
-                    alt.X("kind", title="Kind"),
+                    alt.X(
+                        "kind",
+                        title="Kind",
+                    ),
                     alt.Y("sum(distance_km)", title="Distance / km"),
                 )
                 .to_json(format="vega")
