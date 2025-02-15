@@ -29,6 +29,9 @@ Fixes:
 - [GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224): Replace empty strings in kind and equipment with literal "Unknown".
 - [GH-223](https://github.com/martin-ueding/geo-activity-playground/issues/223): Remove duplicate legend for day overview.
 - [GH-222](https://github.com/martin-ueding/geo-activity-playground/issues/222): Add authentication to enablement of additional zoom levels.
+- Sort equipment details by last use.
+- Make Eddington plots only zoomable in one axis.
+- Add uniform kind scale to equipment usage plots.
 
 ### Version 0.37.0
 
