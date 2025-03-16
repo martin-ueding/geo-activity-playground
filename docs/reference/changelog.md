@@ -15,6 +15,7 @@ This is the pre-release series. Things haven't settled yet, so each minor versio
 #### Version 0.38.1
 
 - [GH-227](https://github.com/martin-ueding/geo-activity-playground/issues/227): Do not fail if elevation gain is missing.
+- Update pyarrow dependency from 18 to 19.
 
 #### Version 0.38.0
 
