@@ -119,8 +119,8 @@ def _get_metadata_from_timeseries(timeseries: pd.DataFrame) -> ActivityMeta:
     metadata["end_latitude"] = timeseries["latitude"].iloc[-1]
     metadata["start_longitude"] = timeseries["longitude"].iloc[0]
     metadata["end_longitude"] = timeseries["longitude"].iloc[-1]
-
-    metadata["elevation_gain"] = timeseries["elevation_gain_cum"].iloc[-1]
+    if "elevation_gain_cum" in timeseries.columns:
+        metadata["elevation_gain"] = timeseries["elevation_gain_cum"].iloc[-1]
 
     return metadata
 
