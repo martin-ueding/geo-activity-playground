@@ -10,7 +10,13 @@ This is the log of high-level changes that I have done in the various versions.
 
 This is the pre-release series. Things haven't settled yet, so each minor version might introduce breaking changes.
 
-### Version 0.38.0
+### Version 0.38
+
+#### Version 0.38.1
+
+- [GH-227](https://github.com/martin-ueding/geo-activity-playground/issues/227): Do not fail if elevation gain is missing.
+
+#### Version 0.38.0
 
 New features:
 
