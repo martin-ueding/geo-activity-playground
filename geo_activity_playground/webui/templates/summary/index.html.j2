@@ -152,9 +152,9 @@
                     {% for value in row %}
                     <td align="right">
                         {% if value == value %}
-                        {{ value | round(2) }}
+                        {{ value | round(1) }}
                         {% if not loop.first %}
-                        km
+                        m
                         {% endif %}
                         {% endif %}
                     </td>
