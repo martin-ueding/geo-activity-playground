@@ -33,27 +33,14 @@ def make_summary_blueprint(
         df = embellished_activities(activities)
         # df = df.loc[df["consider_for_achievements"]]
 
-        year_kind_total = (
-            df[["year", "kind", "distance_km", "hours"]]
-            .groupby(["year", "kind"])
-            .sum()
-            .reset_index()
-        )
-        year_kind_total_elevation_gain = (
-            df[["year", "kind", "elevation_gain", "hours"]]
-            .groupby(["year", "kind"])
-            .sum()
-            .reset_index()
-        )
-
         return render_template(
             "summary/index.html.j2",
             plot_distance_heatmaps=plot_distance_heatmaps(df, config),
             plot_elevation_gain_heatmaps=plot_elevation_gain_heatmaps(df, config),
             plot_monthly_distance=plot_monthly_distance(df, kind_scale),
             plot_monthly_elevation_gain=plot_monthly_elevation_gain(df, kind_scale),
-            plot_yearly_distance=plot_yearly_distance(year_kind_total, kind_scale),
-            plot_yearly_elevation_gain=plot_yearly_elevation_gain(year_kind_total_elevation_gain, kind_scale),
+            plot_yearly_distance=plot_yearly_distance(df, kind_scale),
+            plot_yearly_elevation_gain=plot_yearly_elevation_gain(df, kind_scale),
             plot_year_cumulative=plot_year_cumulative(df),
             plot_year_elevation_gain_cumulative=plot_year_elevation_gain_cumulative(df),
             tabulate_year_kind_mean=tabulate_year_kind_mean(df)
@@ -178,7 +165,7 @@ def plot_elevation_gain_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip(
-                    "sum(elevation_gain)", format=".1f", title="Total elevation gain"
+                    "sum(elevation_gain)", format=".0f", title="Total elevation gain"
                 ),
                 alt.Tooltip("count(elevation_gain)", title="Number of activities"),
             ],
@@ -206,6 +193,11 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
             alt.Y("sum(distance_km)", title="Distance / km"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
+            [
+                alt.Tooltip("month(start)", title="Month"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("sum(distance_km)", title="Distance / km"),
+            ],            
         )
         .resolve_axis(x="independent")
         .to_json(format="vega")
@@ -230,13 +222,25 @@ def plot_monthly_elevation_gain(meta: pd.DataFrame, kind_scale: alt.Scale) -> st
             alt.Y("sum(elevation_gain)", title="Elevation gain"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
+            [
+                alt.Tooltip("month(start)", title="Month"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("sum(elevation_gain)", title="Elevation gain"),
+            ],
         )
         .resolve_axis(x="independent")
         .to_json(format="vega")
     )
 
 
-def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def plot_yearly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    year_kind_total = (
+        df[["year", "kind", "distance_km", "hours"]]
+        .groupby(["year", "kind"])
+        .sum()
+        .reset_index()
+    )
+
     return (
         alt.Chart(year_kind_total, title="Total Distance per Year")
         .mark_bar()
@@ -253,9 +257,17 @@ def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -
         .to_json(format="vega")
     )
 
-def plot_yearly_elevation_gain(year_kind_total_elevation_gain: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def plot_yearly_elevation_gain(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    year_kind_total_elevation_gain = (
+        df[["year", "kind", "elevation_gain", "hours"]]
+        .groupby(["year", "kind"])
+        .sum()
+        .round(0)
+        .reset_index()
+    )
+
     return (
-        alt.Chart(year_kind_total_elevation_gain, title="Total Elevation gain per Year")
+        alt.Chart(year_kind_total_elevation_gain, title="Total Elevation Gain per Year")
         .mark_bar()
         .encode(
             alt.X("year:O", title="Year"),
@@ -284,7 +296,7 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
     )
 
     return (
-        alt.Chart(year_cumulative, width=500, title="Cumultative Distance per Year")
+        alt.Chart(year_cumulative, width=500, title="Cumulative Distance per Year")
         .mark_line()
         .encode(
             alt.X("week", title="Week"),
@@ -306,7 +318,7 @@ def plot_year_elevation_gain_cumulative(df: pd.DataFrame) -> str:
         .groupby("iso_year")
         .apply(
             lambda group: pd.DataFrame(
-                {"week": group["week"], "elevation_gain": group["elevation_gain"].cumsum()}
+                {"week": group["week"], "elevation_gain": group["elevation_gain"].cumsum().round(0)}
             ),
             include_groups=False,
         )
@@ -314,7 +326,7 @@ def plot_year_elevation_gain_cumulative(df: pd.DataFrame) -> str:
     )
 
     return (
-        alt.Chart(year_cumulative, width=500, title="Cumultative Distance per Year")
+        alt.Chart(year_cumulative, width=500, title="Cumulative Elevation Gain per Year")
         .mark_line()
         .encode(
             alt.X("week", title="Week"),
@@ -403,6 +415,7 @@ def plot_weekly_elevation_gain(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
         df[["iso_year", "week", "kind", "elevation_gain"]]
         .groupby(["iso_year", "week", "kind"])
         .sum()
+        .round(0)
         .reset_index()
     )
     week_kind_elevation_gain["year_week"] = [
