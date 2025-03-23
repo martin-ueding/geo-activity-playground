@@ -39,17 +39,31 @@ def make_summary_blueprint(
             .sum()
             .reset_index()
         )
+        year_kind_total_elevation_gain = (
+            df[["year", "kind", "elevation_gain", "hours"]]
+            .groupby(["year", "kind"])
+            .sum()
+            .reset_index()
+        )
 
         return render_template(
             "summary/index.html.j2",
             plot_distance_heatmaps=plot_distance_heatmaps(df, config),
+            plot_elevation_gain_heatmaps=plot_elevation_gain_heatmaps(df, config),
             plot_monthly_distance=plot_monthly_distance(df, kind_scale),
+            plot_monthly_elevation_gain=plot_monthly_elevation_gain(df, kind_scale),
             plot_yearly_distance=plot_yearly_distance(year_kind_total, kind_scale),
+            plot_yearly_elevation_gain=plot_yearly_elevation_gain(year_kind_total_elevation_gain, kind_scale),
             plot_year_cumulative=plot_year_cumulative(df),
+            plot_year_elevation_gain_cumulative=plot_year_elevation_gain_cumulative(df),
             tabulate_year_kind_mean=tabulate_year_kind_mean(df)
             .reset_index()
             .to_dict(orient="split"),
+            tabulate_year_kind_mean_elevation_gain=tabulate_year_kind_mean_elevation_gain(df)
+            .reset_index()
+            .to_dict(orient="split"),
             plot_weekly_distance=plot_weekly_distance(df, kind_scale),
+            plot_weekly_elevation_gain=plot_weekly_elevation_gain(df, kind_scale),
             nominations=[
                 (
                     repository.get_activity_by_id(activity_id),
@@ -143,6 +157,35 @@ def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]
         for year in sorted(meta["year"].unique())
     }
 
+def plot_elevation_gain_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]:
+    return {
+        year: alt.Chart(
+            meta.loc[(meta["year"] == year)],
+            title="Daily Elevation Gain Heatmap",
+        )
+        .mark_rect()
+        .encode(
+            alt.X("date(start):O", title="Day of month"),
+            alt.Y(
+                "yearmonth(start):O",
+                # scale=alt.Scale(reverse=True),
+                title="Year and month",
+            ),
+            alt.Color(
+                "sum(elevation_gain)",
+                scale=alt.Scale(scheme=config.color_scheme_for_counts),
+            ),
+            [
+                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip(
+                    "sum(elevation_gain)", format=".1f", title="Total elevation gain"
+                ),
+                alt.Tooltip("count(elevation_gain)", title="Number of activities"),
+            ],
+        )
+        .to_json(format="vega")
+        for year in sorted(meta["year"].unique())
+    }
 
 def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
     return (
@@ -168,6 +211,30 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
         .to_json(format="vega")
     )
 
+def plot_monthly_elevation_gain(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    return (
+        alt.Chart(
+            meta.loc[
+                (
+                    meta["start"]
+                    >= pd.to_datetime(
+                        datetime.datetime.now() - datetime.timedelta(days=2 * 365)
+                    )
+                )
+            ],
+            title="Monthly Elevation Gain",
+        )
+        .mark_bar()
+        .encode(
+            alt.X("month(start)", title="Month"),
+            alt.Y("sum(elevation_gain)", title="Elevation gain"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
+            alt.Column("year(start):O", title="Year"),
+        )
+        .resolve_axis(x="independent")
+        .to_json(format="vega")
+    )
+
 
 def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -> str:
     return (
@@ -186,6 +253,22 @@ def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -
         .to_json(format="vega")
     )
 
+def plot_yearly_elevation_gain(year_kind_total_elevation_gain: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    return (
+        alt.Chart(year_kind_total_elevation_gain, title="Total Elevation gain per Year")
+        .mark_bar()
+        .encode(
+            alt.X("year:O", title="Year"),
+            alt.Y("elevation_gain", title="Elevation gain"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
+            [
+                alt.Tooltip("year:O", title="Year"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("elevation_gain", title="Elevation gain"),
+            ],
+        )
+        .to_json(format="vega")
+    )
 
 def plot_year_cumulative(df: pd.DataFrame) -> str:
     year_cumulative = (
@@ -217,6 +300,35 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
         .to_json(format="vega")
     )
 
+def plot_year_elevation_gain_cumulative(df: pd.DataFrame) -> str:
+    year_cumulative = (
+        df[["iso_year", "week", "elevation_gain"]]
+        .groupby("iso_year")
+        .apply(
+            lambda group: pd.DataFrame(
+                {"week": group["week"], "elevation_gain": group["elevation_gain"].cumsum()}
+            ),
+            include_groups=False,
+        )
+        .reset_index()
+    )
+
+    return (
+        alt.Chart(year_cumulative, width=500, title="Cumultative Distance per Year")
+        .mark_line()
+        .encode(
+            alt.X("week", title="Week"),
+            alt.Y("elevation_gain", title="Elevation gain"),
+            alt.Color("iso_year:N", title="Year"),
+            [
+                alt.Tooltip("week", title="Week"),
+                alt.Tooltip("iso_year:N", title="Year"),
+                alt.Tooltip("elevation_gain", title="Elevation gain"),
+            ],
+        )
+        .interactive()
+        .to_json(format="vega")
+    )
 
 def tabulate_year_kind_mean(df: pd.DataFrame) -> pd.DataFrame:
     year_kind_mean = (
@@ -232,6 +344,19 @@ def tabulate_year_kind_mean(df: pd.DataFrame) -> pd.DataFrame:
 
     return year_kind_mean_distance
 
+def tabulate_year_kind_mean_elevation_gain(df: pd.DataFrame) -> pd.DataFrame:
+    year_kind_mean = (
+        df[["year", "kind", "elevation_gain", "hours"]]
+        .groupby(["year", "kind"])
+        .mean()
+        .reset_index()
+    )
+
+    year_kind_mean_elevation_gain = year_kind_mean.pivot(
+        index="year", columns="kind", values="elevation_gain"
+    )
+
+    return year_kind_mean_elevation_gain
 
 def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
     week_kind_total_distance = (
@@ -268,6 +393,46 @@ def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
                 alt.Tooltip("year_week", title="Year and Week"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip("distance_km", title="Distance / km"),
+            ],
+        )
+        .to_json(format="vega")
+    )
+
+def plot_weekly_elevation_gain(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    week_kind_elevation_gain = (
+        df[["iso_year", "week", "kind", "elevation_gain"]]
+        .groupby(["iso_year", "week", "kind"])
+        .sum()
+        .reset_index()
+    )
+    week_kind_elevation_gain["year_week"] = [
+        f"{year}-{week:02d}"
+        for year, week in zip(
+            week_kind_elevation_gain["iso_year"], week_kind_elevation_gain["week"]
+        )
+    ]
+
+    last_year = week_kind_elevation_gain["iso_year"].iloc[-1]
+    last_week = week_kind_elevation_gain["week"].iloc[-1]
+
+    return (
+        alt.Chart(
+            week_kind_elevation_gain.loc[
+                (week_kind_elevation_gain["iso_year"] == last_year)
+                | (week_kind_elevation_gain["iso_year"] == last_year - 1)
+                & (week_kind_elevation_gain["week"] >= last_week)
+            ],
+            title="Weekly Elevation gain",
+        )
+        .mark_bar()
+        .encode(
+            alt.X("year_week", title="Year and Week"),
+            alt.Y("elevation_gain", title="Elevation gain"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
+            [
+                alt.Tooltip("year_week", title="Year and Week"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("elevation_gain", title="Elevation gain"),
             ],
         )
         .to_json(format="vega")

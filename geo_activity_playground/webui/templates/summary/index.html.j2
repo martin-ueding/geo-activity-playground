@@ -28,7 +28,6 @@
     </div>
 </div>
 
-
 <p>How much distance have you covered in each year up to that time of the year? The first plot gives you each year as
     one line. The second plot shows you how distance you have covered in each year and with which activity kinds.</p>
 
@@ -96,6 +95,96 @@
     <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-{{ year }}-pane" role="tabpanel"
         aria-labelledby="heatmap-{{ year }}" tabindex="0">
         {{ vega_direct("plot_distance_heatmap_%d"|format(year), plot) }}
+    </div>
+    {% endfor %}
+</div>
+
+<h2>Elevation Gain</h2>
+
+<p>This is your weekly elevation gain for the past rolling year, split by activity kind.</p>
+
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct("plot_weekly_elevation_gain", plot_weekly_elevation_gain) }}
+    </div>
+</div>
+
+<p>Similarly, you find the same data but aggregated by whole months for the past two years. Also split by activity kind.
+</p>
+
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct("plot_monthly_elevation_gain", plot_monthly_elevation_gain) }}
+    </div>
+</div>
+
+<p>How much elevation have you gained in each year up to that time of the year? The first plot gives you each year as
+    one line. The second plot shows you how much elevation you have gained in each year and with which activity kinds.</p>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ vega_direct("plot_year_elevation_gain_cumulative", plot_year_elevation_gain_cumulative) }}
+    </div>
+    <div class="col-md-6">
+        {{ vega_direct("plot_yearly_elevation_gain", plot_yearly_elevation_gain) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <p>What's the average elevation gain per activity? This naturally differs per activity and perhaps also varies with
+            the years. This table gives you all the mean values.</p>
+    </div>
+
+    <div class="col-md-8">
+        <table class="table table-sort table-arrows">
+            <thead>
+                <tr>
+                    <th style="text-align: right;">Year</th>
+                    {% for col in tabulate_year_kind_mean_elevation_gain['columns'][1:] %}
+                    <th style="text-align: right;">{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in tabulate_year_kind_mean_elevation_gain['data'] %}
+                <tr>
+                    {% for value in row %}
+                    <td align="right">
+                        {% if value == value %}
+                        {{ value | round(2) }}
+                        {% if not loop.first %}
+                        km
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p>Next we take one row per month, each column is a day-of-month. The brighter a box, the more elevation gain you have covered
+    on that day. This makes it easy to spot those days where you really covered a lot of elevation gain!</p>
+
+
+<ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+    {% for year, plot in plot_elevation_gain_heatmaps.items() %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.last %} active {% endif %}" id="heatmap-elevation-gain-{{ year }}" data-bs-toggle="tab"
+            data-bs-target="#heatmap-elevation-gain-{{ year }}-pane" type="button" role="tab" aria-controls="heatmap-elevation-gain-{{ year }}-pane"
+            aria-selected="{{ loop.last }}">{{ year }}</button>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="tab-content mb-3" id="myTabContent">
+    {% for year, plot in plot_elevation_gain_heatmaps.items() %}
+    <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-elevation-gain-{{ year }}-pane" role="tabpanel"
+        aria-labelledby="heatmap-elevation-gain-{{ year }}" tabindex="0">
+        {{ vega_direct("plot_elevation_gain_heatmap_%d"|format(year), plot) }}
     </div>
     {% endfor %}
 </div>
