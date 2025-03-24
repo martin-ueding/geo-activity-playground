@@ -197,7 +197,7 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
                 alt.Tooltip("month(start)", title="Month"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip("sum(distance_km)", title="Distance / km"),
-            ],            
+            ],
         )
         .resolve_axis(x="independent")
         .to_json(format="vega")
@@ -225,7 +225,7 @@ def plot_monthly_elevation_gain(meta: pd.DataFrame, kind_scale: alt.Scale) -> st
             [
                 alt.Tooltip("month(start)", title="Month"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("sum(elevation_gain)", title="Elevation gain"),
+                alt.Tooltip("sum(elevation_gain)", format=".0f", title="Elevation gain"),
             ],
         )
         .resolve_axis(x="independent")
