@@ -8,7 +8,7 @@
 </div>
 
 <div class="row mb-3">
-    <div class="col-4">
+    <div class="col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
         <dl>
             <dt>Name</dt>
             <dd>{{ activity["name"] }}</dd>
@@ -54,7 +54,7 @@
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit metadata</a>
     </div>
-    <div class="col-8">
+    <div class="col-sm-12 col-md-8 col-lg-8 col-xl-8 col-xxl-8">
         <div id="activity-map" style="height: 500px;" class="mb-3"></div>
         <script>
             var map = L.map('activity-map', {
