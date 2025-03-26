@@ -186,5 +186,9 @@ def _get_eddington_number_history(meta: pd.DataFrame) -> dict:
         .encode(
             alt.X("date", title="Date"),
             alt.Y("eddington_number", title="Eddington number"),
+            [
+                alt.Tooltip("date", title="Date"),
+                alt.Tooltip("eddington_number", title="Eddington number"),
+            ],
         )
     ).to_json(format="vega")
