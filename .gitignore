@@ -5,3 +5,4 @@ __pycache__/
 data
 dist
 site
+*.sqlite3
