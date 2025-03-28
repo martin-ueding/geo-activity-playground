@@ -1,0 +1,14 @@
+{% extends "gap_app/page.html.j2" %}
+
+{% block container %}
+<h1>Upload Activity</h1>
+
+<form method="post" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="file1" class="form-label">Activity file</label>
+        <input type="file" name="file" id="file1" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+{% endblock %}

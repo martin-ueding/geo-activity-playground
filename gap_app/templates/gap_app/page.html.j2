@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Geo Activity Playground</title>
+
+    <!-- Bootstrap CSS. -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Leaflet for interactive maps. -->
+    <link rel="stylesheet" href="/static/leaflet.css" />
+    <script src="/static/leaflet.js"></script>
+
+    <!-- Fullscreen button for Leaflet. -->
+    <link href='/static/leaflet.fullscreen.css' rel='stylesheet' />
+    <script src='/static/Leaflet.fullscreen.min.js'></script>
+
+    <link rel="stylesheet" href="/static/MarkerCluster.css" />
+    <link rel="stylesheet" href="/static/MarkerCluster.Default.css" />
+    <script src="/static/leaflet.markercluster.js"></script>
+
+    <!-- Vega for plots.-->
+    <script src="/static/vega@5"></script>
+    <script src="/static/vega-lite@4"></script>
+    <script src="/static/vega-embed@6"></script>
+
+    <script src="/static/bootstrap-dark-mode.js"></script>
+
+    <script src="/static/table-sort.min.js"></script>
+
+    <!-- Favicon. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    <link rel="manifest" href="/static/site.webmanifest">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/static/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-body-secondary mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'index' %}">Geo Activity Playground</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                        {% if num_activities > 0 %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Activities
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'calendar-index' %}">Calendar</a></li>
+                                <li><a class="dropdown-item" href="{% url 'search-index' %}">Overview & Search</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Statistics
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'summary-index' %}">Summary
+                                        Statistics</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'eddington_index' %}">Eddington
+                                        Number</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'equipment-index' %}">Equipment</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Explorer
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'explorer' 14 %}">Explorer
+                                        Tiles (Zoom 14)</a></li>
+                                <li><a class="dropdown-item" href="{% url 'explorer' 14 %}">Squadratinhos
+                                        (Zoom 17)</a></li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li><a class="dropdown-item" href="{% url 'square-planner-index' 14 %}">Square Planner
+                                        (Zoom 14)</a></li>
+                                <li><a class="dropdown-item" href="{% url 'square-planner-index' 14 %}">Square Planner
+                                        (Zoom 17)</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{% url 'heatmap-index' %}">Heatmap</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'activity-add' %}">Upload Activities</a>
+                                </li>
+
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li><a class="dropdown-item" href="{% url 'settings-index' %}">Settings</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <button
+                                class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                                id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                                data-bs-display="static" aria-label="Toggle theme (dark)">
+                                <span id="bd-theme-text">Theme</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="light" aria-pressed="false">
+                                        ☀️ Light
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center active"
+                                        data-bs-theme-value="dark" aria-pressed="true">
+                                        🌙 Dark
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="auto" aria-pressed="false">
+                                        ⚙️ Auto
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% block container %}
+        {% endblock %}
+
+        <div class="row border-top py-3 my-4">
+            <ul class="nav col-4">
+                <li class="nav-item text-muted px-2 nav-link">Version {{ version }}</li>
+            </ul>
+            <ul class="nav col-8 justify-content-end">
+                <li class="nav-item"><a href="https://github.com/martin-ueding/geo-activity-playground"
+                        class="nav-link px-2 text-muted" target="_blank">GitHub</a></li>
+                <li class="nav-item"><a href="https://martin-ueding.github.io/geo-activity-playground/"
+                        class="nav-link px-2 text-muted" target="_blank">Documentation</a></li>
+                <li class="nav-item"><a href="https://bonn.social/tags/GeoActivityPlayground"
+                        class="nav-link px-2 text-muted" target="_blank">Mastodon</a></li>
+                <li class="nav-item"><a href="https://pypi.org/project/geo-activity-playground/"
+                        class="nav-link px-2 text-muted" target="_blank">PyPI</a></li>
+                <li class="nav-item"><a href="https://martin-ueding.de/" class="nav-link px-2 text-muted">Martin
+                        Ueding</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/static/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

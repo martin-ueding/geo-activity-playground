@@ -1,3 +1,4 @@
+import pathlib
 from typing import Optional
 
 from django.contrib.auth.models import User
@@ -43,7 +44,6 @@ class Activity(models.Model):
 
     calories = models.FloatField(blank=True, null=True)
     steps = models.IntegerField(blank=True, null=True)
-    calories = models.IntegerField(blank=True, null=True)
     elevation_gain = models.FloatField(blank=True, null=True)
 
     @property
@@ -55,3 +55,7 @@ class Activity(models.Model):
     def average_speed_moving_kmh(self) -> Optional[float]:
         if self.moving_time is not None:
             return self.distance_km / self.moving_time
+
+    @property
+    def timeseries_path(self) -> pathlib.Path:
+        return pathlib.Path(f"{self.id}.parquet")

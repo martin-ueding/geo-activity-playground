@@ -6,3 +6,4 @@ data
 dist
 site
 *.sqlite3
+*.parquet
