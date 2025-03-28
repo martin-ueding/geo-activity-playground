@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -30,5 +32,26 @@ class Activity(models.Model):
         Equipment, blank=True, null=True, on_delete=models.CASCADE
     )
     start = models.DateTimeField(blank=True, null=True)
+    distance_km = models.FloatField(default=0.0)
     elapsed_time = models.DurationField(blank=True, null=True)
     moving_time = models.DurationField(blank=True, null=True)
+
+    start_latitude = models.FloatField(blank=True, null=True)
+    start_longitude = models.FloatField(blank=True, null=True)
+    end_latitude = models.FloatField(blank=True, null=True)
+    end_longitude = models.FloatField(blank=True, null=True)
+
+    calories = models.FloatField(blank=True, null=True)
+    steps = models.IntegerField(blank=True, null=True)
+    calories = models.IntegerField(blank=True, null=True)
+    elevation_gain = models.FloatField(blank=True, null=True)
+
+    @property
+    def average_speed_elapsed_kmh(self) -> Optional[float]:
+        if self.elapsed_time is not None:
+            return self.distance_km / self.elapsed_time
+
+    @property
+    def average_speed_moving_kmh(self) -> Optional[float]:
+        if self.moving_time is not None:
+            return self.distance_km / self.moving_time
