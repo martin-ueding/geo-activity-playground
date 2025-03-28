@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
 from gap_app.models import Activity
@@ -16,6 +17,11 @@ from geo_activity_playground.importers.activity_parsers import read_activity
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
+
+
+def activity_view(request: HttpRequest, activity_id) -> HttpResponse:
+    activity = get_object_or_404(Activity, pk=activity_id)
+    return render(request, "gap_app/activity_view.html.j2", {"activity": activity})
 
 
 class ActivityUploadForm(forms.Form):

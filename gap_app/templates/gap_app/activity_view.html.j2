@@ -1,0 +1,91 @@
+{% extends "gap_app/page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ activity.name }}</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-4">
+        <dl>
+            <dt>Name</dt>
+            <dd>{{ activity.name }}</dd>
+            <dt>Kind</dt>
+            <dd>{{ activity.kind }}</dd>
+            <dt>Distance</dt>
+            <dd>{{ activity.distance_km }} km</dd>
+            <dt>Elapsed time</dt>
+            <dd>{{ activity.elapsed_time }}</dd>
+            <dt>Moving time</dt>
+            <dd>{{ activity.moving_time }}</dd>
+            <dt>Average moving speed</dt>
+            <dd>{{ activity.average_speed_moving_kmh|floatformat:1 }} km/h = {{ activity.pace_elapsed }} h/km</dd>
+            <dt>Average elapsed speed</dt>
+            <dd>{{ activity.average_speed_elapsed_kmh|floatformat:1 }} km/h = {{ activity.pace_moving }} h/km</dd>
+            <dt>Start time</dt>
+            <dd><a href="">{{ date }}</a>
+                {{ activity.start }}
+            </dd>
+            <dt>Calories</dt>
+            <dd>{{ activity.calories }}</dd>
+            <dt>Steps</dt>
+            <dd>{{ activity.steps }}</dd>
+            {% if activity.elevation_gain is defined %}
+            <dt>Elevation gain</dt>
+            <dd>{{ activity.elevation_gain }} m</dd>
+            {% endif %}
+            <dt>Equipment</dt>
+            <dd>{{ activity.equipment }}</dd>
+            <dt>New Explorer Tiles</dt>
+            <dd>{{ new_tiles_14 }}</dd>
+            <dt>New Squadratinhos</dt>
+            <dd>{{ new_tiles_17 }}</dd>
+            <dt>ID</dt>
+            <dd>{{ activity.id }}</dd>
+            <dt>Source path</dt>
+            <dd>{{ activity.path }}</dd>
+        </dl>
+
+        <a href="" class="btn btn-secondary btn-small">Edit metadata</a>
+    </div>
+    <div class="col-8">
+        <div id="activity-map" style="height: 500px;" class="mb-3"></div>
+        <script>
+            var map = L.map('activity-map', {
+                fullscreenControl: true
+            });
+            L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map);
+
+            let geojson = L.geoJSON({{ color_line_geojson| safe }}, {
+                style: function (feature) { return { color: feature.properties.color } }
+            }).addTo(map)
+            map.fitBounds(geojson.getBounds());
+        </script>
+
+
+        <style>
+            span.colorbar {
+                text-shadow: -1px -1px 0 black, -1px 0px 0 black, -1px 1px 0 black, 0px -1px 0 black, 0px 0px 0 black, 0px 1px 0 black, 1px -1px 0 black, 1px 0px 0 black, 1px 1px 0 black;
+                padding-left: 5px;
+                padding-right: 5px;
+                line-height: 130%;
+                color: white;
+            }
+        </style>
+
+        <div>
+            {% for speed, color in speed_color_bar.colors %}
+            <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ speed }}</span>
+            {% endfor %}
+            km/h
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
