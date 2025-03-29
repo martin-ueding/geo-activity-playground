@@ -42,6 +42,7 @@ nav:
     - features/kind-rename.md
   - How-Tos:
     - plan-missing-tile-rides.md
+    - create-a-privacy-zone.md
     - set-up-a-development-environment.md
   - changelog.md
   - acknowledgments.md

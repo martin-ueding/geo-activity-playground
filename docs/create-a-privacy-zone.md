@@ -1,24 +1,18 @@
-# Share Picture
+# Create a Privacy Zone
 
-On each activity page you will find a "share picture" like the following:
-
-![](share-picture.png)
-
-## Privacy zones
-
-You might want to remove points that are close to your home, work or relatives. For this you can define arbitrary polygons as "privacy zones".
+On each activity page you will find a “share picture” for use in social media and messengers. You might want to exclude your home or work from these. For this you can define arbitrary polygons as "privacy zones".
 
 To create such a polygon, go to [GeoJSON.io](https://geojson.io/). You will see a map similar to this one:
 
-![](geojson-io-1.png)
+![](images/geojson-io-1.png)
 
 Select the polygon tool and click on the map to span the polygon.
 
-![](geojson-io-2.png)
+![](images/geojson-io-2.png)
 
 Once you are done, press <kbd>Enter</kbd> to finish the polygon. In the left panel the GeoJSON output will appear:
 
-![](geojson-io-3.png)
+![](images/geojson-io-3.png)
 
 For this case, we have this GeoJSON:
 
