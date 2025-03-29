@@ -1,7 +1,7 @@
 # Changelog
 
 <!-- 
-- [GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000):
+- ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
 This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
