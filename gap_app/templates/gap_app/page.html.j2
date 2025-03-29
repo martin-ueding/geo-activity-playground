@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,37 +10,38 @@
     <title>Geo Activity Playground</title>
 
     <!-- Bootstrap CSS. -->
-    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'gap_app/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Leaflet for interactive maps. -->
-    <link rel="stylesheet" href="/static/leaflet.css" />
-    <script src="/static/leaflet.js"></script>
+    <link rel="stylesheet" href="{% static 'gap_app/leaflet.css' %}" />
+    <script src="{% static 'gap_app/leaflet.js' %}"></script>
 
     <!-- Fullscreen button for Leaflet. -->
-    <link href='/static/leaflet.fullscreen.css' rel='stylesheet' />
-    <script src='/static/Leaflet.fullscreen.min.js'></script>
+    <link href="{% static 'gap_app/leaflet.fullscreen.css' %}"" rel='stylesheet' />
+    <script src=" {% static 'gap_app/Leaflet.fullscreen.min.js' %}">
+    </script>
 
-    <link rel="stylesheet" href="/static/MarkerCluster.css" />
-    <link rel="stylesheet" href="/static/MarkerCluster.Default.css" />
-    <script src="/static/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="{% static 'gap_app/MarkerCluster.css' %}" />
+    <link rel="stylesheet" href="{% static 'gap_app/MarkerCluster.Default.css' %}" />
+    <script src="{% static 'gap_app/leaflet.markercluster.js' %}"></script>
 
     <!-- Vega for plots.-->
-    <script src="/static/vega@5"></script>
-    <script src="/static/vega-lite@4"></script>
-    <script src="/static/vega-embed@6"></script>
+    <script src="{% static 'gap_app/vega@5' %}"></script>
+    <script src="{% static 'gap_app/vega-lite@4' %}"></script>
+    <script src="{% static 'gap_app/vega-embed@6' %}"></script>
 
-    <script src="/static/bootstrap-dark-mode.js"></script>
+    <script src="{% static 'gap_app/bootstrap-dark-mode.js' %}"></script>
 
-    <script src="/static/table-sort.min.js"></script>
+    <script src="{% static 'gap_app/table-sort.min.js' %}"></script>
 
     <!-- Favicon. -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
-    <link rel="manifest" href="/static/site.webmanifest">
-    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'gap_app/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'gap_app/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'gap_app/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'gap_app/site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'gap_app/favicon.ico' %}">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/static/browserconfig.xml">
+    <meta name="msapplication-config" content="{% static 'gap_app/browserconfig.xml' %}">
     <meta name="theme-color" content="#ffffff">
 </head>
 
@@ -184,7 +187,7 @@
         </div>
     </div>
 
-    <script src="/static/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'gap_app/bootstrap.bundle.min.js' %}"></script>
 </body>
 
 </html>
