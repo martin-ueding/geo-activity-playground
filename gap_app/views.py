@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.views.generic.edit import FormView
 
 from gap_app.models import Activity
+from gap_app.models import Equipment
 from gap_app.models import Kind
 from geo_activity_playground.core.enrichment import _embellish_single_time_series
 from geo_activity_playground.core.enrichment import _get_metadata_from_timeseries
@@ -29,6 +30,24 @@ def activity_view(request: HttpRequest, activity_id) -> HttpResponse:
     return render(request, "gap_app/activity_view.html.j2", {"activity": activity})
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
+
 class ActivityUploadForm(forms.Form):
     def __init__(self, user: User, data=None, files=None) -> None:
         super().__init__(data, files)
@@ -40,8 +59,14 @@ class ActivityUploadForm(forms.Form):
             required=False,
             widget=forms.Select(attrs={"class": "form-control"}),
         )
+        self.fields["equipment"] = forms.ModelChoiceField(
+            queryset=Equipment.objects.filter(owner_id=self._user),
+            to_field_name="name",
+            required=False,
+            widget=forms.Select(attrs={"class": "form-control"}),
+        )
 
-    file = forms.FileField()
+    file = MultipleFileField()
 
 
 def _import_activity_file(request: HttpRequest, f: UploadedFile) -> None:
@@ -82,11 +107,16 @@ def activity_upload(request: HttpRequest):
     if request.method == "POST":
         form = ActivityUploadForm(request.user, request.POST, request.FILES)
         if form.is_valid():
-            activity = _import_activity_file(request, request.FILES["file"])
-            if (kind := form.cleaned_data["kind"]) is not None:
-                activity.kind = kind
+            activity = None
+            for uploaded_file in request.FILES.getlist("file"):
+                activity = _import_activity_file(request, uploaded_file)
+                if (kind := form.cleaned_data["kind"]) is not None:
+                    activity.kind = kind
+                if (equipment := form.cleaned_data["equipment"]) is not None:
+                    activity.equipment = equipment
                 activity.save()
-            return redirect("activity-view", activity_id=activity.id)
+            if activity is not None:
+                return redirect("activity-view", activity_id=activity.id)
     else:
         form = ActivityUploadForm(request.user)
 
