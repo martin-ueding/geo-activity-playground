@@ -26,6 +26,7 @@ Added:
 
 Changed:
 
+- **Branch rename**: `master` is renamed to `main`.
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restructure the documentation such that it hopefully is more inviting for new users.
 - Share picture now scales with viewport. ([GH-232](https://github.com/martin-ueding/geo-activity-playground/issues/232))
