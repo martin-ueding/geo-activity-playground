@@ -21,6 +21,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add tooltips to all charts. ([GH-231](https://github.com/martin-ueding/geo-activity-playground/issues/231))
+
 Changed:
 
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
