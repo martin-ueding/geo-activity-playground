@@ -25,7 +25,6 @@ nav:
     - install-on-linux.md
     - getting-started/installing-stable-on-windows.md
     - Advanced Installation Topics:
-      - getting-started/installing-git-on-linux.md
       - getting-started/docker.md
       - getting-started/docker-compose.md
       - getting-started/docker-compose-tailscale.md

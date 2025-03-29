@@ -74,6 +74,14 @@ For your development environment to properly resolve all the packages, it needs 
 poetry run code .
 ```
 
+## Starting the program
+
+In order to test your changes, you can run the server from the Git repository like so:
+
+```bash
+poetry run geo-activity-playground --basedir path/to/your/basedir serve
+```
+
 ## Committing changes
 
 Do your changes like in any other Python project. Commit them. Before the commit is finalized, the pre-commit hook will run and take care of import order and code formatting. It might happen that the commit command fails. Add the new changes and then try to commit again.
