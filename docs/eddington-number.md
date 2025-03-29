@@ -6,7 +6,7 @@ If you have an Eddington number E, it means that you have had E days with at lea
 
 In the following plot you can see in blue the number of days that exceed the given distance. You can see that I have a 998 days that exceed 1 km, that's pretty easy when one just records enough data over many years. But then there are only 259 days where I exceed 20 km as this is beyond the distance that I have when I only go for a walk or run some simple errands.
 
-![](eddington.png)
+![](images/eddington.png)
 
 The red curve indicates how many rides one needs to get the Eddington number. As it is a semi-log plot, the straight line is curved like a log-curve.
 
