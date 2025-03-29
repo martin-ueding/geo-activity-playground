@@ -5,6 +5,8 @@ from typing import Optional
 from django.contrib.auth.models import User
 from django.db import models
 
+from gap_site.settings import DATA_DIR
+
 
 class Kind(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -69,4 +71,6 @@ class Activity(models.Model):
 
     @property
     def timeseries_path(self) -> pathlib.Path:
-        return pathlib.Path(f"{self.id}.parquet")
+        directory = DATA_DIR / "Activity Time Series"
+        directory.mkdir(exist_ok=True)
+        return directory / f"{self.id}.parquet"
