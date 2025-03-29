@@ -49,6 +49,9 @@ class Activity(models.Model):
     steps = models.IntegerField(blank=True, null=True)
     elevation_gain = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     @property
     def average_speed_elapsed_kmh(self) -> Optional[float]:
         if self.elapsed_time is not None:

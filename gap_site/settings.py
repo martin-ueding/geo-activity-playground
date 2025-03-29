@@ -19,7 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 _app_dirs = appdirs.AppDirs("Geo Activity Playground", "Martin Ueding", roaming=True)
 DATA_DIR = Path(_app_dirs.user_data_dir)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-
+CACHE_DIR = Path(_app_dirs.user_cache_dir)
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
