@@ -32,17 +32,15 @@ The configuration options are available within the interface such that you do no
 
 ## Get started
 
-Install the software using one of the following options:
+If you're new, just follow these steps:
 
-- [Using the stable version on Linux](getting-started/installing-stable-on-linux.md)
-- [Using the stable version on Windows](getting-started/installing-stable-on-windows.md)
-- [Using the development version on Linux](getting-started/installing-git-on-linux.md)
+1. Install the software on [Linux](install-on-linux.md) or [Windows](install-on-windows.md).
+2. [Create a base directory](create-a-base-directory.md).
+3. [Start the webserver](starting-the-webserver.md).
+4. Choose a method to [record activities](record-activities.md).
+5. Import your activities via [activity files](import-activity-files.md) or [connect the Strava API](connect-strava-api.md).
 
-Get your activity data in place using one of the following options:
-
-- [Use local activity files](getting-started/using-activity-files.md) if you already have these.
-- [Use the Strava API](getting-started/using-strava-api.md) if you want to use this project to analyse your data on Strava.
-- [Move from Strava](getting-started/moving-from-strava.md) if you wan to leave Strava and work locally from then on.
+Have fun. If you're stuck, [get help](get-help.md).
 
 ## Free software
 
