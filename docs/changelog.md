@@ -18,11 +18,11 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
-## Unreleased
+## Version 0.38.2 — 2025-03-29
 
 Added:
 
-- Add tooltips to all charts. ([GH-231](https://github.com/martin-ueding/geo-activity-playground/issues/231))
+- Add tooltips to all charts and add a sensible amount of decimal places. ([GH-231](https://github.com/martin-ueding/geo-activity-playground/issues/231))
 
 Changed:
 

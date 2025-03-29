@@ -48,6 +48,7 @@ nav:
   - Explanation:
     - explorer-tiles.md
     - eddington-number.md
+    - heart-rate-zones.md
   - acknowledgments.md
 
 markdown_extensions:
