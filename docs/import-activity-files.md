@@ -33,4 +33,4 @@ So for `Activities/2024-03-03-17-42-10 Home to Bakery.gpx` the `name` is `2024-0
 
 Once you have your files put into the directory, you're all set and can proceed with the next steps.
 
-You can extend the directory structure to categorize your activities, see [Advanced Metadata Extraction](https://martin-ueding.github.io/geo-activity-playground/getting-started/advanced-metadata-extraction).
+You can extend the directory structure to categorize your activities, see [advanced metadata extraction](advanced-metadata-extraction.md).
