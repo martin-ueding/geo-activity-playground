@@ -19,16 +19,22 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Changed:
+
+- Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
 ## Version 0.38.1 — 2025-03-16
 
-### Fixed
+Fixed:
 
 - Do not fail if elevation gain is missing. ([GH-227](https://github.com/martin-ueding/geo-activity-playground/issues/227))
-- Update pyarrow dependency from 18 to 19.
+- Update pyarrow dependency from 18 to 19 to help with dependency issues.
 
 ## Version 0.38.0 — 2025-01-26
 
-New features:
+Added:
 
 - Show history of recent filters.
 - Allow saving filters as favorites.
@@ -39,7 +45,7 @@ New features:
 - Add time evolution of Eddington number. ([GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195))
 - Add Eddington number but grouped by weeks instead of days. ([GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195))
 
-Fixes:
+Fixed:
 
 - Sort activities by date descending in the search view. ([GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225))
 - Replace empty strings in kind and equipment with literal "Unknown". ([GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224))
@@ -51,83 +57,118 @@ Fixes:
 
 ## Version 0.37.0 — 2025-01-18
 
-New features:
+Added:
 
 - Add unified activity filter for activity overview, heatmap, Eddington number, summary statistics. ([GH-215](https://github.com/martin-ueding/geo-activity-playground/issues/215))
 
-Fixes:
+Fixed:
 
 - Fix Docker build with Poetry 2.0. ([GH-218](https://github.com/martin-ueding/geo-activity-playground/issues/218))
 - Fix equipment summary when routes are present. ([GH-219](https://github.com/martin-ueding/geo-activity-playground/issues/219))
 
 ## Version 0.36.2 — 2025-01-10
 
+Fixed:
+
 - Try to fix search view for routes without time information. ([GH-217](https://github.com/martin-ueding/geo-activity-playground/issues/217))
 
 ## Version 0.36.1 — 2025-01-06
+
+Fixed:
 
 - Remove integrity from assets. ([GH-216](https://github.com/martin-ueding/geo-activity-playground/issues/216))
 
 ## Version 0.36.0 — 2025-01-04
 
+Added:
+
 - Add date filter to heatmap. ([GH-212](https://github.com/martin-ueding/geo-activity-playground/issues/212))
 - Add square planner to navigation. ([GH-209](https://github.com/martin-ueding/geo-activity-playground/issues/209))
+
+Changed:
+
 - Clip speed coloring with IQR to remove outliers. ([GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211))
-
-Internal stuff:
-
 - Remove multiprocessing for parsing activities due to warnings about multithreading. This unfortunately slows down initial processing. ([GH-206](https://github.com/martin-ueding/geo-activity-playground/issues/206))
 - Start to simplify the controller structure. ([GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214))
 - Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols. ([GH-213](https://github.com/martin-ueding/geo-activity-playground/issues/213))
 
 ## Version 0.35.1 — 2025-01-03
 
-- Support activity files with uppercase suffix. ([GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208))
+Changed:
+
 - Do some internal changes to the map background generation for share pictures.
 - Do some refactoring in the web code.
 
+Fixed:
+
+- Support activity files with uppercase suffix. ([GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208))
+
 ## Version 0.35.0 — 2025-01-01
+
+Added:
 
 - Add button to explorer tile map to remove map background.
 
 ## Version 0.34.2 — 2024-12-31
 
+Changed:
+
 - Host another JavaScript asset locally.
 
 ## Version 0.34.1 — 2024-12-30
 
+Changed:
+
 - Host all assets locally to avoid using CDNs.
 
 ## Version 0.34.0 — 2024-12-21
+
+Added:
+
+- Add a share picture per day. ([GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157))
+
+Fixed:
 
 - Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export. ([GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197))
 - Make CSV header parsing a bit more robust. ([GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197))
 - Correct label for equipment "kinds" plot. ([GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201))
 - Fix documentation, remove `--skip-strava` and replace it with `--skip-reload`. ([GH-203](https://github.com/martin-ueding/geo-activity-playground/issues/203))
 - Fix mismatch between ISO week and regular year. ([GH-205](https://github.com/martin-ueding/geo-activity-playground/issues/205))
-- Add a share picture per day. ([GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157))
 
 ## Version 0.33.4 — 2024-12-07
+
+Added:
 
 - Add compatibility for Python 3.13.
 
 ## Version 0.33.3 — 2024-11-24
+
+Fixed:
 
 - Fix startup without any activities. ([GH-200](https://github.com/martin-ueding/geo-activity-playground/issues/200))
 - Fix upload when there is no `Activities` directory.
 
 ## Version 0.33.2 — 2024-11-17
 
+Fixed:
+
 - Fix explorer map. The problem was that VS Code auto-formatted the embedded JavaScript and created syntax errors. ([GH-198](https://github.com/martin-ueding/geo-activity-playground/issues/198))
 
 ## Version 0.33.1 — 2024-11-16
+
+Fixed:
 
 - Fix little bug with `_meta`. ([GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156))
 
 ## Version 0.33.0 — 2024-11-14
 
+Added:
+
 - Make heatmap colormap configurable via web UI.
 - Make tile map URL configurable via configuration file. ([GH-196](https://github.com/martin-ueding/geo-activity-playground/issues/196))
+
+Changed:
+
 - Make daily pulse plot per year in tabs.
 
 ## Version 0.32.0 — 2024-11-12
