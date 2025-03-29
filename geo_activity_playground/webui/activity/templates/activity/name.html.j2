@@ -50,33 +50,35 @@
     <div class="col">
         <h2>Activities</h2>
 
-        <table class="table table-sort table-arrows">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th class="numeric-sort">Distance / km</th>
-                    <th>Elapsed time</th>
-                    <th>Speed / km/h</th>
-                    <th>Equipment</th>
-                    <th>Kind</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for activity in activities %}
-                <tr>
-                    <td><span style="color: {{ activity['color'] }};">█</span> <a
-                            href="{{ url_for('activity.show', id=activity.id) }}">{{
-                            activity.name }}</a></td>
-                    <td>{{ activity.start|dt }}</td>
-                    <td>{{ activity.distance_km | round(1) }}</td>
-                    <td>{{ activity.elapsed_time|td }}</td>
-                    <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
-                    <td>{{ activity["equipment"] }}</td>
-                    <td>{{ activity["kind"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th class="numeric-sort">Distance / km</th>
+                        <th>Elapsed time</th>
+                        <th>Speed / km/h</th>
+                        <th>Equipment</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td><span style="color: {{ activity['color'] }};">█</span> <a
+                                href="{{ url_for('activity.show', id=activity.id) }}">{{
+                                activity.name }}</a></td>
+                        <td>{{ activity.start|dt }}</td>
+                        <td>{{ activity.distance_km | round(1) }}</td>
+                        <td>{{ activity.elapsed_time|td }}</td>
+                        <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
+                        <td>{{ activity["equipment"] }}</td>
+                        <td>{{ activity["kind"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </table>
     </div>
 </div>
