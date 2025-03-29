@@ -1,4 +1,4 @@
-# Add local bin to PATH
+# Add Local Bin to PATH
 
 If you get a “command not found” error when starting the program after the installation, you will learn how to fix it in this how-to.
 

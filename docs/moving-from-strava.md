@@ -78,8 +78,8 @@ The equipment might have nonsensical seeming names like `10370891.0`. The proble
 
 ## Use the directory
 
-Now that the files from Strava are converted, consult the [guide on using activity files](using-activity-files.md) to proceed from here.
+Now that the files from Strava are converted, consult the [guide on using activity files](import-activity-files.md) to proceed from here.
 
 ## Recording more activities
 
-Now that you don't record via Strava, you will need some other app to record your activities. There are Apps like [OsmAnd](https://osmand.net/) or [OpenTracks](https://opentracksapp.com/) which provide such functionality. Export the files as GPX, FIT, TCX or KML files and put them into the directory structure. On the next start of the program, they will be picked up.
+Now that you don't record via Strava, you will need some other app to [record activities](record-activities.md)..

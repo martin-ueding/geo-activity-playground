@@ -7,7 +7,6 @@
 This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 <!-- 
 Types of changes
 
@@ -28,6 +27,7 @@ Added:
 Changed:
 
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+- Restructure the documentation such that it hopefully is more inviting for new users.
 
 ## Version 0.38.1 — 2025-03-16
 

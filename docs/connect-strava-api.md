@@ -1,4 +1,4 @@
-# Using Strava API
+# Connect Strava API
 
 You might have all your data on the Strava service and would like to use this for additional analytics without moving your data. That is fine.
 
@@ -12,7 +12,7 @@ Navigate to the [API settings page](https://www.strava.com/settings/api) and cre
 
 After you are done with that, you can see your App here:
 
-![](strava-api-2.png)
+![](images/strava-api-2.png)
 
 There is a "client ID" and a "client secret" that we are going to need for the next step. In general our app could be used by all sorts of people who can then access _their_ data only. We want to access our own data, but we still need to authorize our app to use our data. 
 

@@ -1,4 +1,4 @@
-# Create a base directory
+# Create a Base Directory
 
 Geo Activity Playground lets you explicitly choose where you want to have your files.
 

@@ -24,20 +24,15 @@ nav:
   - Installation:
     - install-on-linux.md
     - getting-started/installing-stable-on-windows.md
-    - Advanced Installation Topics:
-      - getting-started/docker.md
-      - getting-started/docker-compose.md
-      - getting-started/docker-compose-tailscale.md
-      - add-local-bin-to-path.md
+    - add-local-bin-to-path.md
   - create-a-base-directory.md
-  - recording-activities.md
-  - Getting Started:
-    - Loading Activities:
-      - getting-started/using-activity-files.md
-      - getting-started/advanced-metadata-extraction.md
-      - getting-started/using-strava-api.md
-      - getting-started/moving-from-strava.md
-    - getting-started/starting-the-webserver.md
+  - record-activities.md
+  - starting-the-webserver.md
+  - Activity Sources:
+    - import-activity-files.md
+    - connect-strava-api.md
+    - moving-from-strava.md
+    - advanced-metadata-extraction.md
   - Features:
     - features/overview.md
     - features/activity-view.md
@@ -52,6 +47,10 @@ nav:
   - changelog.md
   - acknowledgments.md
   - set-up-a-development-environment.md
+  - Deployment with Docker:
+    - getting-started/docker.md
+    - getting-started/docker-compose.md
+    - getting-started/docker-compose-tailscale.md
 
 markdown_extensions:
   - pymdownx.highlight

@@ -1,4 +1,4 @@
-# Advanced Metadata extraction
+# Advanced Metadata Extraction
 
 If you would like to set the metadata fields or change what part of the filename should be the activity name, you can use a custom directory structure with corresponding regular expressions.
 
