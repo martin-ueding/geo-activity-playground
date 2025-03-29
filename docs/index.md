@@ -12,23 +12,23 @@ The main user interface is web-based, you can run this on your Linux, Mac or Win
 
 This is the view of a single activity:
 
-![](screenshot-activity.png)
+![](images/screenshot-activity.png)
 
 You also get a beautiful interactive heatmap of all your activities:
 
-![](screenshot-heatmap.png)
+![](images/screenshot-heatmap.png)
 
 Also there are plenty of summary statistics that lets you track how many rides, walks or hikes you have done:
 
-![alt text](screenshot-summary.png)
+![t](images/screenshot-summary.png)
 
 If you're into _explorer tiles_ or _squadratinhos_, this got you covered:
 
-![](screenshot-explorer.png)
+![](images/screenshot-explorer.png)
 
 The configuration options are available within the interface such that you do not have to work with configuration files (like in earlier versions):
 
-![](screenshot-settings.png)
+![](images/screenshot-settings.png)
 
 ## Get started
 
