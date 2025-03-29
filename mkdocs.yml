@@ -50,7 +50,7 @@ nav:
     - features/upload.md
     - features/share-picture.md
     - features/kind-rename.md
-  - reference/changelog.md
+  - changelog.md
   - acknowledgments.md
   - set-up-a-development-environment.md
 
