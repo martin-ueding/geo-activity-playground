@@ -10,7 +10,7 @@ from gap_site.settings import DATA_DIR
 
 class Kind(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
@@ -18,7 +18,7 @@ class Kind(models.Model):
 
 class Equipment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     purchase_date = models.DateField(blank=True, null=True)
 
     def __str__(self) -> str:

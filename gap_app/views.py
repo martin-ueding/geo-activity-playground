@@ -74,7 +74,7 @@ def _import_activity_file(request: HttpRequest, f: UploadedFile) -> None:
     )
     activity.save()
     timeseries.to_parquet(activity.timeseries_path)
-    return activity.id
+    return activity
 
 
 @login_required
@@ -82,8 +82,11 @@ def activity_upload(request: HttpRequest):
     if request.method == "POST":
         form = ActivityUploadForm(request.user, request.POST, request.FILES)
         if form.is_valid():
-            activity_id = _import_activity_file(request, request.FILES["file"])
-            return redirect("activity-view", activity_id=activity_id)
+            activity = _import_activity_file(request, request.FILES["file"])
+            if (kind := form.cleaned_data["kind"]) is not None:
+                activity.kind = kind
+                activity.save()
+            return redirect("activity-view", activity_id=activity.id)
     else:
         form = ActivityUploadForm(request.user)
 
