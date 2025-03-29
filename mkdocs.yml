@@ -33,16 +33,18 @@ nav:
     - connect-strava-api.md
     - moving-from-strava.md
     - advanced-metadata-extraction.md
+  - get-help.md
   - Features:
     - features/explorer-tiles.md
     - features/eddington.md
     - features/upload.md
     - features/share-picture.md
     - features/kind-rename.md
+  - How-Tos:
+    - plan-missing-tile-rides.md
+    - set-up-a-development-environment.md
   - changelog.md
-  - get-help.md
   - acknowledgments.md
-  - set-up-a-development-environment.md
   - Deployment with Docker:
     - using-git-version-via-docker.md
     - using-git-version-via-docker-compose.md
