@@ -38,7 +38,7 @@ If you're new, just follow these steps:
 2. [Create a base directory](create-a-base-directory.md).
 3. [Start the webserver](starting-the-webserver.md).
 4. Choose a method to [record activities](record-activities.md).
-5. Import your activities via [activity files](import-activity-files.md) or [connect the Strava API](connect-strava-api.md).
+5. Import your activities via [activity files](import-activity-files.md), [connect the Strava API](connect-strava-api.md) or [upload activity files](upload-activity-files.md) in the web interface.
 
 Have fun. If you're stuck, [get help](get-help.md).
 

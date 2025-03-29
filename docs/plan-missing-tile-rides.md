@@ -1,6 +1,10 @@
+# Plan Missing Tile Rides
+
+Looking at these maps with _explorer tiles_ you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. In this how-to guide you will learn how to export the missing tiles, plan a route and get navigated along it.
+
 ## Missing tile files
 
-Looking at these maps with _explorer tiles_ you can see the gaps. And if you feel challenged to fill those, you might want to plan a “tactical bike ride” to explore those. Let us take another look at my tile history in Sint Annaland:
+Let us take another look at my tile history in Sint Annaland:
 
 ![](images/explorer-sint-annaland.png)
 
@@ -18,7 +22,7 @@ You can then upload the GeoJSON file to [Bikerouter](https://bikerouter.de/) and
 
 Then plan a route that goes through as many tiles as possible. Download the route as GPX and use an app like OsmAnd to ride along it.
 
-### Missing tiles on the go
+## Missing tiles on the go
 
 The above is nice to plan the route, perhaps you also want to take the missing tiles along to do spontaneous tile hunting.
 

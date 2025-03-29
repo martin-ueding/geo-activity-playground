@@ -31,25 +31,24 @@ nav:
   - Activity Sources:
     - import-activity-files.md
     - connect-strava-api.md
+    - upload-activity-files.md
     - moving-from-strava.md
-    - advanced-metadata-extraction.md
   - get-help.md
-  - Features:
-    - features/upload.md
-    - features/kind-rename.md
   - How-To Guides:
     - plan-missing-tile-rides.md
     - create-a-privacy-zone.md
     - set-up-a-development-environment.md
-  - Explanation:
-    - explorer-tiles.md
-    - eddington-number.md
-  - changelog.md
-  - acknowledgments.md
-  - Deployment with Docker:
+    - rename-activity-kinds.md
     - using-git-version-via-docker.md
     - using-git-version-via-docker-compose.md
     - using-git-version-via-docker-compose-and-tailscale-vpn.md
+  - Reference:
+    - advanced-metadata-extraction.md
+    - changelog.md
+  - Explanation:
+    - explorer-tiles.md
+    - eddington-number.md
+  - acknowledgments.md
 
 markdown_extensions:
   - pymdownx.highlight
