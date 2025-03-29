@@ -29,6 +29,8 @@ nav:
       - getting-started/docker.md
       - getting-started/docker-compose.md
       - getting-started/docker-compose-tailscale.md
+      - add-local-bin-to-path.md
+  - create-a-base-directory.md
   - recording-activities.md
   - Getting Started:
     - Loading Activities:

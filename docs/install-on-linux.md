@@ -24,7 +24,7 @@ Next you can try to start the program to see whether the installation has worked
 geo-activity-playground --help
 ```
 
-Does this work? Good! Then move on to TODO.
+Does this work? Good! Then move on to [create a base directory](create-a-base-directory.md).
 
 If you get an error that reads like “command not found”, then you need to [add local bin to PATH](add-local-bin-to-path.md).
 
