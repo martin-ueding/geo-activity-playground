@@ -23,7 +23,7 @@ nav:
   - index.md
   - Installation:
     - install-on-linux.md
-    - getting-started/installing-stable-on-windows.md
+    - install-on-windows.md
     - add-local-bin-to-path.md
   - create-a-base-directory.md
   - record-activities.md
