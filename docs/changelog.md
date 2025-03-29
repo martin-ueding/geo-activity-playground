@@ -23,7 +23,7 @@ Types of changes
 
 ### Fixed
 
-- [GH-227](https://github.com/martin-ueding/geo-activity-playground/issues/227): Do not fail if elevation gain is missing.
+- Do not fail if elevation gain is missing. ([GH-227](https://github.com/martin-ueding/geo-activity-playground/issues/227))
 - Update pyarrow dependency from 18 to 19.
 
 ## Version 0.38.0 — 2025-01-26
@@ -32,19 +32,19 @@ New features:
 
 - Show history of recent filters.
 - Allow saving filters as favorites.
-- [GH-192](https://github.com/martin-ueding/geo-activity-playground/issues/192): Add average speed to various views.
-- [GH-199](https://github.com/martin-ueding/geo-activity-playground/issues/199): Add elevation gain extraction. Be aware that this is very noisy for most GPS devices as they lack a barometer.
+- Add average speed to various views. ([GH-192](https://github.com/martin-ueding/geo-activity-playground/issues/192))
+- Add elevation gain extraction. Be aware that this is very noisy for most GPS devices as they lack a barometer. ([GH-199](https://github.com/martin-ueding/geo-activity-playground/issues/199))
 - "Hall of Fame" includes additional nominations per equipment used.
-- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add Eddington number with activities from just single years.
-- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add time evolution of Eddington number.
-- [GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195): Add Eddington number but grouped by weeks instead of days.
+- Add Eddington number with activities from just single years. ([GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195))
+- Add time evolution of Eddington number. ([GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195))
+- Add Eddington number but grouped by weeks instead of days. ([GH-195](https://github.com/martin-ueding/geo-activity-playground/issues/195))
 
 Fixes:
 
-- [GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225): Sort activities by date descending in the search view.
-- [GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224): Replace empty strings in kind and equipment with literal "Unknown".
-- [GH-223](https://github.com/martin-ueding/geo-activity-playground/issues/223): Remove duplicate legend for day overview.
-- [GH-222](https://github.com/martin-ueding/geo-activity-playground/issues/222): Add authentication to enablement of additional zoom levels.
+- Sort activities by date descending in the search view. ([GH-225](https://github.com/martin-ueding/geo-activity-playground/issues/225))
+- Replace empty strings in kind and equipment with literal "Unknown". ([GH-224](https://github.com/martin-ueding/geo-activity-playground/issues/224))
+- Remove duplicate legend for day overview. ([GH-223](https://github.com/martin-ueding/geo-activity-playground/issues/223))
+- Add authentication to enablement of additional zoom levels. ([GH-222](https://github.com/martin-ueding/geo-activity-playground/issues/222))
 - Sort equipment details by last use.
 - Make Eddington plots only zoomable in one axis.
 - Add uniform kind scale to equipment usage plots.
@@ -53,36 +53,36 @@ Fixes:
 
 New features:
 
-- [GH-215](https://github.com/martin-ueding/geo-activity-playground/issues/215): Add unified activity filter for activity overview, heatmap, Eddington number, summary statistics.
+- Add unified activity filter for activity overview, heatmap, Eddington number, summary statistics. ([GH-215](https://github.com/martin-ueding/geo-activity-playground/issues/215))
 
 Fixes:
 
-- [GH-218](https://github.com/martin-ueding/geo-activity-playground/issues/218): Fix Docker build with Poetry 2.0.
-- [GH-219](https://github.com/martin-ueding/geo-activity-playground/issues/219): Fix equipment summary when routes are present.
+- Fix Docker build with Poetry 2.0. ([GH-218](https://github.com/martin-ueding/geo-activity-playground/issues/218))
+- Fix equipment summary when routes are present. ([GH-219](https://github.com/martin-ueding/geo-activity-playground/issues/219))
 
 ## Version 0.36.2 — 2025-01-10
 
-- [GH-217](https://github.com/martin-ueding/geo-activity-playground/issues/217): Try to fix search view for routes without time information.
+- Try to fix search view for routes without time information. ([GH-217](https://github.com/martin-ueding/geo-activity-playground/issues/217))
 
 ## Version 0.36.1 — 2025-01-06
 
-- [GH-216](https://github.com/martin-ueding/geo-activity-playground/issues/216): Remove integrity from assets.
+- Remove integrity from assets. ([GH-216](https://github.com/martin-ueding/geo-activity-playground/issues/216))
 
 ## Version 0.36.0 — 2025-01-04
 
-- [GH-212](https://github.com/martin-ueding/geo-activity-playground/issues/212): Add date filter to heatmap.
-- [GH-209](https://github.com/martin-ueding/geo-activity-playground/issues/209): Add square planner to navigation.
-- [GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211): Clip speed coloring with IQR to remove outliers.
+- Add date filter to heatmap. ([GH-212](https://github.com/martin-ueding/geo-activity-playground/issues/212))
+- Add square planner to navigation. ([GH-209](https://github.com/martin-ueding/geo-activity-playground/issues/209))
+- Clip speed coloring with IQR to remove outliers. ([GH-211](https://github.com/martin-ueding/geo-activity-playground/issues/211))
 
 Internal stuff:
 
-- [GH-206](https://github.com/martin-ueding/geo-activity-playground/issues/206): Remove multiprocessing for parsing activities due to warnings about multithreading. This unfortunately slows down initial processing.
-- [GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214): Start to simplify the controller structure.
-- [GH-213](https://github.com/martin-ueding/geo-activity-playground/issues/213): Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols.
+- Remove multiprocessing for parsing activities due to warnings about multithreading. This unfortunately slows down initial processing. ([GH-206](https://github.com/martin-ueding/geo-activity-playground/issues/206))
+- Start to simplify the controller structure. ([GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214))
+- Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols. ([GH-213](https://github.com/martin-ueding/geo-activity-playground/issues/213))
 
 ## Version 0.35.1 — 2025-01-03
 
-- [GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208): Support activity files with uppercase suffix.
+- Support activity files with uppercase suffix. ([GH-208](https://github.com/martin-ueding/geo-activity-playground/issues/208))
 - Do some internal changes to the map background generation for share pictures.
 - Do some refactoring in the web code.
 
@@ -100,12 +100,12 @@ Internal stuff:
 
 ## Version 0.34.0 — 2024-12-21
 
-- [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export.
-- [GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197): Make CSV header parsing a bit more robust.
-- [GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201): Correct label for equipment "kinds" plot.
-- [GH-203](https://github.com/martin-ueding/geo-activity-playground/issues/203): Fix documentation, remove `--skip-strava` and replace it with `--skip-reload`.
-- [GH-205](https://github.com/martin-ueding/geo-activity-playground/issues/205): Fix mismatch between ISO week and regular year.
-- [GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157): Add a share picture per day.
+- Enforce UTF-8 encoding when reading the `activities.csv` from the Strava export. ([GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197))
+- Make CSV header parsing a bit more robust. ([GH-197](https://github.com/martin-ueding/geo-activity-playground/issues/197))
+- Correct label for equipment "kinds" plot. ([GH-201](https://github.com/martin-ueding/geo-activity-playground/issues/201))
+- Fix documentation, remove `--skip-strava` and replace it with `--skip-reload`. ([GH-203](https://github.com/martin-ueding/geo-activity-playground/issues/203))
+- Fix mismatch between ISO week and regular year. ([GH-205](https://github.com/martin-ueding/geo-activity-playground/issues/205))
+- Add a share picture per day. ([GH-157](https://github.com/martin-ueding/geo-activity-playground/issues/157))
 
 ## Version 0.33.4 — 2024-12-07
 
@@ -113,71 +113,71 @@ Internal stuff:
 
 ## Version 0.33.3 — 2024-11-24
 
-- [GH-200](https://github.com/martin-ueding/geo-activity-playground/issues/200): Fix startup without any activities.
+- Fix startup without any activities. ([GH-200](https://github.com/martin-ueding/geo-activity-playground/issues/200))
 - Fix upload when there is no `Activities` directory.
 
 ## Version 0.33.2 — 2024-11-17
 
-- [GH-198](https://github.com/martin-ueding/geo-activity-playground/issues/198): Fix explorer map. The problem was that VS Code auto-formatted the embedded JavaScript and created syntax errors.
+- Fix explorer map. The problem was that VS Code auto-formatted the embedded JavaScript and created syntax errors. ([GH-198](https://github.com/martin-ueding/geo-activity-playground/issues/198))
 
 ## Version 0.33.1 — 2024-11-16
 
-- [GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156): Fix little bug with `_meta`.
+- Fix little bug with `_meta`. ([GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156))
 
 ## Version 0.33.0 — 2024-11-14
 
 - Make heatmap colormap configurable via web UI.
-- [GH-196](https://github.com/martin-ueding/geo-activity-playground/issues/196): Make tile map URL configurable via configuration file.
+- Make tile map URL configurable via configuration file. ([GH-196](https://github.com/martin-ueding/geo-activity-playground/issues/196))
 - Make daily pulse plot per year in tabs.
 
 ## Version 0.32.0 — 2024-11-12
 
-- [GH-173](https://github.com/martin-ueding/geo-activity-playground/issues/173): Add config option `ignore_suffixes` which can be set to something like `[".kml"]` to ignore certain file types.
+- Add config option `ignore_suffixes` which can be set to something like `[".kml"]` to ignore certain file types. ([GH-173](https://github.com/martin-ueding/geo-activity-playground/issues/173))
 - Include all activities in the summary, even those which are not to be considered for achievements.
 - Remove debug print.
 - Make share picture always the same size independent of the content.
 
 ## Version 0.31.0 — 2024-11-01
 
-- [GH-189](https://github.com/martin-ueding/geo-activity-playground/issues/189): Fix heatmap tile cache expiry in cases where the activity kind has changed.
+- Fix heatmap tile cache expiry in cases where the activity kind has changed. ([GH-189](https://github.com/martin-ueding/geo-activity-playground/issues/189))
 - Make date and time formats better to read.
-- [GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156): Add metadata editing functionality with override files.
+- Add metadata editing functionality with override files. ([GH-156](https://github.com/martin-ueding/geo-activity-playground/issues/156))
 
 ## Version 0.30.0 — 2024-10-25
 
-- [GH-187](https://github.com/martin-ueding/geo-activity-playground/issues/187): Update favicon to new logo.
-- [GH-174](https://github.com/martin-ueding/geo-activity-playground/issues/174): Add new search functionality that also serves as an overview over all activities.
-- [GH-168](https://github.com/martin-ueding/geo-activity-playground/issues/168): Clicking on table headers will sort the tables now.
-- [GH-162](https://github.com/martin-ueding/geo-activity-playground/issues/162): Make track segmentation configurable with a configuration setting.
+- Update favicon to new logo. ([GH-187](https://github.com/martin-ueding/geo-activity-playground/issues/187))
+- Add new search functionality that also serves as an overview over all activities. ([GH-174](https://github.com/martin-ueding/geo-activity-playground/issues/174))
+- Clicking on table headers will sort the tables now. ([GH-168](https://github.com/martin-ueding/geo-activity-playground/issues/168))
+- Make track segmentation configurable with a configuration setting. ([GH-162](https://github.com/martin-ueding/geo-activity-playground/issues/162))
 - Visualize cadence on the activity page.
-- [GH-188](https://github.com/martin-ueding/geo-activity-playground/issues/188): Remove `root=` prefix in activity kind when importing from Strava.
-- [GH-188](https://github.com/martin-ueding/geo-activity-playground/issues/188): Add option to rename activity kinds.
+- Remove `root=` prefix in activity kind when importing from Strava. ([GH-188](https://github.com/martin-ueding/geo-activity-playground/issues/188))
+- Add option to rename activity kinds. ([GH-188](https://github.com/martin-ueding/geo-activity-playground/issues/188))
 
 ## Version 0.29.2 — 2024-10-14
 
 - Documentation improvements by [beautiful-orca](https://github.com/beautiful-orca): [GH-180](https://github.com/martin-ueding/geo-activity-playground/pull/180), [GH-181](https://github.com/martin-ueding/geo-activity-playground/pull/181), [GH-182](https://github.com/martin-ueding/geo-activity-playground/pull/182), [GH-183](https://github.com/martin-ueding/geo-activity-playground/pull/183), [GH-185](https://github.com/martin-ueding/geo-activity-playground/pull/185)
-- [GH-184](https://github.com/martin-ueding/geo-activity-playground/issues/184): Use Python 3.12 in Docker.
-- [GH-178](https://github.com/martin-ueding/geo-activity-playground/issues/178): Fix display of number of new tiles in activity view.
-- [GH-177](https://github.com/martin-ueding/geo-activity-playground/issues/177): Fix distance from new `stravalib` version.
-- [GH-179](https://github.com/martin-ueding/geo-activity-playground/issues/179): Work around Pandas deprecation message.
-- [GH-176](https://github.com/martin-ueding/geo-activity-playground/issues/176): Do not modify filename on upload any more.
-- [GH-175](https://github.com/martin-ueding/geo-activity-playground/issues/175): Mention Organic Maps.
+- Use Python 3.12 in Docker. ([GH-184](https://github.com/martin-ueding/geo-activity-playground/issues/184))
+- Fix display of number of new tiles in activity view. ([GH-178](https://github.com/martin-ueding/geo-activity-playground/issues/178))
+- Fix distance from new `stravalib` version. ([GH-177](https://github.com/martin-ueding/geo-activity-playground/issues/177))
+- Work around Pandas deprecation message. ([GH-179](https://github.com/martin-ueding/geo-activity-playground/issues/179))
+- Do not modify filename on upload any more. ([GH-176](https://github.com/martin-ueding/geo-activity-playground/issues/176))
+- Mention Organic Maps. ([GH-175](https://github.com/martin-ueding/geo-activity-playground/issues/175))
 
 ## Version 0.29.1 — 2024-10-03
 
-- [GH-167](https://github.com/martin-ueding/geo-activity-playground/issues/167): Fix explorer tile export.
-- [GH-169](https://github.com/martin-ueding/geo-activity-playground/issues/169): Fix import of KML files with waypoints.
+- Fix explorer tile export. ([GH-167](https://github.com/martin-ueding/geo-activity-playground/issues/167))
+- Fix import of KML files with waypoints. ([GH-169](https://github.com/martin-ueding/geo-activity-playground/issues/169))
 
 ## Version 0.29.0 — 2024-09-30
 
 - Use dropdown menus to make navigation a bit smaller.
-- [GH-163](https://github.com/martin-ueding/geo-activity-playground/issues/163): Recompute explorer tiles when there are deleted activities. Previously this would lead to `KeyError` when trying to use the heatmap or the explorer tile maps.
-- [GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161): Fix explorer tile clusters and square if one has activities that are not to be considered for achievements.
-- [GH-164](https://github.com/martin-ueding/geo-activity-playground/issues/164): Create new function to handle write-and-replace on Windows.
-- [GH-155](https://github.com/martin-ueding/geo-activity-playground/issues/155): Use the same scale for all plots with kind, make this configurable in the settings menu.
+- Recompute explorer tiles when there are deleted activities. Previously this would lead to `KeyError` when trying to use the heatmap or the explorer tile maps. ([GH-163](https://github.com/martin-ueding/geo-activity-playground/issues/163))
+- Fix explorer tile clusters and square if one has activities that are not to be considered for achievements. ([GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161))
+- Create new function to handle write-and-replace on Windows. ([GH-164](https://github.com/martin-ueding/geo-activity-playground/issues/164))
+- Use the same scale for all plots with kind, make this configurable in the settings menu. ([GH-155](https://github.com/martin-ueding/geo-activity-playground/issues/155))
 - Rewrite the documentation start page to make it more appealing and reflect the work in the web interface.
-- [GH-166](https://github.com/martin-ueding/geo-activity-playground/issues/166): Add map with new explorer tiles to activity view.
-- [GH-160](https://github.com/martin-ueding/geo-activity-playground/issues/160): Update version of `stravalib` and with that also `pydantic`. That fixes a bug with `recursive_guard`.
+- Add map with new explorer tiles to activity view. ([GH-166](https://github.com/martin-ueding/geo-activity-playground/issues/166))
+- Update version of `stravalib` and with that also `pydantic`. That fixes a bug with `recursive_guard`. ([GH-160](https://github.com/martin-ueding/geo-activity-playground/issues/160))
 
 ## Version 0.28.0 — 2024-09-07
 
@@ -186,7 +186,7 @@ Internal stuff:
 - Accelerate the tile visit computation.
 - Ignore equipment offsets of equipments that don't exist.
 - Reset corrupt heatmap cache files.
-- [GH-159](https://github.com/martin-ueding/geo-activity-playground/issues/159): Improve password mechanism to protect both upload and settings.
+- Improve password mechanism to protect both upload and settings. ([GH-159](https://github.com/martin-ueding/geo-activity-playground/issues/159))
 - Document the use of Open Street Map uMap for missing explorer tiles on the go.
 
 ## Version 0.27.1 — 2024-08-14
@@ -195,12 +195,12 @@ Internal stuff:
 
 ## Version 0.27.0 — 2024-08-11
 
-- [GH-128](https://github.com/martin-ueding/geo-activity-playground/issues/128): Let the Strava Checkout importer set the file `strava-last-activity-date.json` which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout.
-- [GH-143](https://github.com/martin-ueding/geo-activity-playground/issues/143): Use custom CSV parser to read activities that have newlines in their descriptions.
-- [GH-146](https://github.com/martin-ueding/geo-activity-playground/issues/146): Make multiprocessing optional with `num_processes = 1` in the configuration.
-- [GH-147](https://github.com/martin-ueding/geo-activity-playground/issues/147): Add another safeguard against activities that don't have latitude/longitude data.
-- [GH-149](https://github.com/martin-ueding/geo-activity-playground/issues/149): Only pre-compute explorer maps for zoom 14 and 17 by default. Other ones just have to be enabled once. This saves a bit of computing time for most people that don't need to go down to zoom 19.
-- [GH-151](https://github.com/martin-ueding/geo-activity-playground/issues/151): Do not fail if version cannot be determined.
+- Let the Strava Checkout importer set the file `strava-last-activity-date.json` which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout. ([GH-128](https://github.com/martin-ueding/geo-activity-playground/issues/128))
+- Use custom CSV parser to read activities that have newlines in their descriptions. ([GH-143](https://github.com/martin-ueding/geo-activity-playground/issues/143))
+- Make multiprocessing optional with `num_processes = 1` in the configuration. ([GH-146](https://github.com/martin-ueding/geo-activity-playground/issues/146))
+- Add another safeguard against activities that don't have latitude/longitude data. ([GH-147](https://github.com/martin-ueding/geo-activity-playground/issues/147))
+- Only pre-compute explorer maps for zoom 14 and 17 by default. Other ones just have to be enabled once. This saves a bit of computing time for most people that don't need to go down to zoom 19. ([GH-149](https://github.com/martin-ueding/geo-activity-playground/issues/149))
+- Do not fail if version cannot be determined. ([GH-151](https://github.com/martin-ueding/geo-activity-playground/issues/151))
 - Add settings menu where one can configure various things:
   - Equipment offsets
   - Maximum heart rate for heart rate zones
@@ -212,24 +212,24 @@ Internal stuff:
 
 ## Version 0.26.3 — 2024-08-08
 
-- [GH-142](https://github.com/martin-ueding/geo-activity-playground/issues/142): Require `pandas >= 2.2.0` to make sure that it knows about `include_groups`.
-- [GH-144](https://github.com/martin-ueding/geo-activity-playground/issues/144): Ignore activities without time series when using the Strava Checkout import.
+- Require `pandas >= 2.2.0` to make sure that it knows about `include_groups`. ([GH-142](https://github.com/martin-ueding/geo-activity-playground/issues/142))
+- Ignore activities without time series when using the Strava Checkout import. ([GH-144](https://github.com/martin-ueding/geo-activity-playground/issues/144))
 
 ## Version 0.26.2 — 2024-08-06
 
 - Start with a test suite for the web server that also tests importing.
   - Already fixed a few little bugs with that.
-- [GH-141](https://github.com/martin-ueding/geo-activity-playground/issues/141): Fix summary page if there are no activities with steps.
+- Fix summary page if there are no activities with steps. ([GH-141](https://github.com/martin-ueding/geo-activity-playground/issues/141))
 
 ## Version 0.26.1 — 2024-08-06
 
-- [GH-139](https://github.com/martin-ueding/geo-activity-playground/issues/139), [GH-140](https://github.com/martin-ueding/geo-activity-playground/issues/140): More fixes for Strava archive importer.
+- More fixes for Strava archive importer. ([GH-139](https://github.com/martin-ueding/geo-activity-playground/issues/139), [GH-140](https://github.com/martin-ueding/geo-activity-playground/issues/140))
 
 ## Version 0.26.0 — 2024-08-06
 
 - Add automatic dark mode.
 - Add some more explanation for the Strava connection.
-- [GH-138](https://github.com/martin-ueding/geo-activity-playground/issues/138): Fix import from Strava archive that was broken in 0.25.0.
+- Fix import from Strava archive that was broken in 0.25.0. ([GH-138](https://github.com/martin-ueding/geo-activity-playground/issues/138))
 - Style the settings page a bit.
 
 ## Version 0.25.0 — 2024-08-05
@@ -241,34 +241,34 @@ Internal stuff:
   - Unfortunately it means that everything needs to parsed again into the new format. I'm sorry about that, especially to you Strava users that need to deal with the rate limiting!
 - Add an web interface to connect to Strava API using a shared application such that it becomes much simpler to set up.
 
-- [GH-41](https://github.com/martin-ueding/geo-activity-playground/issues/41): Compute moving time.
-- [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the share picture.
-- [GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131): Update to the column names in the Strava export.
-- [GH-133](https://github.com/martin-ueding/geo-activity-playground/issues/133): Cope with manually recorded activities in Strava export.
-- [GH-134](https://github.com/martin-ueding/geo-activity-playground/issues/134): Cope with broken FIT files.
+- Compute moving time. ([GH-41](https://github.com/martin-ueding/geo-activity-playground/issues/41))
+- Make calories and steps optional for the share picture. ([GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127))
+- Update to the column names in the Strava export. ([GH-131](https://github.com/martin-ueding/geo-activity-playground/issues/131))
+- Cope with manually recorded activities in Strava export. ([GH-133](https://github.com/martin-ueding/geo-activity-playground/issues/133))
+- Cope with broken FIT files. ([GH-134](https://github.com/martin-ueding/geo-activity-playground/issues/134))
 
 ## Version 0.24.2 — 2024-07-29
 
-- [GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127): Make calories and steps optional for the summary statistics.
+- Make calories and steps optional for the summary statistics. ([GH-127](https://github.com/martin-ueding/geo-activity-playground/issues/127))
 
 ## Version 0.24.1 — 2024-07-27
 
-- [GH-124](https://github.com/martin-ueding/geo-activity-playground/issues/124): Add more timezone handling for Strava API.
-- [GH-125](https://github.com/martin-ueding/geo-activity-playground/issues/125): Fix building of Docker container.
-- [GH-126](https://github.com/martin-ueding/geo-activity-playground/issues/126): Fix heatmap download.
+- Add more timezone handling for Strava API. ([GH-124](https://github.com/martin-ueding/geo-activity-playground/issues/124))
+- Fix building of Docker container. ([GH-125](https://github.com/martin-ueding/geo-activity-playground/issues/125))
+- Fix heatmap download. ([GH-126](https://github.com/martin-ueding/geo-activity-playground/issues/126))
 
 ## Version 0.24.0 — 2024-07-26
 
-- [GH-43](https://github.com/martin-ueding/geo-activity-playground/issues/43): Added nicer share pictures and privacy zones.
-- [GH-95](https://github.com/martin-ueding/geo-activity-playground/issues/05): Display the number of new explorer tiles and squadratinhos per activity.
-- [GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113): Open footer links in a new tab.
-- [GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114): Show total distance and duration in day overview.
-- [GH-115](https://github.com/martin-ueding/geo-activity-playground/issues/115): Add more summary statistics and add a "hall of fame" as well.
-- [GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161): Show table for Eddington number, also update the plot to make it a bit easier to read. Add some more explanatory text.
-- [GH-118](https://github.com/martin-ueding/geo-activity-playground/issues/118): Fix links in search results.
-- [GH-121](https://github.com/martin-ueding/geo-activity-playground/issues/121): Fix link to share picture.
-- [GH-122](https://github.com/martin-ueding/geo-activity-playground/issues/122): Convert everything to "timezone naive" dates in order to get rid of inconsistencies.
-- [GH-123](https://github.com/martin-ueding/geo-activity-playground/issues/123): Fix startup from empty cache. A cache migration assumed that `activities.parquet` exists. I've added a check.
+- Added nicer share pictures and privacy zones. ([GH-43](https://github.com/martin-ueding/geo-activity-playground/issues/43))
+- Display the number of new explorer tiles and squadratinhos per activity. ([GH-95](https://github.com/martin-ueding/geo-activity-playground/issues/05))
+- Open footer links in a new tab. ([GH-113](https://github.com/martin-ueding/geo-activity-playground/pull/113))
+- Show total distance and duration in day overview. ([GH-114](https://github.com/martin-ueding/geo-activity-playground/issues/114))
+- Add more summary statistics and add a "hall of fame" as well. ([GH-115](https://github.com/martin-ueding/geo-activity-playground/issues/115))
+- Show table for Eddington number, also update the plot to make it a bit easier to read. Add some more explanatory text. ([GH-161](https://github.com/martin-ueding/geo-activity-playground/issues/161))
+- Fix links in search results. ([GH-118](https://github.com/martin-ueding/geo-activity-playground/issues/118))
+- Fix link to share picture. ([GH-121](https://github.com/martin-ueding/geo-activity-playground/issues/121))
+- Convert everything to "timezone naive" dates in order to get rid of inconsistencies. ([GH-122](https://github.com/martin-ueding/geo-activity-playground/issues/122))
+- Fix startup from empty cache. A cache migration assumed that `activities.parquet` exists. I've added a check. ([GH-123](https://github.com/martin-ueding/geo-activity-playground/issues/123))
 - Use Flask Blueprints to organize code.
 - Remove half-finished "locations" feature from the navigation.
 - Allow filtering the heatmap by activity kinds.
@@ -276,13 +276,13 @@ Internal stuff:
 
 ## Version 0.23.0 — 2024-06-22
 
-- [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Add password protection for upload.
+- Add password protection for upload. ([GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111))
 - Use Flask “flash” messages.
-- [GH-110](https://github.com/martin-ueding/geo-activity-playground/issues/110): Support routes that don't have time information attached them. That might be useful if you haven't recorded some particular track but still want it to count towards your heatmap and explorer tiles.
+- Support routes that don't have time information attached them. That might be useful if you haven't recorded some particular track but still want it to count towards your heatmap and explorer tiles. ([GH-110](https://github.com/martin-ueding/geo-activity-playground/issues/110))
 
 ## Version 0.22.0 — 2024-06-16
 
-- [GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111): Allow uploading files from within the web UI and parse them directly after uploading.
+- Allow uploading files from within the web UI and parse them directly after uploading. ([GH-111](https://github.com/martin-ueding/geo-activity-playground/issues/111))
 - Fix bug that lead to re-parsing of activity files during startup.
 
 ## Version 0.21.2 — 2024-06-09
@@ -297,11 +297,11 @@ Internal stuff:
 
 - **Breaking change:** New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the documentation on activity files for the new way.
 
-- [GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105): Ignore similar activities that have vanished.
-- [GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106): Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now.
-- [GH-107](https://github.com/martin-ueding/geo-activity-playground/issues/107): Remove warning by fixing a Pandas slice assignment.
-- [GH-108](https://github.com/martin-ueding/geo-activity-playground/issues/108): Calories and steps are now extracted from FIT files.
-- [GH-109](https://github.com/martin-ueding/geo-activity-playground/issues/109): Better error message when trying to start up without any activity files.
+- Ignore similar activities that have vanished. ([GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105))
+- Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now. ([GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106))
+- Remove warning by fixing a Pandas slice assignment. ([GH-107](https://github.com/martin-ueding/geo-activity-playground/issues/107))
+- Calories and steps are now extracted from FIT files. ([GH-108](https://github.com/martin-ueding/geo-activity-playground/issues/108))
+- Better error message when trying to start up without any activity files. ([GH-109](https://github.com/martin-ueding/geo-activity-playground/issues/109))
 
 - Removed `imagehash` from the dependencies.
 - Single day overview is now linked from each activity.
@@ -310,15 +310,15 @@ Internal stuff:
 
 ## Version 0.20.0 — 2024-03-02
 
-- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`.
-- [GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90): Take time jumps into account in activity distance computation and the various plots of the activities.
-- [GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91): Import altitude information from GPX files if available.
-- [GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92): Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates.
-- [GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99): Skip Strava export activities that don't have a file.
-- [GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98): Also accept boolean values in commute column of Strava's `activities.csv`.
-- [GH-100](https://github.com/martin-ueding/geo-activity-playground/issues/100): Protect fingerprint computation from bogus values
-- [GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102): Make dependency on `vegafusion[embed]` explicit in the dependencies.
-- [GH-103](https://github.com/martin-ueding/geo-activity-playground/issues/103): Delete old pickle file before moving the new one onto it.
+- Fix failure to import Strava distance stream due to `unsupported operand type(s) for /: 'list' and 'int'`. ([GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88))
+- Take time jumps into account in activity distance computation and the various plots of the activities. ([GH-90](https://github.com/martin-ueding/geo-activity-playground/issues/90))
+- Import altitude information from GPX files if available. ([GH-91](https://github.com/martin-ueding/geo-activity-playground/pull/91))
+- Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. ([GH-92](https://github.com/martin-ueding/geo-activity-playground/issues/92))
+- Skip Strava export activities that don't have a file. ([GH-99](https://github.com/martin-ueding/geo-activity-playground/issues/99))
+- Also accept boolean values in commute column of Strava's `activities.csv`. ([GH-98](https://github.com/martin-ueding/geo-activity-playground/issues/98))
+- Protect fingerprint computation from bogus values ([GH-100](https://github.com/martin-ueding/geo-activity-playground/issues/100))
+- Make dependency on `vegafusion[embed]` explicit in the dependencies. ([GH-102](https://github.com/martin-ueding/geo-activity-playground/issues/102))
+- Delete old pickle file before moving the new one onto it. ([GH-103](https://github.com/martin-ueding/geo-activity-playground/issues/103))
 
 ## Version 0.19.1 — 2024-02-03
 
@@ -326,14 +326,14 @@ Internal stuff:
 
 ## Version 0.19.0 — 2024-02-03
 
-- [GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88): Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now.
+- Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field `distance_km` and everything is represented as kilometer internally now. ([GH-88](https://github.com/martin-ueding/geo-activity-playground/issues/88))
 - Add more tooltip information in the plot on the landing page.
-- [GH-87](https://github.com/martin-ueding/geo-activity-playground/issues/87): Add `prefer_metadata_from_file` configuration option.
-- [GH-17](https://github.com/martin-ueding/geo-activity-playground/issues/17): Download calories from Strava via the detailed API.
+- Add `prefer_metadata_from_file` configuration option. ([GH-87](https://github.com/martin-ueding/geo-activity-playground/issues/87))
+- Download calories from Strava via the detailed API. ([GH-17](https://github.com/martin-ueding/geo-activity-playground/issues/17))
 - Add option `--skip-strava` to the `serve` command in order to start the webserver without reaching out to Strava first. This might be useful if the rate limit has been exceeded.
-- [GH-89](https://github.com/martin-ueding/geo-activity-playground/issues/89): Refactor some paths into a module such that there are not so many redundant definitions around.
-- [GH-86](https://github.com/martin-ueding/geo-activity-playground/issues/86): Attempt to also read Strava exports that are localized to German, though untested.
-- [GH-36](https://github.com/martin-ueding/geo-activity-playground/issues/36): Add a square planner.
+- Refactor some paths into a module such that there are not so many redundant definitions around. ([GH-89](https://github.com/martin-ueding/geo-activity-playground/issues/89))
+- Attempt to also read Strava exports that are localized to German, though untested. ([GH-86](https://github.com/martin-ueding/geo-activity-playground/issues/86))
+- Add a square planner. ([GH-36](https://github.com/martin-ueding/geo-activity-playground/issues/36))
 
 ## Version 0.18.0 — 2024-01-26
 
