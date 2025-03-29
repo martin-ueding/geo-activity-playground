@@ -28,6 +28,8 @@ Changed:
 
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restructure the documentation such that it hopefully is more inviting for new users.
+- Share picture now scales with viewport. ([GH-232](https://github.com/martin-ueding/geo-activity-playground/issues/232))
+- Activity details and map go below each other on small viewports. ([GH-232](https://github.com/martin-ueding/geo-activity-playground/issues/232))
 
 Removed:
 
