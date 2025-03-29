@@ -52,6 +52,7 @@ nav:
     - features/kind-rename.md
   - reference/changelog.md
   - acknowledgments.md
+  - set-up-a-development-environment.md
 
 markdown_extensions:
   - pymdownx.highlight
