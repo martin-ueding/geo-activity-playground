@@ -29,6 +29,10 @@ Changed:
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restructure the documentation such that it hopefully is more inviting for new users.
 
+Removed:
+
+- Remove documentation of individual features as it is hard to maintain and doesn't seem to bring much value. With the web interface it is better to invest into usability or inline explanation instead.
+
 ## Version 0.38.1 — 2025-03-16
 
 Fixed:
