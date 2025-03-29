@@ -56,32 +56,3 @@ Inside this folder there are my GPX/FIT/TCX/KML files as outlined in [how-to gui
 ![](windows-installation-08.png)
 
 You need to have at least one activity file before you can start the program.
-
-## Starting the webserver
-
-Once you have your activity files in place, we need to add a start script. Right-click into the playground folder (next to the “Activities folder”) and in the context menu select “Create New” and then “Text File”. Name it `start.bat`. Windows will ask you whether want to change the suffix (file extension) because it might get unusable. Yes, we want to do that. It should look like this:
-
-![](windows-installation-14.png)
-
-Then right-click on that file and select “Edit”. A text editor will open up. Put the following content into this file:
-
-```bat
-python -m geo_activity_playground serve
-pause
-```
-
-Then save and close it. I need you to create this file yourself and cannot offer a download because the Windows Defender will not allow you to execute such script files downloaded as a security precaution. If you create the file yourself, it will let you execute it.
-
-Once you have the `start.bat` there, you can double-click on it to execute it. A new terminal window should open and it should start to parse your activities.
-
-![](windows-installation-15.png)
-
-After it has loaded everything, you can open <http://127.0.0.1:5000/> in your browser. You should then see the landing page:
-
-![](windows-installation-16.png)
-
-Also other functions like the heatmap work:
-
-![](windows-installation-17.png)
-
-That's it, have fun!
