@@ -21,31 +21,34 @@ theme:
 
 nav:
   - index.md
-  - Getting Started:
-      - getting-started/installing-stable-on-linux.md
-      - getting-started/installing-stable-on-windows.md
+  - Installation:
+    - install-on-linux.md
+    - getting-started/installing-stable-on-windows.md
+    - Advanced Installation Topics:
       - getting-started/installing-git-on-linux.md
       - getting-started/docker.md
       - getting-started/docker-compose.md
       - getting-started/docker-compose-tailscale.md
+  - recording-activities.md
+  - Getting Started:
+    - Loading Activities:
       - getting-started/using-activity-files.md
       - getting-started/advanced-metadata-extraction.md
       - getting-started/using-strava-api.md
       - getting-started/moving-from-strava.md
-      - getting-started/starting-the-webserver.md
+    - getting-started/starting-the-webserver.md
   - Features:
-      - features/overview.md
-      - features/activity-view.md
-      - features/calendar.md
-      - features/heatmaps.md
-      - features/explorer-tiles.md
-      - features/eddington.md
-      - features/equipment.md
-      - features/upload.md
-      - features/share-picture.md
-      - features/kind-rename.md
-  - Reference:
-      - reference/changelog.md
+    - features/overview.md
+    - features/activity-view.md
+    - features/calendar.md
+    - features/heatmaps.md
+    - features/explorer-tiles.md
+    - features/eddington.md
+    - features/equipment.md
+    - features/upload.md
+    - features/share-picture.md
+    - features/kind-rename.md
+  - reference/changelog.md
   - acknowledgments.md
 
 markdown_extensions:

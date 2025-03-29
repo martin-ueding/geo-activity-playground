@@ -1,10 +1,10 @@
-# Geo Activity Playground
+# Home
 
-This is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.
+Geo Activity Playground is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.
 
-It caters to serve a similar purpose as [Strava](https://strava.com/) with [Statshunters](https://statshunters.com/) statshunters does but while not requiring you to share your location data with a service provider.
+It caters to serve a similar purpose as other systems like [Strava](https://strava.com/), [Statshunters](https://statshunters.com/) or [VeloViewer](https://veloviewer.com/), though the focus here is on self-hosting and using local files.
 
-One can use this program with a local collection of activity files (GPX, FIT, TCX, KML, CSV) or via the Strava API. The latter is appealing to people who want to keep their data with Strava primarily. In case that one wants to move, this might provide a noncommital way of testing out this project.
+One can use this program with a local collection of activity files (GPX, FIT, TCX, KML, CSV) or via the Strava API. The latter is appealing to people who want to keep their data with Strava primarily. In case that one wants to move, this might provide a noncommittal way of testing out this project.
 
 The main user interface is web-based, you can run this on your Linux, Mac or Windows laptop. If you want, it can also run on a home server or your personal cloud instance.
 
