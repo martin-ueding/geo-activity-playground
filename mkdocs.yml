@@ -35,7 +35,6 @@ nav:
     - advanced-metadata-extraction.md
   - get-help.md
   - Features:
-    - features/explorer-tiles.md
     - features/upload.md
     - features/kind-rename.md
   - How-To Guides:
@@ -43,6 +42,7 @@ nav:
     - create-a-privacy-zone.md
     - set-up-a-development-environment.md
   - Explanation:
+    - explorer-tiles.md
     - eddington-number.md
   - changelog.md
   - acknowledgments.md
