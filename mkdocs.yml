@@ -48,9 +48,9 @@ nav:
   - acknowledgments.md
   - set-up-a-development-environment.md
   - Deployment with Docker:
-    - getting-started/docker.md
-    - getting-started/docker-compose.md
-    - getting-started/docker-compose-tailscale.md
+    - using-git-version-via-docker.md
+    - using-git-version-via-docker-compose.md
+    - using-git-version-via-docker-compose-and-tailscale-vpn.md
 
 markdown_extensions:
   - pymdownx.highlight
