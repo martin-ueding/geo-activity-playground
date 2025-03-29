@@ -3,13 +3,17 @@ import tempfile
 
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.urls import reverse
+from django.views.generic.edit import FormView
 
 from gap_app.models import Activity
+from gap_app.models import Kind
 from geo_activity_playground.core.enrichment import _embellish_single_time_series
 from geo_activity_playground.core.enrichment import _get_metadata_from_timeseries
 from geo_activity_playground.importers.activity_parsers import read_activity
@@ -25,6 +29,17 @@ def activity_view(request: HttpRequest, activity_id) -> HttpResponse:
 
 
 class ActivityUploadForm(forms.Form):
+    def __init__(self, user: User, data=None, files=None) -> None:
+        super().__init__(data, files)
+        self._user = user
+
+        self.fields["kind"] = forms.ModelChoiceField(
+            queryset=Kind.objects.filter(owner_id=self._user),
+            to_field_name="name",
+            required=False,
+            widget=forms.Select(attrs={"class": "form-control"}),
+        )
+
     file = forms.FileField()
 
 
@@ -62,11 +77,11 @@ def _import_activity_file(request: HttpRequest, f: UploadedFile) -> None:
 @login_required
 def activity_upload(request: HttpRequest):
     if request.method == "POST":
-        form = ActivityUploadForm(request.POST, request.FILES)
+        form = ActivityUploadForm(request.user, request.POST, request.FILES)
         if form.is_valid():
             _import_activity_file(request, request.FILES["file"])
     else:
-        form = ActivityUploadForm()
+        form = ActivityUploadForm(request.user)
 
     return render(request, "gap_app/activity_add.html.j2", {"form": form})
 
