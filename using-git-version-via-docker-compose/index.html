@@ -8,26 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/using-git-version-via-docker-compose/">
       
       
+        <link rel="prev" href="../using-git-version-via-docker/">
       
-        <link rel="next" href="install-on-linux/">
+      
+        <link rel="next" href="../using-git-version-via-docker-compose-and-tailscale-vpn/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.47">
     
     
       
-        <title>Geo Activity Playground</title>
+        <title>Using Git Version via Docker Compose - Geo Activity Playground</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.6f8fc17f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,7 +48,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#home" class="md-skip">
+        <a href="#using-git-version-via-docker-compose" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +90,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Geo Activity Playground" class="md-header__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+    <a href=".." title="Geo Activity Playground" class="md-header__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Using Git Version via Docker Compose
             
           </span>
         </div>
@@ -209,7 +211,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Geo Activity Playground" class="md-nav__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+    <a href=".." title="Geo Activity Playground" class="md-nav__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -224,30 +226,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Home
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -256,53 +238,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#screenshot-tour" class="md-nav__link">
-    <span class="md-ellipsis">
-      Screenshot tour
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      Get started
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#free-software" class="md-nav__link">
-    <span class="md-ellipsis">
-      Free software
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -349,7 +284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="install-on-linux/" class="md-nav__link">
+      <a href="../install-on-linux/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -370,7 +305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="install-on-windows/" class="md-nav__link">
+      <a href="../install-on-windows/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -391,7 +326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="add-local-bin-to-path/" class="md-nav__link">
+      <a href="../add-local-bin-to-path/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -419,7 +354,7 @@
   
   
     <li class="md-nav__item">
-      <a href="create-a-base-directory/" class="md-nav__link">
+      <a href="../create-a-base-directory/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -439,7 +374,7 @@
   
   
     <li class="md-nav__item">
-      <a href="starting-the-webserver/" class="md-nav__link">
+      <a href="../starting-the-webserver/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -459,7 +394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="record-activities/" class="md-nav__link">
+      <a href="../record-activities/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -514,7 +449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="import-activity-files/" class="md-nav__link">
+      <a href="../import-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -535,7 +470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="connect-strava-api/" class="md-nav__link">
+      <a href="../connect-strava-api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -556,7 +491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="upload-activity-files/" class="md-nav__link">
+      <a href="../upload-activity-files/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -577,7 +512,7 @@
   
   
     <li class="md-nav__item">
-      <a href="moving-from-strava/" class="md-nav__link">
+      <a href="../moving-from-strava/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -605,7 +540,7 @@
   
   
     <li class="md-nav__item">
-      <a href="get-help/" class="md-nav__link">
+      <a href="../get-help/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -622,17 +557,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
         
           
           <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
@@ -646,7 +583,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             How-To Guides
@@ -660,7 +597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="plan-missing-tile-rides/" class="md-nav__link">
+      <a href="../plan-missing-tile-rides/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -681,7 +618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="create-a-privacy-zone/" class="md-nav__link">
+      <a href="../create-a-privacy-zone/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -702,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="set-up-a-development-environment/" class="md-nav__link">
+      <a href="../set-up-a-development-environment/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -723,7 +660,7 @@
   
   
     <li class="md-nav__item">
-      <a href="rename-activity-kinds/" class="md-nav__link">
+      <a href="../rename-activity-kinds/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -744,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-git-version-via-docker/" class="md-nav__link">
+      <a href="../using-git-version-via-docker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -762,10 +699,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="using-git-version-via-docker-compose/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker Compose
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -774,6 +731,53 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-directory-structure-and-composeyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating directory structure and compose.yml
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-image-and-running-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Building image and running container
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-the-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the image
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -786,7 +790,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-git-version-via-docker-compose-and-tailscale-vpn/" class="md-nav__link">
+      <a href="../using-git-version-via-docker-compose-and-tailscale-vpn/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -849,7 +853,7 @@
   
   
     <li class="md-nav__item">
-      <a href="advanced-metadata-extraction/" class="md-nav__link">
+      <a href="../advanced-metadata-extraction/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -870,7 +874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="changelog/" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -933,7 +937,7 @@
   
   
     <li class="md-nav__item">
-      <a href="explorer-tiles/" class="md-nav__link">
+      <a href="../explorer-tiles/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -954,7 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="eddington-number/" class="md-nav__link">
+      <a href="../eddington-number/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -975,7 +979,7 @@
   
   
     <li class="md-nav__item">
-      <a href="heart-rate-zones/" class="md-nav__link">
+      <a href="../heart-rate-zones/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1003,7 +1007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="acknowledgments/" class="md-nav__link">
+      <a href="../acknowledgments/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1043,27 +1047,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#screenshot-tour" class="md-nav__link">
+  <a href="#creating-directory-structure-and-composeyml" class="md-nav__link">
     <span class="md-ellipsis">
-      Screenshot tour
+      Creating directory structure and compose.yml
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
+  <a href="#building-image-and-running-container" class="md-nav__link">
     <span class="md-ellipsis">
-      Get started
+      Building image and running container
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#free-software" class="md-nav__link">
+  <a href="#updating-the-image" class="md-nav__link">
     <span class="md-ellipsis">
-      Free software
+      Updating the image
     </span>
   </a>
   
@@ -1084,34 +1088,44 @@
                   
 
 
-<h1 id="home">Home</h1>
-<p>Geo Activity Playground is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.</p>
-<p>It caters to serve a similar purpose as other systems like <a href="https://strava.com/">Strava</a>, <a href="https://statshunters.com/">Statshunters</a> or <a href="https://veloviewer.com/">VeloViewer</a>, though the focus here is on self-hosting and using local files.</p>
-<p>One can use this program with a local collection of activity files (GPX, FIT, TCX, KML, CSV) or via the Strava API. The latter is appealing to people who want to keep their data with Strava primarily. In case that one wants to move, this might provide a noncommittal way of testing out this project.</p>
-<p>The main user interface is web-based, you can run this on your Linux, Mac or Windows laptop. If you want, it can also run on a home server or your personal cloud instance.</p>
-<h2 id="screenshot-tour">Screenshot tour</h2>
-<p>This is the view of a single activity:</p>
-<p><img alt="" src="images/screenshot-activity.png" /></p>
-<p>You also get a beautiful interactive heatmap of all your activities:</p>
-<p><img alt="" src="images/screenshot-heatmap.png" /></p>
-<p>Also there are plenty of summary statistics that lets you track how many rides, walks or hikes you have done:</p>
-<p><img alt="t" src="images/screenshot-summary.png" /></p>
-<p>If you're into <em>explorer tiles</em> or <em>squadratinhos</em>, this got you covered:</p>
-<p><img alt="" src="images/screenshot-explorer.png" /></p>
-<p>The configuration options are available within the interface such that you do not have to work with configuration files (like in earlier versions):</p>
-<p><img alt="" src="images/screenshot-settings.png" /></p>
-<h2 id="get-started">Get started</h2>
-<p>If you're new, just follow these steps:</p>
-<ol>
-<li>Install the software on <a href="install-on-linux/">Linux</a> or <a href="install-on-windows/">Windows</a>.</li>
-<li><a href="create-a-base-directory/">Create a base directory</a>.</li>
-<li><a href="starting-the-webserver/">Start the webserver</a>.</li>
-<li>Choose a method to <a href="record-activities/">record activities</a>.</li>
-<li>Import your activities via <a href="import-activity-files/">activity files</a>, <a href="connect-strava-api/">connect the Strava API</a> or <a href="upload-activity-files/">upload activity files</a> in the web interface.</li>
-</ol>
-<p>Have fun. If you're stuck, <a href="get-help/">get help</a>.</p>
-<h2 id="free-software">Free software</h2>
-<p>You can <a href="https://github.com/martin-ueding/geo-activity-playground">find the code on GitHub</a> where you can also file issues. If you would like to use this yourself or contribute, feel free to reach out via the contact options <a href="https://martin-ueding.de/">from my website</a>. I would especially appreciate improvements to the documentation. If you're familiar with Markdown and GitHub, you can also directly create a pull request. The code is licensed under the very permissive MIT license.</p>
+<h1 id="using-git-version-via-docker-compose">Using Git Version via Docker Compose</h1>
+<p><a href="https://www.docker.com/">Docker</a> is a software that allows you to run Linux programs in a container.
+<a href="https://docs.docker.com/compose/">Docker Compose</a> is a tool for defining multi-container Docker environments in a single YAML configuration file and deploy it with a single command.</p>
+<p>This how-to will give you an example <code>compose.yml</code> that can build the geo-activity-playground docker image from Github and start this project within a Docker container.</p>
+<h2 id="creating-directory-structure-and-composeyml">Creating directory structure and compose.yml</h2>
+<p>With these steps the playground folder (which contains the activities) will be located in the docker project folder. The location can be changed in the <code>compose.yml</code>.</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/docker/geo-activity-playground/playground/Activities
+<span class="nb">cd</span><span class="w"> </span>/docker/geo-activity-playground
+nano<span class="w"> </span>compose.yml
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>services:
+  geo-activity:
+    build:
+      context: https://github.com/martin-ueding/geo-activity-playground.git
+      # this sets the build context to the DOCKERFILE located in the Github repository
+    container_name: geo-activity-playground
+    volumes:
+      - /docker/geo-activity-playground/playground:/data  # optional: change left side to your desired playground directory
+    ports:
+      - 5000:5000 # optional: change the exposed port on the left side
+    restart: unless-stopped
+</code></pre></div>
+<p>If you want to build the release version from Github instead, you can adjust the build context and add the release tag.
+<code>context: https://github.com/martin-ueding/geo-activity-playground.git#0.29.1</code></p>
+<h2 id="building-image-and-running-container">Building image and running container</h2>
+<p>You need to set up your files according to one of the presented methods, like activity files or the Strava API. Consult the other pages in the sidebar for the details.</p>
+<p>Once you have your playground directory, you can build the image and start the container.</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>build
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div>
+<p>This will start the webserver on <a href="http://localhost:5000/">http://localhost:5000/</a> or at the port you chose to expose.</p>
+<p>Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another port.</p>
+<h2 id="updating-the-image">Updating the image</h2>
+<p>If using the tagged release version, update the tag to the latest one first.</p>
+<div class="highlight"><pre><span></span><code>docker compose down
+docker compose build
+docker compose up -d --force-recreate
+</code></pre></div>
 
 
 
@@ -1158,10 +1172,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>

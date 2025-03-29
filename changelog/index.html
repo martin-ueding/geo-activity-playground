@@ -1,0 +1,3164 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/changelog/">
+      
+      
+        <link rel="prev" href="../advanced-metadata-extraction/">
+      
+      
+        <link rel="next" href="../explorer-tiles/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.47">
+    
+    
+      
+        <title>Changelog - Geo Activity Playground</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Geo Activity Playground" class="md-header__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Geo Activity Playground
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="amber" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Geo Activity Playground" class="md-nav__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Geo Activity Playground
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Installation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install-on-linux/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Install on Linux
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install-on-windows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Install on Windows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add-local-bin-to-path/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Add Local Bin to PATH
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create-a-base-directory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Create a Base Directory
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starting-the-webserver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Starting the Program
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../record-activities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Record Activities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Activity Sources
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Activity Sources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../import-activity-files/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Import Activity Files
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connect-strava-api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connect Strava API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../upload-activity-files/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upload activity files
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../moving-from-strava/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moving from Strava
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-help/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get Help
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    How-To Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            How-To Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-missing-tile-rides/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plan Missing Tile Rides
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create-a-privacy-zone/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Create a Privacy Zone
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../set-up-a-development-environment/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Set up a Development Environment
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rename-activity-kinds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rename activity kinds
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../using-git-version-via-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../using-git-version-via-docker-compose/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker Compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../using-git-version-via-docker-compose-and-tailscale-vpn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Git Version via Docker Compose and Tailscale VPN
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-metadata-extraction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Metadata Extraction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-0382-2025-03-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.2 — 2025-03-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0381-2025-03-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.1 — 2025-03-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0380-2025-01-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.0 — 2025-01-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0370-2025-01-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.37.0 — 2025-01-18
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0362-2025-01-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.2 — 2025-01-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0361-2025-01-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.1 — 2025-01-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0360-2025-01-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.0 — 2025-01-04
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0351-2025-01-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.35.1 — 2025-01-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0350-2025-01-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.35.0 — 2025-01-01
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0342-2024-12-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.2 — 2024-12-31
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0341-2024-12-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.1 — 2024-12-30
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0340-2024-12-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.0 — 2024-12-21
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0334-2024-12-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.4 — 2024-12-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0333-2024-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.3 — 2024-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0332-2024-11-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.2 — 2024-11-17
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0331-2024-11-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.1 — 2024-11-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0330-2024-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.0 — 2024-11-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0320-2024-11-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.32.0 — 2024-11-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0310-2024-11-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.31.0 — 2024-11-01
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0300-2024-10-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.30.0 — 2024-10-25
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0292-2024-10-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.2 — 2024-10-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0291-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.1 — 2024-10-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0290-2024-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.0 — 2024-09-30
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0280-2024-09-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.28.0 — 2024-09-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0271-2024-08-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27.1 — 2024-08-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0270-2024-08-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27.0 — 2024-08-11
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0263-2024-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.3 — 2024-08-08
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0262-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.2 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0261-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.1 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0260-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.0 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0250-2024-08-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.25.0 — 2024-08-05
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0242-2024-07-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.2 — 2024-07-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0241-2024-07-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.1 — 2024-07-27
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0240-2024-07-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.0 — 2024-07-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0230-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.23.0 — 2024-06-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0220-2024-06-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.22.0 — 2024-06-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0212-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.2 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0211-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.1 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0210-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.0 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0200-2024-03-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.20.0 — 2024-03-02
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0191-2024-02-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.1 — 2024-02-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0190-2024-02-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.0 — 2024-02-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0180-2024-01-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.18.0 — 2024-01-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0175-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.5 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0174-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.4 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0173-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.3 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0172-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.2 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0171-2024-01-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.1 — 2024-01-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0170-2024-01-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.0 — 2024-01-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0164-2023-12-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.4 — 2023-12-23
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0163-2023-12-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.3 — 2023-12-23
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0162-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.2 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0161-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.1 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0160-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.0 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0153-2023-12-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.3 — 2023-12-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0152-2023-12-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.2 — 2023-12-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0151-2023-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.1 — 2023-12-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0150-2023-12-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.0 — 2023-12-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0142-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.2 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0141-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.1 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0140-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.0 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0130-2023-12-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.13.0 — 2023-12-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0120-2023-12-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.12.0 — 2023-12-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0110-2023-12-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.11.0 — 2023-12-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0100-2023-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.10.0 — 2023-11-27
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-090-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.9.0 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-083-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.3 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-082-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.2 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-081-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.1 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-080-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.0 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-070-2023-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.7.0 — 2023-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-060-2023-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.6.0 — 2023-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-050-2023-11-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.5.0 — 2023-11-15
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-040-2023-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.4.0 — 2023-11-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-030-2023-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.3.0 — 2023-11-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-020-2023-11-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.2.0 — 2023-11-05
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-013-2023-07-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.1.3 — 2023-07-28
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Explanation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Explanation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../explorer-tiles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Explorer Tiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eddington-number/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Eddington Number
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heart-rate-zones/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Heart Rate Zones
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-0382-2025-03-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.2 — 2025-03-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0381-2025-03-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.1 — 2025-03-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0380-2025-01-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.38.0 — 2025-01-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0370-2025-01-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.37.0 — 2025-01-18
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0362-2025-01-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.2 — 2025-01-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0361-2025-01-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.1 — 2025-01-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0360-2025-01-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.36.0 — 2025-01-04
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0351-2025-01-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.35.1 — 2025-01-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0350-2025-01-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.35.0 — 2025-01-01
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0342-2024-12-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.2 — 2024-12-31
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0341-2024-12-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.1 — 2024-12-30
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0340-2024-12-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.34.0 — 2024-12-21
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0334-2024-12-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.4 — 2024-12-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0333-2024-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.3 — 2024-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0332-2024-11-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.2 — 2024-11-17
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0331-2024-11-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.1 — 2024-11-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0330-2024-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.33.0 — 2024-11-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0320-2024-11-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.32.0 — 2024-11-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0310-2024-11-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.31.0 — 2024-11-01
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0300-2024-10-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.30.0 — 2024-10-25
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0292-2024-10-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.2 — 2024-10-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0291-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.1 — 2024-10-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0290-2024-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.29.0 — 2024-09-30
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0280-2024-09-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.28.0 — 2024-09-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0271-2024-08-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27.1 — 2024-08-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0270-2024-08-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.27.0 — 2024-08-11
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0263-2024-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.3 — 2024-08-08
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0262-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.2 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0261-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.1 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0260-2024-08-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.26.0 — 2024-08-06
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0250-2024-08-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.25.0 — 2024-08-05
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0242-2024-07-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.2 — 2024-07-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0241-2024-07-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.1 — 2024-07-27
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0240-2024-07-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.24.0 — 2024-07-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0230-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.23.0 — 2024-06-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0220-2024-06-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.22.0 — 2024-06-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0212-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.2 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0211-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.1 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0210-2024-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.21.0 — 2024-06-09
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0200-2024-03-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.20.0 — 2024-03-02
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0191-2024-02-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.1 — 2024-02-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0190-2024-02-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.19.0 — 2024-02-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0180-2024-01-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.18.0 — 2024-01-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0175-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.5 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0174-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.4 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0173-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.3 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0172-2024-01-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.2 — 2024-01-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0171-2024-01-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.1 — 2024-01-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0170-2024-01-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.17.0 — 2024-01-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0164-2023-12-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.4 — 2023-12-23
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0163-2023-12-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.3 — 2023-12-23
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0162-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.2 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0161-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.1 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0160-2023-12-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.16.0 — 2023-12-22
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0153-2023-12-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.3 — 2023-12-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0152-2023-12-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.2 — 2023-12-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0151-2023-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.1 — 2023-12-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0150-2023-12-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.15.0 — 2023-12-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0142-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.2 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0141-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.1 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0140-2023-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.14.0 — 2023-12-12
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0130-2023-12-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.13.0 — 2023-12-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0120-2023-12-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.12.0 — 2023-12-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0110-2023-12-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.11.0 — 2023-12-03
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-0100-2023-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.10.0 — 2023-11-27
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-090-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.9.0 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-083-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.3 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-082-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.2 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-081-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.1 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-080-2023-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.8.0 — 2023-11-26
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-070-2023-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.7.0 — 2023-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-060-2023-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.6.0 — 2023-11-24
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-050-2023-11-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.5.0 — 2023-11-15
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-040-2023-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.4.0 — 2023-11-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-030-2023-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.3.0 — 2023-11-10
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-020-2023-11-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.2.0 — 2023-11-05
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-013-2023-07-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.1.3 — 2023-07-28
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="changelog">Changelog</h1>
+<!-- 
+- ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
+-->
+
+<p>This is a log of all changes made to the project. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
+and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<!-- 
+Types of changes
+
+    *Added* for new features.
+    *Changed* for changes in existing functionality.
+    *Deprecated* for soon-to-be removed features.
+    *Removed* for now removed features.
+    *Fixed* for any bug fixes.
+    *Security* in case of vulnerabilities.
+-->
+
+<h2 id="version-0382-2025-03-29">Version 0.38.2 — 2025-03-29</h2>
+<p>Added:</p>
+<ul>
+<li>Add tooltips to all charts and add a sensible amount of decimal places. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/231">GH-231</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li><strong>Branch rename</strong>: <code>master</code> is renamed to <code>main</code>.</li>
+<li>Format changelog according to <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>.</li>
+<li>Restructure the documentation such that it hopefully is more inviting for new users.</li>
+<li>Share picture now scales with viewport. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/232">GH-232</a>)</li>
+<li>Activity details and map go below each other on small viewports. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/232">GH-232</a>)</li>
+</ul>
+<p>Removed:</p>
+<ul>
+<li>Remove documentation of individual features as it is hard to maintain and doesn't seem to bring much value. With the web interface it is better to invest into usability or inline explanation instead.</li>
+</ul>
+<h2 id="version-0381-2025-03-16">Version 0.38.1 — 2025-03-16</h2>
+<p>Fixed:</p>
+<ul>
+<li>Do not fail if elevation gain is missing. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/227">GH-227</a>)</li>
+<li>Update pyarrow dependency from 18 to 19 to help with dependency issues.</li>
+</ul>
+<h2 id="version-0380-2025-01-26">Version 0.38.0 — 2025-01-26</h2>
+<p>Added:</p>
+<ul>
+<li>Show history of recent filters.</li>
+<li>Allow saving filters as favorites.</li>
+<li>Add average speed to various views. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/192">GH-192</a>)</li>
+<li>Add elevation gain extraction. Be aware that this is very noisy for most GPS devices as they lack a barometer. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/199">GH-199</a>)</li>
+<li>"Hall of Fame" includes additional nominations per equipment used.</li>
+<li>Add Eddington number with activities from just single years. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/195">GH-195</a>)</li>
+<li>Add time evolution of Eddington number. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/195">GH-195</a>)</li>
+<li>Add Eddington number but grouped by weeks instead of days. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/195">GH-195</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Sort activities by date descending in the search view. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/225">GH-225</a>)</li>
+<li>Replace empty strings in kind and equipment with literal "Unknown". (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/224">GH-224</a>)</li>
+<li>Remove duplicate legend for day overview. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/223">GH-223</a>)</li>
+<li>Add authentication to enablement of additional zoom levels. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/222">GH-222</a>)</li>
+<li>Sort equipment details by last use.</li>
+<li>Make Eddington plots only zoomable in one axis.</li>
+<li>Add uniform kind scale to equipment usage plots.</li>
+</ul>
+<h2 id="version-0370-2025-01-18">Version 0.37.0 — 2025-01-18</h2>
+<p>Added:</p>
+<ul>
+<li>Add unified activity filter for activity overview, heatmap, Eddington number, summary statistics. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/215">GH-215</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix Docker build with Poetry 2.0. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/218">GH-218</a>)</li>
+<li>Fix equipment summary when routes are present. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/219">GH-219</a>)</li>
+</ul>
+<h2 id="version-0362-2025-01-10">Version 0.36.2 — 2025-01-10</h2>
+<p>Fixed:</p>
+<ul>
+<li>Try to fix search view for routes without time information. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/217">GH-217</a>)</li>
+</ul>
+<h2 id="version-0361-2025-01-06">Version 0.36.1 — 2025-01-06</h2>
+<p>Fixed:</p>
+<ul>
+<li>Remove integrity from assets. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/216">GH-216</a>)</li>
+</ul>
+<h2 id="version-0360-2025-01-04">Version 0.36.0 — 2025-01-04</h2>
+<p>Added:</p>
+<ul>
+<li>Add date filter to heatmap. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/212">GH-212</a>)</li>
+<li>Add square planner to navigation. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/209">GH-209</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Clip speed coloring with IQR to remove outliers. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/211">GH-211</a>)</li>
+<li>Remove multiprocessing for parsing activities due to warnings about multithreading. This unfortunately slows down initial processing. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/206">GH-206</a>)</li>
+<li>Start to simplify the controller structure. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/214">GH-214</a>)</li>
+<li>Encode kinds via integers in heatmap to protect it against weird kind names containing control symbols. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/213">GH-213</a>)</li>
+</ul>
+<h2 id="version-0351-2025-01-03">Version 0.35.1 — 2025-01-03</h2>
+<p>Changed:</p>
+<ul>
+<li>Do some internal changes to the map background generation for share pictures.</li>
+<li>Do some refactoring in the web code.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Support activity files with uppercase suffix. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/208">GH-208</a>)</li>
+</ul>
+<h2 id="version-0350-2025-01-01">Version 0.35.0 — 2025-01-01</h2>
+<p>Added:</p>
+<ul>
+<li>Add button to explorer tile map to remove map background.</li>
+</ul>
+<h2 id="version-0342-2024-12-31">Version 0.34.2 — 2024-12-31</h2>
+<p>Changed:</p>
+<ul>
+<li>Host another JavaScript asset locally.</li>
+</ul>
+<h2 id="version-0341-2024-12-30">Version 0.34.1 — 2024-12-30</h2>
+<p>Changed:</p>
+<ul>
+<li>Host all assets locally to avoid using CDNs.</li>
+</ul>
+<h2 id="version-0340-2024-12-21">Version 0.34.0 — 2024-12-21</h2>
+<p>Added:</p>
+<ul>
+<li>Add a share picture per day. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/157">GH-157</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Enforce UTF-8 encoding when reading the <code>activities.csv</code> from the Strava export. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/197">GH-197</a>)</li>
+<li>Make CSV header parsing a bit more robust. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/197">GH-197</a>)</li>
+<li>Correct label for equipment "kinds" plot. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/201">GH-201</a>)</li>
+<li>Fix documentation, remove <code>--skip-strava</code> and replace it with <code>--skip-reload</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/203">GH-203</a>)</li>
+<li>Fix mismatch between ISO week and regular year. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/205">GH-205</a>)</li>
+</ul>
+<h2 id="version-0334-2024-12-07">Version 0.33.4 — 2024-12-07</h2>
+<p>Added:</p>
+<ul>
+<li>Add compatibility for Python 3.13.</li>
+</ul>
+<h2 id="version-0333-2024-11-24">Version 0.33.3 — 2024-11-24</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix startup without any activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/200">GH-200</a>)</li>
+<li>Fix upload when there is no <code>Activities</code> directory.</li>
+</ul>
+<h2 id="version-0332-2024-11-17">Version 0.33.2 — 2024-11-17</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix explorer map. The problem was that VS Code auto-formatted the embedded JavaScript and created syntax errors. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/198">GH-198</a>)</li>
+</ul>
+<h2 id="version-0331-2024-11-16">Version 0.33.1 — 2024-11-16</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix little bug with <code>_meta</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/156">GH-156</a>)</li>
+</ul>
+<h2 id="version-0330-2024-11-14">Version 0.33.0 — 2024-11-14</h2>
+<p>Added:</p>
+<ul>
+<li>Make heatmap colormap configurable via web UI.</li>
+<li>Make tile map URL configurable via configuration file. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/196">GH-196</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Make daily pulse plot per year in tabs.</li>
+</ul>
+<h2 id="version-0320-2024-11-12">Version 0.32.0 — 2024-11-12</h2>
+<p>Added:</p>
+<ul>
+<li>Add config option <code>ignore_suffixes</code> which can be set to something like <code>[".kml"]</code> to ignore certain file types. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/173">GH-173</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Include all activities in the summary, even those which are not to be considered for achievements.</li>
+<li>Make share picture always the same size independent of the content.</li>
+</ul>
+<p>Removed:</p>
+<ul>
+<li>Remove debug print.</li>
+</ul>
+<h2 id="version-0310-2024-11-01">Version 0.31.0 — 2024-11-01</h2>
+<p>Added:</p>
+<ul>
+<li>Add metadata editing functionality with override files. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/156">GH-156</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Make date and time formats better to read.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix heatmap tile cache expiry in cases where the activity kind has changed. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/189">GH-189</a>)</li>
+</ul>
+<h2 id="version-0300-2024-10-25">Version 0.30.0 — 2024-10-25</h2>
+<p>Added:</p>
+<ul>
+<li>Add new search functionality that also serves as an overview over all activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/174">GH-174</a>)</li>
+<li>Make track segmentation configurable with a configuration setting. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/162">GH-162</a>)</li>
+<li>Remove <code>root=</code> prefix in activity kind when importing from Strava. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/188">GH-188</a>)</li>
+<li>Visualize cadence on the activity page.</li>
+<li>Add option to rename activity kinds. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/188">GH-188</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Update favicon to new logo. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/187">GH-187</a>)</li>
+<li>Clicking on table headers will sort the tables now. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/168">GH-168</a>)</li>
+</ul>
+<h2 id="version-0292-2024-10-14">Version 0.29.2 — 2024-10-14</h2>
+<p>Added:</p>
+<ul>
+<li>Mention Organic Maps. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/175">GH-175</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Documentation improvements by <a href="https://github.com/beautiful-orca">beautiful-orca</a>: <a href="https://github.com/martin-ueding/geo-activity-playground/pull/180">GH-180</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/pull/181">GH-181</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/pull/182">GH-182</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/pull/183">GH-183</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/pull/185">GH-185</a></li>
+<li>Use Python 3.12 in Docker. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/184">GH-184</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix display of number of new tiles in activity view. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/178">GH-178</a>)</li>
+<li>Fix distance from new <code>stravalib</code> version. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/177">GH-177</a>)</li>
+<li>Work around Pandas deprecation message. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/179">GH-179</a>)</li>
+<li>Do not modify filename on upload any more. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/176">GH-176</a>)</li>
+</ul>
+<h2 id="version-0291-2024-10-03">Version 0.29.1 — 2024-10-03</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix explorer tile export. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/167">GH-167</a>)</li>
+<li>Fix import of KML files with waypoints. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/169">GH-169</a>)</li>
+</ul>
+<h2 id="version-0290-2024-09-30">Version 0.29.0 — 2024-09-30</h2>
+<p>Added:</p>
+<ul>
+<li>Add map with new explorer tiles to activity view. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/166">GH-166</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Use dropdown menus to make navigation a bit smaller.</li>
+<li>Use the same scale for all plots with kind, make this configurable in the settings menu. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/155">GH-155</a>)</li>
+<li>Rewrite the documentation start page to make it more appealing and reflect the work in the web interface.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Recompute explorer tiles when there are deleted activities. Previously this would lead to <code>KeyError</code> when trying to use the heatmap or the explorer tile maps. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/163">GH-163</a>)</li>
+<li>Fix explorer tile clusters and square if one has activities that are not to be considered for achievements. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/161">GH-161</a>)</li>
+<li>Create new function to handle write-and-replace on Windows. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/164">GH-164</a>)</li>
+<li>Update version of <code>stravalib</code> and with that also <code>pydantic</code>. That fixes a bug with <code>recursive_guard</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/160">GH-160</a>)</li>
+</ul>
+<h2 id="version-0280-2024-09-07">Version 0.28.0 — 2024-09-07</h2>
+<p>Added:</p>
+<ul>
+<li>Add settings menu to suppress fields from share pictures.</li>
+<li>Document the use of Open Street Map uMap for missing explorer tiles on the go.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Accelerate the tile visit computation.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix spelling mistake in navigation bar.</li>
+<li>Ignore equipment offsets of equipments that don't exist.</li>
+<li>Reset corrupt heatmap cache files.</li>
+</ul>
+<p>Security:</p>
+<ul>
+<li>Improve password mechanism to protect both upload and settings. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/159">GH-159</a>)</li>
+</ul>
+<h2 id="version-0271-2024-08-14">Version 0.27.1 — 2024-08-14</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix <code>num_processes</code> option.</li>
+</ul>
+<h2 id="version-0270-2024-08-11">Version 0.27.0 — 2024-08-11</h2>
+<p>Added:</p>
+<ul>
+<li>Add another safeguard against activities that don't have latitude/longitude data. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/147">GH-147</a>)</li>
+<li>Make multiprocessing optional with <code>num_processes = 1</code> in the configuration. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/146">GH-146</a>)</li>
+<li>Add settings menu where one can configure various things:</li>
+<li>Equipment offsets</li>
+<li>Maximum heart rate for heart rate zones</li>
+<li>Metadata extractions from paths</li>
+<li>Privacy zones</li>
+<li>Strava connection</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Let the Strava Checkout importer set the file <code>strava-last-activity-date.json</code> which is needed such that the Strava API importer can pick up after all the activities that have been imported via the checkout. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/128">GH-128</a>)</li>
+<li>Use custom CSV parser to read activities that have newlines in their descriptions. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/143">GH-143</a>)</li>
+<li>Only pre-compute explorer maps for zoom 14 and 17 by default. Other ones just have to be enabled once. This saves a bit of computing time for most people that don't need to go down to zoom 19. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/149">GH-149</a>)</li>
+<li>The <code>config.json</code> replaces the <code>config.toml</code> and will automatically be generated.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Do not fail if version cannot be determined. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/151">GH-151</a>)</li>
+<li>Fix bug in explorer tile interpolation that likely doesn't have an effect in practice.</li>
+</ul>
+<h2 id="version-0263-2024-08-08">Version 0.26.3 — 2024-08-08</h2>
+<p>Fixed:</p>
+<ul>
+<li>Require <code>pandas &gt;= 2.2.0</code> to make sure that it knows about <code>include_groups</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/142">GH-142</a>)</li>
+<li>Ignore activities without time series when using the Strava Checkout import. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/144">GH-144</a>)</li>
+</ul>
+<h2 id="version-0262-2024-08-06">Version 0.26.2 — 2024-08-06</h2>
+<p>Added:</p>
+<ul>
+<li>Start with a test suite for the web server that also tests importing.</li>
+<li>Already fixed a few little bugs with that.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix summary page if there are no activities with steps. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/141">GH-141</a>)</li>
+</ul>
+<h2 id="version-0261-2024-08-06">Version 0.26.1 — 2024-08-06</h2>
+<p>Fixed:</p>
+<ul>
+<li>More fixes for Strava archive importer. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/139">GH-139</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/issues/140">GH-140</a>)</li>
+</ul>
+<h2 id="version-0260-2024-08-06">Version 0.26.0 — 2024-08-06</h2>
+<p>Added:</p>
+<ul>
+<li>Add automatic dark mode.</li>
+<li>Add some more explanation for the Strava connection.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Style the settings page a bit.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix import from Strava archive that was broken in 0.25.0. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/138">GH-138</a>)</li>
+</ul>
+<h2 id="version-0250-2024-08-05">Version 0.25.0 — 2024-08-05</h2>
+<p>Added:</p>
+<ul>
+<li>Add an web interface to connect to Strava API using a shared application such that it becomes much simpler to set up.</li>
+<li>Compute moving time. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/41">GH-41</a>)</li>
+<li>Make calories and steps optional for the share picture. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/127">GH-127</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Restructure the way that activities are imported to realize a couple of benefits:</li>
+<li>Deleting activities is detected now, they are removed from the heatmap.</li>
+<li>If the code is changed, not everything has to be parsed again. This is especially helpful with regard to the rate-limited Strava API.</li>
+<li>Some code is deduplicated that had accumulated between activity file parsing and the Strava API.</li>
+<li>Unfortunately it means that everything needs to parsed again into the new format. I'm sorry about that, especially to you Strava users that need to deal with the rate limiting!</li>
+<li>Update to the column names in the Strava export. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/131">GH-131</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Cope with manually recorded activities in Strava export. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/133">GH-133</a>)</li>
+<li>Cope with broken FIT files. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/134">GH-134</a>)</li>
+</ul>
+<h2 id="version-0242-2024-07-29">Version 0.24.2 — 2024-07-29</h2>
+<p>Fixed:</p>
+<ul>
+<li>Make calories and steps optional for the summary statistics. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/127">GH-127</a>)</li>
+</ul>
+<h2 id="version-0241-2024-07-27">Version 0.24.1 — 2024-07-27</h2>
+<p>Fixed:</p>
+<ul>
+<li>Add more timezone handling for Strava API. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/124">GH-124</a>)</li>
+<li>Fix building of Docker container. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/125">GH-125</a>)</li>
+<li>Fix heatmap download. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/126">GH-126</a>)</li>
+</ul>
+<h2 id="version-0240-2024-07-26">Version 0.24.0 — 2024-07-26</h2>
+<p>Added:</p>
+<ul>
+<li>Added nicer share pictures and privacy zones. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/43">GH-43</a>)</li>
+<li>Display the number of new explorer tiles and squadratinhos per activity. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/05">GH-95</a>)</li>
+<li>Show total distance and duration in day overview. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/114">GH-114</a>)</li>
+<li>Add more summary statistics and add a "hall of fame" as well. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/115">GH-115</a>)</li>
+<li>Show table for Eddington number, also update the plot to make it a bit easier to read. Add some more explanatory text. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/161">GH-161</a>)</li>
+<li>Allow filtering the heatmap by activity kinds.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Open footer links in a new tab. (<a href="https://github.com/martin-ueding/geo-activity-playground/pull/113">GH-113</a>)</li>
+<li>Fix links in search results. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/118">GH-118</a>)</li>
+<li>Fix link to share picture. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/121">GH-121</a>)</li>
+<li>Convert everything to "timezone naive" dates in order to get rid of inconsistencies. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/122">GH-122</a>)</li>
+<li>Use Flask Blueprints to organize code.</li>
+</ul>
+<p>Removed:</p>
+<ul>
+<li>Remove half-finished "locations" feature from the navigation.</li>
+<li>Remove duplicate link to landing page from navigation.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix startup from empty cache. A cache migration assumed that <code>activities.parquet</code> exists. I've added a check. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/123">GH-123</a>)</li>
+</ul>
+<h2 id="version-0230-2024-06-22">Version 0.23.0 — 2024-06-22</h2>
+<p>Added:</p>
+<ul>
+<li>Use Flask “flash” messages.</li>
+<li>Support routes that don't have time information attached them. That might be useful if you haven't recorded some particular track but still want it to count towards your heatmap and explorer tiles. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/110">GH-110</a>)</li>
+</ul>
+<p>Security:</p>
+<ul>
+<li>Add password protection for upload. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/111">GH-111</a>)</li>
+</ul>
+<h2 id="version-0220-2024-06-16">Version 0.22.0 — 2024-06-16</h2>
+<p>Added:</p>
+<ul>
+<li>Allow uploading files from within the web UI and parse them directly after uploading. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/111">GH-111</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix bug that lead to re-parsing of activity files during startup.</li>
+</ul>
+<h2 id="version-0212-2024-06-09">Version 0.21.2 — 2024-06-09</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix crash in search due to missing <code>distance/km</code>.</li>
+</ul>
+<h2 id="version-0211-2024-06-09">Version 0.21.1 — 2024-06-09</h2>
+<p>Added:</p>
+<ul>
+<li>Add support for Python 3.12.</li>
+</ul>
+<h2 id="version-0210-2024-06-09">Version 0.21.0 — 2024-06-09</h2>
+<ul>
+<li>
+<p><strong>Breaking change:</strong> New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used <code>prefer_metadata_from_file</code> before, see the documentation on activity files for the new way.</p>
+</li>
+<li>
+<p>Ignore similar activities that have vanished. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/105">GH-105</a>)</p>
+</li>
+<li>Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/106">GH-106</a>)</li>
+<li>Remove warning by fixing a Pandas slice assignment. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/107">GH-107</a>)</li>
+<li>Calories and steps are now extracted from FIT files. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/108">GH-108</a>)</li>
+<li>
+<p>Better error message when trying to start up without any activity files. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/109">GH-109</a>)</p>
+</li>
+<li>
+<p>Removed <code>imagehash</code> from the dependencies.</p>
+</li>
+<li>Single day overview is now linked from each activity.</li>
+<li>Parsing of activity files is now parallelized over all CPU cores and faster than before.</li>
+<li>The coloring of the speed along the activity line doesn't remove outliers any more.</li>
+</ul>
+<h2 id="version-0200-2024-03-02">Version 0.20.0 — 2024-03-02</h2>
+<ul>
+<li>Fix failure to import Strava distance stream due to <code>unsupported operand type(s) for /: 'list' and 'int'</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>)</li>
+<li>Take time jumps into account in activity distance computation and the various plots of the activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/90">GH-90</a>)</li>
+<li>Import altitude information from GPX files if available. (<a href="https://github.com/martin-ueding/geo-activity-playground/pull/91">GH-91</a>)</li>
+<li>Keep identity of activities based on hash of the file content, not the path. This allows to rename activities and just update their metadata, without having duplicates. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/92">GH-92</a>)</li>
+<li>Skip Strava export activities that don't have a file. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/99">GH-99</a>)</li>
+<li>Also accept boolean values in commute column of Strava's <code>activities.csv</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/98">GH-98</a>)</li>
+<li>Protect fingerprint computation from bogus values (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/100">GH-100</a>)</li>
+<li>Make dependency on <code>vegafusion[embed]</code> explicit in the dependencies. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/102">GH-102</a>)</li>
+<li>Delete old pickle file before moving the new one onto it. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/103">GH-103</a>)</li>
+</ul>
+<h2 id="version-0191-2024-02-03">Version 0.19.1 — 2024-02-03</h2>
+<ul>
+<li>Fix broken import of CSV files due to missing argument <code>opener</code>.</li>
+</ul>
+<h2 id="version-0190-2024-02-03">Version 0.19.0 — 2024-02-03</h2>
+<ul>
+<li>Fix confusion about the internal data type for distance. Most of the time it was in meter, but the display was always in kilometer. In order to make it more clear now, the internal data now only contains the field <code>distance_km</code> and everything is represented as kilometer internally now. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/88">GH-88</a>)</li>
+<li>Add more tooltip information in the plot on the landing page.</li>
+<li>Add <code>prefer_metadata_from_file</code> configuration option. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/87">GH-87</a>)</li>
+<li>Download calories from Strava via the detailed API. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/17">GH-17</a>)</li>
+<li>Add option <code>--skip-strava</code> to the <code>serve</code> command in order to start the webserver without reaching out to Strava first. This might be useful if the rate limit has been exceeded.</li>
+<li>Refactor some paths into a module such that there are not so many redundant definitions around. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/89">GH-89</a>)</li>
+<li>Attempt to also read Strava exports that are localized to German, though untested. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/86">GH-86</a>)</li>
+<li>Add a square planner. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/36">GH-36</a>)</li>
+</ul>
+<h2 id="version-0180-2024-01-26">Version 0.18.0 — 2024-01-26</h2>
+<ul>
+<li>Fix <em>internal server error 500</em> when there are not-a-number entries in the speed. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/85">GH-85</a></li>
+<li>Display activity source path in detail view.</li>
+<li>Ignore files which start with a period. This should also avoid Apple Quarantine files. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/83">GH-83</a></li>
+<li>Allow to have both Strava API and activity files.</li>
+<li>Use an existing Strava Export to load activities, retrieve only the remainder from the Strava API.</li>
+<li>In the calender, give the yearly total.</li>
+</ul>
+<h2 id="version-0175-2024-01-14">Version 0.17.5 — 2024-01-14</h2>
+<ul>
+<li>Convert FIT sport type enum to strings. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/84">GH-84</a></li>
+</ul>
+<h2 id="version-0174-2024-01-14">Version 0.17.4 — 2024-01-14</h2>
+<ul>
+<li>Try to use charset-normalizer to figure out the strange encoding. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/83">GH-83</a></li>
+</ul>
+<h2 id="version-0173-2024-01-14">Version 0.17.3 — 2024-01-14</h2>
+<ul>
+<li>Fix error handler for GPX encoding issues. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/83">GH-83</a></li>
+</ul>
+<h2 id="version-0172-2024-01-14">Version 0.17.2 — 2024-01-14</h2>
+<ul>
+<li>Fix FIT import failure when the sub-sport is none. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/84">GH-84</a></li>
+</ul>
+<h2 id="version-0171-2024-01-13">Version 0.17.1 — 2024-01-13</h2>
+<ul>
+<li>Use locally downloaded tiles for all maps, this way we do not need to download them twice for activities and explorer/heatmap.</li>
+<li>Localize SimRa files to local time zone. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/80">GH-80</a></li>
+<li>Parse speed unit from FIT file. There are many devices which record in m/s and not in km/h, yielding too low speeds in the analysis. This is now fixed. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/82">GH-82</a></li>
+<li>Skip <code>.DS_Store</code> files in the activity directory. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/81">GH-81</a></li>
+<li>From FIT files we also extract the <em>grade</em>, <em>temperature</em> and <em>GPS accuracy</em> fields if they are present. There is no analysis for them yet, though. Also extract the workout name, sport and sub-sport fields from FIT files. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/81">GH-81</a></li>
+<li>Add more logging to diagnose Unicode issue on macOS. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/83">GH-83</a></li>
+</ul>
+<h2 id="version-0170-2024-01-03">Version 0.17.0 — 2024-01-03</h2>
+<ul>
+<li>Fix bug which broke the import of <code>.tcx.gz</code> files.</li>
+<li>Add <code>Dockerfile</code> such that one can easily use this with Docker. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/78">GH-78</a></li>
+<li>Add support for the CSV files of the <a href="https://simra-project.github.io/">SimRa Project</a>. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/79">GH-79</a></li>
+</ul>
+<h2 id="version-0164-2023-12-23">Version 0.16.4 — 2023-12-23</h2>
+<ul>
+<li>Fix syntax error.</li>
+</ul>
+<h2 id="version-0163-2023-12-23">Version 0.16.3 — 2023-12-23</h2>
+<ul>
+<li>Ignore Strava activities without a time series.</li>
+</ul>
+<h2 id="version-0162-2023-12-22">Version 0.16.2 — 2023-12-22</h2>
+<ul>
+<li>Make heatmap images that are downloaded look the same as the interactive one.</li>
+<li>Always emit the path when there is something wrong while parsing an activity file.</li>
+</ul>
+<h2 id="version-0161-2023-12-22">Version 0.16.1 — 2023-12-22</h2>
+<ul>
+<li>Fix handling of TCX files on Windows. On that platform one cannot open the same file twice, therefore my approach failed. Now I close the file properly such that this should work on Windows as well.</li>
+</ul>
+<h2 id="version-0160-2023-12-22">Version 0.16.0 — 2023-12-22</h2>
+<ul>
+<li>Add feature to render heatmap from visible area. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/73">GH-73</a></li>
+<li>Remove heatmap image generation from clusters, remove Scikit-Learn dependency.</li>
+<li>Add offsets for equipment. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/71">GH-71</a></li>
+<li>Fix number of tile visits in explorer view. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/69">GH-69</a></li>
+<li>Add action to convert Strava checkout to our format. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/65">GH-65</a></li>
+<li>Filter out some GPS jumps. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/54">GH-54</a></li>
+<li>Add simple search function. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/70">GH-70</a></li>
+</ul>
+<h2 id="version-0153-2023-12-20">Version 0.15.3 — 2023-12-20</h2>
+<ul>
+<li>Create temporary file for TCX parsing in the same directory. There was a problem on Windows where the program didn't have access permissions to the temporary files directory.</li>
+</ul>
+<h2 id="version-0152-2023-12-20">Version 0.15.2 — 2023-12-20</h2>
+<ul>
+<li>Try to open GPX files in binary mode to avoid encoding issues. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/74">GH-74</a></li>
+</ul>
+<h2 id="version-0151-2023-12-16">Version 0.15.1 — 2023-12-16</h2>
+<ul>
+<li>Add <code>if __name__ == "__main__"</code> clause such that one can use <code>python -m geo_activity_playground</code> on Windows.</li>
+</ul>
+<h2 id="version-0150-2023-12-13">Version 0.15.0 — 2023-12-13</h2>
+<ul>
+<li>Export all missing tiles in the viewport, not just the neighbors.</li>
+<li>Automatically retry Strava API when the rate limit is exhausted. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/67">GH-67</a></li>
+<li>Give more helpful error messages when the are no activity files present.</li>
+</ul>
+<h2 id="version-0142-2023-12-12">Version 0.14.2 — 2023-12-12</h2>
+<ul>
+<li>Fix broken Strava import (bug introduced in 0.14.0).</li>
+</ul>
+<h2 id="version-0141-2023-12-12">Version 0.14.1 — 2023-12-12</h2>
+<ul>
+<li>Fix hard-coded part in KML import (bug introduced in 0.14.0).</li>
+</ul>
+<h2 id="version-0140-2023-12-12">Version 0.14.0 — 2023-12-12</h2>
+<ul>
+<li>Do more calculations eagerly at startup such that the webserver is more responsive. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/58">GH-58</a></li>
+<li>Allow setting host and port via the command line. <a href="https://github.com/martin-ueding/geo-activity-playground/pull/61">GH-61</a></li>
+<li>Re-add download of explored tiles in area. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/63">GH-63</a></li>
+<li>Unify time handling, use UTC for all internal representations. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/52">GH-52</a></li>
+<li>Add some sort of KML support that at least works for KML exported by Viking. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/62">GH-62</a></li>
+</ul>
+<h2 id="version-0130-2023-12-10">Version 0.13.0 — 2023-12-10</h2>
+<ul>
+<li>Revamp heatmap, use interpolated lines to provide a good experience even at high zoom levels.</li>
+<li>This also fixes the gaps that were present before. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/34">GH-34</a></li>
+<li>Add cache migration functionality.</li>
+<li>Make sure that cache directory is created beforehand. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/55">GH-55</a></li>
+<li>Split tracks into segments based on gaps of 30 seconds in the time data. That helps with interpolation across long distances when one has paused the recording. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/47">GH-47</a></li>
+<li>Fix introduced bug. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/56">GH-56</a></li>
+<li>Add cache to heatmap such that it doesn't need to render all activities and only add new activities as needed.</li>
+<li>Add a footer. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/49">GH-49</a></li>
+<li>Only export missing tiles in the active viewport. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/53">GH-53</a></li>
+<li>Add missing dependency to SciKit Learn again; I was too eager to remove that. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/59">GH-59</a></li>
+</ul>
+<h2 id="version-0120-2023-12-07">Version 0.12.0 — 2023-12-07</h2>
+<ul>
+<li>Change coloring of clusters, have a color per cluster. Also mark the square just as an overlay.</li>
+<li>Fix bug with explorer tile page when the maximum cluster or square is just 1. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/51">GH-51</a></li>
+<li>Speed up the computation of the latest tiles.</li>
+</ul>
+<h2 id="version-0110-2023-12-03">Version 0.11.0 — 2023-12-03</h2>
+<ul>
+<li>Add last activity in tile to the tooltip. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/35">GH-35</a></li>
+<li>Add explorer coloring mode by last activity. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/45">GH-45</a></li>
+<li>Actually implement <code>Activity/{Kind}/{Equipment}/{Name}.{Format}</code> directory structure.</li>
+<li>Document configuration file.</li>
+<li>Interpolate tracks to find more explorer tiles. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/27">GH-27</a></li>
+<li>Fix bug that occurs when activities have no distance information.</li>
+<li>Show time evolution of the number of explorer tiles, the largest cluster and the square size. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/33">GH-33</a></li>
+<li>Center map view on biggest explorer cluster.</li>
+<li>Show speed distribution. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/42">GH-42</a></li>
+</ul>
+<h2 id="version-0100-2023-11-27">Version 0.10.0 — 2023-11-27</h2>
+<ul>
+<li>Use a grayscale map for the explorer tile maps. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/38">GH-38</a></li>
+<li>Explicitly write “0 km” in calendar cells where there are no activities. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/39">GH-39</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/pull/40">GH-40</a></li>
+</ul>
+<h2 id="version-090-2023-11-26">Version 0.9.0 — 2023-11-26</h2>
+<ul>
+<li>Certain exceptions are not skipped when parsing files. This way one can gather all errors at the end. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/29">GH-29</a></li>
+<li>Support TCX files. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/8">GH-8</a></li>
+<li>Fix equipment view when using the directory source. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/25">GH-25</a></li>
+<li>Fix links from the explorer tiles to the first activity that explored them. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/30">GH-30</a></li>
+<li>Fix how the API response from Strava is handled during the initial token exchange. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/37">GH-37</a></li>
+</ul>
+<h2 id="version-083-2023-11-26">Version 0.8.3 — 2023-11-26</h2>
+<ul>
+<li>Only compute the explorer tile cluster size if there are cluster tiles. Otherwise the DBSCAN algorithm doesn't work anyway. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/24">GH-24</a></li>
+<li>Remove allocation of huge array. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/23">GH-23</a></li>
+</ul>
+<h2 id="version-082-2023-11-26">Version 0.8.2 — 2023-11-26</h2>
+<ul>
+<li>Some FIT files apparently have entries with explicit latitude/longitude values, but those are null. I've added a check which skips those points.</li>
+</ul>
+<h2 id="version-081-2023-11-26">Version 0.8.1 — 2023-11-26</h2>
+<ul>
+<li>Fix reading of FIT files from Wahoo hardware by reading them in binary mode. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/20">GH-20</a>.</li>
+<li>Fix divide-by-zero error in speed calculation. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/21">GH-21</a></li>
+</ul>
+<h2 id="version-080-2023-11-26">Version 0.8.0 — 2023-11-26</h2>
+<ul>
+<li>Make heart rate zone computation a bit more flexibly by offering a lower bound for the resting heart rate.</li>
+<li>Open explorer map centered around median tile.</li>
+<li>Compute explorer cluster and square size, print that. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/2">GH-2</a></li>
+<li>Make it compatible with Python versions from 3.9 to 3.11 such that more people can use it. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/22">GH-22</a></li>
+</ul>
+<h2 id="version-070-2023-11-24">Version 0.7.0 — 2023-11-24</h2>
+<ul>
+<li>Add <em>Squadratinhos</em>, which are explorer tiles at zoom 17 instead of zoom 14.</li>
+<li>Reduce memory footprint for explorer tile computation.</li>
+</ul>
+<h2 id="version-060-2023-11-24">Version 0.6.0 — 2023-11-24</h2>
+<ul>
+<li>Interactive map for each activity.</li>
+<li>Color explorer tiles in red, green and blue. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/2">GH-2</a></li>
+<li>Directly serve GeoJSON and Vega JSON embedded in the document.</li>
+<li>Automatically detect which source is to be used. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/16">GH-16</a></li>
+<li>Fix the name of the script to be <code>geo-activity-playground</code> and not just <code>geo-playground</code>. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/11">GH-11</a></li>
+<li>Add mini maps to the landing page. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/9">GH-9</a></li>
+<li>Add fullscreen button to the maps. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/4">GH-4</a></li>
+<li>Add favicon. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/19">GH-19</a></li>
+<li>Added some more clever caching to the explorer tiles such that loading the page with explorer tiles comes up in just a few seconds.</li>
+<li>Add a triplet of time series plots (distance, altitude, heart rate) for each activity.</li>
+<li>Show plot for heart rate zones per activity. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/12">GH-12</a></li>
+<li>Handle activities without any location points. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/10">GH-10</a></li>
+<li>Resolve Strava Gear name. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/18">GH-18</a></li>
+<li>Add page for equipment. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/3">GH-3</a></li>
+<li>Add a pop-up with some metadata about the first visit to the explorer tiles. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/14">GH-14</a></li>
+<li>Integrate missing explorer tiles into the web interface. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/7">GH-7</a>.</li>
+<li>Color activity line with speed. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/13">GH-13</a></li>
+<li>Add interactive heatmap.</li>
+<li>Add margin to generated heatmaps. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/1">GH-1</a></li>
+</ul>
+<h2 id="version-050-2023-11-15">Version 0.5.0 — 2023-11-15</h2>
+<ul>
+<li>Add some plots for the Eddington number. <a href="https://github.com/martin-ueding/geo-activity-playground/issues/3">GH-3</a></li>
+</ul>
+<h2 id="version-040-2023-11-10">Version 0.4.0 — 2023-11-10</h2>
+<ul>
+<li>Add some more plots.</li>
+</ul>
+<h2 id="version-030-2023-11-10">Version 0.3.0 — 2023-11-10</h2>
+<ul>
+<li>Start to build web interface with Flask.</li>
+<li>Remove tqdm progress bars and use colorful logging instead.</li>
+<li>Add interactive explorer tile map.</li>
+</ul>
+<h2 id="version-020-2023-11-05">Version 0.2.0 — 2023-11-05</h2>
+<ul>
+<li>Unity command line entrypoint.</li>
+<li>Crop heatmaps to fit.</li>
+<li>Export missing tiles as GeoJSON.</li>
+<li>Add Strava API.</li>
+<li>Add directory source.</li>
+</ul>
+<h2 id="version-013-2023-07-28">Version 0.1.3 — 2023-07-28</h2>
+<ul>
+<li>Generate some heatmap images.</li>
+<li>Generate an explorer tile video.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+    
+  </body>
+</html>
