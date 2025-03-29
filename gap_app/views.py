@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.edit import FormView
@@ -52,26 +53,28 @@ def _import_activity_file(request: HttpRequest, f: UploadedFile) -> None:
                 tmp_file.write(chunk)
 
         activity_meta, timeseries = read_activity(upload_path)
-        timeseries = _embellish_single_time_series(timeseries, None, 0)
-        activity_meta.update(_get_metadata_from_timeseries(timeseries))
 
-        activity = Activity(
-            owner=request.user,
-            name=original_name,
-            start=activity_meta.get("start", None),
-            distance_km=activity_meta.get("distance_km", 0.0),
-            elapsed_time=activity_meta.get("elapsed_time", None),
-            moving_time=activity_meta.get("moving_time", None),
-            start_latitude=activity_meta.get("start_latitude", None),
-            start_longitude=activity_meta.get("start_longitude", None),
-            end_latitude=activity_meta.get("end_latitude", None),
-            end_longitude=activity_meta.get("end_longitude", None),
-            calories=activity_meta.get("calories", None),
-            steps=activity_meta.get("steps", None),
-            elevation_gain=activity_meta.get("elevation_gain", None),
-        )
-        activity.save()
-        timeseries.to_parquet(activity.timeseries_path)
+    timeseries = _embellish_single_time_series(timeseries, None, 0)
+    activity_meta.update(_get_metadata_from_timeseries(timeseries))
+
+    activity = Activity(
+        owner=request.user,
+        name=original_name,
+        start=activity_meta.get("start", None),
+        distance_km=activity_meta.get("distance_km", 0.0),
+        elapsed_time=activity_meta.get("elapsed_time", None),
+        moving_time=activity_meta.get("moving_time", None),
+        start_latitude=activity_meta.get("start_latitude", None),
+        start_longitude=activity_meta.get("start_longitude", None),
+        end_latitude=activity_meta.get("end_latitude", None),
+        end_longitude=activity_meta.get("end_longitude", None),
+        calories=activity_meta.get("calories", None),
+        steps=activity_meta.get("steps", None),
+        elevation_gain=activity_meta.get("elevation_gain", None),
+    )
+    activity.save()
+    timeseries.to_parquet(activity.timeseries_path)
+    return activity.id
 
 
 @login_required
@@ -79,7 +82,8 @@ def activity_upload(request: HttpRequest):
     if request.method == "POST":
         form = ActivityUploadForm(request.user, request.POST, request.FILES)
         if form.is_valid():
-            _import_activity_file(request, request.FILES["file"])
+            activity_id = _import_activity_file(request, request.FILES["file"])
+            return redirect("activity-view", activity_id=activity_id)
     else:
         form = ActivityUploadForm(request.user)
 
