@@ -44,12 +44,12 @@ nav:
     - using-git-version-via-docker-compose-and-tailscale-vpn.md
   - Reference:
     - advanced-metadata-extraction.md
-    - changelog.md
   - Explanation:
     - explorer-tiles.md
     - eddington-number.md
     - heart-rate-zones.md
   - acknowledgments.md
+  - changelog.md
 
 markdown_extensions:
   - pymdownx.highlight
