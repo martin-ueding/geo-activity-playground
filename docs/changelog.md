@@ -18,6 +18,12 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Changed:
+
+- Add warning emoji (⚠️) to changelog to inform of breaking changes.
+
 ## Version 0.38.2 — 2025-03-29
 
 Added:
@@ -26,7 +32,7 @@ Added:
 
 Changed:
 
-- **Branch rename**: `master` is renamed to `main`.
+- ⚠️ `master` is renamed to `main`.
 - Format changelog according to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Restructure the documentation such that it hopefully is more inviting for new users.
 - Share picture now scales with viewport. ([GH-232](https://github.com/martin-ueding/geo-activity-playground/issues/232))
@@ -467,7 +473,7 @@ Added:
 
 Changed:
 
-- **Breaking change:** New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the documentation on activity files for the new way.
+- ⚠️ New way to extract metadata from paths and filenames. This uses regular expressions and is more versatile than the heuristic before. If you have used `prefer_metadata_from_file` before, see the documentation on activity files for the new way.
 - Ignore similar activities that have vanished. ([GH-105](https://github.com/martin-ueding/geo-activity-playground/issues/105))
 - Be more strict when identifying jumps in activities. Take 30 s and 100 m distance as criterion now. ([GH-106](https://github.com/martin-ueding/geo-activity-playground/issues/106))
 - Better error message when trying to start up without any activity files. ([GH-109](https://github.com/martin-ueding/geo-activity-playground/issues/109))
