@@ -33,5 +33,5 @@ If you get an error that reads like “command not found”, then you need to [a
 At some later point you likely want to upgrade to the latest version. For this use the following command:
 
 ```bash
-pipx upgrade geo-activity-playground
+pipx upgrade --pip-args "--upgrade-strategy eager" geo-activity-playground
 ```
