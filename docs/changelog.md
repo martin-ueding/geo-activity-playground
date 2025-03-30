@@ -22,6 +22,7 @@ Types of changes
 
 Changed:
 
+- Make all tables responsive. ([GH-233](https://github.com/martin-ueding/geo-activity-playground/issues/233))
 - Add warning emoji (⚠️) to changelog to inform of breaking changes.
 
 ## Version 0.38.2 — 2025-03-29
