@@ -24,6 +24,7 @@ nav:
   - Installation:
     - install-on-linux.md
     - install-on-windows.md
+    - install-on-macos.md
     - add-local-bin-to-path.md
   - create-a-base-directory.md
   - starting-the-webserver.md
