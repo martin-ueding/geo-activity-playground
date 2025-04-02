@@ -20,6 +20,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add installation instructions for macOS.
+
 Changed:
 
 - Make all tables responsive. ([GH-233](https://github.com/martin-ueding/geo-activity-playground/issues/233))
