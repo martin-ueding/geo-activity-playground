@@ -13,7 +13,7 @@ from geo_activity_playground.webui.search_util import search_query_from_form
 from geo_activity_playground.webui.search_util import SearchQueryHistory
 
 
-def make_eddington_blueprint(
+def make_elevation_eddington_blueprint(
     repository: ActivityRepository, search_query_history: SearchQueryHistory
 ) -> Blueprint:
     blueprint = Blueprint("elevation_eddington", __name__, template_folder="templates")
@@ -96,7 +96,7 @@ def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> 
                     eddington_df,
                     height=500,
                     width=800,
-                    title=f"Eddington Number {en}",
+                    title=f"Elevation Eddington Number {en}",
                 )
                 .mark_area(interpolate="step")
                 .encode(

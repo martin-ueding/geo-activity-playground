@@ -21,6 +21,7 @@ from .authenticator import Authenticator
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
+from .elevation_eddington_blueprint import make_elevation_eddington_blueprint
 from .entry_controller import EntryController
 from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
@@ -105,6 +106,10 @@ def web_ui_main(
         make_eddington_blueprint(repository, search_query_history),
         url_prefix="/eddington",
     )
+    app.register_blueprint(
+        make_elevation_eddington_blueprint(repository, search_query_history),
+        url_prefix="/elevation-eddington",
+    )    
     app.register_blueprint(
         make_equipment_blueprint(repository, config), url_prefix="/equipment"
     )
