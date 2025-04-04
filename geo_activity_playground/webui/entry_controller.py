@@ -23,6 +23,9 @@ class EntryController:
             result["distance_last_30_days_plot"] = distance_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
+            result["elevation_gain_last_30_days_plot"] = elevation_gain_last_30_days_meta_plot(
+                self._repository.meta, kind_scale
+            )
 
         for activity in itertools.islice(
             self._repository.iter_activities(dropna=True), 15
@@ -57,6 +60,31 @@ def distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip("sum(distance_km)", format=".1f", title="Distance / km"),
+            ],
+        )
+        .to_json(format="vega")
+    )
+
+def elevation_gain_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+    before_30_days = pd.to_datetime(
+        datetime.datetime.now() - datetime.timedelta(days=31)
+    )
+    return (
+        alt.Chart(
+            meta.loc[meta["start"] > before_30_days],
+            width=700,
+            height=200,
+            title="Elevation gain per day",
+        )
+        .mark_bar()
+        .encode(
+            alt.X("yearmonthdate(start)", title="Date"),
+            alt.Y("sum(elevation_gain)", title="Elevation gain / m"),
+            alt.Color("kind", scale=kind_scale, title="Kind"),
+            [
+                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("sum(elevation_gain)", format=".0f", title="Elevation gain / "),
             ],
         )
         .to_json(format="vega")

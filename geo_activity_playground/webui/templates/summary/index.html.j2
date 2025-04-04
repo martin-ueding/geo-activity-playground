@@ -228,7 +228,7 @@
                 </ul>
                 </p>
                 <p class="card-text"><small class="text-body-secondary"></small>{{ activity.kind }} with {{
-                    (activity.distance_km)|round(1) }} km in {{
+                    (activity.distance_km)|round(1) }} km / {{activity.elevation_gain|round|int}} m in {{
                     activity.elapsed_time|td }} on {{ activity.start|dt }}</small></p>
             </div>
         </div>
