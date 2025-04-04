@@ -59,7 +59,7 @@ class IdentityImageTransform(ImageTransform):
 class GrayscaleImageTransform(ImageTransform):
     def transform_image(self, image: np.ndarray) -> np.ndarray:
         image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
-        image = np.dstack((image, image, image))  # to rgb
+        return np.dstack((image, image, image))  # to rgb
 
 
 class PastelImageTransform(ImageTransform):
