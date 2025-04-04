@@ -34,7 +34,7 @@ The configuration options are available within the interface such that you do no
 
 If you're new, just follow these steps:
 
-1. Install the software on [Linux](install-on-linux.md) or [Windows](install-on-windows.md).
+1. Install the software on [Linux](install-on-linux.md), [Windows](install-on-windows.md) or [macOS](install-on-macos.md).
 2. [Create a base directory](create-a-base-directory.md).
 3. [Start the webserver](starting-the-webserver.md).
 4. Choose a method to [record activities](record-activities.md).

@@ -1,9 +1,5 @@
 # Changelog
 
-<!-- 
-- ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
--->
-
 This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -16,9 +12,16 @@ Types of changes
     *Removed* for now removed features.
     *Fixed* for any bug fixes.
     *Security* in case of vulnerabilities.
+
+([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
 ## Unreleased
+
+Added:
+
+- Add installation instructions for macOS. ([GH-235](https://github.com/martin-ueding/geo-activity-playground/issues/235))
+- Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 
 Changed:
 
