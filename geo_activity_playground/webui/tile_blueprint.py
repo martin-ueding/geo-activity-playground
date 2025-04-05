@@ -29,5 +29,5 @@ class TileView:
 
     def register(self, app: Flask, name: str):
         app.add_url_rule(
-            f"/{name}/<scheme>/<int:z>/<int:x>/<int:y>.png", "name", self.dispatch
+            f"/{name}/<scheme>/<int:z>/<int:x>/<int:y>.png", name, self.dispatch
         )
