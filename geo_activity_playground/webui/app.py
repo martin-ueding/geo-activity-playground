@@ -30,8 +30,8 @@ from .search_blueprint import make_search_blueprint
 from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
-from .tile_blueprint import make_tile_blueprint
 from .tile_blueprint import register_tile_routes
+from .tile_blueprint import TileGetter
 from .upload_blueprint import make_upload_blueprint
 from geo_activity_playground.webui.search_util import SearchQueryHistory
 
@@ -145,7 +145,8 @@ def web_ui_main(
         url_prefix="/upload",
     )
 
-    register_tile_routes(app, config)
+    tile_getter = TileGetter(config.map_tile_url)
+    register_tile_routes(app, tile_getter)
 
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)

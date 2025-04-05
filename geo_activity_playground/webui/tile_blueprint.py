@@ -100,20 +100,19 @@ class TileView(View):
         return Response(bytes(f.getbuffer()), mimetype="image/png")
 
 
-def register_tile_routes(app: Flask, config: Config):
-    tile_getter = TileGetter(config.map_tile_url)
-
+def register_tile_routes(app: Flask, tile_getter: TileGetter):
     app.add_url_rule(
         "/tile/color/<int:z>/<int:x>/<int:y>.png",
-        view_func=TileView.as_view("tile_color", IdentityImageTransform(), tile_getter),
+        "tile_color",
+        TileView(IdentityImageTransform(), tile_getter).dispatch_request,
     )
     app.add_url_rule(
         "/tile/grayscale/<int:z>/<int:x>/<int:y>.png",
-        view_func=TileView.as_view(
-            "tile_grayscale", GrayscaleImageTransform(), tile_getter
-        ),
+        "tile_grayscale",
+        TileView(GrayscaleImageTransform(), tile_getter).dispatch_request,
     )
     app.add_url_rule(
         "/tile/pastel/<int:z>/<int:x>/<int:y>.png",
-        view_func=TileView.as_view("tile_pastel", PastelImageTransform(), tile_getter),
+        "tile_pastel",
+        TileView(PastelImageTransform(), tile_getter).dispatch_request,
     )
