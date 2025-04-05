@@ -7,11 +7,9 @@ import shutil
 import urllib.parse
 
 from flask import Flask
-from flask import render_template
 from flask import request
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
 from ..core.config import ConfigAccessor
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
@@ -25,7 +23,7 @@ from .authenticator import Authenticator
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
-from .entry_controller import EntryController
+from .entry_controller import EntryView
 from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
@@ -37,14 +35,7 @@ from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import TileView
 from .upload_blueprint import make_upload_blueprint
-
-
-def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
-    entry_controller = EntryController(repository, config)
-
-    @app.route("/")
-    def index():
-        return render_template("home.html.j2", **entry_controller.render())
+from geo_activity_playground.webui.interfaces import MyView
 
 
 def get_secret_key():
@@ -86,24 +77,25 @@ def web_ui_main(
 
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
-
     config = config_accessor()
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
     )
-
     tile_getter = TileGetter(config.map_tile_url)
     image_transforms = {
         "color": IdentityImageTransform(),
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
     }
-    tile_view = TileView(image_transforms, tile_getter)
-    tile_view.register(app, "tile")
+    views: list[MyView] = [
+        EntryView(repository, config),
+        TileView(image_transforms, tile_getter),
+    ]
 
-    route_start(app, repository, config_accessor())
+    for view in views:
+        view.register(app)
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
     app.register_blueprint(
