@@ -144,8 +144,6 @@ def web_ui_main(
         make_summary_blueprint(repository, config, search_query_history),
         url_prefix="/summary",
     )
-
-    # app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator
