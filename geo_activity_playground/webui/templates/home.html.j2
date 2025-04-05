@@ -13,11 +13,6 @@
 </div>
 
 
-<div class="row mb-3">
-    <div class="col">
-        <h2>Latest activities</h2>
-    </div>
-</div>
 
 <script>
     function add_map(id, geojson) {
@@ -35,7 +30,13 @@
     }
 </script>
 
-{% for activity_batch in latest_activities|batch(3) %}
+<h2>Latest activities</h2>
+
+{% for year, year_data in latest_activities.items() %}
+<h3>Year {{ year }}</h3>
+{% for week, week_data in year_data.items() %}
+<h4>Week {{ week }}</h4>
+{% for activity_batch in week_data|batch(3) %}
 <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
     {% for elem in activity_batch %}
     <div class="col">
@@ -56,6 +57,8 @@
     </div>
     {% endfor %}
 </div>
+{% endfor %}
+{% endfor %}
 {% endfor %}
 {% else %}
 <p>You don't have activities yet. Either put some files into a directory <tt>Activities</tt>, <a

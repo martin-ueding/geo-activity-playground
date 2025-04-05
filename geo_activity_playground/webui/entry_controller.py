@@ -1,3 +1,4 @@
+import collections
 import datetime
 import itertools
 
@@ -26,24 +27,34 @@ class EntryView(MyView):
 
         if len(self._repository):
             kind_scale = make_kind_scale(self._repository.meta, self._config)
-            context["distance_last_30_days_plot"] = distance_last_30_days_meta_plot(
+            context["distance_last_30_days_plot"] = _distance_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
 
-        for activity in itertools.islice(
-            self._repository.iter_activities(dropna=True), 15
-        ):
-            time_series = self._repository.get_time_series(activity["id"])
-            context["latest_activities"].append(
-                {
-                    "line_geojson": make_geojson_from_time_series(time_series),
-                    "activity": activity,
-                }
-            )
+        meta = self._repository.meta.copy()
+        isocalendar = meta["start"].dt.isocalendar()
+        meta["isoyear"] = isocalendar["year"]
+        meta["isoweek"] = isocalendar["week"]
+        print(meta)
+
+        context["latest_activities"] = collections.defaultdict(
+            lambda: collections.defaultdict(list)
+        )
+        for (year, week), activity_meta in list(meta.groupby(["isoyear", "isoweek"]))[
+            :-5:-1
+        ]:
+            for index, activity in activity_meta.iterrows():
+                time_series = self._repository.get_time_series(activity["id"])
+                context["latest_activities"][year][week].append(
+                    {
+                        "activity": activity,
+                        "line_geojson": make_geojson_from_time_series(time_series),
+                    }
+                )
         return render_template("home.html.j2", **context)
 
 
-def distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def _distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.now() - datetime.timedelta(days=31)
     )
