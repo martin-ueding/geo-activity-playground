@@ -1,4 +1,3 @@
-import collections
 import dataclasses
 import functools
 import logging
@@ -12,7 +11,6 @@ from PIL import Image
 
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.tiles import compute_tile_float
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 
 
 logger = logging.getLogger(__name__)
