@@ -29,6 +29,7 @@ Changed:
 - Add warning emoji (⚠️) to changelog to inform of breaking changes.
 - Suggest to upgrade with `--pip-args "--upgrade-strategy eager"` to get the latest versions of dependencies as well.
 - Make arrows in square planner look consistent on Windows. ([GH-237](https://github.com/martin-ueding/geo-activity-playground/issues/237))
+- Display activities from the past five weeks on the landing page.
 
 ## Version 0.38.2 — 2025-03-29
 
