@@ -13,6 +13,7 @@ from flask import request
 from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.config import ConfigAccessor
+from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity.blueprint import make_activity_blueprint
 from .activity.controller import ActivityController
@@ -31,7 +32,6 @@ from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import register_tile_routes
-from .tile_blueprint import TileGetter
 from .upload_blueprint import make_upload_blueprint
 from geo_activity_playground.webui.search_util import SearchQueryHistory
 

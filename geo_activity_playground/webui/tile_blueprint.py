@@ -10,6 +10,7 @@ from flask.views import View
 
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.raster_map import get_tile
+from geo_activity_playground.core.raster_map import TileGetter
 
 
 def make_tile_blueprint(config: Config) -> Blueprint:
@@ -70,19 +71,6 @@ class PastelImageTransform(ImageTransform):
         averaged_tile = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
         grayscale_tile = np.dstack((averaged_tile, averaged_tile, averaged_tile))
         return self._factor * grayscale_tile + (1 - self._factor) * image
-
-
-class TileGetter:
-    def __init__(self, map_tile_url: str):
-        self._map_tile_url = map_tile_url
-
-    def get_tile(
-        self,
-        z: int,
-        x: int,
-        y: int,
-    ):
-        return get_tile(z, x, y, self._map_tile_url)
 
 
 class TileView(View):

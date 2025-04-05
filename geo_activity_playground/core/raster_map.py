@@ -244,3 +244,16 @@ def download_file(url: str, destination: pathlib.Path):
     with open(destination, "wb") as f:
         f.write(r.content)
     time.sleep(0.1)
+
+
+class TileGetter:
+    def __init__(self, map_tile_url: str):
+        self._map_tile_url = map_tile_url
+
+    def get_tile(
+        self,
+        z: int,
+        x: int,
+        y: int,
+    ):
+        return get_tile(z, x, y, self._map_tile_url)
