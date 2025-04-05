@@ -32,20 +32,13 @@ class EntryView(MyView):
             )
 
         meta = self._repository.meta.copy()
-        isocalendar = meta["start"].dt.isocalendar()
-        meta["isoyear"] = isocalendar["year"]
-        meta["isoweek"] = isocalendar["week"]
-        print(meta)
+        meta["date"] = meta["start"].dt.date
 
-        context["latest_activities"] = collections.defaultdict(
-            lambda: collections.defaultdict(list)
-        )
-        for (year, week), activity_meta in list(meta.groupby(["isoyear", "isoweek"]))[
-            :-5:-1
-        ]:
+        context["latest_activities"] = collections.defaultdict(list)
+        for date, activity_meta in list(meta.groupby("date"))[:-30:-1]:
             for index, activity in activity_meta.iterrows():
                 time_series = self._repository.get_time_series(activity["id"])
-                context["latest_activities"][year][week].append(
+                context["latest_activities"][date].append(
                     {
                         "activity": activity,
                         "line_geojson": make_geojson_from_time_series(time_series),
