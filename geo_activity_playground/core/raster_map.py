@@ -1,3 +1,4 @@
+import abc
 import dataclasses
 import functools
 import logging
@@ -255,3 +256,30 @@ class TileGetter:
         y: int,
     ):
         return get_tile(z, x, y, self._map_tile_url)
+
+
+class ImageTransform:
+    @abc.abstractmethod
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        pass
+
+
+class IdentityImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        return image
+
+
+class GrayscaleImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
+        return np.dstack((image, image, image))  # to rgb
+
+
+class PastelImageTransform(ImageTransform):
+    def __init__(self, factor: float = 0.7):
+        self._factor = factor
+
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        averaged_tile = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
+        grayscale_tile = np.dstack((averaged_tile, averaged_tile, averaged_tile))
+        return self._factor * grayscale_tile + (1 - self._factor) * image
