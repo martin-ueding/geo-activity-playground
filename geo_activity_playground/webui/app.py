@@ -13,6 +13,9 @@ from flask import request
 from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.config import ConfigAccessor
+from ..core.raster_map import GrayscaleImageTransform
+from ..core.raster_map import IdentityImageTransform
+from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity.blueprint import make_activity_blueprint
@@ -28,12 +31,12 @@ from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .heatmap.blueprint import make_heatmap_blueprint
 from .search_blueprint import make_search_blueprint
+from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
-from .tile_blueprint import register_tile_routes
+from .tile_blueprint import TileView
 from .upload_blueprint import make_upload_blueprint
-from geo_activity_playground.webui.search_util import SearchQueryHistory
 
 
 def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
@@ -91,6 +94,15 @@ def web_ui_main(
         repository, tile_visit_accessor, config_accessor
     )
 
+    tile_getter = TileGetter(config.map_tile_url)
+    image_transforms = {
+        "color": IdentityImageTransform(),
+        "grayscale": GrayscaleImageTransform(),
+        "pastel": PastelImageTransform(),
+    }
+    tile_view = TileView(image_transforms, tile_getter)
+    tile_view.register(app, "tile")
+
     route_start(app, repository, config_accessor())
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
@@ -144,9 +156,6 @@ def web_ui_main(
         ),
         url_prefix="/upload",
     )
-
-    tile_getter = TileGetter(config.map_tile_url)
-    register_tile_routes(app, tile_getter)
 
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)
