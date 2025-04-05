@@ -27,16 +27,6 @@ class SettingsController:
     def __init__(self, config_accessor: ConfigAccessor) -> None:
         self._config_accessor = config_accessor
 
-    def render_admin_password(self) -> dict:
-        return {
-            "password": self._config_accessor().upload_password,
-        }
-
-    def save_admin_password(self, password: str) -> None:
-        self._config_accessor().upload_password = password
-        self._config_accessor.save()
-        flash("Updated admin password.", category="success")
-
     def render_equipment_offsets(self) -> dict:
         return {
             "equipment_offsets": self._config_accessor().equipment_offsets,

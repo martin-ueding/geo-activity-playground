@@ -35,7 +35,9 @@ from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import TileView
 from .upload_blueprint import make_upload_blueprint
+from geo_activity_playground.webui.flasher import FlaskFlasher
 from geo_activity_playground.webui.interfaces import MyView
+from geo_activity_playground.webui.views.settings_views import SettingsAdminPasswordView
 
 
 def get_secret_key():
@@ -89,8 +91,10 @@ def web_ui_main(
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
     }
+    flasher = FlaskFlasher()
     views: list[MyView] = [
         EntryView(repository, config),
+        SettingsAdminPasswordView(authenticator, config_accessor, flasher),
         TileView(image_transforms, tile_getter),
     ]
 
