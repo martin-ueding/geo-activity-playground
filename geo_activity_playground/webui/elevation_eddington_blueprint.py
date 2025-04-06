@@ -1,4 +1,5 @@
 import datetime
+from math import ceil
 
 import altair as alt
 import numpy as np
@@ -36,24 +37,24 @@ def make_elevation_eddington_blueprint(
         activities["isoweek"] = [
             start.isocalendar().week for start in activities["start"]
         ]
-        divisor = int(request.args.get('elevation_eddington_divisor') or 20)
-            
+        divisor = int(request.args.get("elevation_eddington_divisor") or 20)
+
         en_per_day, eddington_df_per_day = _get_elevation_gain_per_group(
-            activities.groupby("date")
+            activities.groupby("date"), divisor
         )
         en_per_week, eddington_df_per_week = _get_elevation_gain_per_group(
-            activities.groupby(["isoyear", "isoweek"])
+            activities.groupby(["isoyear", "isoweek"]), divisor
         )
 
         return render_template(
             "elevation_eddington/index.html.j2",
             eddington_number=en_per_day,
             logarithmic_plot=_make_eddington_plot(
-                eddington_df_per_day, en_per_day, "Days"
+                eddington_df_per_day, en_per_day, "Days", divisor
             ),
             eddington_per_week=en_per_week,
             eddington_per_week_plot=_make_eddington_plot(
-                eddington_df_per_week, en_per_week, "Weeks"
+                eddington_df_per_week, en_per_week, "Weeks", divisor
             ),
             eddington_table=eddington_df_per_day.loc[
                 (eddington_df_per_day["elevation_gain"] > en_per_day)
@@ -64,16 +65,18 @@ def make_elevation_eddington_blueprint(
                 & (eddington_df_per_week["elevation_gain"] <= en_per_week + 10)
             ].to_dict(orient="records"),
             query=query.to_jinja(),
-            yearly_eddington=_get_yearly_eddington(activities),
-            eddington_number_history_plot=_get_eddington_number_history(activities),
+            yearly_eddington=_get_yearly_eddington(activities, divisor),
+            eddington_number_history_plot=_get_eddington_number_history(
+                activities, divisor
+            ),
             elevation_eddington_divisor=divisor,
-            divisor_values_avail=[20,10,1],
+            divisor_values_avail=[20, 10, 1],
         )
 
     return blueprint
 
 
-def _get_elevation_gain_per_group(grouped) -> tuple[int, pd.DataFrame]:
+def _get_elevation_gain_per_group(grouped, divisor) -> tuple[int, pd.DataFrame]:
     sum_per_group = grouped.apply(
         lambda group: int(sum(group["elevation_gain"])), include_groups=False
     )
@@ -83,15 +86,20 @@ def _get_elevation_gain_per_group(grouped) -> tuple[int, pd.DataFrame]:
         for d in range(max(counts.keys()) + 1)
     )
     eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
-    en = eddington.loc[eddington["total"] >= eddington["elevation_gain"]][
+    eddington["elevation_gain_div"] = eddington["elevation_gain"] // divisor
+    en = eddington.loc[eddington["total"] >= eddington["elevation_gain_div"]][
         "elevation_gain"
     ].iloc[-1]
-    eddington["missing"] = eddington["elevation_gain"] - eddington["total"]
+    eddington["missing"] = eddington["elevation_gain_div"] - eddington["total"]
+
     return en, eddington
 
 
-def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> dict:
+def _make_eddington_plot(
+    eddington_df: pd.DataFrame, en: int, interval: str, divisor: int
+) -> dict:
     x = list(range(1, max(eddington_df["elevation_gain"]) + 1))
+    y = [v / divisor for v in x]
     return (
         (
             (
@@ -121,7 +129,7 @@ def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> 
                 )
             )
             + (
-                alt.Chart(pd.DataFrame({"elevation_gain": x, "total": x}))
+                alt.Chart(pd.DataFrame({"elevation_gain": x, "total": y}))
                 .mark_line(color="red")
                 .encode(alt.X("elevation_gain"), alt.Y("total"))
             )
@@ -131,20 +139,20 @@ def _make_eddington_plot(eddington_df: pd.DataFrame, en: int, interval: str) -> 
     )
 
 
-def _get_eddington_number(distances: pd.Series) -> int:
-    if len(distances) == 1:
-        if distances.iloc[0] >= 1:
+def _get_eddington_number(elevation_gains: pd.Series, divisor: int) -> int:
+    if len(elevation_gains) == 1:
+        if elevation_gains.iloc[0] >= 1:
             return 1
         else:
             0
 
-    sorted_distances = sorted(distances, reverse=True)
-    for en, distance in enumerate(sorted_distances, 1):
-        if distance < en:
+    sorted_elevation_gains = sorted(elevation_gains, reverse=True)
+    for en, elevation_gain in enumerate(sorted_elevation_gains, 1):
+        if elevation_gain < en:
             return en - 1
 
 
-def _get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
+def _get_yearly_eddington(meta: pd.DataFrame, divisor: int) -> dict[int, int]:
     meta = meta.dropna(subset=["start", "elevation_gain"]).copy()
     meta["year"] = [start.year for start in meta["start"]]
     meta["date"] = [start.date() for start in meta["start"]]
@@ -153,14 +161,15 @@ def _get_yearly_eddington(meta: pd.DataFrame) -> dict[int, int]:
         lambda group: _get_eddington_number(
             group.groupby("date").apply(
                 lambda group2: int(group2["elevation_gain"].sum()), include_groups=False
-            )
+            ),
+            divisor,
         ),
         include_groups=False,
     )
     return yearly_eddington.to_dict()
 
 
-def _get_eddington_number_history(meta: pd.DataFrame) -> dict:
+def _get_eddington_number_history(meta: pd.DataFrame, divisor: int) -> dict:
 
     daily_distances = meta.groupby("date").apply(
         lambda group2: int(group2["elevation_gain"].sum()), include_groups=False
