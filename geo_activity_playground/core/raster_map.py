@@ -1,4 +1,4 @@
-import collections
+import abc
 import dataclasses
 import functools
 import logging
@@ -12,7 +12,6 @@ from PIL import Image
 
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.tiles import compute_tile_float
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
 
 
 logger = logging.getLogger(__name__)
@@ -244,3 +243,43 @@ def download_file(url: str, destination: pathlib.Path):
     with open(destination, "wb") as f:
         f.write(r.content)
     time.sleep(0.1)
+
+
+class TileGetter:
+    def __init__(self, map_tile_url: str):
+        self._map_tile_url = map_tile_url
+
+    def get_tile(
+        self,
+        z: int,
+        x: int,
+        y: int,
+    ):
+        return get_tile(z, x, y, self._map_tile_url)
+
+
+class ImageTransform:
+    @abc.abstractmethod
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        pass
+
+
+class IdentityImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        return image
+
+
+class GrayscaleImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
+        return np.dstack((image, image, image))  # to rgb
+
+
+class PastelImageTransform(ImageTransform):
+    def __init__(self, factor: float = 0.7):
+        self._factor = factor
+
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        averaged_tile = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
+        grayscale_tile = np.dstack((averaged_tile, averaged_tile, averaged_tile))
+        return self._factor * grayscale_tile + (1 - self._factor) * image
