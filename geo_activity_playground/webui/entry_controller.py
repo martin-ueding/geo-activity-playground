@@ -30,7 +30,7 @@ class EntryView(MyView):
             context["distance_last_30_days_plot"] = _distance_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
-            result["elevation_gain_last_30_days_plot"] = elevation_gain_last_30_days_meta_plot(
+            context["elevation_gain_last_30_days_plot"] = _elevation_gain_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
 
@@ -75,7 +75,7 @@ def _distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) 
         .to_json(format="vega")
     )
 
-def elevation_gain_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def _elevation_gain_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.now() - datetime.timedelta(days=31)
     )
