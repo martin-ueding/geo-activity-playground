@@ -36,11 +36,12 @@ def make_elevation_eddington_blueprint(
         activities["isoweek"] = [
             start.isocalendar().week for start in activities["start"]
         ]
-
-        en_per_day, eddington_df_per_day = _get_distances_per_group(
+        divisor = int(request.args.get('elevation_eddington_divisor') or 20)
+            
+        en_per_day, eddington_df_per_day = _get_elevation_gain_per_group(
             activities.groupby("date")
         )
-        en_per_week, eddington_df_per_week = _get_distances_per_group(
+        en_per_week, eddington_df_per_week = _get_elevation_gain_per_group(
             activities.groupby(["isoyear", "isoweek"])
         )
 
@@ -65,12 +66,14 @@ def make_elevation_eddington_blueprint(
             query=query.to_jinja(),
             yearly_eddington=_get_yearly_eddington(activities),
             eddington_number_history_plot=_get_eddington_number_history(activities),
+            elevation_eddington_divisor=divisor,
+            divisor_values_avail=[20,10,1],
         )
 
     return blueprint
 
 
-def _get_distances_per_group(grouped) -> tuple[int, pd.DataFrame]:
+def _get_elevation_gain_per_group(grouped) -> tuple[int, pd.DataFrame]:
     sum_per_group = grouped.apply(
         lambda group: int(sum(group["elevation_gain"])), include_groups=False
     )

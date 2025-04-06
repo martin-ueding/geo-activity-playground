@@ -10,9 +10,31 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
+        <form method="GET">
+            <div class="mb-3">
+                <label class="form-label">Divisor</label>
+                <select class="form-select" aria-label="Divisor" name="elevation_eddington_divisor" onchange="this.form.submit()">
+                    {% for dv in divisor_values_avail %}
+                    <option {% if dv==elevation_eddington_divisor %} selected {% endif %}>{{ dv }}</option>
+                    {% endfor %}
+                    {% for key, value in query.items() %}
+                        {% if value and key != "active" %}
+                            {% if value is sequence %}
+                                {% for v in value %}
+                                <input type="hidden" name="{{ key }}" value="{{ v }}"/>
+                                {% endfor %}
+                            {% else %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
         <h2>Definition</h2>
 
-        <p>Your Eddington number is <b>{{ eddington_number }}</b>.</p>
+        <p>Your Eddington number with divisor {{ elevation_eddington_divisor }} is <b>{{ eddington_number }}</b>.</p>
 
         <p>That means that on {{ eddington_number }} separate days you
             have recorded activities exceeding {{ eddington_number }} km. Going high is one thing, going often is
