@@ -147,9 +147,10 @@ def _get_eddington_number(elevation_gains: pd.Series, divisor: int) -> int:
             0
 
     sorted_elevation_gains = sorted(elevation_gains, reverse=True)
-    for en, elevation_gain in enumerate(sorted_elevation_gains, 1):
-        if elevation_gain < en:
-            return en - 1
+
+    for number_of_days, elevation_gain in enumerate(sorted_elevation_gains, 1):
+        if elevation_gain / divisor < number_of_days:
+            return (number_of_days - 1) * divisor
 
 
 def _get_yearly_eddington(meta: pd.DataFrame, divisor: int) -> dict[int, int]:
@@ -171,25 +172,26 @@ def _get_yearly_eddington(meta: pd.DataFrame, divisor: int) -> dict[int, int]:
 
 def _get_eddington_number_history(meta: pd.DataFrame, divisor: int) -> dict:
 
-    daily_distances = meta.groupby("date").apply(
+    daily_elevation_gains = meta.groupby("date").apply(
         lambda group2: int(group2["elevation_gain"].sum()), include_groups=False
     )
 
     eddington_number_history = {"date": [], "eddington_number": []}
     top_days = []
-    for date, distance in daily_distances.items():
+    for date, elevation_gain in daily_elevation_gains.items():
+        elevation_gain = elevation_gain / divisor
         if len(top_days) == 0:
-            top_days.append(distance)
+            top_days.append(elevation_gain)
         else:
-            if distance >= top_days[0]:
-                top_days.append(distance)
+            if elevation_gain >= top_days[0]:
+                top_days.append(elevation_gain)
                 top_days.sort()
         while top_days[0] < len(top_days):
             top_days.pop(0)
         eddington_number_history["date"].append(
             datetime.datetime.combine(date, datetime.datetime.min.time())
         )
-        eddington_number_history["eddington_number"].append(len(top_days))
+        eddington_number_history["eddington_number"].append(len(top_days) * divisor)
     history = pd.DataFrame(eddington_number_history)
 
     return (
