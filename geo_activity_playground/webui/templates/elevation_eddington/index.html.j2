@@ -36,8 +36,8 @@
 
         <p>Your Eddington number with divisor {{ elevation_eddington_divisor }} is <b>{{ eddington_number }}</b>.</p>
 
-        <p>That means that on {{ eddington_number }} separate days you
-            have recorded activities exceeding {{ eddington_number }} km. Going high is one thing, going often is
+        <p>That means that on {{ (eddington_number / elevation_eddington_divisor) | int }} separate days you
+            have recorded activities with an elevation gain of more than {{ eddington_number }} m. Going high is one thing, going often is
             another. But going high often is hard. Also if you increment the Eddington number, all days with less
             elevation gain will not count any more. It becomes increasingly hard to increment the Eddington number because you
             don't only need to achieve a higher count, but all flatter activities don't count towards the bigger number.

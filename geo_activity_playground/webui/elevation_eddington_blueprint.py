@@ -58,11 +58,16 @@ def make_elevation_eddington_blueprint(
             ),
             eddington_table=eddington_df_per_day.loc[
                 (eddington_df_per_day["elevation_gain"] > en_per_day)
-                & (eddington_df_per_day["elevation_gain"] <= en_per_day + 10)
+                & (eddington_df_per_day["elevation_gain"] <= en_per_day + 10 * divisor)
+                & (eddington_df_per_day["elevation_gain"] % divisor == 0)
             ].to_dict(orient="records"),
             eddington_table_weeks=eddington_df_per_week.loc[
                 (eddington_df_per_week["elevation_gain"] > en_per_week)
-                & (eddington_df_per_week["elevation_gain"] <= en_per_week + 10)
+                & (
+                    eddington_df_per_week["elevation_gain"]
+                    <= en_per_week + 10 * divisor
+                )
+                & (eddington_df_per_week["elevation_gain"] % divisor == 0)
             ].to_dict(orient="records"),
             query=query.to_jinja(),
             yearly_eddington=_get_yearly_eddington(activities, divisor),
@@ -87,9 +92,12 @@ def _get_elevation_gain_per_group(grouped, divisor) -> tuple[int, pd.DataFrame]:
     )
     eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
     eddington["elevation_gain_div"] = eddington["elevation_gain"] // divisor
-    en = eddington.loc[eddington["total"] >= eddington["elevation_gain_div"]][
-        "elevation_gain"
-    ].iloc[-1]
+    en = (
+        eddington.loc[eddington["total"] >= eddington["elevation_gain_div"]][
+            "total"
+        ].iloc[-1]
+        * divisor
+    )
     eddington["missing"] = eddington["elevation_gain_div"] - eddington["total"]
 
     return en, eddington
@@ -113,17 +121,19 @@ def _make_eddington_plot(
                 .encode(
                     alt.X(
                         "elevation_gain",
-                        scale=alt.Scale(domainMin=0),
+                        scale=alt.Scale(domainMin=0, domainMax=en * 3),
                         title="Elevation Gain",
                     ),
                     alt.Y(
                         "total",
-                        scale=alt.Scale(domainMax=en + 10),
-                        title=f"{interval} exceeding distance",
+                        scale=alt.Scale(domainMax=en / divisor * 1.5),
+                        title=f"{interval} exceeding elevation gain",
                     ),
                     [
                         alt.Tooltip("elevation_gain", title="Elevation Gain"),
-                        alt.Tooltip("total", title=f"{interval} exceeding distance"),
+                        alt.Tooltip(
+                            "total", title=f"{interval} exceeding elevation gain"
+                        ),
                         alt.Tooltip("missing", title=f"{interval} missing for next"),
                     ],
                 )
@@ -134,7 +144,7 @@ def _make_eddington_plot(
                 .encode(alt.X("elevation_gain"), alt.Y("total"))
             )
         )
-        .interactive(bind_x=False)
+        .interactive(bind_x=True, bind_y=True)
         .to_json(format="vega")
     )
 
