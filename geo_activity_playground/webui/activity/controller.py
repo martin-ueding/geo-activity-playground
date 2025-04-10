@@ -9,14 +9,15 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+from flask import request
 from PIL import Image
 from PIL import ImageDraw
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.activities import make_color_bar
 from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.privacy_zones import PrivacyZone
@@ -86,19 +87,26 @@ class ActivityController:
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(new_tiles)
 
+        line_color_value = request.args.get("line_color_value") or "speed"
+
         result = {
             "activity": activity,
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
-            "color_line_geojson": make_geojson_color_line(time_series),
+            "color_line_geojson": make_geojson_color_line(
+                time_series, line_color_value
+            ),
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
-            "speed_color_bar": make_speed_color_bar(time_series),
+            "line_color_bar": make_color_bar(time_series, line_color_value),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
+            "line_color_value": line_color_value,
+            "line_value_unit": line_color_value == "speed" and "km/h" or "m",
+            "line_color_value_avail": ["speed", "altitude"],
         }
         if (
             heart_zones := _extract_heart_rate_zones(

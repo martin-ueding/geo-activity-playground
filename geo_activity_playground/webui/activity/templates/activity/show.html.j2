@@ -83,10 +83,21 @@
         </style>
 
         <div>
-            {% for speed, color in speed_color_bar.colors %}
-            <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ speed }}</span>
+            {% for value, color in line_color_bar.colors %}
+            <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ value }}</span>
             {% endfor %}
-            km/h
+            {{ line_value_unit }}
+        </div>
+
+        <div class="mb-3" style="padding-top: 10px;">
+            <form method="GET">
+                <label class="form-label">Line Color by</label>
+                <select class="form-select" aria-label="Line Color by" name="line_color_value" onchange="this.form.submit()">
+                    {% for v in line_color_value_avail %}
+                    <option {% if v==line_color_value %} selected {% endif %} value="{{ v }}">{{ v | capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
     </div>
 </div>

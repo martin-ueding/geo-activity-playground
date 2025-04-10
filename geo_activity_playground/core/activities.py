@@ -197,8 +197,8 @@ def inter_quartile_range(values):
     return np.quantile(values, 0.75) - np.quantile(values, 0.25)
 
 
-def make_geojson_color_line(time_series: pd.DataFrame) -> str:
-    low, high, clamp_speed = _make_speed_clamp(time_series["speed"])
+def make_geojson_color_line(time_series: pd.DataFrame, column: str) -> str:
+    low, high, clamp_value = _make_value_clamp(time_series[column])
     cmap = matplotlib.colormaps["viridis"]
     features = [
         geojson.Feature(
@@ -209,8 +209,8 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
                 ]
             ),
             properties={
-                "speed": next_row["speed"] if np.isfinite(next_row["speed"]) else 0.0,
-                "color": matplotlib.colors.to_hex(cmap(clamp_speed(next_row["speed"]))),
+                column: (next_row[column] if np.isfinite(next_row[column]) else 0.0),
+                "color": matplotlib.colors.to_hex(cmap(clamp_value(next_row[column]))),
             },
         )
         for _, group in time_series.groupby("segment_id")
@@ -220,21 +220,21 @@ def make_geojson_color_line(time_series: pd.DataFrame) -> str:
     return geojson.dumps(feature_collection)
 
 
-def make_speed_color_bar(time_series: pd.DataFrame) -> dict[str, Any]:
-    low, high, clamp_speed = _make_speed_clamp(time_series["speed"])
+def make_color_bar(time_series: pd.DataFrame, column: str) -> dict[str, Any]:
+    low, high, clamp_value = _make_value_clamp(time_series[column])
     cmap = matplotlib.colormaps["viridis"]
     colors = [
-        (f"{speed:.1f}", matplotlib.colors.to_hex(cmap(clamp_speed(speed))))
-        for speed in np.linspace(low, high, 10)
+        (f"{value:.1f}", matplotlib.colors.to_hex(cmap(clamp_value(value))))
+        for value in np.linspace(low, high, 10)
     ]
     return {"low": low, "high": high, "colors": colors}
 
 
-def _make_speed_clamp(speeds: pd.Series) -> tuple[float, float, Callable]:
-    speed_without_na = speeds.dropna()
-    low = min(speed_without_na)
+def _make_value_clamp(values: pd.Series) -> tuple[float, float, Callable]:
+    values_without_na = values.dropna()
+    low = min(values_without_na)
     high = min(
-        max(speed_without_na),
-        np.median(speed_without_na) + 1.5 * inter_quartile_range(speed_without_na),
+        max(values_without_na),
+        np.median(values_without_na) + 1.5 * inter_quartile_range(values_without_na),
     )
-    return low, high, lambda speed: min(max((speed - low) / (high - low), 0.0), 1.0)
+    return low, high, lambda value: min(max((value - low) / (high - low), 0.0), 1.0)
