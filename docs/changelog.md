@@ -30,6 +30,7 @@ Changed:
 - Suggest to upgrade with `--pip-args "--upgrade-strategy eager"` to get the latest versions of dependencies as well.
 - Make arrows in square planner look consistent on Windows. ([GH-237](https://github.com/martin-ueding/geo-activity-playground/issues/237))
 - Display activities from the past 30 days on the landing page.
+- Documentation navigation is now with sections, making the sidebar less nested.
 
 ## Version 0.38.2 — 2025-03-29
 
