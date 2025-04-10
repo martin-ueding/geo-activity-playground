@@ -32,6 +32,7 @@ from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .tile_blueprint import make_tile_blueprint
 from .upload_blueprint import make_upload_blueprint
+from .bubble_chart_blueprint import make_bubble_chart_blueprint
 from geo_activity_playground.webui.search_util import SearchQueryHistory
 
 
@@ -143,6 +144,9 @@ def web_ui_main(
         ),
         url_prefix="/upload",
     )
+
+    bubble_chart_blueprint = make_bubble_chart_blueprint(repository)
+    app.register_blueprint(bubble_chart_blueprint, url_prefix="/bubble-chart")
 
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)

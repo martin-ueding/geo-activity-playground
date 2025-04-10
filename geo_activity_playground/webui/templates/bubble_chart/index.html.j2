@@ -1,0 +1,46 @@
+<!-- filepath: /home/michael/Nextcloud/Python/Geoactivity-Fork/geo-activity-playground/geo_activity_playground/webui/templates/bubble_chart/index.html.j2 -->
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Bubble Chart</h1>
+        <div id="bubble-chart"></div>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <script>
+            const chartSpec = {{ bubble_chart | safe }};
+            vegaEmbed('#bubble-chart', chartSpec).catch(console.error);
+        </script>
+    </div>
+</div>
+
+<script>
+    const chartSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "data": {
+            "values": [
+                {"date": "2025-02-21", "distance": 23, "activity": "Run"},
+                {"date": "2025-02-22", "distance": 27, "activity": "Run"},
+                {"date": "2025-02-23", "distance": 38, "activity": "Ride"}
+            ]
+        },
+        "mark": "circle",
+        "encoding": {
+            "x": {"field": "date", "type": "temporal", "title": "Date"},
+            "y": {"field": "distance", "type": "quantitative", "title": "Distance (km)"},
+            "size": {"field": "distance", "type": "quantitative", "scale": {"range": [10, 300]}},
+            "color": {"field": "activity", "type": "nominal", "title": "Activity"},
+            "tooltip": [
+                {"field": "date", "type": "temporal", "title": "Date"},
+                {"field": "distance", "type": "quantitative", "title": "Distance (km)"},
+                {"field": "activity", "type": "nominal", "title": "Activity"}
+            ]
+        },
+        "title": "Distance per Day (Bubble Chart)"
+    };
+    vegaEmbed('#bubble-chart', chartSpec).catch(console.error);
+</script>
+
+{% endblock %}
