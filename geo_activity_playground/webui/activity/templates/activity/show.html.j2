@@ -8,7 +8,7 @@
 </div>
 
 <div class="row mb-3">
-    <div class="col-4">
+    <div class="col-sm-12 col-md-4">
         <dl>
             <dt>Name</dt>
             <dd>{{ activity["name"] }}</dd>
@@ -54,7 +54,7 @@
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit metadata</a>
     </div>
-    <div class="col-8">
+    <div class="col-sm-12 col-md-8">
         <div id="activity-map" style="height: 500px;" class="mb-3"></div>
         <script>
             var map = L.map('activity-map', {
@@ -161,7 +161,7 @@
 
 <h2>Share picture</h2>
 
-<p><img src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
+<p><img class="img-fluid" src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
 
 <p>Not happy with the displayed data? <a href="{{ url_for('settings.sharepic') }}">Change share picture
         settings</a>.</p>
@@ -207,29 +207,31 @@
 
         <p><a href="{{ url_for('.name', name=activity['name']) }}">Overview over these activities</a></p>
 
-        <table class="table table-sort table-arrows">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th class="numeric-sort">Distance / km</th>
-                    <th>Elapsed time</th>
-                    <th>Equipment</th>
-                    <th>Kind</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for other_activity in similar_activites %}
-                <tr>
-                    <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start|dt
-                            }}</a></td>
-                    <td>{{ other_activity.distance_km | round(1) }}</td>
-                    <td>{{ other_activity.elapsed_time|td }}</td>
-                    <td>{{ other_activity["equipment"] }}</td>
-                    <td>{{ other_activity["kind"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="numeric-sort">Distance / km</th>
+                        <th>Elapsed time</th>
+                        <th>Equipment</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for other_activity in similar_activites %}
+                    <tr>
+                        <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start|dt
+                                }}</a></td>
+                        <td>{{ other_activity.distance_km | round(1) }}</td>
+                        <td>{{ other_activity.elapsed_time|td }}</td>
+                        <td>{{ other_activity["equipment"] }}</td>
+                        <td>{{ other_activity["kind"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endif %}
