@@ -22,23 +22,24 @@ def make_equipment_blueprint(
 
         # Prepare data for the stacked area chart
         activities = repository.meta
-        activities["week"] = activities["start"].dt.to_period("W").apply(lambda r: r.start_time)
-        weekly_data = (
-            activities.groupby(["week", "equipment"])
+        activities["month"] = activities["start"].dt.to_period("M").apply(lambda r: r.start_time)
+        monthly_data = (
+            activities.groupby(["month", "equipment"])
             .agg(total_distance=("distance_km", "sum"))
             .reset_index()
         )
 
         stacked_area_chart = (
-            alt.Chart(weekly_data, height=300, width=600, title="Weekly Equipment Usage")
+            alt.Chart(monthly_data, height=300, width=1200, title="Monthly Equipment Usage")
             .mark_area()
             .encode(
-                x=alt.X("week:T", title="Week"),
-                y=alt.Y("total_distance:Q", title="Total Kilometers per Week"),
+                x=alt.X("month:T", title="Month"),
+                y=alt.Y("total_distance:Q", title="Total Kilometers per Month"),
                 color=alt.Color("equipment:N", title="Equipment"),
                 tooltip=[
+                    alt.Tooltip("month:T", title="Date"),  # Add the date to the tooltip
                     alt.Tooltip("equipment:N", title="Equipment"),
-                    alt.Tooltip("total_distance:Q", title="Total Distance"),
+                    alt.Tooltip("total_distance:Q" , format=".0f", title="Total Distance"),
                 ],
             )
             .interactive()
