@@ -23,6 +23,7 @@ Added:
 - Add installation instructions for macOS. ([GH-235](https://github.com/martin-ueding/geo-activity-playground/issues/235))
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
+- README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
 
 Changed:
 
