@@ -6,6 +6,8 @@ import secrets
 import shutil
 import urllib.parse
 
+import sqlalchemy as sa
+import sqlalchemy.orm
 from flask import Flask
 from flask import request
 
@@ -35,6 +37,7 @@ from .summary_blueprint import make_summary_blueprint
 from .upload_blueprint import make_upload_blueprint
 from .views.entry_views import EntryView
 from .views.tile_views import TileView
+from geo_activity_playground.core.datamodel import Base
 from geo_activity_playground.webui.bubble_chart_blueprint import (
     make_bubble_chart_blueprint,
 )
@@ -53,6 +56,12 @@ def get_secret_key():
         with open(secret_file, "w") as f:
             json.dump(secret, f)
     return secret
+
+
+def make_database_session() -> sqlalchemy.orm.Session:
+    engine = sa.create_engine("sqlite:///database.sqlite", echo=False)
+    Base.metadata.create_all(engine)
+    return sqlalchemy.orm.Session(engine)
 
 
 def web_ui_main(
@@ -80,6 +89,8 @@ def web_ui_main(
         s = int(seconds // 1 % 60)
         return f"{h}:{m:02d}:{s:02d}"
 
+    database = make_database_session()
+    database.commit()
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
     config = config_accessor()

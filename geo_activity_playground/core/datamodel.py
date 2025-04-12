@@ -71,7 +71,7 @@ class Equipment(Base):
         back_populates="equipment", cascade="all, delete-orphan"
     )
     default_for_kinds: Mapped[list["Kind"]] = relationship(
-        back_populates="equipment", cascade="all, delete-orphan"
+        back_populates="default_equipment", cascade="all, delete-orphan"
     )
 
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
@@ -90,8 +90,8 @@ class Kind(Base):
     activities: Mapped[list["Activity"]] = relationship(
         back_populates="kind", cascade="all, delete-orphan"
     )
-    default_equipment_id = Mapped[int] = mapped_column(
-        ForeignKey("equipment.id", name="default_equipment_id")
+    default_equipment_id: Mapped[int] = mapped_column(
+        ForeignKey("equipments.id", name="default_equipment_id")
     )
     default_equipment: Mapped["Equipment"] = relationship(back_populates="kinds")
 
