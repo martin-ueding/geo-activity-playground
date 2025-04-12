@@ -22,6 +22,10 @@ Added:
 
 - Add installation instructions for macOS. ([GH-235](https://github.com/martin-ueding/geo-activity-playground/issues/235))
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
+- Add documentation for noisy elevation gain.
+- README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
+- Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
+- Bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
 
 Changed:
 
@@ -30,6 +34,7 @@ Changed:
 - Suggest to upgrade with `--pip-args "--upgrade-strategy eager"` to get the latest versions of dependencies as well.
 - Make arrows in square planner look consistent on Windows. ([GH-237](https://github.com/martin-ueding/geo-activity-playground/issues/237))
 - Display activities from the past 30 days on the landing page.
+- Documentation navigation is now with sections, making the sidebar less nested.
 
 ## Version 0.38.2 — 2025-03-29
 

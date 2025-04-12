@@ -72,16 +72,6 @@ def make_settings_blueprint(
     def index():
         return render_template("settings/index.html.j2")
 
-    @blueprint.route("/admin-password", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def admin_password():
-        if request.method == "POST":
-            settings_controller.save_admin_password(request.form["password"])
-        return render_template(
-            "settings/admin-password.html.j2",
-            **settings_controller.render_admin_password(),
-        )
-
     @blueprint.route("/color-schemes", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def color_schemes():

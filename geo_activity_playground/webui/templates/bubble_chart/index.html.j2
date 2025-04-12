@@ -1,0 +1,26 @@
+<!-- filepath: /home/michael/Nextcloud/Python/Geoactivity-Fork/geo-activity-playground/geo_activity_playground/webui/templates/bubble_chart/index.html.j2 -->
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Bubble Chart</h1>
+        <div id="bubble-chart"></div>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <script>
+            const chartSpec = {{ bubble_chart | safe }};
+            vegaEmbed('#bubble-chart', chartSpec).then((result) => {
+                // Add a click event listener to the chart
+                result.view.addEventListener('click', (event, item) => {
+                    if (item && item.datum && item.datum.activity_url) {
+                        // Redirect to the activity URL
+                        window.location.href = item.datum.activity_url;
+                    }
+                });
+            }).catch(console.error);
+        </script>
+    </div>
+</div>
+{% endblock %}

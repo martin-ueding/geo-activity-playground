@@ -24,7 +24,6 @@ from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
 from .elevation_eddington_blueprint import make_elevation_eddington_blueprint
-from .entry_controller import EntryView
 from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
@@ -34,9 +33,15 @@ from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
-from .tile_blueprint import TileView
 from .upload_blueprint import make_upload_blueprint
+from .views.entry_views import EntryView
+from .views.tile_views import TileView
+from geo_activity_playground.webui.bubble_chart_blueprint import (
+    make_bubble_chart_blueprint,
+)
+from geo_activity_playground.webui.flasher import FlaskFlasher
 from geo_activity_playground.webui.interfaces import MyView
+from geo_activity_playground.webui.views.settings_views import SettingsAdminPasswordView
 
 
 def get_secret_key():
@@ -90,8 +95,10 @@ def web_ui_main(
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
     }
+    flasher = FlaskFlasher()
     views: list[MyView] = [
         EntryView(repository, config),
+        SettingsAdminPasswordView(authenticator, config_accessor, flasher),
         TileView(image_transforms, tile_getter),
     ]
 
@@ -113,7 +120,7 @@ def web_ui_main(
     app.register_blueprint(
         make_elevation_eddington_blueprint(repository, search_query_history),
         url_prefix="/elevation-eddington",
-    )    
+    )
     app.register_blueprint(
         make_equipment_blueprint(repository, config), url_prefix="/equipment"
     )
@@ -145,14 +152,15 @@ def web_ui_main(
         make_summary_blueprint(repository, config, search_query_history),
         url_prefix="/summary",
     )
-
-    # app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator
         ),
         url_prefix="/upload",
     )
+
+    bubble_chart_blueprint = make_bubble_chart_blueprint(repository)
+    app.register_blueprint(bubble_chart_blueprint, url_prefix="/bubble-chart")
 
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)

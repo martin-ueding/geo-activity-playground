@@ -1,6 +1,5 @@
 import collections
 import datetime
-import itertools
 
 import altair as alt
 import pandas as pd
@@ -30,8 +29,10 @@ class EntryView(MyView):
             context["distance_last_30_days_plot"] = _distance_last_30_days_meta_plot(
                 self._repository.meta, kind_scale
             )
-            context["elevation_gain_last_30_days_plot"] = _elevation_gain_last_30_days_meta_plot(
-                self._repository.meta, kind_scale
+            context["elevation_gain_last_30_days_plot"] = (
+                _elevation_gain_last_30_days_meta_plot(
+                    self._repository.meta, kind_scale
+                )
             )
 
         meta = self._repository.meta.copy()
@@ -75,7 +76,10 @@ def _distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) 
         .to_json(format="vega")
     )
 
-def _elevation_gain_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+
+def _elevation_gain_last_30_days_meta_plot(
+    meta: pd.DataFrame, kind_scale: alt.Scale
+) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.now() - datetime.timedelta(days=31)
     )
@@ -94,7 +98,9 @@ def _elevation_gain_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.S
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("sum(elevation_gain)", format=".0f", title="Elevation gain / "),
+                alt.Tooltip(
+                    "sum(elevation_gain)", format=".0f", title="Elevation gain / "
+                ),
             ],
         )
         .to_json(format="vega")
