@@ -25,6 +25,7 @@ Added:
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
 - Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
+- Bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
 
 Changed:
 
