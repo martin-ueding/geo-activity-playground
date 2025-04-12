@@ -14,6 +14,7 @@ repos:
         entry: poetry run black
         language: system
         files: '.*\.py'
+        exclude: '.*\.py\.mako'
 #      - id: mypy
 #        name: Static type checking
 #        entry: poetry run mypy -p geo_activity_playground
