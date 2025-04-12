@@ -23,7 +23,6 @@ from .authenticator import Authenticator
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
-from .entry_controller import EntryView
 from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
@@ -33,9 +32,12 @@ from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
-from .tile_blueprint import TileView
 from .upload_blueprint import make_upload_blueprint
+from .views.entry_views import EntryView
+from .views.tile_views import TileView
+from geo_activity_playground.webui.flasher import FlaskFlasher
 from geo_activity_playground.webui.interfaces import MyView
+from geo_activity_playground.webui.views.settings_views import SettingsAdminPasswordView
 
 
 def get_secret_key():
@@ -89,8 +91,10 @@ def web_ui_main(
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
     }
+    flasher = FlaskFlasher()
     views: list[MyView] = [
         EntryView(repository, config),
+        SettingsAdminPasswordView(authenticator, config_accessor, flasher),
         TileView(image_transforms, tile_getter),
     ]
 
@@ -140,8 +144,6 @@ def web_ui_main(
         make_summary_blueprint(repository, config, search_query_history),
         url_prefix="/summary",
     )
-
-    # app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator

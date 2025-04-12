@@ -1,6 +1,5 @@
 import collections
 import datetime
-import itertools
 
 import altair as alt
 import pandas as pd

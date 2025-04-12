@@ -2,6 +2,8 @@ site_name: Geo Activity Playground
 site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
 
 theme:
+  features:
+    - navigation.sections
   name: material
   palette:
     - scheme: default
@@ -26,15 +28,15 @@ nav:
     - install-on-windows.md
     - install-on-macos.md
     - add-local-bin-to-path.md
-  - create-a-base-directory.md
-  - starting-the-webserver.md
-  - record-activities.md
+  - Getting Started:
+    - create-a-base-directory.md
+    - starting-the-webserver.md
+    - record-activities.md
   - Activity Sources:
     - import-activity-files.md
     - connect-strava-api.md
     - upload-activity-files.md
     - moving-from-strava.md
-  - get-help.md
   - How-To Guides:
     - plan-missing-tile-rides.md
     - create-a-privacy-zone.md
@@ -49,8 +51,11 @@ nav:
     - explorer-tiles.md
     - eddington-number.md
     - heart-rate-zones.md
-  - acknowledgments.md
-  - changelog.md
+    - elevation-gain-from-noisy-data.md
+  - Other:
+    - get-help.md
+    - acknowledgments.md
+    - changelog.md
 
 markdown_extensions:
   - pymdownx.highlight
