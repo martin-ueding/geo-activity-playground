@@ -2,6 +2,8 @@ site_name: Geo Activity Playground
 site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
 
 theme:
+  features:
+    - navigation.sections
   name: material
   palette:
     - scheme: default
@@ -21,32 +23,39 @@ theme:
 
 nav:
   - index.md
+  - Installation:
+    - install-on-linux.md
+    - install-on-windows.md
+    - install-on-macos.md
+    - add-local-bin-to-path.md
   - Getting Started:
-      - getting-started/installing-stable-on-linux.md
-      - getting-started/installing-stable-on-windows.md
-      - getting-started/installing-git-on-linux.md
-      - getting-started/docker.md
-      - getting-started/docker-compose.md
-      - getting-started/docker-compose-tailscale.md
-      - getting-started/using-activity-files.md
-      - getting-started/advanced-metadata-extraction.md
-      - getting-started/using-strava-api.md
-      - getting-started/moving-from-strava.md
-      - getting-started/starting-the-webserver.md
-  - Features:
-      - features/overview.md
-      - features/activity-view.md
-      - features/calendar.md
-      - features/heatmaps.md
-      - features/explorer-tiles.md
-      - features/eddington.md
-      - features/equipment.md
-      - features/upload.md
-      - features/share-picture.md
-      - features/kind-rename.md
+    - create-a-base-directory.md
+    - starting-the-webserver.md
+    - record-activities.md
+  - Activity Sources:
+    - import-activity-files.md
+    - connect-strava-api.md
+    - upload-activity-files.md
+    - moving-from-strava.md
+  - How-To Guides:
+    - plan-missing-tile-rides.md
+    - create-a-privacy-zone.md
+    - set-up-a-development-environment.md
+    - rename-activity-kinds.md
+    - using-git-version-via-docker.md
+    - using-git-version-via-docker-compose.md
+    - using-git-version-via-docker-compose-and-tailscale-vpn.md
   - Reference:
-      - reference/changelog.md
-  - acknowledgments.md
+    - advanced-metadata-extraction.md
+  - Explanation:
+    - explorer-tiles.md
+    - eddington-number.md
+    - heart-rate-zones.md
+    - elevation-gain-from-noisy-data.md
+  - Other:
+    - get-help.md
+    - acknowledgments.md
+    - changelog.md
 
 markdown_extensions:
   - pymdownx.highlight

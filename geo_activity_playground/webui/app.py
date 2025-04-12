@@ -7,12 +7,14 @@ import shutil
 import urllib.parse
 
 from flask import Flask
-from flask import render_template
 from flask import request
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
 from ..core.config import ConfigAccessor
+from ..core.raster_map import GrayscaleImageTransform
+from ..core.raster_map import IdentityImageTransform
+from ..core.raster_map import PastelImageTransform
+from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity.blueprint import make_activity_blueprint
 from .activity.controller import ActivityController
@@ -21,27 +23,24 @@ from .authenticator import Authenticator
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .eddington_blueprint import make_eddington_blueprint
-from .entry_controller import EntryController
 from .equipment_blueprint import make_equipment_blueprint
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .heatmap.blueprint import make_heatmap_blueprint
 from .search_blueprint import make_search_blueprint
+from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
-from .tile_blueprint import make_tile_blueprint
 from .upload_blueprint import make_upload_blueprint
-from .bubble_chart_blueprint import make_bubble_chart_blueprint
-from geo_activity_playground.webui.search_util import SearchQueryHistory
-
-
-def route_start(app: Flask, repository: ActivityRepository, config: Config) -> None:
-    entry_controller = EntryController(repository, config)
-
-    @app.route("/")
-    def index():
-        return render_template("home.html.j2", **entry_controller.render())
+from .views.entry_views import EntryView
+from .views.tile_views import TileView
+from geo_activity_playground.webui.bubble_chart_blueprint import (
+    make_bubble_chart_blueprint,
+)
+from geo_activity_playground.webui.flasher import FlaskFlasher
+from geo_activity_playground.webui.interfaces import MyView
+from geo_activity_playground.webui.views.settings_views import SettingsAdminPasswordView
 
 
 def get_secret_key():
@@ -83,15 +82,27 @@ def web_ui_main(
 
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
-
     config = config_accessor()
     activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
     )
+    tile_getter = TileGetter(config.map_tile_url)
+    image_transforms = {
+        "color": IdentityImageTransform(),
+        "grayscale": GrayscaleImageTransform(),
+        "pastel": PastelImageTransform(),
+    }
+    flasher = FlaskFlasher()
+    views: list[MyView] = [
+        EntryView(repository, config),
+        SettingsAdminPasswordView(authenticator, config_accessor, flasher),
+        TileView(image_transforms, tile_getter),
+    ]
 
-    route_start(app, repository, config_accessor())
+    for view in views:
+        view.register(app)
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
     app.register_blueprint(
@@ -136,8 +147,6 @@ def web_ui_main(
         make_summary_blueprint(repository, config, search_query_history),
         url_prefix="/summary",
     )
-
-    app.register_blueprint(make_tile_blueprint(config), url_prefix="/tile")
     app.register_blueprint(
         make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator

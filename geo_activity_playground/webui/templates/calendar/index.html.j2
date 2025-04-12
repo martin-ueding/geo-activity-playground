@@ -1,0 +1,48 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-1">
+    <div class="col">
+        <h1>Calendar</h1>
+    </div>
+</div>
+
+<div class="row mb-1">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        {% for i in range(1, 13) %}
+                        <th style="text-align: right;">{{ i }}</th>
+                        {% endfor %}
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for year, month_data in monthly_distances.items() %}
+                    {% set year_int = year|round(0)|int %}
+                    <tr>
+                        <td>{{ year_int }}</td>
+                        {% for month in range(1, 13) %}
+                        <td align="right">
+                            {% set distance = month_data[month] %}
+                            {% if distance %}
+                            <a href="{{ url_for(".month", year=year_int, month=month) }}">{{ distance|int() }} km</a>
+                            {% else %}
+                            0 km
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td align="right">{{ yearly_distances[year]|int() }} km</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

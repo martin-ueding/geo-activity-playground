@@ -163,6 +163,13 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
             alt.Y("sum(distance_km)", title="Distance / km"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
+            [
+                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip(
+                    "sum(distance_km)", format=".1f", title="Total distance / km"
+                ),
+                alt.Tooltip("count(distance_km)", title="Number of activities"),
+            ],
         )
         .resolve_axis(x="independent")
         .to_json(format="vega")
@@ -180,7 +187,7 @@ def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -
             [
                 alt.Tooltip("year:O", title="Year"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("distance_km", title="Distance / km"),
+                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
             ],
         )
         .to_json(format="vega")
@@ -210,7 +217,7 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
             [
                 alt.Tooltip("week", title="Week"),
                 alt.Tooltip("iso_year:N", title="Year"),
-                alt.Tooltip("distance_km", title="Distance / km"),
+                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
             ],
         )
         .interactive()
@@ -267,7 +274,7 @@ def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
             [
                 alt.Tooltip("year_week", title="Year and Week"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("distance_km", title="Distance / km"),
+                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
             ],
         )
         .to_json(format="vega")

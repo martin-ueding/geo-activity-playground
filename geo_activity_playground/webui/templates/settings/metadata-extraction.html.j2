@@ -1,0 +1,54 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Metadata Extraction</h1>
+
+<p>If the current activity metadata is not to your liking, you can adjust how these fields are populated:</p>
+
+<ul>
+    <li><tt>kind</tt>: The kind of the activity, like "Ride" or "Run".</li>
+    <li><tt>equipment</tt>: Name for the equipment used, like "Red Roadbike".</li>
+    <li><tt>name</tt>: Name for the activity, like "Ride with Friends".</li>
+</ul>
+
+<p>By default these fields are extracted from files that contain this data. Otherwise the filename is set as <tt>name</tt>.
+    You can overwrite this by setting up a directory structure with corresponding regular expressions using named capture groups.</p>
+
+
+<form method="POST">
+    <div class="row">
+        <div class="col-md-6">
+            {% for regex in metadata_extraction_regexes %}
+            <div class="mb-3">
+                <label for="regex_{{ loop.index }}" class="form-label">Regular expression</label>
+                <input type="text" class="form-control" id="regex_{{ loop.index }}" name="regex" value="{{ regex }}" />
+            </div>
+            {% endfor %}
+            <div class="mb-3">
+                <label for="regex_new" class="form-label">Regular expression</label>
+                <input type="text" class="form-control" id="regex_new" name="regex" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <p>Consider a directory structure <tt>Ride/Red Roadbike/2024-08-10 11-45-00 Ride with Friends.fit</tt> under Activities. 
+                You can extract <tt>kind</tt>: "Ride", <tt>equipment</tt>: "Red Roadbike", <tt>name</tt>: "Ride with Friends" 
+                with the following regular expression:</p>
+
+            <div class="code">
+                <pre
+                    class="code literal-block">(?P&lt;kind&gt;[^/]+)/(?P&lt;equipment&gt;[^/]+)/[-\d_ .]+(?P&lt;name&gt;[^/\.]+)</pre>
+            </div>
+
+            <p>Have a look at the documentation 
+                <a href="https://martin-ueding.github.io/geo-activity-playground/advanced-metadata-extraction">Advanced Metadata Extraction</a> 
+                for explanations and examples.</p>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

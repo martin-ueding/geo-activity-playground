@@ -67,6 +67,14 @@ def make_equipment_blueprint(
                 .encode(
                     alt.X("time", title="Date"),
                     alt.Y("total_distance_km", title="Cumulative distance / km"),
+                    tooltip=[
+                        alt.Tooltip("time:T", title="Date"),
+                        alt.Tooltip(
+                            "total_distance_km:Q",
+                            title="Cumulative distance / km",
+                            format=".0f",
+                        ),
+                    ],
                 )
                 .interactive()
                 .to_json(format="vega")
@@ -87,6 +95,13 @@ def make_equipment_blueprint(
                         scale=make_kind_scale(repository.meta, config),
                         title="Kind",
                     ),
+                    tooltip=[
+                        alt.Tooltip("year(start):O", title="Year"),
+                        alt.Tooltip(
+                            "sum(distance_km):Q", title="Distance / km", format=".0f"
+                        ),
+                        alt.Tooltip("kind:N", title="Kind"),
+                    ],
                 )
                 .to_json(format="vega")
             )
@@ -104,6 +119,12 @@ def make_equipment_blueprint(
                         title="Kind",
                     ),
                     alt.Y("sum(distance_km)", title="Distance / km"),
+                    tooltip=[
+                        alt.Tooltip("kind:N", title="Kind"),
+                        alt.Tooltip(
+                            "sum(distance_km):Q", title="Distance / km", format=".0f"
+                        ),
+                    ],
                 )
                 .to_json(format="vega")
             )
