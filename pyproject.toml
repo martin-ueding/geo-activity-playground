@@ -11,6 +11,7 @@ geo-activity-playground = "geo_activity_playground.__main__:main"
 [tool.poetry.dependencies]
 python = "^3.10,<3.14"
 
+alembic = "^1.15.2"
 altair = "^5.5.0"
 appdirs = "^1.4.4"
 charset-normalizer = "^3.3.2"
@@ -28,6 +29,7 @@ pyarrow = "^19.0.1"
 python-dateutil = "^2.8.2"
 requests = "^2.28.1"
 shapely = "^2.0.5"
+sqlalchemy = "^2.0.40"
 stravalib = "^2.0"
 tcxreader = "^0.4.5"
 tomli = { version = "^2.0.1", python = "<3.11" }
@@ -36,8 +38,6 @@ vegafusion = { version = "^1.4.3", extras = ["embed"] }
 vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
-sqlalchemy = "^2.0.40"
-alembic = "^1.15.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"
