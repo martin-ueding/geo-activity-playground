@@ -64,10 +64,13 @@ class Equipment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
     offset_km: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
 
     activities: Mapped[list["Activity"]] = relationship(
+        back_populates="equipment", cascade="all, delete-orphan"
+    )
+    default_for_kinds: Mapped[list["Kind"]] = relationship(
         back_populates="equipment", cascade="all, delete-orphan"
     )
 
@@ -79,7 +82,7 @@ class Kind(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
     consider_for_achievements: Mapped[bool] = mapped_column(
         sa.Boolean, default=True, nullable=False
     )
@@ -87,5 +90,9 @@ class Kind(Base):
     activities: Mapped[list["Activity"]] = relationship(
         back_populates="kind", cascade="all, delete-orphan"
     )
+    default_equipment_id = Mapped[int] = mapped_column(
+        ForeignKey("equipment.id", name="default_equipment_id")
+    )
+    default_equipment: Mapped["Equipment"] = relationship(back_populates="kinds")
 
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
