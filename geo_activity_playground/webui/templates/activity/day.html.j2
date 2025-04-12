@@ -1,0 +1,81 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ date }}</h1>
+    </div>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div id="activity-map" style="height: 500px;"></div>
+        <script>
+            var map = L.map('activity-map', {
+                fullscreenControl: true
+            });
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map);
+
+            let geojson = L.geoJSON({{ geojson| safe }}, {
+                style: function (feature) { return { color: feature.properties.color } }
+            }).addTo(map)
+            map.fitBounds(geojson.getBounds());
+        </script>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Activities</h2>
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Distance / km</th>
+                        <th>Elapsed time</th>
+                        <th>Speed / km/h</th>
+                        <th>Equipment</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td><span style="color: {{ activity['color'] }};">█</span> <a
+                                href="{{ url_for('activity.show', id=activity.id) }}">{{
+                                activity.name }}</a></td>
+                        <td>{{ activity.start|dt }}</td>
+                        <td>{{ activity.distance_km | round(1) }}</td>
+                        <td>{{ activity.elapsed_time|td }}</td>
+                        <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
+                        <td>{{ activity["equipment"] }}</td>
+                        <td>{{ activity["kind"] }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if activities|length > 1 %}
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td></td>
+                        <td><b>{{ total_distance | round(1) }}</b></td>
+                        <td><b>{{ total_elapsed_time|td }}</b></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h2>Share picture</h2>
+
+<p><img class="img-fluid" src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
+
+{% endblock %}

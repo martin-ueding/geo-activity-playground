@@ -1,0 +1,86 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ name }}</h1>
+    </div>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div id="activity-map" style="height: 500px;"></div>
+        <script>
+            var map = L.map('activity-map', {
+                fullscreenControl: true
+            });
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map);
+
+            let geojson = L.geoJSON({{ geojson| safe }}, {
+                style: function (feature) { return { color: feature.properties.color } }
+            }).addTo(map)
+            map.fitBounds(geojson.getBounds());
+        </script>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("tick_plot", tick_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("equipment_plot", equipment_plot) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct("distance_plot", distance_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct("minutes_plot", minutes_plot) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Activities</h2>
+
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th class="numeric-sort">Distance / km</th>
+                        <th>Elapsed time</th>
+                        <th>Speed / km/h</th>
+                        <th>Equipment</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td><span style="color: {{ activity['color'] }};">█</span> <a
+                                href="{{ url_for('activity.show', id=activity.id) }}">{{
+                                activity.name }}</a></td>
+                        <td>{{ activity.start|dt }}</td>
+                        <td>{{ activity.distance_km | round(1) }}</td>
+                        <td>{{ activity.elapsed_time|td }}</td>
+                        <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
+                        <td>{{ activity["equipment"] }}</td>
+                        <td>{{ activity["kind"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

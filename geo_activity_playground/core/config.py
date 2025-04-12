@@ -12,7 +12,7 @@ from geo_activity_playground.core.paths import strava_dynamic_config_path
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore
 
 
 logger = logging.getLogger(__name__)

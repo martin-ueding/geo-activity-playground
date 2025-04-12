@@ -1,0 +1,57 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-1">
+    <div class="col">
+        <h1>Calendar {{ year }}-{{ "{0:02d}".format(month) }}</h1>
+    </div>
+</div>
+
+<div class="row mb-1">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                        <th>Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week, week_data in weeks.items() %}
+                    <tr>
+                        <td>{{ week }}</td>
+                        {% for day in range(1, 8) %}
+                        <td>
+                            {% if weeks[week][day] %}
+                            <a href="{{ url_for('activity.day', year=year, month=month, day=day_of_month[week][day]) }}"><b>{{
+                                    day_of_month[week][day] }}.</b></a>
+                            {% elif day_of_month[week][day] %}
+                            <b>{{ day_of_month[week][day] }}.</b>
+                            {% endif %}
+
+                            {% if weeks[week][day] %}
+                            <ul>
+                                {% for activity in weeks[week][day] %}
+                                <li><a href="{{ url_for('activity.show', id=activity.id) }}">{{ activity.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
