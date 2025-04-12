@@ -25,7 +25,6 @@ def main_heatmap_video(options) -> None:
     os.chdir(options.basedir)
 
     repository = ActivityRepository()
-    repository.reload()
     assert len(repository) > 0
     config_accessor = ConfigAccessor()
 

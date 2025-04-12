@@ -7,7 +7,6 @@ from collections.abc import Callable
 from typing import Any
 from typing import Iterator
 from typing import Optional
-from typing import TypedDict
 
 import geojson
 import matplotlib
@@ -17,37 +16,17 @@ import sqlalchemy.orm
 from tqdm import tqdm
 
 from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import ActivityMeta
+from geo_activity_playground.core.datamodel import Equipment
 from geo_activity_playground.core.datamodel import get_or_make_equipment
 from geo_activity_playground.core.datamodel import get_or_make_kind
+from geo_activity_playground.core.datamodel import Kind
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
 from geo_activity_playground.core.paths import activity_meta_override_dir
 
 logger = logging.getLogger(__name__)
-
-
-class ActivityMeta(TypedDict):
-    average_speed_elapsed_kmh: float
-    average_speed_moving_kmh: float
-    calories: float
-    commute: bool
-    consider_for_achievements: bool
-    distance_km: float
-    elapsed_time: datetime.timedelta
-    elevation_gain: float
-    end_latitude: float
-    end_longitude: float
-    equipment: str
-    id: int
-    kind: str
-    moving_time: datetime.timedelta
-    name: str
-    path: str
-    start_latitude: float
-    start_longitude: float
-    start: np.datetime64
-    steps: int
 
 
 def make_activity_meta() -> ActivityMeta:
@@ -98,59 +77,56 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
 
 
 class ActivityRepository:
-    def __init__(self) -> None:
-        self.meta = pd.DataFrame()
+    def __init__(self, db_session: sqlalchemy.orm.Session) -> None:
+        self._db_session = db_session
 
     def __len__(self) -> int:
-        return len(self.meta)
-
-    def reload(self) -> None:
-        self.meta = pd.read_parquet(activities_file())
+        return len(self.get_activity_ids())
 
     def has_activity(self, activity_id: int) -> bool:
-        if len(self.meta):
-            if activity_id in self.meta["id"]:
-                return True
-
-        return False
+        return bool(
+            self._db_session.scalars(
+                sqlalchemy.query(Activity).where(Activity.id == activity_id)
+            ).all()
+        )
 
     def last_activity_date(self) -> Optional[datetime.datetime]:
-        if len(self.meta):
-            return self.meta.iloc[-1]["start"]
+        result = self._db_session.scalars(
+            sqlalchemy.select(Activity).order_by(Activity.start)
+        ).all()
+        if result:
+            return result[-1].start
         else:
             return None
 
     def get_activity_ids(self, only_achievements: bool = False) -> list[int]:
+        query = sqlalchemy.select(Activity.id)
         if only_achievements:
-            return list(self.meta.loc[self.meta["consider_for_achievements"]].index)
-        else:
-            return list(self.meta.index)
+            query = query.where(Kind.consider_for_achievements)
+        result = self._db_session.scalars(query).all()
+        return result
 
-    def iter_activities(self, new_to_old=True, dropna=False) -> Iterator[ActivityMeta]:
+    def iter_activities(self, new_to_old=True, drop_na=False) -> list[Activity]:
+        query = sqlalchemy.select(Activity)
+        if drop_na:
+            query = query.where(Activity.start.is_not(None))
+        result = self._db_session.scalars(query.order_by(Activity.start)).all()
         direction = -1 if new_to_old else 1
-        for index, row in self.meta[::direction].iterrows():
-            if not dropna or not pd.isna(row["start"]):
-                yield row
+        return result[::direction]
 
-    def get_activity_by_id(self, id: int) -> ActivityMeta:
-        activity = self.meta.loc[id]
-        assert isinstance(activity["name"], str), activity["name"]
-        return activity
+    def get_activity_by_id(self, id: int) -> Activity:
+        return self._db_session.scalar(
+            sqlalchemy.select(Activity).where(Activity.id == id)
+        )
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
-        path = activity_enriched_time_series_dir() / f"{id}.parquet"
-        try:
-            df = pd.read_parquet(path)
-        except OSError as e:
-            logger.error(f"Error while reading {path}, deleting cache file …")
-            path.unlink(missing_ok=True)
-            raise
+        return self.get_activity_by_id(id).timeseries
 
-        return df
-
-    def save(self) -> None:
-        self.meta.to_parquet(activities_file())
+    @property
+    def meta(self) -> pd.DataFrame:
+        activities = self.iter_activities(new_to_old=False)
+        return pd.DataFrame([activity.to_dict() for activity in activities])
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:

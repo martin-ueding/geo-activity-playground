@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityMeta
+from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
 from geo_activity_playground.core.paths import strava_last_activity_date_path

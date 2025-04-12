@@ -1,5 +1,10 @@
 import datetime
+import logging
+from typing import Any
+from typing import TypedDict
 
+import numpy as np
+import pandas as pd
 import sqlalchemy as sa
 import sqlalchemy.orm
 from sqlalchemy import ForeignKey
@@ -8,6 +13,34 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+
+from geo_activity_playground.core.paths import activity_enriched_time_series_dir
+
+
+logger = logging.getLogger(__name__)
+
+
+class ActivityMeta(TypedDict):
+    average_speed_elapsed_kmh: float
+    average_speed_moving_kmh: float
+    calories: float
+    commute: bool
+    consider_for_achievements: bool
+    distance_km: float
+    elapsed_time: datetime.timedelta
+    elevation_gain: float
+    end_latitude: float
+    end_longitude: float
+    equipment: str
+    id: int
+    kind: str
+    moving_time: datetime.timedelta
+    name: str
+    path: str
+    start_latitude: float
+    start_longitude: float
+    start: np.datetime64
+    steps: int
 
 
 class Base(DeclarativeBase):
@@ -58,6 +91,9 @@ class Activity(Base):
     )
     kind: Mapped["Kind"] = relationship(back_populates="activities")
 
+    def __getitem__(self, item) -> Any:
+        return self.to_dict()[item]
+
     def __str__(self) -> str:
         return f"{self.start} {self.name}"
 
@@ -68,6 +104,50 @@ class Activity(Base):
     @property
     def average_speed_elapsed_kmh(self) -> float:
         return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
+
+    @property
+    def timeseries(self) -> pd.DataFrame:
+        path = activity_enriched_time_series_dir() / f"{self.id}.parquet"
+        try:
+            df = pd.read_parquet(path)
+        except OSError as e:
+            logger.error(f"Error while reading {path}, deleting cache file …")
+            path.unlink(missing_ok=True)
+            raise
+
+        return df
+
+    def to_dict(self) -> ActivityMeta:
+        equipment = self.equipment.name if self.equipment is not None else "Unknown"
+        kind = self.kind.name if self.kind is not None else "Unknown"
+        consider_for_achievements = (
+            self.kind.consider_for_achievements if self.kind is not None else True
+        )
+        return ActivityMeta(
+            id=self.id,
+            name=self.name,
+            path=self.path,
+            distance_km=self.distance_km,
+            start=self.start,
+            elapsed_time=self.elapsed_time,
+            moving_time=self.moving_time,
+            start_latitude=self.start_latitude,
+            start_longitude=self.start_longitude,
+            end_latitude=self.end_latitude,
+            end_longitude=self.end_longitude,
+            elevation_gain=self.elevation_gain,
+            start_elevation=self.start_elevation,
+            end_elevation=self.end_elevation,
+            calories=self.calories,
+            steps=self.steps,
+            num_new_tiles_14=self.num_new_tiles_14,
+            num_new_tiles_17=self.num_new_tiles_17,
+            equipment=equipment,
+            kind=kind,
+            average_speed_moving_kmh=self.average_speed_moving_kmh,
+            average_speed_elapsed_kmh=self.average_speed_elapsed_kmh,
+            consider_for_achievements=consider_for_achievements,
+        )
 
 
 class Equipment(Base):

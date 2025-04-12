@@ -121,7 +121,7 @@ def make_activity_repository(
     os.chdir(basedir)
 
     database = make_database_session()
-    repository = ActivityRepository()
+    repository = ActivityRepository(database)
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)

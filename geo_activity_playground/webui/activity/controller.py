@@ -12,12 +12,12 @@ import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
-from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_color_line
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.activities import make_speed_color_bar
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
 from geo_activity_playground.core.privacy_zones import PrivacyZone
 from geo_activity_playground.core.raster_map import map_image_from_tile_bounds

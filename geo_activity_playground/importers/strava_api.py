@@ -11,8 +11,8 @@ from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir
 from geo_activity_playground.core.paths import strava_api_dir

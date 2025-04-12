@@ -66,7 +66,6 @@ def web_ui_main(
     host: str,
     port: int,
 ) -> None:
-    repository.reload()
 
     app = Flask(__name__)
     app.config["UPLOAD_FOLDER"] = "Activities"

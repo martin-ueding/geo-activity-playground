@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.activities import make_activity_meta
 from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.coordinates import get_distance
+from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
