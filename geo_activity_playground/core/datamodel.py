@@ -1,6 +1,7 @@
 import datetime
 
 import sqlalchemy as sa
+import sqlalchemy.orm
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
@@ -18,17 +19,14 @@ class Activity(Base):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    updated: Mapped[datetime.timedelta] = mapped_column(sa.DateTime, nullable=False)
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
     path: Mapped[str] = mapped_column(sa.String, nullable=True)
 
     distance_km: Mapped[float] = mapped_column(sa.Float, nullable=False)
 
     # Temporal data:
-    start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=False)
-    elapsed_time: Mapped[datetime.timedelta] = mapped_column(
-        sa.Interval, nullable=False
-    )
+    start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=True)
+    elapsed_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
     moving_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
 
     # Geographic data:
@@ -47,16 +45,29 @@ class Activity(Base):
     steps: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # Tile achievements:
-    num_new_tiles_14: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    num_new_tiles_17: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    num_new_tiles_14: Mapped[int] = mapped_column(sa.Integer, nullable=True)
+    num_new_tiles_17: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # References to other tables:
     equipment_id: Mapped[int] = mapped_column(
-        ForeignKey("equipments.id", name="equipment_id")
+        ForeignKey("equipments.id", name="equipment_id"), nullable=True
     )
     equipment: Mapped["Equipment"] = relationship(back_populates="activities")
-    kind_id: Mapped[int] = mapped_column(ForeignKey("kinds.id", name="kind_id"))
+    kind_id: Mapped[int] = mapped_column(
+        ForeignKey("kinds.id", name="kind_id"), nullable=True
+    )
     kind: Mapped["Kind"] = relationship(back_populates="activities")
+
+    def __str__(self) -> str:
+        return f"{self.start} {self.name}"
+
+    @property
+    def average_speed_moving_kmh(self) -> float:
+        return self.distance_km / (self.moving_time.total_seconds() / 3_600)
+
+    @property
+    def average_speed_elapsed_kmh(self) -> float:
+        return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
 
 
 class Equipment(Base):
@@ -91,8 +102,36 @@ class Kind(Base):
         back_populates="kind", cascade="all, delete-orphan"
     )
     default_equipment_id: Mapped[int] = mapped_column(
-        ForeignKey("equipments.id", name="default_equipment_id")
+        ForeignKey("equipments.id", name="default_equipment_id"), nullable=True
     )
-    default_equipment: Mapped["Equipment"] = relationship(back_populates="kinds")
+    default_equipment: Mapped["Equipment"] = relationship(
+        back_populates="default_for_kinds"
+    )
 
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
+
+
+def get_or_make_kind(name: str, database: sqlalchemy.orm.Session) -> Kind:
+    kinds = database.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
+    if kinds:
+        assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
+        return kinds[0]
+    else:
+        kind = Kind(name=name)
+        database.add(kind)
+        return kind
+
+
+def get_or_make_equipment(name: str, database: sqlalchemy.orm.Session) -> Equipment:
+    equipments = database.scalars(
+        sqlalchemy.select(Equipment).where(Equipment.name == name)
+    ).all()
+    if equipments:
+        assert (
+            len(equipments) == 1
+        ), f"There must be only one equipment with name '{name}'."
+        return equipments[0]
+    else:
+        equipment = Equipment(name=name)
+        database.add(equipment)
+        return equipment

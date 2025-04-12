@@ -58,16 +58,11 @@ def get_secret_key():
     return secret
 
 
-def make_database_session() -> sqlalchemy.orm.Session:
-    engine = sa.create_engine("sqlite:///database.sqlite", echo=False)
-    Base.metadata.create_all(engine)
-    return sqlalchemy.orm.Session(engine)
-
-
 def web_ui_main(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config_accessor: ConfigAccessor,
+    database: sqlalchemy.orm.Session,
     host: str,
     port: int,
 ) -> None:
@@ -89,8 +84,6 @@ def web_ui_main(
         s = int(seconds // 1 % 60)
         return f"{h}:{m:02d}:{s:02d}"
 
-    database = make_database_session()
-    database.commit()
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
     config = config_accessor()

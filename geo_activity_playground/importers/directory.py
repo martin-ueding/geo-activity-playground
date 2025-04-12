@@ -7,10 +7,14 @@ import re
 import traceback
 from typing import Optional
 
+import sqlalchemy
 from tqdm import tqdm
 
 from geo_activity_playground.core.activities import ActivityMeta
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import get_or_make_equipment
+from geo_activity_playground.core.datamodel import get_or_make_kind
 from geo_activity_playground.core.paths import activity_extracted_dir
 from geo_activity_playground.core.paths import activity_extracted_meta_dir
 from geo_activity_playground.core.paths import activity_extracted_time_series_dir

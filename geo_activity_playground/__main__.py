@@ -4,12 +4,16 @@ import os
 import pathlib
 
 import coloredlogs
+import sqlalchemy as sa
+import sqlalchemy.orm
 
 from .importers.strava_checkout import convert_strava_checkout
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.config import import_old_config
 from geo_activity_playground.core.config import import_old_strava_config
+from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import Base
 from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
 from geo_activity_playground.explorer.video import explorer_video_main
 from geo_activity_playground.heatmap_video import main_heatmap_video
@@ -103,11 +107,20 @@ def main() -> None:
     options.func(options)
 
 
+def make_database_session() -> sqlalchemy.orm.Session:
+    engine = sa.create_engine("sqlite:///database.sqlite", echo=False)
+    Base.metadata.create_all(engine)
+    return sqlalchemy.orm.Session(engine)
+
+
 def make_activity_repository(
     basedir: pathlib.Path, skip_reload: bool
-) -> tuple[ActivityRepository, TileVisitAccessor, ConfigAccessor]:
+) -> tuple[
+    ActivityRepository, TileVisitAccessor, ConfigAccessor, sqlalchemy.orm.Session
+]:
     os.chdir(basedir)
 
+    database = make_database_session()
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
@@ -115,14 +128,16 @@ def make_activity_repository(
     import_old_strava_config(config_accessor)
 
     if not skip_reload:
-        scan_for_activities(repository, tile_visit_accessor, config_accessor())
+        scan_for_activities(
+            repository, tile_visit_accessor, config_accessor(), database
+        )
 
-    return repository, tile_visit_accessor, config_accessor
+    return repository, tile_visit_accessor, config_accessor, database
 
 
 def main_cache(basedir: pathlib.Path) -> None:
-    (repository, tile_visit_accessor, config_accessor) = make_activity_repository(
-        basedir, False
+    (repository, tile_visit_accessor, config_accessor, database) = (
+        make_activity_repository(basedir, False)
     )
 
 

@@ -13,8 +13,12 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+import sqlalchemy.orm
 from tqdm import tqdm
 
+from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import get_or_make_equipment
+from geo_activity_playground.core.datamodel import get_or_make_kind
 from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
@@ -57,72 +61,40 @@ def make_activity_meta() -> ActivityMeta:
     )
 
 
-def build_activity_meta() -> None:
-    if activities_file().exists():
-        meta = pd.read_parquet(activities_file())
-        present_ids = set(meta["id"])
-    else:
-        meta = pd.DataFrame(columns=["id"])
-        present_ids = set()
-
+def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
     available_ids = {
         int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
     }
-    new_ids = available_ids - present_ids
-    deleted_ids = present_ids - available_ids
 
-    # Remove updated activities and read these again.
-    if activities_file().exists():
-        meta_mtime = activities_file().stat().st_mtime
-        updated_ids = {
-            int(path.stem)
-            for path in activity_enriched_meta_dir().glob("*.pickle")
-            if path.stat().st_mtime > meta_mtime
-        }
-        new_ids.update(updated_ids)
-        deleted_ids.update(updated_ids & present_ids)
-
-    if deleted_ids:
-        logger.debug(f"Removing activities {deleted_ids} from repository.")
-        meta.drop(sorted(deleted_ids), axis="index", inplace=True)
-
-    rows = []
-    for new_id in tqdm(new_ids, desc="Register new activities"):
-        with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
-            data = pickle.load(f)
-        override_file = activity_meta_override_dir() / f"{new_id}.json"
+    for legacy_id in available_ids:
+        result = database.scalars(
+            sqlalchemy.select(Activity).where(Activity.id == legacy_id)
+        ).all()
+        if result:
+            continue
+        with open(activity_enriched_meta_dir() / f"{legacy_id}.pickle", "rb") as f:
+            data: ActivityMeta = pickle.load(f)
+        override_file = activity_meta_override_dir() / f"{legacy_id}.json"
         if override_file.exists():
             with open(override_file) as f:
                 data.update(json.load(f))
-        rows.append(data)
 
-    if rows:
-        new_shard = pd.DataFrame(rows)
-        new_shard.index = new_shard["id"]
-        new_shard.index.name = "index"
-        if len(meta):
-            meta = pd.concat([meta, new_shard])
+        del data["consider_for_achievements"]
+        del data["commute"]
+
+        if data["kind"] == "Unknown":
+            data["kind"] = None
         else:
-            meta = new_shard
+            data["kind"] = get_or_make_kind(data["kind"], database)
+        if data["equipment"] == "Unknown":
+            data["equipment"] = None
+        else:
+            data["equipment"] = get_or_make_equipment(data["equipment"], database)
 
-    if len(meta):
-        assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
-            meta["start"].dtype,
-            meta["start"].iloc[0],
-        )
-
-        meta.sort_values("start", inplace=True)
-
-        meta.loc[meta["kind"] == "", "kind"] = "Unknown"
-        meta.loc[meta["equipment"] == "", "equipment"] = "Unknown"
-        meta["average_speed_moving_kmh"] = meta["distance_km"] / (
-            meta["moving_time"].dt.total_seconds() / 3_600
-        )
-        meta["average_speed_elapsed_kmh"] = meta["distance_km"] / (
-            meta["elapsed_time"].dt.total_seconds() / 3_600
-        )
-
-    meta.to_parquet(activities_file())
+        print(data)
+        activity = Activity(**data)
+        database.add(activity)
+        database.commit()
 
 
 class ActivityRepository:
