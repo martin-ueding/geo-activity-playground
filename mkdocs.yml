@@ -51,6 +51,7 @@ nav:
     - explorer-tiles.md
     - eddington-number.md
     - heart-rate-zones.md
+    - elevation-gain-from-noisy-data.md
   - Other:
     - get-help.md
     - acknowledgments.md
