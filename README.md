@@ -53,5 +53,5 @@ Here are a few examples of what Geo Activity Playground looks like in action:
 
 The app runs on **Linux**, **macOS**, and **Windows**. No cloud service required — it's just Python and a browser!
 
-For full setup instructions and OS-specific steps, visit the ![Documentation](https://martin-ueding.github.io/geo-activity-playground/).
+For full setup instructions and OS-specific steps, visit the [documentation](https://martin-ueding.github.io/geo-activity-playground/).
 
