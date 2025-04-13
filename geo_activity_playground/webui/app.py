@@ -6,7 +6,6 @@ import secrets
 import shutil
 import urllib.parse
 
-import sqlalchemy as sa
 import sqlalchemy.orm
 from flask import Flask
 from flask import request
@@ -35,9 +34,8 @@ from .settings.blueprint import make_settings_blueprint
 from .square_planner_blueprint import make_square_planner_blueprint
 from .summary_blueprint import make_summary_blueprint
 from .upload_blueprint import make_upload_blueprint
-from .views.entry_views import EntryView
+from .views.entry_views import register_entry_views
 from .views.tile_views import TileView
-from geo_activity_playground.core.datamodel import Base
 from geo_activity_playground.webui.bubble_chart_blueprint import (
     make_bubble_chart_blueprint,
 )
@@ -99,13 +97,14 @@ def web_ui_main(
     }
     flasher = FlaskFlasher()
     views: list[MyView] = [
-        EntryView(repository, config),
         SettingsAdminPasswordView(authenticator, config_accessor, flasher),
         TileView(image_transforms, tile_getter),
     ]
 
     for view in views:
         view.register(app)
+
+    register_entry_views(app, repository, config)
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
     app.register_blueprint(

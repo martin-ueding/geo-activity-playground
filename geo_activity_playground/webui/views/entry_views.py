@@ -2,6 +2,7 @@ import collections
 import datetime
 
 import altair as alt
+import flask
 import pandas as pd
 from flask import render_template
 from flask import Response
@@ -9,34 +10,29 @@ from flask import Response
 from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.activities import make_geojson_from_time_series
 from geo_activity_playground.core.config import Config
-from geo_activity_playground.webui.interfaces import MyView
 from geo_activity_playground.webui.plot_util import make_kind_scale
 
 
-class EntryView(MyView):
-    def __init__(self, repository: ActivityRepository, config: Config) -> None:
-        self._repository = repository
-        self._config = config
-
-    def register(self, app):
-        app.add_url_rule("/", "index", self.dispatch)
-
-    def dispatch(self) -> Response:
+def register_entry_views(
+    app: flask.Flask, repository: ActivityRepository, config: Config
+) -> None:
+    @app.route("/")
+    def index() -> Response:
         context = {"latest_activities": []}
 
-        if len(self._repository):
-            kind_scale = make_kind_scale(self._repository.meta, self._config)
+        if len(repository):
+            kind_scale = make_kind_scale(repository.meta, config)
             context["distance_last_30_days_plot"] = _distance_last_30_days_meta_plot(
-                self._repository.meta, kind_scale
+                repository.meta, kind_scale
             )
 
-        meta = self._repository.meta.copy()
+        meta = repository.meta.copy()
         meta["date"] = meta["start"].dt.date
 
         context["latest_activities"] = collections.defaultdict(list)
         for date, activity_meta in list(meta.groupby("date"))[:-30:-1]:
             for index, activity in activity_meta.iterrows():
-                time_series = self._repository.get_time_series(activity["id"])
+                time_series = repository.get_time_series(activity["id"])
                 context["latest_activities"][date].append(
                     {
                         "activity": activity,
