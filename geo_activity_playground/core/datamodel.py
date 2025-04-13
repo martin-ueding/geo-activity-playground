@@ -14,7 +14,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from geo_activity_playground.core.paths import activity_enriched_time_series_dir
+from geo_activity_playground.core.paths import time_series_dir
 
 
 logger = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ class Activity(Base):
 
     @property
     def timeseries(self) -> pd.DataFrame:
-        path = activity_enriched_time_series_dir() / f"{self.id}.parquet"
+        path = time_series_dir() / f"{self.id}.parquet"
         try:
             df = pd.read_parquet(path)
         except OSError as e:

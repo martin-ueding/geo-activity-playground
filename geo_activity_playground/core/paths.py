@@ -1,10 +1,11 @@
-"""
-Paths within the playground and cache.
-"""
 import contextlib
 import functools
 import pathlib
 import typing
+
+"""
+Paths within the playground and cache.
+"""
 
 
 def dir_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:
@@ -48,16 +49,13 @@ _tiles_per_time_series = _cache_dir / "Tiles" / "Tiles Per Time Series"
 
 _strava_api_dir = pathlib.Path("Strava API")
 _strava_dynamic_config_path = _strava_api_dir / "strava-client-id.json"
-
 _strava_last_activity_date_path = _cache_dir / "strava-last-activity-date.json"
-
 _new_config_file = pathlib.Path("config.json")
-
 _activity_meta_override_dir = pathlib.Path("Metadata Override")
+_time_series_dir = pathlib.Path("Time Series")
 
 
 cache_dir = dir_wrapper(_cache_dir)
-
 activity_extracted_dir = dir_wrapper(_activity_extracted_dir)
 activity_extracted_meta_dir = dir_wrapper(_activity_extracted_meta_dir)
 activity_extracted_time_series_dir = dir_wrapper(_activity_extracted_time_series_dir)
@@ -66,6 +64,7 @@ activity_enriched_time_series_dir = dir_wrapper(_activity_enriched_time_series_d
 tiles_per_time_series = dir_wrapper(_tiles_per_time_series)
 strava_api_dir = dir_wrapper(_strava_api_dir)
 activity_meta_override_dir = dir_wrapper(_activity_meta_override_dir)
+time_series_dir = dir_wrapper(_time_series_dir)
 
 activities_file = file_wrapper(_activities_file)
 strava_dynamic_config_path = file_wrapper(_strava_dynamic_config_path)

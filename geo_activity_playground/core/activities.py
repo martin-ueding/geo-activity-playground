@@ -2,7 +2,9 @@ import datetime
 import functools
 import json
 import logging
+import pathlib
 import pickle
+import shutil
 from collections.abc import Callable
 from typing import Any
 from typing import Iterator
@@ -21,10 +23,10 @@ from geo_activity_playground.core.datamodel import Equipment
 from geo_activity_playground.core.datamodel import get_or_make_equipment
 from geo_activity_playground.core.datamodel import get_or_make_kind
 from geo_activity_playground.core.datamodel import Kind
-from geo_activity_playground.core.paths import activities_file
 from geo_activity_playground.core.paths import activity_enriched_meta_dir
 from geo_activity_playground.core.paths import activity_enriched_time_series_dir
 from geo_activity_playground.core.paths import activity_meta_override_dir
+from geo_activity_playground.core.paths import time_series_dir
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +47,14 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
         int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
     }
 
-    for legacy_id in available_ids:
-        result = database.scalars(
-            sqlalchemy.select(Activity).where(Activity.id == legacy_id)
-        ).all()
-        if result:
+    for legacy_id in tqdm(available_ids, desc="Importing activities into database"):
+        pickle_path = activity_enriched_meta_dir() / f"{legacy_id}.pickle"
+        result = database.scalar(
+            sqlalchemy.select(Activity).where(Activity.path == str(pickle_path))
+        )
+        if result is not None:
             continue
-        with open(activity_enriched_meta_dir() / f"{legacy_id}.pickle", "rb") as f:
+        with open(pickle_path, "rb") as f:
             data: ActivityMeta = pickle.load(f)
         override_file = activity_meta_override_dir() / f"{legacy_id}.json"
         if override_file.exists():
@@ -60,6 +63,8 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
 
         del data["consider_for_achievements"]
         del data["commute"]
+        del data["id"]
+        data["path"] = str(pickle_path)
 
         if data["kind"] == "Unknown":
             data["kind"] = None
@@ -70,10 +75,16 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
         else:
             data["equipment"] = get_or_make_equipment(data["equipment"], database)
 
-        print(data)
         activity = Activity(**data)
         database.add(activity)
         database.commit()
+
+        enriched_time_series_path = (
+            activity_enriched_time_series_dir() / f"{legacy_id}.parquet"
+        )
+        shutil.copy(
+            enriched_time_series_path, time_series_dir() / f"{activity.id}.parquet"
+        )
 
 
 class ActivityRepository:
@@ -115,9 +126,12 @@ class ActivityRepository:
         return result[::direction]
 
     def get_activity_by_id(self, id: int) -> Activity:
-        return self._db_session.scalar(
-            sqlalchemy.select(Activity).where(Activity.id == id)
+        activity = self._db_session.scalar(
+            sqlalchemy.select(Activity).where(Activity.id == int(id))
         )
+        if activity is None:
+            raise ValueError(f"Cannot find activity {id} in database.")
+        return activity
 
     @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
@@ -125,8 +139,18 @@ class ActivityRepository:
 
     @property
     def meta(self) -> pd.DataFrame:
-        activities = self.iter_activities(new_to_old=False)
-        return pd.DataFrame([activity.to_dict() for activity in activities])
+        activities = self.iter_activities(new_to_old=False, drop_na=True)
+        df = pd.DataFrame([activity.to_dict() for activity in activities])
+        df["year"] = [start.year for start in df["start"]]
+        df["month"] = [start.month for start in df["start"]]
+        df["day"] = [start.day for start in df["start"]]
+        df["week"] = [start.isocalendar().week for start in df["start"]]
+        df["iso_year"] = [start.isocalendar().year for start in df["start"]]
+        df["hours"] = [
+            elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
+        ]
+        df.index = df["id"]
+        return df
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
