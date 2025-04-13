@@ -56,9 +56,10 @@ class Activity(DB.Model):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(sa.String, nullable=False)
     path: Mapped[str] = mapped_column(sa.String, nullable=True)
+    upstream_id: Mapped[str] = mapped_column(sa.String, nullable=True)
 
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
     distance_km: Mapped[float] = mapped_column(sa.Float, nullable=False)
 
     # Crop data:
