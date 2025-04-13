@@ -9,13 +9,13 @@ from PIL import Image
 from PIL import ImageDraw
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.raster_map import convert_to_grayscale
-from geo_activity_playground.core.raster_map import map_image_from_tile_bounds
-from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.core.raster_map import tile_bounds_around_center
-from geo_activity_playground.core.tiles import compute_tile_float
+from .core.activities import ActivityRepository
+from .core.config import ConfigAccessor
+from .core.raster_map import convert_to_grayscale
+from .core.raster_map import map_image_from_tile_bounds
+from .core.raster_map import OSM_TILE_SIZE
+from .core.raster_map import tile_bounds_around_center
+from .core.tiles import compute_tile_float
 
 
 def main_heatmap_video(options) -> None:

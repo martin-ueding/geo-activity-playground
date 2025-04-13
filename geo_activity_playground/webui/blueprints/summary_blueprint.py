@@ -7,13 +7,13 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.meta_search import apply_search_query
-from geo_activity_playground.webui.plot_util import make_kind_scale
-from geo_activity_playground.webui.search_util import search_query_from_form
-from geo_activity_playground.webui.search_util import SearchQueryHistory
+from ...core.activities import ActivityRepository
+from ...core.activities import make_geojson_from_time_series
+from ...core.config import Config
+from ...core.meta_search import apply_search_query
+from ..plot_util import make_kind_scale
+from ..search_util import search_query_from_form
+from ..search_util import SearchQueryHistory
 
 
 def make_summary_blueprint(

@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template
 import altair as alt
 import pandas as pd
+from flask import Blueprint
+from flask import render_template
 
-def make_bubble_chart_blueprint(repository):
+
+def make_bubble_chart_blueprint(repository) -> Blueprint:
     blueprint = Blueprint("bubble_chart", __name__, template_folder="templates")
 
     @blueprint.route("/", endpoint="index")
@@ -11,14 +13,25 @@ def make_bubble_chart_blueprint(repository):
 
         # Ensure 'activity_id' exists in the activities DataFrame
         if "activity_id" not in activities.columns:
-            activities["activity_id"] = activities.index  # Use index as fallback if missing
+            activities["activity_id"] = (
+                activities.index
+            )  # Use index as fallback if missing
 
         # Prepare the bubble chart data
-        bubble_data = activities[["start", "distance_km", "kind", "activity_id"]].rename(
-            columns={"start": "date", "distance_km": "distance", "kind": "activity", "activity_id": "id"}
+        bubble_data = activities[
+            ["start", "distance_km", "kind", "activity_id"]
+        ].rename(
+            columns={
+                "start": "date",
+                "distance_km": "distance",
+                "kind": "activity",
+                "activity_id": "id",
+            }
         )
         bubble_data["date"] = pd.to_datetime(bubble_data["date"]).dt.date
-        bubble_data["activity_url"] = bubble_data["id"].apply(lambda x: f"/activity/{x}")
+        bubble_data["activity_url"] = bubble_data["id"].apply(
+            lambda x: f"/activity/{x}"
+        )
 
         # Create the bubble chart
         bubble_chart = (
@@ -27,7 +40,9 @@ def make_bubble_chart_blueprint(repository):
             .encode(
                 x=alt.X("date:T", title="Date"),
                 y=alt.Y("distance:Q", title="Distance (km)"),
-                size=alt.Size("distance:Q", scale=alt.Scale(range=[10, 300]), title="Distance"),
+                size=alt.Size(
+                    "distance:Q", scale=alt.Scale(range=[10, 300]), title="Distance"
+                ),
                 color=alt.Color("activity:N", title="Activity"),
                 tooltip=[
                     alt.Tooltip("date:T", title="Date"),
@@ -36,10 +51,7 @@ def make_bubble_chart_blueprint(repository):
                     alt.Tooltip("activity_url:N", title="Activity Link"),
                 ],
             )
-            .properties(
-                height=800,
-                width=1200
-            )
+            .properties(height=800, width=1200)
             .interactive()
             .to_json(format="vega")
         )

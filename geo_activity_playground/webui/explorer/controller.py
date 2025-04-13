@@ -1,6 +1,6 @@
 import datetime
 import itertools
-import pickle
+import logging
 
 import altair as alt
 import geojson
@@ -9,24 +9,25 @@ import numpy as np
 import pandas as pd
 from flask import flash
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.coordinates import Bounds
-from geo_activity_playground.core.tiles import compute_tile
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.grid_file import get_border_tiles
-from geo_activity_playground.explorer.grid_file import logger
-from geo_activity_playground.explorer.grid_file import make_explorer_rectangle
-from geo_activity_playground.explorer.grid_file import make_explorer_tile
-from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
-from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
-from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import compute_tile_evolution
-from geo_activity_playground.explorer.tile_visits import TileEvolutionState
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from ...core.activities import ActivityRepository
+from ...core.config import ConfigAccessor
+from ...core.coordinates import Bounds
+from ...core.tiles import compute_tile
+from ...core.tiles import get_tile_upper_left_lat_lon
+from ...explorer.grid_file import get_border_tiles
+from ...explorer.grid_file import make_explorer_rectangle
+from ...explorer.grid_file import make_explorer_tile
+from ...explorer.grid_file import make_grid_file_geojson
+from ...explorer.grid_file import make_grid_file_gpx
+from ...explorer.grid_file import make_grid_points
+from ...explorer.tile_visits import compute_tile_evolution
+from ...explorer.tile_visits import TileEvolutionState
+from ...explorer.tile_visits import TileVisitAccessor
 
 
 alt.data_transformers.enable("vegafusion")
+
+logger = logging.getLogger(__name__)
 
 
 class ExplorerController:

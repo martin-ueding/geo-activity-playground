@@ -3,10 +3,10 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.summary_stats import get_equipment_use_table
-from geo_activity_playground.webui.plot_util import make_kind_scale
+from ...core.activities import ActivityRepository
+from ...core.config import Config
+from ...core.summary_stats import get_equipment_use_table
+from ..plot_util import make_kind_scale
 
 
 def make_equipment_blueprint(
@@ -22,7 +22,9 @@ def make_equipment_blueprint(
 
         # Prepare data for the stacked area chart
         activities = repository.meta
-        activities["month"] = activities["start"].dt.to_period("M").apply(lambda r: r.start_time)
+        activities["month"] = (
+            activities["start"].dt.to_period("M").apply(lambda r: r.start_time)
+        )
         monthly_data = (
             activities.groupby(["month", "equipment"])
             .agg(total_distance=("distance_km", "sum"))
@@ -30,7 +32,9 @@ def make_equipment_blueprint(
         )
 
         stacked_area_chart = (
-            alt.Chart(monthly_data, height=300, width=1200, title="Monthly Equipment Usage")
+            alt.Chart(
+                monthly_data, height=300, width=1200, title="Monthly Equipment Usage"
+            )
             .mark_area()
             .encode(
                 x=alt.X("month:T", title="Month"),
@@ -39,7 +43,9 @@ def make_equipment_blueprint(
                 tooltip=[
                     alt.Tooltip("month:T", title="Date"),  # Add the date to the tooltip
                     alt.Tooltip("equipment:N", title="Equipment"),
-                    alt.Tooltip("total_distance:Q" , format=".0f", title="Total Distance"),
+                    alt.Tooltip(
+                        "total_distance:Q", format=".0f", title="Total Distance"
+                    ),
                 ],
             )
             .interactive()

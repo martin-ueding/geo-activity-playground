@@ -7,18 +7,18 @@ import coloredlogs
 import sqlalchemy as sa
 import sqlalchemy.orm
 
+from .core.activities import ActivityRepository
+from .core.config import ConfigAccessor
+from .core.config import import_old_config
+from .core.config import import_old_strava_config
+from .core.datamodel import Activity
+from .core.datamodel import Base
+from .explorer.tile_visits import TileVisitAccessor
+from .explorer.video import explorer_video_main
+from .heatmap_video import main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.config import import_old_config
-from geo_activity_playground.core.config import import_old_strava_config
-from geo_activity_playground.core.datamodel import Activity
-from geo_activity_playground.core.datamodel import Base
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.explorer.video import explorer_video_main
-from geo_activity_playground.heatmap_video import main_heatmap_video
-from geo_activity_playground.webui.app import web_ui_main
-from geo_activity_playground.webui.upload_blueprint import scan_for_activities
+from .webui.app import web_ui_main
+from .webui.blueprints.upload_blueprint import scan_for_activities
 
 logger = logging.getLogger(__name__)
 

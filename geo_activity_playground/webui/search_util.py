@@ -1,11 +1,9 @@
-from typing import Optional
-
 from werkzeug.datastructures import MultiDict
 
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.meta_search import _parse_date_or_none
-from geo_activity_playground.core.meta_search import SearchQuery
-from geo_activity_playground.webui.authenticator import Authenticator
+from ..core.config import ConfigAccessor
+from ..core.meta_search import _parse_date_or_none
+from ..core.meta_search import SearchQuery
+from .authenticator import Authenticator
 
 
 def search_query_from_form(args: MultiDict) -> SearchQuery:

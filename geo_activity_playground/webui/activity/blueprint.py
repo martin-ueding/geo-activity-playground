@@ -8,11 +8,11 @@ from flask import request
 from flask import Response
 from flask import url_for
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.paths import activity_meta_override_dir
-from geo_activity_playground.webui.activity.controller import ActivityController
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
+from ...core.activities import ActivityRepository
+from ...core.paths import activity_meta_override_dir
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from .controller import ActivityController
 
 
 def make_activity_blueprint(

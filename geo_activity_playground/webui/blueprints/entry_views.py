@@ -7,10 +7,10 @@ import pandas as pd
 from flask import render_template
 from flask import Response
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.webui.plot_util import make_kind_scale
+from ...core.activities import ActivityRepository
+from ...core.activities import make_geojson_from_time_series
+from ...core.config import Config
+from ..plot_util import make_kind_scale
 
 
 def register_entry_views(

@@ -4,9 +4,9 @@ from flask import render_template
 from flask import Response
 from flask import url_for
 
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
-from geo_activity_playground.webui.explorer.controller import ExplorerController
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from .controller import ExplorerController
 
 
 def make_explorer_blueprint(

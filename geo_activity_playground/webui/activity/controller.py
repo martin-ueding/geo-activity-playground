@@ -12,22 +12,21 @@ import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import make_geojson_color_line
-from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.activities import make_speed_color_bar
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.datamodel import Activity
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
-from geo_activity_playground.core.privacy_zones import PrivacyZone
-from geo_activity_playground.core.raster_map import map_image_from_tile_bounds
-from geo_activity_playground.core.raster_map import OSM_MAX_ZOOM
-from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.core.raster_map import tile_bounds_around_center
-from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
-from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from ...core.activities import ActivityRepository
+from ...core.activities import make_geojson_color_line
+from ...core.activities import make_geojson_from_time_series
+from ...core.activities import make_speed_color_bar
+from ...core.config import Config
+from ...core.datamodel import Activity
+from ...core.heart_rate import HeartRateZoneComputer
+from ...core.privacy_zones import PrivacyZone
+from ...core.raster_map import map_image_from_tile_bounds
+from ...core.raster_map import OSM_MAX_ZOOM
+from ...core.raster_map import OSM_TILE_SIZE
+from ...core.raster_map import tile_bounds_around_center
+from ...explorer.grid_file import make_grid_file_geojson
+from ...explorer.grid_file import make_grid_points
+from ...explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
 

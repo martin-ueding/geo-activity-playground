@@ -7,8 +7,8 @@ from typing import Optional
 from flask import flash
 from flask import url_for
 
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
+from ...core.config import ConfigAccessor
+from ...core.heart_rate import HeartRateZoneComputer
 
 
 SHAREPIC_FIELDS = {

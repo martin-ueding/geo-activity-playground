@@ -9,13 +9,13 @@ from flask import request
 from flask import Response
 from flask import url_for
 
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.paths import _activity_enriched_dir
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
-from geo_activity_playground.webui.flasher import Flasher
-from geo_activity_playground.webui.flasher import FlashTypes
-from geo_activity_playground.webui.settings.controller import SettingsController
+from ...core.config import ConfigAccessor
+from ...core.paths import _activity_enriched_dir
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from ..flasher import Flasher
+from ..flasher import FlashTypes
+from .controller import SettingsController
 
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [

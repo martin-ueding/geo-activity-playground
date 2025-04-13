@@ -6,7 +6,7 @@ from flask import redirect
 from flask import session
 from flask import url_for
 
-from geo_activity_playground.core.config import Config
+from ..core.config import Config
 
 
 class Authenticator:

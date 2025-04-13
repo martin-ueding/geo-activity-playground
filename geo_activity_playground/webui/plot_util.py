@@ -1,7 +1,7 @@
 import altair as alt
 import pandas as pd
 
-from geo_activity_playground.core.config import Config
+from ..core.config import Config
 
 
 def make_kind_scale(meta: pd.DataFrame, config: Config) -> alt.Scale:
