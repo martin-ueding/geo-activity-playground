@@ -1,4 +1,3 @@
-import json
 import urllib.parse
 
 import sqlalchemy
@@ -15,7 +14,6 @@ from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
-from ...core.paths import activity_meta_override_dir
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from .controller import ActivityController
