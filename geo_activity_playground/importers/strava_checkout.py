@@ -6,25 +6,24 @@ import shutil
 import sys
 import traceback
 from typing import Optional
-from typing import Union
 
 import dateutil.parser
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.paths import activity_extracted_meta_dir
-from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.paths import strava_last_activity_date_path
-from geo_activity_playground.core.tasks import get_state
-from geo_activity_playground.core.tasks import set_state
-from geo_activity_playground.core.tasks import work_tracker_path
-from geo_activity_playground.core.tasks import WorkTracker
-from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
-from geo_activity_playground.importers.activity_parsers import ActivityParseError
-from geo_activity_playground.importers.activity_parsers import read_activity
-from geo_activity_playground.importers.csv_parser import parse_csv
+from ..core.datamodel import ActivityMeta
+from ..core.paths import activity_extracted_meta_dir
+from ..core.paths import activity_extracted_time_series_dir
+from ..core.paths import strava_last_activity_date_path
+from ..core.tasks import get_state
+from ..core.tasks import set_state
+from ..core.tasks import work_tracker_path
+from ..core.tasks import WorkTracker
+from ..core.time_conversion import convert_to_datetime_ns
+from .activity_parsers import ActivityParseError
+from .activity_parsers import read_activity
+from .csv_parser import parse_csv
 
 
 logger = logging.getLogger(__name__)

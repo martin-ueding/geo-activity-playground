@@ -4,7 +4,6 @@ import itertools
 import logging
 import pathlib
 import pickle
-from typing import Any
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -12,15 +11,14 @@ from typing import TypedDict
 import pandas as pd
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.paths import atomic_open
-from geo_activity_playground.core.paths import tiles_per_time_series
-from geo_activity_playground.core.tasks import try_load_pickle
-from geo_activity_playground.core.tasks import work_tracker_path
-from geo_activity_playground.core.tasks import WorkTracker
-from geo_activity_playground.core.tiles import adjacent_to
-from geo_activity_playground.core.tiles import interpolate_missing_tile
+from ..core.activities import ActivityRepository
+from ..core.config import Config
+from ..core.paths import atomic_open
+from ..core.tasks import try_load_pickle
+from ..core.tasks import work_tracker_path
+from ..core.tasks import WorkTracker
+from ..core.tiles import adjacent_to
+from ..core.tiles import interpolate_missing_tile
 
 
 logger = logging.getLogger(__name__)

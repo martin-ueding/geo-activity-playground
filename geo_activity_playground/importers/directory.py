@@ -1,27 +1,21 @@
 import hashlib
 import logging
-import multiprocessing
 import pathlib
 import pickle
 import re
 import traceback
 from typing import Optional
 
-import sqlalchemy
 from tqdm import tqdm
 
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.datamodel import Activity
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.datamodel import get_or_make_equipment
-from geo_activity_playground.core.datamodel import get_or_make_kind
-from geo_activity_playground.core.paths import activity_extracted_dir
-from geo_activity_playground.core.paths import activity_extracted_meta_dir
-from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.tasks import stored_object
-from geo_activity_playground.core.tasks import WorkTracker
-from geo_activity_playground.importers.activity_parsers import ActivityParseError
-from geo_activity_playground.importers.activity_parsers import read_activity
+from ..core.config import Config
+from ..core.paths import activity_extracted_dir
+from ..core.paths import activity_extracted_meta_dir
+from ..core.paths import activity_extracted_time_series_dir
+from ..core.tasks import stored_object
+from ..core.tasks import WorkTracker
+from .activity_parsers import ActivityParseError
+from .activity_parsers import read_activity
 
 logger = logging.getLogger(__name__)
 

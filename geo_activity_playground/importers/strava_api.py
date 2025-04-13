@@ -11,15 +11,15 @@ from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.paths import activity_extracted_meta_dir
-from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.paths import strava_api_dir
-from geo_activity_playground.core.paths import strava_last_activity_date_path
-from geo_activity_playground.core.tasks import get_state
-from geo_activity_playground.core.tasks import set_state
-from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
+from ..core.config import Config
+from ..core.datamodel import ActivityMeta
+from ..core.paths import activity_extracted_meta_dir
+from ..core.paths import activity_extracted_time_series_dir
+from ..core.paths import strava_api_dir
+from ..core.paths import strava_last_activity_date_path
+from ..core.tasks import get_state
+from ..core.tasks import set_state
+from ..core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)

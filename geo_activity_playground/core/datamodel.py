@@ -15,7 +15,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from geo_activity_playground.core.paths import time_series_dir
+from .paths import time_series_dir
 
 
 logger = logging.getLogger(__name__)

@@ -13,8 +13,8 @@ import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
 
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
+from ..core.datamodel import ActivityMeta
+from ..core.time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
 

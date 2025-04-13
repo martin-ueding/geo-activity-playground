@@ -8,8 +8,8 @@ from typing import Generic
 from typing import Sequence
 from typing import TypeVar
 
-from geo_activity_playground.core.paths import atomic_open
-from geo_activity_playground.core.paths import cache_dir
+from .paths import atomic_open
+from .paths import cache_dir
 
 
 T = TypeVar("T")

@@ -1,33 +1,21 @@
 import datetime
 import functools
-import json
 import logging
-import pathlib
-import pickle
-import shutil
 from collections.abc import Callable
 from typing import Any
-from typing import Iterator
 from typing import Optional
 
 import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
-import sqlalchemy.orm
+import sqlalchemy
 from tqdm import tqdm
 
 from geo_activity_playground.core.datamodel import Activity
 from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.datamodel import DB
-from geo_activity_playground.core.datamodel import Equipment
-from geo_activity_playground.core.datamodel import get_or_make_equipment
-from geo_activity_playground.core.datamodel import get_or_make_kind
 from geo_activity_playground.core.datamodel import Kind
-from geo_activity_playground.core.paths import activity_enriched_meta_dir
-from geo_activity_playground.core.paths import activity_enriched_time_series_dir
-from geo_activity_playground.core.paths import activity_meta_override_dir
-from geo_activity_playground.core.paths import time_series_dir
 
 logger = logging.getLogger(__name__)
 

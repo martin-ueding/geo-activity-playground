@@ -1,5 +1,4 @@
 import pathlib
-import pickle
 
 import imagehash
 import numpy as np
@@ -10,7 +9,7 @@ from tqdm import tqdm
 
 from .activities import ActivityRepository
 from .coordinates import get_distance
-from geo_activity_playground.core.tasks import stored_object
+from .tasks import stored_object
 
 
 fingerprint_path = pathlib.Path("Cache/activity_fingerprints.pickle")

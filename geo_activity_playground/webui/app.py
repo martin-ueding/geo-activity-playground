@@ -7,17 +7,14 @@ import secrets
 import shutil
 import urllib.parse
 
-import sqlalchemy.orm
 from flask import Flask
 from flask import request
 from flask_alembic import Alembic
-from flask_sqlalchemy import SQLAlchemy
 
 from ..core.activities import ActivityRepository
 from ..core.config import ConfigAccessor
 from ..core.config import import_old_config
 from ..core.config import import_old_strava_config
-from ..core.datamodel import Base
 from ..core.datamodel import DB
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform

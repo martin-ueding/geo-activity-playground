@@ -20,9 +20,7 @@ from ...core.raster_map import PixelBounds
 from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import TileVisitAccessor
-from ..explorer.controller import (
-    bounding_box_for_biggest_cluster,
-)
+from ..explorer.controller import bounding_box_for_biggest_cluster
 
 
 logger = logging.getLogger(__name__)
