@@ -39,6 +39,7 @@ vegafusion-python-embed = "^1.4.3"
 vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
 flask-sqlalchemy = "^3.1.1"
+flask-alembic = "^3.1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"

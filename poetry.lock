@@ -869,6 +869,22 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-alembic"
+version = "3.1.1"
+description = "Integrate Alembic with Flask."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "flask_alembic-3.1.1-py3-none-any.whl", hash = "sha256:1d0cda58518d4332d8563da555bee03107fe2169c7157f61a2e0759d0150209b"},
+    {file = "flask_alembic-3.1.1.tar.gz", hash = "sha256:358a0ad8f74e2969273a8d89feaf5842f65cc909064b51fde4b51415790d92f4"},
+]
+
+[package.dependencies]
+alembic = ">=1.13"
+flask = ">=3.0"
+sqlalchemy = ">=2.0"
+
+[[package]]
 name = "flask-sqlalchemy"
 version = "3.1.1"
 description = "Add SQLAlchemy support to your Flask application."
@@ -4360,4 +4376,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.14"
-content-hash = "61fdfd4b527a0b0c8507e2a30b2b884cfbe76a1b09438d247ac4093d48542b15"
+content-hash = "fa1c8ec924dbb3440043c8f8b74461aaf8e11d1279ff2bea937d286efd2d7c02"

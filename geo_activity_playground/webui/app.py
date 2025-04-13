@@ -10,6 +10,7 @@ import urllib.parse
 import sqlalchemy.orm
 from flask import Flask
 from flask import request
+from flask_alembic import Alembic
 from flask_sqlalchemy import SQLAlchemy
 
 from ..core.activities import ActivityRepository
@@ -72,10 +73,16 @@ def web_ui_main(
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         f"sqlite:///{basedir.absolute()}/database.sqlite"
     )
+    app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
     DB.init_app(app)
 
+    alembic = Alembic()
+    alembic.init_app(app)
+
     with app.app_context():
-        DB.create_all()
+        alembic.upgrade()
+        DB.session.commit()
+        # DB.create_all()
 
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
