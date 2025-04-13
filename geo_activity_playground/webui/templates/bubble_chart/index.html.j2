@@ -2,16 +2,36 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
 <div class="row mb-3">
     <div class="col">
-        <h1>Bubble Chart</h1>
-        <div id="bubble-chart"></div>
-        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <h1>Bubble Chart: Distance</h1>
+        <div id="bubble-chart-distance"></div>
         <script>
-            const chartSpec = {{ bubble_chart | safe }};
-            vegaEmbed('#bubble-chart', chartSpec).then((result) => {
+            const chartSpecDistance = {{ bubble_chart_distance | safe }};
+            vegaEmbed('#bubble-chart-distance', chartSpecDistance).then((result) => {
+                // Add a click event listener to the chart
+                result.view.addEventListener('click', (event, item) => {
+                    if (item && item.datum && item.datum.activity_url) {
+                        // Redirect to the activity URL
+                        window.location.href = item.datum.activity_url;
+                    }
+                });
+            }).catch(console.error);
+        </script>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>Bubble Chart: Elevation Gain</h1>
+        <div id="bubble-chart-elevation-gain"></div>
+        <script>
+            const chartSpecElevationGain = {{ bubble_chart_elevation_gain | safe }};
+            vegaEmbed('#bubble-chart-elevation-gain', chartSpecElevationGain).then((result) => {
                 // Add a click event listener to the chart
                 result.view.addEventListener('click', (event, item) => {
                     if (item && item.datum && item.datum.activity_url) {
