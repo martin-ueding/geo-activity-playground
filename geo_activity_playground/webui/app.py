@@ -10,38 +10,38 @@ import sqlalchemy.orm
 from flask import Flask
 from flask import request
 
-from ..core.activities import ActivityRepository
-from ..core.config import ConfigAccessor
-from ..core.raster_map import GrayscaleImageTransform
-from ..core.raster_map import IdentityImageTransform
-from ..core.raster_map import PastelImageTransform
-from ..core.raster_map import TileGetter
-from ..explorer.tile_visits import TileVisitAccessor
-from .activity.blueprint import make_activity_blueprint
-from .activity.controller import ActivityController
-from .auth_blueprint import make_auth_blueprint
-from .authenticator import Authenticator
-from .calendar.blueprint import make_calendar_blueprint
-from .calendar.controller import CalendarController
-from .eddington_blueprint import make_eddington_blueprint
-from .equipment_blueprint import make_equipment_blueprint
-from .explorer.blueprint import make_explorer_blueprint
-from .explorer.controller import ExplorerController
-from .heatmap.blueprint import make_heatmap_blueprint
-from .search_blueprint import make_search_blueprint
-from .search_util import SearchQueryHistory
-from .settings.blueprint import make_settings_blueprint
-from .square_planner_blueprint import make_square_planner_blueprint
-from .summary_blueprint import make_summary_blueprint
-from .upload_blueprint import make_upload_blueprint
-from .views.entry_views import register_entry_views
-from .views.tile_views import TileView
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.core.raster_map import GrayscaleImageTransform
+from geo_activity_playground.core.raster_map import IdentityImageTransform
+from geo_activity_playground.core.raster_map import PastelImageTransform
+from geo_activity_playground.core.raster_map import TileGetter
+from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from geo_activity_playground.webui.activity.blueprint import make_activity_blueprint
+from geo_activity_playground.webui.activity.controller import ActivityController
+from geo_activity_playground.webui.auth_blueprint import make_auth_blueprint
+from geo_activity_playground.webui.authenticator import Authenticator
 from geo_activity_playground.webui.bubble_chart_blueprint import (
     make_bubble_chart_blueprint,
 )
+from geo_activity_playground.webui.calendar.blueprint import make_calendar_blueprint
+from geo_activity_playground.webui.calendar.controller import CalendarController
+from geo_activity_playground.webui.eddington_blueprint import make_eddington_blueprint
+from geo_activity_playground.webui.equipment_blueprint import make_equipment_blueprint
+from geo_activity_playground.webui.explorer.blueprint import make_explorer_blueprint
+from geo_activity_playground.webui.explorer.controller import ExplorerController
 from geo_activity_playground.webui.flasher import FlaskFlasher
-from geo_activity_playground.webui.interfaces import MyView
-from geo_activity_playground.webui.views.settings_views import SettingsAdminPasswordView
+from geo_activity_playground.webui.heatmap.blueprint import make_heatmap_blueprint
+from geo_activity_playground.webui.search_blueprint import make_search_blueprint
+from geo_activity_playground.webui.search_util import SearchQueryHistory
+from geo_activity_playground.webui.settings.blueprint import make_settings_blueprint
+from geo_activity_playground.webui.square_planner_blueprint import (
+    make_square_planner_blueprint,
+)
+from geo_activity_playground.webui.summary_blueprint import make_summary_blueprint
+from geo_activity_playground.webui.upload_blueprint import make_upload_blueprint
+from geo_activity_playground.webui.views.entry_views import register_entry_views
+from geo_activity_playground.webui.views.tile_views import register_tile_views
 
 
 def get_secret_key():
@@ -96,15 +96,9 @@ def web_ui_main(
         "pastel": PastelImageTransform(),
     }
     flasher = FlaskFlasher()
-    views: list[MyView] = [
-        SettingsAdminPasswordView(authenticator, config_accessor, flasher),
-        TileView(image_transforms, tile_getter),
-    ]
-
-    for view in views:
-        view.register(app)
 
     register_entry_views(app, repository, config)
+    register_tile_views(app, image_transforms, tile_getter)
 
     app.register_blueprint(make_auth_blueprint(authenticator), url_prefix="/auth")
     app.register_blueprint(
@@ -132,7 +126,7 @@ def web_ui_main(
         url_prefix="/heatmap",
     )
     app.register_blueprint(
-        make_settings_blueprint(config_accessor, authenticator),
+        make_settings_blueprint(config_accessor, authenticator, flasher),
         url_prefix="/settings",
     )
     app.register_blueprint(
