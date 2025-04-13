@@ -123,6 +123,9 @@ class Activity(DB.Model):
             path.unlink(missing_ok=True)
             raise
 
+        if self.index_begin or self.index_end:
+            df = df.iloc[self.index_begin or 0 : self.index_end or -1].copy()
+
         return df
 
     def to_dict(self) -> ActivityMeta:
