@@ -114,18 +114,22 @@ class Activity(DB.Model):
         return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
 
     @property
-    def timeseries(self) -> pd.DataFrame:
+    def raw_time_series(self) -> pd.DataFrame:
         path = time_series_dir() / f"{self.id}.parquet"
         try:
-            df = pd.read_parquet(path)
+            return pd.read_parquet(path)
         except OSError as e:
             logger.error(f"Error while reading {path}, deleting cache file …")
             path.unlink(missing_ok=True)
             raise
 
+    @property
+    def time_series(self) -> pd.DataFrame:
+        df = self.raw_time_series
         if self.index_begin or self.index_end:
-            df = df.iloc[self.index_begin or 0 : self.index_end or -1].copy()
-
+            df = self.raw_time_series.iloc[
+                self.index_begin or 0 : self.index_end or -1
+            ].copy()
         return df
 
     def to_dict(self) -> ActivityMeta:

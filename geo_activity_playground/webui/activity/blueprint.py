@@ -1,5 +1,7 @@
 import urllib.parse
 
+import geojson
+import matplotlib
 import sqlalchemy
 from flask import abort
 from flask import Blueprint
@@ -71,7 +73,7 @@ def make_activity_blueprint(
     def edit(id: str):
         activity = DB.session.get(Activity, int(id))
         if activity is None:
-            raise abort(404)
+            abort(404)
         equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
         kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
 
@@ -98,6 +100,73 @@ def make_activity_blueprint(
             activity=activity,
             kinds=kinds,
             equipments=equipments,
+        )
+
+    @blueprint.route("/trim/<id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def trim(id: str):
+        activity = DB.session.get(Activity, int(id))
+        if activity is None:
+            abort(404)
+
+        if request.method == "POST":
+            form_begin = request.form.get("begin")
+            form_end = request.form.get("end")
+
+            if form_begin:
+                activity.index_begin = int(form_begin)
+            if form_end:
+                activity.index_end = int(form_end)
+
+            DB.session.commit()
+
+        cmap = matplotlib.colormaps["turbo"]
+        num_points = len(activity.time_series)
+        begin = activity.index_begin or 0
+        end = activity.index_end or num_points
+
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.LineString(
+                        [
+                            (lon, lat)
+                            for lat, lon in zip(group["latitude"], group["longitude"])
+                        ]
+                    )
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+            ]
+            + [
+                geojson.Feature(
+                    geometry=geojson.Point(
+                        (lon, lat),
+                    ),
+                    properties={
+                        "name": f"{index}",
+                        "markerType": "circle",
+                        "markerStyle": {
+                            "fillColor": matplotlib.colors.to_hex(
+                                cmap(1 - index / num_points)
+                            ),
+                            "fillOpacity": 0.5,
+                            "radius": 8,
+                            "color": "black" if begin <= index < end else "white",
+                            "opacity": 0.8,
+                            "weight": 2,
+                        },
+                    },
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+                for index, lat, lon in zip(
+                    group.index, group["latitude"], group["longitude"]
+                )
+            ]
+        )
+        return render_template(
+            "activity/trim.html.j2",
+            activity=activity,
+            color_line_geojson=geojson.dumps(fc),
         )
 
     return blueprint
