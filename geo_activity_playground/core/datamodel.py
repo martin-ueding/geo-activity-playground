@@ -61,6 +61,10 @@ class Activity(DB.Model):
 
     distance_km: Mapped[float] = mapped_column(sa.Float, nullable=False)
 
+    # Crop data:
+    index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)
+    index_end: Mapped[int] = mapped_column(sa.Integer, nullable=True)
+
     # Temporal data:
     start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=True)
     elapsed_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
