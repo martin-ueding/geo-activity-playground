@@ -19,6 +19,7 @@ from tqdm import tqdm
 
 from geo_activity_playground.core.datamodel import Activity
 from geo_activity_playground.core.datamodel import ActivityMeta
+from geo_activity_playground.core.datamodel import DB
 from geo_activity_playground.core.datamodel import Equipment
 from geo_activity_playground.core.datamodel import get_or_make_equipment
 from geo_activity_playground.core.datamodel import get_or_make_kind
@@ -42,14 +43,14 @@ def make_activity_meta() -> ActivityMeta:
     )
 
 
-def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
+def build_activity_meta() -> None:
     available_ids = {
         int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
     }
 
-    for legacy_id in tqdm(available_ids, desc="Importing activities into database"):
+    for legacy_id in tqdm(available_ids, desc="Importing activities into DB.session"):
         pickle_path = activity_enriched_meta_dir() / f"{legacy_id}.pickle"
-        result = database.scalar(
+        result = DB.session.scalar(
             sqlalchemy.select(Activity).where(Activity.path == str(pickle_path))
         )
         if result is not None:
@@ -69,15 +70,15 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
         if data["kind"] == "Unknown":
             data["kind"] = None
         else:
-            data["kind"] = get_or_make_kind(data["kind"], database)
+            data["kind"] = get_or_make_kind(data["kind"])
         if data["equipment"] == "Unknown":
             data["equipment"] = None
         else:
-            data["equipment"] = get_or_make_equipment(data["equipment"], database)
+            data["equipment"] = get_or_make_equipment(data["equipment"])
 
         activity = Activity(**data)
-        database.add(activity)
-        database.commit()
+        DB.session.add(activity)
+        DB.session.commit()
 
         enriched_time_series_path = (
             activity_enriched_time_series_dir() / f"{legacy_id}.parquet"
@@ -88,21 +89,18 @@ def build_activity_meta(database: sqlalchemy.orm.Session) -> None:
 
 
 class ActivityRepository:
-    def __init__(self, db_session: sqlalchemy.orm.Session) -> None:
-        self._db_session = db_session
-
     def __len__(self) -> int:
         return len(self.get_activity_ids())
 
     def has_activity(self, activity_id: int) -> bool:
         return bool(
-            self._db_session.scalars(
+            DB.session.scalars(
                 sqlalchemy.query(Activity).where(Activity.id == activity_id)
             ).all()
         )
 
     def last_activity_date(self) -> Optional[datetime.datetime]:
-        result = self._db_session.scalars(
+        result = DB.session.scalars(
             sqlalchemy.select(Activity).order_by(Activity.start)
         ).all()
         if result:
@@ -114,23 +112,23 @@ class ActivityRepository:
         query = sqlalchemy.select(Activity.id)
         if only_achievements:
             query = query.where(Kind.consider_for_achievements)
-        result = self._db_session.scalars(query).all()
+        result = DB.session.scalars(query).all()
         return result
 
     def iter_activities(self, new_to_old=True, drop_na=False) -> list[Activity]:
         query = sqlalchemy.select(Activity)
         if drop_na:
             query = query.where(Activity.start.is_not(None))
-        result = self._db_session.scalars(query.order_by(Activity.start)).all()
+        result = DB.session.scalars(query.order_by(Activity.start)).all()
         direction = -1 if new_to_old else 1
         return result[::direction]
 
     def get_activity_by_id(self, id: int) -> Activity:
-        activity = self._db_session.scalar(
+        activity = DB.session.scalar(
             sqlalchemy.select(Activity).where(Activity.id == int(id))
         )
         if activity is None:
-            raise ValueError(f"Cannot find activity {id} in database.")
+            raise ValueError(f"Cannot find activity {id} in DB.session.")
         return activity
 
     @functools.lru_cache(maxsize=3000)

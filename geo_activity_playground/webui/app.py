@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import json
+import os
 import pathlib
 import secrets
 import shutil
@@ -9,9 +10,14 @@ import urllib.parse
 import sqlalchemy.orm
 from flask import Flask
 from flask import request
+from flask_sqlalchemy import SQLAlchemy
 
 from ..core.activities import ActivityRepository
 from ..core.config import ConfigAccessor
+from ..core.config import import_old_config
+from ..core.config import import_old_strava_config
+from ..core.datamodel import Base
+from ..core.datamodel import DB
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import PastelImageTransform
@@ -30,6 +36,7 @@ from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
+from .blueprints.upload_blueprint import scan_for_activities
 from .calendar.blueprint import make_calendar_blueprint
 from .calendar.controller import CalendarController
 from .explorer.blueprint import make_explorer_blueprint
@@ -53,15 +60,33 @@ def get_secret_key():
 
 
 def web_ui_main(
-    repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config_accessor: ConfigAccessor,
-    database: sqlalchemy.orm.Session,
+    basedir: pathlib.Path,
+    skip_reload: bool,
     host: str,
     port: int,
 ) -> None:
+    os.chdir(basedir)
 
     app = Flask(__name__)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"sqlite:///{basedir.absolute()}/database.sqlite"
+    )
+    DB.init_app(app)
+
+    with app.app_context():
+        DB.create_all()
+
+    repository = ActivityRepository()
+    tile_visit_accessor = TileVisitAccessor()
+    config_accessor = ConfigAccessor()
+    import_old_config(config_accessor)
+    import_old_strava_config(config_accessor)
+
+    if not skip_reload:
+        with app.app_context():
+            scan_for_activities(repository, tile_visit_accessor, config_accessor())
+
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
 

@@ -1,24 +1,13 @@
 import argparse
 import logging
-import os
 import pathlib
 
 import coloredlogs
-import sqlalchemy as sa
-import sqlalchemy.orm
 
-from .core.activities import ActivityRepository
-from .core.config import ConfigAccessor
-from .core.config import import_old_config
-from .core.config import import_old_strava_config
-from .core.datamodel import Activity
-from .core.datamodel import Base
-from .explorer.tile_visits import TileVisitAccessor
 from .explorer.video import explorer_video_main
 from .heatmap_video import main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
 from .webui.app import web_ui_main
-from .webui.blueprints.upload_blueprint import scan_for_activities
 
 logger = logging.getLogger(__name__)
 
@@ -38,16 +27,6 @@ def main() -> None:
     subparsers = parser.add_subparsers(
         description="The tools are organized in subcommands.", metavar="Command"
     )
-
-    # subparser = subparsers.add_parser(
-    #     "explorer",
-    #     help="Generate GeoJSON/GPX files with explored and missing explorer tiles.",
-    # )
-    # subparser.set_defaults(
-    #     func=lambda options: main_explorer(
-    #         make_time_series_source(options.basedir)
-    #     )
-    # )
 
     subparser = subparsers.add_parser(
         "explorer-video", help="Generate video with explorer timeline."
@@ -69,7 +48,8 @@ def main() -> None:
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
         func=lambda options: web_ui_main(
-            *make_activity_repository(options.basedir, options.skip_reload),
+            options.basedir,
+            options.skip_reload,
             host=options.host,
             port=options.port,
         )
@@ -81,9 +61,6 @@ def main() -> None:
         "--port", default=5000, type=int, help="the port to run listen on"
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
-
-    subparser = subparsers.add_parser("cache", help="Cache stuff")
-    subparser.set_defaults(func=lambda options: main_cache(options.basedir))
 
     subparser = subparsers.add_parser(
         "heatmap-video", help="Create a video with the evolution of the heatmap"
@@ -105,40 +82,6 @@ def main() -> None:
     logging.getLogger("stravalib.protocol.ApiV3").setLevel(logging.WARNING)
 
     options.func(options)
-
-
-def make_database_session() -> sqlalchemy.orm.Session:
-    engine = sa.create_engine("sqlite:///database.sqlite", echo=False)
-    Base.metadata.create_all(engine)
-    return sqlalchemy.orm.Session(engine)
-
-
-def make_activity_repository(
-    basedir: pathlib.Path, skip_reload: bool
-) -> tuple[
-    ActivityRepository, TileVisitAccessor, ConfigAccessor, sqlalchemy.orm.Session
-]:
-    os.chdir(basedir)
-
-    database = make_database_session()
-    repository = ActivityRepository(database)
-    tile_visit_accessor = TileVisitAccessor()
-    config_accessor = ConfigAccessor()
-    import_old_config(config_accessor)
-    import_old_strava_config(config_accessor)
-
-    if not skip_reload:
-        scan_for_activities(
-            repository, tile_visit_accessor, config_accessor(), database
-        )
-
-    return repository, tile_visit_accessor, config_accessor, database
-
-
-def main_cache(basedir: pathlib.Path) -> None:
-    (repository, tile_visit_accessor, config_accessor, database) = (
-        make_activity_repository(basedir, False)
-    )
 
 
 if __name__ == "__main__":

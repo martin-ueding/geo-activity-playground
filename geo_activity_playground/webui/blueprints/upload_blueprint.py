@@ -104,7 +104,6 @@ def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
-    database: sqlalchemy.orm.Session,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
@@ -115,7 +114,7 @@ def scan_for_activities(
         import_from_strava_api(config)
 
     enrich_activities(config)
-    build_activity_meta(database)
+    build_activity_meta()
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)

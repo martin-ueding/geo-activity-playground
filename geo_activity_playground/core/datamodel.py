@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 import sqlalchemy.orm
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
@@ -47,7 +48,10 @@ class Base(DeclarativeBase):
     pass
 
 
-class Activity(Base):
+DB = SQLAlchemy(model_class=Base)
+
+
+class Activity(DB.Model):
     __tablename__ = "activities"
 
     # Housekeeping data:
@@ -150,7 +154,7 @@ class Activity(Base):
         )
 
 
-class Equipment(Base):
+class Equipment(DB.Model):
     __tablename__ = "equipments"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -168,7 +172,7 @@ class Equipment(Base):
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
 
 
-class Kind(Base):
+class Kind(DB.Model):
     __tablename__ = "kinds"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -191,19 +195,19 @@ class Kind(Base):
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
 
-def get_or_make_kind(name: str, database: sqlalchemy.orm.Session) -> Kind:
-    kinds = database.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
+def get_or_make_kind(name: str) -> Kind:
+    kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
         assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
         return kinds[0]
     else:
         kind = Kind(name=name)
-        database.add(kind)
+        DB.session.add(kind)
         return kind
 
 
-def get_or_make_equipment(name: str, database: sqlalchemy.orm.Session) -> Equipment:
-    equipments = database.scalars(
+def get_or_make_equipment(name: str) -> Equipment:
+    equipments = DB.session.scalars(
         sqlalchemy.select(Equipment).where(Equipment.name == name)
     ).all()
     if equipments:
@@ -213,5 +217,5 @@ def get_or_make_equipment(name: str, database: sqlalchemy.orm.Session) -> Equipm
         return equipments[0]
     else:
         equipment = Equipment(name=name)
-        database.add(equipment)
+        DB.session.add(equipment)
         return equipment
