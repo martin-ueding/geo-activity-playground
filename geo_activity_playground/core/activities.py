@@ -43,51 +43,6 @@ def make_activity_meta() -> ActivityMeta:
     )
 
 
-def build_activity_meta() -> None:
-    available_ids = {
-        int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
-    }
-
-    for legacy_id in tqdm(available_ids, desc="Importing activities into DB.session"):
-        pickle_path = activity_enriched_meta_dir() / f"{legacy_id}.pickle"
-        result = DB.session.scalar(
-            sqlalchemy.select(Activity).where(Activity.path == str(pickle_path))
-        )
-        if result is not None:
-            continue
-        with open(pickle_path, "rb") as f:
-            data: ActivityMeta = pickle.load(f)
-        override_file = activity_meta_override_dir() / f"{legacy_id}.json"
-        if override_file.exists():
-            with open(override_file) as f:
-                data.update(json.load(f))
-
-        del data["consider_for_achievements"]
-        del data["commute"]
-        del data["id"]
-        data["path"] = str(pickle_path)
-
-        if data["kind"] == "Unknown":
-            data["kind"] = None
-        else:
-            data["kind"] = get_or_make_kind(data["kind"])
-        if data["equipment"] == "Unknown":
-            data["equipment"] = None
-        else:
-            data["equipment"] = get_or_make_equipment(data["equipment"])
-
-        activity = Activity(**data)
-        DB.session.add(activity)
-        DB.session.commit()
-
-        enriched_time_series_path = (
-            activity_enriched_time_series_dir() / f"{legacy_id}.parquet"
-        )
-        shutil.copy(
-            enriched_time_series_path, time_series_dir() / f"{activity.id}.parquet"
-        )
-
-
 class ActivityRepository:
     def __len__(self) -> int:
         return len(self.get_activity_ids())

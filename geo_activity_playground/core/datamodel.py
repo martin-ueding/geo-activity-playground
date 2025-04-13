@@ -5,8 +5,8 @@ from typing import TypedDict
 
 import numpy as np
 import pandas as pd
+import sqlalchemy
 import sqlalchemy as sa
-import sqlalchemy.orm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
@@ -56,11 +56,12 @@ class Activity(DB.Model):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    path: Mapped[str] = mapped_column(sa.String, nullable=True)
-    upstream_id: Mapped[str] = mapped_column(sa.String, nullable=True)
-
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
     distance_km: Mapped[float] = mapped_column(sa.Float, nullable=False)
+
+    # Where it comes from:
+    path: Mapped[str] = mapped_column(sa.String, nullable=True)
+    upstream_id: Mapped[str] = mapped_column(sa.String, nullable=True)
 
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)

@@ -1,7 +1,6 @@
 import os
 import pathlib
 
-import sqlalchemy
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -10,9 +9,8 @@ from flask import request
 from flask import url_for
 
 from ...core.activities import ActivityRepository
-from ...core.activities import build_activity_meta
 from ...core.config import Config
-from ...core.enrichment import enrich_activities
+from ...core.enrichment import populate_database_from_extracted
 from ...explorer.tile_visits import compute_tile_evolution
 from ...explorer.tile_visits import compute_tile_visits_new
 from ...explorer.tile_visits import TileVisitAccessor
@@ -113,8 +111,7 @@ def scan_for_activities(
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(config)
 
-    enrich_activities(config)
-    build_activity_meta()
+    populate_database_from_extracted(config)
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)
