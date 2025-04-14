@@ -78,13 +78,14 @@ def populate_database_from_extracted(config: Config) -> None:
             equipment = None
 
         activity = Activity(
-            name="Name Placeholder",
+            name=extracted_metadata.get("name", "Name Placeholder"),
             distance_km=0,
             equipment=equipment,
             kind=kind,
             calories=extracted_metadata.get("calories", None),
             elevation_gain=extracted_metadata.get("elevation_gain", None),
             steps=extracted_metadata.get("steps", None),
+            path=extracted_metadata.get("path", None),
         )
 
         _update_via_time_series(activity, time_series)
