@@ -2,6 +2,7 @@ import datetime
 import io
 import logging
 import re
+import urllib.parse
 from typing import Optional
 
 import altair as alt
@@ -9,6 +10,14 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+import sqlalchemy
+from flask import abort
+from flask import Blueprint
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import Response
+from flask import url_for
 from PIL import Image
 from PIL import ImageDraw
 
@@ -18,6 +27,9 @@ from ...core.activities import make_geojson_from_time_series
 from ...core.activities import make_speed_color_bar
 from ...core.config import Config
 from ...core.datamodel import Activity
+from ...core.datamodel import DB
+from ...core.datamodel import Equipment
+from ...core.datamodel import Kind
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
 from ...core.raster_map import map_image_from_tile_bounds
@@ -27,29 +39,62 @@ from ...core.raster_map import tile_bounds_around_center
 from ...explorer.grid_file import make_grid_file_geojson
 from ...explorer.grid_file import make_grid_points
 from ...explorer.tile_visits import TileVisitAccessor
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
 
 logger = logging.getLogger(__name__)
 
 
-class ActivityController:
-    def __init__(
-        self,
-        repository: ActivityRepository,
-        tile_visit_accessor: TileVisitAccessor,
-        config: Config,
-    ) -> None:
-        self._repository = repository
-        self._tile_visit_accessor = tile_visit_accessor
-        self._config = config
-        self._heart_rate_zone_computer = HeartRateZoneComputer(config)
+def make_activity_blueprint(
+    repository: ActivityRepository,
+    authenticator: Authenticator,
+    tile_visit_accessor: TileVisitAccessor,
+    config: Config,
+) -> Blueprint:
+    blueprint = Blueprint("activity", __name__, template_folder="templates")
 
-    def render_activity(self, id: int) -> dict:
-        activity = self._repository.get_activity_by_id(id)
+    @blueprint.route("/all")
+    def all():
+        cmap = matplotlib.colormaps["Dark2"]
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.MultiLineString(
+                        coordinates=[
+                            [
+                                [lon, lat]
+                                for lat, lon in zip(
+                                    group["latitude"], group["longitude"]
+                                )
+                            ]
+                            for _, group in repository.get_time_series(
+                                activity["id"]
+                            ).groupby("segment_id")
+                        ]
+                    ),
+                    properties={
+                        "color": matplotlib.colors.to_hex(cmap(i % 8)),
+                        "activity_name": activity["name"],
+                        "activity_id": str(activity["id"]),
+                    },
+                )
+                for i, activity in enumerate(repository.iter_activities())
+            ]
+        )
 
-        time_series = self._repository.get_time_series(id)
+        context = {
+            "geojson": geojson.dumps(fc),
+        }
+        return render_template("activity/lines.html.j2", **context)
+
+    @blueprint.route("/<int:id>")
+    def show(id: str):
+        activity = repository.get_activity_by_id(id)
+
+        time_series = repository.get_time_series(id)
         line_json = make_geojson_from_time_series(time_series)
 
-        meta = self._repository.meta
+        meta = repository.meta
         similar_activities = meta.loc[
             (meta.name == activity["name"]) & (meta.id != activity["id"])
         ]
@@ -58,21 +103,17 @@ class ActivityController:
 
         new_tiles = {
             zoom: sum(
-                self._tile_visit_accessor.tile_state["tile_history"][zoom][
-                    "activity_id"
-                ]
+                tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
                 == activity["id"]
             )
-            for zoom in sorted(self._config.explorer_zoom_levels)
+            for zoom in sorted(config.explorer_zoom_levels)
         }
 
         new_tiles_geojson = {}
         new_tiles_per_zoom = {}
-        for zoom in sorted(self._config.explorer_zoom_levels):
-            new_tiles = self._tile_visit_accessor.tile_state["tile_history"][zoom].loc[
-                self._tile_visit_accessor.tile_state["tile_history"][zoom][
-                    "activity_id"
-                ]
+        for zoom in sorted(config.explorer_zoom_levels):
+            new_tiles = tile_visit_accessor.tile_state["tile_history"][zoom].loc[
+                tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
                 == activity["id"]
             ]
             if len(new_tiles):
@@ -86,7 +127,7 @@ class ActivityController:
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(new_tiles)
 
-        result = {
+        context = {
             "activity": activity,
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
@@ -102,39 +143,45 @@ class ActivityController:
         }
         if (
             heart_zones := _extract_heart_rate_zones(
-                time_series, self._heart_rate_zone_computer
+                time_series, heart_rate_zone_computer
             )
         ) is not None:
-            result["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
+            context["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
         if "altitude" in time_series.columns:
-            result["altitude_time_plot"] = altitude_time_plot(time_series)
+            context["altitude_time_plot"] = altitude_time_plot(time_series)
         if "elevation_gain_cum" in time_series.columns:
-            result["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
+            context["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
         if "heartrate" in time_series.columns:
-            result["heartrate_time_plot"] = heart_rate_time_plot(time_series)
+            context["heartrate_time_plot"] = heart_rate_time_plot(time_series)
         if "cadence" in time_series.columns:
-            result["cadence_time_plot"] = cadence_time_plot(time_series)
-        return result
+            context["cadence_time_plot"] = cadence_time_plot(time_series)
 
-    def render_sharepic(self, id: int) -> bytes:
-        activity = self._repository.get_activity_by_id(id)
-        time_series = self._repository.get_time_series(id)
-        for coordinates in self._config.privacy_zones.values():
+        return render_template("activity/show.html.j2", **context)
+
+    @blueprint.route("/<int:id>/sharepic.png")
+    def sharepic(id: int):
+        activity = repository.get_activity_by_id(id)
+        time_series = repository.get_time_series(id)
+        for coordinates in config.privacy_zones.values():
             privacy_zone = PrivacyZone(coordinates)
             time_series = privacy_zone.filter_time_series(time_series)
         if len(time_series) == 0:
-            time_series = self._repository.get_time_series(id)
-        return make_sharepic(
-            activity, time_series, self._config.sharepic_suppressed_fields, self._config
+            time_series = repository.get_time_series(id)
+        return Response(
+            make_sharepic(
+                activity, time_series, config.sharepic_suppressed_fields, config
+            ),
+            mimetype="image/png",
         )
 
-    def render_day(self, year: int, month: int, day: int) -> dict:
-        meta = self._repository.meta
+    @blueprint.route("/day/<int:year>/<int:month>/<int:day>")
+    def day(year: int, month: int, day: int):
+        meta = repository.meta
         selection = meta["start"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
 
         time_series = [
-            self._repository.get_time_series(activity_id)
+            repository.get_time_series(activity_id)
             for activity_id in activities_that_day["id"]
         ]
 
@@ -163,7 +210,7 @@ class ActivityController:
         for i, activity_record in enumerate(activities_list):
             activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
 
-        return {
+        context = {
             "activities": activities_list,
             "geojson": geojson.dumps(fc),
             "date": datetime.date(year, month, day).isoformat(),
@@ -173,59 +220,36 @@ class ActivityController:
             "month": month,
             "year": year,
         }
+        return render_template(
+            "activity/day.html.j2",
+            **context,
+        )
 
-    def render_day_sharepic(self, year: int, month: int, day: int) -> bytes:
-        meta = self._repository.meta
+    @blueprint.route("/day-sharepic/<int:year>/<int:month>/<int:day>/sharepic.png")
+    def day_sharepic(year: int, month: int, day: int):
+        meta = repository.meta
         selection = meta["start"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
 
         time_series = [
-            self._repository.get_time_series(activity_id)
+            repository.get_time_series(activity_id)
             for activity_id in activities_that_day["id"]
         ]
         assert len(activities_that_day) > 0
         assert len(time_series) > 0
-        return (make_day_sharepic(activities_that_day, time_series, self._config),)
-
-    def render_all(self) -> dict:
-        cmap = matplotlib.colormaps["Dark2"]
-        fc = geojson.FeatureCollection(
-            features=[
-                geojson.Feature(
-                    geometry=geojson.MultiLineString(
-                        coordinates=[
-                            [
-                                [lon, lat]
-                                for lat, lon in zip(
-                                    group["latitude"], group["longitude"]
-                                )
-                            ]
-                            for _, group in self._repository.get_time_series(
-                                activity["id"]
-                            ).groupby("segment_id")
-                        ]
-                    ),
-                    properties={
-                        "color": matplotlib.colors.to_hex(cmap(i % 8)),
-                        "activity_name": activity["name"],
-                        "activity_id": str(activity["id"]),
-                    },
-                )
-                for i, activity in enumerate(self._repository.iter_activities())
-            ]
+        return Response(
+            make_day_sharepic(activities_that_day, time_series, config),
+            mimetype="image/png",
         )
 
-        return {
-            "geojson": geojson.dumps(fc),
-        }
-
-    def render_name(self, name: str) -> dict:
-        meta = self._repository.meta
+    @blueprint.route("/name/<name>")
+    def name(name: str):
+        meta = repository.meta
         selection = meta["name"] == name
         activities_with_name = meta.loc[selection]
 
         time_series = [
-            self._repository.get_time_series(activity_id)
+            repository.get_time_series(activity_id)
             for activity_id in activities_with_name["id"]
         ]
 
@@ -254,7 +278,7 @@ class ActivityController:
         for i, activity_record in enumerate(activities_list):
             activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
 
-        return {
+        context = {
             "activities": activities_list,
             "geojson": geojson.dumps(fc),
             "name": name,
@@ -263,6 +287,113 @@ class ActivityController:
             "distance_plot": name_distance_plot(activities_with_name),
             "minutes_plot": name_minutes_plot(activities_with_name),
         }
+        return render_template(
+            "activity/name.html.j2",
+            **context,
+        )
+
+    @blueprint.route("/edit/<id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def edit(id: str):
+        activity = DB.session.get(Activity, int(id))
+        if activity is None:
+            abort(404)
+        equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
+        kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
+
+        if request.method == "POST":
+            activity.name = request.form.get("name")
+
+            form_equipment = request.form.get("equipment")
+            if form_equipment == "null":
+                activity.equipment = None
+            else:
+                activity.equipment = DB.session.get(Equipment, int(form_equipment))
+
+            form_kind = request.form.get("kind")
+            if form_kind == "null":
+                activity.kind = None
+            else:
+                activity.kind = DB.session.get(Kind, int(form_kind))
+
+            DB.session.commit()
+            return redirect(url_for(".show", id=activity.id))
+
+        return render_template(
+            "activity/edit.html.j2",
+            activity=activity,
+            kinds=kinds,
+            equipments=equipments,
+        )
+
+    @blueprint.route("/trim/<id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def trim(id: str):
+        activity = DB.session.get(Activity, int(id))
+        if activity is None:
+            abort(404)
+
+        if request.method == "POST":
+            form_begin = request.form.get("begin")
+            form_end = request.form.get("end")
+
+            if form_begin:
+                activity.index_begin = int(form_begin)
+            if form_end:
+                activity.index_end = int(form_end)
+
+            DB.session.commit()
+
+        cmap = matplotlib.colormaps["turbo"]
+        num_points = len(activity.time_series)
+        begin = activity.index_begin or 0
+        end = activity.index_end or num_points
+
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.LineString(
+                        [
+                            (lon, lat)
+                            for lat, lon in zip(group["latitude"], group["longitude"])
+                        ]
+                    )
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+            ]
+            + [
+                geojson.Feature(
+                    geometry=geojson.Point(
+                        (lon, lat),
+                    ),
+                    properties={
+                        "name": f"{index}",
+                        "markerType": "circle",
+                        "markerStyle": {
+                            "fillColor": matplotlib.colors.to_hex(
+                                cmap(1 - index / num_points)
+                            ),
+                            "fillOpacity": 0.5,
+                            "radius": 8,
+                            "color": "black" if begin <= index < end else "white",
+                            "opacity": 0.8,
+                            "weight": 2,
+                        },
+                    },
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+                for index, lat, lon in zip(
+                    group.index, group["latitude"], group["longitude"]
+                )
+            ]
+        )
+        return render_template(
+            "activity/trim.html.j2",
+            activity=activity,
+            color_line_geojson=geojson.dumps(fc),
+        )
+
+    return blueprint
 
 
 def speed_time_plot(time_series: pd.DataFrame) -> str:

@@ -21,9 +21,8 @@ from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
-from .activity.blueprint import make_activity_blueprint
-from .activity.controller import ActivityController
 from .authenticator import Authenticator
+from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.bubble_chart_blueprint import make_bubble_chart_blueprint
 from .blueprints.eddington_blueprint import register_eddington_blueprint
@@ -109,7 +108,6 @@ def web_ui_main(
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
     config = config_accessor()
-    activity_controller = ActivityController(repository, tile_visit_accessor, config)
     calendar_controller = CalendarController(repository)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
@@ -126,7 +124,7 @@ def web_ui_main(
 
     blueprints = {
         "/activity": make_activity_blueprint(
-            activity_controller, repository, authenticator
+            repository, authenticator, tile_visit_accessor, config
         ),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
