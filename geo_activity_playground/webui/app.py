@@ -26,6 +26,7 @@ from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.bubble_chart_blueprint import make_bubble_chart_blueprint
+from .blueprints.calendar_blueprint import make_calendar_blueprint
 from .blueprints.eddington_blueprint import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
@@ -36,8 +37,6 @@ from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
-from .calendar.blueprint import make_calendar_blueprint
-from .calendar.controller import CalendarController
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .flasher import FlaskFlasher
@@ -109,7 +108,6 @@ def web_ui_main(
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
     config = config_accessor()
-    calendar_controller = CalendarController(repository)
     explorer_controller = ExplorerController(
         repository, tile_visit_accessor, config_accessor
     )
@@ -134,7 +132,7 @@ def web_ui_main(
         ),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
-        "/calendar": make_calendar_blueprint(calendar_controller),
+        "/calendar": make_calendar_blueprint(repository),
         "/eddington": register_eddington_blueprint(repository, search_query_history),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(explorer_controller, authenticator),

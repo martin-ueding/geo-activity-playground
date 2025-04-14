@@ -1,18 +1,18 @@
 import collections
 import datetime
 
+from flask import Blueprint
+from flask import render_template
+
 from ...core.activities import ActivityRepository
 
 
-class CalendarController:
-    def __init__(self, repository: ActivityRepository) -> None:
-        self._repository = repository
+def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
+    blueprint = Blueprint("calendar", __name__, template_folder="templates")
 
-    def render_overview(self) -> dict:
-        meta = self._repository.meta.copy()
-        meta["date"] = meta["start"].dt.date
-        meta["year"] = meta["start"].dt.year
-        meta["month"] = meta["start"].dt.month
+    @blueprint.route("/")
+    def index():
+        meta = repository.meta
 
         monthly_distance = meta.groupby(
             ["year", "month"],
@@ -33,20 +33,16 @@ class CalendarController:
             for index, row in yearly_distance.reset_index().iterrows()
         }
 
-        return {
-            "num_activities": len(self._repository.meta),
+        context = {
+            "num_activities": len(repository),
             "monthly_distances": monthly_pivot,
             "yearly_distances": yearly_distances,
         }
+        return render_template("calendar/index.html.j2", **context)
 
-    def render_month(self, year: int, month: int) -> dict:
-        meta = self._repository.meta.copy()
-        meta["date"] = meta["start"].dt.date
-        meta["year"] = meta["start"].dt.year
-        meta["month"] = meta["start"].dt.month
-        meta["day"] = meta["start"].dt.day
-        meta["day_of_week"] = meta["start"].dt.day_of_week
-        meta["isoweek"] = meta["start"].dt.isocalendar().week
+    @blueprint.route("/<int:year>/<int:month>")
+    def month(year: int, month: int):
+        meta = repository.meta
 
         filtered = meta.loc[
             (meta["year"] == year) & (meta["month"] == month)
@@ -72,9 +68,13 @@ class CalendarController:
                 }
             )
 
-        return {
+        context = {
             "year": year,
             "month": month,
             "weeks": weeks,
             "day_of_month": day_of_month,
         }
+
+        return render_template("calendar/month.html.j2", **context)
+
+    return blueprint
