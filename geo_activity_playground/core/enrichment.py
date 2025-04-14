@@ -86,6 +86,7 @@ def populate_database_from_extracted(config: Config) -> None:
             elevation_gain=extracted_metadata.get("elevation_gain", None),
             steps=extracted_metadata.get("steps", None),
             path=extracted_metadata.get("path", None),
+            upstream_id=upstream_id,
         )
 
         _update_via_time_series(activity, time_series)
