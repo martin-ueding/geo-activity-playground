@@ -19,13 +19,13 @@ Types of changes
 
 Added:
 
+- Add trim feature for activities, although the user interface is quite basic at the moment. ([GH-234](https://github.com/martin-ueding/geo-activity-playground/issues/234))
+- Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
+- Add bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
 - Add installation instructions for macOS. ([GH-235](https://github.com/martin-ueding/geo-activity-playground/issues/235))
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
-- Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
-- Add bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
-- Add trim feature for activities, although the user interface is quite basic at the moment. ([GH-234](https://github.com/martin-ueding/geo-activity-playground/issues/234))
 
 Changed:
 
