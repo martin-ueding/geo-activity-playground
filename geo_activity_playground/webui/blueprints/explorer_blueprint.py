@@ -7,7 +7,12 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+from flask import Blueprint
 from flask import flash
+from flask import redirect
+from flask import render_template
+from flask import Response
+from flask import url_for
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
@@ -23,41 +28,30 @@ from ...explorer.grid_file import make_grid_points
 from ...explorer.tile_visits import compute_tile_evolution
 from ...explorer.tile_visits import TileEvolutionState
 from ...explorer.tile_visits import TileVisitAccessor
-
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
 
 alt.data_transformers.enable("vegafusion")
 
 logger = logging.getLogger(__name__)
 
 
-class ExplorerController:
-    def __init__(
-        self,
-        repository: ActivityRepository,
-        tile_visit_accessor: TileVisitAccessor,
-        config_accessor: ConfigAccessor,
-    ) -> None:
-        self._repository = repository
-        self._tile_visit_accessor = tile_visit_accessor
-        self._config_accessor = config_accessor
+def make_explorer_blueprint(
+    authenticator: Authenticator,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config_accessor: ConfigAccessor,
+) -> Blueprint:
+    blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
-    def enable_zoom_level(self, zoom: int) -> None:
-        if 0 <= zoom <= 19:
-            self._config_accessor().explorer_zoom_levels.append(zoom)
-            self._config_accessor().explorer_zoom_levels.sort()
-            self._config_accessor.save()
-            compute_tile_evolution(self._tile_visit_accessor, self._config_accessor())
-            flash(f"Enabled {zoom=} for explorer tiles.", category="success")
-        else:
-            flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
-
-    def render(self, zoom: int) -> dict:
-        if zoom not in self._config_accessor().explorer_zoom_levels:
+    @blueprint.route("/<int:zoom>")
+    def map(zoom: int):
+        if zoom not in config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
-        tile_evolution_states = self._tile_visit_accessor.tile_state["evolution_state"]
-        tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
-        tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
+        tile_evolution_states = tile_visit_accessor.tile_state["evolution_state"]
+        tile_visits = tile_visit_accessor.tile_state["tile_visits"]
+        tile_histories = tile_visit_accessor.tile_state["tile_history"]
 
         medians = tile_histories[zoom].median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
@@ -65,10 +59,10 @@ class ExplorerController:
         )
 
         explored = get_three_color_tiles(
-            tile_visits[zoom], self._repository, tile_evolution_states[zoom], zoom
+            tile_visits[zoom], repository, tile_evolution_states[zoom], zoom
         )
 
-        return {
+        context = {
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
@@ -90,35 +84,74 @@ class ExplorerController:
             ),
             "zoom": zoom,
         }
+        return render_template("explorer/index.html.j2", **context)
 
-    def export_missing_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
+    @blueprint.route("/enable-zoom-level/<int:zoom>")
+    @needs_authentication(authenticator)
+    def enable_zoom_level(zoom: int):
+        if 0 <= zoom <= 19:
+            config_accessor().explorer_zoom_levels.append(zoom)
+            config_accessor().explorer_zoom_levels.sort()
+            config_accessor.save()
+            compute_tile_evolution(tile_visit_accessor, config_accessor())
+            flash(f"Enabled {zoom=} for explorer tiles.", category="success")
+        else:
+            flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
+        return redirect(url_for(".map", zoom=zoom))
+
+    @blueprint.route(
+        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/explored.<suffix>"
+    )
+    def download(
+        zoom: int, north: float, east: float, south: float, west: float, suffix: str
+    ):
         x1, y1 = compute_tile(north, west, zoom)
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_histories = self._tile_visit_accessor.tile_state["tile_history"]
+        tile_histories = tile_visit_accessor.tile_state["tile_history"]
         tiles = tile_histories[zoom]
         points = get_border_tiles(tiles, zoom, tile_bounds)
         if suffix == "geojson":
-            return make_grid_file_geojson(points)
+            result = make_grid_file_geojson(points)
         elif suffix == "gpx":
-            return make_grid_file_gpx(points)
+            result = make_grid_file_gpx(points)
 
-    def export_explored_tiles(self, zoom, north, east, south, west, suffix: str) -> str:
+        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
+        return Response(
+            result,
+            mimetype=mimetypes[suffix],
+            headers={"Content-disposition": "attachment"},
+        )
+
+    @blueprint.route(
+        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/missing.<suffix>"
+    )
+    def missing(
+        zoom: int, north: float, east: float, south: float, west: float, suffix: str
+    ):
         x1, y1 = compute_tile(north, west, zoom)
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_visits = self._tile_visit_accessor.tile_state["tile_visits"]
+        tile_visits = tile_visit_accessor.tile_state["tile_visits"]
         tiles = tile_visits[zoom]
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
         )
         if suffix == "geojson":
-            return make_grid_file_geojson(points)
+            result = make_grid_file_geojson(points)
         elif suffix == "gpx":
-            return make_grid_file_gpx(points)
-        ...
+            result = make_grid_file_gpx(points)
+
+        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
+        return Response(
+            result,
+            mimetype=mimetypes[suffix],
+            headers={"Content-disposition": "attachment"},
+        )
+
+    return blueprint
 
 
 def get_three_color_tiles(

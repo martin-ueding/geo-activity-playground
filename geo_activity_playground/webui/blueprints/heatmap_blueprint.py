@@ -24,9 +24,9 @@ from ...core.raster_map import PixelBounds
 from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import TileVisitAccessor
-from ..explorer.controller import bounding_box_for_biggest_cluster
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
+from .explorer_blueprint import bounding_box_for_biggest_cluster
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +184,7 @@ def _get_counts(
         tmp_path.rename(tile_count_cache_path)
     else:
         activities = apply_search_query(repository.meta, query)
-        activity_ids = self.activities_per_tile[z].get((x, y), set())
+        activity_ids = activities_per_tile[z].get((x, y), set())
         for activity_id in activity_ids:
             if activity_id not in activities["id"]:
                 continue

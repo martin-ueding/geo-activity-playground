@@ -30,6 +30,7 @@ from .blueprints.calendar_blueprint import make_calendar_blueprint
 from .blueprints.eddington_blueprint import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
+from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
@@ -37,8 +38,6 @@ from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
-from .explorer.blueprint import make_explorer_blueprint
-from .explorer.controller import ExplorerController
 from .flasher import FlaskFlasher
 from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
@@ -108,9 +107,6 @@ def web_ui_main(
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)
     config = config_accessor()
-    explorer_controller = ExplorerController(
-        repository, tile_visit_accessor, config_accessor
-    )
     tile_getter = TileGetter(config.map_tile_url)
     image_transforms = {
         "color": IdentityImageTransform(),
@@ -135,7 +131,9 @@ def web_ui_main(
         "/calendar": make_calendar_blueprint(repository),
         "/eddington": register_eddington_blueprint(repository, search_query_history),
         "/equipment": make_equipment_blueprint(repository, config),
-        "/explorer": make_explorer_blueprint(explorer_controller, authenticator),
+        "/explorer": make_explorer_blueprint(
+            authenticator, repository, tile_visit_accessor, config_accessor
+        ),
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history
         ),
