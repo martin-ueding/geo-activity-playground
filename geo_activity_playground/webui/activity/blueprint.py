@@ -1,6 +1,9 @@
-import json
 import urllib.parse
 
+import geojson
+import matplotlib
+import sqlalchemy
+from flask import abort
 from flask import Blueprint
 from flask import redirect
 from flask import render_template
@@ -8,11 +11,14 @@ from flask import request
 from flask import Response
 from flask import url_for
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.paths import activity_meta_override_dir
-from geo_activity_playground.webui.activity.controller import ActivityController
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
+from ...core.activities import ActivityRepository
+from ...core.datamodel import Activity
+from ...core.datamodel import DB
+from ...core.datamodel import Equipment
+from ...core.datamodel import Kind
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from .controller import ActivityController
 
 
 def make_activity_blueprint(
@@ -65,45 +71,102 @@ def make_activity_blueprint(
     @blueprint.route("/edit/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def edit(id: str):
-        activity_id = int(id)
-        activity = repository.get_activity_by_id(activity_id)
-        override_file = activity_meta_override_dir() / f"{activity_id}.json"
-        if override_file.exists():
-            with open(override_file) as f:
-                override = json.load(f)
-        else:
-            override = {}
+        activity = DB.session.get(Activity, int(id))
+        if activity is None:
+            abort(404)
+        equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
+        kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
 
         if request.method == "POST":
-            override = {}
-            if value := request.form.get("name"):
-                override["name"] = value
-                repository.meta.loc[activity_id, "name"] = value
-            if value := request.form.get("kind"):
-                override["kind"] = value
-                repository.meta.loc[activity_id, "kind"] = value
-            if value := request.form.get("equipment"):
-                override["equipment"] = value
-                repository.meta.loc[activity_id, "equipment"] = value
-            if value := request.form.get("commute"):
-                override["commute"] = True
-                repository.meta.loc[activity_id, "commute"] = True
-            if value := request.form.get("consider_for_achievements"):
-                override["consider_for_achievements"] = True
-                repository.meta.loc[activity_id, "consider_for_achievements"] = True
+            activity.name = request.form.get("name")
 
-            with open(override_file, "w") as f:
-                json.dump(override, f, ensure_ascii=False, indent=4, sort_keys=True)
+            form_equipment = request.form.get("equipment")
+            if form_equipment == "null":
+                activity.equipment = None
+            else:
+                activity.equipment = DB.session.get(Equipment, int(form_equipment))
 
-            repository.save()
+            form_kind = request.form.get("kind")
+            if form_kind == "null":
+                activity.kind = None
+            else:
+                activity.kind = DB.session.get(Kind, int(form_kind))
 
-            return redirect(url_for(".show", id=activity_id))
+            DB.session.commit()
+            return redirect(url_for(".show", id=activity.id))
 
         return render_template(
             "activity/edit.html.j2",
-            activity_id=activity_id,
             activity=activity,
-            override=override,
+            kinds=kinds,
+            equipments=equipments,
+        )
+
+    @blueprint.route("/trim/<id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def trim(id: str):
+        activity = DB.session.get(Activity, int(id))
+        if activity is None:
+            abort(404)
+
+        if request.method == "POST":
+            form_begin = request.form.get("begin")
+            form_end = request.form.get("end")
+
+            if form_begin:
+                activity.index_begin = int(form_begin)
+            if form_end:
+                activity.index_end = int(form_end)
+
+            DB.session.commit()
+
+        cmap = matplotlib.colormaps["turbo"]
+        num_points = len(activity.time_series)
+        begin = activity.index_begin or 0
+        end = activity.index_end or num_points
+
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.LineString(
+                        [
+                            (lon, lat)
+                            for lat, lon in zip(group["latitude"], group["longitude"])
+                        ]
+                    )
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+            ]
+            + [
+                geojson.Feature(
+                    geometry=geojson.Point(
+                        (lon, lat),
+                    ),
+                    properties={
+                        "name": f"{index}",
+                        "markerType": "circle",
+                        "markerStyle": {
+                            "fillColor": matplotlib.colors.to_hex(
+                                cmap(1 - index / num_points)
+                            ),
+                            "fillOpacity": 0.5,
+                            "radius": 8,
+                            "color": "black" if begin <= index < end else "white",
+                            "opacity": 0.8,
+                            "weight": 2,
+                        },
+                    },
+                )
+                for _, group in activity.raw_time_series.groupby("segment_id")
+                for index, lat, lon in zip(
+                    group.index, group["latitude"], group["longitude"]
+                )
+            ]
+        )
+        return render_template(
+            "activity/trim.html.j2",
+            activity=activity,
+            color_line_geojson=geojson.dumps(fc),
         )
 
     return blueprint

@@ -1,30 +1,26 @@
-import datetime
 import io
 import logging
 import pathlib
-from typing import Optional
 
 import matplotlib.pylab as pl
 import numpy as np
 from PIL import Image
 from PIL import ImageDraw
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.meta_search import apply_search_query
-from geo_activity_playground.core.meta_search import SearchQuery
-from geo_activity_playground.core.raster_map import convert_to_grayscale
-from geo_activity_playground.core.raster_map import GeoBounds
-from geo_activity_playground.core.raster_map import get_sensible_zoom_level
-from geo_activity_playground.core.raster_map import get_tile
-from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.core.raster_map import PixelBounds
-from geo_activity_playground.core.tasks import work_tracker
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.webui.explorer.controller import (
-    bounding_box_for_biggest_cluster,
-)
+from ...core.activities import ActivityRepository
+from ...core.config import Config
+from ...core.meta_search import apply_search_query
+from ...core.meta_search import SearchQuery
+from ...core.raster_map import convert_to_grayscale
+from ...core.raster_map import GeoBounds
+from ...core.raster_map import get_sensible_zoom_level
+from ...core.raster_map import get_tile
+from ...core.raster_map import OSM_TILE_SIZE
+from ...core.raster_map import PixelBounds
+from ...core.tasks import work_tracker
+from ...core.tiles import get_tile_upper_left_lat_lon
+from ...explorer.tile_visits import TileVisitAccessor
+from ..explorer.controller import bounding_box_for_biggest_cluster
 
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,8 @@
 import pytest
 
-from geo_activity_playground.importers.csv_parser import _parse_cell
-from geo_activity_playground.importers.csv_parser import _parse_line
-from geo_activity_playground.importers.csv_parser import parse_csv
+from .csv_parser import _parse_cell
+from .csv_parser import _parse_line
+from .csv_parser import parse_csv
 
 
 def test_parse_csv() -> None:

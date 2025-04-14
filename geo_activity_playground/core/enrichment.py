@@ -1,128 +1,118 @@
 import datetime
 import logging
 import pickle
-from typing import Any
 from typing import Optional
 
 import numpy as np
 import pandas as pd
+import sqlalchemy
 from tqdm import tqdm
 
-from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import make_activity_meta
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.coordinates import get_distance
-from geo_activity_playground.core.paths import activity_enriched_meta_dir
-from geo_activity_playground.core.paths import activity_enriched_time_series_dir
-from geo_activity_playground.core.paths import activity_extracted_meta_dir
-from geo_activity_playground.core.paths import activity_extracted_time_series_dir
-from geo_activity_playground.core.tiles import compute_tile_float
-from geo_activity_playground.core.time_conversion import convert_to_datetime_ns
+from .config import Config
+from .coordinates import get_distance
+from .datamodel import Activity
+from .datamodel import ActivityMeta
+from .datamodel import DB
+from .datamodel import get_or_make_equipment
+from .datamodel import get_or_make_kind
+from .paths import activity_extracted_meta_dir
+from .paths import activity_extracted_time_series_dir
+from .paths import time_series_dir
+from .tiles import compute_tile_float
+from .time_conversion import convert_to_datetime_ns
 
 logger = logging.getLogger(__name__)
 
 
-def enrich_activities(config: Config) -> None:
-    # Delete removed activities.
-    for enriched_metadata_path in activity_enriched_meta_dir().glob("*.pickle"):
-        if not (activity_extracted_meta_dir() / enriched_metadata_path.name).exists():
-            logger.warning(f"Deleting {enriched_metadata_path}")
-            enriched_metadata_path.unlink()
-    for enriched_time_series_path in activity_enriched_time_series_dir().glob(
-        "*.parquet"
-    ):
-        if not (
-            activity_extracted_time_series_dir() / enriched_time_series_path.name
-        ).exists():
-            logger.warning(f"Deleting {enriched_time_series_path}")
-            enriched_time_series_path.unlink()
+def populate_database_from_extracted(config: Config) -> None:
+    available_ids = {
+        int(path.stem) for path in activity_extracted_meta_dir().glob("*.pickle")
+    }
+    present_ids = {
+        int(elem)
+        for elem in DB.session.scalars(sqlalchemy.select(Activity.upstream_id)).all()
+        if elem
+    }
+    new_ids = available_ids - present_ids
 
-    # Get new metadata paths.
-    new_extracted_metadata_paths = []
-    for extracted_metadata_path in activity_extracted_meta_dir().glob("*.pickle"):
-        enriched_metadata_path = (
-            activity_enriched_meta_dir() / extracted_metadata_path.name
+    for upstream_id in tqdm(new_ids, desc="Importing new activities into database"):
+        extracted_metadata_path = (
+            activity_extracted_meta_dir() / f"{upstream_id}.pickle"
         )
-        if (
-            not enriched_metadata_path.exists()
-            or enriched_metadata_path.stat().st_mtime
-            < extracted_metadata_path.stat().st_mtime
-        ):
-            extracted_time_series_path = (
-                activity_extracted_time_series_dir()
-                / f"{extracted_metadata_path.stem}.parquet"
-            )
-            if extracted_time_series_path.exists():
-                new_extracted_metadata_paths.append(extracted_metadata_path)
-            else:
-                logger.error(
-                    f"Extracted activity metadata {extracted_metadata_path} is lacking the corresponding time series path {extracted_time_series_path}. Likely that is an activity without location data. Deleting this."
-                )
-                extracted_metadata_path.unlink()
+        with open(extracted_metadata_path, "rb") as f:
+            extracted_metadata: ActivityMeta = pickle.load(f)
 
-    for extracted_metadata_path in tqdm(
-        new_extracted_metadata_paths, desc="Enrich new activity data"
-    ):
-        # Read extracted data.
-        activity_id = extracted_metadata_path.stem
         extracted_time_series_path = (
-            activity_extracted_time_series_dir() / f"{activity_id}.parquet"
+            activity_extracted_time_series_dir() / f"{upstream_id}.parquet"
         )
         time_series = pd.read_parquet(extracted_time_series_path)
-        with open(extracted_metadata_path, "rb") as f:
-            extracted_metadata = pickle.load(f)
-
-        metadata = make_activity_meta()
-        metadata.update(extracted_metadata)
 
         # Skip activities that don't have geo information attached to them. This shouldn't happen, though.
         if "latitude" not in time_series.columns:
             logger.warning(
-                f"Activity {metadata} doesn't have latitude/longitude information. Ignoring this one."
+                f"Activity {upstream_id} doesn't have latitude/longitude information. Ignoring this one."
             )
             continue
 
-        # Rename kinds if needed.
-        if metadata["kind"] in config.kind_renames:
-            metadata["kind"] = config.kind_renames[metadata["kind"]]
-
-        # Enrich time series.
-        if metadata["kind"] in config.kinds_without_achievements:
-            metadata["consider_for_achievements"] = False
         time_series = _embellish_single_time_series(
-            time_series, metadata.get("start", None), config.time_diff_threshold_seconds
+            time_series,
+            extracted_metadata.get("start", None),
+            config.time_diff_threshold_seconds,
         )
-        metadata.update(_get_metadata_from_timeseries(time_series))
 
-        # Write enriched data.
-        enriched_metadata_path = activity_enriched_meta_dir() / f"{activity_id}.pickle"
-        enriched_time_series_path = (
-            activity_enriched_time_series_dir() / f"{activity_id}.parquet"
+        kind_name = extracted_metadata.get("kind", None)
+        if kind_name:
+            # Rename kinds if needed.
+            if kind_name in config.kind_renames:
+                kind_name = config.kind_renames[kind_name]
+            kind = get_or_make_kind(kind_name)
+        else:
+            kind = None
+
+        equipment_name = extracted_metadata.get("equipment", None)
+        if equipment_name:
+            equipment = get_or_make_equipment(equipment_name)
+        elif kind:
+            equipment = kind.default_equipment
+        else:
+            equipment = None
+
+        activity = Activity(
+            name=extracted_metadata.get("name", "Name Placeholder"),
+            distance_km=0,
+            equipment=equipment,
+            kind=kind,
+            calories=extracted_metadata.get("calories", None),
+            elevation_gain=extracted_metadata.get("elevation_gain", None),
+            steps=extracted_metadata.get("steps", None),
+            path=extracted_metadata.get("path", None),
         )
-        with open(enriched_metadata_path, "wb") as f:
-            pickle.dump(metadata, f)
+
+        _update_via_time_series(activity, time_series)
+
+        DB.session.add(activity)
+        DB.session.commit()
+
+        enriched_time_series_path = time_series_dir() / f"{activity.id}.parquet"
         time_series.to_parquet(enriched_time_series_path)
 
 
-def _get_metadata_from_timeseries(timeseries: pd.DataFrame) -> ActivityMeta:
-    metadata = ActivityMeta()
+def _update_via_time_series(
+    activity: Activity, time_series: pd.DataFrame
+) -> ActivityMeta:
+    activity.start = time_series["time"].iloc[0]
+    activity.elapsed_time = time_series["time"].iloc[-1] - time_series["time"].iloc[0]
+    activity.distance_km = time_series["distance_km"].iloc[-1]
+    if "calories" in time_series.columns:
+        activity.calories = time_series["calories"].iloc[-1]
+    activity.moving_time = _compute_moving_time(time_series)
 
-    # Extract some meta data from the time series.
-    metadata["start"] = timeseries["time"].iloc[0]
-    metadata["elapsed_time"] = timeseries["time"].iloc[-1] - timeseries["time"].iloc[0]
-    metadata["distance_km"] = timeseries["distance_km"].iloc[-1]
-    if "calories" in timeseries.columns:
-        metadata["calories"] = timeseries["calories"].iloc[-1]
-    metadata["moving_time"] = _compute_moving_time(timeseries)
-
-    metadata["start_latitude"] = timeseries["latitude"].iloc[0]
-    metadata["end_latitude"] = timeseries["latitude"].iloc[-1]
-    metadata["start_longitude"] = timeseries["longitude"].iloc[0]
-    metadata["end_longitude"] = timeseries["longitude"].iloc[-1]
-    if "elevation_gain_cum" in timeseries.columns:
-        metadata["elevation_gain"] = timeseries["elevation_gain_cum"].iloc[-1]
-
-    return metadata
+    activity.start_latitude = time_series["latitude"].iloc[0]
+    activity.end_latitude = time_series["latitude"].iloc[-1]
+    activity.start_longitude = time_series["longitude"].iloc[0]
+    activity.end_longitude = time_series["longitude"].iloc[-1]
+    if "elevation_gain_cum" in time_series.columns:
+        activity.elevation_gain = time_series["elevation_gain_cum"].iloc[-1]
 
 
 def _compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:

@@ -1,10 +1,9 @@
 import datetime
 import math
-from typing import Optional
 
 import pandas as pd
 
-from geo_activity_playground.core.config import Config
+from .config import Config
 
 
 class HeartRateZoneComputer:

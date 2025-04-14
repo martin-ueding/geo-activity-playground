@@ -5,12 +5,12 @@ from flask import render_template
 from flask import Response
 from flask import url_for
 
-from geo_activity_playground.explorer.grid_file import make_explorer_rectangle
-from geo_activity_playground.explorer.grid_file import make_explorer_tile
-from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
-from geo_activity_playground.explorer.grid_file import make_grid_file_gpx
-from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from ...explorer.grid_file import make_explorer_rectangle
+from ...explorer.grid_file import make_explorer_tile
+from ...explorer.grid_file import make_grid_file_geojson
+from ...explorer.grid_file import make_grid_file_gpx
+from ...explorer.grid_file import make_grid_points
+from ...explorer.tile_visits import TileVisitAccessor
 
 
 def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blueprint:

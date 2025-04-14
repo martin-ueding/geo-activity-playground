@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import render_template
 
-from geo_activity_playground.webui.calendar.controller import CalendarController
+from .controller import CalendarController
 
 
 def make_calendar_blueprint(calendar_controller: CalendarController) -> Blueprint:

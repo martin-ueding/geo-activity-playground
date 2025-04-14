@@ -7,8 +7,8 @@ import geojson
 import gpxpy
 import pandas as pd
 
-from geo_activity_playground.core.coordinates import Bounds
-from geo_activity_playground.core.tiles import get_tile_upper_left_lat_lon
+from ..core.coordinates import Bounds
+from ..core.tiles import get_tile_upper_left_lat_lon
 
 
 logger = logging.getLogger(__name__)

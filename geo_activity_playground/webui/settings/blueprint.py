@@ -6,13 +6,16 @@ from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import Response
 from flask import url_for
 
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.paths import _activity_enriched_dir
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
-from geo_activity_playground.webui.settings.controller import SettingsController
+from ...core.config import ConfigAccessor
+from ...core.paths import _activity_enriched_dir
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from ..flasher import Flasher
+from ..flasher import FlashTypes
+from .controller import SettingsController
 
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
@@ -62,7 +65,7 @@ def int_or_none(s: str) -> Optional[int]:
 
 
 def make_settings_blueprint(
-    config_accessor: ConfigAccessor, authenticator: Authenticator
+    config_accessor: ConfigAccessor, authenticator: Authenticator, flasher: Flasher
 ) -> Blueprint:
     settings_controller = SettingsController(config_accessor)
     blueprint = Blueprint("settings", __name__, template_folder="templates")
@@ -71,6 +74,18 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def index():
         return render_template("settings/index.html.j2")
+
+    @blueprint.route("/admin-password")
+    @needs_authentication(authenticator)
+    def admin_password() -> Response:
+        if request.method == "POST":
+            config_accessor().upload_password = request.form["password"]
+            config_accessor.save()
+            flasher.flash_message("Updated admin password.", FlashTypes.SUCCESS)
+        return render_template(
+            "settings/admin-password.html.j2",
+            password=config_accessor().upload_password,
+        )
 
     @blueprint.route("/color-schemes", methods=["GET", "POST"])
     @needs_authentication(authenticator)

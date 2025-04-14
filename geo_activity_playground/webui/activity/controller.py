@@ -12,21 +12,21 @@ import pandas as pd
 from PIL import Image
 from PIL import ImageDraw
 
-from geo_activity_playground.core.activities import ActivityMeta
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import make_geojson_color_line
-from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.activities import make_speed_color_bar
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.heart_rate import HeartRateZoneComputer
-from geo_activity_playground.core.privacy_zones import PrivacyZone
-from geo_activity_playground.core.raster_map import map_image_from_tile_bounds
-from geo_activity_playground.core.raster_map import OSM_MAX_ZOOM
-from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.core.raster_map import tile_bounds_around_center
-from geo_activity_playground.explorer.grid_file import make_grid_file_geojson
-from geo_activity_playground.explorer.grid_file import make_grid_points
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
+from ...core.activities import ActivityRepository
+from ...core.activities import make_geojson_color_line
+from ...core.activities import make_geojson_from_time_series
+from ...core.activities import make_speed_color_bar
+from ...core.config import Config
+from ...core.datamodel import Activity
+from ...core.heart_rate import HeartRateZoneComputer
+from ...core.privacy_zones import PrivacyZone
+from ...core.raster_map import map_image_from_tile_bounds
+from ...core.raster_map import OSM_MAX_ZOOM
+from ...core.raster_map import OSM_TILE_SIZE
+from ...core.raster_map import tile_bounds_around_center
+from ...explorer.grid_file import make_grid_file_geojson
+from ...explorer.grid_file import make_grid_points
+from ...explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
 
@@ -482,7 +482,7 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
 
 
 def make_sharepic(
-    activity: ActivityMeta,
+    activity: Activity,
     time_series: pd.DataFrame,
     sharepic_suppressed_fields: list[str],
     config: Config,
@@ -497,17 +497,21 @@ def make_sharepic(
     )
 
     facts = {
-        "kind": f"{activity['kind']}",
-        "start": f"{activity['start'].date()}",
-        "equipment": f"{activity['equipment']}",
-        "distance_km": f"\n{activity['distance_km']:.1f} km",
-        "elapsed_time": re.sub(r"^0 days ", "", f"{activity['elapsed_time']}"),
+        "distance_km": f"\n{activity.distance_km:.1f} km",
     }
+    if activity.start:
+        facts["start"] = f"{activity.start.date()}"
+    if activity.elapsed_time:
+        facts["elapsed_time"] = re.sub(r"^0 days ", "", f"{activity.elapsed_time}")
+    if activity.kind:
+        facts["kind"] = f"{activity.kind.name}"
+    if activity.equipment:
+        facts["equipment"] = f"{activity.equipment.name}"
 
-    if activity.get("calories", 0) and not pd.isna(activity["calories"]):
-        facts["calories"] = f"{activity['calories']:.0f} kcal"
-    if activity.get("steps", 0) and not pd.isna(activity["steps"]):
-        facts["steps"] = f"{activity['steps']:.0f} steps"
+    if activity.calories:
+        facts["calories"] = f"{activity.calories} kcal"
+    if activity.steps:
+        facts["steps"] = f"{activity.steps} steps"
 
     facts = {
         key: value

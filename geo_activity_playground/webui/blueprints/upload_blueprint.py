@@ -8,21 +8,18 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from ..core.activities import ActivityRepository
-from ..core.activities import build_activity_meta
-from ..explorer.tile_visits import compute_tile_evolution
-from ..explorer.tile_visits import compute_tile_visits_new
-from ..explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.enrichment import enrich_activities
-from geo_activity_playground.importers.directory import get_file_hash
-from geo_activity_playground.importers.directory import import_from_directory
-from geo_activity_playground.importers.strava_api import import_from_strava_api
-from geo_activity_playground.importers.strava_checkout import (
-    import_from_strava_checkout,
-)
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
+from ...core.activities import ActivityRepository
+from ...core.config import Config
+from ...core.enrichment import populate_database_from_extracted
+from ...explorer.tile_visits import compute_tile_evolution
+from ...explorer.tile_visits import compute_tile_visits_new
+from ...explorer.tile_visits import TileVisitAccessor
+from ...importers.directory import get_file_hash
+from ...importers.directory import import_from_directory
+from ...importers.strava_api import import_from_strava_api
+from ...importers.strava_checkout import import_from_strava_checkout
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
 
 
 def make_upload_blueprint(
@@ -114,9 +111,7 @@ def scan_for_activities(
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(config)
 
-    enrich_activities(config)
-    build_activity_meta()
-    repository.reload()
+    populate_database_from_extracted(config)
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)

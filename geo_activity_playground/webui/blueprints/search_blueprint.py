@@ -1,22 +1,18 @@
 import urllib.parse
 from functools import reduce
 
-import dateutil.parser
 from flask import Blueprint
-from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
-from flask import Response
 
-from ..core.activities import ActivityRepository
-from geo_activity_playground.core.config import ConfigAccessor
-from geo_activity_playground.core.meta_search import apply_search_query
-from geo_activity_playground.core.meta_search import SearchQuery
-from geo_activity_playground.webui.authenticator import Authenticator
-from geo_activity_playground.webui.authenticator import needs_authentication
-from geo_activity_playground.webui.search_util import search_query_from_form
-from geo_activity_playground.webui.search_util import SearchQueryHistory
+from ...core.activities import ActivityRepository
+from ...core.config import ConfigAccessor
+from ...core.meta_search import apply_search_query
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
+from ..search_util import search_query_from_form
+from ..search_util import SearchQueryHistory
 
 
 def reduce_or(selections):

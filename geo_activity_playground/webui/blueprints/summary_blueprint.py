@@ -7,13 +7,13 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.activities import make_geojson_from_time_series
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.meta_search import apply_search_query
-from geo_activity_playground.webui.plot_util import make_kind_scale
-from geo_activity_playground.webui.search_util import search_query_from_form
-from geo_activity_playground.webui.search_util import SearchQueryHistory
+from ...core.activities import ActivityRepository
+from ...core.activities import make_geojson_from_time_series
+from ...core.config import Config
+from ...core.meta_search import apply_search_query
+from ..plot_util import make_kind_scale
+from ..search_util import search_query_from_form
+from ..search_util import SearchQueryHistory
 
 
 def make_summary_blueprint(
@@ -30,8 +30,7 @@ def make_summary_blueprint(
         activities = apply_search_query(repository.meta, query)
 
         kind_scale = make_kind_scale(repository.meta, config)
-        df = embellished_activities(activities)
-        # df = df.loc[df["consider_for_achievements"]]
+        df = activities
 
         year_kind_total = (
             df[["year", "kind", "distance_km", "hours"]]
@@ -39,6 +38,8 @@ def make_summary_blueprint(
             .sum()
             .reset_index()
         )
+
+        nominations = nominate_activities(df)
 
         return render_template(
             "summary/index.html.j2",
@@ -58,7 +59,7 @@ def make_summary_blueprint(
                         repository.get_time_series(activity_id)
                     ),
                 )
-                for activity_id, reasons in nominate_activities(df).items()
+                for activity_id, reasons in nominations.items()
             ],
             query=query.to_jinja(),
         )
@@ -98,19 +99,6 @@ def _nominate_activities_inner(
             value = meta.loc[i, variable]
             format_applied = format_str.format(value)
             nominations[i].append(f"{title}{title_suffix}: {format_applied}")
-
-
-def embellished_activities(meta: pd.DataFrame) -> pd.DataFrame:
-    df = meta.loc[~pd.isna(meta["start"])].copy()
-    df["year"] = [start.year for start in df["start"]]
-    df["month"] = [start.month for start in df["start"]]
-    df["day"] = [start.day for start in df["start"]]
-    df["week"] = [start.isocalendar().week for start in df["start"]]
-    df["iso_year"] = [start.isocalendar().year for start in df["start"]]
-    df["hours"] = [
-        elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
-    ]
-    return df
 
 
 def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]:

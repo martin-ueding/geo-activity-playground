@@ -1,15 +1,14 @@
-import dateutil.parser
 from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask import Response
 
-from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.explorer.tile_visits import TileVisitAccessor
-from geo_activity_playground.webui.heatmap.heatmap_controller import HeatmapController
-from geo_activity_playground.webui.search_util import search_query_from_form
-from geo_activity_playground.webui.search_util import SearchQueryHistory
+from ...core.activities import ActivityRepository
+from ...core.config import Config
+from ...explorer.tile_visits import TileVisitAccessor
+from ..search_util import search_query_from_form
+from ..search_util import SearchQueryHistory
+from .heatmap_controller import HeatmapController
 
 
 def make_heatmap_blueprint(
