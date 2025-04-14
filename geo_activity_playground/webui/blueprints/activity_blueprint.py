@@ -29,6 +29,7 @@ from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
+from ...core.enrichment import update_via_time_series
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
 from ...core.raster_map import map_image_from_tile_bounds
@@ -341,6 +342,8 @@ def make_activity_blueprint(
                 activity.index_begin = int(form_begin)
             if form_end:
                 activity.index_end = int(form_end)
+
+            update_via_time_series(activity, activity.time_series)
 
             DB.session.commit()
 

@@ -32,11 +32,13 @@
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }}
             </dd>
+            {% if activity.calories %}
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
+            {% endif %}
             <dt>Steps</dt>
             <dd>{{ activity.steps }}</dd>
-            {% if activity.elevation_gain is defined %}
+            {% if activity.elevation_gain %}
             <dt>Elevation gain</dt>
             <dd>{{ activity.elevation_gain|round(0) }} m</dd>
             {% endif %}

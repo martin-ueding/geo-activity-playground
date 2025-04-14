@@ -89,7 +89,7 @@ def populate_database_from_extracted(config: Config) -> None:
             upstream_id=upstream_id,
         )
 
-        _update_via_time_series(activity, time_series)
+        update_via_time_series(activity, time_series)
 
         DB.session.add(activity)
         DB.session.commit()
@@ -98,14 +98,18 @@ def populate_database_from_extracted(config: Config) -> None:
         time_series.to_parquet(enriched_time_series_path)
 
 
-def _update_via_time_series(
+def update_via_time_series(
     activity: Activity, time_series: pd.DataFrame
 ) -> ActivityMeta:
     activity.start = time_series["time"].iloc[0]
     activity.elapsed_time = time_series["time"].iloc[-1] - time_series["time"].iloc[0]
-    activity.distance_km = time_series["distance_km"].iloc[-1]
+    activity.distance_km = (
+        time_series["distance_km"].iloc[-1] - time_series["distance_km"].iloc[0]
+    )
     if "calories" in time_series.columns:
-        activity.calories = time_series["calories"].iloc[-1]
+        activity.calories = (
+            time_series["calories"].iloc[-1] - time_series["calories"].iloc[0]
+        )
     activity.moving_time = _compute_moving_time(time_series)
 
     activity.start_latitude = time_series["latitude"].iloc[0]
@@ -113,7 +117,10 @@ def _update_via_time_series(
     activity.start_longitude = time_series["longitude"].iloc[0]
     activity.end_longitude = time_series["longitude"].iloc[-1]
     if "elevation_gain_cum" in time_series.columns:
-        activity.elevation_gain = time_series["elevation_gain_cum"].iloc[-1]
+        elevation_gain_cum = time_series["elevation_gain_cum"].fillna(0)
+        activity.elevation_gain = (
+            elevation_gain_cum.iloc[-1] - elevation_gain_cum.iloc[0]
+        )
 
 
 def _compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:

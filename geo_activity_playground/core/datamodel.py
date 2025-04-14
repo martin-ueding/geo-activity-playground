@@ -127,12 +127,12 @@ class Activity(DB.Model):
 
     @property
     def time_series(self) -> pd.DataFrame:
-        df = self.raw_time_series
         if self.index_begin or self.index_end:
-            df = self.raw_time_series.iloc[
+            return self.raw_time_series.iloc[
                 self.index_begin or 0 : self.index_end or -1
-            ].copy()
-        return df
+            ]
+        else:
+            return self.raw_time_series
 
     def to_dict(self) -> ActivityMeta:
         equipment = self.equipment.name if self.equipment is not None else "Unknown"
