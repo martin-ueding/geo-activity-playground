@@ -9,6 +9,7 @@ from typing import Optional
 from tqdm import tqdm
 
 from ..core.config import Config
+from ..core.datamodel import ActivityMeta
 from ..core.paths import activity_extracted_dir
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
