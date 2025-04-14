@@ -29,6 +29,7 @@ from .blueprints.bubble_chart_blueprint import make_bubble_chart_blueprint
 from .blueprints.eddington_blueprint import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
+from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
@@ -40,7 +41,6 @@ from .calendar.controller import CalendarController
 from .explorer.blueprint import make_explorer_blueprint
 from .explorer.controller import ExplorerController
 from .flasher import FlaskFlasher
-from .heatmap.blueprint import make_heatmap_blueprint
 from .search_util import SearchQueryHistory
 from .settings.blueprint import make_settings_blueprint
 
