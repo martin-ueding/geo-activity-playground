@@ -74,7 +74,6 @@ class ActivityRepository:
             raise ValueError(f"Cannot find activity {id} in DB.session.")
         return activity
 
-    @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
         return self.get_activity_by_id(id).time_series
 
