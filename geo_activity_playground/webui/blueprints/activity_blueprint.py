@@ -2,7 +2,6 @@ import datetime
 import io
 import logging
 import re
-import urllib.parse
 from typing import Optional
 
 import altair as alt
@@ -50,6 +49,7 @@ def make_activity_blueprint(
     authenticator: Authenticator,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    heart_rate_zone_computer: HeartRateZoneComputer,
 ) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
 

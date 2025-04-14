@@ -16,6 +16,7 @@ from ..core.config import ConfigAccessor
 from ..core.config import import_old_config
 from ..core.config import import_old_strava_config
 from ..core.datamodel import DB
+from ..core.heart_rate import HeartRateZoneComputer
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import PastelImageTransform
@@ -119,12 +120,17 @@ def web_ui_main(
         "pastel": PastelImageTransform(),
     }
     flasher = FlaskFlasher()
+    heart_rate_zone_computer = HeartRateZoneComputer(config)
 
     register_entry_views(app, repository, config)
 
     blueprints = {
         "/activity": make_activity_blueprint(
-            repository, authenticator, tile_visit_accessor, config
+            repository,
+            authenticator,
+            tile_visit_accessor,
+            config,
+            heart_rate_zone_computer,
         ),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
