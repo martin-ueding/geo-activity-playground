@@ -2,8 +2,8 @@ site_name: Geo Activity Playground
 site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
 
 theme:
-  features:
-    - navigation.sections
+  # features:
+  #   - navigation.sections
   name: material
   palette:
     - scheme: default
@@ -53,9 +53,9 @@ nav:
     - heart-rate-zones.md
     - elevation-gain-from-noisy-data.md
   - Other:
-    - get-help.md
     - acknowledgments.md
-    - changelog.md
+  - get-help.md
+  - changelog.md
 
 markdown_extensions:
   - pymdownx.highlight
