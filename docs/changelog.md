@@ -33,10 +33,12 @@ Changed:
 - Make all tables responsive. ([GH-233](https://github.com/martin-ueding/geo-activity-playground/issues/233))
 - Suggest to upgrade with `--pip-args "--upgrade-strategy eager"` to get the latest versions of dependencies as well.
 - Display activities from the past 30 days on the landing page, grouped by day.
+- Only show relevant data on the activity page.
 
 Removed:
 
 - Deleting an activity file from the `Activities` directory will not remove them from the database any more.
+- Remove “commute” property as it is unclear what that even means and what to do with that.
 
 Fixed:
 
