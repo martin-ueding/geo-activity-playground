@@ -208,40 +208,6 @@ def make_settings_blueprint(
             kinds=kinds,
         )
 
-    @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def equipment_offsets():
-        if request.method == "POST":
-            equipments = request.form.getlist("equipment")
-            offsets = request.form.getlist("offset")
-            strava_login_helper.save_equipment_offsets(equipments, offsets)
-            assert len(equipments) == len(offsets)
-            new_equipment_offsets = {}
-            for equipment, offset_str in zip(equipments, offsets):
-                if not equipment or not offset_str:
-                    continue
-
-                try:
-                    offset = float(offset_str)
-                except ValueError as e:
-                    flash(
-                        f"Cannot parse number {offset_str} for {equipment}: {e}",
-                        category="danger",
-                    )
-                    continue
-
-                if not offset:
-                    continue
-
-                new_equipment_offsets[equipment] = offset
-            config_accessor().equipment_offsets = new_equipment_offsets
-            config_accessor.save()
-            flash("Updated equipment offsets.", category="success")
-        context = {
-            "equipment_offsets": config_accessor().equipment_offsets,
-        }
-        return render_template("settings/equipment-offsets.html.j2", **context)
-
     @blueprint.route("/heart-rate", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def heart_rate():
@@ -296,23 +262,6 @@ def make_settings_blueprint(
             "settings/kind-renames.html.j2",
             rules_str=rules_str,
         )
-
-    @blueprint.route("/kinds-without-achievements", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def kinds_without_achievements():
-        if request.method == "POST":
-            kinds = request.form.getlist("kind")
-            new_kinds = [kind.strip() for kind in kinds if kind.strip()]
-            new_kinds.sort()
-
-            config_accessor().kinds_without_achievements = new_kinds
-            config_accessor.save()
-            flash("Updated kinds without achievements.", category="success")
-            strava_login_helper.save_kinds_without_achievements(kinds)
-        context = {
-            "kinds_without_achievements": config_accessor().kinds_without_achievements,
-        }
-        return render_template("settings/kinds-without-achievements.html.j2", **context)
 
     @blueprint.route("/metadata-extraction", methods=["GET", "POST"])
     @needs_authentication(authenticator)
