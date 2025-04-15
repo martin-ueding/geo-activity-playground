@@ -168,9 +168,12 @@ def make_settings_blueprint(
                         f"Equipment '{name}' added.", FlashTypes.SUCCESS
                     )
             DB.session.commit()
-        equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
+        equipments = DB.session.scalars(
+            sqlalchemy.select(Equipment).order_by(Equipment.name)
+        ).all()
         return render_template(
-            "settings/manage-equipments.html.j2", equipments=equipments
+            "settings/manage-equipments.html.j2",
+            equipments=equipments,
         )
 
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])

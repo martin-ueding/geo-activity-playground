@@ -9,34 +9,36 @@
     here.</p>
 
 <form method="POST">
-    <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
-        {% for equipment in equipments %}
-        <div class="col-md-4">
-            <input type="hidden" name="id" value="{{ equipment.id }}" />
-
-            <div class="mb-3">
-                <label for="name_{{ loop.index }}" class="form-label">Equipment</label>
-                <input type="text" class="form-control" id="name_{{ loop.index }}" name="name"
-                    value="{{ equipment.name }}" />
-            </div>
-            <div class="mb-3">
-                <label for="offset_km_{{ loop.index }}" class="form-label">Offset / km</label>
-                <input type="number" class="form-control" id="offset_km_{{ loop.index }}" name="offset_km"
-                    value="{{ equipment.offset_km }}" />
-            </div>
+    <div class="row g-3 mb-1">
+        <div class="col">
+            <label class="form-label">Equipment</label>
         </div>
-        {% endfor %}
+        <div class="col">
+            <label class="form-label">Offset / km</label>
+        </div>
+    </div>
+    {% for equipment in equipments %}
+    <div class="row g-3 mb-1">
+        <input type="hidden" name="id" value="{{ equipment.id }}" />
+        <div class="col">
 
-        <div class="col-md-4">
-            <input type="hidden" name="id" value="" />
-            <div class="mb-3">
-                <label for="name_new" class="form-label">Equipment</label>
-                <input type="text" class="form-control" id="name_new" name="name" />
-            </div>
-            <div class="mb-3">
-                <label for="offset_km_new" class="form-label">Offset / km</label>
-                <input type="number" class="form-control" id="offset_km_new" name="offset_km" />
-            </div>
+            <input type="text" class="form-control" id="name_{{ loop.index }}" name="name"
+                value="{{ equipment.name }}" />
+        </div>
+        <div class="col">
+            <input type="number" class="form-control" id="offset_km_{{ loop.index }}" name="offset_km"
+                value="{{ equipment.offset_km }}" />
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row g-3 mb-3 mt-2">
+        <input type="hidden" name="id" value="" />
+        <div class="col">
+            <input type="text" class="form-control" id="name_new" name="name" />
+        </div>
+        <div class="col">
+            <input type="number" class="form-control" id="offset_km_new" name="offset_km" />
         </div>
     </div>
 
