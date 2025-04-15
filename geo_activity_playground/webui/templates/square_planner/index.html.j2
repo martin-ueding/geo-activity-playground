@@ -145,7 +145,57 @@
     </div>
 </div>
 
-<p class="mb-3">This feature was developed in memory of Natenom who unfortunately didn't live to enjoy it for more tile
+
+<form class="row row-cols-lg-auto g-3 align-items-center bm-3 mb-3" method="POST"
+    action="{{ url_for('.save_bookmark', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">
+    <div class="col-12">
+        <label class="visually-hidden" for="inlineFormInputGroupUsername">Name</label>
+        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Name" name="name">
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Create bookmark</button>
+    </div>
+</form>
+
+
+{% if bookmarks %}
+<h2 class="mb-3">Bookmarks</h2>
+<table class="table mb-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Zoom</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Size</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bookmark in bookmarks %}
+        <tr>
+            <td>{{ bookmark.name }}</td>
+            <td>{{ bookmark.zoom }}</td>
+            <td>{{ bookmark.x }}</td>
+            <td>{{ bookmark.y }}</td>
+            <td>{{ bookmark.size }}</td>
+            <td>
+                <a class="btn btn-small btn-primary"
+                    href="{{ url_for('.index', zoom=bookmark.zoom, x=bookmark.x, y=bookmark.y, size=bookmark.size) }}">Open</a>
+                <a class="btn btn-small btn-danger" href="{{ url_for('.delete_bookmark', id=bookmark.id) }}"
+                    onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<hr />
+
+<p class="mb-3">This feature was developed in memory of Natenom who unfortunately didn't live to enjoy it for more
+    tile
     exploring.</p>
 
 {% endblock %}

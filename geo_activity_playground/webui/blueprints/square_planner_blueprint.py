@@ -1,10 +1,14 @@
 import geojson
+import sqlalchemy
 from flask import Blueprint
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import Response
 from flask import url_for
 
+from ...core.datamodel import DB
+from ...core.datamodel import SquarePlannerBookmark
 from ...explorer.grid_file import make_explorer_rectangle
 from ...explorer.grid_file import make_explorer_tile
 from ...explorer.grid_file import make_grid_file_geojson
@@ -72,6 +76,9 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
             square_x=x,
             square_y=y,
             square_size=size,
+            bookmarks=DB.session.scalars(
+                sqlalchemy.select(SquarePlannerBookmark)
+            ).all(),
         )
 
     @blueprint.route("/<int:zoom>/<int:x>/<int:y>/<int:size>/missing.<suffix>")
@@ -98,6 +105,24 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
             mimetype=mimetypes[suffix],
             headers={"Content-disposition": "attachment"},
         )
+
+    @blueprint.route(
+        "/save-bookmark/<int:zoom>/<int:x>/<int:y>/<int:size>", methods=["POST"]
+    )
+    def save_bookmark(zoom: int, x: int, y: int, size: int):
+        bookmark = SquarePlannerBookmark(
+            zoom=zoom, x=x, y=y, size=size, name=request.form["name"]
+        )
+        DB.session.add(bookmark)
+        DB.session.commit()
+        return redirect(request.referrer)
+
+    @blueprint.route("/delete-bookmark/<int:id>")
+    def delete_bookmark(id: int):
+        bookmark = DB.session.get(SquarePlannerBookmark, id)
+        DB.session.delete(bookmark)
+        DB.session.commit()
+        return redirect(request.referrer)
 
     return blueprint
 
