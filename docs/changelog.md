@@ -26,6 +26,7 @@ Added:
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
+- Add rudimentary equipment settings where one can change name and offset.
 
 Changed:
 
