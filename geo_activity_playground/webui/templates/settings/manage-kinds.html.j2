@@ -1,0 +1,48 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Kinds</h1>
+
+<p>Apart from bicycle rides and runs, you might also record your car and train rides. If you don't want to include these
+    for achievements like explorer tiles, you can enter the activity kinds that should not be considered here.</p>
+
+<form method="POST">
+    <div class="row g-3 mb-1">
+        <div class="col">
+            <label class="form-label">Kind</label>
+        </div>
+        <div class="col">
+            <label class="form-label">Consider for Achievements</label>
+        </div>
+    </div>
+    {% for kind in kinds %}
+    <div class="row g-3 mb-1">
+        <input type="hidden" name="id" value="{{ kind.id }}" />
+        <div class="col">
+
+            <input type="text" class="form-control" name="name" value="{{ kind.name }}" />
+        </div>
+        <div class="col">
+            <input type="checkbox" class="form-check-input" name="consider_for_achievements" value="{{ kind.id }}" {% if
+                kind.consider_for_achievements %} checked {% endif %} />
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row g-3 mb-3 mt-2">
+        <input type="hidden" name="id" value="" />
+        <div class="col">
+            <input type="text" class="form-control" id="name_new" name="name" />
+        </div>
+        <div class="col">
+            <input type="checkbox" class="form-check-input" id="consider_for_achievements_new"
+                name="consider_for_achievements" value="new" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

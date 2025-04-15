@@ -17,6 +17,7 @@ from flask import url_for
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
+from ...core.datamodel import Kind
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.paths import _activity_enriched_dir
 from ..authenticator import Authenticator
@@ -174,6 +175,37 @@ def make_settings_blueprint(
         return render_template(
             "settings/manage-equipments.html.j2",
             equipments=equipments,
+        )
+
+    @blueprint.route("/manage-kinds", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def manage_kinds():
+        if request.method == "POST":
+            print(request.form)
+            ids = request.form.getlist("id")
+            names = request.form.getlist("name")
+            consider_for_achievements = request.form.getlist(
+                "consider_for_achievements"
+            )
+            assert len(ids) == len(names)
+            for id, name in zip(ids, names):
+                if id:
+                    kind = DB.session.get(Kind, int(id))
+                    kind.name = name
+                    kind.consider_for_achievements = id in consider_for_achievements
+                if not id and name:
+                    kind = Kind(name)
+                    if consider_for_achievements:
+                        kind.consider_for_achievements = (
+                            "new" in consider_for_achievements
+                        )
+                    DB.session.add(kind)
+                    flasher.flash_message(f"Kind '{name}' added.", FlashTypes.SUCCESS)
+            DB.session.commit()
+        kinds = DB.session.scalars(sqlalchemy.select(Kind).order_by(Kind.name)).all()
+        return render_template(
+            "settings/manage-kinds.html.j2",
+            kinds=kinds,
         )
 
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
