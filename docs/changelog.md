@@ -26,7 +26,6 @@ Added:
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
-- Add rudimentary equipment settings where one can change name and offset.
 - Add bookmark function for the square planner. ([GH-210](https://github.com/martin-ueding/geo-activity-playground/issues/210))
 
 Changed:
@@ -37,6 +36,7 @@ Changed:
 - Display activities from the past 30 days on the landing page, grouped by day.
 - Only show relevant data on the activity page.
 - The split between controllers and blueprints is removed, making the code less complex at the cost of not separating code from the web framework. ([GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214))
+- Settings pages for equipment offsets and activity kinds to consider for achievements have been converted into management pages for equipments and activity kinds.
 
 Removed:
 
