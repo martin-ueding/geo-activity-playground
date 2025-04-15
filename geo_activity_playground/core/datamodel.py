@@ -15,6 +15,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
+from .config import Config
 from .paths import time_series_dir
 
 
@@ -211,18 +212,21 @@ class Kind(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
 
-def get_or_make_kind(name: str) -> Kind:
+def get_or_make_kind(name: str, config: Config) -> Kind:
     kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
         assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
         return kinds[0]
     else:
-        kind = Kind(name=name)
+        kind = Kind(
+            name=name,
+            consider_for_achievements=config.kinds_without_achievements.get(name, True),
+        )
         DB.session.add(kind)
         return kind
 
 
-def get_or_make_equipment(name: str) -> Equipment:
+def get_or_make_equipment(name: str, config: Config) -> Equipment:
     equipments = DB.session.scalars(
         sqlalchemy.select(Equipment).where(Equipment.name == name)
     ).all()
@@ -232,6 +236,8 @@ def get_or_make_equipment(name: str) -> Equipment:
         ), f"There must be only one equipment with name '{name}'."
         return equipments[0]
     else:
-        equipment = Equipment(name=name)
+        equipment = Equipment(
+            name=name, offset_km=config.equipment_offsets.get(name, 0)
+        )
         DB.session.add(equipment)
         return equipment

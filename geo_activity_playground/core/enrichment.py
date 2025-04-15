@@ -65,13 +65,13 @@ def populate_database_from_extracted(config: Config) -> None:
             # Rename kinds if needed.
             if kind_name in config.kind_renames:
                 kind_name = config.kind_renames[kind_name]
-            kind = get_or_make_kind(kind_name)
+            kind = get_or_make_kind(kind_name, config)
         else:
             kind = None
 
         equipment_name = extracted_metadata.get("equipment", None)
         if equipment_name:
-            equipment = get_or_make_equipment(equipment_name)
+            equipment = get_or_make_equipment(equipment_name, config)
         elif kind:
             equipment = kind.default_equipment
         else:
