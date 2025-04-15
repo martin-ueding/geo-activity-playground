@@ -5,6 +5,7 @@ import urllib.parse
 from typing import Any
 from typing import Optional
 
+import sqlalchemy
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -14,6 +15,8 @@ from flask import Response
 from flask import url_for
 
 from ...core.config import ConfigAccessor
+from ...core.datamodel import DB
+from ...core.datamodel import Equipment
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.paths import _activity_enriched_dir
 from ..authenticator import Authenticator
@@ -143,6 +146,33 @@ def make_settings_blueprint(
             color_scheme_for_heatmap_avail=MATPLOTLIB_COLOR_SCHEMES_CONTINUOUS,
         )
 
+    @blueprint.route("/manage-equipments", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def manage_equipments():
+        if request.method == "POST":
+            ids = request.form.getlist("id")
+            names = request.form.getlist("name")
+            offsets = request.form.getlist("offset_km")
+            assert len(ids) == len(names) == len(offsets)
+            for id, name, offset in zip(ids, names, offsets):
+                if id:
+                    equipment = DB.session.get(Equipment, int(id))
+                    equipment.name = name
+                    equipment.offset_km = int(float(offset))
+                if not id and name:
+                    equipment = Equipment(name)
+                    if offset:
+                        equipment.offset_km = int(float(offset))
+                    DB.session.add(equipment)
+                    flasher.flash_message(
+                        f"Equipment '{name}' added.", FlashTypes.SUCCESS
+                    )
+            DB.session.commit()
+        equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
+        return render_template(
+            "settings/manage-equipments.html.j2", equipments=equipments
+        )
+
     @blueprint.route("/equipment-offsets", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def equipment_offsets():
@@ -171,7 +201,7 @@ def make_settings_blueprint(
                 new_equipment_offsets[equipment] = offset
             config_accessor().equipment_offsets = new_equipment_offsets
             config_accessor.save()
-        flash("Updated equipment offsets.", category="success")
+            flash("Updated equipment offsets.", category="success")
         context = {
             "equipment_offsets": config_accessor().equipment_offsets,
         }

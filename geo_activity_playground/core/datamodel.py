@@ -182,6 +182,9 @@ class Equipment(DB.Model):
         back_populates="default_equipment", cascade="all, delete-orphan"
     )
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.offset_km} km)"
+
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
 
 
