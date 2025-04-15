@@ -42,6 +42,7 @@ Removed:
 
 - Deleting an activity file from the `Activities` directory will not remove them from the database any more.
 - Remove “commute” property as it is unclear what that even means and what to do with that.
+- Remove current activity kind renaming functionality. Will be replaced by something acting on the database later.
 
 Fixed:
 
