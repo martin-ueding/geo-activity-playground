@@ -234,7 +234,10 @@ def get_or_make_kind(name: str, config: Config) -> Kind:
     else:
         kind = Kind(
             name=name,
-            consider_for_achievements=config.kinds_without_achievements.get(name, True),
+            # this doesn't seem to work: AttributeError: 'list' object has no attribute 'get'
+            # ... wait for fix: https://github.com/martin-ueding/geo-activity-playground/issues/257
+            # consider_for_achievements=config.kinds_without_achievements.get(name, True),
+            consider_for_achievements=True,
         )
         DB.session.add(kind)
         return kind
