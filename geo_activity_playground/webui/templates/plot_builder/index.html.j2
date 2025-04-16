@@ -1,0 +1,44 @@
+{% extends "page.html.j2" %}
+{% from "search_form.html.j2" import search_form %}
+
+{% block container %}
+
+<h1 class="row mb-3">Plot Builder</h1>
+
+
+<div class="row">
+    <div class="col-md-4">
+        {% macro select_field(label, name, choices, active) %}
+        <div class="mb-3">
+            <label for="{{ name }}">{{ label }}</label>
+            <select name="{{ name }}" class="form-select">
+                {% for choice_value, choice_label in choices.items() %}
+                <option id="{{ name }}" value="{{ choice_value }}" {% if active==choice_value %} selected {% endif %}>
+                    {{ choice_label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endmacro %}
+
+        <form>
+            {{ select_field("Mark", "mark", marks, mark)}}
+
+            {{ select_field("X", "x", continuous, x)}}
+            {{ select_field("Y", "y", continuous, y)}}
+            {{ select_field("Color", "color", continuous, color)}}
+            {{ select_field("Size", "size", continuous, size)}}
+            {{ select_field("Shape", "shape", discrete, shape)}}
+            {{ select_field("Row", "row", discrete, row)}}
+            {{ select_field("Column", "column", discrete, column)}}
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <div class="col-md-8">
+        {% if plot %}
+        {{ vega_direct("plot", plot) }}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

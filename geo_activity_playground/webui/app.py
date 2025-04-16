@@ -32,6 +32,7 @@ from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
+from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
@@ -137,6 +138,7 @@ def web_ui_main(
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history
         ),
+        "/plot-builder": make_plot_builder_blueprint(repository),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
         "/search": make_search_blueprint(
