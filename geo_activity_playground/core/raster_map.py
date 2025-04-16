@@ -10,8 +10,8 @@ import numpy as np
 import requests
 from PIL import Image
 
-from geo_activity_playground.core.config import Config
-from geo_activity_playground.core.tiles import compute_tile_float
+from .config import Config
+from .tiles import compute_tile_float
 
 
 logger = logging.getLogger(__name__)

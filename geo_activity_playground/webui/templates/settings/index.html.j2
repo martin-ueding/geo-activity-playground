@@ -32,9 +32,18 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Equipment offsets</h5>
-                    <p class="card-text">Not all activities with a given equipment are recorded? Just set an offset.</p>
-                    <a href="{{ url_for('.equipment_offsets') }}" class="btn btn-primary">Set up equipment offsets</a>
+                    <h5 class="card-title">Equipment</h5>
+                    <p class="card-text">Manage your equipments here.</p>
+                    <a href="{{ url_for('.manage_equipments') }}" class="btn btn-primary">Manage equipments</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Kinds</h5>
+                    <p class="card-text">Manage your activity kinds here.</p>
+                    <a href="{{ url_for('.manage_kinds') }}" class="btn btn-primary">Manage kinds</a>
                 </div>
             </div>
         </div>
@@ -44,26 +53,6 @@
                     <h5 class="card-title">Heart rate</h5>
                     <p class="card-text">Specify maximum heart rate to derive heart rate zones.</p>
                     <a href="{{ url_for('.heart_rate') }}" class="btn btn-primary">Set up heart rate</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Kind renames</h5>
-                    <p class="card-text">Bulk rename activity kinds</p>
-                    <a href="{{ url_for('.kind_renames') }}" class="btn btn-primary">Set up kind renames</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Kinds without achievements</h5>
-                    <p class="card-text">Recorded car rides that shouldn't count towards the explorer tiles? Exempt
-                        activity kinds from consideration.</p>
-                    <a href="{{ url_for('.kinds_without_achievements') }}" class="btn btn-primary">Set up kinds without
-                        achievements</a>
                 </div>
             </div>
         </div>

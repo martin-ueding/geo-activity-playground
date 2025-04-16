@@ -1,6 +1,6 @@
 import pathlib
 
-from geo_activity_playground.importers.directory import _get_metadata_from_path
+from .directory import _get_metadata_from_path
 
 
 def test_get_metadata_from_path() -> None:

@@ -1,49 +1,23 @@
 import datetime
 import functools
-import json
 import logging
-import pickle
 from collections.abc import Callable
 from typing import Any
-from typing import Iterator
 from typing import Optional
-from typing import TypedDict
 
 import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+import sqlalchemy
 from tqdm import tqdm
 
-from geo_activity_playground.core.paths import activities_file
-from geo_activity_playground.core.paths import activity_enriched_meta_dir
-from geo_activity_playground.core.paths import activity_enriched_time_series_dir
-from geo_activity_playground.core.paths import activity_meta_override_dir
+from geo_activity_playground.core.datamodel import Activity
+from geo_activity_playground.core.datamodel import ActivityMeta
+from geo_activity_playground.core.datamodel import DB
+from geo_activity_playground.core.datamodel import Kind
 
 logger = logging.getLogger(__name__)
-
-
-class ActivityMeta(TypedDict):
-    average_speed_elapsed_kmh: float
-    average_speed_moving_kmh: float
-    calories: float
-    commute: bool
-    consider_for_achievements: bool
-    distance_km: float
-    elapsed_time: datetime.timedelta
-    elevation_gain: float
-    end_latitude: float
-    end_longitude: float
-    equipment: str
-    id: int
-    kind: str
-    moving_time: datetime.timedelta
-    name: str
-    path: str
-    start_latitude: float
-    start_longitude: float
-    start: np.datetime64
-    steps: int
 
 
 def make_activity_meta() -> ActivityMeta:
@@ -57,128 +31,68 @@ def make_activity_meta() -> ActivityMeta:
     )
 
 
-def build_activity_meta() -> None:
-    if activities_file().exists():
-        meta = pd.read_parquet(activities_file())
-        present_ids = set(meta["id"])
-    else:
-        meta = pd.DataFrame(columns=["id"])
-        present_ids = set()
-
-    available_ids = {
-        int(path.stem) for path in activity_enriched_meta_dir().glob("*.pickle")
-    }
-    new_ids = available_ids - present_ids
-    deleted_ids = present_ids - available_ids
-
-    # Remove updated activities and read these again.
-    if activities_file().exists():
-        meta_mtime = activities_file().stat().st_mtime
-        updated_ids = {
-            int(path.stem)
-            for path in activity_enriched_meta_dir().glob("*.pickle")
-            if path.stat().st_mtime > meta_mtime
-        }
-        new_ids.update(updated_ids)
-        deleted_ids.update(updated_ids & present_ids)
-
-    if deleted_ids:
-        logger.debug(f"Removing activities {deleted_ids} from repository.")
-        meta.drop(sorted(deleted_ids), axis="index", inplace=True)
-
-    rows = []
-    for new_id in tqdm(new_ids, desc="Register new activities"):
-        with open(activity_enriched_meta_dir() / f"{new_id}.pickle", "rb") as f:
-            data = pickle.load(f)
-        override_file = activity_meta_override_dir() / f"{new_id}.json"
-        if override_file.exists():
-            with open(override_file) as f:
-                data.update(json.load(f))
-        rows.append(data)
-
-    if rows:
-        new_shard = pd.DataFrame(rows)
-        new_shard.index = new_shard["id"]
-        new_shard.index.name = "index"
-        if len(meta):
-            meta = pd.concat([meta, new_shard])
-        else:
-            meta = new_shard
-
-    if len(meta):
-        assert pd.api.types.is_dtype_equal(meta["start"].dtype, "datetime64[ns]"), (
-            meta["start"].dtype,
-            meta["start"].iloc[0],
-        )
-
-        meta.sort_values("start", inplace=True)
-
-        meta.loc[meta["kind"] == "", "kind"] = "Unknown"
-        meta.loc[meta["equipment"] == "", "equipment"] = "Unknown"
-        meta["average_speed_moving_kmh"] = meta["distance_km"] / (
-            meta["moving_time"].dt.total_seconds() / 3_600
-        )
-        meta["average_speed_elapsed_kmh"] = meta["distance_km"] / (
-            meta["elapsed_time"].dt.total_seconds() / 3_600
-        )
-
-    meta.to_parquet(activities_file())
-
-
 class ActivityRepository:
-    def __init__(self) -> None:
-        self.meta = pd.DataFrame()
-
     def __len__(self) -> int:
-        return len(self.meta)
-
-    def reload(self) -> None:
-        self.meta = pd.read_parquet(activities_file())
+        return len(self.get_activity_ids())
 
     def has_activity(self, activity_id: int) -> bool:
-        if len(self.meta):
-            if activity_id in self.meta["id"]:
-                return True
-
-        return False
+        return bool(
+            DB.session.scalars(
+                sqlalchemy.query(Activity).where(Activity.id == activity_id)
+            ).all()
+        )
 
     def last_activity_date(self) -> Optional[datetime.datetime]:
-        if len(self.meta):
-            return self.meta.iloc[-1]["start"]
+        result = DB.session.scalars(
+            sqlalchemy.select(Activity).order_by(Activity.start)
+        ).all()
+        if result:
+            return result[-1].start
         else:
             return None
 
     def get_activity_ids(self, only_achievements: bool = False) -> list[int]:
+        query = sqlalchemy.select(Activity.id)
         if only_achievements:
-            return list(self.meta.loc[self.meta["consider_for_achievements"]].index)
-        else:
-            return list(self.meta.index)
+            query = query.where(Kind.consider_for_achievements)
+        result = DB.session.scalars(query).all()
+        return result
 
-    def iter_activities(self, new_to_old=True, dropna=False) -> Iterator[ActivityMeta]:
+    def iter_activities(self, new_to_old=True, drop_na=False) -> list[Activity]:
+        query = sqlalchemy.select(Activity)
+        if drop_na:
+            query = query.where(Activity.start.is_not(None))
+        result = DB.session.scalars(query.order_by(Activity.start)).all()
         direction = -1 if new_to_old else 1
-        for index, row in self.meta[::direction].iterrows():
-            if not dropna or not pd.isna(row["start"]):
-                yield row
+        return result[::direction]
 
-    def get_activity_by_id(self, id: int) -> ActivityMeta:
-        activity = self.meta.loc[id]
-        assert isinstance(activity["name"], str), activity["name"]
+    def get_activity_by_id(self, id: int) -> Activity:
+        activity = DB.session.scalar(
+            sqlalchemy.select(Activity).where(Activity.id == int(id))
+        )
+        if activity is None:
+            raise ValueError(f"Cannot find activity {id} in DB.session.")
         return activity
 
-    @functools.lru_cache(maxsize=3000)
     def get_time_series(self, id: int) -> pd.DataFrame:
-        path = activity_enriched_time_series_dir() / f"{id}.parquet"
-        try:
-            df = pd.read_parquet(path)
-        except OSError as e:
-            logger.error(f"Error while reading {path}, deleting cache file …")
-            path.unlink(missing_ok=True)
-            raise
+        return self.get_activity_by_id(id).time_series
 
+    @property
+    def meta(self) -> pd.DataFrame:
+        activities = self.iter_activities(new_to_old=False, drop_na=True)
+        df = pd.DataFrame([activity.to_dict() for activity in activities])
+        df["date"] = df["start"].dt.date
+        df["year"] = [start.year for start in df["start"]]
+        df["month"] = [start.month for start in df["start"]]
+        df["day"] = [start.day for start in df["start"]]
+        df["week"] = [start.isocalendar().week for start in df["start"]]
+        df["day_of_week"] = df["start"].dt.day_of_week
+        df["iso_year"] = [start.isocalendar().year for start in df["start"]]
+        df["hours"] = [
+            elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
+        ]
+        df.index = df["id"]
         return df
-
-    def save(self) -> None:
-        self.meta.to_parquet(activities_file())
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:

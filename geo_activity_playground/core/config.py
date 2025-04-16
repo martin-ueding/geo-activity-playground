@@ -5,8 +5,8 @@ import logging
 import pathlib
 from typing import Optional
 
-from geo_activity_playground.core.paths import new_config_file
-from geo_activity_playground.core.paths import strava_dynamic_config_path
+from .paths import new_config_file
+from .paths import strava_dynamic_config_path
 
 
 try:

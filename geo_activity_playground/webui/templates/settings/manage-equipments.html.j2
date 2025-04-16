@@ -1,0 +1,49 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Equipments</h1>
+
+<p>If you record every activity with an equipment but haven't started from the beginning, you might have a certain
+    distance that is not accounted for. In order to have this reflected in the equipment overview, you can enter offsets
+    here.</p>
+
+<form method="POST">
+    <div class="row g-3 mb-1">
+        <div class="col">
+            <label class="form-label">Equipment</label>
+        </div>
+        <div class="col">
+            <label class="form-label">Offset / km</label>
+        </div>
+    </div>
+    {% for equipment in equipments %}
+    <div class="row g-3 mb-1">
+        <input type="hidden" name="id" value="{{ equipment.id }}" />
+        <div class="col">
+
+            <input type="text" class="form-control" id="name_{{ loop.index }}" name="name"
+                value="{{ equipment.name }}" />
+        </div>
+        <div class="col">
+            <input type="number" class="form-control" id="offset_km_{{ loop.index }}" name="offset_km"
+                value="{{ equipment.offset_km }}" />
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row g-3 mb-3 mt-2">
+        <input type="hidden" name="id" value="" />
+        <div class="col">
+            <input type="text" class="form-control" id="name_new" name="name" />
+        </div>
+        <div class="col">
+            <input type="number" class="form-control" id="offset_km_new" name="offset_km" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

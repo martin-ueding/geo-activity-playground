@@ -12,16 +12,19 @@
         <dl>
             <dt>Name</dt>
             <dd>{{ activity["name"] }}</dd>
+
+            {% if activity.kind %}
             <dt>Kind</dt>
-            <dd>{{ activity.kind }}</dd>
-            <dt>Commute</dt>
-            <dd>{{ activity.commute }}</dd>
+            <dd>{{ activity.kind.name }}</dd>
+            {% endif %}
+
             <dt>Distance</dt>
             <dd>{{ activity.distance_km|round(1) }} km</dd>
-            <dt>Elapsed time</dt>
-            <dd>{{ activity.elapsed_time|td }}</dd>
-            <dt>Moving time</dt>
-            <dd>{{ activity.moving_time|td }}</dd>
+
+            {% if activity.elapsed_time %}
+            <dt>Duration</dt>
+            <dd>{{ activity.elapsed_time|td }} elapsed, {{ activity.moving_time|td }} moving</dd>
+
             <dt>Average moving speed</dt>
             <dd>{{ activity.average_speed_moving_kmh|round(1) }} km/h = {{
                 (60/activity.average_speed_moving_kmh)|round(1) }} min/km</dd>
@@ -32,27 +35,46 @@
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }}
             </dd>
+            {% endif %}
+
+            {% if activity.calories %}
             <dt>Calories</dt>
             <dd>{{ activity.calories }}</dd>
+            {% endif %}
+
+            {% if activity.steps %}
             <dt>Steps</dt>
             <dd>{{ activity.steps }}</dd>
-            {% if activity.elevation_gain is defined %}
+            {% endif %}
+
+            {% if activity.elevation_gain %}
             <dt>Elevation gain</dt>
             <dd>{{ activity.elevation_gain|round(0) }} m</dd>
             {% endif %}
+
+            {% if activity.equipment %}
             <dt>Equipment</dt>
-            <dd>{{ activity['equipment'] }}</dd>
+            <dd>{{ activity.equipment.name }}</dd>
+            {% endif %}
+
+            {% if new_tiles[14] %}
             <dt>New Explorer Tiles</dt>
             <dd>{{ new_tiles[14] }}</dd>
+            {% endif %}
+
+            {% if new_tiles[17] %}
             <dt>New Squadratinhos</dt>
             <dd>{{ new_tiles[17] }}</dd>
+            {% endif %}
+
             <dt>ID</dt>
             <dd>{{ activity.id }}</dd>
             <dt>Source path</dt>
             <dd>{{ activity.path }}</dd>
         </dl>
 
-        <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit metadata</a>
+        <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit</a>
+        <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">Trim</a>
     </div>
     <div class="col-sm-12 col-md-8">
         <div id="activity-map" style="height: 500px;" class="mb-3"></div>

@@ -2,9 +2,9 @@ import datetime
 
 import pandas as pd
 
-from geo_activity_playground.core.meta_search import _make_mask
-from geo_activity_playground.core.meta_search import apply_search_query
-from geo_activity_playground.core.meta_search import SearchQuery
+from .meta_search import _make_mask
+from .meta_search import apply_search_query
+from .meta_search import SearchQuery
 
 
 def test_empty_query() -> None:

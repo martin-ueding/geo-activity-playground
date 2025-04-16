@@ -1,7 +1,6 @@
 # Changelog
 
-This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- 
 Types of changes
@@ -16,25 +15,38 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 0.39.0 — 2025-04-15
 
 Added:
 
+- Add trim feature for activities, although the user interface is quite basic at the moment. ([GH-234](https://github.com/martin-ueding/geo-activity-playground/issues/234))
+- Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
+- Add bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
 - Add installation instructions for macOS. ([GH-235](https://github.com/martin-ueding/geo-activity-playground/issues/235))
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
-- Add a plot for monthly equipment usage. ([GH-251](https://github.com/martin-ueding/geo-activity-playground/issues/251))
-- Bubble chart with activities. ([GH-252](https://github.com/martin-ueding/geo-activity-playground/issues/252))
+- Add rudimentary equipment settings where one can change name and offset.
+- Add bookmark function for the square planner. ([GH-210](https://github.com/martin-ueding/geo-activity-playground/issues/210))
 
 Changed:
 
+- ⚠️ The program now stores actual state in the directory and not merely caches the parsed data. This means that one can make changes to the data within the web interface and that will be stored in the database and not in the original files. This is a change in scope of the program so far, which has been only a mere viewer. Data is now stored in a database (SQLite) instead of a Parquet file. Deleting the `Cache` directory will not result in data loss, but deleting `database.sqlite` will.
 - Make all tables responsive. ([GH-233](https://github.com/martin-ueding/geo-activity-playground/issues/233))
-- Add warning emoji (⚠️) to changelog to inform of breaking changes.
 - Suggest to upgrade with `--pip-args "--upgrade-strategy eager"` to get the latest versions of dependencies as well.
+- Display activities from the past 30 days on the landing page, grouped by day.
+- Only show relevant data on the activity page.
+- The split between controllers and blueprints is removed, making the code less complex at the cost of not separating code from the web framework. ([GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214))
+
+Removed:
+
+- Deleting an activity file from the `Activities` directory will not remove them from the database any more.
+- Remove “commute” property as it is unclear what that even means and what to do with that.
+- Remove current activity kind renaming functionality. Will be replaced by something acting on the database later.
+
+Fixed:
+
 - Make arrows in square planner look consistent on Windows. ([GH-237](https://github.com/martin-ueding/geo-activity-playground/issues/237))
-- Display activities from the past 30 days on the landing page.
-- Documentation navigation is now with sections, making the sidebar less nested.
 
 ## Version 0.38.2 — 2025-03-29
 
