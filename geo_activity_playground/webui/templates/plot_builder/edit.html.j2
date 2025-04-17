@@ -1,0 +1,63 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="row mb-3">Plot Builder</h1>
+
+<div class="mb-3"><a class="btn btn-primary" href="{{ url_for('.index') }}">Back to overview</a></div>
+
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {% macro select_field(label, name, choices, active) %}
+        <div class="mb-3">
+            <label for="{{ name }}">{{ label }}</label>
+            <select name="{{ name }}" class="form-select">
+                {% for choice_value, choice_label in choices.items() %}
+                <option id="{{ name }}" value="{{ choice_value }}" {% if active==choice_value %} selected {% endif %}>
+                    {{ choice_label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endmacro %}
+
+        <form>
+            <div class="mb-3">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ spec.name }}">
+            </div>
+
+            {{ select_field("Mark", "mark", marks, spec.mark)}}
+
+            {{ select_field("X", "x", continuous, spec.x)}}
+            {{ select_field("Y", "y", continuous, spec.y)}}
+            {{ select_field("Color", "color", continuous, spec.color)}}
+            {{ select_field("Size", "size", continuous, spec.size)}}
+            {{ select_field("Shape", "shape", discrete, spec.shape)}}
+            {{ select_field("Opacity", "opacity", discrete, spec.opacity)}}
+            {{ select_field("Facet", "facet", discrete, spec.facet)}}
+            {{ select_field("Row", "row", discrete, spec.row)}}
+            {{ select_field("Column", "column", discrete, spec.column)}}
+
+            <button type="submit" class="btn btn-primary">Save & Preview</button>
+        </form>
+    </div>
+    <div class="col-md-8">
+        {% if plot %}
+        {{ vega_direct("plot", plot) }}
+        {% endif %}
+    </div>
+</div>
+
+
+<h1 class="mb-3">JSON Export</h1>
+
+<p>If you want to share this plot specification with somebody else, send them the following code snippet. It contains
+    the name that you have given your plot but no data from your activities.</p>
+
+<code><pre>{{ spec.to_json() }}</pre></code>
+
+
+
+{% endblock %}

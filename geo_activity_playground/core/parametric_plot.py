@@ -1,22 +1,7 @@
-import dataclasses
-from typing import Optional
-
 import altair as alt
 import pandas as pd
 
-
-@dataclasses.dataclass
-class ParametricPlotSpec:
-    mark: str
-    x: str
-    y: str
-    color: Optional[str]
-    shape: Optional[str]
-    size: Optional[str]
-    row: Optional[str]
-    opacity: Optional[str]
-    column: Optional[str]
-    facet: Optional[str]
+from .datamodel import PlotSpec
 
 
 MARKS = {
@@ -50,8 +35,8 @@ CONTINUOUS_VARIABLES = {
     "end_longitude": "End longitude / °",
 }
 DISCRETE_VARIABLES = {
-    "equipment:N": "Equipment",
-    "kind:N": "Activity kind",
+    "equipment": "Equipment",
+    "kind": "Activity kind",
     "consider_for_achievements": "Consider for achievements",
     "year(start):O": "Year",
     "iso_year:O": "ISO Year",
@@ -70,7 +55,7 @@ VARIABLES_1 = {"": "", **DISCRETE_VARIABLES}
 VARIABLES_2 = {"": "", **DISCRETE_VARIABLES, **CONTINUOUS_VARIABLES}
 
 
-def make_parametric_plot(df: pd.DataFrame, spec: ParametricPlotSpec) -> str:
+def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> str:
     chart = alt.Chart(df)
 
     match spec.mark:

@@ -138,7 +138,9 @@ def web_ui_main(
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history
         ),
-        "/plot-builder": make_plot_builder_blueprint(repository),
+        "/plot-builder": make_plot_builder_blueprint(
+            repository, flasher, authenticator
+        ),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
         "/search": make_search_blueprint(
