@@ -35,7 +35,7 @@ def make_plot_builder_blueprint(
     @needs_authentication(authenticator)
     def new() -> Response:
         spec = PlotSpec(
-            name="New Plot",
+            name="My New Plot",
             mark="bar",
             x="year(start):O",
             y="sum(distance_km)",
