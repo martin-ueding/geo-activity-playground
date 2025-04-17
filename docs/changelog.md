@@ -25,6 +25,10 @@ Changed:
 
 - Rename “altitude” to “elevation”. _Altitude_ describes the height between ground and something in the sky, _elevation_ describes the hight of a point of earth with respect to sea level. Hence for our outdoor activities, “elevation” is more fitting. ([GH-253](https://github.com/martin-ueding/geo-activity-playground/issues/253))
 
+Fixed:
+
+- Use `pathlib` to construct database path correctly on Windows.
+
 ## Version 0.39.1 — 2025-04-17
 
 Fixed:
