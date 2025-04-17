@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import json
+import logging
 import os
 import pathlib
 import secrets
@@ -44,6 +45,9 @@ from .flasher import FlaskFlasher
 from .search_util import SearchQueryHistory
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_secret_key():
     secret_file = pathlib.Path("Cache/flask-secret.json")
     if secret_file.exists():
@@ -66,9 +70,9 @@ def web_ui_main(
 
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"sqlite:///{basedir.absolute()}/database.sqlite"
-    )
+    database_path = basedir / "database.sqlite"
+    logger.info(f"Using database file at '{database_path.absolute()}'.")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path.absolute()}"
     app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
     DB.init_app(app)
 
