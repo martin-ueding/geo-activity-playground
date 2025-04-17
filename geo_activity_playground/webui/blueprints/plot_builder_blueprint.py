@@ -62,9 +62,9 @@ def make_plot_builder_blueprint(
             spec.column = request.args["column"]
             spec.facet = request.args["facet"]
             spec.opacity = request.args["opacity"]
-            DB.session.commit()
         try:
             plot = make_parametric_plot(repository.meta, spec)
+            DB.session.commit()
         except ValueError as e:
             plot = None
             flasher.flash_message(str(e), FlashTypes.WARNING)

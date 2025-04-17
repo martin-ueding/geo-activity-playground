@@ -9,6 +9,18 @@
     {{ search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last, request_url) }}
 </div>
 
+{% if custom_plots %}
+<h2>Your custom plots</h2>
+{% for spec, plot in custom_plots %}
+<h3>{{ spec.name }}</h3>
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct("custom_plot_" ~ loop.index, plot) }}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
 <h2>Distances</h2>
 
 <p>This is your weekly distance for the past rolling year, split by activity kind.</p>

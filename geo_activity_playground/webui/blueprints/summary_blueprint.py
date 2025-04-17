@@ -3,6 +3,7 @@ import datetime
 
 import altair as alt
 import pandas as pd
+import sqlalchemy
 from flask import Blueprint
 from flask import render_template
 from flask import request
@@ -10,7 +11,10 @@ from flask import request
 from ...core.activities import ActivityRepository
 from ...core.activities import make_geojson_from_time_series
 from ...core.config import Config
+from ...core.datamodel import DB
+from ...core.datamodel import PlotSpec
 from ...core.meta_search import apply_search_query
+from ...core.parametric_plot import make_parametric_plot
 from ..plot_util import make_kind_scale
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
@@ -62,6 +66,10 @@ def make_summary_blueprint(
                 for activity_id, reasons in nominations.items()
             ],
             query=query.to_jinja(),
+            custom_plots=[
+                (spec, make_parametric_plot(repository.meta, spec))
+                for spec in DB.session.scalars(sqlalchemy.select(PlotSpec)).all()
+            ],
         )
 
     return blueprint
