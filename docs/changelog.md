@@ -19,7 +19,7 @@ Types of changes
 
 Added:
 
-- Add a plot builder.
+- Add a plot builder. ([GH-258](https://github.com/martin-ueding/geo-activity-playground/issues/258))
 
 ## Version 0.39.1 — 2025-04-17
 
