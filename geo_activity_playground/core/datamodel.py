@@ -234,7 +234,7 @@ def get_or_make_kind(name: str, config: Config) -> Kind:
     else:
         kind = Kind(
             name=name,
-            consider_for_achievements=config.kinds_without_achievements.get(name, True),
+            consider_for_achievements=name in config.kinds_without_achievements,
         )
         DB.session.add(kind)
         return kind
