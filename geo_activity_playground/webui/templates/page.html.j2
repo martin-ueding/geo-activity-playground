@@ -130,6 +130,8 @@
                                     <hr class="dropdown-divider">
                                 </li>
 
+                                <li><a class="dropdown-item" href="{{ url_for('plot_builder.index') }}">Plot Builder</a>
+                                </li>
                                 <li><a class="dropdown-item" href="{{ url_for('settings.index') }}">Settings</a></li>
                             </ul>
                         </li>
@@ -196,7 +198,9 @@
 
         <div class="row border-top py-3 my-4">
             <ul class="nav col-4">
-                <li class="nav-item px-2 nav-link"><a href="https://github.com/martin-ueding/geo-activity-playground/blob/main/docs/changelog.md" class="nav-link px-2 text-muted" target="_blank">Version {{ version }}</a></li>
+                <li class="nav-item px-2 nav-link"><a
+                        href="https://github.com/martin-ueding/geo-activity-playground/blob/main/docs/changelog.md"
+                        class="nav-link px-2 text-muted" target="_blank">Version {{ version }}</a></li>
             </ul>
             <ul class="nav col-8 justify-content-end">
                 <li class="nav-item"><a href="https://github.com/martin-ueding/geo-activity-playground"
