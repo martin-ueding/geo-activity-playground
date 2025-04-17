@@ -121,10 +121,12 @@ class Activity(DB.Model):
     def raw_time_series(self) -> pd.DataFrame:
         path = time_series_dir() / f"{self.id}.parquet"
         try:
-            return pd.read_parquet(path)
+            time_series = pd.read_parquet(path)
+            if "altitude" in time_series.columns:
+                time_series.rename(columns={"altitude": "elevation"}, inplace=True)
+            return time_series
         except OSError as e:
-            logger.error(f"Error while reading {path}, deleting cache file …")
-            path.unlink(missing_ok=True)
+            logger.error(f"Error while reading {path}.")
             raise
 
     @property

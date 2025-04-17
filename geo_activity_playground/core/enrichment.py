@@ -192,10 +192,12 @@ def _embellish_single_time_series(
         timeseries["y"] = y
 
     if "altitude" in timeseries.columns:
-        altitude_diff = timeseries["altitude"].diff()
-        altitude_diff = altitude_diff.ewm(span=5, min_periods=5).mean()
-        altitude_diff.loc[altitude_diff.abs() > 30] = 0
-        altitude_diff.loc[altitude_diff < 0] = 0
-        timeseries["elevation_gain_cum"] = altitude_diff.cumsum()
+        timeseries.rename(columns={"altitude": "elevation"}, inplace=True)
+    if "elevation" in timeseries.columns:
+        elevation_diff = timeseries["elevation"].diff()
+        elevation_diff = elevation_diff.ewm(span=5, min_periods=5).mean()
+        elevation_diff.loc[elevation_diff.abs() > 30] = 0
+        elevation_diff.loc[elevation_diff < 0] = 0
+        timeseries["elevation_gain_cum"] = elevation_diff.cumsum()
 
     return timeseries

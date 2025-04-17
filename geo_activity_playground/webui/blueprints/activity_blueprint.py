@@ -148,8 +148,8 @@ def make_activity_blueprint(
             )
         ) is not None:
             context["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
-        if "altitude" in time_series.columns:
-            context["altitude_time_plot"] = altitude_time_plot(time_series)
+        if "elevation" in time_series.columns:
+            context["elevation_time_plot"] = elevation_time_plot(time_series)
         if "elevation_gain_cum" in time_series.columns:
             context["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
         if "heartrate" in time_series.columns:
@@ -445,13 +445,13 @@ def distance_time_plot(time_series: pd.DataFrame) -> str:
     )
 
 
-def altitude_time_plot(time_series: pd.DataFrame) -> str:
+def elevation_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Altitude")
+        alt.Chart(time_series, title="Elevation")
         .mark_line()
         .encode(
             alt.X("time", title="Time"),
-            alt.Y("altitude", scale=alt.Scale(zero=False), title="Altitude / m"),
+            alt.Y("elevation", scale=alt.Scale(zero=False), title="Elevation / m"),
             alt.Color("segment_id:N", title="Segment"),
         )
         .interactive(bind_y=False)
@@ -461,14 +461,14 @@ def altitude_time_plot(time_series: pd.DataFrame) -> str:
 
 def elevation_gain_cum_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Altitude Gain")
+        alt.Chart(time_series, title="Elevation Gain")
         .mark_line()
         .encode(
             alt.X("time", title="Time"),
             alt.Y(
                 "elevation_gain_cum",
                 scale=alt.Scale(zero=False),
-                title="Altitude gain / m",
+                title="Elevation gain / m",
             ),
             alt.Color("segment_id:N", title="Segment"),
         )

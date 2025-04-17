@@ -121,9 +121,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                         if "distance" in fields:
                             row["distance"] = values["distance"]
                         if "altitude" in fields:
-                            row["altitude"] = values["altitude"]
+                            row["elevation"] = values["altitude"]
                         if "enhanced_altitude" in fields:
-                            row["altitude"] = values["enhanced_altitude"]
+                            row["elevation"] = values["enhanced_altitude"]
                         if "speed" in fields:
                             factor = _fit_speed_unit_factor(fields["speed"].units)
                             row["speed"] = values["speed"] * factor
@@ -188,10 +188,10 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 time = convert_to_datetime_ns(time)
                 points.append((time, point.latitude, point.longitude, point.elevation))
 
-    df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "altitude"])
-    # Some files don't have altitude information. In these cases we remove the column.
-    if not df["altitude"].any():
-        del df["altitude"]
+    df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "elevation"])
+    # Some files don't have elevation information. In these cases we remove the column.
+    if not df["elevation"].any():
+        del df["elevation"]
     return df
 
 
@@ -230,7 +230,7 @@ def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
                 "longitude": trackpoint.longitude,
             }
             if trackpoint.elevation:
-                row["altitude"] = trackpoint.elevation
+                row["elevation"] = trackpoint.elevation
             if trackpoint.hr_value:
                 row["heartrate"] = trackpoint.hr_value
             if trackpoint.cadence:
@@ -256,16 +256,16 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
                     parts = where.split(" ")
                     if len(parts) == 2:
                         lon, lat = parts
-                        alt = None
+                        elevation = None
                     if len(parts) == 3:
-                        lon, lat, alt = parts
+                        lon, lat, elevation = parts
                     row = {
                         "time": time,
                         "latitude": float(lat),
                         "longitude": float(lon),
                     }
-                    if alt is not None:
-                        row["altitude"] = float(alt)
+                    if elevation is not None:
+                        row["elevation"] = float(elevation)
                     rows.append(row)
     return pd.DataFrame(rows)
 
