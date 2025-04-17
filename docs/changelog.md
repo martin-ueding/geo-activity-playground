@@ -15,6 +15,13 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix import of activities into database. ([GH-257](https://github.com/martin-ueding/geo-activity-playground/issues/257))
+
+
 ## Version 0.39.0 — 2025-04-15
 
 Added:
