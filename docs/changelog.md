@@ -27,7 +27,7 @@ Changed:
 
 Fixed:
 
-- Use `pathlib` to construct database path correctly on Windows.
+- Use `pathlib` to construct database path correctly on Windows. ([GH-256](https://github.com/martin-ueding/geo-activity-playground/issues/256))
 - Try to support German localization in Strava conversion. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
 - Fix moving time for activities without duration. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
 
