@@ -20,6 +20,11 @@ Types of changes
 Fixed:
 
 - Fix moving time for activities with zero elapsed time or moving time. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
+- Handle `/` in activity name when converting from Strava. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+
+Removed:
+
+- Remove “commute” concept from Strava converter. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
 
 ## Version 0.40.0 — 2025-04-18
 
