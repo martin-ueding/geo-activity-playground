@@ -258,6 +258,13 @@ def convert_strava_checkout(
     activities = pd.read_csv(checkout_path / "activities.csv")
     print(activities)
 
+    # Handle German localization.
+    if activities.columns[0] == "Aktivitäts-ID":
+        assert len(activities.columns) == len(
+            EXPECTED_COLUMNS
+        ), "Strava seems to have changed for format again. Please file a bug report at https://github.com/martin-ueding/geo-activity-playground/issues and include the first line of the 'activities.csv'."
+        activities.columns = EXPECTED_COLUMNS
+
     for _, row in tqdm(activities.iterrows(), desc="Import activity files"):
         # Some people have manually added activities without position data. These don't have a file there. We'll skip these.
         if not isinstance(row["Filename"], str):
