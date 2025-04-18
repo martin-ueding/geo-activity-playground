@@ -112,12 +112,12 @@ class Activity(DB.Model):
 
     @property
     def average_speed_moving_kmh(self) -> Optional[float]:
-        if self.moving_time is not None and self.moving_time.total_seconds():
+        if self.moving_time:
             return self.distance_km / (self.moving_time.total_seconds() / 3_600)
 
     @property
     def average_speed_elapsed_kmh(self) -> Optional[float]:
-        if self.elapsed_time is not None and self.elapsed_time.total_seconds():
+        if self.elapsed_time:
             return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
 
     @property
