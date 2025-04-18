@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 from typing import Any
+from typing import Optional
 from typing import TypedDict
 
 import numpy as np
@@ -110,12 +111,14 @@ class Activity(DB.Model):
         return f"{self.start} {self.name}"
 
     @property
-    def average_speed_moving_kmh(self) -> float:
-        return self.distance_km / (self.moving_time.total_seconds() / 3_600)
+    def average_speed_moving_kmh(self) -> Optional[float]:
+        if self.moving_time is not None:
+            return self.distance_km / (self.moving_time.total_seconds() / 3_600)
 
     @property
-    def average_speed_elapsed_kmh(self) -> float:
-        return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
+    def average_speed_elapsed_kmh(self) -> Optional[float]:
+        if self.elapsed_time is not None:
+            return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
 
     @property
     def raw_time_series(self) -> pd.DataFrame:
