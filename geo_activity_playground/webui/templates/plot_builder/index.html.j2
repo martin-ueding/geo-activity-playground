@@ -1,0 +1,32 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="row mb-3">Plot Builder</h1>
+
+{% if specs %}
+<table class="table mb-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for spec in specs %}
+        <tr>
+            <td>{{ spec.name }}</td>
+            <td>
+                <a class="btn btn-small btn-primary" href="{{ url_for('.edit', id=spec.id) }}">Edit</a>
+                <a class="btn btn-small btn-danger" href="{{ url_for('.delete', id=spec.id) }}"
+                    onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<a class="btn btn-primary" href="{{ url_for('.new') }}">New</a>
+
+{% endblock %}

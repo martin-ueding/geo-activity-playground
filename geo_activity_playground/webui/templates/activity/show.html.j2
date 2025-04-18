@@ -143,16 +143,16 @@
     </div>
 </div>
 
-{% if altitude_time_plot is defined %}
+{% if elevation_time_plot is defined %}
 <div class="row mb-3">
     <div class="col">
-        <h2>Altitude</h2>
+        <h2>Elevation</h2>
     </div>
 </div>
 
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct("altitude_time_plot", altitude_time_plot) }}
+        {{ vega_direct("elevation_time_plot", elevation_time_plot) }}
     </div>
     {% if elevation_gain_cum_plot is defined %}
     <div class="col-md-4">

@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import json
+import logging
 import os
 import pathlib
 import secrets
@@ -35,6 +36,7 @@ from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
+from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
@@ -44,6 +46,9 @@ from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
 from .flasher import FlaskFlasher
 from .search_util import SearchQueryHistory
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_secret_key():
@@ -68,9 +73,9 @@ def web_ui_main(
 
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"sqlite:///{basedir.absolute()}/database.sqlite"
-    )
+    database_path = basedir / "database.sqlite"
+    logger.info(f"Using database file at '{database_path.absolute()}'.")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path.absolute()}"
     app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
     DB.init_app(app)
 
@@ -142,6 +147,9 @@ def web_ui_main(
         ),
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history
+        ),
+        "/plot-builder": make_plot_builder_blueprint(
+            repository, flasher, authenticator
         ),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),

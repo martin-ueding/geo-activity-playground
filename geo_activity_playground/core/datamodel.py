@@ -1,6 +1,8 @@
 import datetime
+import json
 import logging
 from typing import Any
+from typing import Optional
 from typing import TypedDict
 
 import numpy as np
@@ -109,21 +111,25 @@ class Activity(DB.Model):
         return f"{self.start} {self.name}"
 
     @property
-    def average_speed_moving_kmh(self) -> float:
-        return self.distance_km / (self.moving_time.total_seconds() / 3_600)
+    def average_speed_moving_kmh(self) -> Optional[float]:
+        if self.moving_time is not None:
+            return self.distance_km / (self.moving_time.total_seconds() / 3_600)
 
     @property
-    def average_speed_elapsed_kmh(self) -> float:
-        return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
+    def average_speed_elapsed_kmh(self) -> Optional[float]:
+        if self.elapsed_time is not None:
+            return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
 
     @property
     def raw_time_series(self) -> pd.DataFrame:
         path = time_series_dir() / f"{self.id}.parquet"
         try:
-            return pd.read_parquet(path)
+            time_series = pd.read_parquet(path)
+            if "altitude" in time_series.columns:
+                time_series.rename(columns={"altitude": "elevation"}, inplace=True)
+            return time_series
         except OSError as e:
-            logger.error(f"Error while reading {path}, deleting cache file …")
-            path.unlink(missing_ok=True)
+            logger.error(f"Error while reading {path}.")
             raise
 
     @property
@@ -234,7 +240,7 @@ def get_or_make_kind(name: str, config: Config) -> Kind:
     else:
         kind = Kind(
             name=name,
-            consider_for_achievements=config.kinds_without_achievements.get(name, True),
+            consider_for_achievements=name in config.kinds_without_achievements,
         )
         DB.session.add(kind)
         return kind
@@ -255,3 +261,44 @@ def get_or_make_equipment(name: str, config: Config) -> Equipment:
         )
         DB.session.add(equipment)
         return equipment
+
+
+class PlotSpec(DB.Model):
+    __tablename__ = "plot_specs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
+
+    mark: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    x: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    y: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    color: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    shape: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    size: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    row: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    opacity: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    column: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    facet: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+
+    FIELDS = [
+        "name",
+        "mark",
+        "x",
+        "y",
+        "color",
+        "shape",
+        "size",
+        "row",
+        "opacity",
+        "column",
+        "facet",
+    ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def to_json(self) -> str:
+        return json.dumps(
+            {key: getattr(self, key) for key in self.FIELDS if getattr(self, key)}
+        )

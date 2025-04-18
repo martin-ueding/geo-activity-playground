@@ -91,6 +91,9 @@ class ActivityRepository:
         df["hours"] = [
             elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
         ]
+        df["hours_moving"] = [
+            moving_time.total_seconds() / 3600 for moving_time in df["moving_time"]
+        ]
         df.index = df["id"]
         return df
 

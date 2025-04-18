@@ -15,6 +15,29 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Version 0.40.0 — 2025-04-18
+
+Added:
+
+- Add a plot builder. ([GH-258](https://github.com/martin-ueding/geo-activity-playground/issues/258))
+
+Changed:
+
+- Rename “altitude” to “elevation”. _Altitude_ describes the height between ground and something in the sky, _elevation_ describes the hight of a point of earth with respect to sea level. Hence for our outdoor activities, “elevation” is more fitting. ([GH-253](https://github.com/martin-ueding/geo-activity-playground/issues/253))
+
+Fixed:
+
+- Use `pathlib` to construct database path correctly on Windows.
+- Try to support German localization in Strava conversion. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+- Fix moving time for activities without duration. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
+
+## Version 0.39.1 — 2025-04-17
+
+Fixed:
+
+- Fix import of activities into database. ([GH-257](https://github.com/martin-ueding/geo-activity-playground/issues/257))
+
+
 ## Version 0.39.0 — 2025-04-15
 
 Added:
@@ -26,7 +49,6 @@ Added:
 - Add link to changelog from the version string. ([GH-244](https://github.com/martin-ueding/geo-activity-playground/issues/244))
 - Add documentation for noisy elevation gain.
 - README file now contains much more content. ([GH-250](https://github.com/martin-ueding/geo-activity-playground/issues/250))
-- Add rudimentary equipment settings where one can change name and offset.
 - Add bookmark function for the square planner. ([GH-210](https://github.com/martin-ueding/geo-activity-playground/issues/210))
 
 Changed:
@@ -37,6 +59,7 @@ Changed:
 - Display activities from the past 30 days on the landing page, grouped by day.
 - Only show relevant data on the activity page.
 - The split between controllers and blueprints is removed, making the code less complex at the cost of not separating code from the web framework. ([GH-214](https://github.com/martin-ueding/geo-activity-playground/issues/214))
+- Settings pages for equipment offsets and activity kinds to consider for achievements have been converted into management pages for equipments and activity kinds.
 
 Removed:
 
