@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 0.40.0 — 2025-04-18
 
 Added:
 
@@ -29,6 +29,7 @@ Fixed:
 
 - Use `pathlib` to construct database path correctly on Windows.
 - Try to support German localization in Strava conversion. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+- Fix moving time for activities without duration. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
 
 ## Version 0.39.1 — 2025-04-17
 
