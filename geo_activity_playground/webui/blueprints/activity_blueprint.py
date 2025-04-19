@@ -147,7 +147,7 @@ def make_activity_blueprint(
             "new_tiles_geojson": new_tiles_geojson,
             "line_color_value": line_color_value,
             "line_value_unit": line_color_value == "speed" and "km/h" or "m",
-            "line_color_value_avail": ["speed", "altitude"],
+            "line_color_value_avail": ["speed", "elevation"],
         }
         if (
             heart_zones := _extract_heart_rate_zones(
