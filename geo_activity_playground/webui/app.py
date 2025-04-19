@@ -28,8 +28,7 @@ from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.bubble_chart_blueprint import make_bubble_chart_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
-from .blueprints.eddington_blueprints import register_distance_eddington_blueprint
-from .blueprints.eddington_blueprints import register_elevation_eddington_blueprint
+from .blueprints.eddington_blueprints import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
@@ -135,12 +134,7 @@ def web_ui_main(
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
         "/calendar": make_calendar_blueprint(repository),
-        "/eddington": register_distance_eddington_blueprint(
-            repository, search_query_history
-        ),
-        "/elevation-eddington": register_elevation_eddington_blueprint(
-            repository, search_query_history
-        ),
+        "/eddington": register_eddington_blueprint(repository, search_query_history),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(
             authenticator, repository, tile_visit_accessor, config_accessor

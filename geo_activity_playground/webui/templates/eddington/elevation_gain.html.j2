@@ -19,12 +19,12 @@
                     {% endfor %}
                     {% for key, value in query.items() %}
                         {% if value and key != "active" %}
-                            {% if value is sequence %}
+                            {% if value is string %}
+                                <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+                            {% else %}
                                 {% for v in value %}
                                 <input type="hidden" name="{{ key }}" value="{{ v }}"/>
                                 {% endfor %}
-                            {% else %}
-                            <input type="hidden" name="{{ key }}" value="{{ value }}"/>
                             {% endif %}
                         {% endif %}
                     {% endfor %}

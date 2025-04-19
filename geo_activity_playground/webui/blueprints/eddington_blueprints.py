@@ -18,29 +18,19 @@ from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
 
 
-def register_distance_eddington_blueprint(
+def register_eddington_blueprint(
     repository: ActivityRepository, search_query_history: SearchQueryHistory
 ) -> Blueprint:
-    blueprint = Blueprint(f"distance_eddington", __name__, template_folder="templates")
+    blueprint = Blueprint("eddington", __name__, template_folder="templates")
 
     @blueprint.route("/")
-    def index():
+    def distance():
         return _render_eddington_template(
             repository, request, search_query_history, "distance", column_distance, [1]
         )
 
-    return blueprint
-
-
-def register_elevation_eddington_blueprint(
-    repository: ActivityRepository, search_query_history: SearchQueryHistory
-) -> Blueprint:
-    blueprint = Blueprint(
-        f"elevation_gain_eddington", __name__, template_folder="templates"
-    )
-
-    @blueprint.route("/")
-    def index():
+    @blueprint.route("/elevation_gain")
+    def elevation_gain():
         return _render_eddington_template(
             repository,
             request,
