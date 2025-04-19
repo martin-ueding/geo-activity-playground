@@ -12,6 +12,7 @@ from ...core.activities import make_geojson_from_time_series
 from ...core.config import Config
 from ..columns import column_distance
 from ..columns import column_elevation_gain
+from ..columns import ColumnDescription
 from ..plot_util import make_kind_scale
 
 
@@ -48,7 +49,7 @@ def register_entry_views(
 
 
 def _last_30_days_meta_plot(
-    meta: pd.DataFrame, kind_scale: alt.Scale, column: dict[str, str]
+    meta: pd.DataFrame, kind_scale: alt.Scale, column: ColumnDescription
 ) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.now() - datetime.timedelta(days=31)
@@ -58,22 +59,20 @@ def _last_30_days_meta_plot(
             meta.loc[meta["start"] > before_30_days],
             width=700,
             height=200,
-            title=f"{column["displayName"]} per day",
+            title=f"{column.displayName} per day",
         )
         .mark_bar()
         .encode(
             alt.X("yearmonthdate(start)", title="Date"),
-            alt.Y(
-                f"sum({column["name"]})", title=f"{column["name"]} / {column["unit"]}"
-            ),
+            alt.Y(f"sum({column.name})", title=f"{column.name} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip(
-                    f"sum({column["name"]})",
-                    format=column["format"],
-                    title=f"{column["displayName"]} / {column["unit"]}",
+                    f"sum({column.name})",
+                    format=column.format,
+                    title=f"{column.displayName} / {column.unit}",
                 ),
             ],
         )

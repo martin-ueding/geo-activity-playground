@@ -13,6 +13,7 @@ from ...core.activities import ActivityRepository
 from ...core.meta_search import apply_search_query
 from ..columns import column_distance
 from ..columns import column_elevation_gain
+from ..columns import ColumnDescription
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
 
@@ -25,11 +26,7 @@ def register_distance_eddington_blueprint(
     @blueprint.route("/")
     def index():
         return _render_eddington_template(
-            repository,
-            request,
-            search_query_history,
-            "distance",
-            column_distance,
+            repository, request, search_query_history, "distance", column_distance, [1]
         )
 
     return blueprint
@@ -61,12 +58,12 @@ def _render_eddington_template(
     request: Request,
     search_query_history: SearchQueryHistory,
     template_name,
-    column,
-    divisor_values_avail: list[int] = [1],
+    column: ColumnDescription,
+    divisor_values_avail: list[int],
 ) -> str:
 
-    columnName = column["name"]
-    displayName = column["displayName"]
+    columnName = column.name
+    displayName = column.displayName
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
     query = search_query_from_form(request.args)
