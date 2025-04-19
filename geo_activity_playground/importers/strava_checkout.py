@@ -271,9 +271,8 @@ def convert_strava_checkout(
             continue
 
         activity_date = dateutil.parser.parse(row["Activity Date"])
-        activity_name = row["Activity Name"]
+        activity_name: str = row["Activity Name"]
         activity_kind = row["Activity Type"]
-        is_commute = row["Commute"] == "true" or row["Commute"] == True
         equipment = (
             nan_as_none(row["Activity Gear"])
             or nan_as_none(row["Bike"])
@@ -285,8 +284,6 @@ def convert_strava_checkout(
         activity_target = playground_path / "Activities" / str(activity_kind)
         if equipment:
             activity_target /= str(equipment)
-        if is_commute:
-            activity_target /= "Commute"
 
         activity_target /= "".join(
             [
@@ -294,7 +291,7 @@ def convert_strava_checkout(
                 "-",
                 f"{activity_date.hour:02d}-{activity_date.minute:02d}-{activity_date.second:02d}",
                 " ",
-                activity_name,
+                activity_name.replace("/", "_"),
             ]
             + activity_file.suffixes
         )

@@ -15,6 +15,17 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Version 0.40.1 — 2025-04-18
+
+Fixed:
+
+- Fix moving time for activities with zero elapsed time or moving time. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
+- Handle `/` in activity name when converting from Strava. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+
+Removed:
+
+- Remove “commute” concept from Strava converter. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+
 ## Version 0.40.0 — 2025-04-18
 
 Added:
@@ -27,7 +38,7 @@ Changed:
 
 Fixed:
 
-- Use `pathlib` to construct database path correctly on Windows.
+- Use `pathlib` to construct database path correctly on Windows. ([GH-256](https://github.com/martin-ueding/geo-activity-playground/issues/256))
 - Try to support German localization in Strava conversion. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
 - Fix moving time for activities without duration. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
 
