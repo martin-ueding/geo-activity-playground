@@ -1,0 +1,150 @@
+{% extends "page.html.j2" %}
+{% from "search_form.html.j2" import search_form %}
+
+{% block container %}
+<h1 class="mb-3">Eddington Number for Elevation Gain</h1>
+
+<div class="mb-3">
+    {{ search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last, request_url) }}
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <form method="GET">
+            <div class="mb-3">
+                <label class="form-label">Divisor</label>
+                <select class="form-select" aria-label="Divisor" name="elevation_eddington_divisor" onchange="this.form.submit()">
+                    {% for dv in divisor_values_avail %}
+                    <option {% if dv==elevation_eddington_divisor %} selected {% endif %}>{{ dv }}</option>
+                    {% endfor %}
+                    {% for key, value in query.items() %}
+                        {% if value and key != "active" %}
+                            {% if value is sequence %}
+                                {% for v in value %}
+                                <input type="hidden" name="{{ key }}" value="{{ v }}"/>
+                                {% endfor %}
+                            {% else %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        <h2>Definition</h2>
+
+        <p>Your Eddington number with divisor {{ elevation_eddington_divisor }} is <b>{{ eddington_number }}</b>.</p>
+
+        <p>That means that on {{ (eddington_number / elevation_eddington_divisor) | int }} separate days you
+            have recorded activities with an elevation gain of more than {{ eddington_number }} m. Going high is one thing, going often is
+            another. But going high often is hard. Also if you increment the Eddington number, all days with less
+            elevation gain will not count any more. It becomes increasingly hard to increment the Eddington number because you
+            don't only need to achieve a higher count, but all flatter activities don't count towards the bigger number.
+        </p>
+    </div>
+
+    <div class="col-md-8">
+        <h2>Missing days</h2>
+
+        <p>How many more days do you need to increment your Eddington number?</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Elevation Gain</th>
+                    <th>Count</th>
+                    <th>Missing days</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in eddington_table %}
+                <tr>
+                    <td>{{ row['elevation_gain'] }}</td>
+                    <td>{{ row['total'] }}</td>
+                    <td>{{ row['missing'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mb-1">
+    <div class="col">
+        <h2>Plot</h2>
+
+        <p>In a graphical representation, the Eddington number is the elevation gain where the red line intersects with the
+            blue area.</p>
+
+        {{ vega_direct("logarithmic_plot", logarithmic_plot) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    <h2 class="mb-3">Eddington number history</h2>
+
+    <p>How did the Eddington number evolve over time?</p>
+
+    {{ vega_direct("eddington_number_history_plot", eddington_number_history_plot) }}
+</div>
+
+<div class="mb-3">
+    <h2 class="mb-3">Yearly Eddington number</h2>
+
+    <p>If we only consider the activities within one calendar year for the Eddington number, we get the following:</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Eddington number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, eddington in yearly_eddington.items() %}
+            <tr>
+                <td>{{ year }}</td>
+                <td>{{ eddington }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<h2 class="mb-3">Eddington number per Week</h2>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        {{ vega_direct("eddington_per_week_plot", eddington_per_week_plot) }}
+    </div>
+
+    <div class="col-md-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Elevation Gain</th>
+                    <th>Count</th>
+                    <th>Missing weeks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in eddington_table_weeks %}
+                <tr>
+                    <td>{{ row['elevation_gain'] }}</td>
+                    <td>{{ row['total'] }}</td>
+                    <td>{{ row['missing'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mb-1">
+
+</div>
+
+
+{% endblock %}

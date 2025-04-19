@@ -10,6 +10,9 @@ from flask import Response
 from ...core.activities import ActivityRepository
 from ...core.activities import make_geojson_from_time_series
 from ...core.config import Config
+from ..columns import column_distance
+from ..columns import column_elevation_gain
+from ..columns import ColumnDescription
 from ..plot_util import make_kind_scale
 
 
@@ -22,8 +25,11 @@ def register_entry_views(
 
         if len(repository):
             kind_scale = make_kind_scale(repository.meta, config)
-            context["distance_last_30_days_plot"] = _distance_last_30_days_meta_plot(
-                repository.meta, kind_scale
+            context["distance_last_30_days_plot"] = _last_30_days_meta_plot(
+                repository.meta, kind_scale, column_distance
+            )
+            context["elevation_gain_last_30_days_plot"] = _last_30_days_meta_plot(
+                repository.meta, kind_scale, column_elevation_gain
             )
 
         meta = repository.meta.copy()
@@ -42,7 +48,9 @@ def register_entry_views(
         return render_template("home.html.j2", **context)
 
 
-def _distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def _last_30_days_meta_plot(
+    meta: pd.DataFrame, kind_scale: alt.Scale, column: ColumnDescription
+) -> str:
     before_30_days = pd.to_datetime(
         datetime.datetime.now() - datetime.timedelta(days=31)
     )
@@ -51,17 +59,21 @@ def _distance_last_30_days_meta_plot(meta: pd.DataFrame, kind_scale: alt.Scale) 
             meta.loc[meta["start"] > before_30_days],
             width=700,
             height=200,
-            title="Distance per day",
+            title=f"{column.displayName} per day",
         )
         .mark_bar()
         .encode(
             alt.X("yearmonthdate(start)", title="Date"),
-            alt.Y("sum(distance_km)", title="Distance / km"),
+            alt.Y(f"sum({column.name})", title=f"{column.name} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("sum(distance_km)", format=".1f", title="Distance / km"),
+                alt.Tooltip(
+                    f"sum({column.name})",
+                    format=column.format,
+                    title=f"{column.displayName} / {column.unit}",
+                ),
             ],
         )
         .to_json(format="vega")

@@ -15,6 +15,9 @@ from ...core.datamodel import DB
 from ...core.datamodel import PlotSpec
 from ...core.meta_search import apply_search_query
 from ...core.parametric_plot import make_parametric_plot
+from ..columns import column_distance
+from ..columns import column_elevation_gain
+from ..columns import ColumnDescription
 from ..plot_util import make_kind_scale
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
@@ -36,25 +39,38 @@ def make_summary_blueprint(
         kind_scale = make_kind_scale(repository.meta, config)
         df = activities
 
-        year_kind_total = (
-            df[["year", "kind", "distance_km", "hours"]]
-            .groupby(["year", "kind"])
-            .sum()
-            .reset_index()
-        )
-
         nominations = nominate_activities(df)
 
         return render_template(
             "summary/index.html.j2",
-            plot_distance_heatmaps=plot_distance_heatmaps(df, config),
-            plot_monthly_distance=plot_monthly_distance(df, kind_scale),
-            plot_yearly_distance=plot_yearly_distance(year_kind_total, kind_scale),
-            plot_year_cumulative=plot_year_cumulative(df),
-            tabulate_year_kind_mean=tabulate_year_kind_mean(df)
+            plot_distance_heatmaps=plot_heatmaps(df, column_distance, config),
+            plot_elevation_gain_heatmaps=plot_heatmaps(
+                df, column_elevation_gain, config
+            ),
+            plot_monthly_distance=plot_monthly_sums(df, column_distance, kind_scale),
+            plot_monthly_elevation_gain=plot_monthly_sums(
+                df, column_elevation_gain, kind_scale
+            ),
+            plot_yearly_distance=plot_yearly_sums(df, column_distance, kind_scale),
+            plot_yearly_elevation_gain=plot_yearly_sums(
+                df, column_elevation_gain, kind_scale
+            ),
+            plot_year_cumulative=plot_year_cumulative(df, column_distance),
+            plot_year_elevation_gain_cumulative=plot_year_cumulative(
+                df, column_elevation_gain
+            ),
+            tabulate_year_kind_mean=tabulate_year_kind_mean(df, column_distance)
             .reset_index()
             .to_dict(orient="split"),
-            plot_weekly_distance=plot_weekly_distance(df, kind_scale),
+            tabulate_year_kind_mean_elevation_gain=tabulate_year_kind_mean(
+                df, column_elevation_gain
+            )
+            .reset_index()
+            .to_dict(orient="split"),
+            plot_weekly_distance=plot_weekly_sums(df, column_distance, kind_scale),
+            plot_weekly_elevation_gain=plot_weekly_sums(
+                df, column_elevation_gain, kind_scale
+            ),
             nominations=[
                 (
                     repository.get_activity_by_id(activity_id),
@@ -109,11 +125,13 @@ def _nominate_activities_inner(
             nominations[i].append(f"{title}{title_suffix}: {format_applied}")
 
 
-def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]:
+def plot_heatmaps(
+    meta: pd.DataFrame, column: ColumnDescription, config: Config
+) -> dict[int, str]:
     return {
         year: alt.Chart(
             meta.loc[(meta["year"] == year)],
-            title="Daily Distance Heatmap",
+            title=f"Daily {column.displayName} Heatmap",
         )
         .mark_rect()
         .encode(
@@ -124,15 +142,17 @@ def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]
                 title="Year and month",
             ),
             alt.Color(
-                "sum(distance_km)",
+                f"sum({column.name})",
                 scale=alt.Scale(scheme=config.color_scheme_for_counts),
             ),
             [
                 alt.Tooltip("yearmonthdate(start)", title="Date"),
                 alt.Tooltip(
-                    "sum(distance_km)", format=".1f", title="Total distance / km"
+                    f"sum({column.name})",
+                    format=column.format,
+                    title=f"Total {column.displayName} / {column.unit}",
                 ),
-                alt.Tooltip("count(distance_km)", title="Number of activities"),
+                alt.Tooltip(f"count({column.name})", title="Number of activities"),
             ],
         )
         .to_json(format="vega")
@@ -140,7 +160,9 @@ def plot_distance_heatmaps(meta: pd.DataFrame, config: Config) -> dict[int, str]
     }
 
 
-def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def plot_monthly_sums(
+    meta: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
+) -> str:
     return (
         alt.Chart(
             meta.loc[
@@ -151,20 +173,26 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
                     )
                 )
             ],
-            title="Monthly Distance",
+            title=f"Monthly {column.displayName}",
         )
         .mark_bar()
         .encode(
             alt.X("month(start)", title="Month"),
-            alt.Y("sum(distance_km)", title="Distance / km"),
+            alt.Y(
+                f"sum({column.name})",
+                title=f"{column.displayName} / {column.unit}",
+            ),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
             [
-                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip("yearmonth(start)", title="Year and Month"),
+                alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip(
-                    "sum(distance_km)", format=".1f", title="Total distance / km"
+                    f"sum({column.name})",
+                    format=column.format,
+                    title=f"Total {column.displayName} / {column.unit}",
                 ),
-                alt.Tooltip("count(distance_km)", title="Number of activities"),
+                alt.Tooltip(f"count({column.name})", title="Number of activities"),
             ],
         )
         .resolve_axis(x="independent")
@@ -172,31 +200,47 @@ def plot_monthly_distance(meta: pd.DataFrame, kind_scale: alt.Scale) -> str:
     )
 
 
-def plot_yearly_distance(year_kind_total: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def plot_yearly_sums(
+    df: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
+) -> str:
+    year_kind_total = (
+        df[["year", "kind", column.name, "hours"]]
+        .groupby(["year", "kind"])
+        .sum()
+        .reset_index()
+    )
+
     return (
-        alt.Chart(year_kind_total, title="Total Distance per Year")
+        alt.Chart(year_kind_total, title=f"Total {column.displayName} per Year")
         .mark_bar()
         .encode(
             alt.X("year:O", title="Year"),
-            alt.Y("distance_km", title="Distance / km"),
+            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year:O", title="Year"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
+                alt.Tooltip(
+                    column.name,
+                    title=f"{column.displayName} / {column.unit}",
+                    format=column.format,
+                ),
             ],
         )
         .to_json(format="vega")
     )
 
 
-def plot_year_cumulative(df: pd.DataFrame) -> str:
+def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
     year_cumulative = (
-        df[["iso_year", "week", "distance_km"]]
+        df[["iso_year", "week", column.name]]
         .groupby("iso_year")
         .apply(
             lambda group: pd.DataFrame(
-                {"week": group["week"], "distance_km": group["distance_km"].cumsum()}
+                {
+                    "week": group["week"],
+                    column.name: group[column.name].cumsum(),
+                }
             ),
             include_groups=False,
         )
@@ -204,16 +248,24 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
     )
 
     return (
-        alt.Chart(year_cumulative, width=500, title="Cumultative Distance per Year")
+        alt.Chart(
+            year_cumulative,
+            width=500,
+            title=f"Cumulative {column.displayName} per Year",
+        )
         .mark_line()
         .encode(
             alt.X("week", title="Week"),
-            alt.Y("distance_km", title="Distance / km"),
+            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
             alt.Color("iso_year:N", title="Year"),
             [
                 alt.Tooltip("week", title="Week"),
                 alt.Tooltip("iso_year:N", title="Year"),
-                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
+                alt.Tooltip(
+                    column.name,
+                    title=f"{column.displayName} / {column.unit}",
+                    format=column.format,
+                ),
             ],
         )
         .interactive()
@@ -221,24 +273,28 @@ def plot_year_cumulative(df: pd.DataFrame) -> str:
     )
 
 
-def tabulate_year_kind_mean(df: pd.DataFrame) -> pd.DataFrame:
+def tabulate_year_kind_mean(
+    df: pd.DataFrame, column: ColumnDescription
+) -> pd.DataFrame:
     year_kind_mean = (
-        df[["year", "kind", "distance_km", "hours"]]
+        df[["year", "kind", column.name, "hours"]]
         .groupby(["year", "kind"])
         .mean()
         .reset_index()
     )
 
     year_kind_mean_distance = year_kind_mean.pivot(
-        index="year", columns="kind", values="distance_km"
+        index="year", columns="kind", values=column.name
     )
 
     return year_kind_mean_distance
 
 
-def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
+def plot_weekly_sums(
+    df: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
+) -> str:
     week_kind_total_distance = (
-        df[["iso_year", "week", "kind", "distance_km"]]
+        df[["iso_year", "week", "kind", column.name]]
         .groupby(["iso_year", "week", "kind"])
         .sum()
         .reset_index()
@@ -260,17 +316,21 @@ def plot_weekly_distance(df: pd.DataFrame, kind_scale: alt.Scale) -> str:
                 | (week_kind_total_distance["iso_year"] == last_year - 1)
                 & (week_kind_total_distance["week"] >= last_week)
             ],
-            title="Weekly Distance",
+            title=f"Weekly {column.displayName}",
         )
         .mark_bar()
         .encode(
             alt.X("year_week", title="Year and Week"),
-            alt.Y("distance_km", title="Distance / km"),
+            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year_week", title="Year and Week"),
                 alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip("distance_km", title="Distance / km", format=".1f"),
+                alt.Tooltip(
+                    column.name,
+                    title=f"{column.displayName} / {column.unit}",
+                    format=column.format,
+                ),
             ],
         )
         .to_json(format="vega")

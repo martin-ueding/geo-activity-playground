@@ -21,9 +21,9 @@ from PIL import Image
 from PIL import ImageDraw
 
 from ...core.activities import ActivityRepository
+from ...core.activities import make_color_bar
 from ...core.activities import make_geojson_color_line
 from ...core.activities import make_geojson_from_time_series
-from ...core.activities import make_speed_color_bar
 from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
@@ -128,19 +128,26 @@ def make_activity_blueprint(
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(new_tiles)
 
+        line_color_value = request.args.get("line_color_value") or "speed"
+
         context = {
             "activity": activity,
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
-            "color_line_geojson": make_geojson_color_line(time_series),
+            "color_line_geojson": make_geojson_color_line(
+                time_series, line_color_value
+            ),
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
-            "speed_color_bar": make_speed_color_bar(time_series),
+            "line_color_bar": make_color_bar(time_series[line_color_value]),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
+            "line_color_value": line_color_value,
+            "line_value_unit": line_color_value == "speed" and "km/h" or "m",
+            "line_color_value_avail": ["speed", "elevation"],
         }
         if (
             heart_zones := _extract_heart_rate_zones(
