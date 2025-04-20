@@ -52,15 +52,15 @@ def _render_eddington_template(
     divisor_values_avail: list[int],
 ) -> str:
 
-    columnName = column.name
-    displayName = column.display_name
+    column_name = column.name
+    display_name = column.display_name
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
     query = search_query_from_form(request.args)
     search_query_history.register_query(query)
     activities = (
         apply_search_query(repository.meta, query)
-        .dropna(subset=["start", columnName])
+        .dropna(subset=["start", column_name])
         .copy()
     )
 
@@ -70,41 +70,41 @@ def _render_eddington_template(
     activities["isoweek"] = [start.isocalendar().week for start in activities["start"]]
 
     en_per_day, eddington_df_per_day = _get_values_per_group(
-        activities.groupby("date"), columnName, divisor
+        activities.groupby("date"), column_name, divisor
     )
     en_per_week, eddington_df_per_week = _get_values_per_group(
-        activities.groupby(["isoyear", "isoweek"]), columnName, divisor
+        activities.groupby(["isoyear", "isoweek"]), column_name, divisor
     )
 
     return render_template(
         f"eddington/{template_name}.html.j2",
         eddington_number=en_per_day,
         logarithmic_plot=_make_eddington_plot(
-            eddington_df_per_day, en_per_day, "Days", columnName, displayName, divisor
+            eddington_df_per_day, en_per_day, "Days", column_name, display_name, divisor
         ),
         eddington_per_week=en_per_week,
         eddington_per_week_plot=_make_eddington_plot(
             eddington_df_per_week,
             en_per_week,
             "Weeks",
-            columnName,
-            displayName,
+            column_name,
+            display_name,
             divisor,
         ),
         eddington_table=eddington_df_per_day.loc[
-            (eddington_df_per_day[columnName] > en_per_day)
-            & (eddington_df_per_day[columnName] <= en_per_day + 10 * divisor)
-            & (eddington_df_per_day[columnName] % divisor == 0)
+            (eddington_df_per_day[column_name] > en_per_day)
+            & (eddington_df_per_day[column_name] <= en_per_day + 10 * divisor)
+            & (eddington_df_per_day[column_name] % divisor == 0)
         ].to_dict(orient="records"),
         eddington_table_weeks=eddington_df_per_week.loc[
-            (eddington_df_per_week[columnName] > en_per_week)
-            & (eddington_df_per_week[columnName] <= en_per_week + 10 * divisor)
-            & (eddington_df_per_week[columnName] % divisor == 0)
+            (eddington_df_per_week[column_name] > en_per_week)
+            & (eddington_df_per_week[column_name] <= en_per_week + 10 * divisor)
+            & (eddington_df_per_week[column_name] % divisor == 0)
         ].to_dict(orient="records"),
         query=query.to_jinja(),
-        yearly_eddington=_get_yearly_eddington(activities, columnName, divisor),
+        yearly_eddington=_get_yearly_eddington(activities, column_name, divisor),
         eddington_number_history_plot=_get_eddington_number_history(
-            activities, columnName, divisor
+            activities, column_name, divisor
         ),
         eddington_divisor=divisor,
         divisor_values_avail=divisor_values_avail,
@@ -137,11 +137,11 @@ def _make_eddington_plot(
     eddington_df: pd.DataFrame,
     en: int,
     interval: str,
-    columnName: str,
-    displayName: str,
+    column_name: str,
+    display_name: str,
     divisor: int,
 ) -> dict:
-    x = list(range(1, max(eddington_df[columnName]) + 1))
+    x = list(range(1, max(eddington_df[column_name]) + 1))
     y = [v / divisor for v in x]
     return (
         (
@@ -150,33 +150,33 @@ def _make_eddington_plot(
                     eddington_df,
                     height=500,
                     width=800,
-                    title=f"{displayName} Eddington Number {en}",
+                    title=f"{display_name} Eddington Number {en}",
                 )
                 .mark_area(interpolate="step")
                 .encode(
                     alt.X(
-                        columnName,
+                        column_name,
                         scale=alt.Scale(domainMin=0, domainMax=en * 3),
-                        title=displayName,
+                        title=display_name,
                     ),
                     alt.Y(
                         "total",
                         scale=alt.Scale(domainMax=en / divisor * 1.5),
-                        title=f"{interval} exceeding {displayName}",
+                        title=f"{interval} exceeding {display_name}",
                     ),
                     [
-                        alt.Tooltip(columnName, title=displayName),
+                        alt.Tooltip(column_name, title=display_name),
                         alt.Tooltip(
-                            "total", title=f"{interval} exceeding {displayName}"
+                            "total", title=f"{interval} exceeding {display_name}"
                         ),
                         alt.Tooltip("missing", title=f"{interval} missing for next"),
                     ],
                 )
             )
             + (
-                alt.Chart(pd.DataFrame({columnName: x, "total": y}))
+                alt.Chart(pd.DataFrame({column_name: x, "total": y}))
                 .mark_line(color="red")
-                .encode(alt.X(columnName), alt.Y("total"))
+                .encode(alt.X(column_name), alt.Y("total"))
             )
         )
         .interactive(bind_x=True, bind_y=True)

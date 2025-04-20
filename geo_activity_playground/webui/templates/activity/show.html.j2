@@ -116,7 +116,7 @@
                 <label class="form-label">Line Color by</label>
                 <select class="form-select" aria-label="Line Color by" name="line_color_column" onchange="this.form.submit()">
                     {% for name, column in line_color_columns_avail.items() %}
-                    <option {% if name == line_color_column %} selected {% endif %} value="{{ name }}">{{ column.displayName }}</option>
+                    <option {% if name == line_color_column %} selected {% endif %} value="{{ name }}">{{ column.display_name }}</option>
                     {% endfor %}
                 </select>
             </form>
