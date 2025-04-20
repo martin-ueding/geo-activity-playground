@@ -59,7 +59,7 @@ def _last_30_days_meta_plot(
             meta.loc[meta["start"] > before_30_days],
             width=700,
             height=200,
-            title=f"{column.displayName} per day",
+            title=f"{column.display_name} per day",
         )
         .mark_bar()
         .encode(
@@ -72,7 +72,7 @@ def _last_30_days_meta_plot(
                 alt.Tooltip(
                     f"sum({column.name})",
                     format=column.format,
-                    title=f"{column.displayName} / {column.unit}",
+                    title=f"{column.display_name} / {column.unit}",
                 ),
             ],
         )

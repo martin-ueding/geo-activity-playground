@@ -131,7 +131,7 @@ def plot_heatmaps(
     return {
         year: alt.Chart(
             meta.loc[(meta["year"] == year)],
-            title=f"Daily {column.displayName} Heatmap",
+            title=f"Daily {column.display_name} Heatmap",
         )
         .mark_rect()
         .encode(
@@ -150,7 +150,7 @@ def plot_heatmaps(
                 alt.Tooltip(
                     f"sum({column.name})",
                     format=column.format,
-                    title=f"Total {column.displayName} / {column.unit}",
+                    title=f"Total {column.display_name} / {column.unit}",
                 ),
                 alt.Tooltip(f"count({column.name})", title="Number of activities"),
             ],
@@ -173,14 +173,14 @@ def plot_monthly_sums(
                     )
                 )
             ],
-            title=f"Monthly {column.displayName}",
+            title=f"Monthly {column.display_name}",
         )
         .mark_bar()
         .encode(
             alt.X("month(start)", title="Month"),
             alt.Y(
                 f"sum({column.name})",
-                title=f"{column.displayName} / {column.unit}",
+                title=f"{column.display_name} / {column.unit}",
             ),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             alt.Column("year(start):O", title="Year"),
@@ -190,7 +190,7 @@ def plot_monthly_sums(
                 alt.Tooltip(
                     f"sum({column.name})",
                     format=column.format,
-                    title=f"Total {column.displayName} / {column.unit}",
+                    title=f"Total {column.display_name} / {column.unit}",
                 ),
                 alt.Tooltip(f"count({column.name})", title="Number of activities"),
             ],
@@ -211,18 +211,18 @@ def plot_yearly_sums(
     )
 
     return (
-        alt.Chart(year_kind_total, title=f"Total {column.displayName} per Year")
+        alt.Chart(year_kind_total, title=f"Total {column.display_name} per Year")
         .mark_bar()
         .encode(
             alt.X("year:O", title="Year"),
-            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
+            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year:O", title="Year"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip(
                     column.name,
-                    title=f"{column.displayName} / {column.unit}",
+                    title=f"{column.display_name} / {column.unit}",
                     format=column.format,
                 ),
             ],
@@ -251,19 +251,19 @@ def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
         alt.Chart(
             year_cumulative,
             width=500,
-            title=f"Cumulative {column.displayName} per Year",
+            title=f"Cumulative {column.display_name} per Year",
         )
         .mark_line()
         .encode(
             alt.X("week", title="Week"),
-            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
+            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
             alt.Color("iso_year:N", title="Year"),
             [
                 alt.Tooltip("week", title="Week"),
                 alt.Tooltip("iso_year:N", title="Year"),
                 alt.Tooltip(
                     column.name,
-                    title=f"{column.displayName} / {column.unit}",
+                    title=f"{column.display_name} / {column.unit}",
                     format=column.format,
                 ),
             ],
@@ -316,19 +316,19 @@ def plot_weekly_sums(
                 | (week_kind_total_distance["iso_year"] == last_year - 1)
                 & (week_kind_total_distance["week"] >= last_week)
             ],
-            title=f"Weekly {column.displayName}",
+            title=f"Weekly {column.display_name}",
         )
         .mark_bar()
         .encode(
             alt.X("year_week", title="Year and Week"),
-            alt.Y(column.name, title=f"{column.displayName} / {column.unit}"),
+            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
                 alt.Tooltip("year_week", title="Year and Week"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip(
                     column.name,
-                    title=f"{column.displayName} / {column.unit}",
+                    title=f"{column.display_name} / {column.unit}",
                     format=column.format,
                 ),
             ],

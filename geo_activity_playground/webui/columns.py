@@ -1,42 +1,37 @@
-from typing import TypedDict
+import dataclasses
 
 
+@dataclasses.dataclass
 class ColumnDescription:
     name: str
-    displayName: str
+    display_name: str
     unit: str
     format: str
-
-    def __init__(self, name: str, displayName: str, unit: str, format: str):
-        self.name = name
-        self.displayName = displayName
-        self.unit = unit
-        self.format = format
 
 
 column_distance = ColumnDescription(
     name="distance_km",
-    displayName="Distance",
+    display_name="Distance",
     unit="km",
     format=".1f",
 )
 
 column_elevation = ColumnDescription(
     name="elevation",
-    displayName="Elevation",
+    display_name="Elevation",
     unit="m",
     format=".0f",
 )
 column_elevation_gain = ColumnDescription(
     name="elevation_gain",
-    displayName="Elevation Gain",
+    display_name="Elevation Gain",
     unit="m",
     format=".0f",
 )
 
 column_speed = ColumnDescription(
     name="speed",
-    displayName="Speed",
+    display_name="Speed",
     unit="km/h",
     format=".1f",
 )
