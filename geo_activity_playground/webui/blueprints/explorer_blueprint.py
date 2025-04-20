@@ -1,10 +1,12 @@
 import datetime
+import io
 import itertools
 import logging
 
 import altair as alt
 import geojson
 import matplotlib
+import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
 import sqlalchemy
@@ -20,6 +22,8 @@ from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
+from ...core.raster_map import ImageTransform
+from ...core.raster_map import TileGetter
 from ...core.tiles import compute_tile
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.grid_file import get_border_tiles
@@ -43,6 +47,8 @@ def make_explorer_blueprint(
     authenticator: Authenticator,
     tile_visit_accessor: TileVisitAccessor,
     config_accessor: ConfigAccessor,
+    tile_getter: TileGetter,
+    image_transforms: dict[str, ImageTransform],
 ) -> Blueprint:
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
@@ -152,6 +158,69 @@ def make_explorer_blueprint(
             mimetype=mimetypes[suffix],
             headers={"Content-disposition": "attachment"},
         )
+
+    @blueprint.route("/<int:zoom>/server-side")
+    def server_side(zoom: int):
+        if zoom not in config_accessor().explorer_zoom_levels:
+            return {"zoom_level_not_generated": zoom}
+
+        tile_evolution_states = tile_visit_accessor.tile_state["evolution_state"]
+        tile_histories = tile_visit_accessor.tile_state["tile_history"]
+
+        medians = tile_histories[zoom].median()
+        median_lat, median_lon = get_tile_upper_left_lat_lon(
+            medians["tile_x"], medians["tile_y"], zoom
+        )
+
+        context = {
+            "center": {
+                "latitude": median_lat,
+                "longitude": median_lon,
+                "bbox": (
+                    bounding_box_for_biggest_cluster(
+                        tile_evolution_states[zoom].clusters.values(), zoom
+                    )
+                    if len(tile_evolution_states[zoom].memberships) > 0
+                    else {}
+                ),
+            },
+            "plot_tile_evolution": plot_tile_evolution(tile_histories[zoom]),
+            "plot_cluster_evolution": plot_cluster_evolution(
+                tile_evolution_states[zoom].cluster_evolution
+            ),
+            "plot_square_evolution": plot_square_evolution(
+                tile_evolution_states[zoom].square_evolution
+            ),
+            "zoom": zoom,
+        }
+        return render_template("explorer/server-side.html.j2", **context)
+
+    @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
+    def tile(zoom: int, z: int, x: int, y: int) -> Response:
+        tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
+
+        map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
+        if z >= zoom:
+            factor = 2 ** (z - zoom)
+            if (x // factor, y // factor) in tile_visits:
+                map_tile = image_transforms["color"].transform_image(map_tile)
+            else:
+                map_tile = image_transforms["color"].transform_image(map_tile) / 1.2
+        else:
+            grayscale = image_transforms["color"].transform_image(map_tile) / 1.2
+            factor = 2 ** (zoom - z)
+            width = 256 // factor
+            for xo in range(factor):
+                for yo in range(factor):
+                    if (x * factor + xo, y * factor + yo) not in tile_visits:
+                        map_tile[
+                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                        ] = grayscale[
+                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                        ]
+        f = io.BytesIO()
+        pl.imsave(f, map_tile, format="png")
+        return Response(bytes(f.getbuffer()), mimetype="image/png")
 
     return blueprint
 

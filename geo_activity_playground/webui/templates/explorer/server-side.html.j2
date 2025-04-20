@@ -1,0 +1,72 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1>Explorer Tiles</h1>
+
+{% if zoom_level_not_generated %}
+<p>You try to access explorer tiles for a level that hasn't been generated before. That is not a problem, we just don't
+    generate all levels to save a bit of time. If you want to have it, just enable it!</p>
+
+<a href="{{ url_for('.enable_zoom_level', zoom=zoom_level_not_generated) }}" class="btn btn-primary">Enable Zoom {{
+    zoom_level_not_generated }}</a>
+{% else %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>Map with explored tiles</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
+        <p>Download tiles in visible area: <a href="#" onclick="downloadAs('explored.geojson')">Explored as GeoJSON</a>,
+            <a href="#" onclick="downloadAs('explored.gpx')"">Explored as GPX</a>, <a href=" #"
+                onclick="downloadAs('missing.geojson')">Missing as GeoJSON</a> or <a href="#"
+                onclick="downloadAs('missing.gpx')"">Missing as GPX</a>.</p>
+        <script>
+            let map = L.map('explorer-map', {
+                fullscreenControl: true,
+                center: [{{ center.latitude }}, {{ center.longitude }}],
+            zoom: 12
+            });
+            L.tileLayer('/explorer/{{ zoom }}/tile/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map)
+
+            let bbox = {{ center.bbox| safe }}
+            if (bbox) {
+                map.fitBounds(L.geoJSON(bbox).getBounds())
+            }
+        </script>
+    </div>
+</div>
+
+<div class=" row mb-3">
+                <div class="col">
+                    <h2>Tile history</h2>
+                </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            {% if plot_tile_evolution|length > 0 %}
+            {{ vega_direct("plot_tile_evolution", plot_tile_evolution) }}
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            {% if plot_cluster_evolution|length > 0 %}
+            {{ vega_direct("plot_cluster_evolution", plot_cluster_evolution) }}
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            {% if plot_square_evolution|length > 0 %}
+            {{ vega_direct("plot_square_evolution", plot_square_evolution) }}
+            {% endif %}
+        </div>
+    </div>
+
+    {% endif %}
+    {% endblock %}
