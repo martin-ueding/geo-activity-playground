@@ -55,25 +55,25 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
 
 def _make_bubble_chart(bubble_data, column: ColumnDescription):
     return (
-        alt.Chart(bubble_data, title=f"{column.displayName} per Day (Bubble Chart)")
+        alt.Chart(bubble_data, title=f"{column.display_name} per Day (Bubble Chart)")
         .mark_circle()
         .encode(
             x=alt.X("date:T", title="Date"),
             y=alt.Y(
                 f"{column.name}:Q",
-                title=f"{column.displayName} ({column.unit})",
+                title=f"{column.display_name} ({column.unit})",
             ),
             size=alt.Size(
                 f"{column.name}:Q",
                 scale=alt.Scale(range=[10, 300]),
-                title=f"{column.displayName}",
+                title=f"{column.display_name}",
             ),
             color=alt.Color("activity:N", title="Activity"),
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip(
                     f"{column.name}:Q",
-                    title=f"{column.displayName} ({column.unit})",
+                    title=f"{column.display_name} ({column.unit})",
                     format=column.format,
                 ),
                 alt.Tooltip("activity:N", title="Activity"),

@@ -17,6 +17,12 @@ Types of changes
 
 ## Version 0.40.1 — 2025-04-18
 
+Added:
+
+- Add "elevation Eddington number" page, which shows an Eddington number but with elevation instead of distance. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
+- In the activity view, there is a map with a colored track line. The coloring was based only on speed, now it can also show elevation. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
+- On the landing page there is a plot with the elevation gain in the past weeks. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
+
 Fixed:
 
 - Fix moving time for activities with zero elapsed time or moving time. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))

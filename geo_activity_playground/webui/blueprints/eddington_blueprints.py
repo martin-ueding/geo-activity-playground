@@ -53,7 +53,7 @@ def _render_eddington_template(
 ) -> str:
 
     columnName = column.name
-    displayName = column.displayName
+    displayName = column.display_name
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
     query = search_query_from_form(request.args)
