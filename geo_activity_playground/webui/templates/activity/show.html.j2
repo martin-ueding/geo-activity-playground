@@ -49,7 +49,7 @@
 
             {% if activity.elevation_gain %}
             <dt>Elevation gain</dt>
-            <dd>{{ activity.elevation_gain|round(0) }} m</dd>
+            <dd>{{ activity.elevation_gain|round(0)|int }} m</dd>
             {% endif %}
 
             {% if activity.equipment %}
