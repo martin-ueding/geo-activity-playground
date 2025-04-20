@@ -137,7 +137,7 @@ def web_ui_main(
         "/eddington": register_eddington_blueprint(repository, search_query_history),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(
-            authenticator, repository, tile_visit_accessor, config_accessor
+            authenticator, tile_visit_accessor, config_accessor
         ),
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history

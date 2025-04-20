@@ -7,6 +7,7 @@ import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
+import sqlalchemy
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -17,6 +18,8 @@ from flask import url_for
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
+from ...core.datamodel import Activity
+from ...core.datamodel import DB
 from ...core.tiles import compute_tile
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.grid_file import get_border_tiles
@@ -38,7 +41,6 @@ logger = logging.getLogger(__name__)
 
 def make_explorer_blueprint(
     authenticator: Authenticator,
-    repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config_accessor: ConfigAccessor,
 ) -> Blueprint:
@@ -59,7 +61,7 @@ def make_explorer_blueprint(
         )
 
         explored = get_three_color_tiles(
-            tile_visits[zoom], repository, tile_evolution_states[zoom], zoom
+            tile_visits[zoom], tile_evolution_states[zoom], zoom
         )
 
         context = {
@@ -156,7 +158,6 @@ def make_explorer_blueprint(
 
 def get_three_color_tiles(
     tile_visits: dict,
-    repository: ActivityRepository,
     cluster_state: TileEvolutionState,
     zoom: int,
 ) -> str:
@@ -174,13 +175,17 @@ def get_three_color_tiles(
             last_age_days = 10000
         tile_dict[tile] = {
             "first_activity_id": str(tile_data["first_id"]),
-            "first_activity_name": repository.get_activity_by_id(tile_data["first_id"])[
-                "name"
-            ],
+            "first_activity_name": DB.session.scalar(
+                sqlalchemy.select(Activity.name).where(
+                    Activity.id == tile_data["first_id"]
+                )
+            ),
             "last_activity_id": str(tile_data["last_id"]),
-            "last_activity_name": repository.get_activity_by_id(tile_data["last_id"])[
-                "name"
-            ],
+            "last_activity_name": DB.session.scalar(
+                sqlalchemy.select(Activity.name).where(
+                    Activity.id == tile_data["last_id"]
+                )
+            ),
             "first_age_days": first_age_days,
             "first_age_color": matplotlib.colors.to_hex(
                 cmap_first(max(1 - first_age_days / (2 * 365), 0.0))
