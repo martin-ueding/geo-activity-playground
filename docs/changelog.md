@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Version 0.40.1 — 2025-04-18
+## Unreleased
 
 Added:
 
@@ -25,9 +25,14 @@ Added:
 
 Fixed:
 
+- Fix startup without activities. ([GH-263](https://github.com/martin-ueding/geo-activity-playground/issues/263))
+
+## Version 0.40.1 — 2025-04-18
+
+Fixed:
+
 - Fix moving time for activities with zero elapsed time or moving time. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
 - Handle `/` in activity name when converting from Strava. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
-- Fix startup without activities. ([GH-263](https://github.com/martin-ueding/geo-activity-playground/issues/263))
 
 Removed:
 
