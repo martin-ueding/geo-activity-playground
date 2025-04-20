@@ -35,8 +35,6 @@ def register_entry_views(
                 repository.meta, kind_scale, column_elevation_gain
             )
 
-            meta = repository.meta
-
             context["latest_activities"] = collections.defaultdict(list)
             for activity in DB.session.scalars(
                 sqlalchemy.select(Activity).order_by(Activity.start.desc()).limit(100)
