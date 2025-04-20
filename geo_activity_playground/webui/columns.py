@@ -21,9 +21,22 @@ column_distance = ColumnDescription(
     format=".1f",
 )
 
+column_elevation = ColumnDescription(
+    name="elevation",
+    displayName="Elevation",
+    unit="m",
+    format=".0f",
+)
 column_elevation_gain = ColumnDescription(
     name="elevation_gain",
     displayName="Elevation Gain",
     unit="m",
     format=".0f",
+)
+
+column_speed = ColumnDescription(
+    name="speed",
+    displayName="Speed",
+    unit="km/h",
+    format=".1f",
 )

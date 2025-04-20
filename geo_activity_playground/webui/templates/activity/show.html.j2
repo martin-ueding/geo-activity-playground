@@ -108,15 +108,15 @@
             {% for value, color in line_color_bar.colors %}
             <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ value }}</span>
             {% endfor %}
-            {{ line_value_unit }}
+            {{ line_color_columns_avail[line_color_column].unit }}
         </div>
 
         <div class="mb-3" style="padding-top: 10px;">
             <form method="GET">
                 <label class="form-label">Line Color by</label>
-                <select class="form-select" aria-label="Line Color by" name="line_color_value" onchange="this.form.submit()">
-                    {% for v in line_color_value_avail %}
-                    <option {% if v==line_color_value %} selected {% endif %} value="{{ v }}">{{ v | capitalize }}</option>
+                <select class="form-select" aria-label="Line Color by" name="line_color_column" onchange="this.form.submit()">
+                    {% for name, column in line_color_columns_avail.items() %}
+                    <option {% if name == line_color_column %} selected {% endif %} value="{{ name }}">{{ column.displayName }}</option>
                     {% endfor %}
                 </select>
             </form>

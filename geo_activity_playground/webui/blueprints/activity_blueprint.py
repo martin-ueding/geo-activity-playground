@@ -41,6 +41,8 @@ from ...explorer.grid_file import make_grid_points
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
+from ..columns import column_elevation
+from ..columns import column_speed
 
 logger = logging.getLogger(__name__)
 
@@ -128,26 +130,31 @@ def make_activity_blueprint(
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(new_tiles)
 
-        line_color_value = request.args.get("line_color_value") or "speed"
+        line_color_columns_avail = dict(
+            [(column.name, column) for column in [column_speed, column_elevation]]
+        )
+        line_color_column = (
+            request.args.get("line_color_column")
+            or next(iter(line_color_columns_avail.values())).name
+        )
 
         context = {
             "activity": activity,
             "line_json": line_json,
             "distance_time_plot": distance_time_plot(time_series),
             "color_line_geojson": make_geojson_color_line(
-                time_series, line_color_value
+                time_series, line_color_column
             ),
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
-            "line_color_bar": make_color_bar(time_series[line_color_value]),
+            "line_color_bar": make_color_bar(time_series[line_color_column]),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
-            "line_color_value": line_color_value,
-            "line_value_unit": line_color_value == "speed" and "km/h" or "m",
-            "line_color_value_avail": ["speed", "elevation"],
+            "line_color_column": line_color_column,
+            "line_color_columns_avail": line_color_columns_avail,
         }
         if (
             heart_zones := _extract_heart_rate_zones(
