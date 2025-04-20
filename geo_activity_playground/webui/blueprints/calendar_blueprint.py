@@ -1,10 +1,14 @@
 import collections
 import datetime
 
+import pandas as pd
+import sqlalchemy
 from flask import Blueprint
 from flask import render_template
 
 from ...core.activities import ActivityRepository
+from ...core.datamodel import Activity
+from ...core.datamodel import DB
 
 
 def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
@@ -12,9 +16,14 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
 
     @blueprint.route("/")
     def index():
-        meta = repository.meta
+        data = DB.session.execute(
+            sqlalchemy.select(Activity.start, Activity.distance_km)
+        ).all()
+        df = pd.DataFrame(data)
+        df["year"] = df["start"].dt.year
+        df["month"] = df["start"].dt.month
 
-        monthly_distance = meta.groupby(
+        monthly_distance = df.groupby(
             ["year", "month"],
         ).apply(lambda group: sum(group["distance_km"]), include_groups=False)
         monthly_distance.name = "total_distance_km"
@@ -24,7 +33,7 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
             .fillna(0.0)
         )
 
-        yearly_distance = meta.groupby(["year"]).apply(
+        yearly_distance = df.groupby(["year"]).apply(
             lambda group: sum(group["distance_km"]), include_groups=False
         )
         yearly_distance.name = "total_distance_km"
@@ -34,7 +43,6 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
         }
 
         context = {
-            "num_activities": len(repository),
             "monthly_distances": monthly_pivot,
             "yearly_distances": yearly_distances,
         }
