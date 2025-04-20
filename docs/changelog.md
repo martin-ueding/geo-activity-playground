@@ -15,15 +15,15 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 0.41.0 — 2025-04-20
 
 Added:
 
 - Add "elevation Eddington number" page, which shows an Eddington number but with elevation instead of distance. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
 - In the activity view, there is a map with a colored track line. The coloring was based only on speed, now it can also show elevation. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
 - On the landing page there is a plot with the elevation gain in the past weeks. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
-- Add data model for tags.
-- Add a fast server-side rendering mode for explorer tiles. This is much faster with arbitrary many explored tiles, it just doesn't show nice metadata yet. ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
+- Add a fast server-side rendering mode for explorer tiles. This is much faster with arbitrary many explored tiles, it just doesn't show nice metadata yet. This can also be used as a tile source for external planning tools. ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
+- Add data model for tags, though no user interface yet.
 
 Changed:
 
