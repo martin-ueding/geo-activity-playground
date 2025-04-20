@@ -23,6 +23,10 @@ Added:
 - In the activity view, there is a map with a colored track line. The coloring was based only on speed, now it can also show elevation. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
 - On the landing page there is a plot with the elevation gain in the past weeks. ([GH-254](https://github.com/martin-ueding/geo-activity-playground/issues/254))
 
+Changed:
+
+- Use database to populate entry page.
+
 Fixed:
 
 - Fix startup without activities. ([GH-263](https://github.com/martin-ueding/geo-activity-playground/issues/263))
