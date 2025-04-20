@@ -4,12 +4,15 @@ import datetime
 import altair as alt
 import flask
 import pandas as pd
+import sqlalchemy
 from flask import render_template
 from flask import Response
 
 from ...core.activities import ActivityRepository
 from ...core.activities import make_geojson_from_time_series
 from ...core.config import Config
+from ...core.datamodel import Activity
+from ...core.datamodel import DB
 from ..columns import column_distance
 from ..columns import column_elevation_gain
 from ..columns import ColumnDescription
@@ -35,15 +38,17 @@ def register_entry_views(
             meta = repository.meta
 
             context["latest_activities"] = collections.defaultdict(list)
-            for date, activity_meta in list(meta.groupby("date"))[:-30:-1]:
-                for index, activity in activity_meta.iterrows():
-                    time_series = repository.get_time_series(activity["id"])
-                    context["latest_activities"][date].append(
-                        {
-                            "activity": activity,
-                            "line_geojson": make_geojson_from_time_series(time_series),
-                        }
-                    )
+            for activity in DB.session.scalars(
+                sqlalchemy.select(Activity).order_by(Activity.start.desc()).limit(100)
+            ):
+                context["latest_activities"][activity.start.date()].append(
+                    {
+                        "activity": activity,
+                        "line_geojson": make_geojson_from_time_series(
+                            activity.time_series
+                        ),
+                    }
+                )
 
         return render_template("home.html.j2", **context)
 
