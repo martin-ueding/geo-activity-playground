@@ -137,11 +137,11 @@ def make_geojson_color_line(time_series: pd.DataFrame, column: str) -> str:
     return geojson.dumps(feature_collection)
 
 
-def make_color_bar(time_series: pd.Series) -> dict[str, Any]:
+def make_color_bar(time_series: pd.Series, format: str) -> dict[str, Any]:
     low, high, clamp_value = _make_value_clamp(time_series)
     cmap = matplotlib.colormaps["viridis"]
     colors = [
-        (f"{value:.1f}", matplotlib.colors.to_hex(cmap(clamp_value(value))))
+        (f"{value:{format}}", matplotlib.colors.to_hex(cmap(clamp_value(value))))
         for value in np.linspace(low, high, 10)
     ]
     return {"low": low, "high": high, "colors": colors}
