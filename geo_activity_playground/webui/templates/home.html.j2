@@ -48,12 +48,12 @@
                 </a>
                 <p class="card-text">
                     {{ elem.activity.kind.name }} with
-                    {{ (elem.activity.distance_km)|round(1) }} km
+                    📏 {{ (elem.activity.distance_km)|round(1) }} km
                     {% if elem.activity.elapsed_time %}
-                    — ⏱️ {{ elem.activity.elapsed_time|td }}
+                    ⏱️ {{ elem.activity.elapsed_time|td }}
                     {% endif %}
                     {% if elem.activity.elevation_gain %}
-                    — ⛰️ {{ (elem.activity.elevation_gain)|round|int }} m
+                    ⛰️ {{ (elem.activity.elevation_gain)|round|int }} m
                     {% endif %}
                 </p>
                 {% if elem.activity.start %}
