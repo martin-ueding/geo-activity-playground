@@ -1111,6 +1111,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-0410-2025-04-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.41.0 — 2025-04-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-0401-2025-04-18" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.40.1 — 2025-04-18
@@ -1874,6 +1883,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-0410-2025-04-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 0.41.0 — 2025-04-20
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-0401-2025-04-18" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.40.1 — 2025-04-18
@@ -2632,6 +2650,24 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-0410-2025-04-20">Version 0.41.0 — 2025-04-20</h2>
+<p>Added:</p>
+<ul>
+<li>Add "elevation Eddington number" page, which shows an Eddington number but with elevation instead of distance. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/254">GH-254</a>)</li>
+<li>In the activity view, there is a map with a colored track line. The coloring was based only on speed, now it can also show elevation. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/254">GH-254</a>)</li>
+<li>On the landing page there is a plot with the elevation gain in the past weeks. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/254">GH-254</a>)</li>
+<li>Add a fast server-side rendering mode for explorer tiles. This is much faster with arbitrary many explored tiles, it just doesn't show nice metadata yet. This can also be used as a tile source for external planning tools. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/243">GH-243</a>)</li>
+<li>Add data model for tags, though no user interface yet.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Use database to populate entry page.</li>
+<li>Make explorer tile page load much faster.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix startup without activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/263">GH-263</a>)</li>
+</ul>
 <h2 id="version-0401-2025-04-18">Version 0.40.1 — 2025-04-18</h2>
 <p>Fixed:</p>
 <ul>
