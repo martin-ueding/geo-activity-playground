@@ -26,6 +26,7 @@ Added:
 Changed:
 
 - Use database to populate entry page.
+- Make explorer tile page loading much faster.
 
 Fixed:
 
