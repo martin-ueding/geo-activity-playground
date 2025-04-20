@@ -10,8 +10,10 @@ import pandas as pd
 import sqlalchemy
 import sqlalchemy as sa
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
+from sqlalchemy import Table
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -52,6 +54,13 @@ class Base(DeclarativeBase):
 
 
 DB = SQLAlchemy(model_class=Base)
+
+activity_tag_association_table = Table(
+    "activity_tag_association_table",
+    Base.metadata,
+    Column("left_id", ForeignKey("activities.id"), primary_key=True),
+    Column("right_id", ForeignKey("tags.id"), primary_key=True),
+)
 
 
 class Activity(DB.Model):
@@ -103,6 +112,10 @@ class Activity(DB.Model):
         ForeignKey("kinds.id", name="kind_id"), nullable=True
     )
     kind: Mapped["Kind"] = relationship(back_populates="activities")
+
+    tags: Mapped[list["Tag"]] = relationship(
+        secondary=activity_tag_association_table, back_populates="activities"
+    )
 
     def __getitem__(self, item) -> Any:
         return self.to_dict()[item]
@@ -172,6 +185,18 @@ class Activity(DB.Model):
             average_speed_elapsed_kmh=self.average_speed_elapsed_kmh,
             consider_for_achievements=consider_for_achievements,
         )
+
+
+class Tag(DB.Model):
+    __tablename__ = "tags"
+    __table_args__ = (sa.UniqueConstraint("tag", name="tags_tag"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tag: Mapped[str] = mapped_column(String, unique=True)
+
+    activities: Mapped[list[Activity]] = relationship(
+        secondary=activity_tag_association_table, back_populates="tags"
+    )
 
 
 def query_activity_meta() -> pd.DataFrame:
