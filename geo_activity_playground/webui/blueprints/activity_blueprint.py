@@ -148,7 +148,10 @@ def make_activity_blueprint(
             "speed_time_plot": speed_time_plot(time_series),
             "speed_distribution_plot": speed_distribution_plot(time_series),
             "similar_activites": similar_activities,
-            "line_color_bar": make_color_bar(time_series[line_color_column]),
+            "line_color_bar": make_color_bar(
+                time_series[line_color_column],
+                line_color_columns_avail[line_color_column].format,
+            ),
             "date": activity["start"].date(),
             "time": activity["start"].time(),
             "new_tiles": new_tiles_per_zoom,
