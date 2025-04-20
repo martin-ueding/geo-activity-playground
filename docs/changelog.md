@@ -27,6 +27,7 @@ Fixed:
 
 - Fix moving time for activities with zero elapsed time or moving time. ([GH-260](https://github.com/martin-ueding/geo-activity-playground/issues/260))
 - Handle `/` in activity name when converting from Strava. ([GH-259](https://github.com/martin-ueding/geo-activity-playground/issues/259))
+- Fix startup without activities. ([GH-263](https://github.com/martin-ueding/geo-activity-playground/issues/263))
 
 Removed:
 
