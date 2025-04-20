@@ -16,6 +16,7 @@ from geo_activity_playground.core.datamodel import Activity
 from geo_activity_playground.core.datamodel import ActivityMeta
 from geo_activity_playground.core.datamodel import DB
 from geo_activity_playground.core.datamodel import Kind
+from geo_activity_playground.core.datamodel import query_activity_meta
 
 logger = logging.getLogger(__name__)
 
@@ -79,22 +80,8 @@ class ActivityRepository:
 
     @property
     def meta(self) -> pd.DataFrame:
-        activities = self.iter_activities(new_to_old=False, drop_na=True)
-        df = pd.DataFrame([activity.to_dict() for activity in activities])
-        df["date"] = df["start"].dt.date
-        df["year"] = [start.year for start in df["start"]]
-        df["month"] = [start.month for start in df["start"]]
-        df["day"] = [start.day for start in df["start"]]
-        df["week"] = [start.isocalendar().week for start in df["start"]]
-        df["day_of_week"] = df["start"].dt.day_of_week
-        df["iso_year"] = [start.isocalendar().year for start in df["start"]]
-        df["hours"] = [
-            elapsed_time.total_seconds() / 3600 for elapsed_time in df["elapsed_time"]
-        ]
-        df["hours_moving"] = [
-            moving_time.total_seconds() / 3600 for moving_time in df["moving_time"]
-        ]
-        df.index = df["id"]
+        df = query_activity_meta()
+
         return df
 
 

@@ -174,6 +174,62 @@ class Activity(DB.Model):
         )
 
 
+def query_activity_meta() -> pd.DataFrame:
+    rows = DB.session.execute(
+        sqlalchemy.select(
+            Activity.id,
+            Activity.name,
+            Activity.path,
+            Activity.distance_km,
+            Activity.start,
+            Activity.elapsed_time,
+            Activity.moving_time,
+            Activity.start_latitude,
+            Activity.start_longitude,
+            Activity.end_latitude,
+            Activity.end_longitude,
+            Activity.elevation_gain,
+            Activity.start_elevation,
+            Activity.end_elevation,
+            Activity.calories,
+            Activity.steps,
+            Activity.num_new_tiles_14,
+            Activity.num_new_tiles_17,
+            Kind.consider_for_achievements,
+            Equipment.name.label("equipment"),
+            Kind.name.label("kind"),
+        )
+        .join(Activity.equipment)
+        .join(Activity.kind)
+        .order_by(Activity.start)
+    ).all()
+    df = pd.DataFrame(rows)
+
+    for old, new in [
+        ("elapsed_time", "average_speed_elapsed_kmh"),
+        ("moving_time", "average_speed_moving_kmh"),
+    ]:
+        df[new] = pd.NA
+        mask = df[old].dt.total_seconds() > 0
+        df.loc[mask, new] = df.loc[mask, "distance_km"] / (
+            df.loc[mask, old].dt.total_seconds() / 3_600
+        )
+
+    df["date"] = df["start"].dt.date
+    df["year"] = df["start"].dt.year
+    df["month"] = df["start"].dt.month
+    df["day"] = df["start"].dt.day
+    df["week"] = df["start"].dt.isocalendar().week
+    df["day_of_week"] = df["start"].dt.day_of_week
+    df["iso_year"] = df["start"].dt.isocalendar().year
+    df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
+    df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
+
+    df.index = df["id"]
+
+    return df
+
+
 class Equipment(DB.Model):
     __tablename__ = "equipments"
 
