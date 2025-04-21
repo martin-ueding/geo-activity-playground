@@ -124,11 +124,15 @@ class Activity(DB.Model):
     def average_speed_moving_kmh(self) -> Optional[float]:
         if self.moving_time:
             return self.distance_km / (self.moving_time.total_seconds() / 3_600)
+        else:
+            return None
 
     @property
     def average_speed_elapsed_kmh(self) -> Optional[float]:
         if self.elapsed_time:
             return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
+        else:
+            return None
 
     @property
     def raw_time_series(self) -> pd.DataFrame:
