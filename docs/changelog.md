@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Removed:
+
+- Remove dict based access to `Activity` class.
+
 ## Version 0.41.0 — 2025-04-20
 
 Added:
