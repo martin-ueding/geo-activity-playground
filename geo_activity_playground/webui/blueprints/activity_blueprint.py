@@ -71,14 +71,14 @@ def make_activity_blueprint(
                                 )
                             ]
                             for _, group in repository.get_time_series(
-                                activity["id"]
+                                activity.id
                             ).groupby("segment_id")
                         ]
                     ),
                     properties={
                         "color": matplotlib.colors.to_hex(cmap(i % 8)),
-                        "activity_name": activity["name"],
-                        "activity_id": str(activity["id"]),
+                        "activity_name": activity.name,
+                        "activity_id": str(activity.id),
                     },
                 )
                 for i, activity in enumerate(repository.iter_activities())
@@ -99,7 +99,7 @@ def make_activity_blueprint(
 
         meta = repository.meta
         similar_activities = meta.loc[
-            (meta.name == activity["name"]) & (meta.id != activity["id"])
+            (meta.name == activity.name) & (meta.id != activity.id)
         ]
         similar_activities = [row for _, row in similar_activities.iterrows()]
         similar_activities.reverse()
@@ -107,7 +107,7 @@ def make_activity_blueprint(
         new_tiles = {
             zoom: sum(
                 tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
-                == activity["id"]
+                == activity.id
             )
             for zoom in sorted(config.explorer_zoom_levels)
         }
@@ -117,7 +117,7 @@ def make_activity_blueprint(
         for zoom in sorted(config.explorer_zoom_levels):
             new_tiles = tile_visit_accessor.tile_state["tile_history"][zoom].loc[
                 tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
-                == activity["id"]
+                == activity.id
             ]
             if len(new_tiles):
                 points = make_grid_points(
@@ -152,8 +152,8 @@ def make_activity_blueprint(
                 time_series[line_color_column],
                 line_color_columns_avail[line_color_column].format,
             ),
-            "date": activity["start"].date(),
-            "time": activity["start"].time(),
+            "date": activity.start.date(),
+            "time": activity.start.time(),
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
             "line_color_column": line_color_column,

@@ -117,9 +117,6 @@ class Activity(DB.Model):
         secondary=activity_tag_association_table, back_populates="activities"
     )
 
-    def __getitem__(self, item) -> Any:
-        return self.to_dict()[item]
-
     def __str__(self) -> str:
         return f"{self.start} {self.name}"
 
@@ -153,38 +150,6 @@ class Activity(DB.Model):
             ]
         else:
             return self.raw_time_series
-
-    def to_dict(self) -> ActivityMeta:
-        equipment = self.equipment.name if self.equipment is not None else "Unknown"
-        kind = self.kind.name if self.kind is not None else "Unknown"
-        consider_for_achievements = (
-            self.kind.consider_for_achievements if self.kind is not None else True
-        )
-        return ActivityMeta(
-            id=self.id,
-            name=self.name,
-            path=self.path,
-            distance_km=self.distance_km,
-            start=self.start,
-            elapsed_time=self.elapsed_time,
-            moving_time=self.moving_time,
-            start_latitude=self.start_latitude,
-            start_longitude=self.start_longitude,
-            end_latitude=self.end_latitude,
-            end_longitude=self.end_longitude,
-            elevation_gain=self.elevation_gain,
-            start_elevation=self.start_elevation,
-            end_elevation=self.end_elevation,
-            calories=self.calories,
-            steps=self.steps,
-            num_new_tiles_14=self.num_new_tiles_14,
-            num_new_tiles_17=self.num_new_tiles_17,
-            equipment=equipment,
-            kind=kind,
-            average_speed_moving_kmh=self.average_speed_moving_kmh,
-            average_speed_elapsed_kmh=self.average_speed_elapsed_kmh,
-            consider_for_achievements=consider_for_achievements,
-        )
 
 
 class Tag(DB.Model):
