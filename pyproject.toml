@@ -59,6 +59,7 @@ types-requests = "^2.31.0.20240125"
 types-tqdm = "^4.66.0.20240417"
 types-typed-ast = "^1.5.8.7"
 types-xmltodict = "^0.13.0.3"
+pyright = "^1.1.399"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -66,3 +67,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 disable_error_code = "import-untyped"
+
+
+[tool.pyright]
+include = ['geo_activity_playground']

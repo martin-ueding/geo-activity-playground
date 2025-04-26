@@ -176,7 +176,7 @@ def _process_activity(
             activity_tiles["time"],
             zip(activity_tiles["tile_x"], activity_tiles["tile_y"]),
         ):
-            if activity["consider_for_achievements"]:
+            if activity.kind.consider_for_achievements:
                 if tile not in tile_state["tile_visits"][zoom]:
                     new_tile_history_soa["activity_id"].append(activity_id)
                     new_tile_history_soa["time"].append(time)
