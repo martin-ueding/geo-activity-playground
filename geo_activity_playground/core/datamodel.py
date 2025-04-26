@@ -168,6 +168,17 @@ class Tag(DB.Model):
     )
 
 
+def get_or_make_tag(tag: str) -> Tag:
+    tags = DB.session.scalars(sqlalchemy.select(Tag).where(Tag.tag == tag)).all()
+    if tags:
+        assert len(tags) == 1, f"There must be only one tag with name '{tag}'."
+        return tags[0]
+    else:
+        tag = Tag(tag=tag)
+        DB.session.add(tag)
+        return tag
+
+
 def query_activity_meta() -> pd.DataFrame:
     rows = DB.session.execute(
         sqlalchemy.select(
