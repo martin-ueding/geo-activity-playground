@@ -1031,6 +1031,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../similar-projects/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Similar Projects
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1109,6 +1130,15 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unreleased
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#version-0410-2025-04-20" class="md-nav__link">
@@ -1883,6 +1913,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unreleased
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-0410-2025-04-20" class="md-nav__link">
     <span class="md-ellipsis">
       Version 0.41.0 — 2025-04-20
@@ -2650,6 +2689,23 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="unreleased">Unreleased</h2>
+<p>Added:</p>
+<ul>
+<li>Add page to documentation about similar projects.</li>
+<li>Add more detailed error message when activity import failed. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/266">GH-266</a>)</li>
+<li>Allow setting tags for activities. There is a separate tag manager in the settings panel. Search is still missing. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/242">GH-242</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Iterate over activities in temporal order. This could have lead to screwed up explorer tile history. Delete <code>Cache/tile-state-2.pickle</code> and <code>Cache/work-tracker-tile-state.pickle</code> to regenerate that part as needed.</li>
+<li>Try to be more robust with NaN values when importing activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/266">GH-266</a>)</li>
+<li>Fix database directory when using a relative basedir. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/256">GH-256</a>)</li>
+</ul>
+<p>Removed:</p>
+<ul>
+<li>Remove dict based access to <code>Activity</code> class.</li>
+</ul>
 <h2 id="version-0410-2025-04-20">Version 0.41.0 — 2025-04-20</h2>
 <p>Added:</p>
 <ul>
