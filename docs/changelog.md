@@ -20,10 +20,12 @@ Types of changes
 Added:
 
 - Add page to documentation about similar projects.
+- Add more detailed error message when activity import failed. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
 
 Fixed:
 
 - Iterate over activities in temporal order. This could have lead to screwed up explorer tile history. Delete `Cache/tile-state-2.pickle` and `Cache/work-tracker-tile-state.pickle` to regenerate that part as needed.
+- Try to be more robust with NaN values when importing activities. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
 
 Removed:
 

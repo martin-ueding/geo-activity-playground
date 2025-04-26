@@ -15,6 +15,7 @@ from .datamodel import ActivityMeta
 from .datamodel import DB
 from .datamodel import get_or_make_equipment
 from .datamodel import get_or_make_kind
+from .missing_values import some
 from .paths import activity_extracted_meta_dir
 from .paths import activity_extracted_time_series_dir
 from .paths import time_series_dir
@@ -82,9 +83,9 @@ def populate_database_from_extracted(config: Config) -> None:
             distance_km=0,
             equipment=equipment,
             kind=kind,
-            calories=extracted_metadata.get("calories", None),
-            elevation_gain=extracted_metadata.get("elevation_gain", None),
-            steps=extracted_metadata.get("steps", None),
+            calories=some(extracted_metadata.get("calories", None)),
+            elevation_gain=some(extracted_metadata.get("elevation_gain", None)),
+            steps=some(extracted_metadata.get("steps", None)),
             path=extracted_metadata.get("path", None),
             upstream_id=upstream_id,
         )
