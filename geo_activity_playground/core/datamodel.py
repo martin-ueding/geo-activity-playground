@@ -245,6 +245,23 @@ class Equipment(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
 
 
+def get_or_make_equipment(name: str, config: Config) -> Equipment:
+    equipments = DB.session.scalars(
+        sqlalchemy.select(Equipment).where(Equipment.name == name)
+    ).all()
+    if equipments:
+        assert (
+            len(equipments) == 1
+        ), f"There must be only one equipment with name '{name}'."
+        return equipments[0]
+    else:
+        equipment = Equipment(
+            name=name, offset_km=config.equipment_offsets.get(name, 0)
+        )
+        DB.session.add(equipment)
+        return equipment
+
+
 class Kind(DB.Model):
     __tablename__ = "kinds"
 
@@ -268,20 +285,6 @@ class Kind(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
 
-class SquarePlannerBookmark(DB.Model):
-    __tablename__ = "square_planner_bookmarks"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    size: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    name: Mapped[str] = mapped_column(sa.String, nullable=False)
-
-    __table_args__ = (sa.UniqueConstraint("zoom", "x", "y", "size", name="kinds_name"),)
-
-
 def get_or_make_kind(name: str, config: Config) -> Kind:
     kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
@@ -296,21 +299,18 @@ def get_or_make_kind(name: str, config: Config) -> Kind:
         return kind
 
 
-def get_or_make_equipment(name: str, config: Config) -> Equipment:
-    equipments = DB.session.scalars(
-        sqlalchemy.select(Equipment).where(Equipment.name == name)
-    ).all()
-    if equipments:
-        assert (
-            len(equipments) == 1
-        ), f"There must be only one equipment with name '{name}'."
-        return equipments[0]
-    else:
-        equipment = Equipment(
-            name=name, offset_km=config.equipment_offsets.get(name, 0)
-        )
-        DB.session.add(equipment)
-        return equipment
+class SquarePlannerBookmark(DB.Model):
+    __tablename__ = "square_planner_bookmarks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    size: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
+
+    __table_args__ = (sa.UniqueConstraint("zoom", "x", "y", "size", name="kinds_name"),)
 
 
 class PlotSpec(DB.Model):
