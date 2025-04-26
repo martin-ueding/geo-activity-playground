@@ -22,17 +22,6 @@ from geo_activity_playground.core.datamodel import query_activity_meta
 logger = logging.getLogger(__name__)
 
 
-def make_activity_meta() -> ActivityMeta:
-    return ActivityMeta(
-        calories=None,
-        commute=False,
-        consider_for_achievements=True,
-        equipment="Unknown",
-        kind="Unknown",
-        steps=None,
-    )
-
-
 class ActivityRepository:
     def __len__(self) -> int:
         return len(self.get_activity_ids())
