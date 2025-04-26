@@ -29,6 +29,7 @@ from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
+from ...core.datamodel import Tag
 from ...core.enrichment import update_via_time_series
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
@@ -318,7 +319,7 @@ def make_activity_blueprint(
             abort(404)
         equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
         kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
-        tags = DB.session.scalars(sqlalchemy.select(Kind)).all()
+        tags = DB.session.scalars(sqlalchemy.select(Tag)).all()
 
         if request.method == "POST":
             activity.name = request.form.get("name")
@@ -327,13 +328,18 @@ def make_activity_blueprint(
             if form_equipment == "null":
                 activity.equipment = None
             else:
-                activity.equipment = DB.session.get(Equipment, int(form_equipment))
+                activity.equipment = DB.session.get_one(Equipment, int(form_equipment))
 
             form_kind = request.form.get("kind")
             if form_kind == "null":
                 activity.kind = None
             else:
-                activity.kind = DB.session.get(Kind, int(form_kind))
+                activity.kind = DB.session.get_one(Kind, int(form_kind))
+
+            form_tags = request.form.getlist("tag")
+            activity.tags = [
+                DB.session.get_one(Tag, int(tag_id_str)) for tag_id_str in form_tags
+            ]
 
             DB.session.commit()
             return redirect(url_for(".show", id=activity.id))

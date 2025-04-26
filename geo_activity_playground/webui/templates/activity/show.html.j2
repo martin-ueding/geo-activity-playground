@@ -18,6 +18,15 @@
             <dd>{{ activity.kind.name }}</dd>
             {% endif %}
 
+            {% if activity.tags %}
+            <dt>Tags</dt>
+            <dd>
+                {% for tag in activity.tags %}
+                <span class="badge text-bg-primary">{{ tag.tag }}</span>
+                {% endfor %}
+            </dd>
+            {% endif %}
+
             <dt>Distance</dt>
             <dd>{{ activity.distance_km|round(1) }} km</dd>
 
@@ -114,9 +123,11 @@
         <div class="mb-3" style="padding-top: 10px;">
             <form method="GET">
                 <label class="form-label">Line Color by</label>
-                <select class="form-select" aria-label="Line Color by" name="line_color_column" onchange="this.form.submit()">
+                <select class="form-select" aria-label="Line Color by" name="line_color_column"
+                    onchange="this.form.submit()">
                     {% for name, column in line_color_columns_avail.items() %}
-                    <option {% if name == line_color_column %} selected {% endif %} value="{{ name }}">{{ column.display_name }}</option>
+                    <option {% if name==line_color_column %} selected {% endif %} value="{{ name }}">{{
+                        column.display_name }}</option>
                     {% endfor %}
                 </select>
             </form>
