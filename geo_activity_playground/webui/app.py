@@ -70,7 +70,7 @@ def web_ui_main(
 
     app = Flask(__name__)
 
-    database_path = basedir / "database.sqlite"
+    database_path = "database.sqlite"
     logger.info(f"Using database file at '{database_path.absolute()}'.")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path.absolute()}"
     app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}

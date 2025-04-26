@@ -26,6 +26,7 @@ Fixed:
 
 - Iterate over activities in temporal order. This could have lead to screwed up explorer tile history. Delete `Cache/tile-state-2.pickle` and `Cache/work-tracker-tile-state.pickle` to regenerate that part as needed.
 - Try to be more robust with NaN values when importing activities. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
+- Fix database directory when using a relative basedir. ([GH-256](https://github.com/martin-ueding/geo-activity-playground/issues/256))
 
 Removed:
 
