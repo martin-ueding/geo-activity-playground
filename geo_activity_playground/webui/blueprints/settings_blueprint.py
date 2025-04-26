@@ -18,6 +18,7 @@ from ...core.config import ConfigAccessor
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
+from ...core.datamodel import Tag
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.paths import _activity_enriched_dir
 from ..authenticator import Authenticator
@@ -394,6 +395,37 @@ def make_settings_blueprint(
         code = request.args.get("code", type=str)
         strava_login_helper.save_strava_code(code)
         return redirect(url_for(".strava"))
+
+    @blueprint.route("/tags")
+    @needs_authentication(authenticator)
+    def tags_list():
+        return render_template(
+            "settings/tags-list.html.j2",
+            tags=DB.session.scalars(sqlalchemy.select(Tag)).all(),
+        )
+
+    @blueprint.route("/tags/new", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def tags_new():
+        if request.method == "POST":
+            tag_str = request.form["tag"]
+            tag = Tag(tag=tag_str)
+            DB.session.add(tag)
+            DB.session.commit()
+            return redirect(url_for(".tags_list"))
+        else:
+            return render_template("settings/tags-new.html.j2")
+
+    @blueprint.route("/tags/edit/<int:id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def tags_edit(id: int):
+        tag = DB.session.get_one(Tag, id)
+        if request.method == "POST":
+            tag.tag = request.form["tag"]
+            DB.session.commit()
+            return redirect(url_for(".tags_list"))
+        else:
+            return render_template("settings/tags-edit.html.j2", tag=tag)
 
     return blueprint
 

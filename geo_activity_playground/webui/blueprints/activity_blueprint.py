@@ -318,6 +318,7 @@ def make_activity_blueprint(
             abort(404)
         equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
         kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
+        tags = DB.session.scalars(sqlalchemy.select(Kind)).all()
 
         if request.method == "POST":
             activity.name = request.form.get("name")
@@ -342,6 +343,7 @@ def make_activity_blueprint(
             activity=activity,
             kinds=kinds,
             equipments=equipments,
+            tags=tags,
         )
 
     @blueprint.route("/trim/<id>", methods=["GET", "POST"])

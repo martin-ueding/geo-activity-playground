@@ -1,0 +1,17 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Create Tag</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="tag" class="form-label">Tag</label>
+        <input type="text" class="form-control" id="tag" name="tag" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Tags</h1>
+
+<ul>
+    {% for tag in tags %}
+    <li>
+        <b>{{ tag.tag }}</b>
+        <a class="btn btn-sm btn-primary" href="{{ url_for('.tags_edit', id=tag.id) }}">Edit</a>
+    </li>
+    {% endfor %}
+</ul>
+
+
+<a class="btn btn-primary" href="{{ url_for('.tags_new') }}">New</a>
+
+{% endblock %}
