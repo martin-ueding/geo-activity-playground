@@ -2,6 +2,10 @@
 
 This project isn't the only one of its kind. There are a couple of other projects that might also be of interest to you.
 
+Open source projects:
+
+- [CubeTrek](https://cubetrek.com/)
+
 Non-cloud analysis:
 
 - [Running Free by Michael Simons](https://biking.michael-simons.eu/)

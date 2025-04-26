@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Mention CubeTrek on page with similar projects.
+
 ## Version 0.42.0 — 2025-04-26
 
 Added:
