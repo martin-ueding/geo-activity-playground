@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 from collections.abc import Callable
+from collections.abc import Sequence
 from typing import Any
 from typing import Optional
 
@@ -52,14 +53,14 @@ class ActivityRepository:
         else:
             return None
 
-    def get_activity_ids(self, only_achievements: bool = False) -> list[int]:
+    def get_activity_ids(self, only_achievements: bool = False) -> Sequence[int]:
         query = sqlalchemy.select(Activity.id)
         if only_achievements:
             query = query.where(Kind.consider_for_achievements)
-        result = DB.session.scalars(query).all()
+        result = DB.session.scalars(query.order_by(Activity.start)).all()
         return result
 
-    def iter_activities(self, new_to_old=True, drop_na=False) -> list[Activity]:
+    def iter_activities(self, new_to_old=True, drop_na=False) -> Sequence[Activity]:
         query = sqlalchemy.select(Activity)
         if drop_na:
             query = query.where(Activity.start.is_not(None))
