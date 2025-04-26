@@ -21,7 +21,7 @@ Added:
 
 - Add page to documentation about similar projects.
 - Add more detailed error message when activity import failed. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
-- Manager for tag (which can then be assigned to activities). ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
+- Allow setting tags for activities. There is a separate tag manager in the settings panel. ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
 
 Fixed:
 
