@@ -17,6 +17,14 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add page to documentation about similar projects.
+
+Fixed:
+
+- Iterate over activities in temporal order. This could have lead to screwed up explorer tile history. Delete `Cache/tile-state-2.pickle` and `Cache/work-tracker-tile-state.pickle` to regenerate that part as needed.
+
 Removed:
 
 - Remove dict based access to `Activity` class.

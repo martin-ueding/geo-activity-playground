@@ -92,7 +92,13 @@ def populate_database_from_extracted(config: Config) -> None:
         update_via_time_series(activity, time_series)
 
         DB.session.add(activity)
-        DB.session.commit()
+        try:
+            DB.session.commit()
+        except sqlalchemy.exc.StatementError:
+            logger.error(
+                f"Could not insert the following activity into the database: {vars(activity)=}"
+            )
+            raise
 
         enriched_time_series_path = time_series_dir() / f"{activity.id}.parquet"
         time_series.to_parquet(enriched_time_series_path)
