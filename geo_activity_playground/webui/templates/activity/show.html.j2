@@ -135,8 +135,19 @@
     </div>
 </div>
 
-
+{% if activity.photos %}
+<h2 class="mb-3">Photos</h2>
 <div class="row mb-3">
+    {% for photo in activity.photos %}
+    <div class="col-md-3">
+        <img src="{{ url_for('photo.get', id=photo.id, size=512) }}" width="100%" />
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+<div class=" row mb-3">
     <div class="col">
         <h2>Distance & speed</h2>
     </div>
@@ -212,7 +223,8 @@
 
 {% if new_tiles_geojson %}
 <h2>New explorer tiles</h2>
-<p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective zoom
+<p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective
+    zoom
     levels.</p>
 <script>
     function add_map(id, geojson) {
