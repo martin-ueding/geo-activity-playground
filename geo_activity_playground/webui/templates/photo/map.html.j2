@@ -1,0 +1,45 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1>Photo Map</h1>
+
+<div id="photo-map" style="height: 800px;" class="mb-3"></div>
+<script>
+    var map = L.map('photo-map', {
+        fullscreenControl: true
+    });
+    L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '{{ map_tile_attribution|safe }}'
+    }).addTo(map);
+
+    fetch("{{ url_for('photo.map_for_all') }}")
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            let layer = L.geoJSON(data, {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng, {
+                        icon: new L.Icon({
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16],
+                            popupAnchor: [16, 0],
+                            iconUrl: feature.properties.url_marker,
+                        })
+                    });
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup(`<a href="${feature.properties.url_full}" target="_blank"><img src="${feature.properties.url_popup}" /></a>`)
+                }
+            })
+
+            let group = L.markerClusterGroup()
+            group.addLayer(layer)
+
+            group.addTo(map);
+            map.fitBounds(group.getBounds());
+        });
+</script>
+
+{% endblock %}
