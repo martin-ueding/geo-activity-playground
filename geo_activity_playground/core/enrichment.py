@@ -108,8 +108,10 @@ def populate_database_from_extracted(config: Config) -> None:
 def update_via_time_series(
     activity: Activity, time_series: pd.DataFrame
 ) -> ActivityMeta:
-    activity.start = time_series["time"].iloc[0]
-    activity.elapsed_time = time_series["time"].iloc[-1] - time_series["time"].iloc[0]
+    activity.start = some(time_series["time"].iloc[0])
+    activity.elapsed_time = some(
+        time_series["time"].iloc[-1] - time_series["time"].iloc[0]
+    )
     activity.distance_km = (
         time_series["distance_km"].iloc[-1] - time_series["distance_km"].iloc[0]
     )
