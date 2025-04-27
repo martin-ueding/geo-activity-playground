@@ -20,6 +20,7 @@ from ..core.config import import_old_strava_config
 from ..core.datamodel import DB
 from ..core.datamodel import Equipment
 from ..core.datamodel import Kind
+from ..core.datamodel import Tag
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
@@ -185,14 +186,16 @@ def web_ui_main(
             # "search_query_last": search_query_history.prepare_last(),
             "request_url": urllib.parse.quote_plus(request.url),
         }
-        if len(repository):
-            variables["equipments_avail"] = DB.session.scalars(
-                sqlalchemy.select(Equipment).order_by(Equipment.name)
-            ).all()
-
-            variables["kinds_avail"] = DB.session.scalars(
-                sqlalchemy.select(Kind).order_by(Kind.name)
-            ).all()
+        variables["equipments_avail"] = DB.session.scalars(
+            sqlalchemy.select(Equipment).order_by(Equipment.name)
+        ).all()
+        variables["kinds_avail"] = DB.session.scalars(
+            sqlalchemy.select(Kind).order_by(Kind.name)
+        ).all()
+        variables["tags_avail"] = DB.session.scalars(
+            sqlalchemy.select(Tag).order_by(Tag.tag)
+        ).all()
+        print(variables)
         return variables
 
     app.run(host=host, port=port)

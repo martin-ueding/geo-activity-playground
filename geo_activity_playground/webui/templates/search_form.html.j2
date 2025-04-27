@@ -1,4 +1,14 @@
-{% macro search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last, request_url) %}
+{% macro _show_search_query(description, url_parameters, is_favorite, request_url) %}
+<li>
+    <a href="?{{ url_parameters }}">{{ description }}</a>
+    {% if is_favorite %}
+    <a href="{{ url_for('search.delete_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">🗑️</a>
+    {% else %}
+    <a href="{{ url_for('search.save_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">💾</a>
+    {% endif %}
+</li>
+{% endmacro %}
+
 <div class="accordion" id="search_form_accordion">
     <div class="accordion-item">
         <h2 class="accordion-header">
@@ -73,6 +83,22 @@
                                     </div>
                                 </div>
 
+                                <div class="col-12">
+                                    <label for="" class="form-label">Tags</label>
+                                    <div class="form-control">
+                                        {% for tag in tags_avail %}
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="tag"
+                                                value="{{ tag.id }}" id="tag_{{ tag.id }}" {% if tag.id in query.tag %}
+                                                checked {% endif %}>
+                                            <label class="form-check-label" for="tag_{{ tag.id }}">
+                                                {{ tag.tag }}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
                                 <div class="col-6">
                                     <button type="submit" class="btn btn-primary">Filter</button>
                                 </div>
@@ -102,15 +128,3 @@
         </div>
     </div>
 </div>
-{% endmacro %}
-
-{% macro _show_search_query(description, url_parameters, is_favorite, request_url) %}
-<li>
-    <a href="?{{ url_parameters }}">{{ description }}</a>
-    {% if is_favorite %}
-    <a href="{{ url_for('search.delete_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">🗑️</a>
-    {% else %}
-    <a href="{{ url_for('search.save_search_query') }}?{{ url_parameters }}&redirect={{ request_url }}">💾</a>
-    {% endif %}
-</li>
-{% endmacro %}

@@ -11,6 +11,7 @@ def search_query_from_form(args: MultiDict) -> SearchQuery:
         {
             "equipment": map(int, args.getlist("equipment")),
             "kind": map(int, args.getlist("kind")),
+            "tag": map(int, args.getlist("tag")),
             "name": args.get("name", None),
             "name_case_sensitive": _parse_bool(
                 args.get("name_case_sensitive", "false")

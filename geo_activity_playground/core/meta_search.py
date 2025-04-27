@@ -15,12 +15,14 @@ from .datamodel import DB
 from .datamodel import Equipment
 from .datamodel import Kind
 from .datamodel import query_activity_meta
+from .datamodel import Tag
 
 
 @dataclasses.dataclass
 class SearchQuery:
     equipment: list[Equipment] = dataclasses.field(default_factory=list)
     kind: list[Kind] = dataclasses.field(default_factory=list)
+    tag: list[Tag] = dataclasses.field(default_factory=list)
     name: Optional[str] = None
     name_case_sensitive: bool = False
     start_begin: Optional[datetime.date] = None
@@ -39,6 +41,8 @@ class SearchQuery:
             bits.append(
                 "kind is " + (" or ".join(f"“{kind.name}”" for kind in self.kind))
             )
+        if self.tag:
+            bits.append("tag is " + (" or ".join(f"“{tag.tag}”" for tag in self.tag)))
         if self.start_begin:
             bits.append(f"after “{self.start_begin.isoformat()}”")
         if self.start_end:
@@ -53,12 +57,14 @@ class SearchQuery:
             or self.name
             or self.start_begin
             or self.start_end
+            or self.tag
         )
 
     def to_primitives(self) -> dict:
         return {
             "equipment": [equipment.id for equipment in self.equipment],
             "kind": [kind.id for kind in self.kind],
+            "tag": [tag.id for tag in self.tag],
             "name": self.name or "",
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
@@ -67,12 +73,12 @@ class SearchQuery:
 
     @classmethod
     def from_primitives(cls, d: dict) -> "SearchQuery":
-        print(d)
         return cls(
             equipment=[
                 DB.session.get_one(Equipment, id) for id in d.get("equipment", [])
             ],
             kind=[DB.session.get_one(Kind, id) for id in d.get("kind", [])],
+            tag=[DB.session.get_one(Tag, id) for id in d.get("tag", [])],
             name=d.get("name", None),
             name_case_sensitive=d.get("name_case_sensitive", False),
             start_begin=_parse_date_or_none(d.get("start_begin", None)),
@@ -90,6 +96,8 @@ class SearchQuery:
             variables.append(("equipment", equipment.id))
         for kind in self.kind:
             variables.append(("kind", kind.id))
+        for tag in self.tag:
+            variables.append(("tag", tag.id))
         if self.name:
             variables.append(("name", self.name))
         if self.name_case_sensitive:
@@ -123,6 +131,11 @@ def apply_search_query(
     if search_query.kind:
         filter_clauses.append(
             sqlalchemy.or_(*[Activity.kind == kind for kind in search_query.kind])
+        )
+
+    if search_query.tag:
+        filter_clauses.append(
+            sqlalchemy.or_(*[Activity.tags.contains(tag) for tag in search_query.tag])
         )
 
     if search_query.name:

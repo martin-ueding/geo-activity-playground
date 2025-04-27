@@ -1,12 +1,11 @@
 {% extends "page.html.j2" %}
-{% from "search_form.html.j2" import search_form %}
 
 {% block container %}
 
 <h1>Summary Statistics</h1>
 
 <div class="mb-3">
-    {{ search_form(query, equipments_avail, kinds_avail, search_query_favorites, search_query_last, request_url) }}
+    {% include "search_form.html.j2" %}
 </div>
 
 {% if custom_plots %}
@@ -131,7 +130,8 @@
 </div>
 
 <p>How much elevation have you gained in each year up to that time of the year? The first plot gives you each year as
-    one line. The second plot shows you how much elevation you have gained in each year and with which activity kinds.</p>
+    one line. The second plot shows you how much elevation you have gained in each year and with which activity kinds.
+</p>
 
 <div class="row mb-3">
     <div class="col-md-6">
@@ -144,7 +144,8 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        <p>What's the average elevation gain per activity? This naturally differs per activity and perhaps also varies with
+        <p>What's the average elevation gain per activity? This naturally differs per activity and perhaps also varies
+            with
             the years. This table gives you all the mean values.</p>
     </div>
 
@@ -178,24 +179,25 @@
     </div>
 </div>
 
-<p>Next we take one row per month, each column is a day-of-month. The brighter a box, the more elevation gain you have covered
+<p>Next we take one row per month, each column is a day-of-month. The brighter a box, the more elevation gain you have
+    covered
     on that day. This makes it easy to spot those days where you really covered a lot of elevation gain!</p>
 
 
 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     {% for year, plot in plot_elevation_gain_heatmaps.items() %}
     <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.last %} active {% endif %}" id="heatmap-elevation-gain-{{ year }}" data-bs-toggle="tab"
-            data-bs-target="#heatmap-elevation-gain-{{ year }}-pane" type="button" role="tab" aria-controls="heatmap-elevation-gain-{{ year }}-pane"
-            aria-selected="{{ loop.last }}">{{ year }}</button>
+        <button class="nav-link {% if loop.last %} active {% endif %}" id="heatmap-elevation-gain-{{ year }}"
+            data-bs-toggle="tab" data-bs-target="#heatmap-elevation-gain-{{ year }}-pane" type="button" role="tab"
+            aria-controls="heatmap-elevation-gain-{{ year }}-pane" aria-selected="{{ loop.last }}">{{ year }}</button>
     </li>
     {% endfor %}
 </ul>
 
 <div class="tab-content mb-3" id="myTabContent">
     {% for year, plot in plot_elevation_gain_heatmaps.items() %}
-    <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-elevation-gain-{{ year }}-pane" role="tabpanel"
-        aria-labelledby="heatmap-elevation-gain-{{ year }}" tabindex="0">
+    <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-elevation-gain-{{ year }}-pane"
+        role="tabpanel" aria-labelledby="heatmap-elevation-gain-{{ year }}" tabindex="0">
         {{ vega_direct("plot_elevation_gain_heatmap_%d"|format(year), plot) }}
     </div>
     {% endfor %}
