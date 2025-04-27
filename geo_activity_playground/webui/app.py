@@ -20,6 +20,7 @@ from ..core.config import import_old_strava_config
 from ..core.datamodel import DB
 from ..core.datamodel import Equipment
 from ..core.datamodel import Kind
+from ..core.datamodel import Photo
 from ..core.datamodel import Tag
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.raster_map import GrayscaleImageTransform
@@ -197,6 +198,9 @@ def web_ui_main(
         variables["tags_avail"] = DB.session.scalars(
             sqlalchemy.select(Tag).order_by(Tag.tag)
         ).all()
+        variables["photo_count"] = DB.session.scalar(
+            sqlalchemy.select(sqlalchemy.func.count()).select_from(Photo)
+        )
         return variables
 
     app.run(host=host, port=port)

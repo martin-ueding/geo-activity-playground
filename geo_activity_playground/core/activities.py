@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 class ActivityRepository:
     def __len__(self) -> int:
-        return len(self.get_activity_ids())
+        return DB.session.scalars(
+            sqlalchemy.select(sqlalchemy.func.count()).select_from(Activity)
+        ).one()
 
     def has_activity(self, activity_id: int) -> bool:
         return bool(
