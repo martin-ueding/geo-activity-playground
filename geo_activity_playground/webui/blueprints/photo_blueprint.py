@@ -4,6 +4,7 @@ import uuid
 
 import dateutil.parser
 import exifread
+import geojson
 import sqlalchemy
 from flask import Blueprint
 from flask import redirect
@@ -71,6 +72,27 @@ def make_photo_blueprint(
 
         with open(small_path, "rb") as f:
             return Response(f.read(), mimetype="image/webp")
+
+    @blueprint.route("/map-for-activity/<int:activity_id>/photos.geojson")
+    def map_for_activity(activity_id: int) -> Response:
+        activity = DB.session.get_one(Activity, activity_id)
+        fc = geojson.FeatureCollection(
+            features=[
+                geojson.Feature(
+                    geometry=geojson.Point((photo.longitude, photo.latitude)),
+                    properties={
+                        "photo_id": photo.id,
+                        "url_mini": url_for(".get", id=photo.id, size=128),
+                        "url_full": url_for(".get", id=photo.id, size=3000),
+                    },
+                )
+                for photo in activity.photos
+            ]
+        )
+        return Response(
+            geojson.dumps(fc, sort_keys=True, indent=2, ensure_ascii=False),
+            mimetype="application/json",
+        )
 
     @blueprint.route("/new", methods=["GET", "POST"])
     @needs_authentication(authenticator)
