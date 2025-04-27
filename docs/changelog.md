@@ -21,10 +21,12 @@ Added:
 
 - Mention CubeTrek on page with similar projects.
 - Add tag filter to search form. ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
+- Add photo upload that matches photos automatically to activities. Photos are shown on the activity page and also on the map. ([GH-247](https://github.com/martin-ueding/geo-activity-playground/issues/247))
 
 Changed:
 
 - The search queries work directly against the database.
+- Remove some redundant metadata from the activity overview.
 
 Removed:
 
