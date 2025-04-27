@@ -40,6 +40,7 @@ vl-convert-python = "^1.0.1"
 xmltodict = "^0.13.0"
 flask-sqlalchemy = "^3.1.1"
 flask-alembic = "^3.1.1"
+exifread = "^3.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"
