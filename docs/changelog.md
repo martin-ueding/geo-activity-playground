@@ -19,9 +19,9 @@ Types of changes
 
 Added:
 
-- Mention CubeTrek on page with similar projects.
-- Add tag filter to search form. ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
 - Add photo upload that matches photos automatically to activities. Photos are shown on the activity page and also on the map. ([GH-247](https://github.com/martin-ueding/geo-activity-playground/issues/247))
+- Add tag filter to search form. ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
+- Mention CubeTrek on page with similar projects.
 
 Changed:
 
