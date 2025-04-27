@@ -21,6 +21,14 @@ Added:
 
 - Mention CubeTrek on page with similar projects.
 
+Changed:
+
+- The search queries work directly against the database.
+
+Removed:
+
+- Search history is broken for now.
+
 ## Version 0.42.0 — 2025-04-26
 
 Added:
