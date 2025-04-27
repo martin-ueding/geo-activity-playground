@@ -100,6 +100,30 @@
                 style: function (feature) { return { color: feature.properties.color } }
             }).addTo(map)
             map.fitBounds(geojson.getBounds());
+
+
+
+            fetch("{{ url_for('photo.map_for_activity', activity_id = activity.id) }}")
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    L.geoJSON(data, {
+                        pointToLayer: function (feature, latlng) {
+                            return L.marker(latlng, {
+                                icon: new L.Icon({
+                                    iconSize: [32, 32],
+                                    iconAnchor: [16, 16],
+                                    popupAnchor: [16, 0],
+                                    iconUrl: feature.properties.url_marker,
+                                })
+                            });
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.bindPopup(`<a href="${feature.properties.url_full}" target="_blank"><img src="${feature.properties.url_popup}" /></a>`)
+                        }
+                    }).addTo(map);
+                });
         </script>
 
 

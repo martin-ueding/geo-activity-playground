@@ -82,8 +82,9 @@ def make_photo_blueprint(
                     geometry=geojson.Point((photo.longitude, photo.latitude)),
                     properties={
                         "photo_id": photo.id,
-                        "url_mini": url_for(".get", id=photo.id, size=128),
-                        "url_full": url_for(".get", id=photo.id, size=3000),
+                        "url_marker": url_for(".get", id=photo.id, size=128),
+                        "url_popup": url_for(".get", id=photo.id, size=512),
+                        "url_full": url_for(".get", id=photo.id, size=4096),
                     },
                 )
                 for photo in activity.photos
