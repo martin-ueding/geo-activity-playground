@@ -28,6 +28,10 @@ Changed:
 - The search queries work directly against the database.
 - Remove some redundant metadata from the activity overview.
 
+Fixed:
+
+- Filter not-a-time dates when importing into the database. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
+
 Removed:
 
 - Search history is broken for now.
