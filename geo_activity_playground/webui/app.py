@@ -195,7 +195,6 @@ def web_ui_main(
         variables["tags_avail"] = DB.session.scalars(
             sqlalchemy.select(Tag).order_by(Tag.tag)
         ).all()
-        print(variables)
         return variables
 
     app.run(host=host, port=port)
