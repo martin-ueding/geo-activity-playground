@@ -10,12 +10,14 @@
 <div class="row mb-3">
     <div class="col-sm-12 col-md-4">
         <dl>
-            <dt>Name</dt>
-            <dd>{{ activity.name }}</dd>
-
             {% if activity.kind %}
             <dt>Kind</dt>
             <dd>{{ activity.kind.name }}</dd>
+            {% endif %}
+
+            {% if activity.equipment %}
+            <dt>Equipment</dt>
+            <dd>{{ activity.equipment.name }}</dd>
             {% endif %}
 
             {% if activity.tags %}
@@ -59,11 +61,6 @@
             {% if activity.elevation_gain %}
             <dt>Elevation gain</dt>
             <dd>{{ activity.elevation_gain|round(0)|int }} m</dd>
-            {% endif %}
-
-            {% if activity.equipment %}
-            <dt>Equipment</dt>
-            <dd>{{ activity.equipment.name }}</dd>
             {% endif %}
 
             {% if new_tiles[14] %}
