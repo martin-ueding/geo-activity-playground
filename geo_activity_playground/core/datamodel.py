@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import pathlib
 from typing import Any
 from typing import Optional
 from typing import TypedDict
@@ -384,3 +385,7 @@ class Photo(DB.Model):
         ForeignKey("activities.id", name="activity_id"), nullable=False
     )
     activity: Mapped["Activity"] = relationship(back_populates="photos")
+
+    @property
+    def path(self) -> pathlib.Path:
+        return pathlib.Path(self.filename)

@@ -11,6 +11,8 @@ from flask import render_template
 from flask import request
 from flask import Response
 from flask import url_for
+from PIL import Image
+from PIL import ImageOps
 
 from ...core.config import ConfigAccessor
 from ...core.datamodel import Activity
@@ -52,6 +54,24 @@ def make_photo_blueprint(
 ) -> Blueprint:
     blueprint = Blueprint("photo", __name__, template_folder="templates")
 
+    @blueprint.route("/get/<int:id>/<int:size>.webp")
+    def get(id: int, size: int) -> Response:
+        assert size < 5000
+        photo = DB.session.get_one(Photo, id)
+
+        original_path = PHOTOS_DIR() / "original" / photo.path
+        small_path = PHOTOS_DIR() / f"size-{size}" / photo.path.with_suffix(".webp")
+
+        if not small_path.exists():
+            with Image.open(original_path) as im:
+                target_size = (size, size)
+                im = ImageOps.contain(im, target_size)
+                small_path.parent.mkdir(exist_ok=True)
+                im.save(small_path)
+
+        with open(small_path, "rb") as f:
+            return Response(f.read(), mimetype="image/webp")
+
     @blueprint.route("/new", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def new() -> Response:
@@ -74,7 +94,8 @@ def make_photo_blueprint(
                 return redirect(url_for(".new"))
 
             filename = str(uuid.uuid4()) + pathlib.Path(file.filename).suffix
-            path = PHOTOS_DIR() / filename
+            path = PHOTOS_DIR() / "original" / filename
+            path.parent.mkdir(exist_ok=True)
             file.save(path)
             metadata = get_metadata_from_image(path)
 
