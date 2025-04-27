@@ -27,6 +27,8 @@ class SearchQuery:
     name_case_sensitive: bool = False
     start_begin: Optional[datetime.date] = None
     start_end: Optional[datetime.date] = None
+    distance_km_min: Optional[float] = None
+    distance_km_max: Optional[float] = None
 
     def __str__(self) -> str:
         bits = []
@@ -58,6 +60,8 @@ class SearchQuery:
             or self.start_begin
             or self.start_end
             or self.tag
+            or self.distance_km_min
+            or self.distance_km_max
         )
 
     def to_primitives(self) -> dict:
@@ -69,6 +73,8 @@ class SearchQuery:
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
             "start_end": _format_optional_date(self.start_end),
+            "distance_km_min": self.distance_km_min,
+            "distance_km_max": self.distance_km_max,
         }
 
     @classmethod
@@ -83,6 +89,8 @@ class SearchQuery:
             name_case_sensitive=d.get("name_case_sensitive", False),
             start_begin=_parse_date_or_none(d.get("start_begin", None)),
             start_end=_parse_date_or_none(d.get("start_end", None)),
+            distance_km_min=d.get("distance_km_min", None),
+            distance_km_max=d.get("distance_km_max", None),
         )
 
     def to_jinja(self) -> dict:
@@ -106,6 +114,10 @@ class SearchQuery:
             variables.append(("start_begin", self.start_begin.isoformat()))
         if self.start_end:
             variables.append(("start_end", self.start_end.isoformat()))
+        if self.distance_km_min:
+            variables.append(("distance_km_min", self.distance_km_min))
+        if self.distance_km_max:
+            variables.append(("distance_km_max", self.distance_km_max))
 
         return "&".join(
             f"{key}={urllib.parse.quote_plus(value)}" for key, value in variables
@@ -149,6 +161,11 @@ def apply_search_query(
         filter_clauses.append(Activity.start <= search_query.start_begin)
     if search_query.start_end:
         filter_clauses.append(Activity.start < search_query.start_end)
+
+    if search_query.distance_km_min:
+        filter_clauses.append(Activity.distance_km >= search_query.distance_km_min)
+    if search_query.distance_km_max:
+        filter_clauses.append(Activity.distance_km <= search_query.distance_km_max)
 
     return query_activity_meta(filter_clauses)
 

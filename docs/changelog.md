@@ -37,6 +37,7 @@ Added:
 - Add page to documentation about similar projects.
 - Add more detailed error message when activity import failed. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
 - Allow setting tags for activities. There is a separate tag manager in the settings panel. Search is still missing. ([GH-242](https://github.com/martin-ueding/geo-activity-playground/issues/242))
+- Add search filter for activity distance. ([GH-267](https://github.com/martin-ueding/geo-activity-playground/issues/267))
 
 Fixed:
 

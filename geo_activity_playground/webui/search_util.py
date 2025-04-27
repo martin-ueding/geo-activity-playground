@@ -1,3 +1,5 @@
+from typing import Optional
+
 from werkzeug.datastructures import MultiDict
 
 from ..core.config import ConfigAccessor
@@ -18,6 +20,8 @@ def search_query_from_form(args: MultiDict) -> SearchQuery:
             ),
             "start_begin": args.get("start_begin", None),
             "start_end": args.get("start_end", None),
+            "distance_km_min": _optional_float(args.get("distance_km_min", None)),
+            "distance_km_max": _optional_float(args.get("distance_km_max", None)),
         }
     )
 
@@ -26,6 +30,13 @@ def search_query_from_form(args: MultiDict) -> SearchQuery:
 
 def _parse_bool(s: str) -> bool:
     return s == "true"
+
+
+def _optional_float(s: str) -> Optional[float]:
+    if s:
+        return float(s)
+    else:
+        return None
 
 
 class SearchQueryHistory:
