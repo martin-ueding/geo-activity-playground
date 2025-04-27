@@ -7,13 +7,17 @@ from .authenticator import Authenticator
 
 
 def search_query_from_form(args: MultiDict) -> SearchQuery:
-    query = SearchQuery(
-        equipment=args.getlist("equipment"),
-        kind=args.getlist("kind"),
-        name=args.get("name", None),
-        name_case_sensitive=_parse_bool(args.get("name_case_sensitive", "false")),
-        start_begin=_parse_date_or_none(args.get("start_begin", None)),
-        start_end=_parse_date_or_none(args.get("start_end", None)),
+    query = SearchQuery.from_primitives(
+        {
+            "equipment": map(int, args.getlist("equipment")),
+            "kind": map(int, args.getlist("kind")),
+            "name": args.get("name", None),
+            "name_case_sensitive": _parse_bool(
+                args.get("name_case_sensitive", "false")
+            ),
+            "start_begin": args.get("start_begin", None),
+            "start_end": args.get("start_end", None),
+        }
     )
 
     return query

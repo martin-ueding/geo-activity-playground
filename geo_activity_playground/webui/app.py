@@ -8,6 +8,7 @@ import secrets
 import shutil
 import urllib.parse
 
+import sqlalchemy
 from flask import Flask
 from flask import request
 from flask_alembic import Alembic
@@ -17,6 +18,8 @@ from ..core.config import ConfigAccessor
 from ..core.config import import_old_config
 from ..core.config import import_old_strava_config
 from ..core.datamodel import DB
+from ..core.datamodel import Equipment
+from ..core.datamodel import Kind
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
@@ -178,15 +181,18 @@ def web_ui_main(
             "version": _try_get_version(),
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
-            "search_query_favorites": search_query_history.prepare_favorites(),
-            "search_query_last": search_query_history.prepare_last(),
+            # "search_query_favorites": search_query_history.prepare_favorites(),
+            # "search_query_last": search_query_history.prepare_last(),
             "request_url": urllib.parse.quote_plus(request.url),
         }
         if len(repository):
-            variables["equipments_avail"] = sorted(
-                repository.meta["equipment"].unique()
-            )
-            variables["kinds_avail"] = sorted(repository.meta["kind"].unique())
+            variables["equipments_avail"] = DB.session.scalars(
+                sqlalchemy.select(Equipment).order_by(Equipment.name)
+            ).all()
+
+            variables["kinds_avail"] = DB.session.scalars(
+                sqlalchemy.select(Kind).order_by(Kind.name)
+            ).all()
         return variables
 
     app.run(host=host, port=port)

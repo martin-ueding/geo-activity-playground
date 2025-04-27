@@ -2,17 +2,25 @@ import dataclasses
 import datetime
 import re
 import urllib.parse
+from collections.abc import Sequence
 from typing import Optional
 
 import dateutil.parser
 import numpy as np
 import pandas as pd
+import sqlalchemy
+
+from .datamodel import Activity
+from .datamodel import DB
+from .datamodel import Equipment
+from .datamodel import Kind
+from .datamodel import query_activity_meta
 
 
 @dataclasses.dataclass
 class SearchQuery:
-    equipment: list[str] = dataclasses.field(default_factory=list)
-    kind: list[str] = dataclasses.field(default_factory=list)
+    equipment: list[Equipment] = dataclasses.field(default_factory=list)
+    kind: list[Kind] = dataclasses.field(default_factory=list)
     name: Optional[str] = None
     name_case_sensitive: bool = False
     start_begin: Optional[datetime.date] = None
@@ -25,10 +33,12 @@ class SearchQuery:
         if self.equipment:
             bits.append(
                 "equipment is "
-                + (" or ".join(f"“{equipment}”" for equipment in self.equipment))
+                + (" or ".join(f"“{equipment.name}”" for equipment in self.equipment))
             )
         if self.kind:
-            bits.append("kind is " + (" or ".join(f"“{kind}”" for kind in self.kind)))
+            bits.append(
+                "kind is " + (" or ".join(f"“{kind.name}”" for kind in self.kind))
+            )
         if self.start_begin:
             bits.append(f"after “{self.start_begin.isoformat()}”")
         if self.start_end:
@@ -47,8 +57,8 @@ class SearchQuery:
 
     def to_primitives(self) -> dict:
         return {
-            "equipment": self.equipment,
-            "kind": self.kind,
+            "equipment": [equipment.id for equipment in self.equipment],
+            "kind": [kind.id for kind in self.kind],
             "name": self.name or "",
             "name_case_sensitive": self.name_case_sensitive,
             "start_begin": _format_optional_date(self.start_begin),
@@ -57,9 +67,12 @@ class SearchQuery:
 
     @classmethod
     def from_primitives(cls, d: dict) -> "SearchQuery":
+        print(d)
         return cls(
-            equipment=d.get("equipment", []),
-            kind=d.get("kind", []),
+            equipment=[
+                DB.session.get_one(Equipment, id) for id in d.get("equipment", [])
+            ],
+            kind=[DB.session.get_one(Kind, id) for id in d.get("kind", [])],
             name=d.get("name", None),
             name_case_sensitive=d.get("name_case_sensitive", False),
             start_begin=_parse_date_or_none(d.get("start_begin", None)),
@@ -74,9 +87,9 @@ class SearchQuery:
     def to_url_str(self) -> str:
         variables = []
         for equipment in self.equipment:
-            variables.append(("equipment", equipment))
+            variables.append(("equipment", equipment.id))
         for kind in self.kind:
-            variables.append(("kind", kind))
+            variables.append(("kind", kind.id))
         if self.name:
             variables.append(("name", self.name))
         if self.name_case_sensitive:
@@ -94,36 +107,37 @@ class SearchQuery:
 def apply_search_query(
     activity_meta: pd.DataFrame, search_query: SearchQuery
 ) -> pd.DataFrame:
-    mask = _make_mask(activity_meta.index, True)
+
+    filter_clauses = []
 
     if search_query.equipment:
-        mask &= _filter_column(activity_meta["equipment"], search_query.equipment)
-    if search_query.kind:
-        mask &= _filter_column(activity_meta["kind"], search_query.kind)
-    if search_query.name:
-        mask &= pd.Series(
-            [
-                bool(
-                    re.search(
-                        search_query.name,
-                        activity_name,
-                        0 if search_query.name_case_sensitive else re.IGNORECASE,
-                    )
-                )
-                for activity_name in activity_meta["name"]
-            ],
-            index=activity_meta.index,
+        filter_clauses.append(
+            sqlalchemy.or_(
+                *[
+                    Activity.equipment == equipment
+                    for equipment in search_query.equipment
+                ]
+            )
         )
-    if search_query.start_begin is not None:
-        start_begin = datetime.datetime.combine(
-            search_query.start_begin, datetime.time.min
-        )
-        mask &= start_begin <= activity_meta["start"]
-    if search_query.start_end is not None:
-        start_end = datetime.datetime.combine(search_query.start_end, datetime.time.max)
-        mask &= activity_meta["start"] <= start_end
 
-    return activity_meta.loc[mask]
+    if search_query.kind:
+        filter_clauses.append(
+            sqlalchemy.or_(*[Activity.kind == kind for kind in search_query.kind])
+        )
+
+    if search_query.name:
+        filter_clauses.append(
+            Activity.name.contains(search_query.name)
+            if search_query.name_case_sensitive
+            else Activity.name.icontains(search_query.name)
+        )
+
+    if search_query.start_begin:
+        filter_clauses.append(Activity.start <= search_query.start_begin)
+    if search_query.start_end:
+        filter_clauses.append(Activity.start < search_query.start_end)
+
+    return query_activity_meta(filter_clauses)
 
 
 def _format_optional_date(date: Optional[datetime.date]) -> str:

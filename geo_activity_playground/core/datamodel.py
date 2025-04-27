@@ -179,7 +179,7 @@ def get_or_make_tag(tag: str) -> Tag:
         return tag
 
 
-def query_activity_meta() -> pd.DataFrame:
+def query_activity_meta(clauses: list = []) -> pd.DataFrame:
     rows = DB.session.execute(
         sqlalchemy.select(
             Activity.id,
@@ -206,31 +206,33 @@ def query_activity_meta() -> pd.DataFrame:
         )
         .join(Activity.equipment)
         .join(Activity.kind)
+        .where(*clauses)
         .order_by(Activity.start)
     ).all()
     df = pd.DataFrame(rows)
 
-    for old, new in [
-        ("elapsed_time", "average_speed_elapsed_kmh"),
-        ("moving_time", "average_speed_moving_kmh"),
-    ]:
-        df[new] = pd.NA
-        mask = df[old].dt.total_seconds() > 0
-        df.loc[mask, new] = df.loc[mask, "distance_km"] / (
-            df.loc[mask, old].dt.total_seconds() / 3_600
-        )
+    if len(df):
+        for old, new in [
+            ("elapsed_time", "average_speed_elapsed_kmh"),
+            ("moving_time", "average_speed_moving_kmh"),
+        ]:
+            df[new] = pd.NA
+            mask = df[old].dt.total_seconds() > 0
+            df.loc[mask, new] = df.loc[mask, "distance_km"] / (
+                df.loc[mask, old].dt.total_seconds() / 3_600
+            )
 
-    df["date"] = df["start"].dt.date
-    df["year"] = df["start"].dt.year
-    df["month"] = df["start"].dt.month
-    df["day"] = df["start"].dt.day
-    df["week"] = df["start"].dt.isocalendar().week
-    df["day_of_week"] = df["start"].dt.day_of_week
-    df["iso_year"] = df["start"].dt.isocalendar().year
-    df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
-    df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
+        df["date"] = df["start"].dt.date
+        df["year"] = df["start"].dt.year
+        df["month"] = df["start"].dt.month
+        df["day"] = df["start"].dt.day
+        df["week"] = df["start"].dt.isocalendar().week
+        df["day_of_week"] = df["start"].dt.day_of_week
+        df["iso_year"] = df["start"].dt.isocalendar().year
+        df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
+        df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
 
-    df.index = df["id"]
+        df.index = df["id"]
 
     return df
 
