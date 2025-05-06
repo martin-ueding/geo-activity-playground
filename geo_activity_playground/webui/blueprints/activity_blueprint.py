@@ -111,11 +111,14 @@ def make_activity_blueprint(
                 == activity.id
             )
             for zoom in sorted(config.explorer_zoom_levels)
+            if not tile_visit_accessor.tile_state["tile_history"][zoom].empty
         }
 
         new_tiles_geojson = {}
         new_tiles_per_zoom = {}
         for zoom in sorted(config.explorer_zoom_levels):
+            if tile_visit_accessor.tile_state["tile_history"][zoom].empty:
+                continue
             new_tiles = tile_visit_accessor.tile_state["tile_history"][zoom].loc[
                 tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
                 == activity.id
