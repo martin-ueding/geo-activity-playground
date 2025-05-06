@@ -94,7 +94,7 @@
             }).addTo(map);
 
             let geojson = L.geoJSON({{ color_line_geojson| safe }}, {
-                style: function (feature) { return { color: feature.properties.color } }
+                style: function (feature) { return { color: feature.properties.color ? feature.properties.color : 'red' } }
             }).addTo(map)
             map.fitBounds(geojson.getBounds());
 
@@ -134,6 +134,7 @@
             }
         </style>
 
+        {% if line_color_bar %}
         <div>
             {% for value, color in line_color_bar.colors %}
             <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ value }}</span>
@@ -153,6 +154,7 @@
                 </select>
             </form>
         </div>
+        {% endif %}
     </div>
 </div>
 

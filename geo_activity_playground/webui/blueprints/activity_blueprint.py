@@ -144,25 +144,32 @@ def make_activity_blueprint(
 
         context = {
             "activity": activity,
-            "line_json": line_json,
-            "distance_time_plot": distance_time_plot(time_series),
-            "color_line_geojson": make_geojson_color_line(
-                time_series, line_color_column
-            ),
-            "speed_time_plot": speed_time_plot(time_series),
-            "speed_distribution_plot": speed_distribution_plot(time_series),
+            "color_line_geojson": line_json,
             "similar_activites": similar_activities,
-            "line_color_bar": make_color_bar(
-                time_series[line_color_column],
-                line_color_columns_avail[line_color_column].format,
-            ),
-            "date": activity.start.date(),
-            "time": activity.start.time(),
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
-            "line_color_column": line_color_column,
-            "line_color_columns_avail": line_color_columns_avail,
         }
+
+        if not pd.isna(time_series["time"]).all():
+            context.update(
+                {
+                    "distance_time_plot": distance_time_plot(time_series),
+                    "color_line_geojson": make_geojson_color_line(
+                        time_series, line_color_column
+                    ),
+                    "speed_time_plot": speed_time_plot(time_series),
+                    "speed_distribution_plot": speed_distribution_plot(time_series),
+                    "line_color_bar": make_color_bar(
+                        time_series[line_color_column],
+                        line_color_columns_avail[line_color_column].format,
+                    ),
+                    "date": activity.start.date(),
+                    "time": activity.start.time(),
+                    "line_color_column": line_color_column,
+                    "line_color_columns_avail": line_color_columns_avail,
+                }
+            )
+
         if (
             heart_zones := _extract_heart_rate_zones(
                 time_series, heart_rate_zone_computer
