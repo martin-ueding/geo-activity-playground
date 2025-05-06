@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from .missing_values import some
 
@@ -17,3 +18,7 @@ def test_float() -> None:
 
 def test_integer() -> None:
     assert some(1) == 1
+
+
+def test_nat() -> None:
+    assert some(pd.NaT) == None

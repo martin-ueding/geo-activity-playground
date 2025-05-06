@@ -8,8 +8,6 @@ import pandas as pd
 def some(value: Any) -> Optional[Any]:
     if value is None:
         return None
-    elif np.isnan(value):
-        return None
     elif pd.isna(value):
         return None
     else:
