@@ -23,7 +23,7 @@ Fixed:
 - Make entry page robust against routes without a start.
 - Make search page robust against routes without time information.
 - Make activity page robust against missing tiles. ([GH-261](https://github.com/martin-ueding/geo-activity-playground/issues/261))
-- Make activity page robust against routes.
+- Make activity page robust against routes. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
 
 ## 0.43.0 — 2025-04-27
 
