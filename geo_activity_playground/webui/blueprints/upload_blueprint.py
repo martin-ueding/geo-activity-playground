@@ -1,6 +1,7 @@
 import os
 import pathlib
 
+import sqlalchemy
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -10,7 +11,10 @@ from flask import url_for
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
+from ...core.datamodel import DB
+from ...core.datamodel import Kind
 from ...core.enrichment import populate_database_from_extracted
+from ...core.tasks import work_tracker_path
 from ...explorer.tile_visits import compute_tile_evolution
 from ...explorer.tile_visits import compute_tile_visits_new
 from ...explorer.tile_visits import TileVisitAccessor
@@ -114,6 +118,13 @@ def scan_for_activities(
     populate_database_from_extracted(config)
 
     if len(repository) > 0:
+        kinds = DB.session.scalars(sqlalchemy.select(Kind)).all()
+        if all(kind.consider_for_achievements == False for kind in kinds):
+            for kind in kinds:
+                kind.consider_for_achievements = True
+            DB.session.commit()
+            tile_visit_accessor.reset()
+            work_tracker_path("tile-state").unlink()
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
