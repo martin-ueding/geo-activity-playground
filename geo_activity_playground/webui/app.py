@@ -8,6 +8,7 @@ import secrets
 import shutil
 import urllib.parse
 
+import pandas as pd
 import sqlalchemy
 from flask import Flask
 from flask import request
@@ -105,15 +106,25 @@ def web_ui_main(
 
     @app.template_filter()
     def dt(value: datetime.datetime):
-        return value.strftime("%Y-%m-%d %H:%M")
+        if pd.isna(value):
+            return "—"
+        else:
+            return value.strftime("%Y-%m-%d %H:%M")
 
     @app.template_filter()
     def td(v: datetime.timedelta):
-        seconds = v.total_seconds()
-        h = int(seconds // 3600)
-        m = int(seconds // 60 % 60)
-        s = int(seconds // 1 % 60)
-        return f"{h}:{m:02d}:{s:02d}"
+        if pd.isna(v):
+            return "—"
+        else:
+            seconds = v.total_seconds()
+            h = int(seconds // 3600)
+            m = int(seconds // 60 % 60)
+            s = int(seconds // 1 % 60)
+            return f"{h}:{m:02d}:{s:02d}"
+
+    @app.template_filter()
+    def isna(value):
+        return pd.isna(value)
 
     authenticator = Authenticator(config_accessor())
     search_query_history = SearchQueryHistory(config_accessor, authenticator)

@@ -21,6 +21,7 @@ Fixed:
 
 - Handle NaT (not a time) values gracefully. ([GH-268](https://github.com/martin-ueding/geo-activity-playground/issues/268))
 - Make entry page robust against routes without a start.
+- Make search page robust against routes without time information.
 
 ## 0.43.0 — 2025-04-27
 

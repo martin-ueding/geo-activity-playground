@@ -31,7 +31,11 @@
             </td>
             <td>{{ '%.1f' % activity["distance_km"] }} km</td>
             <td>{{ activity.elapsed_time|td }}</td>
-            <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
+            <td>
+                {% if not activity.average_speed_moving_kmh|isna %}
+                {{ activity.average_speed_moving_kmh|round(1) }}
+                {% endif %}
+            </td>
             <td>{{ activity["equipment"] }}</td>
             <td>{{ activity['kind'] }}</td>
         </tr>
