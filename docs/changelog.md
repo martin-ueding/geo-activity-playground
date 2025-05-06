@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Handle NaT (not a time) values gracefully. ([GH-268](https://github.com/martin-ueding/geo-activity-playground/issues/268))
+
 ## 0.43.0 — 2025-04-27
 
 Added:
