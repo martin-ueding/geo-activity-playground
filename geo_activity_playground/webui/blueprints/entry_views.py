@@ -37,7 +37,10 @@ def register_entry_views(
 
             context["latest_activities"] = collections.defaultdict(list)
             for activity in DB.session.scalars(
-                sqlalchemy.select(Activity).order_by(Activity.start.desc()).limit(100)
+                sqlalchemy.select(Activity)
+                .where(Activity.start.is_not(None))
+                .order_by(Activity.start.desc())
+                .limit(100)
             ):
                 context["latest_activities"][activity.start.date()].append(
                     {

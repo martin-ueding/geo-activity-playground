@@ -20,6 +20,7 @@ Types of changes
 Fixed:
 
 - Handle NaT (not a time) values gracefully. ([GH-268](https://github.com/martin-ueding/geo-activity-playground/issues/268))
+- Make entry page robust against routes without a start.
 
 ## 0.43.0 — 2025-04-27
 
