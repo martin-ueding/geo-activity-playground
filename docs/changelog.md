@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 0.43.1 — 2025-05-06
 
 Fixed:
 
@@ -26,7 +26,7 @@ Fixed:
 - Make activity page robust against routes. ([GH-266](https://github.com/martin-ueding/geo-activity-playground/issues/266))
 - Enforce that at least one activity kind is considered for achievements. ([GH-261](https://github.com/martin-ueding/geo-activity-playground/issues/261))
 
-## 0.43.0 — 2025-04-27
+## Version 0.43.0 — 2025-04-27
 
 Added:
 
