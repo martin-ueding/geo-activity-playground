@@ -95,16 +95,18 @@ def make_settings_blueprint(
     def index():
         return render_template("settings/index.html.j2")
 
-    @blueprint.route("/admin-password")
+    @blueprint.route("/admin-password", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def admin_password() -> Response:
         if request.method == "POST":
             config_accessor().upload_password = request.form["password"]
             config_accessor.save()
             flasher.flash_message("Updated admin password.", FlashTypes.SUCCESS)
-        return render_template(
-            "settings/admin-password.html.j2",
-            password=config_accessor().upload_password,
+        return Response(
+            render_template(
+                "settings/admin-password.html.j2",
+                password=config_accessor().upload_password,
+            )
         )
 
     @blueprint.route("/color-schemes", methods=["GET", "POST"])

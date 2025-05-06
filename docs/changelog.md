@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Version 0.43.2 — 2025-05-06
+
+Fixed:
+
+- Allow POST request to `/settings/admin-password`. ([GH-269](https://github.com/martin-ueding/geo-activity-playground/issues/269))
+
 ## Version 0.43.1 — 2025-05-06
 
 Fixed:
