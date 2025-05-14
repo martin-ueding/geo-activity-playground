@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed
+
+- Fix adding of new equipment. ([GH-272](https://github.com/martin-ueding/geo-activity-playground/issues/272))
+
 ## Version 0.43.2 — 2025-05-06
 
 Fixed:
