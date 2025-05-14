@@ -124,7 +124,7 @@ def scan_for_activities(
                 kind.consider_for_achievements = True
             DB.session.commit()
             tile_visit_accessor.reset()
-            work_tracker_path("tile-state").unlink()
+            work_tracker_path("tile-state").unlink(missing_ok=True)
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()

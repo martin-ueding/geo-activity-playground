@@ -21,6 +21,7 @@ Fixed
 
 - Fix adding of new equipment. ([GH-272](https://github.com/martin-ueding/geo-activity-playground/issues/272))
 - Fix adding of new activity kind. ([GH-270](https://github.com/martin-ueding/geo-activity-playground/issues/270))
+- Gracefully handle case when no activity kinds are considered for achievements but no prior tiles have been extracted. ([GH-274](https://github.com/martin-ueding/geo-activity-playground/issues/274))
 
 ## Version 0.43.2 — 2025-05-06
 
