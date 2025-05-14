@@ -20,6 +20,7 @@ Types of changes
 Fixed
 
 - Fix adding of new equipment. ([GH-272](https://github.com/martin-ueding/geo-activity-playground/issues/272))
+- Fix adding of new activity kind. ([GH-270](https://github.com/martin-ueding/geo-activity-playground/issues/270))
 
 ## Version 0.43.2 — 2025-05-06
 
