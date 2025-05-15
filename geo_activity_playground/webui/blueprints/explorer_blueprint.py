@@ -212,7 +212,8 @@ def make_explorer_blueprint(
             width = 256 // factor
             for xo in range(factor):
                 for yo in range(factor):
-                    if (x * factor + xo, y * factor + yo) not in tile_visits:
+                    tile = (x * factor + xo, y * factor + yo)
+                    if tile not in tile_visits:
                         map_tile[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
                         ] = grayscale[

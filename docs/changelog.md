@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 0.43.3 — 2025-05-15
 
 Fixed
 
