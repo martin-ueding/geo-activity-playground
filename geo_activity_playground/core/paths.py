@@ -65,7 +65,7 @@ activity_enriched_time_series_dir = dir_wrapper(_activity_enriched_time_series_d
 tiles_per_time_series = dir_wrapper(_tiles_per_time_series)
 strava_api_dir = dir_wrapper(_strava_api_dir)
 activity_meta_override_dir = dir_wrapper(_activity_meta_override_dir)
-time_series_dir = dir_wrapper(_time_series_dir)
+TIME_SERIES_DIR = dir_wrapper(_time_series_dir)
 PHOTOS_DIR = dir_wrapper(_photos_dir)
 
 activities_file = file_wrapper(_activities_file)

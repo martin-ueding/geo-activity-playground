@@ -13,14 +13,19 @@ from flask import render_template
 from flask import request
 from flask import Response
 from flask import url_for
+from tqdm import tqdm
 
 from ...core.config import ConfigAccessor
+from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
+from ...core.enrichment import _embellish_single_time_series
+from ...core.enrichment import update_via_time_series
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.paths import _activity_enriched_dir
+from ...core.paths import TIME_SERIES_DIR
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..flasher import Flasher
@@ -348,8 +353,19 @@ def make_settings_blueprint(
             config_accessor().time_diff_threshold_seconds = threshold
             config_accessor.save()
             flash(f"Threshold set to {threshold}.", category="success")
-            shutil.rmtree(_activity_enriched_dir)
-            return redirect(url_for("upload.reload"))
+            for activity in tqdm(
+                DB.session.scalars(sqlalchemy.select(Activity)).all(),
+                desc="Recomputing segments",
+            ):
+                time_series = _embellish_single_time_series(
+                    activity.raw_time_series,
+                    None,
+                    threshold,
+                )
+                update_via_time_series(activity, time_series)
+                enriched_time_series_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
+                time_series.to_parquet(enriched_time_series_path)
+                DB.session.commit()
         return render_template(
             "settings/segmentation.html.j2",
             threshold=config_accessor().time_diff_threshold_seconds,

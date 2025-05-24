@@ -18,7 +18,7 @@ from .datamodel import get_or_make_kind
 from .missing_values import some
 from .paths import activity_extracted_meta_dir
 from .paths import activity_extracted_time_series_dir
-from .paths import time_series_dir
+from .paths import TIME_SERIES_DIR
 from .tiles import compute_tile_float
 from .time_conversion import convert_to_datetime_ns
 
@@ -101,7 +101,7 @@ def populate_database_from_extracted(config: Config) -> None:
             )
             raise
 
-        enriched_time_series_path = time_series_dir() / f"{activity.id}.parquet"
+        enriched_time_series_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
         time_series.to_parquet(enriched_time_series_path)
 
 

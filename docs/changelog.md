@@ -23,6 +23,10 @@ Added:
 - Add user defined colors for activity tags. ([GH-276](https://github.com/martin-ueding/geo-activity-playground/issues/276))
 - Add download of original file (after login). ([GH-271](https://github.com/martin-ueding/geo-activity-playground/issues/271))
 
+Fixed:
+
+- Fix change of track segmentation threshold. ([GH-273](https://github.com/martin-ueding/geo-activity-playground/issues/273))
+
 ## Version 0.43.3 — 2025-05-15
 
 Fixed:

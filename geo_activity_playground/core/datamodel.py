@@ -23,7 +23,7 @@ from sqlalchemy.orm import relationship
 from .config import Config
 from .paths import activity_extracted_meta_dir
 from .paths import activity_extracted_time_series_dir
-from .paths import time_series_dir
+from .paths import TIME_SERIES_DIR
 
 
 logger = logging.getLogger(__name__)
@@ -143,7 +143,7 @@ class Activity(DB.Model):
 
     @property
     def raw_time_series(self) -> pd.DataFrame:
-        path = time_series_dir() / f"{self.id}.parquet"
+        path = TIME_SERIES_DIR() / f"{self.id}.parquet"
         try:
             time_series = pd.read_parquet(path)
             if "altitude" in time_series.columns:
@@ -164,7 +164,7 @@ class Activity(DB.Model):
 
     def delete_data(self) -> None:
         for path in [
-            time_series_dir() / f"{self.id}.parquet",
+            TIME_SERIES_DIR() / f"{self.id}.parquet",
             activity_extracted_meta_dir() / f"{self.upstream_id}.pickle",
             activity_extracted_time_series_dir() / f"{self.upstream_id}.pickle",
         ]:
