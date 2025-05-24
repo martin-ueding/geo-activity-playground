@@ -15,9 +15,15 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add delete button for activities (with an “Are you sure?” confirmation). ([GH-278](https://github.com/martin-ueding/geo-activity-playground/issues/278))
+
 ## Version 0.43.3 — 2025-05-15
 
-Fixed
+Fixed:
 
 - Fix adding of new equipment. ([GH-272](https://github.com/martin-ueding/geo-activity-playground/issues/272))
 - Fix adding of new activity kind. ([GH-270](https://github.com/martin-ueding/geo-activity-playground/issues/270))
