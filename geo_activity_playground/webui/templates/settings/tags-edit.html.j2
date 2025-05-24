@@ -10,6 +10,11 @@
         <input type="text" class="form-control" id="tag" name="tag" value="{{ tag.tag }}" />
     </div>
 
+    <div class="mb-3">
+        <label for="color" class="form-label">Color</label>
+        <input type="color" class="form-control" id="color" name="color" value="{{ tag.color or '#0d6efd' }}" />
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
 

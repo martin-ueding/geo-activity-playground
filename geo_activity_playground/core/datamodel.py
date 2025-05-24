@@ -177,6 +177,7 @@ class Tag(DB.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     tag: Mapped[str] = mapped_column(String, unique=True)
+    color: Mapped[str] = mapped_column(String, nullable=True)
 
     activities: Mapped[list[Activity]] = relationship(
         secondary=activity_tag_association_table, back_populates="tags"

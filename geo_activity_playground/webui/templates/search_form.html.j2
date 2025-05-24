@@ -103,7 +103,7 @@
                                                 value="{{ tag.id }}" id="tag_{{ tag.id }}" {% if tag.id in query.tag %}
                                                 checked {% endif %}>
                                             <label class="form-check-label" for="tag_{{ tag.id }}">
-                                                {{ tag.tag }}
+                                                {{ activity_tag(tag) }}
                                             </label>
                                         </div>
                                         {% endfor %}

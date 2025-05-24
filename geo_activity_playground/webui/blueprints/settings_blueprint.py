@@ -424,6 +424,7 @@ def make_settings_blueprint(
         tag = DB.session.get_one(Tag, id)
         if request.method == "POST":
             tag.tag = request.form["tag"]
+            tag.color = request.form["color"]
             DB.session.commit()
             return redirect(url_for(".tags_list"))
         else:

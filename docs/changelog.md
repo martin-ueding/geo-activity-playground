@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add delete button for activities (with an “Are you sure?” confirmation). ([GH-278](https://github.com/martin-ueding/geo-activity-playground/issues/278))
+- Add user defined colors for activity tags. ([GH-276](https://github.com/martin-ueding/geo-activity-playground/issues/276))
 
 ## Version 0.43.3 — 2025-05-15
 

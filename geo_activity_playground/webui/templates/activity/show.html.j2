@@ -24,7 +24,7 @@
             <dt>Tags</dt>
             <dd>
                 {% for tag in activity.tags %}
-                <span class="badge text-bg-primary">{{ tag.tag }}</span>
+                {{ activity_tag(tag) }}
                 {% endfor %}
             </dd>
             {% endif %}

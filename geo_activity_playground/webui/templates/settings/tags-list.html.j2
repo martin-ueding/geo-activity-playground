@@ -7,7 +7,7 @@
 <ul>
     {% for tag in tags %}
     <li>
-        <b>{{ tag.tag }}</b>
+        {{ activity_tag(tag) }}
         <a class="btn btn-sm btn-primary" href="{{ url_for('.tags_edit', id=tag.id) }}">Edit</a>
     </li>
     {% endfor %}
