@@ -78,7 +78,7 @@
             <dt>Upstream ID</dt>
             <dd>{{ activity.upstream_id }}</dd>
             <dt>Source path</dt>
-            <dd>{{ activity.path }}</dd>
+            <dd><a href="{{ url_for('.download_original', id=activity.id) }}">{{ activity.path }}</a></dd>
         </dl>
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit</a>

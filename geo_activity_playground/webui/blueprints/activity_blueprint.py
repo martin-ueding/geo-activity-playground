@@ -1,6 +1,7 @@
 import datetime
 import io
 import logging
+import pathlib
 import re
 from typing import Optional
 
@@ -439,6 +440,18 @@ def make_activity_blueprint(
         DB.session.delete(activity)
         DB.session.commit()
         return redirect(url_for("index"))
+
+    @blueprint.route("/download-original/<id>")
+    @needs_authentication(authenticator)
+    def download_original(id: int):
+        activity = DB.session.get_one(Activity, id)
+        path = pathlib.Path(activity.path)
+        with open(path) as f:
+            return Response(
+                f.read(),
+                mimetype="application/octet-stream",
+                headers={"Content-disposition": f'attachment; filename="{path.name}"'},
+            )
 
     return blueprint
 
