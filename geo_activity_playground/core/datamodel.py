@@ -21,6 +21,8 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from .config import Config
+from .paths import activity_extracted_meta_dir
+from .paths import activity_extracted_time_series_dir
 from .paths import time_series_dir
 
 
@@ -159,6 +161,14 @@ class Activity(DB.Model):
             ]
         else:
             return self.raw_time_series
+
+    def delete_data(self) -> None:
+        for path in [
+            time_series_dir() / f"{self.id}.parquet",
+            activity_extracted_meta_dir() / f"{self.upstream_id}.pickle",
+            activity_extracted_time_series_dir() / f"{self.upstream_id}.pickle",
+        ]:
+            path.unlink(missing_ok=True)
 
 
 class Tag(DB.Model):

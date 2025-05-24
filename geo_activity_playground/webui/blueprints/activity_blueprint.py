@@ -431,6 +431,15 @@ def make_activity_blueprint(
             color_line_geojson=geojson.dumps(fc),
         )
 
+    @blueprint.route("/delete/<id>")
+    @needs_authentication(authenticator)
+    def delete(id: int):
+        activity = DB.session.get_one(Activity, id)
+        activity.delete_data()
+        DB.session.delete(activity)
+        DB.session.commit()
+        return redirect(url_for("index"))
+
     return blueprint
 
 

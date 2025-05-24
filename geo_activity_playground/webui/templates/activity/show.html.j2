@@ -75,12 +75,16 @@
 
             <dt>ID</dt>
             <dd>{{ activity.id }}</dd>
+            <dt>Upstream ID</dt>
+            <dd>{{ activity.upstream_id }}</dd>
             <dt>Source path</dt>
             <dd>{{ activity.path }}</dd>
         </dl>
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit</a>
         <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">Trim</a>
+        <a class="btn btn-small btn-danger" href="{{ url_for('.delete', id=activity.id) }}"
+            onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
     </div>
     <div class="col-sm-12 col-md-8">
         <div id="activity-map" style="height: 500px;" class="mb-3"></div>
