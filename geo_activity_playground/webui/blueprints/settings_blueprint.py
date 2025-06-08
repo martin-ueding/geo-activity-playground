@@ -277,7 +277,7 @@ def make_settings_blueprint(
         if request.method == "POST":
             zone_names = request.form.getlist("zone_name")
             zone_geojsons = request.form.getlist("zone_geojson")
-            strava_login_helper.save_privacy_zones(zone_names, zone_geojsons)
+            save_privacy_zones(zone_names, zone_geojsons, config_accessor)
 
             assert len(zone_names) == len(zone_geojsons)
             new_zone_config = {}
@@ -411,6 +411,7 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def strava_callback():
         code = request.args.get("code", type=str)
+        assert code
         strava_login_helper.save_strava_code(code)
         return redirect(url_for(".strava"))
 
@@ -495,3 +496,65 @@ class StravaLoginHelper:
         self._config_accessor().strava_client_code = code
         self._config_accessor.save()
         flash("Connected to Strava API", category="success")
+
+
+def save_privacy_zones(
+    zone_names: list[str], zone_geojsons: list[str], config_accessor: ConfigAccessor
+) -> None:
+    assert len(zone_names) == len(zone_geojsons)
+    new_zone_config = {}
+
+    for zone_name, zone_geojson_str in zip(zone_names, zone_geojsons):
+        if not zone_name or not zone_geojson_str:
+            continue
+
+        try:
+            zone_geojson = json.loads(zone_geojson_str)
+        except json.decoder.JSONDecodeError as e:
+            flash(
+                f"Could not parse GeoJSON for {zone_name} due to the following error: {e}"
+            )
+            continue
+
+        if not zone_geojson["type"] == "FeatureCollection":
+            flash(
+                f"Pasted GeoJSON for {zone_name} must be of type 'FeatureCollection'.",
+                category="danger",
+            )
+            continue
+
+        features = zone_geojson["features"]
+
+        if not len(features) == 1:
+            flash(
+                f"Pasted GeoJSON for {zone_name} must contain exactly one feature. You cannot have multiple shapes for one privacy zone",
+                category="danger",
+            )
+            continue
+
+        feature = features[0]
+        geometry = feature["geometry"]
+
+        if not geometry["type"] == "Polygon":
+            flash(
+                f"Geometry for {zone_name} is not a polygon. You need to create a polygon (or circle or rectangle).",
+                category="danger",
+            )
+            continue
+
+        coordinates = geometry["coordinates"]
+
+        if not len(coordinates) == 1:
+            flash(
+                f"Polygon for {zone_name} consists of multiple polygons. Please supply a simple one.",
+                category="danger",
+            )
+            continue
+
+        points = coordinates[0]
+
+        new_zone_config[zone_name] = points
+
+    config_accessor().privacy_zones = new_zone_config
+    config_accessor.save()
+    flash("Updated privacy zones.", category="success")
