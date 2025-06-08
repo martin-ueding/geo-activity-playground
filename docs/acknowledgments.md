@@ -80,15 +80,16 @@ Strava has an API, and with [stravalib](https://stravalib.readthedocs.io/en/late
 
 ## Strava local heatmap
 
-https://github.com/remisalmon/Strava-local-heatmap
+The [Strava local heatmap](https://github.com/remisalmon/Strava-local-heatmap) project provides a script that renders heatmap files from GPX files locally. It has a gorgeous color scheme with a few nifty tricks. The heatmap in this project is inspired by this project that doesn't share the code.
 
 ## tcxreader
 
-https://github.com/alenrajsp/tcxreader
+Support for the TCX file format is provided via [tcxreader](https://github.com/alenrajsp/tcxreader).
 
 ## Vega & Altair
 
-https://altair-viz.github.io/index.html
-https://vega.github.io/vega/
+Creating plots that look nice in a browser is hard and I don't like writing JavaScript. Fortunately there is [Vega](https://vega.github.io/vega/) for the beautiful plots and [Altair](https://altair-viz.github.io/index.html) as a Python package that generates the necessary JavaScript for me.
 
 ## Velo Viewer
+
+I never used [Velo Viewer](https://veloviewer.com/) myself but many people say good things about it. It has so many statistics and inspired many more projects, including this one.

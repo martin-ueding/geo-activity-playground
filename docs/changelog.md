@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add developer documentation about Alembic migrations.
+- Write a bit more about the acknowledgments.
 
 Changed:
 
