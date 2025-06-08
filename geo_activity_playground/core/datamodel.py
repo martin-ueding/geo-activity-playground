@@ -29,6 +29,9 @@ from .paths import TIME_SERIES_DIR
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_UNKNOWN_NAME = "Unknown"
+
+
 class ActivityMeta(TypedDict):
     average_speed_elapsed_kmh: float
     average_speed_moving_kmh: float

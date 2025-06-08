@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from ..core.config import Config
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import DEFAULT_UNKNOWN_NAME
 from ..core.paths import activity_extracted_dir
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
@@ -84,8 +85,8 @@ def import_from_directory(
             # https://stackoverflow.com/a/74718395/653152
             name=path.name.removesuffix("".join(path.suffixes)),
             path=str(path),
-            kind="Unknown",
-            equipment="Unknown",
+            kind=DEFAULT_UNKNOWN_NAME,
+            equipment=DEFAULT_UNKNOWN_NAME,
             consider_for_achievements=True,
         )
         activity_meta.update(activity_meta_from_file)

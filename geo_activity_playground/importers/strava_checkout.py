@@ -13,6 +13,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import DEFAULT_UNKNOWN_NAME
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
 from ..core.paths import strava_last_activity_date_path
@@ -277,7 +278,7 @@ def convert_strava_checkout(
             nan_as_none(row["Activity Gear"])
             or nan_as_none(row["Bike"])
             or nan_as_none(row["Gear"])
-            or ""
+            or DEFAULT_UNKNOWN_NAME
         )
         activity_file = checkout_path / row["Filename"]
 

@@ -27,6 +27,7 @@ Fixed:
 - Fix redirect after uploading a new activity. ([GH-286](https://github.com/martin-ueding/geo-activity-playground/issues/286))
 - Fix filter application to heatmap. ([GH-285](https://github.com/martin-ueding/geo-activity-playground/issues/285))
 - Attempt to fix equipment and summary page when activities without date are present. ([GH-282](https://github.com/martin-ueding/geo-activity-playground/issues/282))
+- Set unknown equipment in Strava Checkout import to “Unknown”. ([GH-275](https://github.com/martin-ueding/geo-activity-playground/issues/275))
 
 ## Version 0.44.0 — 2025-05-24
 
