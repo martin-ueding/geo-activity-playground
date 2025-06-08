@@ -103,10 +103,12 @@
 
 <div class="tab-content mb-3" id="myTabContent">
     {% for year, plot in plot_distance_heatmaps.items() %}
+    {% if year %}
     <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="heatmap-{{ year }}-pane" role="tabpanel"
         aria-labelledby="heatmap-{{ year }}" tabindex="0">
         {{ vega_direct("plot_distance_heatmap_%d"|format(year), plot) }}
     </div>
+    {% endif %}
     {% endfor %}
 </div>
 
