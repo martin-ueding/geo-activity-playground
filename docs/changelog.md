@@ -24,6 +24,7 @@ Added:
 Fixed:
 
 - Saving privacy zones now works again. ([GH-287](https://github.com/martin-ueding/geo-activity-playground/issues/287))
+- Fix redirect after uploading a new activity. ([GH-286](https://github.com/martin-ueding/geo-activity-playground/issues/286))
 
 ## Version 0.44.0 — 2025-05-24
 

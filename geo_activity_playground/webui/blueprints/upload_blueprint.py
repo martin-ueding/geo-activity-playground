@@ -11,6 +11,7 @@ from flask import url_for
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
+from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Kind
 from ...core.enrichment import populate_database_from_extracted
@@ -78,9 +79,12 @@ def make_upload_blueprint(
                 config,
                 skip_strava=True,
             )
-            activity_id = get_file_hash(target_path)
-            flash(f"Activity was saved with ID {activity_id}.", "success")
-            return redirect(f"/activity/{activity_id}")
+            latest_activity = DB.session.scalar(
+                sqlalchemy.select(Activity).order_by(Activity.id.desc()).limit(1)
+            )
+            assert latest_activity is not None
+            flash(f"Activity was saved with ID {latest_activity.id}.", "success")
+            return redirect(f"/activity/{latest_activity.id}")
 
     @blueprint.route("/refresh")
     @needs_authentication(authenticator)
