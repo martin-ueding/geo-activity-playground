@@ -28,6 +28,7 @@ Fixed:
 - Fix filter application to heatmap. ([GH-285](https://github.com/martin-ueding/geo-activity-playground/issues/285))
 - Attempt to fix equipment and summary page when activities without date are present. ([GH-282](https://github.com/martin-ueding/geo-activity-playground/issues/282))
 - Set unknown equipment in Strava Checkout import to “Unknown”. ([GH-275](https://github.com/martin-ueding/geo-activity-playground/issues/275))
+- Fix Eddington number computation. ([GH-279](https://github.com/martin-ueding/geo-activity-playground/issues/279))
 
 ## Version 0.44.0 — 2025-05-24
 

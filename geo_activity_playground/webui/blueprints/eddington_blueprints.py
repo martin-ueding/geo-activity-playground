@@ -26,7 +26,12 @@ def register_eddington_blueprint(
     @blueprint.route("/")
     def distance():
         return _render_eddington_template(
-            repository, request, search_query_history, "distance", column_distance, [1]
+            repository,
+            request,
+            search_query_history,
+            "distance",
+            column_distance,
+            [1],
         )
 
     @blueprint.route("/elevation_gain")
@@ -63,6 +68,10 @@ def _render_eddington_template(
         .dropna(subset=["start", column_name])
         .copy()
     )
+
+    assert (
+        len(activities) > 0
+    ), "The filter has selected zero elements, that cannot work here."
 
     activities["year"] = [start.year for start in activities["start"]]
     activities["date"] = [start.date() for start in activities["start"]]
@@ -111,24 +120,24 @@ def _render_eddington_template(
     )
 
 
-def _get_values_per_group(grouped, columnName, divisor) -> tuple[int, pd.DataFrame]:
+def _get_values_per_group(grouped, column_name, divisor) -> tuple[int, pd.DataFrame]:
     sum_per_group = grouped.apply(
-        lambda group: int(sum(group[columnName])), include_groups=False
+        lambda group: int(sum(group[column_name])), include_groups=False
     )
     counts = dict(zip(*np.unique(sorted(sum_per_group), return_counts=True)))
     eddington = pd.DataFrame(
-        {columnName: d, "count": counts.get(d, 0)}
+        {column_name: d, "count": counts.get(d, 0)}
         for d in range(max(counts.keys()) + 1)
     )
     eddington["total"] = eddington["count"][::-1].cumsum()[::-1]
-    eddington[f"{columnName}_div"] = eddington[columnName] // divisor
+    eddington[f"{column_name}_div"] = eddington[column_name] // divisor
     en = (
-        eddington.loc[eddington["total"] >= eddington[f"{columnName}_div"]][
-            "total"
+        eddington.loc[eddington["total"] >= eddington[f"{column_name}_div"]][
+            f"{column_name}_div"
         ].iloc[-1]
         * divisor
     )
-    eddington["missing"] = eddington[f"{columnName}_div"] - eddington["total"]
+    eddington["missing"] = eddington[f"{column_name}_div"] - eddington["total"]
 
     return en, eddington
 
