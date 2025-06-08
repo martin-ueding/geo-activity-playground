@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add config option `reliable_elevation_measurements` (defaulting to true) that allows hiding the elevation gain data if the user knows that their measurement of elevation data is unreliable.
+
 ## Version 0.44.0 — 2025-05-24
 
 Added:

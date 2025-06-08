@@ -38,6 +38,7 @@ class Config:
     privacy_zones: dict[str, list[list[float]]] = dataclasses.field(
         default_factory=dict
     )
+    reliable_elevation_measurements: bool = True
     sharepic_suppressed_fields: list[str] = dataclasses.field(default_factory=list)
     strava_client_id: int = 131693
     strava_client_secret: str = "0ccc0100a2c218512a7ef0cea3b0e322fb4b4365"

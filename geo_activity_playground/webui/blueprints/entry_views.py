@@ -31,9 +31,11 @@ def register_entry_views(
             context["distance_last_30_days_plot"] = _last_30_days_meta_plot(
                 repository.meta, kind_scale, column_distance
             )
-            context["elevation_gain_last_30_days_plot"] = _last_30_days_meta_plot(
-                repository.meta, kind_scale, column_elevation_gain
-            )
+
+            if config.reliable_elevation_measurements:
+                context["elevation_gain_last_30_days_plot"] = _last_30_days_meta_plot(
+                    repository.meta, kind_scale, column_elevation_gain
+                )
 
             context["latest_activities"] = collections.defaultdict(list)
             for activity in DB.session.scalars(
