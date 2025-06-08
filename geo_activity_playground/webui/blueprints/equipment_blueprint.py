@@ -21,7 +21,7 @@ def make_equipment_blueprint(
         )
 
         # Prepare data for the stacked area chart
-        activities = repository.meta
+        activities = repository.meta.dropna(subset=["start"])
         activities["month"] = (
             activities["start"].dt.to_period("M").apply(lambda r: r.start_time)
         )
