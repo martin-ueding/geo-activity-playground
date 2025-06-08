@@ -25,6 +25,7 @@ Fixed:
 
 - Saving privacy zones now works again. ([GH-287](https://github.com/martin-ueding/geo-activity-playground/issues/287))
 - Fix redirect after uploading a new activity. ([GH-286](https://github.com/martin-ueding/geo-activity-playground/issues/286))
+- Fix filter application to heatmap. ([GH-285](https://github.com/martin-ueding/geo-activity-playground/issues/285))
 
 ## Version 0.44.0 — 2025-05-24
 

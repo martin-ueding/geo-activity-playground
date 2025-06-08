@@ -120,7 +120,7 @@ class SearchQuery:
             variables.append(("distance_km_max", self.distance_km_max))
 
         return "&".join(
-            f"{key}={urllib.parse.quote_plus(value)}" for key, value in variables
+            f"{key}={urllib.parse.quote_plus(str(value))}" for key, value in variables
         )
 
 
