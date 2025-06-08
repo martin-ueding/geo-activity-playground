@@ -21,6 +21,10 @@ Added:
 
 - Add developer documentation about Alembic migrations.
 
+Changed:
+
+- Update quad tree picture with a less intrusive watermark.
+
 ## Version 0.45.0 — 2025-06-08
 
 Added:
