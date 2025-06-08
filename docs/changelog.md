@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add developer documentation about Alembic migrations.
+
 ## Version 0.45.0 — 2025-06-08
 
 Added:
