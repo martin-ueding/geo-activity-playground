@@ -4,22 +4,23 @@ This project isn't the only one of its kind. There are a couple of other project
 
 Open source projects:
 
-- [CubeTrek](https://cubetrek.com/)
+- [FitTrackee](https://docs.fittrackee.org/en/index.html): 
+- [CubeTrek](https://cubetrek.com/): Self-hosted server for displaying activities with a focus on elevation data and 3D visualization.
+
+Recording:
+
+- [OpenTracks App](https://opentracksapp.com/): Records activities on Android, available via F-Droid store.
 
 Non-cloud analysis:
 
 - [Running Free by Michael Simons](https://biking.michael-simons.eu/)
 - [Strava local heatmap](https://github.com/remisalmon/Strava-local-heatmap)
 
-Recording:
-
-- [OpenTracks App](https://opentracksapp.com/)
-
 Analysis with cloud data:
 
-- [VeloViewer](https://veloviewer.com/)
-- [Wandrer](https://wandrer.earth/)
-- [Statshunters](https://www.statshunters.com/)
+- [Statshunters](https://www.statshunters.com/): Statistical analysis of activities on Strava.
+- [VeloViewer](https://veloviewer.com/): Statistical analysis of activities on Strava.
+- [Wandrer](https://wandrer.earth/): Tracks which streets were covered, lets you walk all the streets of your city.
 
 Cloud platform for data:
 
