@@ -14,7 +14,13 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Map with explored tiles</h2>
+        <p>You have {{ num_tiles }} explored tiles. There are {{ num_cluster_tiles }} cluster tiles in
+            total. Your largest cluster consists of {{ max_cluster_size }} tiles. Your largest square has size
+            {{ square_size }}².
+        </p>
+        <p>Open the <a
+                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">Square
+                Planner</a> to plan the next extension.</p>
     </div>
 </div>
 

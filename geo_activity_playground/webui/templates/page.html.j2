@@ -94,9 +94,10 @@
                                 Explorer
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('explorer.map', zoom=14) }}">Explorer
+                                <li><a class="dropdown-item" href="{{ url_for('explorer.make_map', zoom=14) }}">Explorer
                                         Tiles (Zoom 14)</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('explorer.map', zoom=17) }}">Squadratinhos
+                                <li><a class="dropdown-item"
+                                        href="{{ url_for('explorer.make_map', zoom=17) }}">Squadratinhos
                                         (Zoom 17)</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('explorer.server_side', zoom=14) }}">Fast
                                         Explorer

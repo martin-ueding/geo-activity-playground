@@ -2,6 +2,7 @@ import datetime
 import io
 import itertools
 import logging
+from collections.abc import Iterable
 from typing import Union
 
 import altair as alt
@@ -60,7 +61,7 @@ def make_explorer_blueprint(
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
     @blueprint.route("/<int:zoom>")
-    def map(zoom: int):
+    def make_map(zoom: int):
         if zoom not in config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
@@ -171,10 +172,10 @@ def make_explorer_blueprint(
         if zoom not in config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
-        tile_evolution_states = tile_visit_accessor.tile_state["evolution_state"]
-        tile_histories = tile_visit_accessor.tile_state["tile_history"]
+        tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        tile_history = tile_visit_accessor.tile_state["tile_history"][zoom]
 
-        medians = tile_histories[zoom].median()
+        medians = tile_history.median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )
@@ -185,20 +186,26 @@ def make_explorer_blueprint(
                 "longitude": median_lon,
                 "bbox": (
                     bounding_box_for_biggest_cluster(
-                        tile_evolution_states[zoom].clusters.values(), zoom
+                        tile_evolution_state.clusters.values(), zoom
                     )
-                    if len(tile_evolution_states[zoom].memberships) > 0
+                    if len(tile_evolution_state.memberships) > 0
                     else {}
                 ),
             },
-            "plot_tile_evolution": plot_tile_evolution(tile_histories[zoom]),
+            "plot_tile_evolution": plot_tile_evolution(tile_history),
             "plot_cluster_evolution": plot_cluster_evolution(
-                tile_evolution_states[zoom].cluster_evolution
+                tile_evolution_state.cluster_evolution
             ),
             "plot_square_evolution": plot_square_evolution(
-                tile_evolution_states[zoom].square_evolution
+                tile_evolution_state.square_evolution
             ),
             "zoom": zoom,
+            "num_tiles": len(tile_history),
+            "num_cluster_tiles": len(tile_evolution_state.memberships),
+            "square_x": tile_evolution_state.square_x,
+            "square_y": tile_evolution_state.square_y,
+            "square_size": tile_evolution_state.max_square_size,
+            "max_cluster_size": max(map(len, tile_evolution_state.clusters.values())),
         }
         return render_template("explorer/server-side.html.j2", **context)
 
@@ -523,7 +530,7 @@ def get_three_color_tiles(
 
 
 def bounding_box_for_biggest_cluster(
-    clusters: list[list[tuple[int, int]]], zoom: int
+    clusters: Iterable[list[tuple[int, int]]], zoom: int
 ) -> str:
     biggest_cluster = max(clusters, key=lambda members: len(members))
     min_x = min(x for x, y in biggest_cluster)
