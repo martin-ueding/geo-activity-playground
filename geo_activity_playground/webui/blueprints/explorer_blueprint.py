@@ -205,6 +205,7 @@ def make_explorer_blueprint(
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> Response:
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
+        evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 
         map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         grayscale = image_transforms["grayscale"].transform_image(map_tile)
@@ -214,17 +215,14 @@ def make_explorer_blueprint(
         cluster_2 = blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
 
         max_cluster_members = max(
-            tile_visit_accessor.tile_state["evolution_state"][zoom].clusters.values(),
+            evolution_state.clusters.values(),
             key=len,
         )
 
         def get_patch(tile_xy) -> np.ndarray:
             if tile_xy in max_cluster_members:
                 return cluster_1
-            elif (
-                tile_xy
-                in tile_visit_accessor.tile_state["evolution_state"][zoom].memberships
-            ):
+            elif tile_xy in evolution_state.memberships:
                 return cluster_2
             elif tile_xy in tile_visits:
                 return explored
@@ -233,13 +231,54 @@ def make_explorer_blueprint(
 
         if z >= zoom:
             factor = 2 ** (z - zoom)
-            tile_xy = (x // factor, y // factor)
+            tile_x = x // factor
+            tile_y = y // factor
+            tile_xy = (tile_x, tile_y)
             result = get_patch(tile_xy)
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
             if y % factor == 0:
                 result[0, :, :] = 0.5
+
+            if (
+                evolution_state.square_x is not None
+                and evolution_state.square_y is not None
+            ):
+                square_line_width = 3
+                square_color = np.array([[[228, 26, 28]]]) / 256
+                if (
+                    x % factor == 0
+                    and tile_x == evolution_state.square_x
+                    and evolution_state.square_y
+                    <= tile_y
+                    < evolution_state.square_y + evolution_state.max_square_size
+                ):
+                    result[:, 0:square_line_width] = blend_color(
+                        result[:, 0:square_line_width], square_color, 0.5
+                    )
+                if (
+                    y % factor == 0
+                    and tile_y == evolution_state.square_y
+                    and evolution_state.square_x
+                    <= tile_x
+                    < evolution_state.square_x + evolution_state.max_square_size
+                ):
+                    result[0:square_line_width, :] = blend_color(
+                        result[0:square_line_width, :], square_color, 0.5
+                    )
+
+                if (
+                    (x + 1) % factor == 0
+                    and (x + 1) // factor
+                    == evolution_state.square_x + evolution_state.max_square_size
+                    and evolution_state.square_y
+                    <= tile_y
+                    < evolution_state.square_y + evolution_state.max_square_size
+                ):
+                    result[:, -square_line_width:] = blend_color(
+                        result[:, -square_line_width:], square_color, 0.5
+                    )
         else:
             result = np.zeros_like(map_tile)
             factor = 2 ** (zoom - z)
