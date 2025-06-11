@@ -2,6 +2,7 @@ import datetime
 import io
 import itertools
 import logging
+from typing import Union
 
 import altair as alt
 import geojson
@@ -41,6 +42,12 @@ from ..authenticator import needs_authentication
 alt.data_transformers.enable("vegafusion")
 
 logger = logging.getLogger(__name__)
+
+
+def blend_color(
+    base: np.ndarray, addition: Union[np.ndarray, float], opacity: float
+) -> np.ndarray:
+    return (1 - opacity) * base + opacity * addition
 
 
 def make_explorer_blueprint(
@@ -202,52 +209,50 @@ def make_explorer_blueprint(
         map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         grayscale = image_transforms["grayscale"].transform_image(map_tile)
         unexplored = grayscale
-        explored = grayscale / 1.3
-        cluster = grayscale.copy()
-        cluster[:, :, 0:1] /= 1.3
+        explored = blend_color(grayscale, 0.0, 0.3)
+        cluster_1 = blend_color(grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3)
+        cluster_2 = blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
+
+        max_cluster_members = max(
+            tile_visit_accessor.tile_state["evolution_state"][zoom].clusters.values(),
+            key=len,
+        )
+
+        def get_patch(tile_xy) -> np.ndarray:
+            if tile_xy in max_cluster_members:
+                return cluster_1
+            elif (
+                tile_xy
+                in tile_visit_accessor.tile_state["evolution_state"][zoom].memberships
+            ):
+                return cluster_2
+            elif tile_xy in tile_visits:
+                return explored
+            else:
+                return unexplored
 
         if z >= zoom:
             factor = 2 ** (z - zoom)
             tile_xy = (x // factor, y // factor)
-            if tile_xy in tile_visits:
-                if (
-                    tile_xy
-                    in tile_visit_accessor.tile_state["evolution_state"][
-                        zoom
-                    ].memberships
-                ):
-                    result = cluster
-                else:
-                    result = explored
-            else:
-                result = unexplored
+            result = get_patch(tile_xy)
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
             if y % factor == 0:
                 result[0, :, :] = 0.5
         else:
-            result = unexplored
+            result = np.zeros_like(map_tile)
             factor = 2 ** (zoom - z)
             width = 256 // factor
             for xo in range(factor):
                 for yo in range(factor):
                     tile_xy = (x * factor + xo, y * factor + yo)
-                    if tile_xy in tile_visits:
-                        result[
-                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = (
-                            cluster
-                            if (
-                                tile_xy
-                                in tile_visit_accessor.tile_state["evolution_state"][
-                                    zoom
-                                ].memberships
-                            )
-                            else explored
-                        )[
-                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ]
+                    patch = get_patch(tile_xy)
+                    result[
+                        yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                    ] = patch[
+                        yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                    ]
                     if width >= 64:
                         result[yo * width, :, :] = 0.5
                         result[:, xo * width, :] = 0.5
@@ -262,7 +267,7 @@ def get_three_color_tiles(
     tile_visits: dict,
     cluster_state: TileEvolutionState,
     zoom: int,
-) -> str:
+) -> dict:
     logger.info("Generate data for explorer tile map …")
     today = datetime.date.today()
     cmap_first = matplotlib.colormaps["plasma"]
