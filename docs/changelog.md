@@ -25,6 +25,7 @@ Added:
 Changed:
 
 - Update quad tree picture with a less intrusive watermark.
+- Make “fast explorer tile mode” much prettier, mark cluster and square.
 
 ## Version 0.45.0 — 2025-06-08
 
