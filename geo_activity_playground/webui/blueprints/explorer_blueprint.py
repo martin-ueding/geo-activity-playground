@@ -227,18 +227,30 @@ def make_explorer_blueprint(
             if y % factor == 0:
                 result[0, :, :] = 0.5
         else:
-            result = explored
+            result = unexplored
             factor = 2 ** (zoom - z)
             width = 256 // factor
             for xo in range(factor):
                 for yo in range(factor):
-                    tile = (x * factor + xo, y * factor + yo)
-                    if tile not in tile_visits:
+                    tile_xy = (x * factor + xo, y * factor + yo)
+                    if tile_xy in tile_visits:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = unexplored[
+                        ] = (
+                            cluster
+                            if (
+                                tile_xy
+                                in tile_visit_accessor.tile_state["evolution_state"][
+                                    zoom
+                                ].memberships
+                            )
+                            else explored
+                        )[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
                         ]
+                    if width >= 64:
+                        result[yo * width, :, :] = 0.5
+                        result[:, xo * width, :] = 0.5
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
         return Response(bytes(f.getbuffer()), mimetype="image/png")
