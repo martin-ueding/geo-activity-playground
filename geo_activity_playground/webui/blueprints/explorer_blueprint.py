@@ -200,14 +200,25 @@ def make_explorer_blueprint(
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
 
         map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
-        grayscale = image_transforms["color"].transform_image(map_tile)
+        grayscale = image_transforms["grayscale"].transform_image(map_tile)
         unexplored = grayscale
-        explored = grayscale / 1.2
+        explored = grayscale / 1.3
+        cluster = grayscale.copy()
+        cluster[:, :, 0:1] /= 1.3
 
         if z >= zoom:
             factor = 2 ** (z - zoom)
-            if (x // factor, y // factor) in tile_visits:
-                result = explored
+            tile_xy = (x // factor, y // factor)
+            if tile_xy in tile_visits:
+                if (
+                    tile_xy
+                    in tile_visit_accessor.tile_state["evolution_state"][
+                        zoom
+                    ].memberships
+                ):
+                    result = cluster
+                else:
+                    result = explored
             else:
                 result = unexplored
 
