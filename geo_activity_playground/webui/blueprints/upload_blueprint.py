@@ -25,6 +25,8 @@ from ...importers.strava_api import import_from_strava_api
 from ...importers.strava_checkout import import_from_strava_checkout
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
+from ..flasher import Flasher
+from ..flasher import FlashTypes
 
 
 def make_upload_blueprint(
@@ -32,6 +34,7 @@ def make_upload_blueprint(
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
     authenticator: Authenticator,
+    flasher: Flasher,
 ) -> Blueprint:
     blueprint = Blueprint("upload", __name__, template_folder="templates")
 
@@ -72,6 +75,12 @@ def make_upload_blueprint(
                 ".tcx",
             ]
             assert target_path.is_relative_to("Activities")
+            if target_path.exists():
+                flasher.flash_message(
+                    f"An activity with path '{target_path}' already exists. Rename the file and try again.",
+                    FlashTypes.DANGER,
+                )
+                return redirect(url_for(".index"))
             file.save(target_path)
             scan_for_activities(
                 repository,
