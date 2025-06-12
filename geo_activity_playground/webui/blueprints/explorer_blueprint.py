@@ -298,7 +298,7 @@ def make_explorer_blueprint(
                             result[-square_line_width:, :], square_color, 0.5
                         )
         else:
-            result = np.zeros_like(map_tile)
+            result = unexplored
             factor = 2 ** (zoom - z)
             width = 256 // factor
             for xo in range(factor):
@@ -307,95 +307,102 @@ def make_explorer_blueprint(
                     tile_y = y * factor + yo
                     tile_xy = (tile_x, tile_y)
                     patch = get_patch(tile_xy)
-                    result[
-                        yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                    ] = patch[
-                        yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                    ]
-                    if width >= 64:
-                        result[yo * width, :, :] = 0.5
-                        result[:, xo * width, :] = 0.5
+                    if patch is not unexplored:
+                        result[
+                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                        ] = patch[
+                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
+                        ]
 
-                    if (
-                        evolution_state.square_x is not None
-                        and evolution_state.square_y is not None
-                    ):
                         if (
-                            tile_x == evolution_state.square_x
-                            and evolution_state.square_y
-                            <= tile_y
-                            < evolution_state.square_y + evolution_state.max_square_size
+                            evolution_state.square_x is not None
+                            and evolution_state.square_y is not None
                         ):
-                            result[
-                                yo * width : (yo + 1) * width,
-                                xo * width : xo * width + square_line_width,
-                            ] = blend_color(
+                            if (
+                                tile_x == evolution_state.square_x
+                                and evolution_state.square_y
+                                <= tile_y
+                                < evolution_state.square_y
+                                + evolution_state.max_square_size
+                            ):
                                 result[
                                     yo * width : (yo + 1) * width,
                                     xo * width : xo * width + square_line_width,
-                                ],
-                                square_color,
-                                0.5,
-                            )
-                        if (
-                            tile_y == evolution_state.square_y
-                            and evolution_state.square_x
-                            <= tile_x
-                            < evolution_state.square_x + evolution_state.max_square_size
-                        ):
-                            result[
-                                yo * width : yo * width + square_line_width,
-                                xo * width : (xo + 1) * width,
-                            ] = blend_color(
+                                ] = blend_color(
+                                    result[
+                                        yo * width : (yo + 1) * width,
+                                        xo * width : xo * width + square_line_width,
+                                    ],
+                                    square_color,
+                                    0.5,
+                                )
+                            if (
+                                tile_y == evolution_state.square_y
+                                and evolution_state.square_x
+                                <= tile_x
+                                < evolution_state.square_x
+                                + evolution_state.max_square_size
+                            ):
                                 result[
                                     yo * width : yo * width + square_line_width,
                                     xo * width : (xo + 1) * width,
-                                ],
-                                square_color,
-                                0.5,
-                            )
+                                ] = blend_color(
+                                    result[
+                                        yo * width : yo * width + square_line_width,
+                                        xo * width : (xo + 1) * width,
+                                    ],
+                                    square_color,
+                                    0.5,
+                                )
 
-                        if (
-                            tile_x + 1
-                            == evolution_state.square_x
-                            + evolution_state.max_square_size
-                            and evolution_state.square_y
-                            <= tile_y
-                            < evolution_state.square_y + evolution_state.max_square_size
-                        ):
-                            result[
-                                yo * width : (yo + 1) * width,
-                                (xo + 1) * width - square_line_width : (xo + 1) * width,
-                            ] = blend_color(
+                            if (
+                                tile_x + 1
+                                == evolution_state.square_x
+                                + evolution_state.max_square_size
+                                and evolution_state.square_y
+                                <= tile_y
+                                < evolution_state.square_y
+                                + evolution_state.max_square_size
+                            ):
                                 result[
                                     yo * width : (yo + 1) * width,
                                     (xo + 1) * width
                                     - square_line_width : (xo + 1) * width,
-                                ],
-                                square_color,
-                                0.5,
-                            )
+                                ] = blend_color(
+                                    result[
+                                        yo * width : (yo + 1) * width,
+                                        (xo + 1) * width
+                                        - square_line_width : (xo + 1) * width,
+                                    ],
+                                    square_color,
+                                    0.5,
+                                )
 
-                        if (
-                            tile_y + 1
-                            == evolution_state.square_y
-                            + evolution_state.max_square_size
-                            and evolution_state.square_x
-                            <= tile_x
-                            < evolution_state.square_x + evolution_state.max_square_size
-                        ):
-                            result[
-                                (yo + 1) * width - square_line_width : (yo + 1) * width,
-                                xo * width : (xo + 1) * width,
-                            ] = blend_color(
+                            if (
+                                tile_y + 1
+                                == evolution_state.square_y
+                                + evolution_state.max_square_size
+                                and evolution_state.square_x
+                                <= tile_x
+                                < evolution_state.square_x
+                                + evolution_state.max_square_size
+                            ):
                                 result[
                                     (yo + 1) * width
                                     - square_line_width : (yo + 1) * width,
                                     xo * width : (xo + 1) * width,
-                                ],
-                                square_color,
-                                0.5,
-                            )
+                                ] = blend_color(
+                                    result[
+                                        (yo + 1) * width
+                                        - square_line_width : (yo + 1) * width,
+                                        xo * width : (xo + 1) * width,
+                                    ],
+                                    square_color,
+                                    0.5,
+                                )
+                    if width >= 64:
+                        result[yo * width, :, :] = 0.5
+                        result[:, xo * width, :] = 0.5
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
         return Response(bytes(f.getbuffer()), mimetype="image/png")
