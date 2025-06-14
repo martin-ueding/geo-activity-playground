@@ -1153,9 +1153,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#version-100-2025-06-14" class="md-nav__link">
     <span class="md-ellipsis">
-      Unreleased
+      Version 1.0.0 — 2025-06-14
     </span>
   </a>
   
@@ -1997,9 +1997,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#version-100-2025-06-14" class="md-nav__link">
     <span class="md-ellipsis">
-      Unreleased
+      Version 1.0.0 — 2025-06-14
     </span>
   </a>
   
@@ -2836,15 +2836,29 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-<h2 id="unreleased">Unreleased</h2>
+<h2 id="version-100-2025-06-14">Version 1.0.0 — 2025-06-14</h2>
 <p>Added:</p>
 <ul>
+<li>Add export feature for activities and metadata. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/246">GH-246</a>)</li>
+<li>Add tooltip to server-side explorer tiles. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/243">GH-243</a>)</li>
 <li>Add developer documentation about Alembic migrations.</li>
 <li>Write a bit more about the acknowledgments.</li>
 </ul>
 <p>Changed:</p>
 <ul>
+<li>Make “fast explorer tile mode” much prettier, mark cluster and square.</li>
 <li>Update quad tree picture with a less intrusive watermark.</li>
+</ul>
+<p>Removed:</p>
+<ul>
+<li>Old explorer mode with client-side rendering is now deprecated as the server-side mode has the same features.  (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/243">GH-243</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Uploading an activity with a filename that already exists gives an error message. Before it would overwrite the source activity file but not scan it again. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/289">GH-289</a>)</li>
+<li>Fix search in cases that only routes (and no tracks) could be found.</li>
+<li>Fix “date before” filter. This was broken due to a mixed-up comparison and effectively acted as a second “date after” filter. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/290">GH-290</a>)</li>
+<li>Add a proper redirect on login such that one directly gets back to the page that one wanted to access.</li>
 </ul>
 <h2 id="version-0450-2025-06-08">Version 0.45.0 — 2025-06-08</h2>
 <p>Added:</p>
