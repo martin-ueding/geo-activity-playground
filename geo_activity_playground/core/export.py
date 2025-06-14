@@ -23,8 +23,12 @@ def export_all(meta_format: str, activity_format: str) -> bytes:
                     export_meta_as_csv(meta, f)
                 case "json":
                     export_meta_as_json(meta, f)
+                case "ods":
+                    export_meta_as_xlsx(meta, f)
                 case "parquet":
                     export_meta_as_parquet(meta, f)
+                case "xlsx":
+                    export_meta_as_xlsx(meta, f)
                 case _:
                     raise ValueError(
                         f"Format {meta_format} is not supported for metadata."
@@ -42,8 +46,12 @@ def export_all(meta_format: str, activity_format: str) -> bytes:
                         export_activity_as_geojson(activity, f)
                     case "gpx":
                         export_activity_as_gpx(activity, f)
+                    case "ods":
+                        export_activity_as_xlsx(activity, f)
                     case "parquet":
                         export_activity_as_parquet(activity, f)
+                    case "xlsx":
+                        export_activity_as_xlsx(activity, f)
                     case _:
                         raise ValueError(
                             f"Format {activity_format} is not supported for activity time series."
@@ -63,6 +71,10 @@ def export_meta_as_json(meta: pd.DataFrame, target: IO[bytes]) -> None:
 
 def export_meta_as_parquet(meta: pd.DataFrame, target: IO[bytes]) -> None:
     meta.to_parquet(target, index=False)
+
+
+def export_meta_as_xlsx(meta: pd.DataFrame, target: IO[bytes]) -> None:
+    meta.to_excel(target, index=False)
 
 
 def export_activity_as_csv(activity: Activity, target: IO[bytes]) -> None:
@@ -108,3 +120,7 @@ def export_activity_as_gpx(activity: Activity, target: IO[bytes]) -> None:
 
 def export_activity_as_parquet(activity: Activity, target: IO[bytes]) -> None:
     activity.time_series.to_parquet(target, index=False)
+
+
+def export_activity_as_xlsx(activity: Activity, target: IO[bytes]) -> None:
+    activity.time_series.to_excel(target, index=False)
