@@ -1,12 +1,23 @@
+
+let tile_layer = null
+
+function changeColor(method) {
+    if (tile_layer) {
+        map.removeLayer(tile_layer)
+    }
+    tile_layer = L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=${method}`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }).addTo(map)
+}
+
 let map = L.map('explorer-map', {
     fullscreenControl: true,
     center: [center_latitude, center_longitude],
     zoom: 12
 });
-L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png`, {
-    maxZoom: 19,
-    attribution: map_tile_attribution
-}).addTo(map)
+
+changeColor('cluster')
 
 if (bbox) {
     map.fitBounds(L.geoJSON(bbox).getBounds())

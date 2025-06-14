@@ -17,6 +17,7 @@ from flask import flash
 from flask import json
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import Response
 from flask import url_for
 
@@ -217,10 +218,6 @@ def make_explorer_blueprint(
 
         map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         grayscale = image_transforms["grayscale"].transform_image(map_tile)
-        unexplored = grayscale
-        explored = blend_color(grayscale, 0.0, 0.3)
-        cluster_1 = blend_color(grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3)
-        cluster_2 = blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
         square_line_width = 3
         square_color = np.array([[[228, 26, 28]]]) / 256
 
@@ -230,14 +227,42 @@ def make_explorer_blueprint(
         )
 
         def get_patch(tile_xy) -> np.ndarray:
-            if tile_xy in max_cluster_members:
-                return cluster_1
-            elif tile_xy in evolution_state.memberships:
-                return cluster_2
-            elif tile_xy in tile_visits:
-                return explored
-            else:
-                return unexplored
+            match request.args.get("color_strategy", "cluster"):
+                case "cluster":
+                    if tile_xy in max_cluster_members:
+                        return blend_color(
+                            grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3
+                        )
+                    elif tile_xy in evolution_state.memberships:
+                        return blend_color(
+                            grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3
+                        )
+                    elif tile_xy in tile_visits:
+                        return blend_color(grayscale, 0.0, 0.3)
+                    else:
+                        return grayscale
+                case "first":
+                    if tile_xy in tile_visits:
+                        today = datetime.date.today()
+                        cmap_first = matplotlib.colormaps["plasma"]
+                        tile_info = tile_visits[tile_xy]
+                        last_age_days = (today - tile_info["first_time"].date()).days
+                        color = cmap_first(max(1 - last_age_days / (2 * 365), 0.0))
+                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+                    else:
+                        return grayscale
+                case "last":
+                    if tile_xy in tile_visits:
+                        today = datetime.date.today()
+                        cmap_first = matplotlib.colormaps["plasma"]
+                        tile_info = tile_visits[tile_xy]
+                        last_age_days = (today - tile_info["last_time"].date()).days
+                        color = cmap_first(max(1 - last_age_days / (2 * 365), 0.0))
+                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+                    else:
+                        return grayscale
+                case _:
+                    raise ValueError("Unsupported color strategy.")
 
         if z >= zoom:
             factor = 2 ** (z - zoom)
@@ -299,7 +324,7 @@ def make_explorer_blueprint(
                             result[-square_line_width:, :], square_color, 0.5
                         )
         else:
-            result = unexplored
+            result = grayscale
             factor = 2 ** (zoom - z)
             width = 256 // factor
             for xo in range(factor):
@@ -308,7 +333,7 @@ def make_explorer_blueprint(
                     tile_y = y * factor + yo
                     tile_xy = (tile_x, tile_y)
                     patch = get_patch(tile_xy)
-                    if patch is not unexplored:
+                    if patch is not grayscale:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
                         ] = patch[
