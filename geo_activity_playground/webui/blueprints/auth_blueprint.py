@@ -14,9 +14,12 @@ def make_auth_blueprint(authenticator: Authenticator) -> Blueprint:
     def index():
         if request.method == "POST":
             authenticator.authenticate(request.form["password"])
+            if redirect_to := request.form["redirect"]:
+                return redirect(redirect_to)
         return render_template(
             "auth/index.html.j2",
             is_authenticated=authenticator.is_authenticated(),
+            redirect=request.args.get("redirect", ""),
         )
 
     @blueprint.route("/logout")

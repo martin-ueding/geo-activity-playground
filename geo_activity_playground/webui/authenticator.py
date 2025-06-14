@@ -3,8 +3,10 @@ from typing import Callable
 
 from flask import flash
 from flask import redirect
+from flask import request
 from flask import session
 from flask import url_for
+from flask.typing import RouteCallable
 
 from ..core.config import Config
 
@@ -32,14 +34,14 @@ class Authenticator:
 
 
 def needs_authentication(authenticator: Authenticator) -> Callable:
-    def decorator(route: Callable) -> Callable:
+    def decorator(route: RouteCallable) -> RouteCallable:
         @functools.wraps(route)
         def wrapped_route(*args, **kwargs):
             if authenticator.is_authenticated():
                 return route(*args, **kwargs)
             else:
                 flash("You need to be logged in to view that site.", category="Warning")
-                return redirect(url_for("auth.index"))
+                return redirect(url_for("auth.index", redirect=request.url))
 
         return wrapped_route
 
