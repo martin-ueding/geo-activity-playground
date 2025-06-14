@@ -2,6 +2,11 @@
 
 {% block container %}
 
+<h1>Export metadata and activities</h1>
+
+<p>Here you can export all metadata and activities as a ZIP file. Depending on the file format chosen, exporting an
+    activity can take around one second. You can observe a progress bar in the terminal.</p>
+
 <form method="get" enctype="multipart/form-data" action="{{ url_for('.export') }}">
     <div class="mb-3">
         <label for="meta_format" class="form-label">Metadata format</label>
@@ -13,10 +18,12 @@
             <option value="ods">OpenDocument Spreadsheet (LibreOffice)</option>
         </select>
     </div>
+
     <div class="mb-3">
         <label for="activity_format" class="form-label">Activity time series format</label>
         <select name="activity_format" id="activity_format" class="form-select"
             aria-label="Activity time series format">
+            <option value="">No export of activities</option>
             <option value="parquet">Parquet</option>
             <option value="csv">CSV</option>
             <option value="geojson">GeoJSON</option>

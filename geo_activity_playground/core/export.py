@@ -33,29 +33,32 @@ def export_all(meta_format: str, activity_format: str) -> bytes:
                     raise ValueError(
                         f"Format {meta_format} is not supported for metadata."
                     )
-        zf.mkdir("activities")
-        for activity in tqdm(
-            DB.session.scalars(sqlalchemy.select(Activity)).all(),
-            desc="Export activity time series",
-        ):
-            with zf.open(f"activities/{activity.id}.{activity_format}", mode="w") as f:
-                match activity_format:
-                    case "csv":
-                        export_activity_as_csv(activity, f)
-                    case "geojson":
-                        export_activity_as_geojson(activity, f)
-                    case "gpx":
-                        export_activity_as_gpx(activity, f)
-                    case "ods":
-                        export_activity_as_xlsx(activity, f)
-                    case "parquet":
-                        export_activity_as_parquet(activity, f)
-                    case "xlsx":
-                        export_activity_as_xlsx(activity, f)
-                    case _:
-                        raise ValueError(
-                            f"Format {activity_format} is not supported for activity time series."
-                        )
+        if activity_format:
+            zf.mkdir("activities")
+            for activity in tqdm(
+                DB.session.scalars(sqlalchemy.select(Activity)).all(),
+                desc="Export activity time series",
+            ):
+                with zf.open(
+                    f"activities/{activity.id}.{activity_format}", mode="w"
+                ) as f:
+                    match activity_format:
+                        case "csv":
+                            export_activity_as_csv(activity, f)
+                        case "geojson":
+                            export_activity_as_geojson(activity, f)
+                        case "gpx":
+                            export_activity_as_gpx(activity, f)
+                        case "ods":
+                            export_activity_as_xlsx(activity, f)
+                        case "parquet":
+                            export_activity_as_parquet(activity, f)
+                        case "xlsx":
+                            export_activity_as_xlsx(activity, f)
+                        case _:
+                            raise ValueError(
+                                f"Format {activity_format} is not supported for activity time series."
+                            )
     return bytes(buffer.getbuffer())
 
 
