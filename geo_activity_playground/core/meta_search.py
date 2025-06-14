@@ -158,7 +158,7 @@ def apply_search_query(
         )
 
     if search_query.start_begin:
-        filter_clauses.append(Activity.start <= search_query.start_begin)
+        filter_clauses.append(Activity.start >= search_query.start_begin)
     if search_query.start_end:
         filter_clauses.append(Activity.start < search_query.start_end)
 

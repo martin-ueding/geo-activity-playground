@@ -31,6 +31,7 @@ Fixed:
 
 - Uploading an activity with a filename that already exists gives an error message. Before it would overwrite the source activity file but not scan it again. ([GH-289](https://github.com/martin-ueding/geo-activity-playground/issues/289))
 - Fix search in cases that only routes (and no tracks) could be found.
+- Fix “date before” filter. This was broken due to a mixed-up comparison and effectively acted as a second “date after” filter. ([GH-290](https://github.com/martin-ueding/geo-activity-playground/issues/290))
 
 ## Version 0.45.0 — 2025-06-08
 
