@@ -226,7 +226,7 @@ def make_explorer_blueprint(
             key=len,
         )
 
-        def get_patch(tile_xy) -> np.ndarray:
+        def get_patch(tile_xy, grayscale) -> np.ndarray:
             match request.args.get("color_strategy", "cluster"):
                 case "cluster":
                     if tile_xy in max_cluster_members:
@@ -277,7 +277,7 @@ def make_explorer_blueprint(
             tile_x = x // factor
             tile_y = y // factor
             tile_xy = (tile_x, tile_y)
-            result = get_patch(tile_xy)
+            result = get_patch(tile_xy, grayscale)
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
@@ -340,13 +340,16 @@ def make_explorer_blueprint(
                     tile_x = x * factor + xo
                     tile_y = y * factor + yo
                     tile_xy = (tile_x, tile_y)
-                    patch = get_patch(tile_xy)
-                    if patch is not grayscale:
+                    if tile_xy in tile_visits:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = patch[
-                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ]
+                        ] = get_patch(
+                            tile_xy,
+                            grayscale[
+                                yo * width : (yo + 1) * width,
+                                xo * width : (xo + 1) * width,
+                            ],
+                        )
 
                         if (
                             evolution_state.square_x is not None
