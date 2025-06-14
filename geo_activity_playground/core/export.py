@@ -3,6 +3,7 @@ import zipfile
 from typing import IO
 
 import geojson
+import gpxpy.gpx
 import pandas as pd
 import sqlalchemy
 from tqdm import tqdm
@@ -39,6 +40,8 @@ def export_all(meta_format: str, activity_format: str) -> bytes:
                         export_activity_as_csv(activity, f)
                     case "geojson":
                         export_activity_as_geojson(activity, f)
+                    case "gpx":
+                        export_activity_as_gpx(activity, f)
                     case "parquet":
                         export_activity_as_parquet(activity, f)
                     case _:
@@ -77,6 +80,30 @@ def export_activity_as_geojson(activity: Activity, target: IO[bytes]) -> None:
     buffer = io.StringIO()
     geojson.dump(result, buffer)
     target.write(buffer.getvalue().encode())
+
+
+def export_activity_as_gpx(activity: Activity, target: IO[bytes]) -> None:
+    g = gpxpy.gpx.GPX()
+
+    gpx_track = gpxpy.gpx.GPXTrack()
+    g.tracks.append(gpx_track)
+
+    ts = activity.time_series
+    for segment_id, group in ts.groupby("segment_id"):
+        gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        gpx_track.segments.append(gpx_segment)
+
+        for index, row in group.iterrows():
+            gpx_segment.points.append(
+                gpxpy.gpx.GPXTrackPoint(
+                    row["latitude"],
+                    row["longitude"],
+                    elevation=row.get("elevation", None),
+                    time=row.get("time", None),
+                )
+            )
+
+    target.write(g.to_xml().encode())
 
 
 def export_activity_as_parquet(activity: Activity, target: IO[bytes]) -> None:
