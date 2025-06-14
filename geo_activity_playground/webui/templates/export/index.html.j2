@@ -1,0 +1,28 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<form method="get" enctype="multipart/form-data" action="{{ url_for('.export') }}">
+    <div class="mb-3">
+        <label for="meta_format" class="form-label">Metadata format</label>
+        <select name="meta_format" id="meta_format" class="form-select" aria-label="Metadata format">
+            <option value="parquet">Parquet</option>
+            {# <option value="json">JSON</option> #}
+            <option value="csv">CSV</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="activity_format" class="form-label">Activity time series format</label>
+        <select name="activity_format" id="activity_format" class="form-select"
+            aria-label="Activity time series format">
+            <option value="parquet">Parquet</option>
+            <option value="csv">CSV</option>
+            <option value="geojson">GeoJSON</option>
+            {# <option value="gpx">GPX</option> #}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Export</button>
+</form>
+
+
+{% endblock %}

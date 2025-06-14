@@ -38,6 +38,7 @@ from .blueprints.eddington_blueprints import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
+from .blueprints.export_blueprint import make_export_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.photo_blueprint import make_photo_blueprint
 from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
@@ -160,6 +161,7 @@ def web_ui_main(
             tile_getter,
             image_transforms,
         ),
+        "/export": make_export_blueprint(authenticator),
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config_accessor(), search_query_history
         ),
