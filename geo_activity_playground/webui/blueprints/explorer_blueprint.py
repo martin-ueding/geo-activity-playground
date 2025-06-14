@@ -1,3 +1,4 @@
+import abc
 import datetime
 import io
 import itertools
@@ -51,6 +52,74 @@ def blend_color(
     base: np.ndarray, addition: Union[np.ndarray, float], opacity: float
 ) -> np.ndarray:
     return (1 - opacity) * base + opacity * addition
+
+
+class ColorStrategy(abc.ABC):
+    @abc.abstractmethod
+    def color_image(
+        self, tile_xy: tuple[int, int], grayscale: np.ndarray
+    ) -> np.ndarray:
+        pass
+
+
+class ClusterColorStrategy(ColorStrategy):
+    def __init__(self, evolution_state, tile_visits):
+        self.evolution_state = evolution_state
+        self.tile_visits = tile_visits
+        self.max_cluster_members = max(
+            evolution_state.clusters.values(),
+            key=len,
+        )
+
+    def color_image(
+        self, tile_xy: tuple[int, int], grayscale: np.ndarray
+    ) -> np.ndarray:
+        if tile_xy in self.max_cluster_members:
+            return blend_color(grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3)
+        elif tile_xy in self.evolution_state.memberships:
+            return blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
+        elif tile_xy in self.tile_visits:
+            return blend_color(grayscale, 0.0, 0.3)
+        else:
+            return grayscale
+
+
+class VisitTimeColorStrategy(ColorStrategy):
+    def __init__(self, tile_visits, use_first=True):
+        self.tile_visits = tile_visits
+        self.use_first = use_first
+
+    def color_image(
+        self, tile_xy: tuple[int, int], grayscale: np.ndarray
+    ) -> np.ndarray:
+        if tile_xy in self.tile_visits:
+            today = datetime.date.today()
+            cmap = matplotlib.colormaps["plasma"]
+            tile_info = self.tile_visits[tile_xy]
+            relevant_time = (
+                tile_info["first_time"] if self.use_first else tile_info["last_time"]
+            )
+            last_age_days = (today - relevant_time.date()).days
+            color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
+            return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+        else:
+            return grayscale
+
+
+class NumVisitsColorStrategy(ColorStrategy):
+    def __init__(self, tile_visits):
+        self.tile_visits = tile_visits
+
+    def color_image(
+        self, tile_xy: tuple[int, int], grayscale: np.ndarray
+    ) -> np.ndarray:
+        if tile_xy in self.tile_visits:
+            cmap = matplotlib.colormaps["viridis"]
+            tile_info = self.tile_visits[tile_xy]
+            color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
+            return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+        else:
+            return grayscale
 
 
 def make_explorer_blueprint(
@@ -179,63 +248,24 @@ def make_explorer_blueprint(
         square_line_width = 3
         square_color = np.array([[[228, 26, 28]]]) / 256
 
-        max_cluster_members = max(
-            evolution_state.clusters.values(),
-            key=len,
-        )
-
-        def get_patch(tile_xy, grayscale) -> np.ndarray:
-            match request.args.get("color_strategy", "cluster"):
-                case "cluster":
-                    if tile_xy in max_cluster_members:
-                        return blend_color(
-                            grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3
-                        )
-                    elif tile_xy in evolution_state.memberships:
-                        return blend_color(
-                            grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3
-                        )
-                    elif tile_xy in tile_visits:
-                        return blend_color(grayscale, 0.0, 0.3)
-                    else:
-                        return grayscale
-                case "first":
-                    if tile_xy in tile_visits:
-                        today = datetime.date.today()
-                        cmap = matplotlib.colormaps["plasma"]
-                        tile_info = tile_visits[tile_xy]
-                        last_age_days = (today - tile_info["first_time"].date()).days
-                        color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
-                    else:
-                        return grayscale
-                case "last":
-                    if tile_xy in tile_visits:
-                        today = datetime.date.today()
-                        cmap = matplotlib.colormaps["plasma"]
-                        tile_info = tile_visits[tile_xy]
-                        last_age_days = (today - tile_info["last_time"].date()).days
-                        color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
-                    else:
-                        return grayscale
-                case "visits":
-                    if tile_xy in tile_visits:
-                        cmap = matplotlib.colormaps["viridis"]
-                        tile_info = tile_visits[tile_xy]
-                        color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
-                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
-                    else:
-                        return grayscale
-                case _:
-                    raise ValueError("Unsupported color strategy.")
+        match request.args.get("color_strategy", "cluster"):
+            case "cluster":
+                color_strategy = ClusterColorStrategy(evolution_state, tile_visits)
+            case "first":
+                color_strategy = VisitTimeColorStrategy(tile_visits, use_first=True)
+            case "last":
+                color_strategy = VisitTimeColorStrategy(tile_visits, use_first=False)
+            case "visits":
+                color_strategy = NumVisitsColorStrategy(tile_visits)
+            case _:
+                raise ValueError("Unsupported color strategy.")
 
         if z >= zoom:
             factor = 2 ** (z - zoom)
             tile_x = x // factor
             tile_y = y // factor
             tile_xy = (tile_x, tile_y)
-            result = get_patch(tile_xy, grayscale)
+            result = color_strategy.color_image(tile_xy, grayscale)
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
@@ -301,7 +331,7 @@ def make_explorer_blueprint(
                     if tile_xy in tile_visits:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = get_patch(
+                        ] = color_strategy.color_image(
                             tile_xy,
                             grayscale[
                                 yo * width : (yo + 1) * width,
