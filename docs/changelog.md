@@ -15,19 +15,19 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 1.0.0 — 2025-06-14
 
 Added:
 
-- Add developer documentation about Alembic migrations.
-- Write a bit more about the acknowledgments.
 - Add export feature for activities and metadata. ([GH-246](https://github.com/martin-ueding/geo-activity-playground/issues/246))
 - Add tooltip to server-side explorer tiles. ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
+- Add developer documentation about Alembic migrations.
+- Write a bit more about the acknowledgments.
 
 Changed:
 
-- Update quad tree picture with a less intrusive watermark.
 - Make “fast explorer tile mode” much prettier, mark cluster and square.
+- Update quad tree picture with a less intrusive watermark.
 
 Removed:
 
@@ -39,7 +39,6 @@ Fixed:
 - Fix search in cases that only routes (and no tracks) could be found.
 - Fix “date before” filter. This was broken due to a mixed-up comparison and effectively acted as a second “date after” filter. ([GH-290](https://github.com/martin-ueding/geo-activity-playground/issues/290))
 - Add a proper redirect on login such that one directly gets back to the page that one wanted to access.
-
 
 ## Version 0.45.0 — 2025-06-08
 
