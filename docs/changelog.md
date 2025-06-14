@@ -29,12 +29,17 @@ Changed:
 - Update quad tree picture with a less intrusive watermark.
 - Make “fast explorer tile mode” much prettier, mark cluster and square.
 
+Removed:
+
+- Old explorer mode with client-side rendering is now deprecated as the server-side mode has the same features.  ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
+
 Fixed:
 
 - Uploading an activity with a filename that already exists gives an error message. Before it would overwrite the source activity file but not scan it again. ([GH-289](https://github.com/martin-ueding/geo-activity-playground/issues/289))
 - Fix search in cases that only routes (and no tracks) could be found.
 - Fix “date before” filter. This was broken due to a mixed-up comparison and effectively acted as a second “date after” filter. ([GH-290](https://github.com/martin-ueding/geo-activity-playground/issues/290))
 - Add a proper redirect on login such that one directly gets back to the page that one wanted to access.
+
 
 ## Version 0.45.0 — 2025-06-08
 
