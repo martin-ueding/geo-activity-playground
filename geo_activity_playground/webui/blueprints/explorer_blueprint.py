@@ -244,20 +244,28 @@ def make_explorer_blueprint(
                 case "first":
                     if tile_xy in tile_visits:
                         today = datetime.date.today()
-                        cmap_first = matplotlib.colormaps["plasma"]
+                        cmap = matplotlib.colormaps["plasma"]
                         tile_info = tile_visits[tile_xy]
                         last_age_days = (today - tile_info["first_time"].date()).days
-                        color = cmap_first(max(1 - last_age_days / (2 * 365), 0.0))
+                        color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
                         return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
                     else:
                         return grayscale
                 case "last":
                     if tile_xy in tile_visits:
                         today = datetime.date.today()
-                        cmap_first = matplotlib.colormaps["plasma"]
+                        cmap = matplotlib.colormaps["plasma"]
                         tile_info = tile_visits[tile_xy]
                         last_age_days = (today - tile_info["last_time"].date()).days
-                        color = cmap_first(max(1 - last_age_days / (2 * 365), 0.0))
+                        color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
+                        return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+                    else:
+                        return grayscale
+                case "visits":
+                    if tile_xy in tile_visits:
+                        cmap = matplotlib.colormaps["viridis"]
+                        tile_info = tile_visits[tile_xy]
+                        color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
                         return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
                     else:
                         return grayscale
