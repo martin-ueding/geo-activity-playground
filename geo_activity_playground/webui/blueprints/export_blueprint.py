@@ -11,6 +11,7 @@ from ..authenticator import needs_authentication
 def make_export_blueprint(authenticator: Authenticator) -> Blueprint:
     blueprint = Blueprint("export", __name__, template_folder="templates")
 
+    @needs_authentication(authenticator)
     @blueprint.route("/")
     def index():
         return render_template("export/index.html.j2")
