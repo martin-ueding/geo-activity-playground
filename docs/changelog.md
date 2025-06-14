@@ -22,6 +22,7 @@ Added:
 - Add developer documentation about Alembic migrations.
 - Write a bit more about the acknowledgments.
 - Add export feature for activities and metadata. ([GH-246](https://github.com/martin-ueding/geo-activity-playground/issues/246))
+- Add tooltip to server-side explorer tiles. ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
 
 Changed:
 

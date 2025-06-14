@@ -16,6 +16,9 @@ map.on('click', e => {
     fetch(`/explorer/${zoom}/info/${e.latlng.lat}/${e.latlng.lng}`)
         .then(response => response.json())
         .then(data => {
+            if (!data.tile_xy) {
+                return;
+            }
             console.debug(data);
 
             let lines = [
