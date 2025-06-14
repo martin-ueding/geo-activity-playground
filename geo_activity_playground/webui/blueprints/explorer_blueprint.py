@@ -14,6 +14,7 @@ import pandas as pd
 import sqlalchemy
 from flask import Blueprint
 from flask import flash
+from flask import json
 from flask import redirect
 from flask import render_template
 from flask import Response
@@ -406,6 +407,35 @@ def make_explorer_blueprint(
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
         return Response(bytes(f.getbuffer()), mimetype="image/png")
+
+    @blueprint.route("/<int:zoom>/info/<float:latitude>/<float:longitude>")
+    def info(zoom: int, latitude: float, longitude: float) -> dict:
+        tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
+        evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        tile_xy = compute_tile(latitude, longitude, zoom)
+        if tile_xy in tile_visits:
+            tile_info = tile_visits[tile_xy]
+            first = DB.session.get_one(Activity, tile_info["first_id"])
+            last = DB.session.get_one(Activity, tile_info["last_id"])
+            result = {
+                "tile_xy": f"{tile_xy}",
+                "num_visits": len(tile_info["activity_ids"]),
+                "first_activity_id": first.id,
+                "first_activity_name": first.name,
+                "first_time": tile_info["first_time"].isoformat(),
+                "last_activity_id": last.id,
+                "last_activity_name": last.name,
+                "last_time": tile_info["last_time"].isoformat(),
+                "is_cluster": tile_xy in evolution_state.memberships,
+                "this_cluster_size": len(
+                    evolution_state.clusters.get(
+                        evolution_state.memberships.get(tile_xy, None), []
+                    )
+                ),
+            }
+        else:
+            result = {}
+        return result
 
     return blueprint
 
