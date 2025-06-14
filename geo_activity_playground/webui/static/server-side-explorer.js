@@ -5,7 +5,7 @@ let map = L.map('explorer-map', {
 });
 L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png`, {
     maxZoom: 19,
-    attribution: '{{ map_tile_attribution|safe }}'
+    attribution: map_tile_attribution
 }).addTo(map)
 
 if (bbox) {
