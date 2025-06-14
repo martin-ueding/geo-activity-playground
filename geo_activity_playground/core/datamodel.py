@@ -229,6 +229,9 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
         .order_by(Activity.start)
     ).all()
     df = pd.DataFrame(rows)
+    # If the search yields only activities without time information, the dtype isn't derived correctly.
+    df["start"] = pd.to_datetime(df["start"])
+    df["elapsed_time"] = pd.to_timedelta(df["elapsed_time"])
 
     if len(df):
         for old, new in [

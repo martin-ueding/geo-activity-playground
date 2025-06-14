@@ -30,6 +30,7 @@ Changed:
 Fixed:
 
 - Uploading an activity with a filename that already exists gives an error message. Before it would overwrite the source activity file but not scan it again. ([GH-289](https://github.com/martin-ueding/geo-activity-playground/issues/289))
+- Fix search in cases that only routes (and no tracks) could be found.
 
 ## Version 0.45.0 — 2025-06-08
 
