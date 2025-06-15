@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Move "Hall of Fame" into separate page.
+
 Fixed:
 
 - Fix summary page when routes are present. ([GH-282](https://github.com/martin-ueding/geo-activity-playground/issues/282))

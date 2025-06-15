@@ -1,0 +1,58 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1>Hall of Fame</h1>
+
+<div class="mb-3">
+    {% include "search_form.html.j2" %}
+</div>
+
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(`map-${id}`, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '{{ map_tile_attribution|safe }}'
+        }).addTo(map)
+
+        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        map.fitBounds(geojson_layer.getBounds())
+        return map
+    }
+</script>
+
+{% for activity_batch in nominations|batch(3) %}
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+    {% for activity, reasons, line_geojson in activity_batch %}
+    <div class="col">
+        <div class="card">
+            <div class="card-img-top" id="map-{{ activity.id }}" style="height: 200px; width: 100%;"></div>
+            <script>
+                let map{{ activity.id }} = add_map("{{ activity.id }}", {{ line_geojson | safe }})
+            </script>
+            <div class="card-body">
+                <a href="{{ url_for('activity.show', id=activity.id) }}">
+                    <h5 class="card-title">{{ activity["name"] }}</h5>
+                </a>
+                <p class="card-text">
+                <ul style='list-style-type: "🏆 "'>
+                    {% for reason in reasons %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+                </p>
+                <p class="card-text"><small class="text-body-secondary"></small>{{ activity.kind }} with {{
+                    (activity.distance_km)|round(1) }} km / {{activity.elevation_gain|round|int}} m in {{
+                    activity.elapsed_time|td }} on {{ activity.start|dt }}</small></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+
+{% endblock %}
