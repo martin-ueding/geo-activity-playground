@@ -55,6 +55,7 @@ GROUP_BY_VARIABLES = {
     "equipment": "Equipment",
     "kind": "Activity kind",
     "consider_for_achievements": "Consider for achievements",
+    "year": "Year",
     "iso_year": "ISO Year",
     "week": "ISO Week",
 }
@@ -88,8 +89,16 @@ def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
                 raise ValueError()
 
         encodings = [
-            alt.X(spec.x, title=VARIABLES_2[spec.x]),
-            alt.Y(spec.y, title=VARIABLES_2[spec.y]),
+            (
+                alt.X(spec.x, type="ordinal", title=VARIABLES_2[spec.x])
+                if spec.mark == "rect"
+                else alt.X(spec.x, title=VARIABLES_2[spec.x])
+            ),
+            (
+                alt.Y(spec.y, type="ordinal", title=VARIABLES_2[spec.y])
+                if spec.mark == "rect"
+                else alt.Y(spec.y, title=VARIABLES_2[spec.y])
+            ),
         ]
         tooltips = [
             alt.Tooltip(spec.x, title=VARIABLES_2[spec.x]),
@@ -120,7 +129,8 @@ def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
             )
             tooltips.append(alt.Tooltip(spec.facet, title=VARIABLES_2[spec.facet]))
 
-        chart_groups[str(key)] = (
+        key = str(int(key) if isinstance(key, float) else key)
+        chart_groups[key] = (
             chart.encode(*encodings, tooltips).interactive().to_json(format="vega")
         )
     return chart_groups

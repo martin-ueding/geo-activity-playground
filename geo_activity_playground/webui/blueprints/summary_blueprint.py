@@ -169,14 +169,6 @@ def make_summary_blueprint(
             plot_elevation_gain_heatmaps=plot_heatmaps(
                 df, column_elevation_gain, config
             ),
-            plot_monthly_distance=plot_monthly_sums(df, column_distance, kind_scale),
-            plot_monthly_elevation_gain=plot_monthly_sums(
-                df, column_elevation_gain, kind_scale
-            ),
-            plot_yearly_distance=plot_yearly_sums(df, column_distance, kind_scale),
-            plot_yearly_elevation_gain=plot_yearly_sums(
-                df, column_elevation_gain, kind_scale
-            ),
             plot_year_cumulative=plot_year_cumulative(df, column_distance),
             plot_year_elevation_gain_cumulative=plot_year_cumulative(
                 df, column_elevation_gain
@@ -198,7 +190,7 @@ def make_summary_blueprint(
                 for spec in DB.session.scalars(sqlalchemy.select(PlotSpec)).all()
             ],
             modular_plots=[
-                modular_plot.render_html(activities) for modular_plot in MODULAR_PLOTS
+                # modular_plot.render_html(activities) for modular_plot in MODULAR_PLOTS
             ],
         )
 

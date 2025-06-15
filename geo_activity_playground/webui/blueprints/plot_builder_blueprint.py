@@ -46,24 +46,24 @@ def make_plot_builder_blueprint(
         DB.session.commit()
         return redirect(url_for(".edit", id=spec.id))
 
-    @blueprint.route("/edit/<int:id>")
+    @blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def edit(id: int) -> Response:
         spec = DB.session.get(PlotSpec, id)
-        if request.args:
-            spec.name = request.args["name"]
-            spec.mark = request.args["mark"]
-            spec.x = request.args["x"]
-            spec.y = request.args["y"]
-            spec.color = request.args["color"]
-            spec.shape = request.args["shape"]
-            spec.size = request.args["size"]
-            spec.size = request.args["size"]
-            spec.row = request.args["row"]
-            spec.column = request.args["column"]
-            spec.facet = request.args["facet"]
-            spec.opacity = request.args["opacity"]
-            spec.group_by = request.args["group_by"]
+        if request.form:
+            spec.name = request.form["name"]
+            spec.mark = request.form["mark"]
+            spec.x = request.form["x"]
+            spec.y = request.form["y"]
+            spec.color = request.form["color"]
+            spec.shape = request.form["shape"]
+            spec.size = request.form["size"]
+            spec.size = request.form["size"]
+            spec.row = request.form["row"]
+            spec.column = request.form["column"]
+            spec.facet = request.form["facet"]
+            spec.opacity = request.form["opacity"]
+            spec.group_by = request.form["group_by"]
         try:
             plot = make_parametric_plot(repository.meta, spec)
             DB.session.commit()
