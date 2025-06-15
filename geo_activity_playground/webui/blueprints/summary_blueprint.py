@@ -165,24 +165,9 @@ def make_summary_blueprint(
 
         return render_template(
             "summary/index.html.j2",
-            plot_distance_heatmaps=plot_heatmaps(df, column_distance, config),
-            plot_elevation_gain_heatmaps=plot_heatmaps(
-                df, column_elevation_gain, config
-            ),
             plot_year_cumulative=plot_year_cumulative(df, column_distance),
             plot_year_elevation_gain_cumulative=plot_year_cumulative(
                 df, column_elevation_gain
-            ),
-            tabulate_year_kind_mean=tabulate_year_kind_mean(df, column_distance)
-            .reset_index()
-            .to_dict(orient="split"),
-            tabulate_year_kind_mean_elevation_gain=tabulate_year_kind_mean(
-                df, column_elevation_gain
-            )
-            .reset_index()
-            .to_dict(orient="split"),
-            plot_weekly_elevation_gain=plot_weekly_sums(
-                df, column_elevation_gain, kind_scale
             ),
             query=query.to_jinja(),
             custom_plots=[
@@ -195,112 +180,6 @@ def make_summary_blueprint(
         )
 
     return blueprint
-
-
-def plot_heatmaps(
-    meta: pd.DataFrame, column: ColumnDescription, config: Config
-) -> dict[int, str]:
-    return {
-        year: alt.Chart(
-            meta.loc[(meta["year"] == year)],
-            title=f"Daily {column.display_name} Heatmap",
-        )
-        .mark_rect()
-        .encode(
-            alt.X("date(start):O", title="Day of month"),
-            alt.Y(
-                "yearmonth(start):O",
-                # scale=alt.Scale(reverse=True),
-                title="Year and month",
-            ),
-            alt.Color(
-                f"sum({column.name})",
-                scale=alt.Scale(scheme=config.color_scheme_for_counts),
-            ),
-            [
-                alt.Tooltip("yearmonthdate(start)", title="Date"),
-                alt.Tooltip(
-                    f"sum({column.name})",
-                    format=column.format,
-                    title=f"Total {column.display_name} / {column.unit}",
-                ),
-                alt.Tooltip(f"count({column.name})", title="Number of activities"),
-            ],
-        )
-        .to_json(format="vega")
-        for year in sorted(meta["year"].dropna().unique())
-    }
-
-
-def plot_monthly_sums(
-    meta: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
-) -> str:
-    return (
-        alt.Chart(
-            meta.loc[
-                (
-                    meta["start"]
-                    >= pd.to_datetime(
-                        datetime.datetime.now() - datetime.timedelta(days=2 * 365)
-                    )
-                )
-            ],
-            title=f"Monthly {column.display_name}",
-        )
-        .mark_bar()
-        .encode(
-            alt.X("month(start)", title="Month"),
-            alt.Y(
-                f"sum({column.name})",
-                title=f"{column.display_name} / {column.unit}",
-            ),
-            alt.Color("kind", scale=kind_scale, title="Kind"),
-            alt.Column("year(start):O", title="Year"),
-            [
-                alt.Tooltip("yearmonth(start)", title="Year and Month"),
-                alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip(
-                    f"sum({column.name})",
-                    format=column.format,
-                    title=f"Total {column.display_name} / {column.unit}",
-                ),
-                alt.Tooltip(f"count({column.name})", title="Number of activities"),
-            ],
-        )
-        .resolve_axis(x="independent")
-        .to_json(format="vega")
-    )
-
-
-def plot_yearly_sums(
-    df: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
-) -> str:
-    year_kind_total = (
-        df[["year", "kind", column.name, "hours"]]
-        .groupby(["year", "kind"])
-        .sum()
-        .reset_index()
-    )
-
-    return (
-        alt.Chart(year_kind_total, title=f"Total {column.display_name} per Year")
-        .mark_bar()
-        .encode(
-            alt.X("year:O", title="Year"),
-            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
-            alt.Color("kind", scale=kind_scale, title="Kind"),
-            [
-                alt.Tooltip("year:O", title="Year"),
-                alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip(
-                    column.name,
-                    title=f"{column.display_name} / {column.unit}",
-                    format=column.format,
-                ),
-            ],
-        )
-        .to_json(format="vega")
-    )
 
 
 def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
@@ -341,69 +220,5 @@ def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
             ],
         )
         .interactive()
-        .to_json(format="vega")
-    )
-
-
-def tabulate_year_kind_mean(
-    df: pd.DataFrame, column: ColumnDescription
-) -> pd.DataFrame:
-    year_kind_mean = (
-        df[["year", "kind", column.name, "hours"]]
-        .groupby(["year", "kind"])
-        .mean()
-        .reset_index()
-    )
-
-    year_kind_mean_distance = year_kind_mean.pivot(
-        index="year", columns="kind", values=column.name
-    )
-
-    return year_kind_mean_distance
-
-
-def plot_weekly_sums(
-    df: pd.DataFrame, column: ColumnDescription, kind_scale: alt.Scale
-) -> str:
-    week_kind_total_distance = (
-        df[["iso_year", "week", "kind", column.name]]
-        .groupby(["iso_year", "week", "kind"])
-        .sum()
-        .reset_index()
-    )
-    week_kind_total_distance["year_week"] = [
-        f"{year}-{week:02d}"
-        for year, week in zip(
-            week_kind_total_distance["iso_year"], week_kind_total_distance["week"]
-        )
-    ]
-
-    last_year = week_kind_total_distance["iso_year"].iloc[-1]
-    last_week = week_kind_total_distance["week"].iloc[-1]
-
-    return (
-        alt.Chart(
-            week_kind_total_distance.loc[
-                (week_kind_total_distance["iso_year"] == last_year)
-                | (week_kind_total_distance["iso_year"] == last_year - 1)
-                & (week_kind_total_distance["week"] >= last_week)
-            ],
-            title=f"Weekly {column.display_name}",
-        )
-        .mark_bar()
-        .encode(
-            alt.X("year_week", title="Year and Week"),
-            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
-            alt.Color("kind", scale=kind_scale, title="Kind"),
-            [
-                alt.Tooltip("year_week", title="Year and Week"),
-                alt.Tooltip("kind", title="Kind"),
-                alt.Tooltip(
-                    column.name,
-                    title=f"{column.display_name} / {column.unit}",
-                    format=column.format,
-                ),
-            ],
-        )
         .to_json(format="vega")
     )

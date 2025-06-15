@@ -49,6 +49,7 @@ DISCRETE_VARIABLES = {
     "week:O": "ISO Week",
     "date(start)": "Day of month",
     "weekday(start)": "Day of week",
+    "iso_day:O": "ISO Day",
 }
 GROUP_BY_VARIABLES = {
     "": "(no grouping)",

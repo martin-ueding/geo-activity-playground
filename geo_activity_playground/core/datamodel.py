@@ -251,6 +251,7 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
         df["week"] = df["start"].dt.isocalendar().week
         df["day_of_week"] = df["start"].dt.day_of_week
         df["iso_year"] = df["start"].dt.isocalendar().year
+        df["iso_day"] = df["start"].dt.isocalendar().day
         df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
         df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
 
