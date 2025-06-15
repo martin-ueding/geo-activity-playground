@@ -365,6 +365,7 @@ class PlotSpec(DB.Model):
     opacity: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
     column: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
     facet: Mapped[str] = mapped_column(sa.String, nullable=False, default="")
+    group_by: Mapped[str] = mapped_column(sa.String, nullable=True, default="")
 
     FIELDS = [
         "name",
@@ -378,6 +379,7 @@ class PlotSpec(DB.Model):
         "opacity",
         "column",
         "facet",
+        "group_by",
     ]
 
     def __str__(self) -> str:

@@ -50,59 +50,77 @@ DISCRETE_VARIABLES = {
     "date(start)": "Day of month",
     "weekday(start)": "Day of week",
 }
+GROUP_BY_VARIABLES = {
+    "": "(no grouping)",
+    "equipment": "Equipment",
+    "kind": "Activity kind",
+    "consider_for_achievements": "Consider for achievements",
+    "iso_year": "ISO Year",
+    "week": "ISO Week",
+}
 
 VARIABLES_1 = {"": "", **DISCRETE_VARIABLES}
 VARIABLES_2 = {"": "", **DISCRETE_VARIABLES, **CONTINUOUS_VARIABLES}
 
 
-def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> str:
-    chart = alt.Chart(df)
+def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
+    if spec.group_by:
+        grouped = df.groupby(spec.group_by)
+    else:
+        grouped = [("", df)]
 
-    match spec.mark:
-        case "point":
-            chart = chart.mark_point()
-        case "circle":
-            chart = chart.mark_circle()
-        case "area":
-            chart = chart.mark_area()
-        case "bar":
-            chart = chart.mark_bar()
-        case "rect":
-            chart = chart.mark_rect()
-        case _:
-            raise ValueError()
+    chart_groups = {}
+    for key, group in grouped:
+        chart = alt.Chart(group)
 
-    encodings = [
-        alt.X(spec.x, title=VARIABLES_2[spec.x]),
-        alt.Y(spec.y, title=VARIABLES_2[spec.y]),
-    ]
-    tooltips = [
-        alt.Tooltip(spec.x, title=VARIABLES_2[spec.x]),
-        alt.Tooltip(spec.y, title=VARIABLES_2[spec.y]),
-    ]
+        match spec.mark:
+            case "point":
+                chart = chart.mark_point()
+            case "circle":
+                chart = chart.mark_circle()
+            case "area":
+                chart = chart.mark_area()
+            case "bar":
+                chart = chart.mark_bar()
+            case "rect":
+                chart = chart.mark_rect()
+            case _:
+                raise ValueError()
 
-    if spec.color:
-        encodings.append(alt.Color(spec.color, title=VARIABLES_2[spec.color]))
-        tooltips.append(alt.Tooltip(spec.color, title=VARIABLES_2[spec.color]))
-    if spec.shape:
-        encodings.append(alt.Shape(spec.shape, title=VARIABLES_2[spec.shape]))
-        tooltips.append(alt.Tooltip(spec.shape, title=VARIABLES_2[spec.shape]))
-    if spec.size:
-        encodings.append(alt.Size(spec.size, title=VARIABLES_2[spec.size]))
-        tooltips.append(alt.Tooltip(spec.size, title=VARIABLES_2[spec.size]))
-    if spec.opacity:
-        encodings.append(alt.Size(spec.opacity, title=VARIABLES_2[spec.opacity]))
-        tooltips.append(alt.Opacity(spec.opacity, title=VARIABLES_2[spec.opacity]))
-    if spec.row:
-        encodings.append(alt.Row(spec.row, title=VARIABLES_2[spec.row]))
-        tooltips.append(alt.Tooltip(spec.row, title=VARIABLES_2[spec.row]))
-    if spec.column:
-        encodings.append(alt.Column(spec.column, title=VARIABLES_2[spec.column]))
-        tooltips.append(alt.Tooltip(spec.column, title=VARIABLES_2[spec.column]))
-    if spec.facet:
-        encodings.append(
-            alt.Facet(spec.facet, columns=3, title=VARIABLES_2[spec.facet])
+        encodings = [
+            alt.X(spec.x, title=VARIABLES_2[spec.x]),
+            alt.Y(spec.y, title=VARIABLES_2[spec.y]),
+        ]
+        tooltips = [
+            alt.Tooltip(spec.x, title=VARIABLES_2[spec.x]),
+            alt.Tooltip(spec.y, title=VARIABLES_2[spec.y]),
+        ]
+
+        if spec.color:
+            encodings.append(alt.Color(spec.color, title=VARIABLES_2[spec.color]))
+            tooltips.append(alt.Tooltip(spec.color, title=VARIABLES_2[spec.color]))
+        if spec.shape:
+            encodings.append(alt.Shape(spec.shape, title=VARIABLES_2[spec.shape]))
+            tooltips.append(alt.Tooltip(spec.shape, title=VARIABLES_2[spec.shape]))
+        if spec.size:
+            encodings.append(alt.Size(spec.size, title=VARIABLES_2[spec.size]))
+            tooltips.append(alt.Tooltip(spec.size, title=VARIABLES_2[spec.size]))
+        if spec.opacity:
+            encodings.append(alt.Opacity(spec.opacity, title=VARIABLES_2[spec.opacity]))
+            tooltips.append(alt.Tooltip(spec.opacity, title=VARIABLES_2[spec.opacity]))
+        if spec.row:
+            encodings.append(alt.Row(spec.row, title=VARIABLES_2[spec.row]))
+            tooltips.append(alt.Tooltip(spec.row, title=VARIABLES_2[spec.row]))
+        if spec.column:
+            encodings.append(alt.Column(spec.column, title=VARIABLES_2[spec.column]))
+            tooltips.append(alt.Tooltip(spec.column, title=VARIABLES_2[spec.column]))
+        if spec.facet:
+            encodings.append(
+                alt.Facet(spec.facet, columns=3, title=VARIABLES_2[spec.facet])
+            )
+            tooltips.append(alt.Tooltip(spec.facet, title=VARIABLES_2[spec.facet]))
+
+        chart_groups[str(key)] = (
+            chart.encode(*encodings, tooltips).interactive().to_json(format="vega")
         )
-        tooltips.append(alt.Tooltip(spec.facet, title=VARIABLES_2[spec.facet]))
-
-    return chart.encode(*encodings, tooltips).interactive().to_json(format="vega")
+    return chart_groups

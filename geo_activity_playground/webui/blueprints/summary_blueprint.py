@@ -88,7 +88,7 @@ def _render_plot_to_html(chart: alt.Chart) -> str:
     chart_json = chart.to_json(format="vega")
     return render_template(
         "summary/vega-chart.html.j2",
-        chart_name=str(uuid.uuid4()),
+        chart_name=f"id-{uuid.uuid4()}",
         chart_json=chart_json,
     )
 
@@ -189,7 +189,6 @@ def make_summary_blueprint(
             )
             .reset_index()
             .to_dict(orient="split"),
-            plot_weekly_distance=plot_weekly_sums(df, column_distance, kind_scale),
             plot_weekly_elevation_gain=plot_weekly_sums(
                 df, column_elevation_gain, kind_scale
             ),

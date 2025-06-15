@@ -8,6 +8,7 @@ from flask import url_for
 
 from ...core.activities import ActivityRepository
 from ...core.datamodel import DB
+from ...core.parametric_plot import GROUP_BY_VARIABLES
 from ...core.parametric_plot import make_parametric_plot
 from ...core.parametric_plot import MARKS
 from ...core.parametric_plot import PlotSpec
@@ -62,6 +63,7 @@ def make_plot_builder_blueprint(
             spec.column = request.args["column"]
             spec.facet = request.args["facet"]
             spec.opacity = request.args["opacity"]
+            spec.group_by = request.args["group_by"]
         try:
             plot = make_parametric_plot(repository.meta, spec)
             DB.session.commit()
@@ -73,6 +75,7 @@ def make_plot_builder_blueprint(
             marks=MARKS,
             discrete=VARIABLES_1,
             continuous=VARIABLES_2,
+            group_by=GROUP_BY_VARIABLES,
             plot=plot,
             spec=spec,
         )

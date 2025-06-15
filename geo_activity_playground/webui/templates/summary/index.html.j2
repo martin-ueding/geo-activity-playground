@@ -1,5 +1,7 @@
 {% extends "page.html.j2" %}
 
+{% from "plot-macros.html.j2" import parametric_plot %}
+
 {% block container %}
 
 <h1>Summary Statistics</h1>
@@ -17,13 +19,9 @@
 
 {% if custom_plots %}
 <h2>Your custom plots</h2>
-{% for spec, plot in custom_plots %}
+{% for spec, plot_groups in custom_plots %}
 <h3>{{ spec.name }}</h3>
-<div class="row mb-3">
-    <div class="col">
-        {{ vega_direct("custom_plot_" ~ loop.index, plot) }}
-    </div>
-</div>
+{{ parametric_plot(spec, plot_groups, loop.index) }}
 {% endfor %}
 {% endif %}
 

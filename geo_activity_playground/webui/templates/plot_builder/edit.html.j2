@@ -1,5 +1,7 @@
 {% extends "page.html.j2" %}
 
+{% from "plot-macros.html.j2" import parametric_plot %}
+
 {% block container %}
 
 <h1 class="row mb-3">Plot Builder</h1>
@@ -28,6 +30,7 @@
                 <input type="text" name="name" id="name" class="form-control" value="{{ spec.name }}">
             </div>
 
+            {{ select_field("Group by", "group_by", group_by, spec.group_by)}}
             {{ select_field("Mark", "mark", marks, spec.mark)}}
 
             {{ select_field("X", "x", continuous, spec.x)}}
@@ -45,7 +48,7 @@
     </div>
     <div class="col-md-8">
         {% if plot %}
-        {{ vega_direct("plot", plot) }}
+        {{ parametric_plot(spec, plot, 0) }}
         {% endif %}
     </div>
 </div>
