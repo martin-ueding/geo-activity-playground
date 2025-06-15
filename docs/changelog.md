@@ -17,9 +17,14 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- The plot builder now supports grouping on top of the previous features.
+
 Changed:
 
 - Move "Hall of Fame" into separate page.
+- A bunch of the random statistics plots are removed. The plot builder is able to recreate them, depending on your preferences. On start-up it will point you to the documentation for it.
 
 Fixed:
 
