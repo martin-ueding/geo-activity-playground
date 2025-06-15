@@ -231,6 +231,9 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     # If the search yields only activities without time information, the dtype isn't derived correctly.
     df["start"] = pd.to_datetime(df["start"])
+    # start = df["start"].to_list()
+    # random.shuffle(start)
+    # df["start"] = pd.Series(start)
     df["elapsed_time"] = pd.to_timedelta(df["elapsed_time"])
 
     if len(df):

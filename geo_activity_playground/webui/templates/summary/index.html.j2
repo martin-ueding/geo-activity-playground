@@ -23,6 +23,11 @@
 <h3>{{ spec.name }}</h3>
 {{ parametric_plot(spec, plot_groups, loop.index) }}
 {% endfor %}
+{% else %}
+<p>It seems that you don't have any custom plots yet. Check out the <a
+        href="https://martin-ueding.github.io/geo-activity-playground/build-custom-plots/"
+        target="_blank">documentation</a> and then head over to the <a href="{{ url_for('plot_builder.index') }}">plot
+        builder</a> to create or import some plots.</p>
 {% endif %}
 
 <h2>Distances</h2>
