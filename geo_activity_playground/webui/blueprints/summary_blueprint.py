@@ -156,7 +156,7 @@ def plot_heatmaps(
             ],
         )
         .to_json(format="vega")
-        for year in sorted(meta["year"].unique())
+        for year in sorted(meta["year"].dropna().unique())
     }
 
 
