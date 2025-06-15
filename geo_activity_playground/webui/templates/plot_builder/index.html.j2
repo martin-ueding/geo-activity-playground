@@ -2,6 +2,7 @@
 
 {% block container %}
 
+
 <h1 class="row mb-3">Plot Builder</h1>
 
 {% if specs %}
@@ -28,5 +29,7 @@
 {% endif %}
 
 <a class="btn btn-primary" href="{{ url_for('.new') }}">New</a>
+
+<a class="btn btn-primary" href="{{ url_for('.import_spec') }}">Import</a>
 
 {% endblock %}

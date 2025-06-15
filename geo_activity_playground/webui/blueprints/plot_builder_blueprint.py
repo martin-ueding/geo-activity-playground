@@ -1,3 +1,5 @@
+import json
+
 import sqlalchemy
 from flask import Blueprint
 from flask import redirect
@@ -5,6 +7,8 @@ from flask import render_template
 from flask import request
 from flask import Response
 from flask import url_for
+from flask.typing import ResponseReturnValue
+from flask.typing import RouteCallable
 
 from ...core.activities import ActivityRepository
 from ...core.datamodel import DB
@@ -26,7 +30,7 @@ def make_plot_builder_blueprint(
     blueprint = Blueprint("plot_builder", __name__, template_folder="templates")
 
     @blueprint.route("/")
-    def index() -> Response:
+    def index() -> ResponseReturnValue:
         return render_template(
             "plot_builder/index.html.j2",
             specs=DB.session.scalars(sqlalchemy.select(PlotSpec)).all(),
@@ -34,7 +38,7 @@ def make_plot_builder_blueprint(
 
     @blueprint.route("/new")
     @needs_authentication(authenticator)
-    def new() -> Response:
+    def new() -> ResponseReturnValue:
         spec = PlotSpec(
             name="My New Plot",
             mark="bar",
@@ -46,10 +50,22 @@ def make_plot_builder_blueprint(
         DB.session.commit()
         return redirect(url_for(".edit", id=spec.id))
 
+    @blueprint.route("/import-spec", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def import_spec() -> ResponseReturnValue:
+        if request.form:
+            parameters = json.loads(request.form["spec_json"])
+            spec = PlotSpec(**parameters)
+            DB.session.add(spec)
+            DB.session.commit()
+            return redirect(url_for(".edit", id=spec.id))
+        else:
+            return render_template("plot_builder/import-spec.html.j2")
+
     @blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
-    def edit(id: int) -> Response:
-        spec = DB.session.get(PlotSpec, id)
+    def edit(id: int) -> ResponseReturnValue:
+        spec = DB.session.get_one(PlotSpec, id)
         if request.form:
             spec.name = request.form["name"]
             spec.mark = request.form["mark"]
@@ -82,7 +98,7 @@ def make_plot_builder_blueprint(
 
     @blueprint.route("/delete/<int:id>")
     @needs_authentication(authenticator)
-    def delete(id: int) -> Response:
+    def delete(id: int) -> ResponseReturnValue:
         spec = DB.session.get(PlotSpec, id)
         DB.session.delete(spec)
         flasher.flash_message(f"Deleted plot '{spec.name}'.", FlashTypes.SUCCESS)

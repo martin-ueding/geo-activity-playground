@@ -4,10 +4,14 @@
 
 {% block container %}
 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">Plot Builder</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+
 <h1 class="row mb-3">Plot Builder</h1>
-
-<div class="mb-3"><a class="btn btn-primary" href="{{ url_for('.index') }}">Back to overview</a></div>
-
 
 <div class="row mb-3">
     <div class="col-md-4">
