@@ -19,8 +19,9 @@
 
 {% if custom_plots %}
 {% for spec, plot_groups in custom_plots %}
-<h3>{{ spec.name }}</h3>
+<h3 class="mb-3">{{ spec.name }}</h3>
 {{ parametric_plot(spec, plot_groups, loop.index) }}
+<p><a class="btn btn-sm btn-secondary" href="{{ url_for('plot_builder.edit', id=spec.id) }}">Edit this plot</a></p>
 {% endfor %}
 {% else %}
 <p>It seems that you don't have any custom plots yet. Check out the <a

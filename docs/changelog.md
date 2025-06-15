@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - The plot builder now supports grouping on top of the previous features.
+- Add an edit button to custom plots on the summary statistics page.
 
 Changed:
 
