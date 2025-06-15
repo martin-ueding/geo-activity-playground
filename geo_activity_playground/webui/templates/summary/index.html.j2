@@ -18,7 +18,6 @@
 {% endif %}
 
 {% if custom_plots %}
-<h2>Your custom plots</h2>
 {% for spec, plot_groups in custom_plots %}
 <h3>{{ spec.name }}</h3>
 {{ parametric_plot(spec, plot_groups, loop.index) }}
@@ -30,38 +29,18 @@
         builder</a> to create or import some plots.</p>
 {% endif %}
 
-<h2>Distances</h2>
+<h2>Cumulative Plots</h2>
 
-
-
-<p>How much distance have you covered in each year up to that time of the year? The first plot gives you each year as
+<p>How much distance and elevation gain have you covered in each year up to that time of the year? The first plot gives
+    you each year as
     one line. The second plot shows you how distance you have covered in each year and with which activity kinds.</p>
 
 <div class="row mb-3">
     <div class="col-md-6">
         {{ vega_direct("plot_year_cumulative", plot_year_cumulative) }}
     </div>
-</div>
-
-
-
-
-<h2>Elevation Gain</h2>
-
-
-
-<p>How much elevation have you gained in each year up to that time of the year? The first plot gives you each year as
-    one line. The second plot shows you how much elevation you have gained in each year and with which activity kinds.
-</p>
-
-<div class="row mb-3">
     <div class="col-md-6">
         {{ vega_direct("plot_year_elevation_gain_cumulative", plot_year_elevation_gain_cumulative) }}
     </div>
 </div>
-
-
-
-
-
 {% endblock %}
