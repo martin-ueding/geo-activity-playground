@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% from "plot-macros.html.j2" import vega, vega_direct, activity_tag %}
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -184,24 +186,6 @@
                 </div>
             </div>
         </nav>
-
-        {% macro vega(id, path) %}
-        <div id="{{ id }}"></div>
-        <script type="text/javascript">
-            vegaEmbed('#{{ id }}', "{{ path }}").then(function (result) { }).catch(console.error);
-        </script>
-        {% endmacro %}
-
-        {% macro vega_direct(id, spec) %}
-        <div id="{{ id }}"></div>
-        <script type="text/javascript">
-            vegaEmbed('#{{ id }}', {{ spec| safe }}).then(function (result) { }).catch(console.error);
-        </script>
-        {% endmacro %}
-
-        {% macro activity_tag(tag) %}
-        <span class="badge" style="background-color: {{ tag.color or '#0d6efd' }}">{{ tag.tag }}</span>
-        {% endmacro %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

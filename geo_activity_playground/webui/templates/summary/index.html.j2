@@ -8,6 +8,13 @@
     {% include "search_form.html.j2" %}
 </div>
 
+{% if modular_plots %}
+<h2>Your modular plots</h2>
+{% for html in modular_plots %}
+{{ html | safe }}
+{% endfor %}
+{% endif %}
+
 {% if custom_plots %}
 <h2>Your custom plots</h2>
 {% for spec, plot in custom_plots %}
@@ -21,14 +28,6 @@
 {% endif %}
 
 <h2>Distances</h2>
-
-<p>This is your weekly distance for the past rolling year, split by activity kind.</p>
-
-<div class="row mb-3">
-    <div class="col">
-        {{ vega_direct("plot_weekly_distance", plot_weekly_distance) }}
-    </div>
-</div>
 
 <p>Similarly, you find the same data but aggregated by whole months for the past two years. Also split by activity kind.
 </p>
