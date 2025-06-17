@@ -29,6 +29,7 @@ Changed:
 - The plots on the summary page have been re-done. They are now all available not only for distance and elevation gain, but also for elapsed and moving time, energy (calories) and steps.
 - Move "Hall of Fame" into separate page.
 - The files in `/static` are organized a little better, no change for the user.
+- Use tabs on the entry page to organize plots for distance and elevation gain.
 
 Fixed:
 
