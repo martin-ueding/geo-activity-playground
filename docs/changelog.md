@@ -26,6 +26,7 @@ Changed:
 
 - Move "Hall of Fame" into separate page.
 - A bunch of the random statistics plots are removed. The plot builder is able to recreate them, depending on your preferences. On start-up it will point you to the documentation for it.
+- The files in `/static` are organized a little better, no change for the user.
 
 Fixed:
 
