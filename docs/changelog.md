@@ -36,6 +36,7 @@ Fixed:
 
 - Fix summary page when routes are present. ([GH-282](https://github.com/martin-ueding/geo-activity-playground/issues/282))
 - Fix opacity in parametric plots.
+- Fix download of explored or missing tiles from the explorer tile view.
 
 ## Version 1.0.0 — 2025-06-14
 

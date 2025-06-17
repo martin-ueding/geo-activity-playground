@@ -53,3 +53,8 @@ map.on('click', e => {
         }
         );
 });
+
+function downloadAs(suffix) {
+    bounds = map.getBounds();
+    window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
+}
