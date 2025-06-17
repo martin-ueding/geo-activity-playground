@@ -274,7 +274,10 @@ def make_explorer_blueprint(
         square_line_width = 3
         square_color = np.array([[[228, 26, 28]]]) / 256
 
-        match request.args.get("color_strategy", "colorful_cluster"):
+        color_strategy_name = request.args.get("color_strategy", "colorful_cluster")
+        if color_strategy_name == "default":
+            color_strategy_name = config_accessor().cluster_color_strategy
+        match color_strategy_name:
             case "max_cluster":
                 color_strategy = MaxClusterColorStrategy(evolution_state, tile_visits)
             case "colorful_cluster":

@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class Config:
     birth_year: Optional[int] = None
+    cluster_color_strategy: str = "colorful_cluster"
     color_scheme_for_counts: str = "teals"
     color_scheme_for_kind: str = "category10"
     color_scheme_for_heatmap: str = "hot"
