@@ -107,6 +107,52 @@ def plot_per_iso_week(df: pd.DataFrame, column: ColumnDescription) -> str:
                 alt.Tooltip(
                     f"sum({column.name})",
                     title=f"{column.display_name} / {column.unit}",
+                    format=column.format,
+                ),
+            ],
+        )
+        .interactive()
+        .to_json(format="vega")
+    )
+
+
+def heatmap_per_day(df: pd.DataFrame, column: ColumnDescription) -> str:
+    return (
+        alt.Chart(
+            _filter_past_year(df),
+            title=f"{column.display_name} per day",
+        )
+        .mark_rect()
+        .encode(
+            alt.X("iso_year_week:O", title="ISO Year and Week"),
+            alt.Y(
+                "iso_day:O",
+                # scale=alt.Scale(
+                #     domain=list(range(1, 8)),
+                #     range=[
+                #         "Monday",
+                #         "Tuesday",
+                #         "Wednesday",
+                #         "Thursday",
+                #         "Friday",
+                #         "Saturday",
+                #         "Sunday",
+                #     ],
+                # ),
+                title="ISO Weekday",
+            ),
+            alt.Color(
+                f"sum({column.name})",
+                scale=alt.Scale(scheme="viridis"),
+                title=f"{column.display_name} / {column.unit}",
+            ),
+            [
+                alt.Tooltip("iso_year_week", title="ISO Year and Week"),
+                alt.Tooltip("iso_day", title="ISO Day"),
+                alt.Tooltip(
+                    f"sum({column.name})",
+                    title=f"{column.display_name} / {column.unit}",
+                    format=column.format,
                 ),
             ],
         )
@@ -154,6 +200,10 @@ def make_summary_blueprint(
             },
             plot_per_iso_week={
                 column.display_name: plot_per_iso_week(df, column)
+                for column in META_COLUMNS
+            },
+            heatmap_per_day={
+                column.display_name: heatmap_per_day(df, column)
                 for column in META_COLUMNS
             },
         )

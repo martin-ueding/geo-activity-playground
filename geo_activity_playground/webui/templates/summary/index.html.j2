@@ -10,39 +10,40 @@
     {% include "search_form.html.j2" %}
 </div>
 
-{% if modular_plots %}
-<h2>Your modular plots</h2>
-{% for html in modular_plots %}
-{{ html | safe }}
-{% endfor %}
-{% endif %}
-
 {% if custom_plots %}
+<h2>Custom plots</h2>
 {% for spec, plot_groups in custom_plots %}
 <h3 class="mb-3">{{ spec.name }}</h3>
 {{ parametric_plot(spec, plot_groups, loop.index) }}
 <p><a class="btn btn-sm btn-secondary" href="{{ url_for('plot_builder.edit', id=spec.id) }}">Edit this plot</a></p>
 {% endfor %}
-{% else %}
-<p>It seems that you don't have any custom plots yet. Check out the <a
-        href="https://martin-ueding.github.io/geo-activity-playground/build-custom-plots/"
-        target="_blank">documentation</a> and then head over to the <a href="{{ url_for('plot_builder.index') }}">plot
-        builder</a> to create or import some plots.</p>
 {% endif %}
 
-<hr>
+<h2>Per year and kind</h2>
 
+<p>How much distance (or else) did you cover within each year? The following plots show the quantity summed up for a
+    year, differentiated by activity kind.</p>
 
 {{ tabbed_vega(plot_per_year_per_kind) }}
 
+<h2>Per week</h2>
+
+<p>What's the distance (or else) per week? See it for all weeks in all years. The larger the circle is, the more you did
+    in that week.</p>
+
 {{ tabbed_vega(plot_per_iso_week) }}
 
+<h2>Per day</h2>
 
-<h2>Cumulative Plots</h2>
+<p>And also more fine-grained per day for the past rolling year. This is grouped by day of the week such that you can
+    easily spot patterns in your daily routine.</p>
 
-<p>How much distance and elevation gain have you covered in each year up to that time of the year? The first plot gives
-    you each year as
-    one line. The second plot shows you how distance you have covered in each year and with which activity kinds.</p>
+{{ tabbed_vega(heatmap_per_day) }}
+
+<h2>Cumulative per year</h2>
+
+<p>How much distance (or else) have you covered in each year up to that time of the year? This lets you see how you are
+    doing compared to previous years.</p>
 
 {{ tabbed_vega(plot_per_year_cumulative) }}
 

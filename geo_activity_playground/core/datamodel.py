@@ -257,6 +257,9 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
         df["iso_day"] = df["start"].dt.isocalendar().day
         df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
         df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
+        df["iso_year_week"] = [
+            f"{year:04d}-{week:02d}" for year, week in zip(df["iso_year"], df["week"])
+        ]
 
         df.index = df["id"]
 

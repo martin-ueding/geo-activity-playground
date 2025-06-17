@@ -26,7 +26,7 @@ Added:
 
 Changed:
 
-- ⚠️ A bunch of the random statistics plots are removed. The plot builder is able to recreate them, depending on your preferences. On start-up it will point you to the documentation for it.
+- The plots on the summary page have been re-done. They are now all available not only for distance and elevation gain, but also for elapsed and moving time, energy (calories) and steps.
 - Move "Hall of Fame" into separate page.
 - The files in `/static` are organized a little better, no change for the user.
 
