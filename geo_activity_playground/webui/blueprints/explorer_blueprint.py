@@ -172,9 +172,9 @@ def make_explorer_blueprint(
         return redirect(url_for(".map", zoom=zoom))
 
     @blueprint.route(
-        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/explored.<suffix>"
+        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/missing.<suffix>"
     )
-    def download(
+    def download_missing(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
     ) -> ResponseReturnValue:
         x1, y1 = compute_tile(north, west, zoom)
@@ -197,9 +197,9 @@ def make_explorer_blueprint(
         )
 
     @blueprint.route(
-        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/missing.<suffix>"
+        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/explored.<suffix>"
     )
-    def missing(
+    def download_explored(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
     ) -> ResponseReturnValue:
         x1, y1 = compute_tile(north, west, zoom)
