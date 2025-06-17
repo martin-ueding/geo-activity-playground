@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix error when search results are empty.
+
 ## Version 1.1.0 — 2025-06-17
 
 Added:
