@@ -1,6 +1,7 @@
 import abc
 import datetime
 import uuid
+from collections.abc import Callable
 from collections.abc import Iterable
 
 import altair as alt
@@ -16,6 +17,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import PlotSpec
 from ...core.meta_search import apply_search_query
 from ...core.parametric_plot import make_parametric_plot
+from ...core.visualizations import PLOTS
 from ..columns import column_distance
 from ..columns import column_elevation_gain
 from ..columns import ColumnDescription
@@ -72,18 +74,6 @@ class ModularPlot:
             return list(rendered_parts.values())[0]
 
 
-class PastYearFilter(DataFilter):
-    def filter(self, activities: pd.DataFrame) -> pd.DataFrame:
-        now = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
-        start = now - datetime.timedelta(days=365)
-        return activities.loc[activities["start"] >= start]
-
-
-class TrivialDataGrouper(DataGrouper):
-    def group(self, activities: pd.DataFrame) -> Iterable[tuple[str, pd.DataFrame]]:
-        return [("", activities)]
-
-
 def _render_plot_to_html(chart: alt.Chart) -> str:
     chart_json = chart.to_json(format="vega")
     return render_template(
@@ -137,16 +127,6 @@ class WeeklyAmountVisualizer(DataVisualizer):
         )
 
 
-MODULAR_PLOTS: list[ModularPlot] = [
-    ModularPlot(
-        "Weekly Distance",
-        PastYearFilter(),
-        TrivialDataGrouper(),
-        WeeklyAmountVisualizer(column_distance),
-    ),
-]
-
-
 def make_summary_blueprint(
     repository: ActivityRepository,
     config: Config,
@@ -163,62 +143,23 @@ def make_summary_blueprint(
         kind_scale = make_kind_scale(repository.meta, config)
         df = activities
 
+        plot_context = {}
+        for name, plot_function in PLOTS.items():
+            if isinstance(plot_function, dict):
+                plot_context[name] = {
+                    key: value(df) for key, value in plot_function.items()
+                }
+            else:
+                plot_context[name] = plot_function(df)
+
         return render_template(
             "summary/index.html.j2",
-            plot_year_cumulative=plot_year_cumulative(df, column_distance),
-            plot_year_elevation_gain_cumulative=plot_year_cumulative(
-                df, column_elevation_gain
-            ),
             query=query.to_jinja(),
             custom_plots=[
                 (spec, make_parametric_plot(repository.meta, spec))
                 for spec in DB.session.scalars(sqlalchemy.select(PlotSpec)).all()
             ],
-            modular_plots=[
-                # modular_plot.render_html(activities) for modular_plot in MODULAR_PLOTS
-            ],
+            **plot_context,
         )
 
     return blueprint
-
-
-def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
-    year_cumulative = (
-        df[["iso_year", "week", column.name]]
-        .groupby("iso_year")
-        .apply(
-            lambda group: pd.DataFrame(
-                {
-                    "week": group["week"],
-                    column.name: group[column.name].cumsum(),
-                }
-            ),
-            include_groups=False,
-        )
-        .reset_index()
-    )
-
-    return (
-        alt.Chart(
-            year_cumulative,
-            width=500,
-            title=f"Cumulative {column.display_name} per Year",
-        )
-        .mark_line()
-        .encode(
-            alt.X("week", title="Week"),
-            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
-            alt.Color("iso_year:N", title="Year"),
-            [
-                alt.Tooltip("week", title="Week"),
-                alt.Tooltip("iso_year:N", title="Year"),
-                alt.Tooltip(
-                    column.name,
-                    title=f"{column.display_name} / {column.unit}",
-                    format=column.format,
-                ),
-            ],
-        )
-        .interactive()
-        .to_json(format="vega")
-    )

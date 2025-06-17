@@ -59,17 +59,17 @@
 <div class="row mb-3">
     <div class="col-md-4">
         {% if plot_tile_evolution|length > 0 %}
-        {{ vega_direct("plot_tile_evolution", plot_tile_evolution) }}
+        {{ vega_direct(plot_tile_evolution) }}
         {% endif %}
     </div>
     <div class="col-md-4">
         {% if plot_cluster_evolution|length > 0 %}
-        {{ vega_direct("plot_cluster_evolution", plot_cluster_evolution) }}
+        {{ vega_direct(plot_cluster_evolution) }}
         {% endif %}
     </div>
     <div class="col-md-4">
         {% if plot_square_evolution|length > 0 %}
-        {{ vega_direct("plot_square_evolution", plot_square_evolution) }}
+        {{ vega_direct(plot_square_evolution) }}
         {% endif %}
     </div>
 </div>

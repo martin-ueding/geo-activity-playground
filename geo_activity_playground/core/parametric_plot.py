@@ -10,9 +10,11 @@ MARKS = {
     "area": "Area",
     "bar": "Bar",
     "rect": "Rectangle",
+    "line": "Line",
 }
 CONTINUOUS_VARIABLES = {
     "distance_km": "Distance / km",
+    "distance_km_cumsum": "Cumulative Distance / km",
     "sum(distance_km)": "Total distance / km",
     "mean(distance_km)": "Average distance / km",
     "start": "Date",
@@ -86,8 +88,31 @@ def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
                 chart = chart.mark_bar()
             case "rect":
                 chart = chart.mark_rect()
+            case "line":
+                chart = chart.mark_line()
             case _:
                 raise ValueError()
+
+        if spec.mark in ["area", "line"]:
+            group_by_variables = [
+                var.split(":")[0]
+                for var in [
+                    spec.color,
+                    spec.shape,
+                    spec.size,
+                    spec.opacity,
+                    spec.row,
+                    spec.column,
+                    spec.facet,
+                ]
+                if var
+            ]
+            for column in ["distance_km"]:
+                group[column + "_cumsum"] = (
+                    group[group_by_variables + [column]]
+                    .groupby(group_by_variables)
+                    .cumsum()
+                )
 
         encodings = [
             (

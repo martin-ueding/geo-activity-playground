@@ -1,11 +1,13 @@
-{% macro vega(id, path) %}
+{% macro vega(path) %}
+{% set id = unique_id() %}
 <div id="{{ id }}"></div>
 <script type="text/javascript">
     vegaEmbed('#{{ id }}', "{{ path }}").then(function (result) { }).catch(console.error);
 </script>
 {% endmacro %}
 
-{% macro vega_direct(id, spec) %}
+{% macro vega_direct(spec) %}
+{% set id = unique_id() %}
 <div id="{{ id }}"></div>
 <script type="text/javascript">
     vegaEmbed('#{{ id }}', {{ spec| safe }}).then(function (result) { }).catch(console.error);
@@ -16,6 +18,28 @@
 <span class="badge" style="background-color: {{ tag.color or '#0d6efd' }}">{{ tag.tag }}</span>
 {% endmacro %}
 
+{% macro tabbed_vega(tab_dict, last=False) %}
+{% set id = unique_id() %}
+<ul class="nav nav-pills mb-3" role="tablist">
+    {% for key in tab_dict.keys() %}
+    {% set plot_id = id ~ "-" ~ loop.index %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {% if (last and loop.last) or (not last and loop.first) %} active {% endif %}"
+            id="{{ plot_id }}-tab" data-bs-toggle="tab" data-bs-target="#{{ plot_id }}-pane" type="button" role="tab"
+            aria-controls="{{ plot_id }}-pane" aria-selected="{{ loop.last }}">{{ key }}</button>
+    </li>
+    {% endfor %}
+</ul>
+<div class="tab-content mb-3">
+    {% for plot in tab_dict.values() %}
+    {% set plot_id = id ~ "-" ~ loop.index %}
+    <div class="tab-pane fade {% if (last and loop.last) or (not last and loop.first) %} show active {% endif %}"
+        id="{{ plot_id }}-pane" role="tabpanel" aria-labelledby="{{ plot_id }}-tab" tabindex="0">
+        {{ vega_direct(plot) }}
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
 
 {% macro parametric_plot(spec, plot_groups, outer_loop_index) %}
 {% if spec.group_by %}
@@ -34,14 +58,14 @@
     {% set plot_id = "custom_plot_" ~ outer_loop_index ~ "_" ~ loop.index %}
     <div class="tab-pane fade {% if loop.last %} show active {% endif %}" id="{{ plot_id }}-pane" role="tabpanel"
         aria-labelledby="{{ plot_id }}-tab" tabindex="0">
-        {{ vega_direct(plot_id, plot) }}
+        {{ vega_direct(plot) }}
     </div>
     {% endfor %}
 </div>
 {% else %}
 <div class="row mb-3">
     <div class="col">
-        {{ vega_direct("custom_plot_" ~ outer_loop_index, plot_groups[""]) }}
+        {{ vega_direct(plot_groups[""]) }}
     </div>
 </div>
 {% endif %}

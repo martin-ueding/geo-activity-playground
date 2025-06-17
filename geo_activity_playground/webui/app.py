@@ -7,6 +7,7 @@ import pathlib
 import secrets
 import shutil
 import urllib.parse
+import uuid
 
 import pandas as pd
 import sqlalchemy
@@ -112,6 +113,10 @@ def web_ui_main(
             return "—"
         else:
             return value.strftime("%Y-%m-%d %H:%M")
+
+    @app.template_global("unique_id")
+    def unique_id():
+        return f"id-{uuid.uuid4()}"
 
     @app.template_filter()
     def td(v: datetime.timedelta):

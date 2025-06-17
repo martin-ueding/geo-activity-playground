@@ -22,11 +22,12 @@ Added:
 - The plot builder now supports grouping on top of the previous features.
 - Add an edit button to custom plots on the summary statistics page.
 - Bring back the colorful cluster coloring mode and make that the default.
+- Expose default cluster coloring mode via `config.json` option `cluster_color_strategy`, web UI settings menu might follow later.
 
 Changed:
 
+- ⚠️ A bunch of the random statistics plots are removed. The plot builder is able to recreate them, depending on your preferences. On start-up it will point you to the documentation for it.
 - Move "Hall of Fame" into separate page.
-- A bunch of the random statistics plots are removed. The plot builder is able to recreate them, depending on your preferences. On start-up it will point you to the documentation for it.
 - The files in `/static` are organized a little better, no change for the user.
 
 Fixed:

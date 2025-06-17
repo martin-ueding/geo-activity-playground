@@ -182,13 +182,13 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct("distance_time_plot", distance_time_plot) }}
+        {{ vega_direct(distance_time_plot) }}
     </div>
     <div class="col-md-4">
-        {{ vega_direct("speed_time_plot", speed_time_plot) }}
+        {{ vega_direct(speed_time_plot) }}
     </div>
     <div class="col-md-4">
-        {{ vega_direct("speed_distribution_plot", speed_distribution_plot) }}
+        {{ vega_direct(speed_distribution_plot) }}
     </div>
 </div>
 
@@ -201,11 +201,11 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct("elevation_time_plot", elevation_time_plot) }}
+        {{ vega_direct(elevation_time_plot) }}
     </div>
     {% if elevation_gain_cum_plot is defined %}
     <div class="col-md-4">
-        {{ vega_direct("elevation_gain_cum_plot", elevation_gain_cum_plot) }}
+        {{ vega_direct(elevation_gain_cum_plot) }}
     </div>
     {% endif %}
 </div>
@@ -216,11 +216,11 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct("heartrate_time_plot", heartrate_time_plot) }}
+        {{ vega_direct(heartrate_time_plot) }}
     </div>
     <div class="col-md-4">
         {% if heart_zones_plot is defined %}
-        {{ vega_direct("heart_zones_plot", heart_zones_plot) }}
+        {{ vega_direct(heart_zones_plot) }}
         {% else %}
         <p>Your activity has heart data, but this program doesn't know your maximum heart rate (or birth year) and
             therefore cannot compute the heart rate zones. Go to the <a
@@ -235,7 +235,7 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct("cadence_time_plot", cadence_time_plot) }}
+        {{ vega_direct(cadence_time_plot) }}
     </div>
 </div>
 {% endif %}

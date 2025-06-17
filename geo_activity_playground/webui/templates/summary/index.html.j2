@@ -36,12 +36,6 @@
     you each year as
     one line. The second plot shows you how distance you have covered in each year and with which activity kinds.</p>
 
-<div class="row mb-3">
-    <div class="col-md-6">
-        {{ vega_direct("plot_year_cumulative", plot_year_cumulative) }}
-    </div>
-    <div class="col-md-6">
-        {{ vega_direct("plot_year_elevation_gain_cumulative", plot_year_elevation_gain_cumulative) }}
-    </div>
-</div>
+{{ tabbed_vega(plot_per_year_cumulative) }}
+
 {% endblock %}
