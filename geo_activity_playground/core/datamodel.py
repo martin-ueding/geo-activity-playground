@@ -32,6 +32,17 @@ logger = logging.getLogger(__name__)
 DEFAULT_UNKNOWN_NAME = "Unknown"
 
 
+def format_timedelta(v: datetime.timedelta):
+    if pd.isna(v):
+        return "—"
+    else:
+        seconds = v.total_seconds()
+        h = int(seconds // 3600)
+        m = int(seconds // 60 % 60)
+        s = int(seconds // 1 % 60)
+        return f"{h}:{m:02d}:{s:02d}"
+
+
 class ActivityMeta(TypedDict):
     average_speed_elapsed_kmh: float
     average_speed_moving_kmh: float
@@ -164,6 +175,23 @@ class Activity(DB.Model):
             ]
         else:
             return self.raw_time_series
+
+    @property
+    def emoji_string(self) -> str:
+        bits = []
+        if self.kind:
+            bits.append(f"{self.kind.name} with")
+        if self.distance_km:
+            bits.append(f"📏 {round(self.distance_km, 1)} km")
+        if self.elapsed_time:
+            bits.append(f"⏱️ {format_timedelta(self.elapsed_time)} h")
+        if self.elevation_gain:
+            bits.append(f"⛰️ {round(self.elevation_gain, 1)} m")
+        if self.calories:
+            bits.append(f"🍭 {self.calories} kcal")
+        if self.steps:
+            bits.append(f"👣 {self.steps}")
+        return " ".join(bits)
 
     def delete_data(self) -> None:
         for path in [

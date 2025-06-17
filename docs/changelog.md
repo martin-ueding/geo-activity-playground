@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Use consistent emoji string to describe activities on landing page and hall of fame.
+
 Fixed:
 
 - Fix error when search results are empty.

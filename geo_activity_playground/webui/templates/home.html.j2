@@ -46,14 +46,7 @@
                     <h5 class="card-title">{{ elem.activity.name }}</h5>
                 </a>
                 <p class="card-text">
-                    {{ elem.activity.kind.name }} with
-                    📏 {{ (elem.activity.distance_km)|round(1) }} km
-                    {% if elem.activity.elapsed_time %}
-                    ⏱️ {{ elem.activity.elapsed_time|td }}
-                    {% endif %}
-                    {% if elem.activity.elevation_gain %}
-                    ⛰️ {{ (elem.activity.elevation_gain)|round|int }} m
-                    {% endif %}
+                    {{ elem.activity.emoji_string }}
                 </p>
                 {% if elem.activity.start %}
                 <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start|dt }}</small></p>
