@@ -30,6 +30,7 @@ Changed:
 - Move "Hall of Fame" into separate page.
 - The files in `/static` are organized a little better, no change for the user.
 - Use tabs on the entry page to organize plots for distance and elevation gain.
+- Add breadcrumbs to plot builder edit page.
 
 Fixed:
 
