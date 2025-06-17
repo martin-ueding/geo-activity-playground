@@ -21,6 +21,7 @@ Added:
 
 - The plot builder now supports grouping on top of the previous features.
 - Add an edit button to custom plots on the summary statistics page.
+- Bring back the colorful cluster coloring mode and make that the default.
 
 Changed:
 

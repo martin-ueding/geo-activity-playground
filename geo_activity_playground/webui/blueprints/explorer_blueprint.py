@@ -1,5 +1,6 @@
 import abc
 import datetime
+import hashlib
 import io
 import itertools
 import logging
@@ -62,7 +63,7 @@ class ColorStrategy(abc.ABC):
         pass
 
 
-class ClusterColorStrategy(ColorStrategy):
+class MaxClusterColorStrategy(ColorStrategy):
     def __init__(self, evolution_state, tile_visits):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
@@ -78,6 +79,31 @@ class ClusterColorStrategy(ColorStrategy):
             return blend_color(grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3)
         elif tile_xy in self.evolution_state.memberships:
             return blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
+        elif tile_xy in self.tile_visits:
+            return blend_color(grayscale, 0.0, 0.3)
+        else:
+            return grayscale
+
+
+class ColorfulClusterColorStrategy(ColorStrategy):
+    def __init__(self, evolution_state: TileEvolutionState, tile_visits):
+        self.evolution_state = evolution_state
+        self.tile_visits = tile_visits
+        self.max_cluster_members = max(
+            evolution_state.clusters.values(),
+            key=len,
+        )
+        self._cmap = matplotlib.colormaps["hsv"]
+
+    def color_image(
+        self, tile_xy: tuple[int, int], grayscale: np.ndarray
+    ) -> np.ndarray:
+        if tile_xy in self.evolution_state.memberships:
+            cluster_id = self.evolution_state.memberships[tile_xy]
+            m = hashlib.sha256()
+            m.update(str(cluster_id).encode())
+            d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
+            return blend_color(grayscale, np.array([[self._cmap(d)[:3]]]), 0.3)
         elif tile_xy in self.tile_visits:
             return blend_color(grayscale, 0.0, 0.3)
         else:
@@ -248,9 +274,13 @@ def make_explorer_blueprint(
         square_line_width = 3
         square_color = np.array([[[228, 26, 28]]]) / 256
 
-        match request.args.get("color_strategy", "cluster"):
-            case "cluster":
-                color_strategy = ClusterColorStrategy(evolution_state, tile_visits)
+        match request.args.get("color_strategy", "colorful_cluster"):
+            case "max_cluster":
+                color_strategy = MaxClusterColorStrategy(evolution_state, tile_visits)
+            case "colorful_cluster":
+                color_strategy = ColorfulClusterColorStrategy(
+                    evolution_state, tile_visits
+                )
             case "first":
                 color_strategy = VisitTimeColorStrategy(tile_visits, use_first=True)
             case "last":

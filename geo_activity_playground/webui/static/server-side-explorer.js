@@ -17,7 +17,7 @@ let map = L.map('explorer-map', {
     zoom: 12
 });
 
-changeColor('cluster')
+changeColor('colorful_cluster')
 
 if (bbox) {
     map.fitBounds(L.geoJSON(bbox).getBounds())
