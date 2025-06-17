@@ -3,6 +3,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask.typing import ResponseReturnValue
 
 from ..authenticator import Authenticator
 
@@ -11,7 +12,7 @@ def make_auth_blueprint(authenticator: Authenticator) -> Blueprint:
     blueprint = Blueprint("auth", __name__, template_folder="templates")
 
     @blueprint.route("/", methods=["GET", "POST"])
-    def index():
+    def index() -> ResponseReturnValue:
         if request.method == "POST":
             authenticator.authenticate(request.form["password"])
             if redirect_to := request.form["redirect"]:
@@ -23,7 +24,7 @@ def make_auth_blueprint(authenticator: Authenticator) -> Blueprint:
         )
 
     @blueprint.route("/logout")
-    def logout():
+    def logout() -> ResponseReturnValue:
         authenticator.logout()
         return redirect(url_for(".index"))
 

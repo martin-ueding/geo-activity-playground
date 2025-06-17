@@ -18,6 +18,7 @@ from flask import render_template
 from flask import request
 from flask import Response
 from flask import url_for
+from flask.typing import ResponseReturnValue
 from PIL import Image
 from PIL import ImageDraw
 
@@ -59,7 +60,7 @@ def make_activity_blueprint(
     blueprint = Blueprint("activity", __name__, template_folder="templates")
 
     @blueprint.route("/all")
-    def all():
+    def all() -> ResponseReturnValue:
         cmap = matplotlib.colormaps["Dark2"]
         fc = geojson.FeatureCollection(
             features=[
@@ -93,7 +94,7 @@ def make_activity_blueprint(
         return render_template("activity/lines.html.j2", **context)
 
     @blueprint.route("/<int:id>")
-    def show(id: str):
+    def show(id: str) -> ResponseReturnValue:
         activity = repository.get_activity_by_id(id)
 
         time_series = repository.get_time_series(id)
@@ -189,7 +190,7 @@ def make_activity_blueprint(
         return render_template("activity/show.html.j2", **context)
 
     @blueprint.route("/<int:id>/sharepic.png")
-    def sharepic(id: int):
+    def sharepic(id: int) -> ResponseReturnValue:
         activity = repository.get_activity_by_id(id)
         time_series = repository.get_time_series(id)
         for coordinates in config.privacy_zones.values():
@@ -205,7 +206,7 @@ def make_activity_blueprint(
         )
 
     @blueprint.route("/day/<int:year>/<int:month>/<int:day>")
-    def day(year: int, month: int, day: int):
+    def day(year: int, month: int, day: int) -> ResponseReturnValue:
         meta = repository.meta
         selection = meta["start"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
@@ -256,7 +257,7 @@ def make_activity_blueprint(
         )
 
     @blueprint.route("/day-sharepic/<int:year>/<int:month>/<int:day>/sharepic.png")
-    def day_sharepic(year: int, month: int, day: int):
+    def day_sharepic(year: int, month: int, day: int) -> ResponseReturnValue:
         meta = repository.meta
         selection = meta["start"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
@@ -273,7 +274,7 @@ def make_activity_blueprint(
         )
 
     @blueprint.route("/name/<name>")
-    def name(name: str):
+    def name(name: str) -> ResponseReturnValue:
         meta = repository.meta
         selection = meta["name"] == name
         activities_with_name = meta.loc[selection]
@@ -324,7 +325,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/edit/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
-    def edit(id: str):
+    def edit(id: str) -> ResponseReturnValue:
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -365,7 +366,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/trim/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
-    def trim(id: str):
+    def trim(id: str) -> ResponseReturnValue:
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -434,7 +435,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/delete/<id>")
     @needs_authentication(authenticator)
-    def delete(id: int):
+    def delete(id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, id)
         activity.delete_data()
         DB.session.delete(activity)
@@ -443,7 +444,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/download-original/<id>")
     @needs_authentication(authenticator)
-    def download_original(id: int):
+    def download_original(id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, id)
         path = pathlib.Path(activity.path)
         with open(path) as f:

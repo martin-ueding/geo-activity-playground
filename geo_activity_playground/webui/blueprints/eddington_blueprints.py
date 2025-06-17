@@ -8,6 +8,7 @@ from flask import Blueprint
 from flask import render_template
 from flask import Request
 from flask import request
+from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
 from ...core.meta_search import apply_search_query
@@ -24,7 +25,7 @@ def register_eddington_blueprint(
     blueprint = Blueprint("eddington", __name__, template_folder="templates")
 
     @blueprint.route("/")
-    def distance():
+    def distance() -> ResponseReturnValue:
         return _render_eddington_template(
             repository,
             request,
@@ -35,7 +36,7 @@ def register_eddington_blueprint(
         )
 
     @blueprint.route("/elevation_gain")
-    def elevation_gain():
+    def elevation_gain() -> ResponseReturnValue:
         return _render_eddington_template(
             repository,
             request,

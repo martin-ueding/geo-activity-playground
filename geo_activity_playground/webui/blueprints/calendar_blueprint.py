@@ -5,6 +5,7 @@ import pandas as pd
 import sqlalchemy
 from flask import Blueprint
 from flask import render_template
+from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
 from ...core.datamodel import Activity
@@ -15,7 +16,7 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
     blueprint = Blueprint("calendar", __name__, template_folder="templates")
 
     @blueprint.route("/")
-    def index():
+    def index() -> ResponseReturnValue:
         data = DB.session.execute(
             sqlalchemy.select(Activity.start, Activity.distance_km)
         ).all()
@@ -49,7 +50,7 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
         return render_template("calendar/index.html.j2", **context)
 
     @blueprint.route("/<int:year>/<int:month>")
-    def month(year: int, month: int):
+    def month(year: int, month: int) -> ResponseReturnValue:
         meta = repository.meta
 
         filtered = meta.loc[

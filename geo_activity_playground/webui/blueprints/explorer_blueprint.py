@@ -22,6 +22,7 @@ from flask import render_template
 from flask import request
 from flask import Response
 from flask import url_for
+from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
@@ -159,7 +160,7 @@ def make_explorer_blueprint(
 
     @blueprint.route("/enable-zoom-level/<int:zoom>")
     @needs_authentication(authenticator)
-    def enable_zoom_level(zoom: int):
+    def enable_zoom_level(zoom: int) -> ResponseReturnValue:
         if 0 <= zoom <= 19:
             config_accessor().explorer_zoom_levels.append(zoom)
             config_accessor().explorer_zoom_levels.sort()
@@ -175,7 +176,7 @@ def make_explorer_blueprint(
     )
     def download(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
-    ):
+    ) -> ResponseReturnValue:
         x1, y1 = compute_tile(north, west, zoom)
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
@@ -200,7 +201,7 @@ def make_explorer_blueprint(
     )
     def missing(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
-    ):
+    ) -> ResponseReturnValue:
         x1, y1 = compute_tile(north, west, zoom)
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
@@ -223,7 +224,7 @@ def make_explorer_blueprint(
         )
 
     @blueprint.route("/<int:zoom>/server-side")
-    def server_side(zoom: int):
+    def server_side(zoom: int) -> ResponseReturnValue:
         if zoom not in config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
@@ -265,7 +266,7 @@ def make_explorer_blueprint(
         return render_template("explorer/server-side.html.j2", **context)
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
-    def tile(zoom: int, z: int, x: int, y: int) -> Response:
+    def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 

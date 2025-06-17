@@ -2,6 +2,7 @@ import altair as alt
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
+from flask.typing import ResponseReturnValue
 
 from ..columns import column_distance
 from ..columns import column_elevation_gain
@@ -12,7 +13,7 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
     blueprint = Blueprint("bubble_chart", __name__, template_folder="templates")
 
     @blueprint.route("/", endpoint="index")
-    def bubble_chart():
+    def bubble_chart() -> ResponseReturnValue:
         activities = repository.meta
 
         # Ensure 'activity_id' exists in the activities DataFrame

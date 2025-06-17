@@ -2,6 +2,7 @@ import altair as alt
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
+from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
@@ -15,7 +16,7 @@ def make_equipment_blueprint(
     blueprint = Blueprint("equipment", __name__, template_folder="templates")
 
     @blueprint.route("/")
-    def index():
+    def index() -> ResponseReturnValue:
         equipment_summary = get_equipment_use_table(
             repository.meta, config.equipment_offsets
         )

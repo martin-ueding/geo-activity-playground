@@ -8,10 +8,7 @@
 <div class="row mb-3">
     <div class="col">
         <h2>Last 30 days</h2>
-        {{ vega_direct(distance_last_30_days_plot) }}
-        {% if elevation_gain_last_30_days_plot %}
-        {{ vega_direct(elevation_gain_last_30_days_plot) }}
-        {% endif %}
+        {{ tabbed_vega(last_30_days_plot) }}
     </div>
 </div>
 
