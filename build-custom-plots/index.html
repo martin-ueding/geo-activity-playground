@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/create-a-privacy-zone/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/build-custom-plots/">
       
       
-        <link rel="prev" href="../plan-missing-tile-rides/">
+        <link rel="prev" href="../moving-from-strava/">
       
       
-        <link rel="next" href="../set-up-a-development-environment/">
+        <link rel="next" href="../plan-missing-tile-rides/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Create a Privacy Zone - Geo Activity Playground</title>
+        <title>Build Custom Plots - Geo Activity Playground</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#create-a-privacy-zone" class="md-skip">
+        <a href="#build-custom-plots" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Create a Privacy Zone
+              Build Custom Plots
             
           </span>
         </div>
@@ -640,10 +640,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../build-custom-plots/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Build Custom Plots
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -652,6 +672,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-gallery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example gallery
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -682,19 +731,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../create-a-privacy-zone/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -703,7 +743,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1175,6 +1214,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-gallery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example gallery
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1188,71 +1244,42 @@
                   
 
 
-<h1 id="create-a-privacy-zone">Create a Privacy Zone</h1>
-<p>On each activity page you will find a “share picture” for use in social media and messengers. You might want to exclude your home or work from these. For this you can define arbitrary polygons as "privacy zones".</p>
-<p>To create such a polygon, go to <a href="https://geojson.io/">GeoJSON.io</a>. You will see a map similar to this one:</p>
-<p><img alt="" src="../images/geojson-io-1.png" /></p>
-<p>Select the polygon tool and click on the map to span the polygon.</p>
-<p><img alt="" src="../images/geojson-io-2.png" /></p>
-<p>Once you are done, press <kbd>Enter</kbd> to finish the polygon. In the left panel the GeoJSON output will appear:</p>
-<p><img alt="" src="../images/geojson-io-3.png" /></p>
-<p>For this case, we have this GeoJSON:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;features&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">      </span><span class="nt">&quot;geometry&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;coordinates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="p">[</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68272071401333</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.878628929151887</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.6819310903943</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8780142440226655</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68125883278765</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.879563587362242</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68022375065988</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.880599289703014</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68029311254671</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8814665851591315</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68102940933676</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.881542368256589</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.681723011688035</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.8812729172415175</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.682176515374465</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="p">[</span>
-<span class="w">              </span><span class="mf">6.87987514009842</span><span class="p">,</span>
-<span class="w">              </span><span class="mf">50.68272071401333</span>
-<span class="w">            </span><span class="p">]</span>
-<span class="w">          </span><span class="p">]</span>
-<span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Polygon&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
+<h1 id="build-custom-plots">Build Custom Plots</h1>
+<p>Activity data can be visualized in lots of ways. Every user want to have slightly different visualizations. Hence since version 0.40.0 you can define your own plots using the interactive plot builder.</p>
+<p>Using the JSON codes one can share plots with other users. You can import them in the plot builder. Go to “Admin” → “Plot Builder” and click on “Import”. Paste the code snippet and it will import the plot specification and generate the same from your data.</p>
+<h2 id="example-gallery">Example gallery</h2>
+<p>To get you started, here is some inspiration with plots that are possible.</p>
+<hr />
+<p>This one shows the total distance per year as a bar chart, colored by activity kind:</p>
+<p><img alt="" src="../images/plot-yearly-distances-per-kind.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Yearly Distance per Kind&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;year(start):O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum(distance_km)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kind&quot;</span><span class="p">}</span>
 </code></pre></div>
-<p>Paste this in the appropriate settings menu.</p>
-<p>You can name the zone to help you remember what it encompasses. You can add multiple zones.</p>
-<p>Points that are within any of the privacy zones will not be shown in the share pictures. Except when <em>all</em> of the points are in the privacy zone, then all the points will be shown.</p>
+<hr />
+<p>This one shows the weekly distances as the size of circles. There you can see the usage of ISO year and ISO week.</p>
+<p><img alt="" src="images/plot-weekly-distance-circles.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Distance per Week&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;circle&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;week:O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iso_year:O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum(distance_km)&quot;</span><span class="p">}</span>
+</code></pre></div>
+<hr />
+<p>Here we have the distances aggregated per week and colored by kind. This plot is grouped by year, so you get some tabs above it and one plot per year:</p>
+<p><img alt="" src="../images/plot-tabs.png" /></p>
+<p><img alt="" src="../images/plot-weekly-distance-per-kind.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Weekly Distance per Kind&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;week:O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum(distance_km)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kind&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;group_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iso_year&quot;</span><span class="p">}</span>
+</code></pre></div>
+<hr />
+<p>You can also create heatmaps, here is the daily distance shown as a calendar spanned by month and day-of-month. One plot per year, here showing one of them.</p>
+<p><img alt="" src="../images/plot-daily-distance-heatmap.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daily Distance Heatmap&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rect&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date(start)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;month(start)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum(distance_km)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;group_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;year&quot;</span><span class="p">}</span>
+</code></pre></div>
+<hr />
+<p>Want to spot a pattern in your week? Which days are you most active in? Create a heatmap with the weeks and weekdays separated and you can see which days are with the most distance:</p>
+<p><img alt="" src="../images/plot-weekday-heatmap.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daily distance per weekday&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rect&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;week:O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iso_day:O&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum(distance_km)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;group_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iso_year&quot;</span><span class="p">}</span>
+</code></pre></div>
+<hr />
+<p>We don't need to use time as one axis. We can also plot the distance versus the elapsed time and visualize activity kind as color. One can see the different typical lengths of activities and their distances. Bike rides (green) clearly stand aside from walks and hikes (yellow and purple). But train and car rides (orange and blue) have a different slope again.</p>
+<p><img alt="" src="../images/plot-distance-time.svg" /></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My New Plot&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mark&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;circle&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hours&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;distance_km&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kind&quot;</span><span class="p">}</span>
+</code></pre></div>
 
 
 

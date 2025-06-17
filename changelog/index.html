@@ -639,6 +639,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../build-custom-plots/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build Custom Plots
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../plan-missing-tile-rides/" class="md-nav__link">
         
   
@@ -1151,6 +1172,15 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-110-2025-06-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.1.0 — 2025-06-17
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#version-100-2025-06-14" class="md-nav__link">
@@ -1997,6 +2027,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-110-2025-06-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.1.0 — 2025-06-17
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-100-2025-06-14" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.0.0 — 2025-06-14
@@ -2836,6 +2875,28 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-110-2025-06-17">Version 1.1.0 — 2025-06-17</h2>
+<p>Added:</p>
+<ul>
+<li>The plot builder now supports grouping on top of the previous features.</li>
+<li>Add an edit button to custom plots on the summary statistics page.</li>
+<li>Bring back the colorful cluster coloring mode and make that the default.</li>
+<li>Expose default cluster coloring mode via <code>config.json</code> option <code>cluster_color_strategy</code>, web UI settings menu might follow later.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>The plots on the summary page have been re-done. They are now all available not only for distance and elevation gain, but also for elapsed and moving time, energy (calories) and steps.</li>
+<li>Move "Hall of Fame" into separate page.</li>
+<li>The files in <code>/static</code> are organized a little better, no change for the user.</li>
+<li>Use tabs on the entry page to organize plots for distance and elevation gain.</li>
+<li>Add breadcrumbs to plot builder edit page.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix summary page when routes are present. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/282">GH-282</a>)</li>
+<li>Fix opacity in parametric plots.</li>
+<li>Fix download of explored or missing tiles from the explorer tile view.</li>
+</ul>
 <h2 id="version-100-2025-06-14">Version 1.0.0 — 2025-06-14</h2>
 <p>Added:</p>
 <ul>
