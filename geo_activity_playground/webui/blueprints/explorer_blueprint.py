@@ -51,7 +51,9 @@ logger = logging.getLogger(__name__)
 
 
 def blend_color(
-    base: np.ndarray, addition: Union[np.ndarray, float], opacity: float
+    base: np.ndarray,
+    addition: Union[np.ndarray, float],
+    opacity: Union[np.ndarray, float],
 ) -> np.ndarray:
     return (1 - opacity) * base + opacity * addition
 

@@ -19,6 +19,7 @@ from ...core.raster_map import convert_to_grayscale
 from ...core.raster_map import GeoBounds
 from ...core.raster_map import get_sensible_zoom_level
 from ...core.raster_map import get_tile
+from ...core.raster_map import ImageTransform
 from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import PixelBounds
 from ...core.tasks import work_tracker
@@ -26,6 +27,7 @@ from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import TileVisitAccessor
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
+from .explorer_blueprint import blend_color
 from .explorer_blueprint import bounding_box_for_biggest_cluster
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,7 @@ def make_heatmap_blueprint(
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
     search_query_history: SearchQueryHistory,
+    image_transforms: dict[str, ImageTransform],
 ) -> Blueprint:
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
 
@@ -78,10 +81,15 @@ def make_heatmap_blueprint(
     @blueprint.route("/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(x: int, y: int, z: int):
         query = search_query_from_form(request.args)
+        image_transform = image_transforms[
+            request.args.get("image_transform", "grayscale_inverse")
+        ]
         f = io.BytesIO()
         pl.imsave(
             f,
-            _render_tile_image(x, y, z, query, config, repository, activities_per_tile),
+            _render_tile_image(
+                x, y, z, query, config, repository, activities_per_tile, image_transform
+            ),
             format="png",
         )
         return Response(
@@ -116,6 +124,7 @@ def make_heatmap_blueprint(
                     config,
                     repository,
                     activities_per_tile,
+                    image_transforms["grayscale_inverse"],
                 )
 
         f = io.BytesIO()
@@ -211,6 +220,7 @@ def _render_tile_image(
     config: Config,
     repository: ActivityRepository,
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
+    image_transform: ImageTransform,
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels)
@@ -223,11 +233,9 @@ def _render_tile_image(
     data_color = cmap(tile_counts)
     data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 
+    opacity_mask = np.zeros(tile_pixels)
+    opacity_mask = np.pow(tile_counts, 0.25)
+
     map_tile = np.array(get_tile(z, x, y, config.map_tile_url)) / 255
-    map_tile = convert_to_grayscale(map_tile)
-    map_tile = 1.0 - map_tile  # invert colors
-    for c in range(3):
-        map_tile[:, :, c] = (1.0 - data_color[:, :, c]) * map_tile[
-            :, :, c
-        ] + data_color[:, :, c]
-    return map_tile
+    map_tile = image_transform.transform_image(map_tile)
+    return blend_color(map_tile, data_color[:, :, :3], opacity_mask[:, :, None])

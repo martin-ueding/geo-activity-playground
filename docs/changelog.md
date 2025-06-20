@@ -25,6 +25,7 @@ Added:
 Changed:
 
 - Use consistent emoji string to describe activities on landing page and hall of fame.
+- Modify the way that the heatmap is applied to the underlying map tiles.
 
 Fixed:
 

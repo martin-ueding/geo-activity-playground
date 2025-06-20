@@ -275,6 +275,12 @@ class GrayscaleImageTransform(ImageTransform):
         return np.dstack((image, image, image))  # to rgb
 
 
+class GrayscaleInverseImageTransform(GrayscaleImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        image = super().transform_image(image)
+        return 1.0 - image
+
+
 class PastelImageTransform(ImageTransform):
     def __init__(self, factor: float = 0.7):
         self._factor = factor
