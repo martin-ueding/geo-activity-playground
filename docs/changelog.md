@@ -29,6 +29,7 @@ Fixed:
 
 - Fix error when search results are empty.
 - Fix calls to `vega_direct` on equipment page.
+- Fix rounding issue on hall of fame. ([GH-292](https://github.com/martin-ueding/geo-activity-playground/issues/292))
 
 ## Version 1.1.0 — 2025-06-17
 
