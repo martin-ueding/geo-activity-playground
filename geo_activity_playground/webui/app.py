@@ -6,11 +6,13 @@ import os
 import pathlib
 import secrets
 import shutil
+import threading
 import urllib.parse
 import uuid
 
 import pandas as pd
 import sqlalchemy
+from flask import Config
 from flask import Flask
 from flask import request
 from flask_alembic import Alembic
@@ -70,6 +72,16 @@ def get_secret_key():
     return secret
 
 
+def importer_thread(
+    app: Flask,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: Config,
+) -> None:
+    with app.app_context():
+        scan_for_activities(repository, tile_visit_accessor, config)
+
+
 def web_ui_main(
     basedir: pathlib.Path,
     skip_reload: bool,
@@ -101,8 +113,11 @@ def web_ui_main(
     import_old_strava_config(config_accessor)
 
     if not skip_reload:
-        with app.app_context():
-            scan_for_activities(repository, tile_visit_accessor, config_accessor())
+        thread = threading.Thread(
+            target=importer_thread,
+            args=(app, repository, tile_visit_accessor, config_accessor()),
+        )
+        thread.start()
 
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = get_secret_key()
