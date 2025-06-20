@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Changed:
+
+- Move importing into separate thread to speed-up startup.
+
 ## Version 1.2.0 — 2025-06-20
 
 Added:
