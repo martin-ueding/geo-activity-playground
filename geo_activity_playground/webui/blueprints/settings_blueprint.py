@@ -447,6 +447,23 @@ def make_settings_blueprint(
         else:
             return render_template("settings/tags-edit.html.j2", tag=tag)
 
+    @blueprint.route("/tile-source", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def tile_source() -> str:
+        if request.method == "POST":
+            config_accessor().map_tile_url = request.form["map_tile_url"]
+            config_accessor().map_tile_attribution = request.form[
+                "map_tile_attribution"
+            ]
+            config_accessor.save()
+            flasher.flash_message("Tile source updated.", FlashTypes.SUCCESS)
+        return render_template(
+            "settings/tile-source.html.j2",
+            map_tile_url=config_accessor().map_tile_url,
+            map_tile_attribution=config_accessor().map_tile_attribution,
+            test_url=config_accessor().map_tile_url.format(zoom=14, x=8514, y=5504),
+        )
+
     return blueprint
 
 

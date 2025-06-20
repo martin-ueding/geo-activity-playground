@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Support to upload multiple photos at once. ([GH-293](https://github.com/martin-ueding/geo-activity-playground/issues/293))
+- Add config UI to change map tile source. ([GH-194](https://github.com/martin-ueding/geo-activity-playground/issues/194))
 
 Changed:
 

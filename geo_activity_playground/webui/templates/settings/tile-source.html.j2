@@ -1,0 +1,33 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Tile Source</h1>
+
+<p>You can change the tile source to be whatever you like. Be aware that different sources have different licensing
+    constraints. It is on you to make sure that you are allowed to use the tiles from the source that you enter. See <a
+        href="https://wiki.openstreetmap.org/wiki/Raster_tile_providers" target="_blank">this list of raster tile
+        providers</a> for inspiration.</p>
+
+
+<form action="" method="POST" class="mb-3">
+    <div class="mb-3">
+        <label for="map_tile_url" class="form-label">Map tile URL</label>
+        <input type="text" class="form-control" id="map_tile_url" name="map_tile_url" value="{{ map_tile_url }}" />
+    </div>
+    <div class="mb-3">
+        <label for="map_tile_attribution" class="form-label">Map tile attribution</label>
+        <input type="text" class="form-control" id="map_tile_attribution" name="map_tile_attribution"
+            value="{{ map_tile_attribution|e }}" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<h2>Test image</h2>
+
+<p>This is a tile using your current tile source:</p>
+
+<p><img src="{{ test_url }}"></p>
+
+{% endblock %}
