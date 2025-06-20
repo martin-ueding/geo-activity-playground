@@ -24,6 +24,7 @@ Changed:
 Fixed:
 
 - Fix error when search results are empty.
+- Fix calls to `vega_direct` on equipment page.
 
 ## Version 1.1.0 — 2025-06-17
 
