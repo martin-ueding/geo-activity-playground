@@ -26,7 +26,6 @@ from ..core.datamodel import Photo
 from ..core.datamodel import Tag
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.raster_map import GrayscaleImageTransform
-from ..core.raster_map import GrayscaleInverseImageTransform
 from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
@@ -142,7 +141,6 @@ def web_ui_main(
         "color": IdentityImageTransform(),
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
-        "grayscale_inverse": GrayscaleInverseImageTransform(),
     }
     flasher = FlaskFlasher()
     heart_rate_zone_computer = HeartRateZoneComputer(config)
@@ -172,11 +170,7 @@ def web_ui_main(
         "/export": make_export_blueprint(authenticator),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, search_query_history),
         "/heatmap": make_heatmap_blueprint(
-            repository,
-            tile_visit_accessor,
-            config_accessor(),
-            search_query_history,
-            image_transforms,
+            repository, tile_visit_accessor, config_accessor(), search_query_history
         ),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
