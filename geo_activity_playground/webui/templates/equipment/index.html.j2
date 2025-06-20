@@ -49,13 +49,13 @@
 <h3>{{ equipment }}</h3>
 <div class="row mb-3">
     <div class="col-md-4">
-        {{ vega_direct(data.total_distances_plot_id, data.total_distances_plot) }}
+        {{ vega_direct(data.total_distances_plot) }}
     </div>
     <div class="col-md-4">
-        {{ vega_direct(data.yearly_distance_plot_id, data.yearly_distance_plot) }}
+        {{ vega_direct(data.yearly_distance_plot) }}
     </div>
     <div class="col-md-4">
-        {{ vega_direct(data.usages_plot_id, data.usages_plot) }}
+        {{ vega_direct(data.usages_plot) }}
     </div>
 </div>
 {% endfor %}
