@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Support to upload multiple photos at once. ([GH-293](https://github.com/martin-ueding/geo-activity-playground/issues/293))
+
 Changed:
 
 - Use consistent emoji string to describe activities on landing page and hall of fame.
