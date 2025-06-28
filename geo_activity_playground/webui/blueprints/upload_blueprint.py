@@ -14,7 +14,9 @@ from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Kind
+from ...core.enrichment import add_copernicus_elevation
 from ...core.enrichment import populate_database_from_extracted
+from ...core.tasks import work_tracker
 from ...core.tasks import work_tracker_path
 from ...explorer.tile_visits import compute_tile_evolution
 from ...explorer.tile_visits import compute_tile_visits_new
@@ -141,3 +143,5 @@ def scan_for_activities(
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
+
+        add_copernicus_elevation()

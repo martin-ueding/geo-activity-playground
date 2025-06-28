@@ -49,6 +49,7 @@ class ActivityMeta(TypedDict):
     calories: float
     commute: bool
     consider_for_achievements: bool
+    copernicus_elevation_gain: float
     distance_km: float
     elapsed_time: datetime.timedelta
     elevation_gain: float
@@ -166,6 +167,9 @@ class Activity(DB.Model):
         except OSError as e:
             logger.error(f"Error while reading {path}.")
             raise
+
+    def replace_time_series(self, time_series: pd.DataFrame) -> None:
+        time_series.to_parquet(TIME_SERIES_DIR() / f"{self.id}.parquet")
 
     @property
     def time_series(self) -> pd.DataFrame:

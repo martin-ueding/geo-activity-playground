@@ -9,7 +9,7 @@ license = "MIT"
 geo-activity-playground = "geo_activity_playground.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.14"
+python = "^3.11,<3.14"
 
 alembic = "^1.15.2"
 altair = "^5.5.0"
@@ -42,6 +42,11 @@ flask-sqlalchemy = "^3.1.1"
 flask-alembic = "^3.1.1"
 exifread = "^3.2.0"
 openpyxl = "^3.1.5"
+boto3 = "^1.38.45"
+scipy = "^1.16.0"
+geotiff = "^0.2.10"
+numcodecs = "<0.15.0"
+imagecodecs = "^2025.3.30"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"

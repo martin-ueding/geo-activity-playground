@@ -17,9 +17,21 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). Measured data will not be replaced, just hidden. All the summary statistics will be based on the DEM as it likely is more accurate than data gathered from GPS measurements. This will greatly improve elevation gain computations and bring meaningful values for everyone.
+
+  The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length).
+
 Changed:
 
 - Move importing into separate thread to speed-up startup.
+
+Note that there is a deprecation warning that you will see after startup:
+
+    DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+
+This is due to a [version issues in a dependency](https://github.com/KipCrossing/geotiff/issues/76) and will hopefully be resolved eventually. This doesn't break anything for the time being.
 
 ## Version 1.2.0 — 2025-06-20
 

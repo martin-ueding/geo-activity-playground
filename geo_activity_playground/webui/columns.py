@@ -61,7 +61,7 @@ column_speed = ColumnDescription(
     format=".1f",
 )
 column_elevation = ColumnDescription(
-    name="elevation",
+    name="copernicus_elevation",
     display_name="Elevation",
     unit="m",
     format=".0f",
