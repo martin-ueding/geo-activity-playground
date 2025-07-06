@@ -2,6 +2,7 @@ import datetime
 import pathlib
 import zoneinfo
 
+from geo_activity_playground.core.time_conversion import sanitize_datetime
 from geo_activity_playground.importers.activity_parsers import read_activity
 
 
@@ -17,6 +18,54 @@ def test_time_zone_from_string() -> None:
     dt_helsinki = dt_utc.astimezone(tz_helsinki)
     assert dt_helsinki == datetime.datetime(2025, 6, 21, 17, 41, 6, tzinfo=tz_helsinki)
     assert dt_helsinki.replace(tzinfo=None) == datetime.datetime(2025, 6, 21, 17, 41, 6)
+
+
+def test_utc_to_helsinki() -> None:
+    assert sanitize_datetime(
+        datetime.datetime(2025, 6, 21, 14, 41, 6, tzinfo=zoneinfo.ZoneInfo("UTC")),
+        fallback_from="UTC",
+        fallback_to="Europe/Helsinki",
+    ) == datetime.datetime(
+        2025, 6, 21, 17, 41, 6, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki")
+    )
+
+
+def test_0200_to_helsinki() -> None:
+    assert sanitize_datetime(
+        datetime.datetime(
+            2025,
+            6,
+            21,
+            16,
+            41,
+            6,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=2)),
+        ),
+        fallback_from="UTC",
+        fallback_to="Europe/Helsinki",
+    ) == datetime.datetime(
+        2025, 6, 21, 17, 41, 6, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki")
+    )
+
+
+def test_naive_utc_to_helsinki() -> None:
+    assert sanitize_datetime(
+        datetime.datetime(2025, 6, 21, 14, 41, 6),
+        fallback_from="UTC",
+        fallback_to="Europe/Helsinki",
+    ) == datetime.datetime(
+        2025, 6, 21, 17, 41, 6, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki")
+    )
+
+
+def test_naive_helsinki_to_helsinki() -> None:
+    assert sanitize_datetime(
+        datetime.datetime(2025, 6, 21, 17, 41, 6),
+        fallback_from="Europe/Helsinki",
+        fallback_to="Europe/Helsinki",
+    ) == datetime.datetime(
+        2025, 6, 21, 17, 41, 6, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki")
+    )
 
 
 def test_time_zone_from_abvio() -> None:
@@ -39,4 +88,6 @@ def test_time_zone_from_abvio() -> None:
     )
     meta, ts = read_activity(path)
 
-    assert ts["time"].iloc[0] == datetime.datetime(2025, 6, 21, 17, 41, 6)
+    assert ts["time"].iloc[0] == datetime.datetime(
+        2025, 6, 21, 17, 41, 6, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki")
+    )

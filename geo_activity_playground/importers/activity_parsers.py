@@ -189,9 +189,16 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 elif isinstance(point.time, str):
                     time = dateutil.parser.parse(str(point.time))
                 else:
-                    time = pd.NaT
+                    time = None
+                if time is not None:
+                    time.astimezone()
+                    timestamp = convert_to_datetime_ns(time)
+                else:
+                    timestamp = pd.NaT
                 time = convert_to_datetime_ns(time)
-                points.append((time, point.latitude, point.longitude, point.elevation))
+                points.append(
+                    (timestamp, point.latitude, point.longitude, point.elevation)
+                )
 
     df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "elevation"])
     # Some files don't have elevation information. In these cases we remove the column.
