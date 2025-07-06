@@ -8,15 +8,20 @@ from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.enrichment import apply_enrichments
 from ...core.enrichment import enrichment_set_timezone
+from ..authenticator import Authenticator
+from ..authenticator import needs_authentication
 
 logger = logging.getLogger(__name__)
 
 
-def make_time_zone_fixer_blueprint(config: Config) -> Blueprint:
+def make_time_zone_fixer_blueprint(
+    authenticator: Authenticator, config: Config
+) -> Blueprint:
 
     blueprint = Blueprint("time_zone_fixer", __name__, template_folder="templates")
 
     @blueprint.route("/local-to-utc")
+    @needs_authentication(authenticator)
     def local_to_utc() -> str:
         for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
             if activity.start is None:

@@ -50,7 +50,7 @@ def import_from_directory(config: Config) -> None:
 
 
 def import_from_file(path: pathlib.Path, config: Config) -> None:
-    logger.info(f"Importing {path=}")
+    logger.info(f"Importing {path} …")
     try:
         activity, time_series = read_activity(path)
     except ActivityParseError as e:

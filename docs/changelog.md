@@ -26,13 +26,7 @@ Changed:
 
 - Move importing into separate thread to speed-up startup. Importing then runs in the background.
 - Import new activities with less steps, get rid of intermediate parsed representations.
-- Store times as UTC again.
-
-Note that there is a deprecation warning that you will see after startup:
-
-    DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
-
-This is due to a [version issues in a dependency](https://github.com/KipCrossing/geotiff/issues/76) and will hopefully be resolved eventually. This doesn't break anything for the time being.
+- Store times as UTC again. They are displayed in the local time zone of the activity in most places. In plots they are shown in the browser time zone for the time being. The search table has them in UTC.
 
 ## Version 1.2.0 — 2025-06-20
 
