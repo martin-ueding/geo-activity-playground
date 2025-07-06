@@ -13,7 +13,12 @@ from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
 from ..core.config import Config
+from ..core.datamodel import Activity
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import DB
+from ..core.datamodel import get_or_make_equipment
+from ..core.datamodel import get_or_make_kind
+from ..core.enrichment import apply_enrichments
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
 from ..core.paths import strava_api_dir
@@ -24,21 +29,6 @@ from ..core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)
-
-
-def _embellish_single_time_series(
-    timeseries: pd.DataFrame,
-    start: Optional[datetime.datetime],
-    time_diff_threshold_seconds: Optional[int],
-) -> pd.DataFrame:
-    if start is not None and pd.api.types.is_dtype_equal(
-        timeseries["time"].dtype, "int64"
-    ):
-        time = timeseries["time"]
-        del timeseries["time"]
-        timeseries["time"] = [
-            convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
-        ]
 
 
 def get_current_access_token(config: Config) -> str:
@@ -103,74 +93,76 @@ def try_import_strava(config: Config) -> bool:
     client = Client(access_token=get_current_access_token(config))
 
     try:
-        for activity in tqdm(
+        for strava_activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
         ):
             cache_file = (
                 pathlib.Path("Cache")
                 / "Strava Activity Metadata"
-                / f"{activity.id}.pickle"
+                / f"{strava_activity.id}.pickle"
             )
             # Sometimes we still get an activity here although it has already been imported from the Strava checkout.
             if cache_file.exists():
                 continue
             cache_file.parent.mkdir(exist_ok=True, parents=True)
             with open(cache_file, "wb") as f:
-                pickle.dump(activity, f)
-            if activity.gear_id not in gear_names:
-                gear = client.get_gear(activity.gear_id)
-                gear_names[activity.gear_id] = (
+                pickle.dump(strava_activity, f)
+            if strava_activity.gear_id not in gear_names:
+                gear = client.get_gear(strava_activity.gear_id)
+                gear_names[strava_activity.gear_id] = (
                     f"{gear.name}" or f"{gear.brand_name} {gear.model_name}"
                 )
 
             time_series_path = (
-                activity_extracted_time_series_dir() / f"{activity.id}.parquet"
+                activity_extracted_time_series_dir() / f"{strava_activity.id}.parquet"
             )
             if time_series_path.exists():
                 time_series = pd.read_parquet(time_series_path)
             else:
                 try:
-                    time_series = download_strava_time_series(activity.id, client)
+                    time_series = download_strava_time_series(
+                        strava_activity.id, client
+                    )
                 except ObjectNotFound as e:
                     logger.error(
-                        f"The activity {activity.id} with name “{activity.name}” cannot be found."
+                        f"The activity {strava_activity.id} with name “{strava_activity.name}” cannot be found."
                         f"Perhaps it is a manual activity without a time series. Ignoring. {e=}"
                     )
                     continue
-                time_series.name = activity.id
+                time_series.name = strava_activity.id
                 new_time = [
-                    activity.start_date + datetime.timedelta(seconds=time)
+                    strava_activity.start_date + datetime.timedelta(seconds=time)
                     for time in time_series["time"]
                 ]
                 del time_series["time"]
                 time_series["time"] = new_time
                 time_series.to_parquet(time_series_path)
 
-            detailed_activity = get_detailed_activity(activity.id, client)
+            detailed_activity = get_detailed_activity(strava_activity.id, client)
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
-                activity_meta = ActivityMeta(
-                    **{
-                        "id": activity.id,
-                        "commute": activity.commute,
-                        "distance_km": activity.distance / 1000,
-                        "name": activity.name,
-                        "kind": str(activity.type.root),
-                        "start": convert_to_datetime_ns(activity.start_date),
-                        "elapsed_time": activity.elapsed_time,
-                        "equipment": gear_names[activity.gear_id],
-                        "calories": detailed_activity.calories,
-                        "moving_time": activity.moving_time,
-                    }
+                activity = Activity()
+                activity.upstream_id = strava_activity.id
+                activity.distance = strava_activity.distance / 1000
+                activity.name = strava_activity.name
+                activity.kind = get_or_make_kind(str(strava_activity.type.root))
+                activity.start = strava_activity.start_date.astimezone("UTC")
+                activity.elapsed_time = strava_activity.elapsed_time
+                activity.equipment = get_or_make_equipment(
+                    gear_names[strava_activity.gear_id], config
                 )
-                with open(
-                    activity_extracted_meta_dir() / f"{activity.id}.pickle", "wb"
-                ) as f:
-                    pickle.dump(activity_meta, f)
+                activity.calories = detailed_activity.calories
+                activity.moving_time = detailed_activity.moving_time
+
+                apply_enrichments(activity, time_series, config)
+
+                DB.session.add(activity)
+                DB.session.commit()
+                activity.replace_time_series(time_series)
 
             set_state(
                 strava_last_activity_date_path(),
-                activity.start_date.isoformat().replace("+00:00", "Z"),
+                strava_activity.start_date.isoformat().replace("+00:00", "Z"),
             )
 
         limit_exceeded = False

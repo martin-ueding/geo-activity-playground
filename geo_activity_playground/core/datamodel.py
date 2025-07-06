@@ -90,8 +90,8 @@ class Activity(DB.Model):
     distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
 
     # Where it comes from:
-    path: Mapped[str] = mapped_column(sa.String, nullable=True)
-    upstream_id: Mapped[str] = mapped_column(sa.String, nullable=True)
+    path: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    upstream_id: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
 
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)
