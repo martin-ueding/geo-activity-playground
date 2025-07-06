@@ -3,7 +3,6 @@ import logging
 import pathlib
 import pickle
 import time
-from typing import Optional
 
 import pandas as pd
 from stravalib import Client
@@ -14,18 +13,15 @@ from tqdm import tqdm
 
 from ..core.config import Config
 from ..core.datamodel import Activity
-from ..core.datamodel import ActivityMeta
 from ..core.datamodel import DB
 from ..core.datamodel import get_or_make_equipment
 from ..core.datamodel import get_or_make_kind
 from ..core.enrichment import apply_enrichments
-from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
 from ..core.paths import strava_api_dir
 from ..core.paths import strava_last_activity_date_path
 from ..core.tasks import get_state
 from ..core.tasks import set_state
-from ..core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)

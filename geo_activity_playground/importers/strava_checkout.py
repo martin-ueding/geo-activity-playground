@@ -21,7 +21,6 @@ from ..core.tasks import get_state
 from ..core.tasks import set_state
 from ..core.tasks import work_tracker_path
 from ..core.tasks import WorkTracker
-from ..core.time_conversion import convert_to_datetime_ns
 from .activity_parsers import ActivityParseError
 from .activity_parsers import read_activity
 from .csv_parser import parse_csv
@@ -211,7 +210,7 @@ def import_from_strava_checkout() -> None:
             "id": activity_id,
             "name": row["Activity Name"],
             "path": str(activity_file),
-            "start": convert_to_datetime_ns(start_datetime),
+            "start": start_datetime,
             "steps": float_with_comma_or_period(row["Total Steps"]),
         }
 

@@ -3,7 +3,6 @@ import gzip
 import logging
 import pathlib
 import xml
-import zoneinfo
 from collections.abc import Iterator
 
 import charset_normalizer
@@ -15,10 +14,7 @@ import tcxreader.tcxreader
 import xmltodict
 
 from ..core.datamodel import Activity
-from ..core.datamodel import ActivityMeta
 from ..core.datamodel import get_or_make_kind
-from ..core.time_conversion import convert_to_datetime_ns
-from ..core.time_conversion import get_country_timezone
 
 logger = logging.getLogger(__name__)
 

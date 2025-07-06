@@ -49,7 +49,8 @@
                     {{ elem.activity.emoji_string }}
                 </p>
                 {% if elem.activity.start_local_tz %}
-                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start_local_tz|dt }}</small></p>
+                <p class="card-text"><small class="text-body-secondary">{{ elem.activity.start_local_tz|dt }} {{
+                        elem.activity.iana_timezone }}</small></p>
                 {% endif %}
             </div>
         </div>
