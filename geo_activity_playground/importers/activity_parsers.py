@@ -113,7 +113,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                         }
                         if "heart_rate" in fields:
                             row["heartrate"] = values["heart_rate"]
-                        if "calories" in fields:
+                        if "calories" in fields and isinstance(
+                            values["calories"], float
+                        ):
                             row["calories"] = values["calories"]
                         if "cadence" in fields:
                             row["cadence"] = values["cadence"]

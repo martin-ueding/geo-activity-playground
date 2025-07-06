@@ -93,13 +93,11 @@ def web_ui_main(
 ) -> None:
     os.chdir(basedir)
 
+    warnings.filterwarnings("ignore", "__array__ implementation doesn't")
+    warnings.filterwarnings("ignore", '\'field "native_field_num"')
+    warnings.filterwarnings("ignore", '\'field "units"')
     warnings.filterwarnings(
-        "ignore", "DeprecationWarning: __array__ implementation doesn't"
-    )
-    warnings.filterwarnings("ignore", 'UserWarning: \'field "native_field_num"')
-    warnings.filterwarnings(
-        "ignore",
-        r"DeprecationWarning: datetime.datetime.utcfromtimestamp\(\) is deprecated.*",
+        "ignore", r"datetime.datetime.utcfromtimestamp\(\) is deprecated"
     )
     app = Flask(__name__)
 

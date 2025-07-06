@@ -178,10 +178,10 @@ def make_summary_blueprint(
     def index():
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        activities = apply_search_query(repository.meta, query)
+        df = apply_search_query(repository.meta, query)
 
         kind_scale = make_kind_scale(repository.meta, config)
-        df = activities
+        df_without_nan = df.loc[~pd.isna(df["start"])]
 
         return render_template(
             "summary/index.html.j2",
@@ -191,19 +191,19 @@ def make_summary_blueprint(
                 for spec in DB.session.scalars(sqlalchemy.select(PlotSpec)).all()
             ],
             plot_per_year_per_kind={
-                column.display_name: plot_per_year_per_kind(df, column)
+                column.display_name: plot_per_year_per_kind(df_without_nan, column)
                 for column in META_COLUMNS
             },
             plot_per_year_cumulative={
-                column.display_name: plot_year_cumulative(df, column)
+                column.display_name: plot_year_cumulative(df_without_nan, column)
                 for column in META_COLUMNS
             },
             plot_per_iso_week={
-                column.display_name: plot_per_iso_week(df, column)
+                column.display_name: plot_per_iso_week(df_without_nan, column)
                 for column in META_COLUMNS
             },
             heatmap_per_day={
-                column.display_name: heatmap_per_day(df, column)
+                column.display_name: heatmap_per_day(df_without_nan, column)
                 for column in META_COLUMNS
             },
         )
