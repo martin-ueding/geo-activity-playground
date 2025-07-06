@@ -259,6 +259,5 @@ def apply_enrichments(
 ) -> bool:
     was_changed = False
     for enrichment in enrichments:
-        logger.info(f"Running {enrichment.__name__} …")
         was_changed |= enrichment(activity, time_series, config)
     return was_changed

@@ -52,6 +52,7 @@ from .blueprints.settings_blueprint import make_settings_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
+from .blueprints.time_zone_fixer_blueprint import make_time_zone_fixer_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
 from .flasher import FlaskFlasher
@@ -208,6 +209,7 @@ def web_ui_main(
         ),
         "/summary": make_summary_blueprint(repository, config, search_query_history),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
+        "/time-zone-fixer": make_time_zone_fixer_blueprint(config),
         "/upload": make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator, flasher
         ),
