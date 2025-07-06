@@ -14,7 +14,9 @@ import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
 
+from ..core.datamodel import Activity
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import get_or_make_kind
 from ..core.time_conversion import convert_to_datetime_ns
 from ..core.time_conversion import get_country_timezone
 
@@ -25,9 +27,9 @@ class ActivityParseError(BaseException):
     pass
 
 
-def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
+def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
     suffixes = [s.lower() for s in path.suffixes]
-    metadata = ActivityMeta()
+    activity = Activity()
 
     if suffixes[-1] == ".gz":
         opener = gzip.open
@@ -45,7 +47,7 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
             raise ActivityParseError(f"Encoding issue") from e
     elif file_type == ".fit":
         try:
-            metadata, timeseries = read_fit_activity(path, opener)
+            activity, timeseries = read_fit_activity(path, opener)
         except fitdecode.exceptions.FitError as e:
             raise ActivityParseError(f"Error in FIT file") from e
         except KeyError as e:
@@ -62,14 +64,10 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
 
-    latitude, longitude = timeseries[["latitude", "longitude"]].iloc[0].to_list()
-    country, tz_str = get_country_timezone(latitude, longitude)
-    timeseries["time"] = timeseries["time"].dt.tz_convert(zoneinfo.ZoneInfo(tz_str))
-
-    return metadata, timeseries
+    return activity, timeseries
 
 
-def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFrame]:
+def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]:
     """
     {'timestamp': datetime.datetime(2023, 11, 11, 16, 29, 49, tzinfo=datetime.timezone.utc),
     'position_lat': <int>,
@@ -88,7 +86,7 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
     'ascent': 35,
     'descent': 11}
     """
-    metadata = ActivityMeta()
+    activity = Activity()
     rows = []
     with open(path, "rb") as f:
         with fitdecode.FitReader(f) as fit:
@@ -147,17 +145,18 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
 
                     # Additional meta data fields as documented in https://developer.garmin.com/fit/file-types/workout/.
                     if "wkt_name" in fields:
-                        metadata["name"] = values["wkt_name"]
+                        activity.name = values["wkt_name"]
                     if "sport" in fields:
-                        metadata["kind"] = str(values["sport"])
+                        kind_name = str(values["sport"])
                         if "sub_sport" in values:
-                            metadata["kind"] += " " + str(values["sub_sport"])
+                            kind_name += " " + str(values["sub_sport"])
+                        activity.kind = get_or_make_kind(kind_name)
                     if "total_calories" in fields:
-                        metadata["calories"] = values["total_calories"]
+                        activity.calories = values["total_calories"]
                     if "total_strides" in fields:
-                        metadata["steps"] = 2 * int(values["total_strides"])
+                        activity.steps = 2 * int(values["total_strides"])
 
-    return metadata, pd.DataFrame(rows)
+    return activity, pd.DataFrame(rows)
 
 
 def _fit_speed_unit_factor(unit: str) -> float:

@@ -28,6 +28,13 @@ from .time_conversion import convert_to_datetime_ns
 logger = logging.getLogger(__name__)
 
 
+def foo():
+
+    latitude, longitude = timeseries[["latitude", "longitude"]].iloc[0].to_list()
+    country, tz_str = get_country_timezone(latitude, longitude)
+    timeseries["time"] = timeseries["time"].dt.tz_convert(zoneinfo.ZoneInfo(tz_str))
+
+
 def populate_database_from_extracted(config: Config) -> None:
     available_ids = {
         int(path.stem) for path in activity_extracted_meta_dir().glob("*.pickle")
@@ -69,7 +76,7 @@ def populate_database_from_extracted(config: Config) -> None:
             # Rename kinds if needed.
             if kind_name in config.kind_renames:
                 kind_name = config.kind_renames[kind_name]
-            kind = get_or_make_kind(kind_name, config)
+            kind = get_or_make_kind(kind_name)
         else:
             kind = None
 

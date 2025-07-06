@@ -86,8 +86,8 @@ class Activity(DB.Model):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(sa.String, nullable=False)
-    distance_km: Mapped[float] = mapped_column(sa.Float, nullable=False)
+    name: Mapped[str] = mapped_column(sa.String, nullable=True)
+    distance_km: Mapped[float] = mapped_column(sa.Float, nullable=True)
 
     # Where it comes from:
     path: Mapped[str] = mapped_column(sa.String, nullable=True)
@@ -99,6 +99,7 @@ class Activity(DB.Model):
 
     # Temporal data:
     start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=True)
+    iana_timezone: Mapped[str] = mapped_column(sa.String, nullable=True)
     elapsed_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
     moving_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
 
@@ -107,6 +108,7 @@ class Activity(DB.Model):
     start_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_latitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
+    start_country: Mapped[str] = mapped_column(sa.String, nullable=True)
 
     # Elevation data:
     elevation_gain: Mapped[float] = mapped_column(sa.Float, nullable=True)
@@ -360,7 +362,7 @@ class Kind(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
 
-def get_or_make_kind(name: str, config: Config) -> Kind:
+def get_or_make_kind(name: str) -> Kind:
     kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
         assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
@@ -368,7 +370,7 @@ def get_or_make_kind(name: str, config: Config) -> Kind:
     else:
         kind = Kind(
             name=name,
-            consider_for_achievements=name in config.kinds_without_achievements,
+            consider_for_achievements=True,
         )
         DB.session.add(kind)
         return kind
