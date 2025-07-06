@@ -51,7 +51,7 @@ def make_heatmap_blueprint(
 
         zoom = 14
         tiles = tile_histories[zoom]
-        medians = tiles.median(skipna=True)
+        medians = tiles[["tile_x", "tile_y"]].median(skipna=True)
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )

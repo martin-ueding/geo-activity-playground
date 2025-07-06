@@ -45,7 +45,7 @@
                 </ul>
                 </p>
                 <p class="card-text"><small class="text-body-secondary"></small>{{ activity.emoji_string }} on {{
-                    activity.start|dt }}</small></p>
+                    activity.start_local_tz|dt }} {{ activity.iana_timezone }}</small></p>
             </div>
         </div>
     </div>
