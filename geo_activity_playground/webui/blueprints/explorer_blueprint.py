@@ -2,7 +2,6 @@ import abc
 import datetime
 import hashlib
 import io
-import itertools
 import logging
 from collections.abc import Iterable
 from typing import Union
@@ -13,10 +12,8 @@ import matplotlib
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
-import sqlalchemy
 from flask import Blueprint
 from flask import flash
-from flask import json
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -24,7 +21,6 @@ from flask import Response
 from flask import url_for
 from flask.typing import ResponseReturnValue
 
-from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
@@ -34,8 +30,6 @@ from ...core.raster_map import TileGetter
 from ...core.tiles import compute_tile
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.grid_file import get_border_tiles
-from ...explorer.grid_file import make_explorer_rectangle
-from ...explorer.grid_file import make_explorer_tile
 from ...explorer.grid_file import make_grid_file_geojson
 from ...explorer.grid_file import make_grid_file_gpx
 from ...explorer.grid_file import make_grid_points
