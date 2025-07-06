@@ -3,6 +3,7 @@ import gzip
 import logging
 import pathlib
 import xml
+import zoneinfo
 from collections.abc import Iterator
 
 import charset_normalizer
@@ -15,6 +16,7 @@ import xmltodict
 
 from ..core.datamodel import ActivityMeta
 from ..core.time_conversion import convert_to_datetime_ns
+from ..core.time_conversion import get_country_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +61,10 @@ def read_activity(path: pathlib.Path) -> tuple[ActivityMeta, pd.DataFrame]:
         timeseries = read_simra_activity(path, opener)
     else:
         raise ActivityParseError(f"Unsupported file format: {file_type}")
+
+    latitude, longitude = timeseries[["latitude", "longitude"]].iloc[0].to_list()
+    country, tz_str = get_country_timezone(latitude, longitude)
+    timeseries["time"] = timeseries["time"].dt.tz_convert(zoneinfo.ZoneInfo(tz_str))
 
     return metadata, timeseries
 
@@ -176,10 +182,10 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
         decoded = str(charset_normalizer.from_bytes(content).best())
         gpx = gpxpy.parse(decoded)
 
-    tz_str = None
-    for extension in gpx.extensions:
-        if extension.tag == "{https://cyclemeter.com/xmlschemas/1}startTimeZone":
-            tz_str = extension.text
+    # tz_str = None
+    # for extension in gpx.extensions:
+    #     if extension.tag == "{https://cyclemeter.com/xmlschemas/1}startTimeZone":
+    #         tz_str = extension.text
 
     for track in gpx.tracks:
         for segment in track.segments:
@@ -190,15 +196,14 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                     time = dateutil.parser.parse(str(point.time))
                 else:
                     time = None
-                if time is not None:
-                    time.astimezone()
-                    timestamp = convert_to_datetime_ns(time)
-                else:
-                    timestamp = pd.NaT
-                time = convert_to_datetime_ns(time)
-                points.append(
-                    (timestamp, point.latitude, point.longitude, point.elevation)
-                )
+
+                # if time is not None:
+                #     time.astimezone()
+                #     timestamp = convert_to_datetime_ns(time)
+                # else:
+                #     timestamp = pd.NaT
+                # time = convert_to_datetime_ns(time)
+                points.append((time, point.latitude, point.longitude, point.elevation))
 
     df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "elevation"])
     # Some files don't have elevation information. In these cases we remove the column.
