@@ -1,4 +1,4 @@
-# Rename activity kinds
+# Rename Activity Kinds
 
 Metadata and importing from several sources can be messy and in some cases Strava will export its acivity types/activity kinds under names like `root='Ride'` and not “Ride”. That can lead to issues with tagging and the heatmap. In this case we have multiple, overlapping activity kinds for the same activity kinds.
 

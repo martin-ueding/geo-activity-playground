@@ -1,4 +1,4 @@
-# Upload activity files
+# Upload Activity Files
 
 Some users don't want to restart the application each time they add new activities but run it on their home server. For this use case you can upload activities. This is protected by login, you have to set a password in the settings and log in.
 

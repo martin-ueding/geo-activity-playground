@@ -54,6 +54,7 @@ nav:
     - eddington-number.md
     - heart-rate-zones.md
     - elevation-gain-from-noisy-data.md
+    - time-zone-handling-sucks.md
   - Other:
     - acknowledgments.md
     - similar-projects.md

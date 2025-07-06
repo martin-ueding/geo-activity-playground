@@ -1,4 +1,4 @@
-# Set up a Development Environment
+# Set Up a Development Environment
 
 In this how-to you will find the necessary steps to set up a development environment to run the latest development version and contribute code and documentation changes.
 
