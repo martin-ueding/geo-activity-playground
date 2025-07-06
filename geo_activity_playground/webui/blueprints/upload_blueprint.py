@@ -120,7 +120,7 @@ def scan_for_activities(
     if pathlib.Path("Activities").exists():
         import_from_directory(config)
     if pathlib.Path("Strava Export").exists():
-        import_from_strava_checkout()
+        import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(config)
 

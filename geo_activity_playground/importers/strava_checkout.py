@@ -5,6 +5,7 @@ import pickle
 import shutil
 import sys
 import traceback
+import zoneinfo
 from typing import Optional
 
 import dateutil.parser
@@ -12,8 +13,14 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from ..core.config import Config
+from ..core.datamodel import Activity
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import DB
 from ..core.datamodel import DEFAULT_UNKNOWN_NAME
+from ..core.datamodel import get_or_make_equipment
+from ..core.datamodel import get_or_make_kind
+from ..core.enrichment import apply_enrichments
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
 from ..core.paths import strava_last_activity_date_path
@@ -143,7 +150,7 @@ def float_with_comma_or_period(x: str) -> Optional[float]:
     return float(x)
 
 
-def import_from_strava_checkout() -> None:
+def import_from_strava_checkout(config: Config) -> None:
     checkout_path = pathlib.Path("Strava Export")
     with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
@@ -190,47 +197,13 @@ def import_from_strava_checkout() -> None:
         if not row["Filename"]:
             continue
 
-        start_datetime = dateutil.parser.parse(row["Activity Date"], dayfirst=dayfirst)
+        start_datetime = dateutil.parser.parse(
+            row["Activity Date"], dayfirst=dayfirst
+        ).replace(tzinfo=zoneinfo.ZoneInfo("utc"))
 
         activity_file = checkout_path / row["Filename"]
-        table_activity_meta: ActivityMeta = {
-            "calories": float_with_comma_or_period(row["Calories"]),
-            "commute": row["Commute"] == "true",
-            "distance_km": row["Distance"],
-            "elapsed_time": datetime.timedelta(
-                seconds=float_with_comma_or_period(row["Elapsed Time"])
-            ),
-            "equipment": str(
-                nan_as_none(row["Activity Gear"])
-                or nan_as_none(row["Bike"])
-                or nan_as_none(row["Gear"])
-                or ""
-            ),
-            "kind": row["Activity Type"],
-            "id": activity_id,
-            "name": row["Activity Name"],
-            "path": str(activity_file),
-            "start": start_datetime,
-            "steps": float_with_comma_or_period(row["Total Steps"]),
-        }
 
-        time_series_path = (
-            activity_extracted_time_series_dir() / f"{activity_id}.parquet"
-        )
-        if time_series_path.exists():
-            time_series = pd.read_parquet(time_series_path)
-        else:
-            try:
-                file_activity_meta, time_series = read_activity(activity_file)
-            except ActivityParseError as e:
-                logger.error(f"Error while parsing file {activity_file}:")
-                traceback.print_exc()
-                continue
-            except:
-                logger.error(
-                    f"Encountered a problem with {activity_file=}, see details below."
-                )
-                raise
+        activity, time_series = read_activity(activity_file)
 
         if not len(time_series):
             continue
@@ -238,16 +211,30 @@ def import_from_strava_checkout() -> None:
         if "latitude" not in time_series.columns:
             continue
 
-        meta_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
-        with open(meta_path, "wb") as f:
-            pickle.dump(table_activity_meta, f)
-        time_series.to_parquet(time_series_path)
-
-        start_str = (
-            pd.Timestamp(table_activity_meta["start"]).to_pydatetime().isoformat() + "Z"
+        activity.upstream_id = activity_id
+        activity.calories = float_with_comma_or_period(row["Calories"])
+        activity.distance_km = row["Distance"]
+        activity.elapsed_time = datetime.timedelta(
+            seconds=float_with_comma_or_period(row["Elapsed Time"])
         )
-        latest_start_str = get_state(strava_last_activity_date_path(), start_str)
-        set_state(strava_last_activity_date_path(), max(start_str, latest_start_str))
+        activity.equipment = get_or_make_equipment(
+            nan_as_none(row["Activity Gear"])
+            or nan_as_none(row["Bike"])
+            or nan_as_none(row["Gear"])
+            or DEFAULT_UNKNOWN_NAME,
+            config,
+        )
+        activity.kind = get_or_make_kind(row["Activity Type"])
+        activity.name = row["Activity Name"]
+        activity.path = str(activity_file)
+        activity.start = start_datetime
+        activity.steps = float_with_comma_or_period(row["Total Steps"])
+
+        apply_enrichments(activity, time_series, config)
+
+        DB.session.add(activity)
+        DB.session.commit()
+        activity.replace_time_series(time_series)
 
     work_tracker.close()
 
