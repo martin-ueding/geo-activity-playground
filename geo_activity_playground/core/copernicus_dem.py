@@ -10,13 +10,18 @@ import geotiff
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
+from .paths import USER_CACHE_DIR
+
 
 def s3_path(lat: int, lon: int) -> pathlib.Path:
     lat_str = f"N{(lat):02d}" if lat >= 0 else f"S{(-lat):02d}"
     lon_str = f"E{(lon):03d}" if lon >= 0 else f"W{(-lon):03d}"
-    result = pathlib.Path(
-        f"Copernicus DEM/Copernicus_DSM_COG_30_{lat_str}_00_{lon_str}_00_DEM.tif"
+    result = (
+        USER_CACHE_DIR
+        / "Copernicus DEM"
+        / f"Copernicus_DSM_COG_30_{lat_str}_00_{lon_str}_00_DEM.tif"
     )
+
     result.parent.mkdir(exist_ok=True)
     return result
 
