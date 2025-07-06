@@ -176,6 +176,11 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
         decoded = str(charset_normalizer.from_bytes(content).best())
         gpx = gpxpy.parse(decoded)
 
+    tz_str = None
+    for extension in gpx.extensions:
+        if extension.tag == "{https://cyclemeter.com/xmlschemas/1}startTimeZone":
+            tz_str = extension.text
+
     for track in gpx.tracks:
         for segment in track.segments:
             for point in segment.points:
