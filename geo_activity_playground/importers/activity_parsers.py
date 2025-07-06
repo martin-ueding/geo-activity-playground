@@ -109,10 +109,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[ActivityMeta, pd.DataFr
                         if isinstance(time, datetime.datetime):
                             pass
                         elif time is None or isinstance(time, int):
-                            time = pd.NaT
+                            time = None
                         else:
                             raise RuntimeError(f"Cannot parse time: {time} in {path}.")
-                        time = convert_to_datetime_ns(time)
                         row = {
                             "time": time,
                             "latitude": values["position_lat"] / ((2**32) / 360),
@@ -182,11 +181,6 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
         decoded = str(charset_normalizer.from_bytes(content).best())
         gpx = gpxpy.parse(decoded)
 
-    # tz_str = None
-    # for extension in gpx.extensions:
-    #     if extension.tag == "{https://cyclemeter.com/xmlschemas/1}startTimeZone":
-    #         tz_str = extension.text
-
     for track in gpx.tracks:
         for segment in track.segments:
             for point in segment.points:
@@ -196,13 +190,6 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                     time = dateutil.parser.parse(str(point.time))
                 else:
                     time = None
-
-                # if time is not None:
-                #     time.astimezone()
-                #     timestamp = convert_to_datetime_ns(time)
-                # else:
-                #     timestamp = pd.NaT
-                # time = convert_to_datetime_ns(time)
                 points.append((time, point.latitude, point.longitude, point.elevation))
 
     df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "elevation"])
@@ -240,7 +227,6 @@ def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
         if trackpoint.latitude and trackpoint.longitude:
             time = trackpoint.time
             assert isinstance(time, datetime.datetime)
-            time = convert_to_datetime_ns(time)
             row = {
                 "time": time,
                 "latitude": trackpoint.latitude,
@@ -269,7 +255,6 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
             for track in _list_or_scalar(placemark.get("gx:Track", [])):
                 for when, where in zip(track["when"], track["gx:coord"]):
                     time = dateutil.parser.parse(when)
-                    time = convert_to_datetime_ns(time)
                     parts = where.split(" ")
                     if len(parts) == 2:
                         lon, lat = parts
@@ -299,7 +284,7 @@ def read_simra_activity(path: pathlib.Path, opener) -> pd.DataFrame:
     data["time"] = data["timeStamp"].apply(
         lambda d: datetime.datetime.fromtimestamp(d / 1000)
     )
-    data["time"] = convert_to_datetime_ns(data["time"])
+    data["time"] = data["time"]
     data = data.rename(columns={"lat": "latitude", "lon": "longitude"})
     return data.dropna(subset=["latitude"], ignore_index=True)[
         ["time", "latitude", "longitude"]
