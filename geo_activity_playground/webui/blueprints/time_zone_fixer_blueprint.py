@@ -2,12 +2,15 @@ import logging
 
 import sqlalchemy
 from flask import Blueprint
+from flask import redirect
+from flask import url_for
 
 from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.enrichment import apply_enrichments
 from ...core.enrichment import enrichment_set_timezone
+from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 
@@ -15,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def make_time_zone_fixer_blueprint(
-    authenticator: Authenticator, config: Config
+    authenticator: Authenticator, config: Config, tile_visit_accessor: TileVisitAccessor
 ) -> Blueprint:
 
     blueprint = Blueprint("time_zone_fixer", __name__, template_folder="templates")
@@ -40,5 +43,14 @@ def make_time_zone_fixer_blueprint(
             activity.replace_time_series(time_series)
             DB.session.commit()
         return "Done"
+
+    @blueprint.route("/truncate-activities")
+    @needs_authentication(authenticator)
+    def truncate_activities():
+        DB.session.query(Activity).delete()
+        DB.session.commit()
+        tile_visit_accessor.reset()
+        tile_visit_accessor.save()
+        return redirect(url_for("upload.reload"))
 
     return blueprint

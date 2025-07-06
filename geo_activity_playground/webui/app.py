@@ -207,7 +207,9 @@ def web_ui_main(
         ),
         "/summary": make_summary_blueprint(repository, config, search_query_history),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
-        "/time-zone-fixer": make_time_zone_fixer_blueprint(config),
+        "/time-zone-fixer": make_time_zone_fixer_blueprint(
+            authenticator, config, tile_visit_accessor
+        ),
         "/upload": make_upload_blueprint(
             repository, tile_visit_accessor, config_accessor(), authenticator, flasher
         ),
