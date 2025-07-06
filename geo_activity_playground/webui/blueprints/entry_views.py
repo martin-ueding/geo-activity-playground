@@ -44,7 +44,7 @@ def register_entry_views(
                 .order_by(Activity.start.desc())
                 .limit(100)
             ):
-                context["latest_activities"][activity.start.date()].append(
+                context["latest_activities"][activity.start_local_tz.date()].append(
                     {
                         "activity": activity,
                         "line_geojson": make_geojson_from_time_series(
