@@ -44,7 +44,7 @@
                 (60/activity.average_speed_elapsed_kmh)|round(1) }} min/km</dd>
             <dt>Start time</dt>
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
-                {{ time }}
+                {{ time }} {{ activity.iana_timezone }}
             </dd>
             {% endif %}
 

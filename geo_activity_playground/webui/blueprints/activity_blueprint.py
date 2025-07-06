@@ -164,8 +164,8 @@ def make_activity_blueprint(
                         time_series[line_color_column],
                         line_color_columns_avail[line_color_column].format,
                     ),
-                    "date": activity.start.date(),
-                    "time": activity.start.time(),
+                    "date": activity.start_local_tz.date(),
+                    "time": activity.start_local_tz.time(),
                     "line_color_column": line_color_column,
                     "line_color_columns_avail": line_color_columns_avail,
                 }

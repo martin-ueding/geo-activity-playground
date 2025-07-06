@@ -20,10 +20,13 @@ Types of changes
 Added:
 
 - Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). This will be used as a fall-back in case there is no recorded data. The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length). Unfortunately the data has its own accuracy problem, hence it is not used instead of measured data yet.
+- Query external API for time zone at given coordinates such that times can be shown in the local time zone of the activity.
 
 Changed:
 
-- Move importing into separate thread to speed-up startup.
+- Move importing into separate thread to speed-up startup. Importing then runs in the background.
+- Import new activities with less steps, get rid of intermediate parsed representations.
+- Store times as UTC again.
 
 Note that there is a deprecation warning that you will see after startup:
 

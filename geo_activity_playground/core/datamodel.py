@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import pathlib
+import zoneinfo
 from typing import Any
 from typing import Optional
 from typing import TypedDict
@@ -215,6 +216,15 @@ class Activity(DB.Model):
             activity_extracted_time_series_dir() / f"{self.upstream_id}.pickle",
         ]:
             path.unlink(missing_ok=True)
+
+    @property
+    def start_local_tz(self) -> Optional[datetime.datetime]:
+        if self.start and self.iana_timezone:
+            return self.start.replace(
+                microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC")
+            ).astimezone(zoneinfo.ZoneInfo(self.iana_timezone))
+        else:
+            return self.start
 
 
 class Tag(DB.Model):
