@@ -7,6 +7,7 @@ from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.enrichment import apply_enrichments
+from ...core.enrichment import enrichment_set_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def make_time_zone_fixer_blueprint(config: Config) -> Blueprint:
             logger.info(f"Changing time zone for {activity.name} …")
 
             time_series = activity.raw_time_series
+            enrichment_set_timezone(activity, time_series, config)
             if time_series["time"].dt.tz is None:
                 time_series["time"] = time_series["time"].dt.tz_localize(
                     activity.iana_timezone
