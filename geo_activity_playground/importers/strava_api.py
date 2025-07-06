@@ -3,6 +3,7 @@ import logging
 import pathlib
 import pickle
 import time
+from typing import Optional
 
 import pandas as pd
 from stravalib import Client
@@ -23,6 +24,21 @@ from ..core.time_conversion import convert_to_datetime_ns
 
 
 logger = logging.getLogger(__name__)
+
+
+def _embellish_single_time_series(
+    timeseries: pd.DataFrame,
+    start: Optional[datetime.datetime],
+    time_diff_threshold_seconds: Optional[int],
+) -> pd.DataFrame:
+    if start is not None and pd.api.types.is_dtype_equal(
+        timeseries["time"].dtype, "int64"
+    ):
+        time = timeseries["time"]
+        del timeseries["time"]
+        timeseries["time"] = [
+            convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
+        ]
 
 
 def get_current_access_token(config: Config) -> str:

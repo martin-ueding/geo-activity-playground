@@ -1,256 +1,264 @@
 import datetime
 import logging
-import pathlib
-import pickle
-from typing import Optional
+import zoneinfo
+from typing import Callable
 
 import numpy as np
 import pandas as pd
-import sqlalchemy
-from tqdm import tqdm
 
 from .config import Config
 from .coordinates import get_distance
 from .copernicus_dem import get_elevation
 from .datamodel import Activity
-from .datamodel import ActivityMeta
-from .datamodel import DB
-from .datamodel import get_or_make_equipment
-from .datamodel import get_or_make_kind
 from .missing_values import some
-from .paths import activity_extracted_meta_dir
-from .paths import activity_extracted_time_series_dir
-from .paths import TIME_SERIES_DIR
-from .tasks import work_tracker
 from .tiles import compute_tile_float
-from .time_conversion import convert_to_datetime_ns
+from .time_conversion import get_country_timezone
 
 logger = logging.getLogger(__name__)
 
 
-def foo():
-
-    latitude, longitude = timeseries[["latitude", "longitude"]].iloc[0].to_list()
-    country, tz_str = get_country_timezone(latitude, longitude)
-    timeseries["time"] = timeseries["time"].dt.tz_convert(zoneinfo.ZoneInfo(tz_str))
-
-
-def populate_database_from_extracted(config: Config) -> None:
-    available_ids = {
-        int(path.stem) for path in activity_extracted_meta_dir().glob("*.pickle")
-    }
-    present_ids = {
-        int(elem)
-        for elem in DB.session.scalars(sqlalchemy.select(Activity.upstream_id)).all()
-        if elem
-    }
-    new_ids = available_ids - present_ids
-
-    for upstream_id in tqdm(new_ids, desc="Importing new activities into database"):
-        extracted_metadata_path = (
-            activity_extracted_meta_dir() / f"{upstream_id}.pickle"
-        )
-        with open(extracted_metadata_path, "rb") as f:
-            extracted_metadata: ActivityMeta = pickle.load(f)
-
-        extracted_time_series_path = (
-            activity_extracted_time_series_dir() / f"{upstream_id}.parquet"
-        )
-        time_series = pd.read_parquet(extracted_time_series_path)
-
-        # Skip activities that don't have geo information attached to them. This shouldn't happen, though.
-        if "latitude" not in time_series.columns:
-            logger.warning(
-                f"Activity {upstream_id} doesn't have latitude/longitude information. Ignoring this one."
-            )
-            continue
-
-        time_series = _embellish_single_time_series(
-            time_series,
-            extracted_metadata.get("start", None),
-            config.time_diff_threshold_seconds,
-        )
-
-        kind_name = extracted_metadata.get("kind", None)
-        if kind_name:
-            # Rename kinds if needed.
-            if kind_name in config.kind_renames:
-                kind_name = config.kind_renames[kind_name]
-            kind = get_or_make_kind(kind_name)
-        else:
-            kind = None
-
-        equipment_name = extracted_metadata.get("equipment", None)
-        if equipment_name:
-            equipment = get_or_make_equipment(equipment_name, config)
-        elif kind:
-            equipment = kind.default_equipment
-        else:
-            equipment = None
-
-        activity = Activity(
-            name=extracted_metadata.get("name", "Name Placeholder"),
-            distance_km=0,
-            equipment=equipment,
-            kind=kind,
-            calories=some(extracted_metadata.get("calories", None)),
-            elevation_gain=some(extracted_metadata.get("elevation_gain", None)),
-            steps=some(extracted_metadata.get("steps", None)),
-            path=extracted_metadata.get("path", None),
-            upstream_id=upstream_id,
-        )
-
-        update_via_time_series(activity, time_series)
-
-        DB.session.add(activity)
-        try:
-            DB.session.commit()
-        except sqlalchemy.exc.StatementError:
-            logger.error(
-                f"Could not insert the following activity into the database: {vars(activity)=}"
-            )
-            raise
-
-        enriched_time_series_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
-        time_series.to_parquet(enriched_time_series_path)
+def enrichment_set_timezone(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    assert (
+        len(time_series) > 0
+    ), f"You cannot import an activity without points. {activity=}"
+    latitude, longitude = time_series[["latitude", "longitude"]].iloc[0].to_list()
+    if activity.iana_timezone is None or activity.start_country is None:
+        country, tz_str = get_country_timezone(latitude, longitude)
+        activity.iana_timezone = tz_str
+        activity.start_country = country
+        return True
+    else:
+        return False
 
 
-def update_via_time_series(activity: Activity, time_series: pd.DataFrame) -> None:
-    activity.start = some(time_series["time"].iloc[0])
-    activity.elapsed_time = some(
-        time_series["time"].iloc[-1] - time_series["time"].iloc[0]
-    )
-    activity.distance_km = (
-        time_series["distance_km"].iloc[-1] - time_series["distance_km"].iloc[0]
-    )
-    if "calories" in time_series.columns:
-        activity.calories = (
-            time_series["calories"].iloc[-1] - time_series["calories"].iloc[0]
-        )
-    activity.moving_time = _compute_moving_time(time_series)
-
-    activity.start_latitude = time_series["latitude"].iloc[0]
-    activity.end_latitude = time_series["latitude"].iloc[-1]
-    activity.start_longitude = time_series["longitude"].iloc[0]
-    activity.end_longitude = time_series["longitude"].iloc[-1]
-    if "elevation_gain_cum" in time_series.columns:
-        elevation_gain_cum = time_series["elevation_gain_cum"].fillna(0)
-        activity.elevation_gain = (
-            elevation_gain_cum.iloc[-1] - elevation_gain_cum.iloc[0]
-        )
-
-
-def _compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:
-    def moving_time(group) -> datetime.timedelta:
-        selection = group["speed"] > 1.0
-        time_diff = group["time"].diff().loc[selection]
-        return time_diff.sum()
-
-    return (
-        time_series.groupby("segment_id").apply(moving_time, include_groups=False).sum()
-    )
-
-
-def _embellish_single_time_series(
-    timeseries: pd.DataFrame,
-    start: Optional[datetime.datetime],
-    time_diff_threshold_seconds: Optional[int],
-) -> pd.DataFrame:
-    if start is not None and pd.api.types.is_dtype_equal(
-        timeseries["time"].dtype, "int64"
-    ):
-        time = timeseries["time"]
-        del timeseries["time"]
-        timeseries["time"] = [
-            convert_to_datetime_ns(start + datetime.timedelta(seconds=t)) for t in time
-        ]
-    timeseries["time"] = convert_to_datetime_ns(timeseries["time"])
-    assert pd.api.types.is_dtype_equal(timeseries["time"].dtype, "datetime64[ns]"), (
-        timeseries["time"].dtype,
-        timeseries["time"].iloc[0],
-    )
-
-    distances = get_distance(
-        timeseries["latitude"].shift(1),
-        timeseries["longitude"].shift(1),
-        timeseries["latitude"],
-        timeseries["longitude"],
-    ).fillna(0.0)
-    if time_diff_threshold_seconds:
-        time_diff = (
-            timeseries["time"] - timeseries["time"].shift(1)
-        ).dt.total_seconds()
-        jump_indices = time_diff >= time_diff_threshold_seconds
-        distances.loc[jump_indices] = 0.0
-
-    if "distance_km" not in timeseries.columns:
-        timeseries["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
-
-    if "speed" not in timeseries.columns:
-        timeseries["speed"] = (
-            timeseries["distance_km"].diff()
-            / (timeseries["time"].diff().dt.total_seconds() + 1e-3)
-            * 3600
-        )
-
-    potential_jumps = (timeseries["speed"] > 40) & (timeseries["speed"].diff() > 10)
-    if np.any(potential_jumps):
-        timeseries = timeseries.loc[~potential_jumps].copy()
-
-    if "segment_id" not in timeseries.columns:
-        if time_diff_threshold_seconds:
-            timeseries["segment_id"] = np.cumsum(jump_indices)
-        else:
-            timeseries["segment_id"] = 0
-
-    if "x" not in timeseries.columns:
-        x, y = compute_tile_float(timeseries["latitude"], timeseries["longitude"], 0)
-        timeseries["x"] = x
-        timeseries["y"] = y
-
-    if "altitude" in timeseries.columns:
-        timeseries.rename(columns={"altitude": "elevation"}, inplace=True)
-
-    if "copernicus_elevation" not in timeseries.columns:
-        timeseries["copernicus_elevation"] = [
-            get_elevation(lat, lon)
-            for lat, lon in zip(timeseries["latitude"], timeseries["longitude"])
-        ]
-
+def enrichment_normalize_time(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    # Routes (as opposed to tracks) don't have time information. We cannot do anything with time here.
     if (
-        "elevation" in timeseries.columns
-        or "copernicus_elevation" in timeseries.columns
+        "time" in time_series.columns
+        and pd.isna(time_series["time"]).all()
+        and not pd.api.types.is_datetime64_any_dtype(time_series["time"].dtype)
     ):
+        time_series["time"] = pd.NaT
+        return True
+
+    changed = False
+    tz_utc = zoneinfo.ZoneInfo("UTC")
+    # If the time is naive, assume that it is UTC.
+    if time_series["time"].dt.tz is None:
+        time_series["time"] = time_series["time"].dt.tz_localize(tz_utc)
+        changed = True
+
+    if time_series["time"].dt.tz.utcoffset(None) != tz_utc.utcoffset(None):
+        time_series["time"] = time_series["time"].dt.tz_convert(tz_utc)
+        changed = True
+
+    if not pd.api.types.is_dtype_equal(
+        time_series["time"].dtype, "datetime64[ns, UTC]"
+    ):
+        time_series["time"] = time_series["time"].dt.tz_convert(tz_utc)
+        changed = True
+
+    assert pd.api.types.is_dtype_equal(
+        time_series["time"].dtype, "datetime64[ns, UTC]"
+    ), (
+        time_series["time"].dtype,
+        time_series["time"].iloc[0],
+    )
+
+    new_start = some(time_series["time"].iloc[0])
+    if new_start != activity.start:
+        activity.start = new_start
+        changed = True
+
+    new_elapsed_time = some(time_series["time"].iloc[-1] - time_series["time"].iloc[0])
+    if new_elapsed_time != activity.elapsed_time:
+        activity.elapsed_time = new_elapsed_time
+        changed = True
+
+    return changed
+
+
+def enrichment_rename_altitude(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if "altitude" in time_series.columns:
+        time_series.rename(columns={"altitude": "elevation"}, inplace=True)
+        return True
+    else:
+        return False
+
+
+def enrichment_compute_tile_xy(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if "x" not in time_series.columns:
+        x, y = compute_tile_float(time_series["latitude"], time_series["longitude"], 0)
+        time_series["x"] = x
+        time_series["y"] = y
+        return True
+    else:
+        return False
+
+
+def enrichment_copernicus_elevation(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if "copernicus_elevation" not in time_series.columns:
+        time_series["copernicus_elevation"] = [
+            get_elevation(lat, lon)
+            for lat, lon in zip(time_series["latitude"], time_series["longitude"])
+        ]
+        return True
+    else:
+        return False
+
+
+def enrichment_elevation_gain(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if (
+        "elevation" in time_series.columns
+        or "copernicus_elevation" in time_series.columns
+    ) and "elevation_gain_cum" not in time_series.columns:
         elevation = (
-            timeseries["elevation"]
-            if "elevation" in timeseries.columns
-            else timeseries["copernicus_elevation"]
+            time_series["elevation"]
+            if "elevation" in time_series.columns
+            else time_series["copernicus_elevation"]
         )
         elevation_diff = elevation.diff()
         elevation_diff = elevation_diff.ewm(span=5, min_periods=5).mean()
         elevation_diff.loc[elevation_diff.abs() > 30] = 0
         elevation_diff.loc[elevation_diff < 0] = 0
-        timeseries["elevation_gain_cum"] = elevation_diff.cumsum()
+        time_series["elevation_gain_cum"] = elevation_diff.cumsum().fillna(0)
 
-    return timeseries
+        activity.elevation_gain = (
+            time_series["elevation_gain_cum"].iloc[-1]
+            - time_series["elevation_gain_cum"].iloc[0]
+        )
+        return True
+    else:
+        return False
 
 
-def add_copernicus_elevation(config: Config) -> None:
-    with work_tracker(
-        pathlib.Path("Cache/copernicus-dem.json")
-    ) as processed_activity_ids:
-        for activity in tqdm(
-            DB.session.scalars(sqlalchemy.select(Activity)).all(),
-            desc="Checking Copernicus elevation",
-        ):
-            if activity.id in processed_activity_ids:
-                continue
+def enrichment_add_calories(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if activity.calories is None and "calories" in time_series.columns:
+        activity.calories = (
+            time_series["calories"].iloc[-1] - time_series["calories"].iloc[0]
+        )
+        return True
+    else:
+        return False
 
-            time_series = _embellish_single_time_series(
-                activity.raw_time_series, None, config.time_diff_threshold_seconds
-            )
-            activity.replace_time_series(time_series)
-            update_via_time_series(activity, time_series)
-            DB.session.commit()
 
-            processed_activity_ids.add(activity.id)
+def enrichment_distance(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    changed = False
+
+    distances = get_distance(
+        time_series["latitude"].shift(1),
+        time_series["longitude"].shift(1),
+        time_series["latitude"],
+        time_series["longitude"],
+    ).fillna(0.0)
+
+    if config.time_diff_threshold_seconds:
+        time_diff = (
+            time_series["time"] - time_series["time"].shift(1)
+        ).dt.total_seconds()
+        jump_indices = time_diff >= config.time_diff_threshold_seconds
+        distances.loc[jump_indices] = 0.0
+
+    if "distance_km" not in time_series.columns:
+        time_series["distance_km"] = pd.Series(np.cumsum(distances)) / 1000
+        changed = True
+
+    if "speed" not in time_series.columns:
+        time_series["speed"] = (
+            time_series["distance_km"].diff()
+            / (time_series["time"].diff().dt.total_seconds() + 1e-3)
+            * 3600
+        )
+        changed = True
+
+    potential_jumps = (time_series["speed"] > 40) & (time_series["speed"].diff() > 10)
+    if np.any(potential_jumps):
+        time_series.replace(time_series.loc[~potential_jumps])
+        changed = True
+
+    if "segment_id" not in time_series.columns:
+        if config.time_diff_threshold_seconds:
+            time_series["segment_id"] = np.cumsum(jump_indices)
+        else:
+            time_series["segment_id"] = 0
+        changed = True
+
+    new_distance_km = (
+        time_series["distance_km"].iloc[-1] - time_series["distance_km"].iloc[0]
+    )
+    if new_distance_km != activity.distance_km:
+        activity.distance_km = new_distance_km
+        changed = True
+
+    return changed
+
+
+def enrichment_moving_time(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    def moving_time(group) -> datetime.timedelta:
+        selection = group["speed"] > 1.0
+        time_diff = group["time"].diff().loc[selection]
+        return time_diff.sum()
+
+    new_moving_time = (
+        time_series.groupby("segment_id").apply(moving_time, include_groups=False).sum()
+    )
+    if new_moving_time != activity.moving_time:
+        activity.moving_time = new_moving_time
+        return True
+    else:
+        return False
+
+
+def enrichment_copy_latlon(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    if activity.start_latitude is None:
+        activity.start_latitude = time_series["latitude"].iloc[0]
+        activity.end_latitude = time_series["latitude"].iloc[-1]
+        activity.start_longitude = time_series["longitude"].iloc[0]
+        activity.end_longitude = time_series["longitude"].iloc[-1]
+        return True
+    else:
+        return False
+
+
+enrichments: list[Callable[[Activity, pd.DataFrame, Config], bool]] = [
+    enrichment_set_timezone,
+    enrichment_normalize_time,
+    enrichment_rename_altitude,
+    enrichment_compute_tile_xy,
+    enrichment_copernicus_elevation,
+    enrichment_elevation_gain,
+    enrichment_add_calories,
+    enrichment_distance,
+    enrichment_moving_time,
+    enrichment_copy_latlon,
+]
+
+
+def apply_enrichments(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> bool:
+    was_changed = False
+    for enrichment in enrichments:
+        logger.info(f"Running {enrichment.__name__} …")
+        was_changed |= enrichment(activity, time_series, config)
+    return was_changed

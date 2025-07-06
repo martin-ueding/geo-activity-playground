@@ -1,4 +1,7 @@
+import typing
+
 import numpy as np
+import pandas as pd
 
 
 class Bounds:
@@ -15,7 +18,15 @@ class Bounds:
         return (self.x_min < x < self.x_max) and (self.y_min < y < self.y_max)
 
 
-def get_distance(lat_1: float, lon_1: float, lat_2: float, lon_2: float) -> float:
+FloatOrSeries = typing.TypeVar("FloatOrSeries", float, np.ndarray, pd.Series)
+
+
+def get_distance(
+    lat_1: FloatOrSeries,
+    lon_1: FloatOrSeries,
+    lat_2: FloatOrSeries,
+    lon_2: FloatOrSeries,
+) -> FloatOrSeries:
     """
     https://en.wikipedia.org/wiki/Haversine_formula
     """

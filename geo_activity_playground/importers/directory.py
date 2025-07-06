@@ -6,11 +6,17 @@ import re
 import traceback
 from typing import Optional
 
+import sqlalchemy
 from tqdm import tqdm
 
 from ..core.config import Config
+from ..core.datamodel import Activity
 from ..core.datamodel import ActivityMeta
+from ..core.datamodel import DB
 from ..core.datamodel import DEFAULT_UNKNOWN_NAME
+from ..core.datamodel import get_or_make_equipment
+from ..core.datamodel import get_or_make_kind
+from ..core.enrichment import apply_enrichments
 from ..core.paths import activity_extracted_dir
 from ..core.paths import activity_extracted_meta_dir
 from ..core.paths import activity_extracted_time_series_dir
@@ -24,10 +30,7 @@ logger = logging.getLogger(__name__)
 ACTIVITY_DIR = pathlib.Path("Activities")
 
 
-def import_from_directory(
-    metadata_extraction_regexes: list[str], config: Config
-) -> None:
-
+def import_from_directory(config: Config) -> None:
     activity_paths = [
         path
         for path in ACTIVITY_DIR.rglob("*.*")
@@ -36,105 +39,50 @@ def import_from_directory(
         and not path.stem.startswith(".")
         and not path.suffix in config.ignore_suffixes
     ]
-    work_tracker = WorkTracker(activity_extracted_dir() / "work-tracker-extract.pickle")
-    new_activity_paths = work_tracker.filter(activity_paths)
 
-    with stored_object(
-        activity_extracted_dir() / "file-hashes.pickle", {}
-    ) as file_hashes:
-        for path in tqdm(new_activity_paths, desc="Detect deleted activities"):
-            file_hashes[path] = get_file_hash(path)
-
-        deleted_files = set(file_hashes.keys()) - set(activity_paths)
-        deleted_hashes = [file_hashes[path] for path in deleted_files]
-        for deleted_hash in deleted_hashes:
-            activity_extracted_meta_path = (
-                activity_extracted_meta_dir() / f"{deleted_hash}.pickle"
+    for activity_path in activity_paths:
+        with DB.session.no_autoflush:
+            activity = DB.session.scalar(
+                sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
             )
-            activity_extracted_time_series_path = (
-                activity_extracted_time_series_dir() / f"{deleted_hash}.parquet"
-            )
-            logger.warning(f"Deleting {activity_extracted_meta_path}")
-            logger.warning(f"Deleting {activity_extracted_time_series_path}")
-            activity_extracted_meta_path.unlink(missing_ok=True)
-            activity_extracted_time_series_path.unlink(missing_ok=True)
-        for deleted_file in deleted_files:
-            logger.warning(f"Deleting {deleted_file}")
-            del file_hashes[deleted_file]
-            work_tracker.discard(deleted_file)
+            if activity is None:
+                import_from_file(activity_path, config)
 
-    paths_with_errors = []
-    for path in tqdm(new_activity_paths, desc="Parse activity metadata (serially)"):
-        errors = _cache_single_file(path)
-        if errors:
-            paths_with_errors.append(errors)
 
-    for path in tqdm(new_activity_paths, desc="Collate activity metadata"):
-        activity_id = get_file_hash(path)
-        file_metadata_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
-        work_tracker.mark_done(path)
+def import_from_file(path: pathlib.Path, config: Config) -> None:
+    logger.info(f"Importing {path=}")
+    try:
+        activity, time_series = read_activity(path)
+    except ActivityParseError as e:
+        logger.error(f"Error while parsing file {path}:")
+        traceback.print_exc()
+        return
+    except:
+        logger.error(f"Encountered a problem with {path=}, see details below.")
+        raise
 
-        if not file_metadata_path.exists():
-            continue
+    if len(time_series) == 0:
+        logger.warning(f"Activity with {path=} has no time series data, skipping.")
+        return
 
-        with open(file_metadata_path, "rb") as f:
-            activity_meta_from_file = pickle.load(f)
+    activity.path = str(path)
+    if activity.name is None:
+        activity.name = path.name.removesuffix("".join(path.suffixes))
 
-        activity_meta = ActivityMeta(
-            id=activity_id,
-            # https://stackoverflow.com/a/74718395/653152
-            name=path.name.removesuffix("".join(path.suffixes)),
-            path=str(path),
-            kind=DEFAULT_UNKNOWN_NAME,
-            equipment=DEFAULT_UNKNOWN_NAME,
-            consider_for_achievements=True,
+    meta_from_path = _get_metadata_from_path(path, config.metadata_extraction_regexes)
+    if activity.equipment is None:
+        activity.equipment = get_or_make_equipment(
+            meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME), config
         )
-        activity_meta.update(activity_meta_from_file)
-        activity_meta.update(_get_metadata_from_path(path, metadata_extraction_regexes))
-        with open(file_metadata_path, "wb") as f:
-            pickle.dump(activity_meta, f)
-
-    if paths_with_errors:
-        logger.warning(
-            "There were errors while parsing some of the files. These were skipped and tried again next time."
+    if activity.kind is None:
+        activity.kind = get_or_make_kind(
+            meta_from_path.get("kind", DEFAULT_UNKNOWN_NAME)
         )
-        for path, error in paths_with_errors:
-            logger.error(f"{path}: {error}")
 
-    work_tracker.close()
-
-
-def _cache_single_file(path: pathlib.Path) -> Optional[tuple[pathlib.Path, str]]:
-    activity_id = get_file_hash(path)
-    timeseries_path = activity_extracted_time_series_dir() / f"{activity_id}.parquet"
-    file_metadata_path = activity_extracted_meta_dir() / f"{activity_id}.pickle"
-
-    if not timeseries_path.exists():
-        try:
-            activity_meta_from_file, timeseries = read_activity(path)
-        except ActivityParseError as e:
-            logger.error(f"Error while parsing file {path}:")
-            traceback.print_exc()
-            return path, str(e)
-        except:
-            logger.error(f"Encountered a problem with {path=}, see details below.")
-            raise
-
-        if len(timeseries) == 0:
-            return None
-
-        timeseries.to_parquet(timeseries_path)
-        with open(file_metadata_path, "wb") as f:
-            pickle.dump(activity_meta_from_file, f)
-    return None
-
-
-def get_file_hash(path: pathlib.Path) -> int:
-    file_hash = hashlib.blake2s()
-    with open(path, "rb") as f:
-        while chunk := f.read(8192):
-            file_hash.update(chunk)
-    return int(file_hash.hexdigest(), 16) % 2**62
+    apply_enrichments(activity, time_series, config)
+    DB.session.add(activity)
+    DB.session.commit()
+    activity.replace_time_series(time_series)
 
 
 def _get_metadata_from_path(

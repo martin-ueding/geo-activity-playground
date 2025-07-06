@@ -9,6 +9,7 @@ import shutil
 import threading
 import urllib.parse
 import uuid
+import warnings
 
 import pandas as pd
 import sqlalchemy
@@ -67,6 +68,7 @@ def get_secret_key():
             secret = json.load(f)
     else:
         secret = secrets.token_hex()
+        secret_file.parent.mkdir(exist_ok=True, parents=True)
         with open(secret_file, "w") as f:
             json.dump(secret, f)
     return secret
@@ -90,6 +92,14 @@ def web_ui_main(
 ) -> None:
     os.chdir(basedir)
 
+    warnings.filterwarnings(
+        "ignore", "DeprecationWarning: __array__ implementation doesn't"
+    )
+    warnings.filterwarnings("ignore", 'UserWarning: \'field "native_field_num"')
+    warnings.filterwarnings(
+        "ignore",
+        r"DeprecationWarning: datetime.datetime.utcfromtimestamp\(\) is deprecated.*",
+    )
     app = Flask(__name__)
 
     database_path = pathlib.Path("database.sqlite")

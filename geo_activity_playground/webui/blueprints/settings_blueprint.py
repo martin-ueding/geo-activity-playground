@@ -1,6 +1,5 @@
 import json
 import re
-import shutil
 import urllib.parse
 from typing import Any
 from typing import Optional
@@ -21,11 +20,8 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
-from ...core.enrichment import _embellish_single_time_series
-from ...core.enrichment import update_via_time_series
+from ...core.enrichment import apply_enrichments
 from ...core.heart_rate import HeartRateZoneComputer
-from ...core.paths import _activity_enriched_dir
-from ...core.paths import TIME_SERIES_DIR
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..flasher import Flasher
@@ -357,14 +353,9 @@ def make_settings_blueprint(
                 DB.session.scalars(sqlalchemy.select(Activity)).all(),
                 desc="Recomputing segments",
             ):
-                time_series = _embellish_single_time_series(
-                    activity.raw_time_series,
-                    None,
-                    threshold,
-                )
-                update_via_time_series(activity, time_series)
-                enriched_time_series_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
-                time_series.to_parquet(enriched_time_series_path)
+                time_series = activity.time_series
+                apply_enrichments(activity, time_series, config_accessor())
+                activity.replace_time_series(time_series)
                 DB.session.commit()
         return render_template(
             "settings/segmentation.html.j2",

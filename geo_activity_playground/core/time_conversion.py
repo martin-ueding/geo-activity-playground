@@ -21,6 +21,18 @@ def convert_to_datetime_ns(date) -> np.datetime64 | pd.Series:
         return ts.to_datetime64()
 
 
+def convert_to_datetime_ns_utc(date) -> np.datetime64 | pd.Series:
+    if isinstance(date, pd.Series):
+        ts = pd.to_datetime(date)
+        ts = ts.dt.tz_localize(None)
+        return ts
+    else:
+        ts = pd.to_datetime(date)
+        if ts.tzinfo is not None:
+            ts = ts.tz_localize(None)
+        return ts.to_datetime64()
+
+
 def sanitize_datetime(
     dt: datetime.datetime, fallback_from: str, fallback_to: str
 ) -> datetime.datetime:

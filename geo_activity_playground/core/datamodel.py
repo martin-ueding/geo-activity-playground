@@ -98,17 +98,23 @@ class Activity(DB.Model):
     index_end: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # Temporal data:
-    start: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=True)
-    iana_timezone: Mapped[str] = mapped_column(sa.String, nullable=True)
-    elapsed_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
-    moving_time: Mapped[datetime.timedelta] = mapped_column(sa.Interval, nullable=True)
+    start: Mapped[Optional[datetime.datetime]] = mapped_column(
+        sa.DateTime, nullable=True
+    )
+    iana_timezone: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    elapsed_time: Mapped[Optional[datetime.timedelta]] = mapped_column(
+        sa.Interval, nullable=True
+    )
+    moving_time: Mapped[Optional[datetime.timedelta]] = mapped_column(
+        sa.Interval, nullable=True
+    )
 
     # Geographic data:
     start_latitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     start_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_latitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
-    start_country: Mapped[str] = mapped_column(sa.String, nullable=True)
+    start_country: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
 
     # Elevation data:
     elevation_gain: Mapped[float] = mapped_column(sa.Float, nullable=True)
@@ -146,32 +152,35 @@ class Activity(DB.Model):
 
     @property
     def average_speed_moving_kmh(self) -> Optional[float]:
-        if self.moving_time:
+        if self.distance_km and self.moving_time:
             return self.distance_km / (self.moving_time.total_seconds() / 3_600)
         else:
             return None
 
     @property
     def average_speed_elapsed_kmh(self) -> Optional[float]:
-        if self.elapsed_time:
+        if self.distance_km and self.elapsed_time:
             return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
         else:
             return None
 
     @property
+    def time_series_path(self) -> pathlib.Path:
+        return TIME_SERIES_DIR() / f"{self.id}.parquet"
+
+    @property
     def raw_time_series(self) -> pd.DataFrame:
-        path = TIME_SERIES_DIR() / f"{self.id}.parquet"
         try:
-            time_series = pd.read_parquet(path)
+            time_series = pd.read_parquet(self.time_series_path)
             if "altitude" in time_series.columns:
                 time_series.rename(columns={"altitude": "elevation"}, inplace=True)
             return time_series
         except OSError as e:
-            logger.error(f"Error while reading {path}.")
+            logger.error(f"Error while reading {self.time_series_path}.")
             raise
 
     def replace_time_series(self, time_series: pd.DataFrame) -> None:
-        time_series.to_parquet(TIME_SERIES_DIR() / f"{self.id}.parquet")
+        time_series.to_parquet(self.time_series_path)
 
     @property
     def time_series(self) -> pd.DataFrame:
@@ -335,7 +344,6 @@ def get_or_make_equipment(name: str, config: Config) -> Equipment:
         equipment = Equipment(
             name=name, offset_km=config.equipment_offsets.get(name, 0)
         )
-        DB.session.add(equipment)
         return equipment
 
 
@@ -372,7 +380,6 @@ def get_or_make_kind(name: str) -> Kind:
             name=name,
             consider_for_achievements=True,
         )
-        DB.session.add(kind)
         return kind
 
 

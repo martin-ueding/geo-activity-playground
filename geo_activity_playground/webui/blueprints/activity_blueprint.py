@@ -32,7 +32,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
-from ...core.enrichment import update_via_time_series
+from ...core.enrichment import apply_enrichments
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
 from ...core.raster_map import map_image_from_tile_bounds
@@ -44,8 +44,6 @@ from ...explorer.grid_file import make_grid_points
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
-from ..columns import column_elevation
-from ..columns import column_speed
 from ..columns import TIME_SERIES_COLUMNS
 
 logger = logging.getLogger(__name__)
@@ -381,8 +379,9 @@ def make_activity_blueprint(
             if form_end:
                 activity.index_end = int(form_end)
 
-            update_via_time_series(activity, activity.time_series)
-
+            time_series = activity.time_series
+            apply_enrichments(activity, time_series, config)
+            activity.replace_time_series(time_series)
             DB.session.commit()
 
         cmap = matplotlib.colormaps["turbo"]
