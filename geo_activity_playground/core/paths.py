@@ -3,9 +3,17 @@ import functools
 import pathlib
 import typing
 
+import appdirs
+
 """
 Paths within the playground and cache.
 """
+
+APPDIRS = appdirs.AppDirs(appname="Geo Activity Playground", appauthor="Martin Ueding")
+
+USER_CACHE_DIR = pathlib.Path(APPDIRS.user_cache_dir)
+USER_CONFIG_DIR = pathlib.Path(APPDIRS.user_config_dir)
+USER_DATA_DIR = pathlib.Path(APPDIRS.user_data_dir)
 
 
 def dir_wrapper(path: pathlib.Path) -> typing.Callable[[], pathlib.Path]:

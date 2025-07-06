@@ -2,8 +2,8 @@ import datetime
 import pathlib
 import zoneinfo
 
-from geo_activity_playground.core.time_conversion import sanitize_datetime
-from geo_activity_playground.importers.activity_parsers import read_activity
+from ..importers.activity_parsers import read_activity
+from .time_conversion import sanitize_datetime
 
 
 def test_time_zone_from_string() -> None:
