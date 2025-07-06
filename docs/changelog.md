@@ -21,6 +21,8 @@ Added:
 
 - Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). This will be used as a fall-back in case there is no recorded data. The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length). Unfortunately the data has its own accuracy problem, hence it is not used instead of measured data yet.
 - Query external API for time zone at given coordinates such that times can be shown in the local time zone of the activity.
+- Endpoint `/time-zone-fixer/local-to-utc` added. That will take the currently stored time information, assume it is in local time zone (which might be incorrect) and convert it to UTC using the local time zone of the activity.
+- Endpoint `/time-zone-fixer/truncate-activities` can be called to remove all activities and reload them. This might make sense if the time zone information wasn't parsed correctly.
 
 Changed:
 
