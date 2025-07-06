@@ -213,7 +213,6 @@ def _process_activity(
 def _tiles_from_points(
     time_series: pd.DataFrame, zoom: int
 ) -> Iterator[tuple[datetime.datetime, int, int]]:
-    assert pd.api.types.is_dtype_equal(time_series["time"].dtype, "datetime64[ns]")
     xf = time_series["x"] * 2**zoom
     yf = time_series["y"] * 2**zoom
     for t1, x1, y1, x2, y2, s1, s2 in zip(

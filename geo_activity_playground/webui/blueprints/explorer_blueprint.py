@@ -231,7 +231,7 @@ def make_explorer_blueprint(
         tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         tile_history = tile_visit_accessor.tile_state["tile_history"][zoom]
 
-        medians = tile_history.median()
+        medians = tile_history[["tile_x", "tile_y"]].median()
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians["tile_x"], medians["tile_y"], zoom
         )
