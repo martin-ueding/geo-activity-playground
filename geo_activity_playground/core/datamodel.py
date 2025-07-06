@@ -86,8 +86,8 @@ class Activity(DB.Model):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(sa.String, nullable=True)
-    distance_km: Mapped[float] = mapped_column(sa.Float, nullable=True)
+    name: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
 
     # Where it comes from:
     path: Mapped[str] = mapped_column(sa.String, nullable=True)
