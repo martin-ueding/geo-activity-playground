@@ -108,9 +108,7 @@ def populate_database_from_extracted(config: Config) -> None:
         time_series.to_parquet(enriched_time_series_path)
 
 
-def update_via_time_series(
-    activity: Activity, time_series: pd.DataFrame
-) -> ActivityMeta:
+def update_via_time_series(activity: Activity, time_series: pd.DataFrame) -> None:
     activity.start = some(time_series["time"].iloc[0])
     activity.elapsed_time = some(
         time_series["time"].iloc[-1] - time_series["time"].iloc[0]
@@ -149,7 +147,7 @@ def _compute_moving_time(time_series: pd.DataFrame) -> datetime.timedelta:
 def _embellish_single_time_series(
     timeseries: pd.DataFrame,
     start: Optional[datetime.datetime],
-    time_diff_threshold_seconds: int,
+    time_diff_threshold_seconds: Optional[int],
 ) -> pd.DataFrame:
     if start is not None and pd.api.types.is_dtype_equal(
         timeseries["time"].dtype, "int64"
@@ -212,8 +210,16 @@ def _embellish_single_time_series(
             for lat, lon in zip(timeseries["latitude"], timeseries["longitude"])
         ]
 
-    if "copernicus_elevation" in timeseries.columns:
-        elevation_diff = timeseries["copernicus_elevation"].diff()
+    if (
+        "elevation" in timeseries.columns
+        or "copernicus_elevation" in timeseries.columns
+    ):
+        elevation = (
+            timeseries["elevation"]
+            if "elevation" in timeseries.columns
+            else timeseries["copernicus_elevation"]
+        )
+        elevation_diff = elevation.diff()
         elevation_diff = elevation_diff.ewm(span=5, min_periods=5).mean()
         elevation_diff.loc[elevation_diff.abs() > 30] = 0
         elevation_diff.loc[elevation_diff < 0] = 0
@@ -222,35 +228,22 @@ def _embellish_single_time_series(
     return timeseries
 
 
-def add_copernicus_elevation_to_activity(activity: Activity) -> None:
-    ts = activity.time_series
-    if "copernicus_elevation" in ts:
-        return
-    logger.info(f"Adding elevation information from Copernicus DEM to {activity} …")
-    ts["copernicus_elevation"] = [
-        get_elevation(lat, lon) for lat, lon in zip(ts["latitude"], ts["longitude"])
-    ]
-    elevation_diff = ts["copernicus_elevation"].diff()
-    elevation_diff.loc[elevation_diff < 0] = 0
-    ts["elevation_gain_cum"] = elevation_diff.cumsum()
-    activity.replace_time_series(ts)
-
-    activity.start_elevation = ts["copernicus_elevation"].dropna().iloc[0]
-    activity.end_elevation = ts["copernicus_elevation"].dropna().iloc[-1]
-    activity.elevation_gain = (
-        ts["elevation_gain_cum"].dropna().iloc[-1]
-        - ts["elevation_gain_cum"].dropna().iloc[0]
-    )
-    DB.session.commit()
-
-
-def add_copernicus_elevation() -> None:
+def add_copernicus_elevation(config: Config) -> None:
     with work_tracker(
         pathlib.Path("Cache/copernicus-dem.json")
     ) as processed_activity_ids:
-        for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
+        for activity in tqdm(
+            DB.session.scalars(sqlalchemy.select(Activity)).all(),
+            desc="Checking Copernicus elevation",
+        ):
             if activity.id in processed_activity_ids:
                 continue
 
-            add_copernicus_elevation_to_activity(activity)
+            time_series = _embellish_single_time_series(
+                activity.raw_time_series, None, config.time_diff_threshold_seconds
+            )
+            activity.replace_time_series(time_series)
+            update_via_time_series(activity, time_series)
+            DB.session.commit()
+
             processed_activity_ids.add(activity.id)

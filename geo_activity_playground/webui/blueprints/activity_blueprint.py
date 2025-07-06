@@ -46,6 +46,7 @@ from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..columns import column_elevation
 from ..columns import column_speed
+from ..columns import TIME_SERIES_COLUMNS
 
 logger = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ def make_activity_blueprint(
             new_tiles_per_zoom[zoom] = len(new_tiles)
 
         line_color_columns_avail = dict(
-            [(column.name, column) for column in [column_speed, column_elevation]]
+            [(column.name, column) for column in TIME_SERIES_COLUMNS]
         )
         line_color_column = (
             request.args.get("line_color_column")

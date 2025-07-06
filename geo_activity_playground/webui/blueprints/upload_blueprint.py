@@ -144,4 +144,4 @@ def scan_for_activities(
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
 
-        add_copernicus_elevation()
+        add_copernicus_elevation(config)

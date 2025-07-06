@@ -19,9 +19,7 @@ Types of changes
 
 Added:
 
-- Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). Measured data will not be replaced, just hidden. All the summary statistics will be based on the DEM as it likely is more accurate than data gathered from GPS measurements. This will greatly improve elevation gain computations and bring meaningful values for everyone.
-
-  The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length).
+- Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). This will be used as a fall-back in case there is no recorded data. The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length). Unfortunately the data has its own accuracy problem, hence it is not used instead of measured data yet.
 
 Changed:
 

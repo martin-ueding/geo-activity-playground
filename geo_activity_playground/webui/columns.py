@@ -60,11 +60,19 @@ column_speed = ColumnDescription(
     unit="km/h",
     format=".1f",
 )
+
 column_elevation = ColumnDescription(
-    name="copernicus_elevation",
+    name="elevation",
     display_name="Elevation",
     unit="m",
     format=".0f",
 )
 
-TIME_SERIES_COLUMNS = [column_speed, column_elevation]
+column_copernicus_elevation = ColumnDescription(
+    name="copernicus_elevation",
+    display_name="Elevation (Copernicus DEM)",
+    unit="m",
+    format=".0f",
+)
+
+TIME_SERIES_COLUMNS = [column_speed, column_elevation, column_copernicus_elevation]
