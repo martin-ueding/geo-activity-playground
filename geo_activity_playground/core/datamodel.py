@@ -171,13 +171,7 @@ class Activity(DB.Model):
 
     @property
     def time_series_path(self) -> pathlib.Path:
-        if not self.time_series_uuid:
-            self.time_series_uuid = str(uuid.uuid4())
-        old_path = TIME_SERIES_DIR() / f"{self.id}.parquet"
-        new_path = TIME_SERIES_DIR() / f"{self.time_series_uuid}.parquet"
-        if old_path.exists() and not new_path.exists():
-            os.symlink(old_path, new_path)
-        return new_path
+        return TIME_SERIES_DIR() / f"{self.time_series_uuid}.parquet"
 
     @property
     def raw_time_series(self) -> pd.DataFrame:

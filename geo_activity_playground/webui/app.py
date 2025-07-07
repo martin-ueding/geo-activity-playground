@@ -22,12 +22,14 @@ from ..core.activities import ActivityRepository
 from ..core.config import ConfigAccessor
 from ..core.config import import_old_config
 from ..core.config import import_old_strava_config
+from ..core.datamodel import Activity
 from ..core.datamodel import DB
 from ..core.datamodel import Equipment
 from ..core.datamodel import Kind
 from ..core.datamodel import Photo
 from ..core.datamodel import Tag
 from ..core.heart_rate import HeartRateZoneComputer
+from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import PastelImageTransform
@@ -120,6 +122,15 @@ def web_ui_main(
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
     import_old_strava_config(config_accessor)
+
+    with app.app_context():
+        for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
+            if not activity.time_series_uuid:
+                activity.time_series_uuid = str(uuid.uuid4())
+                DB.session.commit()
+            old_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
+            if old_path.exists() and not activity.time_series_path.exists():
+                old_path.rename(activity.time_series_path)
 
     if not skip_reload:
         thread = threading.Thread(
