@@ -13,13 +13,13 @@
 
 <p>Your activities are shown in the local time zone of the activity but no time zone is shown. </p>
 <p><a class="btn btn-small btn-danger" href="{{ url_for('.local_to_utc') }}"
-        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times at local time
+        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times as local time
         zone</a></p>
 
 <p>Your activities seem to be UTC and don't confirm to the local time zone. You have the impression that all the times
     are off.</p>
 <p><a class="btn btn-small btn-danger" href="{{ url_for('.utc_to_utc') }}"
-        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times at UTC</a></p>
+        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times as UTC</a></p>
 
 <p>Everything seems broken. You want to reload all your activities. Be aware that with Strava API that can take ages due
     to the rate limiting. Also be aware that this will delete all changes that you did after importing the activity
