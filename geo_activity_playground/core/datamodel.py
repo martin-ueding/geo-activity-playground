@@ -1,7 +1,9 @@
 import datetime
 import json
 import logging
+import os
 import pathlib
+import shutil
 import uuid
 import zoneinfo
 from typing import Any
@@ -173,7 +175,8 @@ class Activity(DB.Model):
             self.time_series_uuid = str(uuid.uuid4())
         old_path = TIME_SERIES_DIR() / f"{self.id}.parquet"
         new_path = TIME_SERIES_DIR() / f"{self.time_series_uuid}.parquet"
-        if old_path.exists():
+        if old_path.exists() and not new_path.exists():
+            os.symlink(old_path, new_path)
             old_path.rename(new_path)
         return new_path
 
