@@ -559,7 +559,7 @@
         
   
   <span class="md-ellipsis">
-    Upload activity files
+    Upload Activity Files
   </span>
   
 
@@ -706,7 +706,7 @@
         
   
   <span class="md-ellipsis">
-    Set up a Development Environment
+    Set Up a Development Environment
   </span>
   
 
@@ -727,7 +727,7 @@
         
   
   <span class="md-ellipsis">
-    Rename activity kinds
+    Rename Activity Kinds
   </span>
   
 
@@ -1010,6 +1010,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time-zone-handling-sucks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Time Zone Handling Sucks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1172,6 +1193,15 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-130-2025-07-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.3.0 — 2025-07-07
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#version-120-2025-06-20" class="md-nav__link">
@@ -2036,6 +2066,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-130-2025-07-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.3.0 — 2025-07-07
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-120-2025-06-20" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.2.0 — 2025-06-20
@@ -2893,6 +2932,25 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-130-2025-07-07">Version 1.3.0 — 2025-07-07</h2>
+<p>Added:</p>
+<ul>
+<li>Obtain elevation data from <a href="https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM">Copernicus Digital Elevation Model</a> (DEM). This will be used as a fall-back in case there is no recorded data. The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length). Unfortunately the data has its own accuracy problem, hence it is not used instead of measured data yet.</li>
+<li>Query external API for time zone at given coordinates such that times can be shown in the local time zone of the activity. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/303">GH-303</a>)</li>
+<li>Added a time zone fixer tool which allows to reinterpret the times of already imported activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/158">GH-158</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Move importing into separate thread to speed-up startup. Importing then runs in the background.</li>
+<li>Import new activities with less steps, get rid of intermediate parsed representations.</li>
+<li>After every imported activity, run the whole processing. This means that one can directly use heatmap and cluster while more activities are importing. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/300">GH-300</a>)</li>
+<li>Store times as UTC again. They are displayed in the local time zone of the activity in most places. In plots they are shown in the browser time zone for the time being. The search table has them in UTC.</li>
+<li>Store activity time series with a UUID filename. This makes importing activities robust against crashes or shutdowns of the webserver.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>During a development version, there was an issue with the Strava API. That's fixed. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/305">GH-305</a>)</li>
+</ul>
 <h2 id="version-120-2025-06-20">Version 1.2.0 — 2025-06-20</h2>
 <p>Added:</p>
 <ul>
