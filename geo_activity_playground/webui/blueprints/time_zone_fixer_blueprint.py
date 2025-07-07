@@ -3,6 +3,8 @@ import logging
 import sqlalchemy
 from flask import Blueprint
 from flask import redirect
+from flask import render_template
+from flask import Response
 from flask import url_for
 
 from ...core.config import Config
@@ -23,9 +25,23 @@ def make_time_zone_fixer_blueprint(
 
     blueprint = Blueprint("time_zone_fixer", __name__, template_folder="templates")
 
+    @blueprint.route("/")
+    def index() -> str:
+        return render_template("time_zone_fixer/index.html.j2")
+
     @blueprint.route("/local-to-utc")
     @needs_authentication(authenticator)
-    def local_to_utc() -> str:
+    def local_to_utc():
+        convert(True)
+        return redirect(url_for("index"))
+
+    @blueprint.route("/utc-to-utc")
+    @needs_authentication(authenticator)
+    def utc_to_utc():
+        convert(False)
+        return redirect(url_for("index"))
+
+    def convert(from_iana: bool) -> None:
         for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
             if activity.start is None:
                 continue
@@ -36,11 +52,10 @@ def make_time_zone_fixer_blueprint(
             enrichment_set_timezone(activity, time_series, config)
             if time_series["time"].dt.tz is None:
                 time_series["time"] = time_series["time"].dt.tz_localize(
-                    activity.iana_timezone
+                    activity.iana_timezone if from_iana else "UTC"
                 )
-            time_series["time"] = time_series["time"].dt.tz_convert("utc")
+            time_series["time"] = time_series["time"].dt.tz_convert("UTC")
             update_and_commit(activity, time_series, config)
-        return "Done"
 
     @blueprint.route("/truncate-activities")
     @needs_authentication(authenticator)
