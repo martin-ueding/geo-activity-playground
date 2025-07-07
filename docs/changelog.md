@@ -20,15 +20,19 @@ Types of changes
 Added:
 
 - Obtain elevation data from [Copernicus Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) (DEM). This will be used as a fall-back in case there is no recorded data. The DEM model files are downloaded anonymously from Amazon AWS in tiles of 1° latitude/longitude (covering an area with roughly 100 km side length). Unfortunately the data has its own accuracy problem, hence it is not used instead of measured data yet.
-- Query external API for time zone at given coordinates such that times can be shown in the local time zone of the activity.
-- Endpoint `/time-zone-fixer/local-to-utc` added. That will take the currently stored time information, assume it is in local time zone (which might be incorrect) and convert it to UTC using the local time zone of the activity.
-- Endpoint `/time-zone-fixer/truncate-activities` can be called to remove all activities and reload them. This might make sense if the time zone information wasn't parsed correctly.
+- Query external API for time zone at given coordinates such that times can be shown in the local time zone of the activity. ([GH-303](https://github.com/martin-ueding/geo-activity-playground/issues/303))
+- Added a time zone fixer tool which allows to reinterpret the times of already imported activities. ([GH-158](https://github.com/martin-ueding/geo-activity-playground/issues/158))
 
 Changed:
 
 - Move importing into separate thread to speed-up startup. Importing then runs in the background.
 - Import new activities with less steps, get rid of intermediate parsed representations.
 - Store times as UTC again. They are displayed in the local time zone of the activity in most places. In plots they are shown in the browser time zone for the time being. The search table has them in UTC.
+- Store activity time series with a UUID filename. This makes importing activities robust against crashes or shutdowns of the webserver.
+
+Fixed:
+
+- During a development version, there was an issue with the Strava API. That's fixed. ([GH-305](https://github.com/martin-ueding/geo-activity-playground/issues/305))
 
 ## Version 1.2.0 — 2025-06-20
 
