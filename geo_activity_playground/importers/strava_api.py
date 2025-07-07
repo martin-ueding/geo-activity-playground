@@ -11,6 +11,7 @@ from stravalib.exc import ObjectNotFound
 from stravalib.exc import RateLimitExceeded
 from tqdm import tqdm
 
+from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.datamodel import Activity
 from ..core.datamodel import DB
@@ -23,6 +24,7 @@ from ..core.paths import strava_api_dir
 from ..core.paths import strava_last_activity_date_path
 from ..core.tasks import get_state
 from ..core.tasks import set_state
+from ..explorer.tile_visits import TileVisitAccessor
 
 
 logger = logging.getLogger(__name__)
@@ -71,8 +73,12 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
-def import_from_strava_api(config: Config) -> None:
-    while try_import_strava(config):
+def import_from_strava_api(
+    config: Config,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+) -> None:
+    while try_import_strava(config, repository, tile_visit_accessor):
         now = datetime.datetime.now()
         next_quarter = round_to_next_quarter_hour(now)
         seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -82,7 +88,11 @@ def import_from_strava_api(config: Config) -> None:
         time.sleep(seconds_to_wait)
 
 
-def try_import_strava(config: Config) -> bool:
+def try_import_strava(
+    config: Config,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+) -> bool:
     get_after = get_state(strava_last_activity_date_path(), "2000-01-01T00:00:00Z")
 
     gear_names = {None: "None"}
@@ -139,8 +149,8 @@ def try_import_strava(config: Config) -> bool:
 
             if len(time_series) > 0 and "latitude" in time_series.columns:
                 activity = Activity()
-                activity.upstream_id = strava_activity.id
-                activity.distance = strava_activity.distance / 1000
+                activity.upstream_id = str(strava_activity.id)
+                activity.distance_km = strava_activity.distance / 1000
                 activity.name = strava_activity.name
                 activity.kind = get_or_make_kind(str(strava_activity.type.root))
                 activity.start = strava_activity.start_date.astimezone("UTC")
@@ -152,6 +162,9 @@ def try_import_strava(config: Config) -> bool:
                 activity.moving_time = detailed_activity.moving_time
 
                 update_and_commit(activity, time_series, config)
+                compute_tile_visits_new(repository, tile_visit_accessor)
+                compute_tile_evolution(tile_visit_accessor.tile_state, config)
+                tile_visit_accessor.save()
 
             set_state(
                 strava_last_activity_date_path(),

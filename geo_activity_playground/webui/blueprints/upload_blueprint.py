@@ -122,7 +122,7 @@ def scan_for_activities(
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
-        import_from_strava_api(config)
+        import_from_strava_api(config, repository, tile_visit_accessor)
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)

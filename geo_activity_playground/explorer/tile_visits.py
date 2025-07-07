@@ -256,7 +256,9 @@ def _compute_cluster_evolution(
 
     rows = []
     for index, row in tqdm(
-        tiles.iloc[s.cluster_start :].iterrows(), desc=f"Cluster evolution for {zoom=}"
+        tiles.iloc[s.cluster_start :].iterrows(),
+        desc=f"Cluster evolution for {zoom=}",
+        delay=2,
     ):
         new_clusters = False
         # Current tile.
@@ -333,7 +335,9 @@ def _compute_square_history(
 ) -> None:
     rows = []
     for index, row in tqdm(
-        tiles.iloc[s.square_start :].iterrows(), desc=f"Square evolution for {zoom=}"
+        tiles.iloc[s.square_start :].iterrows(),
+        desc=f"Square evolution for {zoom=}",
+        delay=2,
     ):
         tile = (row["tile_x"], row["tile_y"])
         x, y = tile

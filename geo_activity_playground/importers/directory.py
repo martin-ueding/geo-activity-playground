@@ -13,6 +13,7 @@ from ..core.datamodel import DEFAULT_UNKNOWN_NAME
 from ..core.datamodel import get_or_make_equipment
 from ..core.datamodel import get_or_make_kind
 from ..core.enrichment import update_and_commit
+from ..explorer.tile_visits import compute_tile_evolution
 from ..explorer.tile_visits import compute_tile_visits_new
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity_parsers import ActivityParseError
@@ -86,6 +87,7 @@ def import_from_file(
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)
+        compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
 
 
