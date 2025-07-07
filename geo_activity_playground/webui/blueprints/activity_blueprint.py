@@ -32,7 +32,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
-from ...core.enrichment import apply_enrichments
+from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
 from ...core.raster_map import map_image_from_tile_bounds
@@ -380,9 +380,7 @@ def make_activity_blueprint(
                 activity.index_end = int(form_end)
 
             time_series = activity.time_series
-            apply_enrichments(activity, time_series, config)
-            activity.replace_time_series(time_series)
-            DB.session.commit()
+            update_and_commit(activity, time_series, config)
 
         cmap = matplotlib.colormaps["turbo"]
         num_points = len(activity.time_series)

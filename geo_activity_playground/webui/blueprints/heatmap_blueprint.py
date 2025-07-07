@@ -162,7 +162,7 @@ def _get_counts(
                 )
                 tile_counts = np.zeros(tile_pixels, dtype=np.int32)
                 parsed_activities.clear()
-            for activity_id in activity_ids:
+            for activity_id in list(activity_ids):
                 if activity_id in parsed_activities:
                     continue
                 parsed_activities.add(activity_id)

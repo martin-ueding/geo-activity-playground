@@ -1,10 +1,8 @@
 import datetime
 import logging
 import pathlib
-import pickle
 import shutil
 import sys
-import traceback
 import zoneinfo
 from typing import Optional
 
@@ -14,21 +12,15 @@ import pandas as pd
 from tqdm import tqdm
 
 from ..core.config import Config
-from ..core.datamodel import Activity
-from ..core.datamodel import ActivityMeta
-from ..core.datamodel import DB
 from ..core.datamodel import DEFAULT_UNKNOWN_NAME
 from ..core.datamodel import get_or_make_equipment
 from ..core.datamodel import get_or_make_kind
-from ..core.enrichment import apply_enrichments
+from ..core.enrichment import update_and_commit
 from ..core.paths import activity_extracted_meta_dir
-from ..core.paths import activity_extracted_time_series_dir
-from ..core.paths import strava_last_activity_date_path
 from ..core.tasks import get_state
 from ..core.tasks import set_state
 from ..core.tasks import work_tracker_path
 from ..core.tasks import WorkTracker
-from .activity_parsers import ActivityParseError
 from .activity_parsers import read_activity
 from .csv_parser import parse_csv
 
@@ -230,11 +222,7 @@ def import_from_strava_checkout(config: Config) -> None:
         activity.start = start_datetime
         activity.steps = float_with_comma_or_period(row["Total Steps"])
 
-        apply_enrichments(activity, time_series, config)
-
-        DB.session.add(activity)
-        DB.session.commit()
-        activity.replace_time_series(time_series)
+        update_and_commit(activity, time_series, config)
 
     work_tracker.close()
 

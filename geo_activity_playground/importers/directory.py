@@ -1,27 +1,20 @@
-import hashlib
 import logging
 import pathlib
-import pickle
 import re
 import traceback
-from typing import Optional
 
 import sqlalchemy
-from tqdm import tqdm
 
+from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.datamodel import Activity
-from ..core.datamodel import ActivityMeta
 from ..core.datamodel import DB
 from ..core.datamodel import DEFAULT_UNKNOWN_NAME
 from ..core.datamodel import get_or_make_equipment
 from ..core.datamodel import get_or_make_kind
-from ..core.enrichment import apply_enrichments
-from ..core.paths import activity_extracted_dir
-from ..core.paths import activity_extracted_meta_dir
-from ..core.paths import activity_extracted_time_series_dir
-from ..core.tasks import stored_object
-from ..core.tasks import WorkTracker
+from ..core.enrichment import update_and_commit
+from ..explorer.tile_visits import compute_tile_visits_new
+from ..explorer.tile_visits import TileVisitAccessor
 from .activity_parsers import ActivityParseError
 from .activity_parsers import read_activity
 
@@ -30,7 +23,11 @@ logger = logging.getLogger(__name__)
 ACTIVITY_DIR = pathlib.Path("Activities")
 
 
-def import_from_directory(config: Config) -> None:
+def import_from_directory(
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: Config,
+) -> None:
     activity_paths = [
         path
         for path in ACTIVITY_DIR.rglob("*.*")
@@ -46,10 +43,15 @@ def import_from_directory(config: Config) -> None:
                 sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
             )
             if activity is None:
-                import_from_file(activity_path, config)
+                import_from_file(activity_path, repository, tile_visit_accessor, config)
 
 
-def import_from_file(path: pathlib.Path, config: Config) -> None:
+def import_from_file(
+    path: pathlib.Path,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
+    config: Config,
+) -> None:
     logger.info(f"Importing {path} …")
     try:
         activity, time_series = read_activity(path)
@@ -70,6 +72,7 @@ def import_from_file(path: pathlib.Path, config: Config) -> None:
         activity.name = path.name.removesuffix("".join(path.suffixes))
 
     meta_from_path = _get_metadata_from_path(path, config.metadata_extraction_regexes)
+    activity.name = meta_from_path.get("name", activity.name)
     if activity.equipment is None:
         activity.equipment = get_or_make_equipment(
             meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME), config
@@ -79,10 +82,11 @@ def import_from_file(path: pathlib.Path, config: Config) -> None:
             meta_from_path.get("kind", DEFAULT_UNKNOWN_NAME)
         )
 
-    apply_enrichments(activity, time_series, config)
-    DB.session.add(activity)
-    DB.session.commit()
-    activity.replace_time_series(time_series)
+    update_and_commit(activity, time_series, config)
+
+    if len(repository) > 0:
+        compute_tile_visits_new(repository, tile_visit_accessor)
+        tile_visit_accessor.save()
 
 
 def _get_metadata_from_path(

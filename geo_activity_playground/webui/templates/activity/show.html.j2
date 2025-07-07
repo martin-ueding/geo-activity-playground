@@ -79,6 +79,8 @@
             <dd>{{ activity.upstream_id }}</dd>
             <dt>Source path</dt>
             <dd><a href="{{ url_for('.download_original', id=activity.id) }}">{{ activity.path }}</a></dd>
+            <dt>Time series path</dt>
+            <dd>{{ activity.time_series_path }}</dd>
         </dl>
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit</a>

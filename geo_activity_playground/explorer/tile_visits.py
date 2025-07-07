@@ -143,7 +143,7 @@ def compute_tile_visits_new(
         work_tracker.reset()
 
     for activity_id in tqdm(
-        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits"
+        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=2
     ):
         _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)

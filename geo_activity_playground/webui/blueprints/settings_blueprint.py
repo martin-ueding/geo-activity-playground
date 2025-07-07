@@ -20,7 +20,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
-from ...core.enrichment import apply_enrichments
+from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
@@ -354,9 +354,7 @@ def make_settings_blueprint(
                 desc="Recomputing segments",
             ):
                 time_series = activity.time_series
-                apply_enrichments(activity, time_series, config_accessor())
-                activity.replace_time_series(time_series)
-                DB.session.commit()
+                update_and_commit(activity, time_series, config_accessor())
         return render_template(
             "settings/segmentation.html.j2",
             threshold=config_accessor().time_diff_threshold_seconds,

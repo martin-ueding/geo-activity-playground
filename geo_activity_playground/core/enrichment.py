@@ -10,6 +10,7 @@ from .config import Config
 from .coordinates import get_distance
 from .copernicus_dem import get_elevation
 from .datamodel import Activity
+from .datamodel import DB
 from .missing_values import some
 from .tiles import compute_tile_float
 from .time_conversion import get_country_timezone
@@ -261,3 +262,13 @@ def apply_enrichments(
     for enrichment in enrichments:
         was_changed |= enrichment(activity, time_series, config)
     return was_changed
+
+
+def update_and_commit(
+    activity: Activity, time_series: pd.DataFrame, config: Config
+) -> None:
+    changed = apply_enrichments(activity, time_series, config)
+    if changed:
+        activity.replace_time_series(time_series)
+    DB.session.add(activity)
+    DB.session.commit()

@@ -8,8 +8,8 @@ from flask import url_for
 from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
-from ...core.enrichment import apply_enrichments
 from ...core.enrichment import enrichment_set_timezone
+from ...core.enrichment import update_and_commit
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
@@ -39,9 +39,7 @@ def make_time_zone_fixer_blueprint(
                     activity.iana_timezone
                 )
             time_series["time"] = time_series["time"].dt.tz_convert("utc")
-            apply_enrichments(activity, time_series, config)
-            activity.replace_time_series(time_series)
-            DB.session.commit()
+            update_and_commit(activity, time_series, config)
         return "Done"
 
     @blueprint.route("/truncate-activities")

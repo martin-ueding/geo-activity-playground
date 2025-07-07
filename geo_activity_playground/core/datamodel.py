@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import pathlib
+import uuid
 import zoneinfo
 from typing import Any
 from typing import Optional
@@ -89,6 +90,7 @@ class Activity(DB.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
     distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
+    time_series_uuid: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
 
     # Where it comes from:
     path: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
@@ -167,7 +169,13 @@ class Activity(DB.Model):
 
     @property
     def time_series_path(self) -> pathlib.Path:
-        return TIME_SERIES_DIR() / f"{self.id}.parquet"
+        if not self.time_series_uuid:
+            self.time_series_uuid = str(uuid.uuid4())
+        old_path = TIME_SERIES_DIR() / f"{self.id}.parquet"
+        new_path = TIME_SERIES_DIR() / f"{self.time_series_uuid}.parquet"
+        if old_path.exists():
+            old_path.rename(new_path)
+        return new_path
 
     @property
     def raw_time_series(self) -> pd.DataFrame:
