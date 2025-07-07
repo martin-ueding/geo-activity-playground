@@ -27,6 +27,7 @@ Changed:
 
 - Move importing into separate thread to speed-up startup. Importing then runs in the background.
 - Import new activities with less steps, get rid of intermediate parsed representations.
+- After every imported activity, run the whole processing. This means that one can directly use heatmap and cluster while more activities are importing. ([GH-300](https://github.com/martin-ueding/geo-activity-playground/issues/300))
 - Store times as UTC again. They are displayed in the local time zone of the activity in most places. In plots they are shown in the browser time zone for the time being. The search table has them in UTC.
 - Store activity time series with a UUID filename. This makes importing activities robust against crashes or shutdowns of the webserver.
 
