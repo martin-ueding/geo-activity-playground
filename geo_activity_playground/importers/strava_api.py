@@ -3,6 +3,7 @@ import logging
 import pathlib
 import pickle
 import time
+import zoneinfo
 
 import pandas as pd
 from stravalib import Client
@@ -153,7 +154,9 @@ def try_import_strava(
                 activity.distance_km = strava_activity.distance / 1000
                 activity.name = strava_activity.name
                 activity.kind = get_or_make_kind(str(strava_activity.type.root))
-                activity.start = strava_activity.start_date.astimezone("UTC")
+                activity.start = strava_activity.start_date.astimezone(
+                    zoneinfo.ZoneInfo("UTC")
+                )
                 activity.elapsed_time = strava_activity.elapsed_time
                 activity.equipment = get_or_make_equipment(
                     gear_names[strava_activity.gear_id], config
