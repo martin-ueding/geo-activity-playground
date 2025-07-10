@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- New activities get a UUID assigned and saved. ([GH-310](https://github.com/martin-ueding/geo-activity-playground/issues/310))
+
 ## Version 1.3.0 — 2025-07-07
 
 Added:
