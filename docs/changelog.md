@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add debug output in case of weird FIT file import issues. ([GH-301](https://github.com/martin-ueding/geo-activity-playground/issues/301))
+
 Changed:
 
 - Run explorer tile evolution directly when importing such that one can use all features right after importing the first activity.
