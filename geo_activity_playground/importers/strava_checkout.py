@@ -3,6 +3,7 @@ import logging
 import pathlib
 import shutil
 import sys
+import urllib.parse
 import zoneinfo
 from typing import Optional
 
@@ -266,7 +267,7 @@ def convert_strava_checkout(
                 "-",
                 f"{activity_date.hour:02d}-{activity_date.minute:02d}-{activity_date.second:02d}",
                 " ",
-                activity_name.replace("/", "_"),
+                urllib.parse.quote_plus(activity_name),
             ]
             + activity_file.suffixes
         )

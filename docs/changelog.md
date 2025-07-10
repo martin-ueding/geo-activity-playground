@@ -20,6 +20,7 @@ Types of changes
 Changed:
 
 - Run explorer tile evolution directly when importing such that one can use all features right after importing the first activity.
+- Use URL encode to safely encode the activity names to file paths in the Strava checkout converter. ([GH-298](https://github.com/martin-ueding/geo-activity-playground/issues/298))
 
 Fixed:
 
