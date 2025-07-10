@@ -17,9 +17,14 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Run explorer tile evolution directly when importing such that one can use all features right after importing the first activity.
+
 Fixed:
 
 - New activities get a UUID assigned and saved. ([GH-310](https://github.com/martin-ueding/geo-activity-playground/issues/310))
+- Fix module import on Strava import. ([GH-306](https://github.com/martin-ueding/geo-activity-playground/issues/306))
 
 ## Version 1.3.0 — 2025-07-07
 
