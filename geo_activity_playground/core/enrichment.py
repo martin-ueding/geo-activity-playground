@@ -1,5 +1,6 @@
 import datetime
 import logging
+import uuid
 import zoneinfo
 from typing import Callable
 
@@ -268,6 +269,8 @@ def update_and_commit(
     activity: Activity, time_series: pd.DataFrame, config: Config
 ) -> None:
     changed = apply_enrichments(activity, time_series, config)
+    if not activity.time_series_uuid:
+        activity.time_series_uuid = str(uuid.uuid4())
     if changed:
         activity.replace_time_series(time_series)
     DB.session.add(activity)

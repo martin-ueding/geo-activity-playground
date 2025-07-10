@@ -38,13 +38,15 @@ def import_from_directory(
         and not path.suffix in config.ignore_suffixes
     ]
 
-    for activity_path in activity_paths:
+    for i, activity_path in enumerate(activity_paths):
         with DB.session.no_autoflush:
             activity = DB.session.scalar(
                 sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
             )
             if activity is None:
-                import_from_file(activity_path, repository, tile_visit_accessor, config)
+                import_from_file(
+                    activity_path, repository, tile_visit_accessor, config, i
+                )
 
 
 def import_from_file(
@@ -52,6 +54,7 @@ def import_from_file(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    i: int,
 ) -> None:
     logger.info(f"Importing {path} …")
     try:
@@ -74,6 +77,10 @@ def import_from_file(
 
     meta_from_path = _get_metadata_from_path(path, config.metadata_extraction_regexes)
     activity.name = meta_from_path.get("name", activity.name)
+    if "equipment" in meta_from_path:
+        activity.equipment = get_or_make_equipment(meta_from_path["equipment"], config)
+    if "kind" in meta_from_path:
+        activity.kind = get_or_make_kind(meta_from_path["kind"])
     if activity.equipment is None:
         activity.equipment = get_or_make_equipment(
             meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME), config
@@ -85,7 +92,7 @@ def import_from_file(
 
     update_and_commit(activity, time_series, config)
 
-    if len(repository) > 0:
+    if len(repository) > 0 and i % 50 == 0:
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()

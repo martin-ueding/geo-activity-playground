@@ -131,6 +131,12 @@ def web_ui_main(
             old_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
             if old_path.exists() and not activity.time_series_path.exists():
                 old_path.rename(activity.time_series_path)
+            if not activity.time_series_path.exists():
+                logger.error(
+                    f"Time series for {activity.id=}, expected at {activity.time_series_path}, does not exist. Deleting activity."
+                )
+                DB.session.delete(activity)
+                DB.session.commit()
 
     if not skip_reload:
         thread = threading.Thread(
