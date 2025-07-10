@@ -27,6 +27,9 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
     suffixes = [s.lower() for s in path.suffixes]
     activity = Activity()
 
+    if len(suffixes) == 0:
+        raise ActivityParseError(f"File has no suffix, ignoring")
+
     if suffixes[-1] == ".gz":
         opener = gzip.open
         file_type = suffixes[-2]
