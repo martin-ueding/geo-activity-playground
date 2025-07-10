@@ -25,6 +25,8 @@ from ..core.paths import strava_api_dir
 from ..core.paths import strava_last_activity_date_path
 from ..core.tasks import get_state
 from ..core.tasks import set_state
+from ..explorer.tile_visits import compute_tile_evolution
+from ..explorer.tile_visits import compute_tile_visits_new
 from ..explorer.tile_visits import TileVisitAccessor
 
 
