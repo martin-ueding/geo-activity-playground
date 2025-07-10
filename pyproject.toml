@@ -47,6 +47,7 @@ scipy = "^1.16.0"
 geotiff = "^0.2.10"
 numcodecs = "<0.15.0"
 imagecodecs = "^2025.3.30"
+tifffile = "2025.5.10"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"

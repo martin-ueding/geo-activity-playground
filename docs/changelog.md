@@ -26,6 +26,7 @@ Fixed:
 - New activities get a UUID assigned and saved. ([GH-310](https://github.com/martin-ueding/geo-activity-playground/issues/310))
 - Fix module import on Strava import. ([GH-306](https://github.com/martin-ueding/geo-activity-playground/issues/306))
 - Make date optional in activity show such that routes can be displayed. ([GH-311](https://github.com/martin-ueding/geo-activity-playground/issues/311))
+- Pin `tifffile` version to exactly 2025.5.10. ([GH-308](https://github.com/martin-ueding/geo-activity-playground/issues/308))
 
 ## Version 1.3.0 — 2025-07-07
 
