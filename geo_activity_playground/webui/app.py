@@ -86,6 +86,7 @@ def importer_thread(
 ) -> None:
     with app.app_context():
         scan_for_activities(repository, tile_visit_accessor, config)
+    logger.info("Importer thread is done.")
 
 
 def web_ui_main(

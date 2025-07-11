@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Show Python version in the footer.
+- Add message about importer thread being done.
 
 Fixed:
 
