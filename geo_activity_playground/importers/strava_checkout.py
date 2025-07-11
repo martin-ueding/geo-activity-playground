@@ -3,6 +3,7 @@ import logging
 import pathlib
 import shutil
 import sys
+import traceback
 import urllib.parse
 import zoneinfo
 from typing import Optional
@@ -22,6 +23,7 @@ from ..core.tasks import get_state
 from ..core.tasks import set_state
 from ..core.tasks import work_tracker_path
 from ..core.tasks import WorkTracker
+from .activity_parsers import ActivityParseError
 from .activity_parsers import read_activity
 from .csv_parser import parse_csv
 
@@ -182,12 +184,12 @@ def import_from_strava_checkout(config: Config) -> None:
     ]
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
-        work_tracker.mark_done(activity_id)
         index = all_activity_ids.index(activity_id)
         row = {column: table[column][index] for column in header}
 
         # Some manually recorded activities have no file name. Pandas reads that as a float. We skip those.
         if not row["Filename"]:
+            work_tracker.mark_done(activity_id)
             continue
 
         start_datetime = dateutil.parser.parse(
@@ -196,7 +198,14 @@ def import_from_strava_checkout(config: Config) -> None:
 
         activity_file = checkout_path / row["Filename"]
 
-        activity, time_series = read_activity(activity_file)
+        try:
+            activity, time_series = read_activity(activity_file)
+        except ActivityParseError as e:
+            logger.error(f"Error while parsing `{activity_file}`:")
+            traceback.print_exc()
+            continue
+
+        work_tracker.mark_done(activity_id)
 
         if not len(time_series):
             continue
