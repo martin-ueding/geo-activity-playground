@@ -13,7 +13,7 @@ from scipy.interpolate import RegularGridInterpolator
 from .paths import USER_CACHE_DIR
 
 
-def s3_path(lat: int, lon: int) -> pathlib.Path:
+def _s3_path(lat: int, lon: int) -> pathlib.Path:
     lat_str = f"N{(lat):02d}" if lat >= 0 else f"S{(-lat):02d}"
     lon_str = f"E{(lon):03d}" if lon >= 0 else f"W{(-lon):03d}"
     result = (
@@ -26,7 +26,7 @@ def s3_path(lat: int, lon: int) -> pathlib.Path:
     return result
 
 
-def ensure_copernicus_file(p: pathlib.Path) -> None:
+def _ensure_copernicus_file(p: pathlib.Path) -> None:
     if p.exists():
         return
     s3 = boto3.client(
@@ -39,10 +39,12 @@ def ensure_copernicus_file(p: pathlib.Path) -> None:
 
 
 @functools.lru_cache(9)
-def get_elevation_arrays(p: pathlib.Path) -> Optional[np.ndarray]:
-    ensure_copernicus_file(p)
+def _get_elevation_arrays(p: pathlib.Path) -> Optional[np.ndarray]:
+
+    _ensure_copernicus_file(p)
     if not p.exists():
         return None
+
     gt = geotiff.GeoTiff(p)
     a = np.array(gt.read())
     lon_array, lat_array = gt.get_coord_arrays()
@@ -50,8 +52,8 @@ def get_elevation_arrays(p: pathlib.Path) -> Optional[np.ndarray]:
 
 
 @functools.lru_cache(1)
-def get_interpolator(lat: int, lon: int) -> Optional[RegularGridInterpolator]:
-    arrays = get_elevation_arrays(s3_path(lat, lon))
+def _get_interpolator(lat: int, lon: int) -> Optional[RegularGridInterpolator]:
+    arrays = _get_elevation_arrays(_s3_path(lat, lon))
     # If we don't have data for the current center, we cannot do anything.
     if arrays is None:
         return None
@@ -88,7 +90,7 @@ def get_interpolator(lat: int, lon: int) -> Optional[RegularGridInterpolator]:
 
 
 def get_elevation(lat: float, lon: float) -> float:
-    interpolator = get_interpolator(math.floor(lat), math.floor(lon))
+    interpolator = _get_interpolator(math.floor(lat), math.floor(lon))
     if interpolator is not None:
         return float(interpolator((lat, lon)))
     else:

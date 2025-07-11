@@ -9,7 +9,6 @@ import pandas as pd
 
 from .config import Config
 from .coordinates import get_distance
-from .copernicus_dem import get_elevation
 from .datamodel import Activity
 from .datamodel import DB
 from .missing_values import some
@@ -109,6 +108,8 @@ def enrichment_compute_tile_xy(
 def enrichment_copernicus_elevation(
     activity: Activity, time_series: pd.DataFrame, config: Config
 ) -> bool:
+    from .copernicus_dem import get_elevation
+
     if "copernicus_elevation" not in time_series.columns:
         time_series["copernicus_elevation"] = [
             get_elevation(lat, lon)
@@ -247,7 +248,7 @@ enrichments: list[Callable[[Activity, pd.DataFrame, Config], bool]] = [
     enrichment_normalize_time,
     enrichment_rename_altitude,
     enrichment_compute_tile_xy,
-    enrichment_copernicus_elevation,
+    # enrichment_copernicus_elevation,
     enrichment_elevation_gain,
     enrichment_add_calories,
     enrichment_distance,

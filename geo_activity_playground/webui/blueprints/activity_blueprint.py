@@ -177,7 +177,7 @@ def make_activity_blueprint(
             )
         ) is not None:
             context["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
-        if "copernicus_elevation" in time_series.columns:
+        if "elevation" in time_series.columns:
             context["elevation_time_plot"] = elevation_time_plot(time_series)
         if "elevation_gain_cum" in time_series.columns:
             context["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
@@ -508,7 +508,7 @@ def elevation_time_plot(time_series: pd.DataFrame) -> str:
         .encode(
             alt.X("time", title="Time"),
             alt.Y(
-                "copernicus_elevation",
+                "elevation",
                 scale=alt.Scale(zero=False),
                 title="Elevation / m",
             ),

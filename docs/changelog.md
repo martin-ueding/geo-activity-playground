@@ -15,6 +15,14 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+
+
+Removed:
+
+- Disable Copernicus DEM because the dependencies have caused conflicts, restrict to Python ≥ 3.11 and the value proposition is questionable.
+
 ## Version 1.3.1 — 2025-07-10
 
 Added:
@@ -53,6 +61,10 @@ Changed:
 Fixed:
 
 - During a development version, there was an issue with the Strava API. That's fixed. ([GH-305](https://github.com/martin-ueding/geo-activity-playground/issues/305))
+
+Removed:
+
+- ⚠️ Support for Python 3.10 is now dropped, you need at least Python 3.11.
 
 ## Version 1.2.0 — 2025-06-20
 
