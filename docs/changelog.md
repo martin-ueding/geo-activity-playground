@@ -27,6 +27,7 @@ Fixed:
 - Fix enabling new zoom level for explorer.
 - Recompute cluster and square evolution if chronological order gets broken. ([GH-313](https://github.com/martin-ueding/geo-activity-playground/issues/313))
 - Ignore activities with errors in the Strava checkout importer. ([GH-301](https://github.com/martin-ueding/geo-activity-playground/issues/301))
+- Automatically reset tile history when it doesn't have time zones yet. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
 
 ## Version 1.3.2 — 2025-07-11
 

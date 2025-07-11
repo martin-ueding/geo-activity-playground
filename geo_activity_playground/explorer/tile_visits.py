@@ -153,6 +153,9 @@ def _consistency_check(
 
     for zoom, tile_visits in tile_visit_accessor.tile_state["tile_visits"].items():
         for tile, meta in tile_visits.items():
+            if not pd.isna(meta["first_time"]) and meta["first_time"].tzinfo is None:
+                logger.info("Tile visits are stored without time zone.")
+                return False
             if meta["first_id"] not in present_activity_ids:
                 logger.info(f"Activity {meta['first_id']} have been deleted.")
                 return False
