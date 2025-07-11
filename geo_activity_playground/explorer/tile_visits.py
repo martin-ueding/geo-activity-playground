@@ -13,6 +13,8 @@ from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
+from ..core.datamodel import Activity
+from ..core.datamodel import DB
 from ..core.paths import atomic_open
 from ..core.tasks import try_load_pickle
 from ..core.tasks import work_tracker_path
@@ -20,8 +22,39 @@ from ..core.tasks import WorkTracker
 from ..core.tiles import adjacent_to
 from ..core.tiles import interpolate_missing_tile
 
+# import sqlalchemy as sa
+
+# from sqlalchemy import Column
+# from sqlalchemy import ForeignKey
+# from sqlalchemy import String
+# from sqlalchemy import Table
+# from sqlalchemy.orm import DeclarativeBase
+# from sqlalchemy.orm import Mapped
+# from sqlalchemy.orm import mapped_column
+# from sqlalchemy.orm import relationship
 
 logger = logging.getLogger(__name__)
+
+
+# class VisitedTile(DB.Model):
+#     __tablename__ = "visited_tiles"
+
+#     zoom: Mapped[int] = mapped_column(primary_key=True)
+#     x: Mapped[int] = mapped_column(primary_key=True)
+#     y: Mapped[int] = mapped_column(primary_key=True)
+
+#     first_activity_id: Mapped[int] = mapped_column(
+#         ForeignKey("Activity.id", name="first_activity_id"), nullable=True
+#     )
+#     first_activity: Mapped[Activity] = relationship(back_populates="activities")
+#     first_visit: Mapped[Optional[datetime.datetime]] = mapped_column(
+#         sa.DateTime, nullable=True
+#     )
+
+#     __table_args__ =  (
+#         sa.PrimaryKeyConstraint(zoom, x, y),
+#         {},
+#     )
 
 
 class TileInfo(TypedDict):
@@ -145,6 +178,31 @@ def compute_tile_visits_new(
     ):
         _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)
+
+    for zoom in reversed(range(20)):
+        tile_state = tile_visit_accessor.tile_state
+        if not (
+            tile_state["tile_history"][zoom]["time"].diff().dropna()
+            > datetime.timedelta(seconds=0)
+        ).all():
+            logger.warning(
+                f"The order of the tile history at {zoom=} is not chronological, resetting."
+            )
+            new_tile_history_soa: dict[str, list] = {
+                "activity_id": [],
+                "time": [],
+                "tile_x": [],
+                "tile_y": [],
+            }
+            for tile, visit in tile_state["tile_visits"][zoom].items():
+                new_tile_history_soa["activity_id"].append(visit["first_id"])
+                new_tile_history_soa["time"].append(visit["first_time"])
+                new_tile_history_soa["tile_x"].append(tile[0])
+                new_tile_history_soa["tile_y"].append(tile[1])
+            tile_state["tile_history"][zoom] = pd.DataFrame(new_tile_history_soa)
+            tile_state["tile_history"][zoom].sort_values("time", inplace=True)
+            # Reset the evolution state.
+            tile_state["evolution_state"] = collections.defaultdict(TileEvolutionState)
     tile_visit_accessor.save()
     work_tracker.close()
 

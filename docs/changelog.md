@@ -21,6 +21,11 @@ Added:
 
 - Show Python version in the footer.
 
+Fixed:
+
+- Fix enabling new zoom level for explorer.
+- Recompute cluster and square evolution if chronological order gets broken. ([GH-313](https://github.com/martin-ueding/geo-activity-playground/issues/313))
+
 ## Version 1.3.2 — 2025-07-11
 
 Added:
