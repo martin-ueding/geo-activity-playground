@@ -123,9 +123,12 @@ class VisitTimeColorStrategy(ColorStrategy):
             relevant_time = (
                 tile_info["first_time"] if self.use_first else tile_info["last_time"]
             )
-            last_age_days = (today - relevant_time.date()).days
-            color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-            color = np.array([[color[:3] + (0.5,)]])
+            if pd.isna(relevant_time):
+                color = np.array([[[0, 0, 0, 70]]]) / 256
+            else:
+                last_age_days = (today - relevant_time.date()).days
+                color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
+                color = np.array([[color[:3] + (0.5,)]])
         else:
             color = np.array([[[0, 0, 0, 0]]]) / 256
         return np.broadcast_to(color, grayscale.shape)
