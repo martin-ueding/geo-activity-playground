@@ -38,6 +38,7 @@ nav:
     - upload-activity-files.md
     - moving-from-strava.md
   - How-To Guides:
+    - using-maps-as-overlays.md
     - build-custom-plots.md
     - plan-missing-tile-rides.md
     - create-a-privacy-zone.md
