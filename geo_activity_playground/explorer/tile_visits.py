@@ -177,7 +177,7 @@ def compute_tile_visits_new(
         work_tracker.reset()
 
     for activity_id in tqdm(
-        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=2
+        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=1
     ):
         _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)
@@ -186,7 +186,7 @@ def compute_tile_visits_new(
         tile_state = tile_visit_accessor.tile_state
         if not (
             tile_state["tile_history"][zoom]["time"].diff().dropna()
-            > datetime.timedelta(seconds=0)
+            >= datetime.timedelta(seconds=0)
         ).all():
             logger.warning(
                 f"The order of the tile history at {zoom=} is not chronological, resetting."
@@ -317,7 +317,7 @@ def _compute_cluster_evolution(
     for index, row in tqdm(
         tiles.iloc[s.cluster_start :].iterrows(),
         desc=f"Cluster evolution for {zoom=}",
-        delay=2,
+        delay=1,
     ):
         new_clusters = False
         # Current tile.
@@ -396,7 +396,7 @@ def _compute_square_history(
     for index, row in tqdm(
         tiles.iloc[s.square_start :].iterrows(),
         desc=f"Square evolution for {zoom=}",
-        delay=2,
+        delay=1,
     ):
         tile = (row["tile_x"], row["tile_y"])
         x, y = tile
