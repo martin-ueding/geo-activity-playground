@@ -21,6 +21,7 @@ Added:
 
 - Show Python version in the footer.
 - Add message about importer thread being done.
+- Add `inspect-photo` entrypoint for debugging.
 
 Fixed:
 
@@ -28,6 +29,7 @@ Fixed:
 - Recompute cluster and square evolution if chronological order gets broken. ([GH-313](https://github.com/martin-ueding/geo-activity-playground/issues/313))
 - Ignore activities with errors in the Strava checkout importer. ([GH-301](https://github.com/martin-ueding/geo-activity-playground/issues/301))
 - Automatically reset tile history when it doesn't have time zones yet. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
+- Take EXIF time zone into account when importing images. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
 
 ## Version 1.3.2 — 2025-07-11
 

@@ -4,6 +4,7 @@ import pathlib
 
 import coloredlogs
 
+from .core.photos import main_inspect_photo
 from .explorer.video import explorer_video_main
 from .heatmap_video import main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
@@ -72,6 +73,13 @@ def main() -> None:
     subparser.add_argument("--video-width", type=int, default=1920)
     subparser.add_argument("--video-height", type=int, default=1080)
     subparser.set_defaults(func=main_heatmap_video)
+
+    subparser = subparsers.add_parser(
+        "inspect-photo",
+        help="Extract EXIF data from the image to see how it would be imported",
+    )
+    subparser.add_argument("path", type=pathlib.Path)
+    subparser.set_defaults(func=main_inspect_photo)
 
     options = parser.parse_args()
     coloredlogs.install(

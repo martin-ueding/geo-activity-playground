@@ -2,8 +2,6 @@ import datetime
 import pathlib
 import uuid
 
-import dateutil.parser
-import exifread
 import geojson
 import sqlalchemy
 from flask import Blueprint
@@ -21,34 +19,11 @@ from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Photo
 from ...core.paths import PHOTOS_DIR
+from ...core.photos import get_metadata_from_image
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..flasher import Flasher
 from ..flasher import FlashTypes
-
-
-def ratio_to_decimal(numbers: list[exifread.utils.Ratio]) -> float:
-    deg, min, sec = numbers.values
-    return deg.decimal() + min.decimal() / 60 + sec.decimal() / 3600
-
-
-def get_metadata_from_image(path: pathlib.Path) -> dict:
-    with open(path, "rb") as f:
-        tags = exifread.process_file(f)
-    metadata = {}
-    try:
-        metadata["latitude"] = ratio_to_decimal(tags["GPS GPSLatitude"])
-        metadata["longitude"] = ratio_to_decimal(tags["GPS GPSLongitude"])
-    except KeyError:
-        pass
-    try:
-        metadata["time"] = datetime.datetime.strptime(
-            str(tags["EXIF DateTimeOriginal"]), "%Y:%m:%d %H:%M:%S"
-        )
-    except KeyError:
-        pass
-
-    return metadata
 
 
 def make_photo_blueprint(
