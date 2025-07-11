@@ -24,6 +24,10 @@ Added:
 - Add `inspect-photo` entrypoint for debugging.
 - Add some debug output when `idxmax` cannot be taken. ([GH-307](https://github.com/martin-ueding/geo-activity-playground/issues/307))
 
+Changed:
+
+- Explorer tiles are rendered as overlay, this makes the tiles use as overlays elsewhere. ([GH-245](https://github.com/martin-ueding/geo-activity-playground/issues/245))
+
 Fixed:
 
 - Fix enabling new zoom level for explorer.
