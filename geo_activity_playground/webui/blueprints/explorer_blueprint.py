@@ -159,7 +159,7 @@ def make_explorer_blueprint(
             config_accessor().explorer_zoom_levels.append(zoom)
             config_accessor().explorer_zoom_levels.sort()
             config_accessor.save()
-            compute_tile_evolution(tile_visit_accessor, config_accessor())
+            compute_tile_evolution(tile_visit_accessor.tile_state, config_accessor())
             flash(f"Enabled {zoom=} for explorer tiles.", category="success")
         else:
             flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
