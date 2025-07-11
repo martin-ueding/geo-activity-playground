@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/using-git-version-via-docker-compose/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/">
       
       
-        <link rel="prev" href="../using-git-version-via-docker/">
+        <link rel="prev" href="../moving-from-strava/">
       
       
-        <link rel="next" href="../using-git-version-via-docker-compose-and-tailscale-vpn/">
+        <link rel="next" href="../build-custom-plots/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Using Git Version via Docker Compose - Geo Activity Playground</title>
+        <title>Using Maps as Overlays - Geo Activity Playground</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-git-version-via-docker-compose" class="md-skip">
+        <a href="#using-maps-as-overlays" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using Git Version via Docker Compose
+              Using Maps as Overlays
             
           </span>
         </div>
@@ -679,10 +679,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../using-maps-as-overlays/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Using Maps as Overlays
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -693,6 +715,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adding-them-to-bike-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding them to Bike Router
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -840,32 +891,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Using Git Version via Docker Compose
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../using-git-version-via-docker-compose/" class="md-nav__link">
         
   
   
@@ -876,53 +905,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#creating-directory-structure-and-composeyml" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating directory structure and compose.yml
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-image-and-running-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Building image and running container
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#updating-the-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      Updating the image
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1371,27 +1353,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#creating-directory-structure-and-composeyml" class="md-nav__link">
+  <a href="#adding-them-to-bike-router" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating directory structure and compose.yml
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-image-and-running-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Building image and running container
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#updating-the-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      Updating the image
+      Adding them to Bike Router
     </span>
   </a>
   
@@ -1413,44 +1377,37 @@
 
 
 
-<h1 id="using-git-version-via-docker-compose">Using Git Version via Docker Compose</h1>
-<p><a href="https://www.docker.com/">Docker</a> is a software that allows you to run Linux programs in a container.
-<a href="https://docs.docker.com/compose/">Docker Compose</a> is a tool for defining multi-container Docker environments in a single YAML configuration file and deploy it with a single command.</p>
-<p>This how-to will give you an example <code>compose.yml</code> that can build the geo-activity-playground docker image from Github and start this project within a Docker container.</p>
-<h2 id="creating-directory-structure-and-composeyml">Creating directory structure and compose.yml</h2>
-<p>With these steps the playground folder (which contains the activities) will be located in the docker project folder. The location can be changed in the <code>compose.yml</code>.</p>
-<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>/docker/geo-activity-playground/playground/Activities
-<span class="nb">cd</span><span class="w"> </span>/docker/geo-activity-playground
-nano<span class="w"> </span>compose.yml
+<h1 id="using-maps-as-overlays">Using Maps as Overlays</h1>
+<p>You can use the explorer tile maps and the heatmap as overlays elsewhere. For that, use the following URLs:</p>
+<p>For the base layers, you can use these URLs:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:5000/tile/grayscale/{z}/{x}/{y}.png
+http://localhost:5000/tile/pastel/{z}/{x}/{y}.png
+http://localhost:5000/tile/color/{z}/{x}/{y}.png
+http://localhost:5000/tile/inverse_grayscale/{z}/{x}/{y}.png
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>services:
-  geo-activity:
-    build:
-      context: https://github.com/martin-ueding/geo-activity-playground.git
-      # this sets the build context to the DOCKERFILE located in the Github repository
-    container_name: geo-activity-playground
-    volumes:
-      - /docker/geo-activity-playground/playground:/data  # optional: change left side to your desired playground directory
-    ports:
-      - 5000:5000 # optional: change the exposed port on the left side
-    restart: unless-stopped
+<p>For the explorer tiles, you can use these:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
+
+http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=first
+http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=last
+http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=visits
 </code></pre></div>
-<p>If you want to build the release version from Github instead, you can adjust the build context and add the release tag.
-<code>context: https://github.com/martin-ueding/geo-activity-playground.git#0.29.1</code></p>
-<h2 id="building-image-and-running-container">Building image and running container</h2>
-<p>You need to set up your files according to one of the presented methods, like activity files or the Strava API. Consult the other pages in the sidebar for the details.</p>
-<p>Once you have your playground directory, you can build the image and start the container.</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>build
-docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+<p>And for the heatmap, you can use these:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:5000/heatmap/tile/{z}/{x}/{y}.png
 </code></pre></div>
-<p>This will start the webserver on <a href="http://localhost:5000/">http://localhost:5000/</a> or at the port you chose to expose.</p>
-<p>Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another port.</p>
-<h2 id="updating-the-image">Updating the image</h2>
-<p>If using the tagged release version, update the tag to the latest one first.</p>
-<div class="highlight"><pre><span></span><code>docker compose down
-docker compose build
-docker compose up -d --force-recreate
-</code></pre></div>
+<h2 id="adding-them-to-bike-router">Adding them to Bike Router</h2>
+<p>Go to <a href="https://bikerouter.de">Bike Router</a> and then you can add these as overlay layers. I show it here with the explorer tiles on zoom 17 with the "colorful cluster" strategy:</p>
+<p><img alt="" src="../images/bikerouter-overlay-1.png" /></p>
+<p><img alt="" src="../images/bikerouter-overlay-2.png" /></p>
+<p><img alt="" src="../images/bikerouter-overlay-3.png" /></p>
+<p><img alt="" src="../images/bikerouter-overlay-4.png" /></p>
+<p><img alt="" src="../images/bikerouter-overlay-5.png" /></p>
+<p>And now you can plan routes with your explorer tiles overlaid. Or add the heatmap. Or both.</p>
 
 
 
