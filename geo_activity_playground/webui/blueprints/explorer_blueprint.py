@@ -125,9 +125,10 @@ class VisitTimeColorStrategy(ColorStrategy):
             )
             last_age_days = (today - relevant_time.date()).days
             color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-            return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+            color = np.array([[color[:3] + (0.5,)]])
         else:
-            return grayscale
+            color = np.array([[[0, 0, 0, 0]]]) / 256
+        return np.broadcast_to(color, grayscale.shape)
 
 
 class NumVisitsColorStrategy(ColorStrategy):
@@ -141,9 +142,10 @@ class NumVisitsColorStrategy(ColorStrategy):
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
             color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
-            return blend_color(grayscale, np.array([[color[:3]]]), 0.3)
+            color = np.array([[color[:3] + (0.5,)]])
         else:
-            return grayscale
+            color = np.array([[[0, 0, 0, 0]]]) / 256
+        return np.broadcast_to(color, grayscale.shape)
 
 
 def make_explorer_blueprint(
