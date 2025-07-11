@@ -6,6 +6,7 @@ import os
 import pathlib
 import secrets
 import shutil
+import sys
 import threading
 import urllib.parse
 import uuid
@@ -264,6 +265,9 @@ def web_ui_main(
         ).all()
         variables["photo_count"] = DB.session.scalar(
             sqlalchemy.select(sqlalchemy.func.count()).select_from(Photo)
+        )
+        variables["python_version"] = (
+            f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
         return variables
 
