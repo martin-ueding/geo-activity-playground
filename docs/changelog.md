@@ -15,9 +15,11 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 1.3.2 — 2025-07-11
 
+Added:
 
+- Support Python 3.10 again.
 
 Removed:
 
