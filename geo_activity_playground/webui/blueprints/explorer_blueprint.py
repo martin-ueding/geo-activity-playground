@@ -26,6 +26,7 @@ from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.raster_map import ImageTransform
+from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import TileGetter
 from ...core.tiles import compute_tile
 from ...core.tiles import get_tile_upper_left_lat_lon
@@ -71,13 +72,14 @@ class MaxClusterColorStrategy(ColorStrategy):
         self, tile_xy: tuple[int, int], grayscale: np.ndarray
     ) -> np.ndarray:
         if tile_xy in self.max_cluster_members:
-            return blend_color(grayscale, np.array([[[55, 126, 184]]]) / 256, 0.3)
+            color = np.array([[[55, 126, 184, 70]]]) / 256
         elif tile_xy in self.evolution_state.memberships:
-            return blend_color(grayscale, np.array([[[77, 175, 74]]]) / 256, 0.3)
+            color = np.array([[[77, 175, 74, 70]]]) / 256
         elif tile_xy in self.tile_visits:
-            return blend_color(grayscale, 0.0, 0.3)
+            color = np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            return grayscale
+            color = np.array([[[0, 0, 0, 0]]]) / 256
+        return np.broadcast_to(color, grayscale.shape)
 
 
 class ColorfulClusterColorStrategy(ColorStrategy):
@@ -98,11 +100,12 @@ class ColorfulClusterColorStrategy(ColorStrategy):
             m = hashlib.sha256()
             m.update(str(cluster_id).encode())
             d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
-            return blend_color(grayscale, np.array([[self._cmap(d)[:3]]]), 0.3)
+            color = np.array([[self._cmap(d)[:3] + (0.5,)]])
         elif tile_xy in self.tile_visits:
-            return blend_color(grayscale, 0.0, 0.3)
+            color = np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            return grayscale
+            color = np.array([[[0, 0, 0, 0]]]) / 256
+        return np.broadcast_to(color, grayscale.shape)
 
 
 class VisitTimeColorStrategy(ColorStrategy):
@@ -264,10 +267,11 @@ def make_explorer_blueprint(
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 
-        map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
-        grayscale = image_transforms["grayscale"].transform_image(map_tile)
+        # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
+        # grayscale = image_transforms["grayscale"].transform_image(map_tile)
+        grayscale = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
         square_line_width = 3
-        square_color = np.array([[[228, 26, 28]]]) / 256
+        square_color = np.array([[[228, 26, 28, 255]]]) / 256
 
         color_strategy_name = request.args.get("color_strategy", "colorful_cluster")
         if color_strategy_name == "default":
@@ -311,9 +315,7 @@ def make_explorer_blueprint(
                         <= tile_y
                         < evolution_state.square_y + evolution_state.max_square_size
                     ):
-                        result[:, 0:square_line_width] = blend_color(
-                            result[:, 0:square_line_width], square_color, 0.5
-                        )
+                        result[:, 0:square_line_width] = square_color
                     if (
                         y % factor == 0
                         and tile_y == evolution_state.square_y
@@ -321,10 +323,7 @@ def make_explorer_blueprint(
                         <= tile_x
                         < evolution_state.square_x + evolution_state.max_square_size
                     ):
-                        result[0:square_line_width, :] = blend_color(
-                            result[0:square_line_width, :], square_color, 0.5
-                        )
-
+                        result[0:square_line_width, :] = square_color
                     if (
                         (x + 1) % factor == 0
                         and (x + 1) // factor
@@ -333,9 +332,7 @@ def make_explorer_blueprint(
                         <= tile_y
                         < evolution_state.square_y + evolution_state.max_square_size
                     ):
-                        result[:, -square_line_width:] = blend_color(
-                            result[:, -square_line_width:], square_color, 0.5
-                        )
+                        result[:, -square_line_width:] = square_color
                     if (
                         (y + 1) % factor == 0
                         and (y + 1) // factor
@@ -344,9 +341,7 @@ def make_explorer_blueprint(
                         <= tile_x
                         < evolution_state.square_x + evolution_state.max_square_size
                     ):
-                        result[-square_line_width:, :] = blend_color(
-                            result[-square_line_width:, :], square_color, 0.5
-                        )
+                        result[-square_line_width:, :] = square_color
         else:
             result = grayscale
             factor = 2 ** (zoom - z)
@@ -381,14 +376,7 @@ def make_explorer_blueprint(
                                 result[
                                     yo * width : (yo + 1) * width,
                                     xo * width : xo * width + square_line_width,
-                                ] = blend_color(
-                                    result[
-                                        yo * width : (yo + 1) * width,
-                                        xo * width : xo * width + square_line_width,
-                                    ],
-                                    square_color,
-                                    0.5,
-                                )
+                                ] = square_color
                             if (
                                 tile_y == evolution_state.square_y
                                 and evolution_state.square_x
@@ -399,14 +387,7 @@ def make_explorer_blueprint(
                                 result[
                                     yo * width : yo * width + square_line_width,
                                     xo * width : (xo + 1) * width,
-                                ] = blend_color(
-                                    result[
-                                        yo * width : yo * width + square_line_width,
-                                        xo * width : (xo + 1) * width,
-                                    ],
-                                    square_color,
-                                    0.5,
-                                )
+                                ] = square_color
 
                             if (
                                 tile_x + 1
@@ -421,15 +402,7 @@ def make_explorer_blueprint(
                                     yo * width : (yo + 1) * width,
                                     (xo + 1) * width
                                     - square_line_width : (xo + 1) * width,
-                                ] = blend_color(
-                                    result[
-                                        yo * width : (yo + 1) * width,
-                                        (xo + 1) * width
-                                        - square_line_width : (xo + 1) * width,
-                                    ],
-                                    square_color,
-                                    0.5,
-                                )
+                                ] = square_color
 
                             if (
                                 tile_y + 1
@@ -444,15 +417,7 @@ def make_explorer_blueprint(
                                     (yo + 1) * width
                                     - square_line_width : (yo + 1) * width,
                                     xo * width : (xo + 1) * width,
-                                ] = blend_color(
-                                    result[
-                                        (yo + 1) * width
-                                        - square_line_width : (yo + 1) * width,
-                                        xo * width : (xo + 1) * width,
-                                    ],
-                                    square_color,
-                                    0.5,
-                                )
+                                ] = square_color
                     if width >= 64:
                         result[yo * width, :, :] = 0.5
                         result[:, xo * width, :] = 0.5

@@ -5,6 +5,7 @@ function changeColor(method) {
     if (tile_layer) {
         map.removeLayer(tile_layer)
     }
+
     tile_layer = L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=${method}`, {
         maxZoom: 19,
         attribution: map_tile_attribution
@@ -16,6 +17,11 @@ let map = L.map('explorer-map', {
     center: [center_latitude, center_longitude],
     zoom: 12
 });
+
+base_layer = L.tileLayer("/tile/grayscale/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: map_tile_attribution
+}).addTo(map)
 
 changeColor('default')
 
