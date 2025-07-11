@@ -31,6 +31,7 @@ Fixed:
 - Ignore activities with errors in the Strava checkout importer. ([GH-301](https://github.com/martin-ueding/geo-activity-playground/issues/301))
 - Automatically reset tile history when it doesn't have time zones yet. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
 - Take EXIF time zone into account when importing images. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
+- Fix "first visit" explorer tile color strategy in presence of routes.
 
 ## Version 1.3.2 — 2025-07-11
 
