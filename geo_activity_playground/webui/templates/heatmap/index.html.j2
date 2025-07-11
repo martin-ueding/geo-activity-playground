@@ -18,6 +18,12 @@
                 center: [{{ center.latitude }}, {{ center.longitude }}],
             zoom: 12
             });
+
+            L.tileLayer("/tile/inverse_grayscale/{z}/{x}/{y}.png", {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map)
+
             L.tileLayer('/heatmap/tile/{z}/{x}/{y}.png?{{ extra_args|safe }}', {
                 maxZoom: 19,
                 attribution: '{{ map_tile_attribution|safe }}'

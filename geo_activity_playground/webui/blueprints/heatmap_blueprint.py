@@ -221,13 +221,6 @@ def _render_tile_image(
 
     cmap = pl.get_cmap(config.color_scheme_for_heatmap)
     data_color = cmap(tile_counts)
-    data_color[data_color == cmap(0.0)] = 0.0  # remove background color
-
-    map_tile = np.array(get_tile(z, x, y, config.map_tile_url)) / 255
-    map_tile = convert_to_grayscale(map_tile)
-    map_tile = 1.0 - map_tile  # invert colors
-    for c in range(3):
-        map_tile[:, :, c] = (1.0 - data_color[:, :, c]) * map_tile[
-            :, :, c
-        ] + data_color[:, :, c]
-    return map_tile
+    data_color[tile_counts > 0, 3] = 0.8
+    data_color[tile_counts == 0, 3] = 0.0
+    return data_color

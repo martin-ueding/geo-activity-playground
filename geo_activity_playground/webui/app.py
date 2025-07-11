@@ -33,6 +33,7 @@ from ..core.heart_rate import HeartRateZoneComputer
 from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
+from ..core.raster_map import InverseGrayscaleImageTransform
 from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
@@ -184,6 +185,7 @@ def web_ui_main(
         "color": IdentityImageTransform(),
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
+        "inverse_grayscale": InverseGrayscaleImageTransform(),
     }
     flasher = FlaskFlasher()
     heart_rate_zone_computer = HeartRateZoneComputer(config)

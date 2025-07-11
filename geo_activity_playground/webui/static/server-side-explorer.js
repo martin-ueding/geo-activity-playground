@@ -17,7 +17,7 @@ let base_maps = {
         maxZoom: 19,
         attribution: map_tile_attribution
     }),
-    "Color": L.tileLayer("/tile/color/{z}/{x}/{y}.png", {
+    "Inverse Grayscale": L.tileLayer("/tile/inverse_grayscale/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: map_tile_attribution
     }),
@@ -41,6 +41,10 @@ let overlay_maps = {
         attribution: map_tile_attribution
     }),
     "Number of Visits": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=visits`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Heatmap": L.tileLayer("/heatmap/tile/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: map_tile_attribution
     }),

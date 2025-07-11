@@ -283,3 +283,9 @@ class PastelImageTransform(ImageTransform):
         averaged_tile = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)
         grayscale_tile = np.dstack((averaged_tile, averaged_tile, averaged_tile))
         return self._factor * grayscale_tile + (1 - self._factor) * image
+
+
+class InverseGrayscaleImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
+        return 1 - np.dstack((image, image, image))  # to rgb
