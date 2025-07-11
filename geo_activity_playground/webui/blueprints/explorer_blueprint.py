@@ -302,51 +302,51 @@ def make_explorer_blueprint(
             tile_x = x // factor
             tile_y = y // factor
             tile_xy = (tile_x, tile_y)
-            result = color_strategy.color_image(tile_xy, grayscale)
+            result = color_strategy.color_image(tile_xy, grayscale).copy()
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
             if y % factor == 0:
                 result[0, :, :] = 0.5
 
+            if (
+                evolution_state.square_x is not None
+                and evolution_state.square_y is not None
+            ):
                 if (
-                    evolution_state.square_x is not None
-                    and evolution_state.square_y is not None
+                    x % factor == 0
+                    and tile_x == evolution_state.square_x
+                    and evolution_state.square_y
+                    <= tile_y
+                    < evolution_state.square_y + evolution_state.max_square_size
                 ):
-                    if (
-                        x % factor == 0
-                        and tile_x == evolution_state.square_x
-                        and evolution_state.square_y
-                        <= tile_y
-                        < evolution_state.square_y + evolution_state.max_square_size
-                    ):
-                        result[:, 0:square_line_width] = square_color
-                    if (
-                        y % factor == 0
-                        and tile_y == evolution_state.square_y
-                        and evolution_state.square_x
-                        <= tile_x
-                        < evolution_state.square_x + evolution_state.max_square_size
-                    ):
-                        result[0:square_line_width, :] = square_color
-                    if (
-                        (x + 1) % factor == 0
-                        and (x + 1) // factor
-                        == evolution_state.square_x + evolution_state.max_square_size
-                        and evolution_state.square_y
-                        <= tile_y
-                        < evolution_state.square_y + evolution_state.max_square_size
-                    ):
-                        result[:, -square_line_width:] = square_color
-                    if (
-                        (y + 1) % factor == 0
-                        and (y + 1) // factor
-                        == evolution_state.square_y + evolution_state.max_square_size
-                        and evolution_state.square_x
-                        <= tile_x
-                        < evolution_state.square_x + evolution_state.max_square_size
-                    ):
-                        result[-square_line_width:, :] = square_color
+                    result[:, 0:square_line_width] = square_color
+                if (
+                    y % factor == 0
+                    and tile_y == evolution_state.square_y
+                    and evolution_state.square_x
+                    <= tile_x
+                    < evolution_state.square_x + evolution_state.max_square_size
+                ):
+                    result[0:square_line_width, :] = square_color
+                if (
+                    (x + 1) % factor == 0
+                    and (x + 1) // factor
+                    == evolution_state.square_x + evolution_state.max_square_size
+                    and evolution_state.square_y
+                    <= tile_y
+                    < evolution_state.square_y + evolution_state.max_square_size
+                ):
+                    result[:, -square_line_width:] = square_color
+                if (
+                    (y + 1) % factor == 0
+                    and (y + 1) // factor
+                    == evolution_state.square_y + evolution_state.max_square_size
+                    and evolution_state.square_x
+                    <= tile_x
+                    < evolution_state.square_x + evolution_state.max_square_size
+                ):
+                    result[-square_line_width:, :] = square_color
         else:
             result = grayscale
             factor = 2 ** (zoom - z)

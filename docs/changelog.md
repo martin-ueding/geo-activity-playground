@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Version 1.4.1 — 2025-07-11
+
+Fixed:
+
+- Fixed broken explorer tiles when zooming in a lot.
+
 ## Version 1.4.0 — 2025-07-11
 
 Added:

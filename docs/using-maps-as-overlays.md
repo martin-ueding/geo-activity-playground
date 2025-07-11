@@ -14,16 +14,17 @@ http://localhost:5000/tile/inverse_grayscale/{z}/{x}/{y}.png
 For the explorer tiles, you can use these:
 
 ```
-http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
-http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
-http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
-http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
-
 http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
 http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
 http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=first
 http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=last
 http://localhost:5000/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=visits
+
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
+http://localhost:5000/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
 ```
 
 And for the heatmap, you can use these:
