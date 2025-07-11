@@ -1,29 +1,55 @@
-
-let tile_layer = null
-
-function changeColor(method) {
-    if (tile_layer) {
-        map.removeLayer(tile_layer)
-    }
-
-    tile_layer = L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=${method}`, {
-        maxZoom: 19,
-        attribution: map_tile_attribution
-    }).addTo(map)
-}
-
 let map = L.map('explorer-map', {
     fullscreenControl: true,
     center: [center_latitude, center_longitude],
     zoom: 12
 });
 
-base_layer = L.tileLayer("/tile/grayscale/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: map_tile_attribution
-}).addTo(map)
+let base_maps = {
+    "Grayscale": L.tileLayer("/tile/grayscale/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Pastel": L.tileLayer("/tile/pastel/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Color": L.tileLayer("/tile/color/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Color": L.tileLayer("/tile/color/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+}
 
-changeColor('default')
+let overlay_maps = {
+    "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Max Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=max_cluster`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "First Visit": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=first`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Last Visit": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=last`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+    "Number of Visits": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=visits`, {
+        maxZoom: 19,
+        attribution: map_tile_attribution
+    }),
+}
+
+base_maps['Grayscale'].addTo(map)
+overlay_maps["Colorful Cluster"].addTo(map)
+
+var layerControl = L.control.layers(base_maps, overlay_maps).addTo(map);
 
 if (bbox) {
     map.fitBounds(L.geoJSON(bbox).getBounds())
