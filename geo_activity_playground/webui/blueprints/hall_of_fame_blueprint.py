@@ -1,4 +1,5 @@
 import collections
+import logging
 
 import pandas as pd
 from flask import Blueprint
@@ -10,6 +11,9 @@ from ...core.activities import make_geojson_from_time_series
 from ...core.meta_search import apply_search_query
 from ..search_util import search_query_from_form
 from ..search_util import SearchQueryHistory
+
+
+logger = logging.getLogger(__name__)
 
 
 def make_hall_of_fame_blueprint(
@@ -73,7 +77,14 @@ def _nominate_activities_inner(
 
     for variable, title, format_str in ratings:
         if variable in meta.columns and not pd.isna(meta[variable]).all():
-            i = meta[variable].idxmax()
-            value = meta.loc[i, variable]
-            format_applied = format_str.format(value)
-            nominations[i].append(f"{title}{title_suffix}: {format_applied}")
+            try:
+                i = meta[variable].idxmax()
+            except ValueError as e:
+                print(meta[variable].tolist())
+                print(f"{meta[variable].dtype=}")
+                logger.error(f"Trying to work with {variable=}.")
+                logger.error(f"We got a ValueError: {e}")
+            else:
+                value = meta.loc[i, variable]
+                format_applied = format_str.format(value)
+                nominations[i].append(f"{title}{title_suffix}: {format_applied}")

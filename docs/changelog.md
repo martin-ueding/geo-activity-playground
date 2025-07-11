@@ -22,6 +22,7 @@ Added:
 - Show Python version in the footer.
 - Add message about importer thread being done.
 - Add `inspect-photo` entrypoint for debugging.
+- Add some debug output when `idxmax` cannot be taken. ([GH-307](https://github.com/martin-ueding/geo-activity-playground/issues/307))
 
 Fixed:
 
