@@ -36,8 +36,6 @@ http://localhost:5000/heatmap/tile/{z}/{x}/{y}.png
 
 Go to [Bike Router](https://bikerouter.de) and then you can add these as overlay layers. I show it here with the explorer tiles on zoom 17 with the "colorful cluster" strategy:
 
-![](images/bikerouter-overlay-1.png)
-
 ![](images/bikerouter-overlay-2.png)
 
 ![](images/bikerouter-overlay-3.png)
