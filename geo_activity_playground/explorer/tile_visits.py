@@ -58,7 +58,6 @@ class TileState(TypedDict):
     tile_visits: dict[int, dict[tuple[int, int], TileInfo]]
     tile_history: dict[int, pd.DataFrame]
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]]
-    processed_activities: set[int]
     evolution_state: dict[int, TileEvolutionState]
     version: int
 
@@ -99,7 +98,6 @@ def make_tile_state() -> TileState:
         "tile_visits": collections.defaultdict(make_defaultdict_dict),
         "tile_history": collections.defaultdict(pd.DataFrame),
         "activities_per_tile": collections.defaultdict(make_defaultdict_set),
-        "processed_activities": set(),
         "evolution_state": collections.defaultdict(TileEvolutionState),
         "version": TILE_STATE_VERSION,
     }
