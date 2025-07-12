@@ -52,10 +52,13 @@ def blend_color(
 
 
 class ColorStrategy(abc.ABC):
-    @abc.abstractmethod
     def color_image(
         self, tile_xy: tuple[int, int], grayscale: np.ndarray
     ) -> np.ndarray:
+        return np.broadcast_to(self._color(tile_xy), grayscale.shape)
+
+    @abc.abstractmethod
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
         pass
 
 
@@ -68,18 +71,15 @@ class MaxClusterColorStrategy(ColorStrategy):
             key=len,
         )
 
-    def color_image(
-        self, tile_xy: tuple[int, int], grayscale: np.ndarray
-    ) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
         if tile_xy in self.max_cluster_members:
-            color = np.array([[[55, 126, 184, 70]]]) / 256
+            return np.array([[[55, 126, 184, 70]]]) / 256
         elif tile_xy in self.evolution_state.memberships:
-            color = np.array([[[77, 175, 74, 70]]]) / 256
+            return np.array([[[77, 175, 74, 70]]]) / 256
         elif tile_xy in self.tile_visits:
-            color = np.array([[[0, 0, 0, 70]]]) / 256
+            return np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            color = np.array([[[0, 0, 0, 0]]]) / 256
-        return np.broadcast_to(color, grayscale.shape)
+            return np.array([[[0, 0, 0, 0]]]) / 256
 
 
 class ColorfulClusterColorStrategy(ColorStrategy):
@@ -92,20 +92,17 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         )
         self._cmap = matplotlib.colormaps["hsv"]
 
-    def color_image(
-        self, tile_xy: tuple[int, int], grayscale: np.ndarray
-    ) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
         if tile_xy in self.evolution_state.memberships:
             cluster_id = self.evolution_state.memberships[tile_xy]
             m = hashlib.sha256()
             m.update(str(cluster_id).encode())
             d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
-            color = np.array([[self._cmap(d)[:3] + (0.5,)]])
+            return np.array([[self._cmap(d)[:3] + (0.5,)]])
         elif tile_xy in self.tile_visits:
-            color = np.array([[[0, 0, 0, 70]]]) / 256
+            return np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            color = np.array([[[0, 0, 0, 0]]]) / 256
-        return np.broadcast_to(color, grayscale.shape)
+            return np.array([[[0, 0, 0, 0]]]) / 256
 
 
 class VisitTimeColorStrategy(ColorStrategy):
@@ -113,9 +110,7 @@ class VisitTimeColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self.use_first = use_first
 
-    def color_image(
-        self, tile_xy: tuple[int, int], grayscale: np.ndarray
-    ) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
         if tile_xy in self.tile_visits:
             today = datetime.date.today()
             cmap = matplotlib.colormaps["plasma"]
@@ -129,26 +124,23 @@ class VisitTimeColorStrategy(ColorStrategy):
                 last_age_days = (today - relevant_time.date()).days
                 color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
                 color = np.array([[color[:3] + (0.5,)]])
+            return color
         else:
-            color = np.array([[[0, 0, 0, 0]]]) / 256
-        return np.broadcast_to(color, grayscale.shape)
+            return np.array([[[0, 0, 0, 0]]]) / 256
 
 
 class NumVisitsColorStrategy(ColorStrategy):
     def __init__(self, tile_visits):
         self.tile_visits = tile_visits
 
-    def color_image(
-        self, tile_xy: tuple[int, int], grayscale: np.ndarray
-    ) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
             color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
-            color = np.array([[color[:3] + (0.5,)]])
+            return np.array([[color[:3] + (0.5,)]])
         else:
-            color = np.array([[[0, 0, 0, 0]]]) / 256
-        return np.broadcast_to(color, grayscale.shape)
+            return np.array([[[0, 0, 0, 0]]]) / 256
 
 
 def make_explorer_blueprint(
