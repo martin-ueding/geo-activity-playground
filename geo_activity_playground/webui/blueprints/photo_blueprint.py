@@ -143,7 +143,10 @@ def make_photo_blueprint(
                     .order_by(Activity.start.desc())
                     .limit(1)
                 )
-                if activity is None or activity.start + activity.elapsed_time < time:
+                if (
+                    activity is None
+                    or activity.start_utc + activity.elapsed_time < time
+                ):
                     flasher.flash_message(
                         f"Your image '{file.filename}' is from {time} but no activity could be found. Please first upload an activity or fix the time in the photo.",
                         FlashTypes.DANGER,

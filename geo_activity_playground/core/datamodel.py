@@ -230,6 +230,13 @@ class Activity(DB.Model):
         else:
             return self.start
 
+    @property
+    def start_utc(self) -> Optional[datetime.datetime]:
+        if self.start:
+            return self.start.replace(microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC"))
+        else:
+            return None
+
 
 class Tag(DB.Model):
     __tablename__ = "tags"

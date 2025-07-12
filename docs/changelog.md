@@ -25,6 +25,10 @@ Changed:
 
 - Use 255 instead of 256 as a denominator for colors. Shouldn't make any noticeable difference, though.
 
+Fixed:
+
+- Use UTC time for photo upload. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
+
 ## Version 1.4.1 — 2025-07-11
 
 Fixed:
