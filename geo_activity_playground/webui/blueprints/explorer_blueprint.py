@@ -4,6 +4,7 @@ import hashlib
 import io
 import logging
 from collections.abc import Iterable
+from typing import Optional
 from typing import Union
 
 import altair as alt
@@ -52,13 +53,8 @@ def blend_color(
 
 
 class ColorStrategy(abc.ABC):
-    def color_image(
-        self, tile_xy: tuple[int, int], grayscale: np.ndarray
-    ) -> np.ndarray:
-        return np.broadcast_to(self._color(tile_xy), grayscale.shape)
-
     @abc.abstractmethod
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         pass
 
 
@@ -71,7 +67,7 @@ class MaxClusterColorStrategy(ColorStrategy):
             key=len,
         )
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.max_cluster_members:
             return np.array([[[55, 126, 184, 70]]]) / 256
         elif tile_xy in self.evolution_state.memberships:
@@ -79,7 +75,7 @@ class MaxClusterColorStrategy(ColorStrategy):
         elif tile_xy in self.tile_visits:
             return np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            return np.array([[[0, 0, 0, 0]]]) / 256
+            return None
 
 
 class ColorfulClusterColorStrategy(ColorStrategy):
@@ -92,7 +88,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         )
         self._cmap = matplotlib.colormaps["hsv"]
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.evolution_state.memberships:
             cluster_id = self.evolution_state.memberships[tile_xy]
             m = hashlib.sha256()
@@ -102,7 +98,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         elif tile_xy in self.tile_visits:
             return np.array([[[0, 0, 0, 70]]]) / 256
         else:
-            return np.array([[[0, 0, 0, 0]]]) / 256
+            return None
 
 
 class VisitTimeColorStrategy(ColorStrategy):
@@ -110,7 +106,7 @@ class VisitTimeColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self.use_first = use_first
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.tile_visits:
             today = datetime.date.today()
             cmap = matplotlib.colormaps["plasma"]
@@ -126,21 +122,32 @@ class VisitTimeColorStrategy(ColorStrategy):
                 color = np.array([[color[:3] + (0.5,)]])
             return color
         else:
-            return np.array([[[0, 0, 0, 0]]]) / 256
+            return None
 
 
 class NumVisitsColorStrategy(ColorStrategy):
     def __init__(self, tile_visits):
         self.tile_visits = tile_visits
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray:
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
             color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
             return np.array([[color[:3] + (0.5,)]])
         else:
-            return np.array([[[0, 0, 0, 0]]]) / 256
+            return None
+
+
+class MissingColorStrategy(ColorStrategy):
+    def __init__(self, tile_visits):
+        self.tile_visits = tile_visits
+
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+        if tile_xy in self.tile_visits:
+            return None
+        else:
+            return np.array([[[0, 0, 0, 255]]]) / 256
 
 
 def make_explorer_blueprint(
@@ -286,6 +293,8 @@ def make_explorer_blueprint(
                 color_strategy = VisitTimeColorStrategy(tile_visits, use_first=False)
             case "visits":
                 color_strategy = NumVisitsColorStrategy(tile_visits)
+            case "missing":
+                color_strategy = MissingColorStrategy(tile_visits)
             case _:
                 raise ValueError("Unsupported color strategy.")
 
@@ -294,7 +303,11 @@ def make_explorer_blueprint(
             tile_x = x // factor
             tile_y = y // factor
             tile_xy = (tile_x, tile_y)
-            result = color_strategy.color_image(tile_xy, grayscale).copy()
+            color = color_strategy._color(tile_xy)
+            if color is None:
+                result = grayscale
+            else:
+                result = np.broadcast_to(color, grayscale.shape)
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
@@ -351,13 +364,7 @@ def make_explorer_blueprint(
                     if tile_xy in tile_visits:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = color_strategy.color_image(
-                            tile_xy,
-                            grayscale[
-                                yo * width : (yo + 1) * width,
-                                xo * width : (xo + 1) * width,
-                            ],
-                        )
+                        ] = color_strategy._color(tile_xy)
 
                         if (
                             evolution_state.square_x is not None
