@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add explorer tile color strategy for missing tiles.
+
 ## Version 1.4.1 — 2025-07-11
 
 Fixed:
