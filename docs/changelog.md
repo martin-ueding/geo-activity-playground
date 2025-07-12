@@ -21,6 +21,10 @@ Added:
 
 - Add explorer tile color strategy for missing tiles.
 
+Changed:
+
+- Use 255 instead of 256 as a denominator for colors. Shouldn't make any noticeable difference, though.
+
 ## Version 1.4.1 — 2025-07-11
 
 Fixed:
