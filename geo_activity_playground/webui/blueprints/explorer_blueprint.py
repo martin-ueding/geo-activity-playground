@@ -307,7 +307,7 @@ def make_explorer_blueprint(
             if color is None:
                 result = grayscale
             else:
-                result = np.broadcast_to(color, grayscale.shape)
+                result = np.broadcast_to(color, grayscale.shape).copy()
 
             if x % factor == 0:
                 result[:, 0, :] = 0.5
