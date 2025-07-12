@@ -69,11 +69,11 @@ class MaxClusterColorStrategy(ColorStrategy):
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.max_cluster_members:
-            return np.array([[[55, 126, 184, 70]]]) / 256
+            return np.array([[[55, 126, 184, 70]]]) / 255
         elif tile_xy in self.evolution_state.memberships:
-            return np.array([[[77, 175, 74, 70]]]) / 256
+            return np.array([[[77, 175, 74, 70]]]) / 255
         elif tile_xy in self.tile_visits:
-            return np.array([[[0, 0, 0, 70]]]) / 256
+            return np.array([[[0, 0, 0, 70]]]) / 255
         else:
             return None
 
@@ -96,7 +96,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
             d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
             return np.array([[self._cmap(d)[:3] + (0.5,)]])
         elif tile_xy in self.tile_visits:
-            return np.array([[[0, 0, 0, 70]]]) / 256
+            return np.array([[[0, 0, 0, 70]]]) / 255
         else:
             return None
 
@@ -115,7 +115,7 @@ class VisitTimeColorStrategy(ColorStrategy):
                 tile_info["first_time"] if self.use_first else tile_info["last_time"]
             )
             if pd.isna(relevant_time):
-                color = np.array([[[0, 0, 0, 70]]]) / 256
+                color = np.array([[[0, 0, 0, 70]]]) / 255
             else:
                 last_age_days = (today - relevant_time.date()).days
                 color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
@@ -147,7 +147,7 @@ class MissingColorStrategy(ColorStrategy):
         if tile_xy in self.tile_visits:
             return None
         else:
-            return np.array([[[0, 0, 0, 255]]]) / 256
+            return np.array([[[0, 0, 0, 70]]]) / 255
 
 
 def make_explorer_blueprint(
@@ -361,67 +361,62 @@ def make_explorer_blueprint(
                     tile_x = x * factor + xo
                     tile_y = y * factor + yo
                     tile_xy = (tile_x, tile_y)
-                    if tile_xy in tile_visits:
+                    color = color_strategy._color(tile_xy)
+                    if color is not None:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = color_strategy._color(tile_xy)
+                        ] = color
+
+                    if (
+                        evolution_state.square_x is not None
+                        and evolution_state.square_y is not None
+                    ):
+                        if (
+                            tile_x == evolution_state.square_x
+                            and evolution_state.square_y
+                            <= tile_y
+                            < evolution_state.square_y + evolution_state.max_square_size
+                        ):
+                            result[
+                                yo * width : (yo + 1) * width,
+                                xo * width : xo * width + square_line_width,
+                            ] = square_color
+                        if (
+                            tile_y == evolution_state.square_y
+                            and evolution_state.square_x
+                            <= tile_x
+                            < evolution_state.square_x + evolution_state.max_square_size
+                        ):
+                            result[
+                                yo * width : yo * width + square_line_width,
+                                xo * width : (xo + 1) * width,
+                            ] = square_color
 
                         if (
-                            evolution_state.square_x is not None
-                            and evolution_state.square_y is not None
+                            tile_x + 1
+                            == evolution_state.square_x
+                            + evolution_state.max_square_size
+                            and evolution_state.square_y
+                            <= tile_y
+                            < evolution_state.square_y + evolution_state.max_square_size
                         ):
-                            if (
-                                tile_x == evolution_state.square_x
-                                and evolution_state.square_y
-                                <= tile_y
-                                < evolution_state.square_y
-                                + evolution_state.max_square_size
-                            ):
-                                result[
-                                    yo * width : (yo + 1) * width,
-                                    xo * width : xo * width + square_line_width,
-                                ] = square_color
-                            if (
-                                tile_y == evolution_state.square_y
-                                and evolution_state.square_x
-                                <= tile_x
-                                < evolution_state.square_x
-                                + evolution_state.max_square_size
-                            ):
-                                result[
-                                    yo * width : yo * width + square_line_width,
-                                    xo * width : (xo + 1) * width,
-                                ] = square_color
+                            result[
+                                yo * width : (yo + 1) * width,
+                                (xo + 1) * width - square_line_width : (xo + 1) * width,
+                            ] = square_color
 
-                            if (
-                                tile_x + 1
-                                == evolution_state.square_x
-                                + evolution_state.max_square_size
-                                and evolution_state.square_y
-                                <= tile_y
-                                < evolution_state.square_y
-                                + evolution_state.max_square_size
-                            ):
-                                result[
-                                    yo * width : (yo + 1) * width,
-                                    (xo + 1) * width
-                                    - square_line_width : (xo + 1) * width,
-                                ] = square_color
-
-                            if (
-                                tile_y + 1
-                                == evolution_state.square_y
-                                + evolution_state.max_square_size
-                                and evolution_state.square_x
-                                <= tile_x
-                                < evolution_state.square_x
-                                + evolution_state.max_square_size
-                            ):
-                                result[
-                                    (yo + 1) * width
-                                    - square_line_width : (yo + 1) * width,
-                                    xo * width : (xo + 1) * width,
-                                ] = square_color
+                        if (
+                            tile_y + 1
+                            == evolution_state.square_y
+                            + evolution_state.max_square_size
+                            and evolution_state.square_x
+                            <= tile_x
+                            < evolution_state.square_x + evolution_state.max_square_size
+                        ):
+                            result[
+                                (yo + 1) * width - square_line_width : (yo + 1) * width,
+                                xo * width : (xo + 1) * width,
+                            ] = square_color
                     if width >= 64:
                         result[yo * width, :, :] = 0.5
                         result[:, xo * width, :] = 0.5
