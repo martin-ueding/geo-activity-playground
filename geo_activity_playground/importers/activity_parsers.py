@@ -8,7 +8,7 @@ from collections.abc import Iterator
 import charset_normalizer
 import dateutil.parser
 import fitdecode.exceptions
-import gpxpy
+import gpxpy.gpx
 import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
@@ -40,7 +40,7 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
     if file_type == ".gpx":
         try:
             timeseries = read_gpx_activity(path, opener)
-        except gpxpy.gpx.GPXXMLSyntaxException as e:
+        except gpxpy.gpx.GPXException as e:
             raise ActivityParseError(f"Syntax error while parsing GPX file") from e
         except UnicodeDecodeError as e:
             raise ActivityParseError(f"Encoding issue") from e

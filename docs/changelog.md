@@ -28,6 +28,7 @@ Changed:
 Fixed:
 
 - Use UTC time for photo upload. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
+- Catch more exceptions during GPX import. ([GH-301](https://github.com/martin-ueding/geo-activity-playground/issues/301))
 
 ## Version 1.4.1 — 2025-07-11
 
