@@ -79,11 +79,11 @@ def _nominate_activities_inner(
         if variable in meta.columns and not pd.isna(meta[variable]).all():
             try:
                 i = meta[variable].idxmax()
-            except ValueError as e:
+            except (KeyError, TypeError):
                 print(meta[variable].tolist())
                 print(f"{meta[variable].dtype=}")
                 logger.error(f"Trying to work with {variable=}.")
-                logger.error(f"We got a ValueError: {e}")
+                raise
             else:
                 value = meta.loc[i, variable]
                 format_applied = format_str.format(value)

@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Catch `TypeError` as well as `ValueError`. ([GH-307](https://github.com/martin-ueding/geo-activity-playground/issues/307))
+
 ## Version 1.5.0 — 2025-07-12
 
 Added:
