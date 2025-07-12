@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     
     # Only run if the comment is not from the issue author
-    if: github.event.comment.user.login == github.event.issue.user.login
+    # if: github.event.comment.user.login == github.event.issue.user.login
     
     steps:
     - name: Check if issue has "need info" label
