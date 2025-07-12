@@ -19,6 +19,12 @@ Types of changes
 
 Fixed:
 
+- Fixed broken explorer tiles when zooming in a lot. That was broken again.
+
+## Version 1.5.1 — 2025-07-12
+
+Fixed:
+
 - Catch `TypeError` as well as `ValueError`. ([GH-307](https://github.com/martin-ueding/geo-activity-playground/issues/307))
 
 ## Version 1.5.0 — 2025-07-12
