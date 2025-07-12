@@ -42,7 +42,7 @@
     </div>
 </div>
 
-<div class=" row mb-3">
+<div class="row mb-3">
     <div class="col">
         <h2>Tile history</h2>
     </div>
@@ -65,6 +65,43 @@
         {% endif %}
     </div>
 </div>
+
+<h2 class="mb-3">Tile URLs</h2>
+
+<p>You can use the overlay tiles with other services like <a href="https://bikerouter.de/" target="_blank">Bike
+        Router</a>. See <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/"
+        target="_blank">the documentation for this feature</a>. For your server, use the following URLs:</p>
+
+<code><pre>
+{{ host_url }}tile/grayscale/{z}/{x}/{y}.png
+{{ host_url }}tile/pastel/{z}/{x}/{y}.png
+{{ host_url }}tile/color/{z}/{x}/{y}.png
+{{ host_url }}tile/inverse_grayscale/{z}/{x}/{y}.png
+</pre></code>
+
+<p>For the explorer tiles, you can use these:</p>
+
+<code><pre>
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=first
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=last
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=visits
+{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=missing
+
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
+{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing
+</pre></code>
+
+<p>And for the heatmap, you can use this:</p>
+
+<code><pre>
+{{ host_url }}heatmap/tile/{z}/{x}/{y}.png
+</pre></code>
 
 {% endif %}
 {% endblock %}

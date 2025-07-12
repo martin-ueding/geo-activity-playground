@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add explorer tile color strategy for missing tiles.
+- List tile URLs on explorer page. ([GH-245](https://github.com/martin-ueding/geo-activity-playground/issues/245))
 
 Changed:
 

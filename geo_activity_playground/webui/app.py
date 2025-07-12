@@ -256,6 +256,7 @@ def web_ui_main(
             # "search_query_favorites": search_query_history.prepare_favorites(),
             # "search_query_last": search_query_history.prepare_last(),
             "request_url": urllib.parse.quote_plus(request.url),
+            "host_url": request.host_url,
         }
         variables["equipments_avail"] = DB.session.scalars(
             sqlalchemy.select(Equipment).order_by(Equipment.name)
