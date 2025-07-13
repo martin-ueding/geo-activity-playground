@@ -186,7 +186,7 @@ def compute_tile_visits_new(
     for zoom in reversed(range(20)):
         tile_state = tile_visit_accessor.tile_state
         if not (
-            tile_state["tile_history"][zoom]["time"].diff().dropna()
+            tile_state["tile_history"][zoom]["time"].dropna().diff().dropna()
             >= datetime.timedelta(seconds=0)
         ).all():
             logger.warning(
