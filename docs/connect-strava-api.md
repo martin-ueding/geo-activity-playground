@@ -29,3 +29,7 @@ Therefore it is recommended to use a Strava export in order to get started quick
 ## Skip Strava download
 
 If you don't want to download new activities from Strava, use `--skip-reload` to have the webserver start right away.
+
+## Rescan all Strava activities
+
+The scanning of Strava activities resumes after the last activity that was imported. If for some reason you want to scan all the activities again, delete the file `Cache/strava-last-activity-date.json`. It will then start the next scan from the beginning.
