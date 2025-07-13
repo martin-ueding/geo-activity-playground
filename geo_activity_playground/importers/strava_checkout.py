@@ -198,6 +198,8 @@ def import_from_strava_checkout(config: Config) -> None:
 
         activity_file = checkout_path / row["Filename"]
 
+        logger.info(f"Importing '{activity_file}' …")
+
         try:
             activity, time_series = read_activity(activity_file)
         except ActivityParseError as e:
