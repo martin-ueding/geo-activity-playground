@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix photo date extraction by using `strptime` again. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
+
 ## Version 1.5.2 — 2025-07-12
 
 Fixed:
