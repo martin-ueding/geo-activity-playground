@@ -1,6 +1,6 @@
 # Moving from Strava
 
-If you have been using Strava up to this point but want to use this project from now on, this is the correct guide. Here I will show how you can convert your data from Strava into the format of this project and keep adding new data without Strava in the future.
+If you have been using Strava up to this point but want to use this project _exclusively_ from now on, this is the correct guide. Here I will show how you can convert your data from Strava into the format of this project and keep adding new data without Strava in the future.
 
 ## Download your archive from Strava
 
