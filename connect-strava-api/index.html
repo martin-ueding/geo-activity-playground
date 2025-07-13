@@ -1471,7 +1471,7 @@
 <h2 id="skip-strava-download">Skip Strava download</h2>
 <p>If you don't want to download new activities from Strava, use <code>--skip-reload</code> to have the webserver start right away.</p>
 <h2 id="rescan-all-strava-activities">Rescan all Strava activities</h2>
-<p>The scanning of Strava activities resumes after the last activity that was imported. If for some reason you want to scan all the activities again, delete the file <code>Cache/strava-last-activity-date.json</code>. It will then start the next scan from the beginning.</p>
+<p>The scanning of Strava activities resumes after the last activity that was imported. If you want to override this behavior temporarily, you can add <code>--strava-start YYYY-MM-DD</code> and/or <code>--strava-end YYYY-MM-DD</code> at the end of the command line (after <code>serve</code>). Replace the placeholders with a date like 2025-07-13. This will trigger a scan of Strava activities within the specified time range.</p>
 
 
 
