@@ -24,7 +24,7 @@ def test_empty_query() -> None:
 
     search_query = SearchQuery()
 
-    actual = apply_search_query(activity_meta, search_query)
+    actual = apply_search_query(search_query)
     assert (actual["id"] == activity_meta["id"]).all()
 
 
@@ -43,7 +43,7 @@ def test_equipment_query() -> None:
         }
     )
     search_query = SearchQuery(equipment=["B"])
-    actual = apply_search_query(activity_meta, search_query)
+    actual = apply_search_query(search_query)
     assert set(actual["id"]) == {2, 3}
 
 
@@ -62,7 +62,7 @@ def test_date_query() -> None:
         }
     )
     search_query = SearchQuery(start_begin=datetime.date(2024, 12, 31))
-    actual = apply_search_query(activity_meta, search_query)
+    actual = apply_search_query(search_query)
     assert set(actual["id"]) == {2}
 
 
@@ -81,7 +81,7 @@ def test_name_query() -> None:
         }
     )
     search_query = SearchQuery(name="Test1")
-    actual = apply_search_query(activity_meta, search_query)
+    actual = apply_search_query(search_query)
     assert set(actual["id"]) == {1}
 
 

@@ -178,7 +178,7 @@ def make_summary_blueprint(
     def index():
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        df = apply_search_query(repository.meta, query)
+        df = apply_search_query(query)
 
         kind_scale = make_kind_scale(repository.meta, config)
         df_without_nan = df.loc[~pd.isna(df["start"])]

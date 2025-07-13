@@ -26,7 +26,7 @@ def make_hall_of_fame_blueprint(
     def index() -> str:
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        activities = apply_search_query(repository.meta, query)
+        activities = apply_search_query(query)
         df = activities
 
         nominations = nominate_activities(df)

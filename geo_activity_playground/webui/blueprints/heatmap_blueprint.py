@@ -183,7 +183,7 @@ def _get_counts(
         tile_count_cache_path.unlink(missing_ok=True)
         tmp_path.rename(tile_count_cache_path)
     else:
-        activities = apply_search_query(repository.meta, query)
+        activities = apply_search_query(query)
         activity_ids = activities_per_tile[z].get((x, y), set())
         for activity_id in activity_ids:
             if activity_id not in activities["id"]:
