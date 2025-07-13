@@ -11,15 +11,16 @@ import threading
 import urllib.parse
 import uuid
 import warnings
+from typing import Optional
 
 import pandas as pd
 import sqlalchemy
-from flask import Config
 from flask import Flask
 from flask import request
 from flask_alembic import Alembic
 
 from ..core.activities import ActivityRepository
+from ..core.config import Config
 from ..core.config import ConfigAccessor
 from ..core.config import import_old_config
 from ..core.config import import_old_strava_config
@@ -84,9 +85,13 @@ def importer_thread(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    strava_begin: Optional[str],
+    strava_end: Optional[str],
 ) -> None:
     with app.app_context():
-        scan_for_activities(repository, tile_visit_accessor, config)
+        scan_for_activities(
+            repository, tile_visit_accessor, config, strava_begin, strava_end
+        )
     logger.info("Importer thread is done.")
 
 
@@ -95,6 +100,8 @@ def web_ui_main(
     skip_reload: bool,
     host: str,
     port: int,
+    strava_begin: Optional[str],
+    strava_end: Optional[str],
 ) -> None:
     os.chdir(basedir)
 
@@ -145,7 +152,14 @@ def web_ui_main(
     if not skip_reload:
         thread = threading.Thread(
             target=importer_thread,
-            args=(app, repository, tile_visit_accessor, config_accessor()),
+            args=(
+                app,
+                repository,
+                tile_visit_accessor,
+                config_accessor(),
+                strava_begin,
+                strava_end,
+            ),
         )
         thread.start()
 

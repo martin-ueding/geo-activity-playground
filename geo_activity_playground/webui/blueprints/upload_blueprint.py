@@ -1,5 +1,6 @@
 import os
 import pathlib
+from typing import Optional
 
 import sqlalchemy
 from flask import Blueprint
@@ -115,6 +116,8 @@ def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
+    strava_begin: Optional[str] = None,
+    strava_end: Optional[str] = None,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
@@ -122,7 +125,9 @@ def scan_for_activities(
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
-        import_from_strava_api(config, repository, tile_visit_accessor)
+        import_from_strava_api(
+            config, repository, tile_visit_accessor, strava_begin, strava_end
+        )
 
     if len(repository) > 0:
         compute_tile_visits_new(repository, tile_visit_accessor)

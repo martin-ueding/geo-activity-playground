@@ -53,6 +53,8 @@ def main() -> None:
             options.skip_reload,
             host=options.host,
             port=options.port,
+            strava_begin=options.strava_begin,
+            strava_end=options.strava_end,
         )
     )
     subparser.add_argument(
@@ -62,6 +64,12 @@ def main() -> None:
         "--port", default=5000, type=int, help="the port to run listen on"
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
+    subparser.add_argument(
+        "--strava-begin", help="Start date to limit Strava sync, format YYYY-MM-DD"
+    )
+    subparser.add_argument(
+        "--strava-end", help="End date to limit Strava sync, format YYYY-MM-DD"
+    )
 
     subparser = subparsers.add_parser(
         "heatmap-video", help="Create a video with the evolution of the heatmap"

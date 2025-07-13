@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add `--strava-begin` and `--strava-end` command line options. ([GH-296](https://github.com/martin-ueding/geo-activity-playground/issues/296))
+
 Changed:
 
 - Remove duplicate queries to all activities, should speed up summary statistics, search and hall of fame.
