@@ -27,6 +27,7 @@ Fixed:
 - Fix photo date extraction by using `strptime` again. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))
 - Replace `api.geotimezone.com` with the `timezonefinder` such that finding the time zone from coordinates doesn't need an external service. That service was unavailable due to a TLS certificate expiry and caused disruption. ([GH-319](https://github.com/martin-ueding/geo-activity-playground/issues/319))
 - Ensure that time series are localized to UTC before extracting tile visits. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
+- If the FIT field `enhanced_speed` is a tuple, it is just ignored now. ([GH-299](https://github.com/martin-ueding/geo-activity-playground/issues/299))
 
 ## Version 1.5.2 — 2025-07-12
 
