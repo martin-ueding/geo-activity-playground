@@ -124,9 +124,7 @@ class SearchQuery:
         )
 
 
-def apply_search_query(
-    activity_meta: pd.DataFrame, search_query: SearchQuery
-) -> pd.DataFrame:
+def apply_search_query(search_query: SearchQuery) -> pd.DataFrame:
 
     filter_clauses = []
 

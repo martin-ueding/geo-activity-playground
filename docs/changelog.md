@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Remove duplicate queries to all activities, should speed up summary statistics, search and hall of fame.
+
 Fixed:
 
 - Rotate photos according to their EXIF rotation tag. ([GH-322](https://github.com/martin-ueding/geo-activity-playground/issues/322))

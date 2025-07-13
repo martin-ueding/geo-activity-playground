@@ -35,7 +35,7 @@ def make_search_blueprint(
     def index():
         query = search_query_from_form(request.args)
         search_query_history.register_query(query)
-        activities = apply_search_query(repository.meta, query)
+        activities = apply_search_query(query)
 
         return render_template(
             "search/index.html.j2",

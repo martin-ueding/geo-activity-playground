@@ -64,11 +64,7 @@ def _render_eddington_template(
 
     query = search_query_from_form(request.args)
     search_query_history.register_query(query)
-    activities = (
-        apply_search_query(repository.meta, query)
-        .dropna(subset=["start", column_name])
-        .copy()
-    )
+    activities = apply_search_query(query).dropna(subset=["start", column_name]).copy()
 
     assert (
         len(activities) > 0
