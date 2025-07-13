@@ -4,6 +4,7 @@ import pathlib
 import pickle
 import time
 import zoneinfo
+from typing import Optional
 
 import pandas as pd
 from stravalib import Client
@@ -80,8 +81,12 @@ def import_from_strava_api(
     config: Config,
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
+    strava_begin: Optional[str] = None,
+    strava_end: Optional[str] = None,
 ) -> None:
-    while try_import_strava(config, repository, tile_visit_accessor):
+    while try_import_strava(
+        config, repository, tile_visit_accessor, strava_begin, strava_end
+    ):
         now = datetime.datetime.now()
         next_quarter = round_to_next_quarter_hour(now)
         seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -95,8 +100,13 @@ def try_import_strava(
     config: Config,
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
+    strava_begin: Optional[str] = None,
+    strava_end: Optional[str] = None,
 ) -> bool:
-    get_after = get_state(strava_last_activity_date_path(), "2000-01-01T00:00:00Z")
+    if strava_begin:
+        get_after = f"{strava_begin}T00:00:00Z"
+    else:
+        get_after = get_state(strava_last_activity_date_path(), "2000-01-01T00:00:00Z")
 
     gear_names = {None: "None"}
 
@@ -106,6 +116,13 @@ def try_import_strava(
         for strava_activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
         ):
+            if (
+                strava_end
+                and strava_activity.start_date is not None
+                and str(strava_activity.start_date) > strava_end
+            ):
+                break
+
             cache_file = (
                 pathlib.Path("Cache")
                 / "Strava Activity Metadata"
@@ -171,10 +188,11 @@ def try_import_strava(
                 compute_tile_evolution(tile_visit_accessor.tile_state, config)
                 tile_visit_accessor.save()
 
-            set_state(
-                strava_last_activity_date_path(),
-                strava_activity.start_date.isoformat().replace("+00:00", "Z"),
-            )
+            if strava_begin is None and strava_end is None:
+                set_state(
+                    strava_last_activity_date_path(),
+                    strava_activity.start_date.isoformat().replace("+00:00", "Z"),
+                )
 
         limit_exceeded = False
     except RateLimitExceeded:
