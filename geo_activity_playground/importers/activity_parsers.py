@@ -4,6 +4,7 @@ import logging
 import pathlib
 import xml
 from collections.abc import Iterator
+from typing import Union
 
 import charset_normalizer
 import dateutil.parser
@@ -135,12 +136,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                             factor = _fit_speed_unit_factor(
                                 fields["enhanced_speed"].units
                             )
-                            try:
-                                row["speed"] = values["enhanced_speed"] * factor
-                            except TypeError as e:
-                                logger.warning(
-                                    f'Cannot work with {values["enhanced_speed"]!r}, {factor!r}'
-                                )
+                            row["speed"] = (
+                                _first_of_tuple(values["enhanced_speed"]) * factor
+                            )
                         if "grade" in fields:
                             row["grade"] = values["grade"]
                         if "temperature" in fields:
@@ -172,6 +170,13 @@ def _fit_speed_unit_factor(unit: str) -> float:
         return 1.0
     else:
         raise ActivityParseError(f"Unknown speed unit {unit}")
+
+
+def _first_of_tuple(value: Union[float, tuple[float, float]]) -> float:
+    try:
+        return float(value)
+    except TypeError:
+        return float(value[0])
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
