@@ -254,12 +254,17 @@ def _process_activity(
 
                 first_time = tile_visit.get("first_time", None)
                 last_time = tile_visit.get("last_time", None)
-                if first_time is None or time < first_time:
-                    tile_visit["first_id"] = activity_id
-                    tile_visit["first_time"] = time
-                if last_time is None or time > last_time:
-                    tile_visit["last_id"] = activity_id
-                    tile_visit["last_time"] = time
+                try:
+                    if first_time is None or time < first_time:
+                        tile_visit["first_id"] = activity_id
+                        tile_visit["first_time"] = time
+                    if last_time is None or time > last_time:
+                        tile_visit["last_id"] = activity_id
+                        tile_visit["last_time"] = time
+                except TypeError as e:
+                    raise TypeError(
+                        f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"
+                    ) from e
 
             activities_per_tile[tile].add(activity_id)
 
@@ -276,7 +281,7 @@ def _process_activity(
 def _tiles_from_points(
     time_series: pd.DataFrame, zoom: int
 ) -> Iterator[tuple[datetime.datetime, int, int]]:
-    # Some people haven't localized their time series yet. This breaks the tile history part. Just assume that it is UTC, should be good enough for tiles.
+    # XXX Some people haven't localized their time series yet. This breaks the tile history part. Just assume that it is UTC, should be good enough for tiles.
     if time_series["time"].dt.tz is None:
         time_series = time_series.copy()
         time_series["time"].dt.tz_localize(zoneinfo.ZoneInfo("UTC"))

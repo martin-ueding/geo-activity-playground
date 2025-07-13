@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add `--strava-begin` and `--strava-end` command line options. ([GH-296](https://github.com/martin-ueding/geo-activity-playground/issues/296))
+- Add more debug output for timezone handling in tile history. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
 
 Changed:
 
