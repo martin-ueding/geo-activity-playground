@@ -22,6 +22,8 @@ Added:
 - Bring back the progress bar for activity import.
 - Print the path of the imported activity in the Strava checkout importer.
 - Add some buttons to the trim feature overlay to make it easier to use. ([GH-234](https://github.com/martin-ueding/geo-activity-playground/issues/234))
+- Add [Wanderer](https://wanderer.to/) to the list of related projects.
+- Add documentation about digital elevation models and their problems.
 
 Fixed:
 
