@@ -23,10 +23,14 @@ def get_metadata_from_image(path: pathlib.Path) -> dict:
     except KeyError:
         pass
     try:
-        metadata["time"] = dateutil.parser.parse(
-            str(tags["EXIF DateTimeOriginal"])
-            + str(tags.get("EXIF OffsetTime", "+00:00"))
+        date_time_original = str(tags["EXIF DateTimeOriginal"]) + str(
+            tags.get("EXIF OffsetTime", "+00:00")
+        ).replace(":", "")
+        print(f"Extracted date: {date_time_original}")
+        metadata["time"] = datetime.datetime.strptime(
+            date_time_original, "%Y:%m:%d %H:%M:%S%z"
         ).astimezone(zoneinfo.ZoneInfo("UTC"))
+
     except KeyError:
         pass
 
