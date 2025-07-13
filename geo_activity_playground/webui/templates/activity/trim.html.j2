@@ -9,47 +9,12 @@
 
 <a href="{{ url_for('.show', id=activity['id']) }}" class="btn btn-primary btn-small">Back</a>
 
-
 <div id="activity-map" style="height: 600px;" class="mb-3"></div>
 <script>
-    var map = L.map('activity-map', {
-        fullscreenControl: true
-    });
-    L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '{{ map_tile_attribution|safe }}'
-    }).addTo(map);
-
-
-    let layer = L.geoJSON({{ color_line_geojson| safe }}, {
-        pointToLayer: function (feature, lat_lon) {
-            let p = feature.properties
-
-            let marker = null
-            if (p.markerType == "circle") {
-                marker = L.circleMarker(lat_lon, p.markerStyle)
-            } else {
-                marker = L.marker(lat_lon)
-            }
-
-            let text = ''
-            if (p.name) {
-                text += `<p><b>${p.name}</b></p>`
-            }
-            if (p.description) {
-                text += p.description
-            }
-            if (text) {
-                marker = marker.bindPopup(text)
-            }
-
-            return marker
-        }
-    })
-
-    layer.addTo(map)
-    map.fitBounds(layer.getBounds());
+    var map_tile_attribution = '{{ map_tile_attribution }}';
+    var color_line_geojson = {{ color_line_geojson | safe }};
 </script>
+<script src="/static/activity-trim.js"></script>
 
 <form method="POST">
     <div class="mb-3">
