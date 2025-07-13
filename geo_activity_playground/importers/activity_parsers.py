@@ -128,7 +128,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                         if "altitude" in fields:
                             row["elevation"] = values["altitude"]
                         if "enhanced_altitude" in fields:
-                            row["elevation"] = values["enhanced_altitude"]
+                            row["elevation"] = _first_of_tuple(
+                                values["enhanced_altitude"]
+                            )
                         if "speed" in fields:
                             factor = _fit_speed_unit_factor(fields["speed"].units)
                             row["speed"] = values["speed"] * factor
