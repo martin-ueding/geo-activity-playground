@@ -17,6 +17,8 @@ Types of changes
 
 ## Version 1.8.0 — 2025-07-13
 
+This release should have been a patch release (1.7.2), unfortunately I realized this too late. Removing or yanking a release causes more trouble than it is worth.
+
 Changed:
 
 - Update documentation for Strava to include the `--strava-begin` and `--strava-end` command line options. ([GH-296](https://github.com/martin-ueding/geo-activity-playground/issues/296))
