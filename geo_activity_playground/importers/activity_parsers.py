@@ -138,10 +138,9 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                             try:
                                 row["speed"] = values["enhanced_speed"] * factor
                             except TypeError as e:
-                                # https://github.com/martin-ueding/geo-activity-playground/issues/301
-                                raise ActivityParseError(
+                                logger.warning(
                                     f'Cannot work with {values["enhanced_speed"]!r}, {factor!r}'
-                                ) from e
+                                )
                         if "grade" in fields:
                             row["grade"] = values["grade"]
                         if "temperature" in fields:
