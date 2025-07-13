@@ -25,6 +25,8 @@ Fixed:
 
 - Rotate photos according to their EXIF rotation tag. ([GH-322](https://github.com/martin-ueding/geo-activity-playground/issues/322))
 - Use local time zone for statistics. ([GH-323](https://github.com/martin-ueding/geo-activity-playground/issues/323))
+- Make tile history consistency check more robust against routes.
+- Attempt to unpack FIT tuples to handle enhanced speed and elevation. ([GH-299](https://github.com/martin-ueding/geo-activity-playground/issues/299))
 
 ## Version 1.6.0 — 2025-07-13
 
