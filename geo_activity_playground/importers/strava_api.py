@@ -7,6 +7,7 @@ import zoneinfo
 from typing import Optional
 
 import pandas as pd
+import sqlalchemy
 from stravalib import Client
 from stravalib.exc import Fault
 from stravalib.exc import ObjectNotFound
@@ -121,7 +122,20 @@ def try_import_strava(
                 and strava_activity.start_date is not None
                 and str(strava_activity.start_date) > strava_end
             ):
+                logger.info(f"Reached {strava_end}, stopping.")
                 break
+
+            if (
+                existing_activity := DB.session.scalar(
+                    sqlalchemy.select(Activity).where(
+                        Activity.upstream_id == strava_activity.id
+                    )
+                )
+            ) is not None:
+                logger.info(
+                    f"Strava activity {strava_activity.id} already exists in database as {existing_activity.id}, skipping."
+                )
+                continue
 
             cache_file = (
                 pathlib.Path("Cache")

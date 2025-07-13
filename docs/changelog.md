@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Before importing activities via the Strava API, make sure that they don't already exist. ([GH-296](https://github.com/martin-ueding/geo-activity-playground/issues/296))
+
 ## Version 1.7.0 — 2025-07-13
 
 Added:
