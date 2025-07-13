@@ -315,6 +315,12 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
                 )
         df["start_local"] = start_local
 
+        # Work around bytes stored in DB.
+        df["calories"] = [
+            sum(a * 256**b for b, a in enumerate(c)) if isinstance(c, bytes) else c
+            for c in df["calories"]
+        ]
+
         for old, new in [
             ("elapsed_time", "average_speed_elapsed_kmh"),
             ("moving_time", "average_speed_moving_kmh"),

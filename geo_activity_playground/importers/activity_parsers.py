@@ -156,7 +156,7 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                             kind_name += " " + str(values["sub_sport"])
                         activity.kind = get_or_make_kind(kind_name)
                     if "total_calories" in fields:
-                        activity.calories = values["total_calories"]
+                        activity.calories = int(str(values["total_calories"]))
                     if "total_strides" in fields:
                         activity.steps = 2 * int(values["total_strides"])
 

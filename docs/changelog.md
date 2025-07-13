@@ -27,6 +27,7 @@ Fixed:
 - Use local time zone for statistics. ([GH-323](https://github.com/martin-ueding/geo-activity-playground/issues/323))
 - Make tile history consistency check more robust against routes.
 - Attempt to unpack FIT tuples to handle enhanced speed and elevation. ([GH-299](https://github.com/martin-ueding/geo-activity-playground/issues/299))
+- Work around bytes in calories field. ([GH-307](https://github.com/martin-ueding/geo-activity-playground/issues/307))
 - Make tile visit consistency robust against deleted activities.
 
 ## Version 1.6.0 — 2025-07-13

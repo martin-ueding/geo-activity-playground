@@ -109,6 +109,7 @@ def web_ui_main(
     database_path = pathlib.Path("database.sqlite")
     logger.info(f"Using database file at '{database_path.absolute()}'.")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path.absolute()}"
+    # app.config["SQLALCHEMY_ECHO"] = True
     app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
     DB.init_app(app)
 
