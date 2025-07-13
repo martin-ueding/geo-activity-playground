@@ -231,7 +231,7 @@ class Activity(DB.Model):
             return self.start
 
     @property
-    def start_utc(self) -> Optional[datetime.datetime]:
+    def start_local(self) -> Optional[datetime.datetime]:
         if self.start:
             return self.start.replace(microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC"))
         else:
@@ -270,6 +270,7 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
             Activity.path,
             Activity.distance_km,
             Activity.start,
+            Activity.iana_timezone,
             Activity.elapsed_time,
             Activity.moving_time,
             Activity.start_latitude,
@@ -302,6 +303,18 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
         # df["start"] = pd.Series(start)
         df["elapsed_time"] = pd.to_timedelta(df["elapsed_time"])
 
+        start_local = []
+        for start, iana_timezone in zip(df["start"], df["iana_timezone"]):
+            if pd.isna(start) or iana_timezone is None:
+                start_local.append(start)
+            else:
+                start_local.append(
+                    start.tz_localize(zoneinfo.ZoneInfo("UTC"))
+                    .tz_convert(iana_timezone)
+                    .tz_localize(None)
+                )
+        df["start_local"] = start_local
+
         for old, new in [
             ("elapsed_time", "average_speed_elapsed_kmh"),
             ("moving_time", "average_speed_moving_kmh"),
@@ -312,14 +325,14 @@ def query_activity_meta(clauses: list = []) -> pd.DataFrame:
                 df.loc[mask, old].dt.total_seconds() / 3_600
             )
 
-        df["date"] = df["start"].dt.date
-        df["year"] = df["start"].dt.year
-        df["month"] = df["start"].dt.month
-        df["day"] = df["start"].dt.day
-        df["week"] = df["start"].dt.isocalendar().week
-        df["day_of_week"] = df["start"].dt.day_of_week
-        df["iso_year"] = df["start"].dt.isocalendar().year
-        df["iso_day"] = df["start"].dt.isocalendar().day
+        df["date"] = df["start_local"].dt.date
+        df["year"] = df["start_local"].dt.year
+        df["month"] = df["start_local"].dt.month
+        df["day"] = df["start_local"].dt.day
+        df["week"] = df["start_local"].dt.isocalendar().week
+        df["day_of_week"] = df["start_local"].dt.day_of_week
+        df["iso_year"] = df["start_local"].dt.isocalendar().year
+        df["iso_day"] = df["start_local"].dt.isocalendar().day
         df["hours"] = df["elapsed_time"].dt.total_seconds() / 3_600
         df["hours_moving"] = df["moving_time"].dt.total_seconds() / 3_600
         df["iso_year_week"] = [
