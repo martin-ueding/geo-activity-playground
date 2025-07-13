@@ -4,6 +4,7 @@ import itertools
 import logging
 import pathlib
 import pickle
+import zoneinfo
 from typing import Iterator
 from typing import Optional
 from typing import TypedDict
@@ -272,6 +273,10 @@ def _process_activity(
 def _tiles_from_points(
     time_series: pd.DataFrame, zoom: int
 ) -> Iterator[tuple[datetime.datetime, int, int]]:
+    # Some people haven't localized their time series yet. This breaks the tile history part. Just assume that it is UTC, should be good enough for tiles.
+    if time_series["time"].dt.tz is None:
+        time_series = time_series.copy()
+        time_series["time"].dt.tz_localize(zoneinfo.ZoneInfo("UTC"))
     xf = time_series["x"] * 2**zoom
     yf = time_series["y"] * 2**zoom
     for t1, x1, y1, x2, y2, s1, s2 in zip(
