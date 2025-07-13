@@ -60,15 +60,15 @@ logger = logging.getLogger(__name__)
 
 class TileInfo(TypedDict):
     activity_ids: set[int]
-    first_time: datetime.datetime
+    first_time: pd.Timestamp
     first_id: int
-    last_time: datetime.datetime
+    last_time: pd.Timestamp
     last_id: int
 
 
 class TileHistoryRow(TypedDict):
     activity_id: int
-    time: datetime.datetime
+    time: pd.Timestamp
     tile_x: int
     tile_y: int
 
@@ -254,6 +254,10 @@ def _process_activity(
 
                 first_time = tile_visit.get("first_time", None)
                 last_time = tile_visit.get("last_time", None)
+                if first_time.tz is None:
+                    first_time = first_time.tz_localize("UTC")
+                if last_time.tz is None:
+                    last_time = last_time.tz_localize("UTC")
                 try:
                     if first_time is None or time < first_time:
                         tile_visit["first_id"] = activity_id
