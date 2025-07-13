@@ -1329,6 +1329,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-170-2025-07-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.7.0 — 2025-07-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-160-2025-07-13" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.6.0 — 2025-07-13
@@ -2272,6 +2281,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-170-2025-07-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.7.0 — 2025-07-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-160-2025-07-13" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.6.0 — 2025-07-13
@@ -3211,6 +3229,25 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-170-2025-07-13">Version 1.7.0 — 2025-07-13</h2>
+<p>Added:</p>
+<ul>
+<li>Add <code>--strava-begin</code> and <code>--strava-end</code> command line options. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/296">GH-296</a>)</li>
+<li>Add more debug output for timezone handling in tile history. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/309">GH-309</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Remove duplicate queries to all activities, should speed up summary statistics, search and hall of fame.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Rotate photos according to their EXIF rotation tag. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/322">GH-322</a>)</li>
+<li>Use local time zone for statistics. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/323">GH-323</a>)</li>
+<li>Make tile history consistency check more robust against routes.</li>
+<li>Attempt to unpack FIT tuples to handle enhanced speed and elevation. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/299">GH-299</a>)</li>
+<li>Work around bytes in calories field. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/307">GH-307</a>)</li>
+<li>Make tile visit consistency robust against deleted activities.</li>
+</ul>
 <h2 id="version-160-2025-07-13">Version 1.6.0 — 2025-07-13</h2>
 <p>Added:</p>
 <ul>
