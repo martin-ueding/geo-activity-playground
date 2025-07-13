@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## 1.7.0 — 2025-07-13
+## Version 1.7.0 — 2025-07-13
 
 Added:
 
