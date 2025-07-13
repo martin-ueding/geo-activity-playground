@@ -12,8 +12,14 @@ Types of changes
     *Fixed* for any bug fixes.
     *Security* in case of vulnerabilities.
 
-([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
+
 -->
+
+## Unreleased
+
+Fixed:
+
+- Rotate photos according to their EXIF rotation tag. ([GH-322](https://github.com/martin-ueding/geo-activity-playground/issues/322))
 
 ## Version 1.6.0 — 2025-07-13
 
