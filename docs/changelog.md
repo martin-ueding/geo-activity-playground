@@ -21,6 +21,10 @@ Changed:
 
 - Update documentation for Strava to include the `--strava-begin` and `--strava-end` command line options. ([GH-296](https://github.com/martin-ueding/geo-activity-playground/issues/296))
 
+Fixed:
+
+- Convert tile visit times to UTC if needed. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
+
 ## Version 1.7.1 — 2025-07-13
 
 Fixed:
