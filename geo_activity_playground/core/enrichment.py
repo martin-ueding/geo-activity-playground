@@ -13,7 +13,7 @@ from .datamodel import Activity
 from .datamodel import DB
 from .missing_values import some
 from .tiles import compute_tile_float
-from .time_conversion import get_country_timezone
+from .time_conversion import get_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,7 @@ def enrichment_set_timezone(
     ), f"You cannot import an activity without points. {activity=}"
     latitude, longitude = time_series[["latitude", "longitude"]].iloc[0].to_list()
     if activity.iana_timezone is None or activity.start_country is None:
-        country, tz_str = get_country_timezone(latitude, longitude)
-        activity.iana_timezone = tz_str
-        activity.start_country = country
+        activity.iana_timezone = get_timezone(latitude, longitude)
         return True
     else:
         return False

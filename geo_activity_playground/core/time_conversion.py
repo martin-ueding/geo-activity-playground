@@ -2,8 +2,10 @@ import datetime
 import json
 import logging
 import zoneinfo
+from typing import Optional
 
 import requests
+import timezonefinder
 
 from .paths import USER_CACHE_DIR
 
@@ -40,3 +42,8 @@ def get_country_timezone(latitude: float, longitude: float) -> tuple[str, str]:
         with open(cache_file, "w") as f:
             json.dump(data, f)
     return data["location"], data["iana_timezone"]
+
+
+def get_timezone(latitude: float, longitude: float) -> Optional[str]:
+    tf = timezonefinder.TimezoneFinder()  # reuse
+    return tf.timezone_at(lng=longitude, lat=latitude)
