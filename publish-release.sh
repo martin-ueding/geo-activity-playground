@@ -5,7 +5,7 @@ set -eu
 version="$(poetry version --short)"
 today=$(date +%Y-%m-%d)
 
-sed -i "s/## Unreleased/## $version — $today/" docs/changelog.md
+sed -i "s/## Unreleased/## Version $version — $today/" docs/changelog.md
 git ca -m "Bump version to $version"
 
 # Upload the code.
