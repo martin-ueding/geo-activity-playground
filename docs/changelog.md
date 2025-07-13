@@ -12,7 +12,7 @@ Types of changes
     *Fixed* for any bug fixes.
     *Security* in case of vulnerabilities.
 
-
+([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
 ## Unreleased
@@ -20,6 +20,7 @@ Types of changes
 Fixed:
 
 - Rotate photos according to their EXIF rotation tag. ([GH-322](https://github.com/martin-ueding/geo-activity-playground/issues/322))
+- Use local time zone for statistics. ([GH-323](https://github.com/martin-ueding/geo-activity-playground/issues/323))
 
 ## Version 1.6.0 — 2025-07-13
 
