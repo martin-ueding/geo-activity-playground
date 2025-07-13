@@ -644,6 +644,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rescan-all-strava-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rescan all Strava activities
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1202,6 +1211,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../satellite-elevation-isnt-helpful/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Satellite Elevation Isn’t Helpful
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1397,6 +1429,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rescan-all-strava-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rescan all Strava activities
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1429,6 +1470,8 @@
 <p>Therefore it is recommended to use a Strava export in order to get started quicker. For this go to the <a href="https://www.strava.com/athlete/delete_your_account">Strava account download page</a> and download all your data. You will get a ZIP file. Unpack the files into <code>Playground/Strava Export</code>. These will be picked up there. Activities from Strava will only be downloaded after importing all these, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.</p>
 <h2 id="skip-strava-download">Skip Strava download</h2>
 <p>If you don't want to download new activities from Strava, use <code>--skip-reload</code> to have the webserver start right away.</p>
+<h2 id="rescan-all-strava-activities">Rescan all Strava activities</h2>
+<p>The scanning of Strava activities resumes after the last activity that was imported. If for some reason you want to scan all the activities again, delete the file <code>Cache/strava-last-activity-date.json</code>. It will then start the next scan from the beginning.</p>
 
 
 

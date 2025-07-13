@@ -8,26 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/">
+        <link rel="canonical" href="https://martin-ueding.github.io/geo-activity-playground/satellite-elevation-isnt-helpful/">
       
       
+        <link rel="prev" href="../time-zone-handling-sucks/">
       
-        <link rel="next" href="install-on-linux/">
+      
+        <link rel="next" href="../acknowledgments/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
-        <title>Geo Activity Playground</title>
+        <title>Satellite Elevation Isn’t Helpful - Geo Activity Playground</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,7 +48,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#home" class="md-skip">
+        <a href="#satellite-elevation-isnt-helpful" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +90,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Geo Activity Playground" class="md-header__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+    <a href=".." title="Geo Activity Playground" class="md-header__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Satellite Elevation Isn’t Helpful
             
           </span>
         </div>
@@ -212,7 +214,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Geo Activity Playground" class="md-nav__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
+    <a href=".." title="Geo Activity Playground" class="md-nav__button md-logo" aria-label="Geo Activity Playground" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -227,32 +229,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Home
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -263,53 +243,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#screenshot-tour" class="md-nav__link">
-    <span class="md-ellipsis">
-      Screenshot tour
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      Get started
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#free-software" class="md-nav__link">
-    <span class="md-ellipsis">
-      Free software
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -359,7 +292,7 @@
   
   
     <li class="md-nav__item">
-      <a href="install-on-linux/" class="md-nav__link">
+      <a href="../install-on-linux/" class="md-nav__link">
         
   
   
@@ -382,7 +315,7 @@
   
   
     <li class="md-nav__item">
-      <a href="install-on-windows/" class="md-nav__link">
+      <a href="../install-on-windows/" class="md-nav__link">
         
   
   
@@ -405,7 +338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="install-on-macos/" class="md-nav__link">
+      <a href="../install-on-macos/" class="md-nav__link">
         
   
   
@@ -428,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="add-local-bin-to-path/" class="md-nav__link">
+      <a href="../add-local-bin-to-path/" class="md-nav__link">
         
   
   
@@ -496,7 +429,7 @@
   
   
     <li class="md-nav__item">
-      <a href="create-a-base-directory/" class="md-nav__link">
+      <a href="../create-a-base-directory/" class="md-nav__link">
         
   
   
@@ -519,7 +452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="starting-the-webserver/" class="md-nav__link">
+      <a href="../starting-the-webserver/" class="md-nav__link">
         
   
   
@@ -542,7 +475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="record-activities/" class="md-nav__link">
+      <a href="../record-activities/" class="md-nav__link">
         
   
   
@@ -610,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="import-activity-files/" class="md-nav__link">
+      <a href="../import-activity-files/" class="md-nav__link">
         
   
   
@@ -633,7 +566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="connect-strava-api/" class="md-nav__link">
+      <a href="../connect-strava-api/" class="md-nav__link">
         
   
   
@@ -656,7 +589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="upload-activity-files/" class="md-nav__link">
+      <a href="../upload-activity-files/" class="md-nav__link">
         
   
   
@@ -679,7 +612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="moving-from-strava/" class="md-nav__link">
+      <a href="../moving-from-strava/" class="md-nav__link">
         
   
   
@@ -747,7 +680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-maps-as-overlays/" class="md-nav__link">
+      <a href="../using-maps-as-overlays/" class="md-nav__link">
         
   
   
@@ -770,7 +703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="build-custom-plots/" class="md-nav__link">
+      <a href="../build-custom-plots/" class="md-nav__link">
         
   
   
@@ -793,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="plan-missing-tile-rides/" class="md-nav__link">
+      <a href="../plan-missing-tile-rides/" class="md-nav__link">
         
   
   
@@ -816,7 +749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="create-a-privacy-zone/" class="md-nav__link">
+      <a href="../create-a-privacy-zone/" class="md-nav__link">
         
   
   
@@ -839,7 +772,7 @@
   
   
     <li class="md-nav__item">
-      <a href="set-up-a-development-environment/" class="md-nav__link">
+      <a href="../set-up-a-development-environment/" class="md-nav__link">
         
   
   
@@ -862,7 +795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="rename-activity-kinds/" class="md-nav__link">
+      <a href="../rename-activity-kinds/" class="md-nav__link">
         
   
   
@@ -885,7 +818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-git-version-via-docker/" class="md-nav__link">
+      <a href="../using-git-version-via-docker/" class="md-nav__link">
         
   
   
@@ -908,7 +841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-git-version-via-docker-compose/" class="md-nav__link">
+      <a href="../using-git-version-via-docker-compose/" class="md-nav__link">
         
   
   
@@ -931,7 +864,7 @@
   
   
     <li class="md-nav__item">
-      <a href="using-git-version-via-docker-compose-and-tailscale-vpn/" class="md-nav__link">
+      <a href="../using-git-version-via-docker-compose-and-tailscale-vpn/" class="md-nav__link">
         
   
   
@@ -954,7 +887,7 @@
   
   
     <li class="md-nav__item">
-      <a href="change-database-schema/" class="md-nav__link">
+      <a href="../change-database-schema/" class="md-nav__link">
         
   
   
@@ -1022,7 +955,7 @@
   
   
     <li class="md-nav__item">
-      <a href="advanced-metadata-extraction/" class="md-nav__link">
+      <a href="../advanced-metadata-extraction/" class="md-nav__link">
         
   
   
@@ -1049,18 +982,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
           <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
@@ -1076,7 +1011,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Explanation
@@ -1090,7 +1025,7 @@
   
   
     <li class="md-nav__item">
-      <a href="explorer-tiles/" class="md-nav__link">
+      <a href="../explorer-tiles/" class="md-nav__link">
         
   
   
@@ -1113,7 +1048,7 @@
   
   
     <li class="md-nav__item">
-      <a href="eddington-number/" class="md-nav__link">
+      <a href="../eddington-number/" class="md-nav__link">
         
   
   
@@ -1136,7 +1071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="heart-rate-zones/" class="md-nav__link">
+      <a href="../heart-rate-zones/" class="md-nav__link">
         
   
   
@@ -1159,7 +1094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="elevation-gain-from-noisy-data/" class="md-nav__link">
+      <a href="../elevation-gain-from-noisy-data/" class="md-nav__link">
         
   
   
@@ -1182,7 +1117,7 @@
   
   
     <li class="md-nav__item">
-      <a href="time-zone-handling-sucks/" class="md-nav__link">
+      <a href="../time-zone-handling-sucks/" class="md-nav__link">
         
   
   
@@ -1202,10 +1137,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="satellite-elevation-isnt-helpful/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Satellite Elevation Isn’t Helpful
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1216,6 +1173,44 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#lidar-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      LiDAR data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tunnels-and-overpasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tunnels and overpasses
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1273,7 +1268,7 @@
   
   
     <li class="md-nav__item">
-      <a href="acknowledgments/" class="md-nav__link">
+      <a href="../acknowledgments/" class="md-nav__link">
         
   
   
@@ -1296,7 +1291,7 @@
   
   
     <li class="md-nav__item">
-      <a href="similar-projects/" class="md-nav__link">
+      <a href="../similar-projects/" class="md-nav__link">
         
   
   
@@ -1326,7 +1321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="get-help/" class="md-nav__link">
+      <a href="../get-help/" class="md-nav__link">
         
   
   
@@ -1348,7 +1343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="changelog/" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         
   
   
@@ -1390,27 +1385,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#screenshot-tour" class="md-nav__link">
+  <a href="#lidar-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Screenshot tour
+      LiDAR data
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
+  <a href="#tunnels-and-overpasses" class="md-nav__link">
     <span class="md-ellipsis">
-      Get started
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#free-software" class="md-nav__link">
-    <span class="md-ellipsis">
-      Free software
+      Tunnels and overpasses
     </span>
   </a>
   
@@ -1432,34 +1418,26 @@
 
 
 
-<h1 id="home">Home</h1>
-<p>Geo Activity Playground is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.</p>
-<p>It caters to serve a similar purpose as other systems like <a href="https://strava.com/">Strava</a>, <a href="https://statshunters.com/">Statshunters</a> or <a href="https://veloviewer.com/">VeloViewer</a>, though the focus here is on self-hosting and using local files.</p>
-<p>One can use this program with a local collection of activity files (GPX, FIT, TCX, KML, CSV) or via the Strava API. The latter is appealing to people who want to keep their data with Strava primarily. In case that one wants to move, this might provide a noncommittal way of testing out this project.</p>
-<p>The main user interface is web-based, you can run this on your Linux, Mac or Windows laptop. If you want, it can also run on a home server or your personal cloud instance.</p>
-<h2 id="screenshot-tour">Screenshot tour</h2>
-<p>This is the view of a single activity:</p>
-<p><img alt="" src="images/screenshot-activity.png" /></p>
-<p>You also get a beautiful interactive heatmap of all your activities:</p>
-<p><img alt="" src="images/screenshot-heatmap.png" /></p>
-<p>Also there are plenty of summary statistics that lets you track how many rides, walks or hikes you have done:</p>
-<p><img alt="t" src="images/screenshot-summary.png" /></p>
-<p>If you're into <em>explorer tiles</em> or <em>squadratinhos</em>, this got you covered:</p>
-<p><img alt="" src="images/screenshot-explorer.png" /></p>
-<p>The configuration options are available within the interface such that you do not have to work with configuration files (like in earlier versions):</p>
-<p><img alt="" src="images/screenshot-settings.png" /></p>
-<h2 id="get-started">Get started</h2>
-<p>If you're new, just follow these steps:</p>
-<ol>
-<li>Install the software on <a href="install-on-linux/">Linux</a>, <a href="install-on-windows/">Windows</a> or <a href="install-on-macos/">macOS</a>.</li>
-<li><a href="create-a-base-directory/">Create a base directory</a>.</li>
-<li><a href="starting-the-webserver/">Start the webserver</a>.</li>
-<li>Choose a method to <a href="record-activities/">record activities</a>.</li>
-<li>Import your activities via <a href="import-activity-files/">activity files</a>, <a href="connect-strava-api/">connect the Strava API</a> or <a href="upload-activity-files/">upload activity files</a> in the web interface.</li>
-</ol>
-<p>Have fun. If you're stuck, <a href="get-help/">get help</a>.</p>
-<h2 id="free-software">Free software</h2>
-<p>You can <a href="https://github.com/martin-ueding/geo-activity-playground">find the code on GitHub</a> where you can also file issues. If you would like to use this yourself or contribute, feel free to reach out via the contact options <a href="https://martin-ueding.de/">from my website</a>. I would especially appreciate improvements to the documentation. If you're familiar with Markdown and GitHub, you can also directly create a pull request. The code is licensed under the very permissive MIT license.</p>
+<h1 id="satellite-elevation-isnt-helpful">Satellite Elevation Isn’t Helpful</h1>
+<p>As you can read in <a href="../elevation-gain-from-noisy-data/">Elevation Gain from Noisy Data</a>, there are certain problems when computing the elevation gain from the GPS measurements. Basically the jitter in the measurements yields to a lot of fake elevation gain when there was none.</p>
+<p>One way to improve the situation is to use a <em>digital elevation model</em> (DEM) where one takes elevation data from elsewhere and computes the elevation based on that. This makes sure that the elevation at every point is unique and doesn't depend on GPS measurement errors. One readily available source is the <a href="https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM">Copernicus DEM</a> provided by the EU.</p>
+<p>One can download elevation maps with a resolution of roughly 30 m. Rendered in false-color, they look like this:</p>
+<p><img alt="" src="../images/copernicus.png" /></p>
+<p>Integrating that into the project allows to compare them. The following is the elevation data extracted from Copernicus DEM:</p>
+<p><img alt="" src="../images/elevation-from-copernicus.png" /></p>
+<p>As you can see, the bridge is taken as the lowest point. With a resolution of 30 m, the bridge likely isn't included. Hence the points have the elevation of the river and are much lower.</p>
+<p>Compare that to the data that was recorded with GPS and without a barometer:</p>
+<p><img alt="" src="../images/elevation-from-measurement.png" /></p>
+<p>Here the bridge is the highest point. However, the absolute numbers are wildly different. I have no idea why they are around 100 m. The Rhine river valley is rather around 50 m, so the DEM has better numbers.</p>
+<p>The problem is that when computing the elevation gain from the DEM data, it counts as if I went down to the river and back up. But that's not the case, I went up the ramp for the bridge and stayed on that level over the river.</p>
+<p>So although that data is good, it isn't of the right kind for this project.</p>
+<h2 id="lidar-data">LiDAR data</h2>
+<p>Looking at <a href="https://bikerouter.de/">Bike Router</a>, which uses <a href="https://sonny.4lima.de/">Sonny’s LiDAR Digital Terrain Models of Europe</a>, has a bit more accuracy. There the bridge seems to have a better height:</p>
+<p><img alt="" src="../images/elevation-from-bikerouter.png" /></p>
+<p>Perhaps it is worthwhile to integrate Sonny's data into this project at some point. It might be better than what is measured with cheap GPS trackers.</p>
+<h2 id="tunnels-and-overpasses">Tunnels and overpasses</h2>
+<p>There still the fundamental issue that there can only be one elevation per coordinate. That means that if one has an intersection of a bridge and an underpass, the intersection point will have one particular value. And that value will be wrong for one of them. With a longer tunnel, this is even worse.</p>
+<p>So no matter how good the data is, the underlying assumption is already wrong. And therefore if one is interested in serious elevation gain data, one needs to invest into a better measurement device with a barometer.</p>
 
 
 
@@ -1508,10 +1486,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.56ea9cef.min.js"></script>
+      <script src="../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
     
   </body>
