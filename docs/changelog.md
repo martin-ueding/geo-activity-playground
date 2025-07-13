@@ -17,6 +17,11 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Bring back the progress bar for activity import.
+- Print the path of the imported activity in the Strava checkout importer.
+
 Fixed:
 
 - Fix photo date extraction by using `strptime` again. ([GH-304](https://github.com/martin-ueding/geo-activity-playground/issues/304))

@@ -4,6 +4,7 @@ import re
 import traceback
 
 import sqlalchemy
+from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
@@ -37,8 +38,22 @@ def import_from_directory(
         and not path.stem.startswith(".")
         and not path.suffix in config.ignore_suffixes
     ]
+    activity_paths.sort()
 
-    for i, activity_path in enumerate(activity_paths):
+    paths_to_import = [
+        activity_path
+        for activity_path in tqdm(
+            activity_paths, desc="Scanning for new files", delay=1
+        )
+        if DB.session.scalar(
+            sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
+        )
+        is None
+    ]
+
+    for i, activity_path in enumerate(
+        tqdm(paths_to_import, desc="Importing activity files", delay=0)
+    ):
         with DB.session.no_autoflush:
             activity = DB.session.scalar(
                 sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
