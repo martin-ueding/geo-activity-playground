@@ -142,9 +142,6 @@ def try_import_strava(
                 / "Strava Activity Metadata"
                 / f"{strava_activity.id}.pickle"
             )
-            # Sometimes we still get an activity here although it has already been imported from the Strava checkout.
-            if cache_file.exists():
-                continue
             cache_file.parent.mkdir(exist_ok=True, parents=True)
             with open(cache_file, "wb") as f:
                 pickle.dump(strava_activity, f)
