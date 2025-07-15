@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Check whether `first_visit` and `last_visit` are `None` before checking the time zone. ([GH-309](https://github.com/martin-ueding/geo-activity-playground/issues/309))
+
 ## Version 1.8.0 — 2025-07-13
 
 This release should have been a patch release (1.7.2), unfortunately I realized this too late. Removing or yanking a release causes more trouble than it is worth.
