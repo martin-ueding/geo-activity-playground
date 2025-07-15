@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "geo-activity-playground"
-version = "1.8.2"
+version = "1.8.3"
 description = "Analysis of geo data activities like rides, runs or hikes."
 authors = ["Martin Ueding <mu@martin-ueding.de>"]
 license = "MIT"
