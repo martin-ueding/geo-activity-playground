@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Rename `Activity.start_local` to `Activity.start_utc` like it should have been named from the beginning. ([GH-325](https://github.com/martin-ueding/geo-activity-playground/issues/325))
+
 ## Version 1.8.1 — 2025-07-15
 
 Fixed:

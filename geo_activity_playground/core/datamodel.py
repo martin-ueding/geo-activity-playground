@@ -231,7 +231,7 @@ class Activity(DB.Model):
             return self.start
 
     @property
-    def start_local(self) -> Optional[datetime.datetime]:
+    def start_utc(self) -> Optional[datetime.datetime]:
         if self.start:
             return self.start.replace(microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC"))
         else:
