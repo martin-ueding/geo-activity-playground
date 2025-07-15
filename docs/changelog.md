@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Use database to see whether Strava activities were already imported. ([GH-321](https://github.com/martin-ueding/geo-activity-playground/issues/321))
+
 ## Version 1.8.2 — 2025-07-15
 
 Fixed:
