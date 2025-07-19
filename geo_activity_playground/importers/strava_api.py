@@ -117,6 +117,9 @@ def try_import_strava(
         for strava_activity in tqdm(
             client.get_activities(after=get_after), desc="Downloading Strava activities"
         ):
+            logger.info(
+                f"Examining Strava activity with ID {strava_activity.id} and name '{strava_activity.name}' …"
+            )
             if (
                 strava_end
                 and strava_activity.start_date is not None
@@ -195,6 +198,7 @@ def try_import_strava(
                 activity.moving_time = detailed_activity.moving_time
 
                 update_and_commit(activity, time_series, config)
+                logger.info(f"Added activity '{activity.name}' from Strava.")
                 compute_tile_visits_new(repository, tile_visit_accessor)
                 compute_tile_evolution(tile_visit_accessor.tile_state, config)
                 tile_visit_accessor.save()
