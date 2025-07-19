@@ -21,6 +21,7 @@ Added:
 
 - Add a bit more logging for Strava API import. ([GH-329](https://github.com/martin-ueding/geo-activity-playground/issues/329))
 - Extract heart rate and cadence from Garmin GPX files. ([GH-327](https://github.com/martin-ueding/geo-activity-playground/issues/327))
+- Allow to upload multiple activities at the same time. ([GH-332](https://github.com/martin-ueding/geo-activity-playground/issues/332))
 
 Fixed:
 
