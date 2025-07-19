@@ -8,6 +8,7 @@ from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import Response
 from flask import url_for
 
 from ...core.activities import ActivityRepository
@@ -59,8 +60,9 @@ def make_upload_blueprint(
         if file.filename == "":
             flash("No selected file", "warning")
             return redirect("/upload")
-        if file:
+        for file in request.files.getlist("file"):
             filename = file.filename
+            assert filename is not None
             target_path = pathlib.Path(request.form["directory"]) / filename
             assert target_path.suffix in [
                 ".csv",
@@ -79,18 +81,18 @@ def make_upload_blueprint(
                 )
                 return redirect(url_for(".index"))
             file.save(target_path)
-            scan_for_activities(
-                repository,
-                tile_visit_accessor,
-                config,
-                skip_strava=True,
-            )
-            latest_activity = DB.session.scalar(
-                sqlalchemy.select(Activity).order_by(Activity.id.desc()).limit(1)
-            )
-            assert latest_activity is not None
-            flash(f"Activity was saved with ID {latest_activity.id}.", "success")
-            return redirect(f"/activity/{latest_activity.id}")
+        scan_for_activities(
+            repository,
+            tile_visit_accessor,
+            config,
+            skip_strava=True,
+        )
+        latest_activity = DB.session.scalar(
+            sqlalchemy.select(Activity).order_by(Activity.id.desc()).limit(1)
+        )
+        assert latest_activity is not None
+        flash(f"Activity was saved with ID {latest_activity.id}.", "success")
+        return redirect(f"/activity/{latest_activity.id}")
 
     @blueprint.route("/refresh")
     @needs_authentication(authenticator)

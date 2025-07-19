@@ -6,7 +6,7 @@
 <form method="post" enctype="multipart/form-data" action="{{ url_for('.receive') }}">
     <div class="mb-3">
         <label for="file1" class="form-label">Activity file</label>
-        <input type="file" name="file" id="file1" class="form-control">
+        <input type="file" name="file" id="file1" class="form-control" multiple>
     </div>
     <div class="mb-3">
         <label for="directory" class="form-label">Target directory</label>
