@@ -240,6 +240,8 @@ def _process_activity(
             zip(activity_tiles["tile_x"], activity_tiles["tile_y"]),
         ):
             if activity.kind.consider_for_achievements:
+                if time is not None and time.tz is None:
+                    time = time.tz_localize("UTC")
                 if tile not in tile_state["tile_visits"][zoom]:
                     new_tile_history_soa["activity_id"].append(activity_id)
                     new_tile_history_soa["time"].append(time)
