@@ -202,9 +202,32 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                     time = dateutil.parser.parse(str(point.time))
                 else:
                     time = None
-                points.append((time, point.latitude, point.longitude, point.elevation))
+                row = {
+                    "time": time,
+                    "latitude": point.latitude,
+                    "longitude": point.longitude,
+                    "elevation": point.elevation,
+                }
+                if point.extensions:
+                    for ext in point.extensions:
+                        if (
+                            ext.tag
+                            == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}TrackPointExtension"
+                        ):
+                            for datum in ext:
+                                if (
+                                    datum.tag
+                                    == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}hr"
+                                ):
+                                    row["heartrate"] = int(datum.text)
+                                if (
+                                    datum.tag
+                                    == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}cad"
+                                ):
+                                    row["cadence"] = int(datum.text)
 
-    df = pd.DataFrame(points, columns=["time", "latitude", "longitude", "elevation"])
+                points.append(row)
+    df = pd.DataFrame(points)
     # Some files don't have elevation information. In these cases we remove the column.
     if not df["elevation"].any():
         del df["elevation"]
