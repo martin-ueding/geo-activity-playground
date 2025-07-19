@@ -22,6 +22,10 @@ Added:
 - Add a bit more logging for Strava API import. ([GH-329](https://github.com/martin-ueding/geo-activity-playground/issues/329))
 - Extract heart rate and cadence from Garmin GPX files. ([GH-327](https://github.com/martin-ueding/geo-activity-playground/issues/327))
 
+Fixed:
+
+- Add another time zone localization. ([GH-331](https://github.com/martin-ueding/geo-activity-playground/issues/331))
+
 ## Version 1.8.3 — 2025-07-15
 
 Fixed:
