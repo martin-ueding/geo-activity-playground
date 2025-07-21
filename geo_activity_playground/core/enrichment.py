@@ -183,14 +183,18 @@ def enrichment_distance(
     if "speed" not in time_series.columns:
         time_series["speed"] = (
             time_series["distance_km"].diff()
-            / (time_series["time"].diff().dt.total_seconds() + 1e-3)
+            / time_series["time"].diff().dt.total_seconds()
             * 3600
         )
+        # divion by 0 causes np.inf/ -np.inf
+        time_series["speed"] = time_series["speed"].replace([0, np.inf, -np.inf], np.nan)
+        time_series.interpolate(inplace=True) # replace 0, nan for nice speed plot
+
         changed = True
 
     potential_jumps = (time_series["speed"] > 40) & (time_series["speed"].diff() > 10)
     if np.any(potential_jumps):
-        time_series.replace(time_series.loc[~potential_jumps])
+        time_series.replace(time_series.loc[~potential_jumps], inplace=True)
         changed = True
 
     if "segment_id" not in time_series.columns:
