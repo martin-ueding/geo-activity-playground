@@ -186,9 +186,9 @@ def enrichment_distance(
             / time_series["time"].diff().dt.total_seconds()
             * 3600
         )
-        # divion by 0 causes np.inf/ -np.inf
-        time_series["speed"] = time_series["speed"].replace([0, np.inf, -np.inf], np.nan)
-        time_series.interpolate(inplace=True) # replace 0, nan for nice speed plot
+        # Division by zero causes infinity. We replace these with NaN and interpolate the values instead.
+        time_series["speed"] = time_series["speed"].replace([np.inf, -np.inf], np.nan)
+        time_series.interpolate(inplace=True)
 
         changed = True
 
