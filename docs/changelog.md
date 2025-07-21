@@ -26,6 +26,7 @@ Added:
 Fixed:
 
 - Add another time zone localization. ([GH-331](https://github.com/martin-ueding/geo-activity-playground/issues/331))
+- Remove speed spikes that stem from data points with the same time stamp. ([GH-328](https://github.com/martin-ueding/geo-activity-playground/issues/328)), ([GH-333](https://github.com/martin-ueding/geo-activity-playground/issues/333))
 
 ## Version 1.8.3 — 2025-07-15
 
