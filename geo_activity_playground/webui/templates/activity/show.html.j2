@@ -308,7 +308,7 @@
                 <tbody>
                     {% for other_activity in similar_activites %}
                     <tr>
-                        <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start|dt
+                        <td><a href="{{ url_for('.show', id=other_activity.id) }}">{{ other_activity.start_local|dt
                                 }}</a></td>
                         <td>{{ other_activity.distance_km | round(1) }}</td>
                         <td>{{ other_activity.elapsed_time|td }}</td>

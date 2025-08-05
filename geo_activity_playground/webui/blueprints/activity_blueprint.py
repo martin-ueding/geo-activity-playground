@@ -207,7 +207,7 @@ def make_activity_blueprint(
     @blueprint.route("/day/<int:year>/<int:month>/<int:day>")
     def day(year: int, month: int, day: int) -> ResponseReturnValue:
         meta = repository.meta
-        selection = meta["start"].dt.date == datetime.date(year, month, day)
+        selection = meta["start_local"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
 
         time_series = [
@@ -258,7 +258,7 @@ def make_activity_blueprint(
     @blueprint.route("/day-sharepic/<int:year>/<int:month>/<int:day>/sharepic.png")
     def day_sharepic(year: int, month: int, day: int) -> ResponseReturnValue:
         meta = repository.meta
-        selection = meta["start"].dt.date == datetime.date(year, month, day)
+        selection = meta["start_local"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
 
         time_series = [
@@ -583,7 +583,7 @@ def name_tick_plot(meta: pd.DataFrame) -> str:
         alt.Chart(meta, title="Repetitions")
         .mark_tick()
         .encode(
-            alt.X("start", title="Date"),
+            alt.X("start_local", title="Date"),
         )
         .to_json(format="vega")
     )
@@ -693,8 +693,8 @@ def make_sharepic(
     facts = {
         "distance_km": f"\n{activity.distance_km:.1f} km",
     }
-    if activity.start:
-        facts["start"] = f"{activity.start.date()}"
+    if activity.start_local_tz:
+        facts["start"] = f"{activity.start_local_tz.date()}"
     if activity.elapsed_time:
         facts["elapsed_time"] = re.sub(r"^0 days ", "", f"{activity.elapsed_time}")
     if activity.kind:
@@ -744,7 +744,7 @@ def make_day_sharepic(
         [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
     )
 
-    date = activities.iloc[0]["start"].date()
+    date = activities.iloc[0]["start_local"].date()
     distance_km = activities["distance_km"].sum()
     elapsed_time: pd.Timedelta = activities["elapsed_time"].sum()
     elapsed_time = elapsed_time.round("s")

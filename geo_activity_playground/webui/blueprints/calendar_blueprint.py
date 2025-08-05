@@ -55,7 +55,7 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
 
         filtered = meta.loc[
             (meta["year"] == year) & (meta["month"] == month)
-        ].sort_values("start")
+        ].sort_values("start_local")
 
         weeks = collections.defaultdict(dict)
         day_of_month = collections.defaultdict(dict)
@@ -67,7 +67,7 @@ def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:
             date += datetime.timedelta(days=1)
 
         for index, row in filtered.iterrows():
-            iso = row["start"].isocalendar()
+            iso = row["start_local"].isocalendar()
             weeks[iso.week][iso.weekday].append(
                 {
                     "name": row["name"],

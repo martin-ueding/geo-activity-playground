@@ -164,7 +164,7 @@ def heatmap_per_day(df: pd.DataFrame, column: ColumnDescription) -> str:
 def _filter_past_year(df: pd.DataFrame) -> pd.DataFrame:
     now = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
     start = now - datetime.timedelta(days=365)
-    return df.loc[df["start"] >= start]
+    return df.loc[df["start_local"] >= start]
 
 
 def make_summary_blueprint(
@@ -181,7 +181,7 @@ def make_summary_blueprint(
         df = apply_search_query(query)
 
         kind_scale = make_kind_scale(repository.meta, config)
-        df_without_nan = df.loc[~pd.isna(df["start"])]
+        df_without_nan = df.loc[~pd.isna(df["start_local"])]
 
         return render_template(
             "summary/index.html.j2",
