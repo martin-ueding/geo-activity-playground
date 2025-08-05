@@ -21,6 +21,7 @@ Fixed:
 
 - Compute Eddington number using local time zone. ([GH-336](https://github.com/martin-ueding/geo-activity-playground/issues/336))
 - Show local time in search table.
+- Use local time for statistics and plots. ([GH-323](https://github.com/martin-ueding/geo-activity-playground/issues/323))
 
 ## Version 1.9.0 — 2025-07-21
 
