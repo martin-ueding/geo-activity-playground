@@ -42,7 +42,7 @@ def make_plot_builder_blueprint(
         spec = PlotSpec(
             name="My New Plot",
             mark="bar",
-            x="year(start):O",
+            x="year(start_local):O",
             y="sum(distance_km)",
             color="kind",
         )

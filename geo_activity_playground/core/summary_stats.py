@@ -10,8 +10,8 @@ def get_equipment_use_table(
             lambda group: pd.Series(
                 {
                     "total_distance_km": group["distance_km"].sum(),
-                    "first_use": group["start"].min(skipna=True),
-                    "last_use": group["start"].max(skipna=True),
+                    "first_use": group["start_local"].min(skipna=True),
+                    "last_use": group["start_local"].max(skipna=True),
                 },
             ),
             include_groups=False,

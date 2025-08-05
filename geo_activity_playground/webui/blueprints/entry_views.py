@@ -64,18 +64,18 @@ def _last_30_days_meta_plot(
     )
     return (
         alt.Chart(
-            meta.loc[meta["start"] > before_30_days],
+            meta.loc[meta["start_local"] > before_30_days],
             width=700,
             height=200,
             title=f"{column.display_name} per day",
         )
         .mark_bar()
         .encode(
-            alt.X("yearmonthdate(start)", title="Date"),
+            alt.X("yearmonthdate(start_local)", title="Date"),
             alt.Y(f"sum({column.name})", title=f"{column.name} / {column.unit}"),
             alt.Color("kind", scale=kind_scale, title="Kind"),
             [
-                alt.Tooltip("yearmonthdate(start)", title="Date"),
+                alt.Tooltip("yearmonthdate(start_local)", title="Date"),
                 alt.Tooltip("kind", title="Kind"),
                 alt.Tooltip(
                     f"sum({column.name})",

@@ -22,9 +22,9 @@ def make_equipment_blueprint(
         )
 
         # Prepare data for the stacked area chart
-        activities = repository.meta.dropna(subset=["start"])
+        activities = repository.meta.dropna(subset=["start_local"])
         activities["month"] = (
-            activities["start"].dt.to_period("M").apply(lambda r: r.start_time)
+            activities["start_local"].dt.to_period("M").apply(lambda r: r.start_time)
         )
         monthly_data = (
             activities.groupby(["month", "equipment"])
@@ -58,7 +58,7 @@ def make_equipment_blueprint(
             selection = repository.meta.loc[repository.meta["equipment"] == equipment]
             total_distances = pd.DataFrame(
                 {
-                    "time": selection["start"],
+                    "time": selection["start_local"],
                     "total_distance_km": selection["distance_km"].cumsum(),
                 }
             )
@@ -95,7 +95,7 @@ def make_equipment_blueprint(
                 )
                 .mark_bar()
                 .encode(
-                    alt.X("year(start):O", title="Year"),
+                    alt.X("year(start_local):O", title="Year"),
                     alt.Y("sum(distance_km)", title="Distance / km"),
                     alt.Color(
                         "kind",
@@ -103,7 +103,7 @@ def make_equipment_blueprint(
                         title="Kind",
                     ),
                     tooltip=[
-                        alt.Tooltip("year(start):O", title="Year"),
+                        alt.Tooltip("year(start_local):O", title="Year"),
                         alt.Tooltip(
                             "sum(distance_km):Q", title="Distance / km", format=".0f"
                         ),

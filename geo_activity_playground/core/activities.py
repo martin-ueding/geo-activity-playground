@@ -40,7 +40,7 @@ class ActivityRepository:
             sqlalchemy.select(Activity).order_by(Activity.start)
         ).all()
         if result:
-            return result[-1].start
+            return result[-1].start_local_tz
         else:
             return None
 

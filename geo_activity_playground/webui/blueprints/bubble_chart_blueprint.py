@@ -25,7 +25,7 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
         # Prepare the bubble chart data
         bubble_data = activities[
             [
-                "start",
+                "start_local",
                 "kind",
                 "activity_id",
                 column_distance.name,
@@ -33,7 +33,7 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
             ]
         ].rename(
             columns={
-                "start": "date",
+                "start_local": "date",
                 "kind": "activity",
                 "activity_id": "id",
             }
