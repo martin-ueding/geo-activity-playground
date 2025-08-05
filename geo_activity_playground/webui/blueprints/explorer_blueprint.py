@@ -173,7 +173,7 @@ def make_explorer_blueprint(
         return redirect(url_for(".map", zoom=zoom))
 
     @blueprint.route(
-        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/missing.<suffix>"
+        "/<int:zoom>/<float(signed=True):north>/<float(signed=True):east>/<float(signed=True):south>/<float(signed=True):west>/missing.<suffix>"
     )
     def download_missing(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
@@ -198,7 +198,7 @@ def make_explorer_blueprint(
         )
 
     @blueprint.route(
-        "/<int:zoom>/<float:north>/<float:east>/<float:south>/<float:west>/explored.<suffix>"
+        "/<int:zoom>/<float(signed=True):north>/<float(signed=True):east>/<float(signed=True):south>/<float(signed=True):west>/explored.<suffix>"
     )
     def download_explored(
         zoom: int, north: float, east: float, south: float, west: float, suffix: str
@@ -424,7 +424,9 @@ def make_explorer_blueprint(
         pl.imsave(f, result, format="png")
         return Response(bytes(f.getbuffer()), mimetype="image/png")
 
-    @blueprint.route("/<int:zoom>/info/<float:latitude>/<float:longitude>")
+    @blueprint.route(
+        "/<int:zoom>/info/<float(signed=True):latitude>/<float(signed=True):longitude>"
+    )
     def info(zoom: int, latitude: float, longitude: float) -> dict:
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
