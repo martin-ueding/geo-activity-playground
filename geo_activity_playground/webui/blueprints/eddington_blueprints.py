@@ -72,20 +72,11 @@ def _render_eddington_template(
         len(activities) > 0
     ), "The filter has selected zero elements, that cannot work here."
 
-    activities["year"] = [start.year for start in activities["start_local"]]
-    activities["date"] = [start.date() for start in activities["start_local"]]
-    activities["isoyear"] = [
-        start.isocalendar().year for start in activities["start_local"]
-    ]
-    activities["isoweek"] = [
-        start.isocalendar().week for start in activities["start_local"]
-    ]
-
     en_per_day, eddington_df_per_day = _get_values_per_group(
         activities.groupby("date"), column_name, divisor
     )
     en_per_week, eddington_df_per_week = _get_values_per_group(
-        activities.groupby(["isoyear", "isoweek"]), column_name, divisor
+        activities.groupby(["iso_year", "week"]), column_name, divisor
     )
 
     return render_template(
@@ -214,8 +205,6 @@ def _get_yearly_eddington(
     meta: pd.DataFrame, columnName: str, divisor: int
 ) -> dict[int, int]:
     meta = meta.dropna(subset=["start_local", columnName]).copy()
-    meta["year"] = [start.year for start in meta["start_local"]]
-    meta["date"] = [start.date() for start in meta["start_local"]]
 
     yearly_eddington = meta.groupby("year").apply(
         lambda group: _get_eddington_number(

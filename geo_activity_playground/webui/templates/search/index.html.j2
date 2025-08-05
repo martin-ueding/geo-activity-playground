@@ -25,8 +25,8 @@
         <tr>
             <td><a href="{{ url_for('activity.show', id=activity['id']) }}">{{ activity['name'] }}</a></td>
             <td>
-                {% if activity['start'] is defined %}
-                {{ activity['start']|dt }}
+                {% if activity['start_local'] is defined %}
+                {{ activity['start_local']|dt }} {{ activity.iana_timezone }}
                 {% endif %}
             </td>
             <td>{{ '%.1f' % activity["distance_km"] }} km</td>
