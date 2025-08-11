@@ -20,6 +20,7 @@ Types of changes
 Fixed:
 
 - Also filter out zero speed values, which can only come from errors. ([GH-333](https://github.com/martin-ueding/geo-activity-playground/issues/333))
+- Cope with GPX files that have points but none with latitude/longitude information. ([GH-334](https://github.com/martin-ueding/geo-activity-playground/issues/334))
 
 ## Version 1.9.1 — 2025-08-05
 
