@@ -229,7 +229,7 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                 points.append(row)
     df = pd.DataFrame(points)
     # Some files don't have elevation information. In these cases we remove the column.
-    if not df["elevation"].any():
+    if "elevation" in df.columns and not df["elevation"].any():
         del df["elevation"]
     return df
 
