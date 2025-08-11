@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Also filter out zero speed values, which can only come from errors. ([GH-333](https://github.com/martin-ueding/geo-activity-playground/issues/333))
+
 ## Version 1.9.1 — 2025-08-05
 
 Fixed:

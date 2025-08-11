@@ -187,7 +187,9 @@ def enrichment_distance(
             * 3600
         )
         # Division by zero causes infinity. We replace these with NaN and interpolate the values instead.
-        time_series["speed"] = time_series["speed"].replace([np.inf, -np.inf], np.nan)
+        time_series["speed"] = time_series["speed"].replace(
+            [0, np.inf, -np.inf], np.nan
+        )
         time_series.interpolate(inplace=True)
 
         changed = True
