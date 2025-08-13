@@ -194,7 +194,7 @@ def import_from_strava_checkout(config: Config) -> None:
 
         start_datetime = dateutil.parser.parse(
             row["Activity Date"], dayfirst=dayfirst
-        ).replace(tzinfo=zoneinfo.ZoneInfo("utc"))
+        ).replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
 
         activity_file = checkout_path / row["Filename"]
 
