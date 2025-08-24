@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Changed:
+
+- Filename of export ZIP archive has a more meaningful name. ([GH-344](https://github.com/martin-ueding/geo-activity-playground/issues/344))
+
 ## Version 1.9.2 — 2025-08-11
 
 Fixed:
