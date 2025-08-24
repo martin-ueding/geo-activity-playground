@@ -25,6 +25,7 @@ Fixed:
 
 - Accept floating point numbers as heart rate in GPX files. ([GH-342](https://github.com/martin-ueding/geo-activity-playground/issues/342))
 - Fix documentation about `--strava-begin` parameter. ([GH-343](https://github.com/martin-ueding/geo-activity-playground/issues/343))
+- Specify UTC timezone as uppercase. ([GH-340](https://github.com/martin-ueding/geo-activity-playground/issues/340))
 
 ## Version 1.9.2 — 2025-08-11
 
