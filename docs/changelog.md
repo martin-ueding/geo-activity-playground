@@ -21,6 +21,10 @@ Changed:
 
 - Filename of export ZIP archive has a more meaningful name. ([GH-344](https://github.com/martin-ueding/geo-activity-playground/issues/344))
 
+Fixed:
+
+- Accept floating point numbers as heart rate in GPX files. ([GH-342](https://github.com/martin-ueding/geo-activity-playground/issues/342))
+
 ## Version 1.9.2 — 2025-08-11
 
 Fixed:

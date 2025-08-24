@@ -219,12 +219,12 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
                                     datum.tag
                                     == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}hr"
                                 ):
-                                    row["heartrate"] = int(datum.text)
+                                    row["heartrate"] = int(float(datum.text))
                                 if (
                                     datum.tag
                                     == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}cad"
                                 ):
-                                    row["cadence"] = int(datum.text)
+                                    row["cadence"] = int(float(datum.text))
 
                 points.append(row)
     df = pd.DataFrame(points)
