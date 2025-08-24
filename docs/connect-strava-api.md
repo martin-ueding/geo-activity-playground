@@ -32,4 +32,4 @@ If you don't want to download new activities from Strava, use `--skip-reload` to
 
 ## Rescan all Strava activities
 
-The scanning of Strava activities resumes after the last activity that was imported. If you want to override this behavior temporarily, you can add `--strava-start YYYY-MM-DD` and/or `--strava-end YYYY-MM-DD` at the end of the command line (after `serve`). Replace the placeholders with a date like 2025-07-13. This will trigger a scan of Strava activities within the specified time range.
+The scanning of Strava activities resumes after the last activity that was imported. If you want to override this behavior temporarily, you can add `--strava-begin YYYY-MM-DD` and/or `--strava-end YYYY-MM-DD` at the end of the command line (after `serve`). Replace the placeholders with a date like 2025-07-13. This will trigger a scan of Strava activities within the specified time range.
