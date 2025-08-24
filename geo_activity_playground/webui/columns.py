@@ -23,13 +23,13 @@ column_elevation_gain = ColumnDescription(
 )
 column_hours = ColumnDescription(
     name="hours",
-    display_name="Elapsed time",
+    display_name="Elapsed Time",
     unit="h",
     format=".1f",
 )
 column_hours_moving = ColumnDescription(
     name="hours_moving",
-    display_name="Moving time",
+    display_name="Moving Time",
     unit="h",
     format=".1f",
 )
