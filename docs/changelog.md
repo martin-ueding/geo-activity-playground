@@ -20,6 +20,7 @@ Types of changes
 Changed:
 
 - Filename of export ZIP archive has a more meaningful name. ([GH-344](https://github.com/martin-ueding/geo-activity-playground/issues/344))
+- Make time series column titles all title case.
 
 Fixed:
 
