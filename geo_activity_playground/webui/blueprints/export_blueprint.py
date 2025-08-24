@@ -8,6 +8,7 @@ from ...core.export import export_all
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 
+from datetime import date
 
 def make_export_blueprint(authenticator: Authenticator) -> Blueprint:
     blueprint = Blueprint("export", __name__, template_folder="templates")
@@ -25,7 +26,7 @@ def make_export_blueprint(authenticator: Authenticator) -> Blueprint:
         return Response(
             bytes(export_all(meta_format, activity_format)),
             mimetype="application/zip",
-            headers={"Content-disposition": 'attachment; filename="export.zip"'},
+            headers={"Content-disposition": f'attachment; filename="GAP-export-{date.today().strftime("%Y-%m-%d")}.zip"'}
         )
 
     return blueprint
