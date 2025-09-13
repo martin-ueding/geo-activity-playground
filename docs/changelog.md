@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Changed:
+
+- File hashes (SHA-256) of activity files will be stored in the database. Activity files with a different path but the same hash will not be imported again. This serves as a deduplication mechanism and also allows for moving activity files after import. This does not deduplicate existing activities. ([GH-330](https://github.com/martin-ueding/geo-activity-playground/issues/330))
+
 ## Version 1.9.3 — 2025-08-24
 
 Changed:
