@@ -132,6 +132,11 @@ EXPECTED_COLUMNS = [
     "Average Grade Adjusted Pace",
     "Timer Time",
     "Total Cycles",
+    "Regeneration",
+    "Mit Haustier",
+    "Wettbewerb",
+    "Langer Lauf",
+    "Für einen guten Zweck",
     "Media",
 ]
 
