@@ -1329,6 +1329,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-194-2025-09-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.9.4 — 2025-09-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-193-2025-08-24" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.9.3 — 2025-08-24
@@ -2362,6 +2371,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-194-2025-09-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.9.4 — 2025-09-13
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-193-2025-08-24" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.9.3 — 2025-08-24
@@ -3391,6 +3409,16 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-194-2025-09-13">Version 1.9.4 — 2025-09-13</h2>
+<p>Changed:</p>
+<ul>
+<li>File hashes (SHA-256) of activity files will be stored in the database. Activity files with a different path but the same hash will not be imported again. This serves as a deduplication mechanism and also allows for moving activity files after import. This does not deduplicate existing activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/330">GH-330</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Make parsing of German Strava CSV header more robust against the addition of new fields. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/348">GH-348</a>)</li>
+<li>Cope with renames of the custom plot builder fields. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/346">GH-346</a>)</li>
+</ul>
 <h2 id="version-193-2025-08-24">Version 1.9.3 — 2025-08-24</h2>
 <p>Changed:</p>
 <ul>
