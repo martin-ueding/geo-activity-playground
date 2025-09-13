@@ -23,7 +23,7 @@ Changed:
 
 Fixed:
 
-- Update expected Strava columns to new format. ([GH-348](https://github.com/martin-ueding/geo-activity-playground/issues/348))
+- Make parsing of German Strava CSV header more robust against the addition of new fields. ([GH-348](https://github.com/martin-ueding/geo-activity-playground/issues/348))
 
 ## Version 1.9.3 — 2025-08-24
 
