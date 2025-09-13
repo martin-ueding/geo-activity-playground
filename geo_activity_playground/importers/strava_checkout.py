@@ -166,7 +166,12 @@ def import_from_strava_checkout(config: Config) -> None:
     if header[0] == EXPECTED_COLUMNS[0]:
         dayfirst = False
     elif header[0] == "Aktivitäts-ID":
-        header = EXPECTED_COLUMNS
+        new_header = list(EXPECTED_COLUMNS)
+        if len(new_header) > len(header):
+            new_header = new_header[: len(header)]
+        elif len(new_header) < len(header):
+            new_header += [f"Ignored_{i}" for i in range(len(header) - len(new_header))]
+        header = new_header
         dayfirst = True
     else:
         logger.error(
