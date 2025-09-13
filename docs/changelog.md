@@ -24,6 +24,7 @@ Changed:
 Fixed:
 
 - Make parsing of German Strava CSV header more robust against the addition of new fields. ([GH-348](https://github.com/martin-ueding/geo-activity-playground/issues/348))
+- Cope with renames of the custom plot builder fields. ([GH-346](https://github.com/martin-ueding/geo-activity-playground/issues/346))
 
 ## Version 1.9.3 — 2025-08-24
 

@@ -66,7 +66,17 @@ GROUP_BY_VARIABLES = {
 VARIABLES_1 = {"": "", **DISCRETE_VARIABLES}
 VARIABLES_2 = {"": "", **DISCRETE_VARIABLES, **CONTINUOUS_VARIABLES}
 
-RENAMES = {"year(start):O": "year(start_local):O"}
+RENAMES = {
+    "year(start):O": "year(start_local):O",
+    "yearquarter(start)": "yearquarter(start_local)",
+    "yearquartermonth(start)": "yearquartermonth(start_local)",
+    "yearmonth(start)": "yearmonth(start_local)",
+    "quarter(start)": "quarter(start_local)",
+    "quartermonth(start)": "quartermonth(start_local)",
+    "month(start)": "month(start_local)",
+    "date(start)": "date(start_local)",
+    "weekday(start)": "weekday(start_local)",
+}
 
 
 def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
