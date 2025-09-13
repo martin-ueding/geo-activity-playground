@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import pathlib
 import re
@@ -51,12 +52,27 @@ def import_from_directory(
         is None
     ]
 
+    for activity in DB.session.scalars(
+        sqlalchemy.select(Activity).filter(
+            Activity.upstream_id.is_(sqlalchemy.null()),
+            Activity.path.is_not(sqlalchemy.null()),
+        )
+    ):
+        assert activity.path is not None
+        if pathlib.Path(activity.path).exists():
+            activity.upstream_id = file_sha256(pathlib.Path(activity.path))
+    DB.session.commit()
+
     for i, activity_path in enumerate(
         tqdm(paths_to_import, desc="Importing activity files", delay=0)
     ):
         with DB.session.no_autoflush:
             activity = DB.session.scalar(
                 sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
+            ) or DB.session.scalar(
+                sqlalchemy.select(Activity).filter(
+                    Activity.upstream_id == file_sha256(activity_path)
+                )
             )
             if activity is None:
                 import_from_file(
@@ -87,6 +103,7 @@ def import_from_file(
         return
 
     activity.path = str(path)
+    activity.upstream_id = file_sha256(path)
     if activity.name is None:
         activity.name = path.name.removesuffix("".join(path.suffixes))
 
@@ -120,3 +137,16 @@ def _get_metadata_from_path(
         if m := re.search(regex, str(path.relative_to(ACTIVITY_DIR))):
             return m.groupdict()
     return {}
+
+
+def file_sha256(filename: pathlib.Path) -> str:
+    """
+    Based on https://stackoverflow.com/a/44873382/653152.
+    """
+    h = hashlib.sha256(usedforsecurity=False)
+    b = bytearray(128 * 1024)
+    mv = memoryview(b)
+    with open(filename, "rb", buffering=0) as f:
+        while n := f.readinto(mv):
+            h.update(mv[:n])
+    return h.hexdigest()
