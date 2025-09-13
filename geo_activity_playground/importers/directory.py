@@ -69,15 +69,25 @@ def import_from_directory(
         with DB.session.no_autoflush:
             activity = DB.session.scalar(
                 sqlalchemy.select(Activity).filter(Activity.path == str(activity_path))
-            ) or DB.session.scalar(
+            )
+            if activity is not None:
+                continue
+
+            with_same_hash = DB.session.scalars(
                 sqlalchemy.select(Activity).filter(
                     Activity.upstream_id == file_sha256(activity_path)
                 )
-            )
-            if activity is None:
-                import_from_file(
-                    activity_path, repository, tile_visit_accessor, config, i
-                )
+            ).all()
+            if with_same_hash:
+                if len(with_same_hash) == 1:
+                    continue
+                else:
+                    logger.warning(
+                        "The following activities are duplicates: "
+                        + ", ".join(str(activity.id) for activity in with_same_hash)
+                    )
+
+            import_from_file(activity_path, repository, tile_visit_accessor, config, i)
 
 
 def import_from_file(
