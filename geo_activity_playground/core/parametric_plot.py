@@ -66,8 +66,14 @@ GROUP_BY_VARIABLES = {
 VARIABLES_1 = {"": "", **DISCRETE_VARIABLES}
 VARIABLES_2 = {"": "", **DISCRETE_VARIABLES, **CONTINUOUS_VARIABLES}
 
+RENAMES = {"year(start):O": "year(start_local):O"}
+
 
 def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
+    # Update renamed fields.
+    for field in spec.FIELDS:
+        setattr(spec, field, RENAMES.get(getattr(spec, field), getattr(spec, field)))
+
     if spec.group_by:
         grouped = df.groupby(spec.group_by)
     else:
