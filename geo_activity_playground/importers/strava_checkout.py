@@ -19,8 +19,6 @@ from ..core.datamodel import get_or_make_equipment
 from ..core.datamodel import get_or_make_kind
 from ..core.enrichment import update_and_commit
 from ..core.paths import activity_extracted_meta_dir
-from ..core.tasks import get_state
-from ..core.tasks import set_state
 from ..core.tasks import work_tracker_path
 from ..core.tasks import WorkTracker
 from .activity_parsers import ActivityParseError
