@@ -14,31 +14,83 @@
 
 <div class="row mb-3">
     <div class="col">
-        <p>You have {{ num_tiles }} explored tiles. There are {{ num_cluster_tiles }} cluster tiles in
-            total. Your largest cluster consists of {{ max_cluster_size }} tiles. Your largest square has size
-            {{ square_size }}².
+        <p>
+            You have {{ num_tiles }} explored tiles.  
+            There are {{ num_cluster_tiles }} cluster tiles in total.
         </p>
-        <p>Open the <a
+        <p>    
+            Your largest cluster consists of {{ max_cluster_size }} tiles.  
+            {% if second_cluster_size > 0 %}
+            <br>
+            Your second-largest cluster consists of {{ second_cluster_size }} tiles.  
+            {% endif %}
+            <br>
+            Your largest square has size {{ square_size }}².
+        </p>
+        <p>
+            Open the <a
                 href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">Square
-                Planner</a> to plan the next extension.</p>
+                Planner</a> to plan the next extension.
+        </p>
     </div>
 </div>
 
 <div class="row mb-3">
     <div class="col">
+<div class="btn-group mb-2" role="group">
+    <button id="btn-largest" class="btn btn-sm btn-outline-primary" onclick="focusCluster('largest')">Focus Largest Cluster</button>
+    {% if second_cluster_size > 0 %}
+    <button id="btn-second" class="btn btn-sm btn-outline-primary" onclick="focusCluster('second')">Focus Second Cluster</button>
+    {% endif %}
+</div>
+
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
-        <p>Download tiles in visible area: <a href="#" onclick="downloadAs('explored.geojson')">Explored as GeoJSON</a>,
-            <a href="#" onclick="downloadAs('explored.gpx')"">Explored as GPX</a>, <a href=" #"
-                onclick="downloadAs('missing.geojson')">Missing as GeoJSON</a> or <a href="#"
-                onclick="downloadAs('missing.gpx')"">Missing as GPX</a>.</p>
+        <p>
+            Download tiles in visible area: 
+            <a href="#" onclick="downloadAs('explored.geojson')">Explored as GeoJSON</a>,
+            <a href="#" onclick="downloadAs('explored.gpx')">Explored as GPX</a>,
+            <a href="#" onclick="downloadAs('missing.geojson')">Missing as GeoJSON</a> or
+            <a href="#" onclick="downloadAs('missing.gpx')">Missing as GPX</a>.
+        </p>
         <script>
             const center_latitude = {{ center.latitude }};
             const center_longitude = {{ center.longitude }};
             const zoom = {{ zoom }};
             const bbox = {{ center.bbox | safe }};
+            const second_bbox = {{ center.second_bbox | safe if center.second_bbox else "null" }};
             const map_tile_attribution = '{{ map_tile_attribution|safe }}';
+
+            function focusCluster(which) {
+                let target;
+                if (which === 'largest') {
+                    target = (typeof bbox === "string") ? JSON.parse(bbox) : bbox;
+                } else if (which === 'second') {
+                    target = (typeof second_bbox === "string") ? JSON.parse(second_bbox) : second_bbox;
+                }
+
+                if (target && target.type === "Feature") {
+                    const coords = target.geometry.coordinates[0].map(c => [c[1], c[0]]);
+                    const bounds = L.latLngBounds(coords);
+                    if (window.map) {
+                        window.map.fitBounds(bounds);
+                    }
+                }
+
+                // highlight active button
+                document.querySelectorAll(".btn-group .btn").forEach(btn => {
+                    btn.classList.remove("btn-primary");
+                    btn.classList.add("btn-outline-primary");
+                });
+                if (which === 'largest') {
+                    document.getElementById("btn-largest").classList.remove("btn-outline-primary");
+                    document.getElementById("btn-largest").classList.add("btn-primary");
+                } else if (which === 'second') {
+                    document.getElementById("btn-second").classList.remove("btn-outline-primary");
+                    document.getElementById("btn-second").classList.add("btn-primary");
+                }
+            }
         </script>
-        <script src=" /static/server-side-explorer.js"></script>
+        <script src="/static/server-side-explorer.js"></script>
     </div>
 </div>
 

@@ -58,18 +58,27 @@ class ColorStrategy(abc.ABC):
         pass
 
 
+def largest_two_clusters(clusters: Iterable[list[tuple[int, int]]]) -> list[list[tuple[int, int]]]:
+    """Return largest and second-largest clusters (if available)."""
+    sorted_clusters = sorted(clusters, key=len, reverse=True)
+    return sorted_clusters[:2]
+
+
 class MaxClusterColorStrategy(ColorStrategy):
     def __init__(self, evolution_state, tile_visits):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
-        self.max_cluster_members = max(
-            evolution_state.clusters.values(),
-            key=len,
-        )
+        clusters = largest_two_clusters(evolution_state.clusters.values())
+        self.max_cluster_members = clusters[0] if clusters else []
+        self.second_cluster_members = clusters[1] if len(clusters) > 1 else []
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.max_cluster_members:
+            # largest cluster → blue
             return np.array([[[55, 126, 184, 70]]]) / 255
+        elif tile_xy in self.second_cluster_members:
+            # second-largest cluster → orange
+            return np.array([[[255, 127, 0, 70]]]) / 255
         elif tile_xy in self.evolution_state.memberships:
             return np.array([[[77, 175, 74, 70]]]) / 255
         elif tile_xy in self.tile_visits:
@@ -237,6 +246,10 @@ def make_explorer_blueprint(
             medians["tile_x"], medians["tile_y"], zoom
         )
 
+        cluster_sizes = sorted([len(c) for c in tile_evolution_state.clusters.values()], reverse=True)
+        max_size = cluster_sizes[0] if cluster_sizes else 0
+        second_size = cluster_sizes[1] if len(cluster_sizes) > 1 else 0
+
         context = {
             "center": {
                 "latitude": median_lat,
@@ -246,6 +259,13 @@ def make_explorer_blueprint(
                         tile_evolution_state.clusters.values(), zoom
                     )
                     if len(tile_evolution_state.memberships) > 0
+                    else {}
+                ),
+                "second_bbox": (
+                    bounding_box_for_second_cluster(
+                        tile_evolution_state.clusters.values(), zoom
+                    )
+                    if len(tile_evolution_state.clusters) > 1
                     else {}
                 ),
             },
@@ -262,17 +282,17 @@ def make_explorer_blueprint(
             "square_x": tile_evolution_state.square_x,
             "square_y": tile_evolution_state.square_y,
             "square_size": tile_evolution_state.max_square_size,
-            "max_cluster_size": max(map(len, tile_evolution_state.clusters.values())),
+            "max_cluster_size": max_size,
+            "second_cluster_size": second_size,
         }
         return render_template("explorer/server-side.html.j2", **context)
+
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 
-        # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
-        # grayscale = image_transforms["grayscale"].transform_image(map_tile)
         grayscale = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
         square_line_width = 3
         square_color = np.array([[[228, 26, 28, 255]]]) / 256
@@ -466,6 +486,36 @@ def bounding_box_for_biggest_cluster(
     max_x = max(x for x, y in biggest_cluster)
     min_y = min(y for x, y in biggest_cluster)
     max_y = max(y for x, y in biggest_cluster)
+    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
+    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
+    return geojson.dumps(
+        geojson.Feature(
+            geometry=geojson.Polygon(
+                [
+                    [
+                        (lon_min, lat_max),
+                        (lon_max, lat_max),
+                        (lon_max, lat_min),
+                        (lon_min, lat_min),
+                        (lon_min, lat_max),
+                    ]
+                ]
+            ),
+        )
+    )
+
+
+def bounding_box_for_second_cluster(
+    clusters: Iterable[list[tuple[int, int]]], zoom: int
+) -> Optional[str]:
+    sorted_clusters = sorted(clusters, key=len, reverse=True)
+    if len(sorted_clusters) < 2:
+        return None
+    second_cluster = sorted_clusters[1]
+    min_x = min(x for x, y in second_cluster)
+    max_x = max(x for x, y in second_cluster)
+    min_y = min(y for x, y in second_cluster)
+    max_y = max(y for x, y in second_cluster)
     lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
     lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
     return geojson.dumps(
