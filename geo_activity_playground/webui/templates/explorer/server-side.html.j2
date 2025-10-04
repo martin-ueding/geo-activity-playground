@@ -22,7 +22,7 @@
             Your largest cluster consists of {{ max_cluster_size }} tiles.  
             {% if second_cluster_size > 0 %}
             <br>
-            Your second-largest cluster consists of {{ second_cluster_size }} tiles.  
+            Your second-largest cluster consists of {{ second_cluster_size }} tiles. That's {{ "%.1f"|format((second_cluster_size / max_cluster_size) * 100) }}% of the largest cluster. 
             {% endif %}
             <br>
             Your largest square has size {{ square_size }}².
