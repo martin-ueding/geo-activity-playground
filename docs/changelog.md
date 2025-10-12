@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Clusters can be bookmarked in order to allow explorer tile fun on vacation or after a move. ([GH-357](https://github.com/martin-ueding/geo-activity-playground/issues/357))
+
 ## Version 1.9.4 — 2025-09-13
 
 Changed:
