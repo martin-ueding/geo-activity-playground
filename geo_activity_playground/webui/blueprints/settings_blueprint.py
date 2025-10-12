@@ -18,6 +18,7 @@ from ...core.config import ConfigAccessor
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Equipment
+from ...core.datamodel import ExplorerTileBookmark
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
 from ...core.enrichment import update_and_commit
@@ -109,6 +110,29 @@ def make_settings_blueprint(
                 password=config_accessor().upload_password,
             )
         )
+
+    @blueprint.route("/cluster-bookmarks/new", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def cluster_bookmark_new():
+        if request.method == "POST":
+            bm = ExplorerTileBookmark(
+                name=request.form["name"],
+                zoom=int(request.form["zoom"]),
+                tile_x=int(request.form["tile_x"]),
+                tile_y=int(request.form["tile_y"]),
+            )
+            DB.session.add(bm)
+            DB.session.commit()
+            return redirect(
+                url_for("explorer.server_side", zoom=int(request.form["zoom"]))
+            )
+        else:
+            return render_template(
+                "settings/cluster-bookmarks-new.html.j2",
+                zoom=request.args["zoom"],
+                tile_x=request.args["tile_x"],
+                tile_y=request.args["tile_y"],
+            )
 
     @blueprint.route("/color-schemes", methods=["GET", "POST"])
     @needs_authentication(authenticator)
