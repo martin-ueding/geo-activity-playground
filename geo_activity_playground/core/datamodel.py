@@ -497,3 +497,16 @@ class Photo(DB.Model):
     @property
     def path(self) -> pathlib.Path:
         return pathlib.Path(self.filename)
+
+
+class ExplorerTileBookmark(DB.Model):
+    __tablename__ = "explorer_tile_bookmarks"
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.tile_x}, {self.tile_y}) @ {self.zoom}"
