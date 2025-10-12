@@ -24,6 +24,17 @@
     </div>
 </div>
 
+{% if bookmarks %}
+<div class="btn-group mb-3" role="group" aria-label="Cluster bookmarks">
+    <button type="button" class="btn btn-primary" onclick='centerOn({{ center.bbox | safe }})'>Biggest ({{
+        max_cluster_size }})</button>
+    {% for bookmark in bookmarks %}
+    <button type="button" class="btn btn-primary" onclick='centerOn({{ bookmark.bbox | safe }})'>{{ bookmark.name }} ({{
+        bookmark.size }})</button>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="row mb-3">
     <div class="col">
         <div id="explorer-map" class="mb-1" style="height: 800px;"></div>

@@ -4,6 +4,7 @@ import hashlib
 import io
 import logging
 from collections.abc import Iterable
+from typing import Any
 from typing import Optional
 from typing import Union
 
@@ -13,6 +14,7 @@ import matplotlib
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
+import sqlalchemy
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -26,6 +28,7 @@ from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
+from ...core.datamodel import ExplorerTileBookmark
 from ...core.raster_map import ImageTransform
 from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import TileGetter
@@ -237,6 +240,27 @@ def make_explorer_blueprint(
             medians["tile_x"], medians["tile_y"], zoom
         )
 
+        bookmarks: list[dict[str, Any]] = []
+        for bookmark in DB.session.scalars(
+            sqlalchemy.select(ExplorerTileBookmark).where(
+                ExplorerTileBookmark.zoom == zoom
+            )
+        ).all():
+            tile = (bookmark.tile_x, bookmark.tile_y)
+            representative = tile_evolution_state.memberships.get(tile, None)
+            if not representative:
+                continue
+            cluster = tile_evolution_state.clusters.get(representative, None)
+            if not cluster:
+                continue
+            bookmarks.append(
+                {
+                    "name": bookmark.name,
+                    "bbox": geojson_bounding_box_for_tile_collection(cluster, zoom),
+                    "size": len(cluster),
+                }
+            )
+
         context = {
             "center": {
                 "latitude": median_lat,
@@ -263,6 +287,7 @@ def make_explorer_blueprint(
             "square_y": tile_evolution_state.square_y,
             "square_size": tile_evolution_state.max_square_size,
             "max_cluster_size": max(map(len, tile_evolution_state.clusters.values())),
+            "bookmarks": bookmarks,
         }
         return render_template("explorer/server-side.html.j2", **context)
 
