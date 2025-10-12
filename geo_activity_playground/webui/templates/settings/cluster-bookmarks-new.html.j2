@@ -1,0 +1,29 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">Create Explorer Tile Cluster Bookmark</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" />
+    </div>
+    <div class="mb-3">
+        <label for="zoom" class="form-label">Zoom</label>
+        <input type="number" class="form-control" id="zoom" name="zoom" value="{{ zoom }}" />
+    </div>
+    <div class="mb-3">
+        <label for="tile_x" class="form-label">Tile X</label>
+        <input type="number" class="form-control" id="tile_x" name="tile_x" value="{{ tile_x }}" />
+    </div>
+    <div class="mb-3">
+        <label for="tile_y" class="form-label">Tile Y</label>
+        <input type="number" class="form-control" id="tile_y" name="tile_y" value="{{ tile_y }}" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+
+{% endblock %}
