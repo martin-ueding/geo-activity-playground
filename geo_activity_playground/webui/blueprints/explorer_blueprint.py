@@ -468,10 +468,16 @@ def bounding_box_for_biggest_cluster(
     clusters: Iterable[list[tuple[int, int]]], zoom: int
 ) -> str:
     biggest_cluster = max(clusters, key=lambda members: len(members))
-    min_x = min(x for x, y in biggest_cluster)
-    max_x = max(x for x, y in biggest_cluster)
-    min_y = min(y for x, y in biggest_cluster)
-    max_y = max(y for x, y in biggest_cluster)
+    return geojson_bounding_box_for_tile_collection(biggest_cluster, zoom)
+
+
+def geojson_bounding_box_for_tile_collection(
+    tiles: list[tuple[int, int]], zoom: int
+) -> str:
+    min_x = min(x for x, y in tiles)
+    max_x = max(x for x, y in tiles)
+    min_y = min(y for x, y in tiles)
+    max_y = max(y for x, y in tiles)
     lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
     lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
     return geojson.dumps(

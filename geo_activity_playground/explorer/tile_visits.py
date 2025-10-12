@@ -76,8 +76,13 @@ class TileHistoryRow(TypedDict):
 class TileEvolutionState:
     def __init__(self) -> None:
         self.num_neighbors: dict[tuple[int, int], int] = {}
+        "Mapping from tile to the number of its neighbors."
+
         self.memberships: dict[tuple[int, int], tuple[int, int]] = {}
+        "Mapping from tile to the representative tile."
         self.clusters: dict[tuple[int, int], list[tuple[int, int]]] = {}
+        "Mapping from representative tile to the list of all cluster members."
+
         self.cluster_evolution = pd.DataFrame()
         self.square_start = 0
         self.cluster_start = 0
