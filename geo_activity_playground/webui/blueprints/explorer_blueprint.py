@@ -450,6 +450,12 @@ def make_explorer_blueprint(
                         evolution_state.memberships.get(tile_xy, None), []
                     )
                 ),
+                "new_bookmark_url": url_for(
+                    "settings.cluster_bookmark_new",
+                    zoom=zoom,
+                    tile_x=tile_xy[0],
+                    tile_y=tile_xy[1],
+                ),
             }
         else:
             result = {}
