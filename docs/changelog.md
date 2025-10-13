@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Show table with relative cluster sizes for all bookmarked clusters. ([GH-357](https://github.com/martin-ueding/geo-activity-playground/issues/357))
+
 ## Version 1.10.0 — 2025-10-12
 
 Added:
