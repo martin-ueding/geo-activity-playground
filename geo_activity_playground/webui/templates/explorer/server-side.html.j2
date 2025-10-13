@@ -26,11 +26,10 @@
 
 {% if bookmarks %}
 <div class="btn-group mb-3" role="group" aria-label="Cluster bookmarks">
-    <button type="button" class="btn btn-primary" onclick='centerOn({{ center.bbox | safe }})'>Biggest ({{
-        max_cluster_size }})</button>
+    <button type="button" class="btn btn-primary" onclick='centerOn({{ center.bbox | safe }})'>Biggest</button>
     {% for bookmark in bookmarks %}
-    <button type="button" class="btn btn-primary" onclick='centerOn({{ bookmark.bbox | safe }})'>{{ bookmark.name }} ({{
-        bookmark.size }})</button>
+    <button type="button" class="btn btn-primary" onclick='centerOn({{ bookmark.bbox | safe }})'>{{ bookmark.name
+        }}</button>
     {% endfor %}
 </div>
 {% endif %}
@@ -53,11 +52,32 @@
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col">
-        <h2>Tile history</h2>
-    </div>
-</div>
+
+{% if bookmarks %}
+<h2 class="mb-3">Bookmarked cluster sizes</h2>
+
+<table class="table mb-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Tiles</th>
+            <th>Relative to maximum</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bookmark in bookmarks %}
+        <tr>
+            <td>{{ bookmark.name }}</td>
+            <td>{{ bookmark.size }}</td>
+            <td>{{ '%.1f'|format(bookmark.size / max_cluster_size * 100) }} %</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+
+<h2 class="mb-3">Tile history</h2>
 
 <div class="row mb-3">
     <div class="col-md-4">
