@@ -84,7 +84,12 @@ map.on('click', e => {
             ]
             if (data.this_cluster_size) {
                 lines.push(`<dt>This cluster size</dt><dd>${data.this_cluster_size}</dd>`)
-                lines.push(`<dt>Bookmark</dt><dd><a href="${data.new_bookmark_url}">Create cluster bookmark</a></dd>`)
+                if (data.new_bookmark_url === undefined) {
+                    console.error("Somehow we got a cluster that doesn't have a proper URL. This is the data that we got in response:")
+                    console.error(data)
+                } else {
+                    lines.push(`<dt>Bookmark</dt><dd><a href="${data.new_bookmark_url}">Create cluster bookmark</a></dd>`)
+                }
             }
 
             L.popup()
