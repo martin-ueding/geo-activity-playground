@@ -19,8 +19,12 @@ Types of changes
 
 Added:
 
-- Add delete feature for cluster bookmarks. ([GH-357](https://github.com/martin-ueding/geo-activity-playground/issues/357))
+- Add delete feature for cluster bookmarks. ([GH-362](https://github.com/martin-ueding/geo-activity-playground/issues/362))
 - Add max cluster as a row in the cluster bookmark table. ([GH-357](https://github.com/martin-ueding/geo-activity-playground/issues/357))
+
+Fixed:
+
+- Only show bookmark URL when it is defined, give an error message otherwise. ([GH-361](https://github.com/martin-ueding/geo-activity-playground/issues/361))
 
 ## Version 1.11.0 — 2025-10-13
 
