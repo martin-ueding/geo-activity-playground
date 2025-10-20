@@ -255,6 +255,7 @@ def make_explorer_blueprint(
                 continue
             bookmarks.append(
                 {
+                    "id": bookmark.id,
                     "name": bookmark.name,
                     "bbox": geojson_bounding_box_for_tile_collection(cluster, zoom),
                     "size": len(cluster),
