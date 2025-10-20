@@ -25,6 +25,10 @@ class Config:
     color_scheme_for_counts: str = "teals"
     color_scheme_for_kind: str = "category10"
     color_scheme_for_heatmap: str = "hot"
+    color_strategy_max_cluster_color: str = "#377eb84d"
+    color_strategy_max_cluster_other_color: str = "#4daf4a4d"
+    color_strategy_visited_color: str = "#0000004d"
+    color_strategy_cmap_opacity: float = 0.5
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     explorer_zoom_levels: list[int] = dataclasses.field(
         default_factory=lambda: [14, 17]

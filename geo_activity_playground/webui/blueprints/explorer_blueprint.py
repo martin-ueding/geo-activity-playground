@@ -1,7 +1,9 @@
 import abc
 import datetime
+import functools
 import hashlib
 import io
+import itertools
 import logging
 from collections.abc import Iterable
 from typing import Any
@@ -24,6 +26,7 @@ from flask import Response
 from flask import url_for
 from flask.typing import ResponseReturnValue
 
+from ...core.config import Config
 from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
@@ -55,6 +58,15 @@ def blend_color(
     return (1 - opacity) * base + opacity * addition
 
 
+@functools.cache
+def hex_color_to_float(color: str) -> np.ndarray:
+    values = [int("".join(x), base=16) / 255 for x in itertools.batched(color[1:], 2)]
+    assert (
+        min(values) >= 0.0 and max(values) <= 1.0
+    ), f"All {values=} must be within 0.0 and 1.0."
+    return np.array([[values]])
+
+
 class ColorStrategy(abc.ABC):
     @abc.abstractmethod
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
@@ -62,27 +74,32 @@ class ColorStrategy(abc.ABC):
 
 
 class MaxClusterColorStrategy(ColorStrategy):
-    def __init__(self, evolution_state, tile_visits):
+    def __init__(self, evolution_state, tile_visits, config: Config):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
         self.max_cluster_members = max(
             evolution_state.clusters.values(),
             key=len,
         )
+        self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.max_cluster_members:
-            return np.array([[[55, 126, 184, 70]]]) / 255
+            return hex_color_to_float(self._config.color_strategy_max_cluster_color)
         elif tile_xy in self.evolution_state.memberships:
-            return np.array([[[77, 175, 74, 70]]]) / 255
+            return hex_color_to_float(
+                self._config.color_strategy_max_cluster_other_color
+            )
         elif tile_xy in self.tile_visits:
-            return np.array([[[0, 0, 0, 70]]]) / 255
+            return hex_color_to_float(self._config.color_strategy_visited_color)
         else:
             return None
 
 
 class ColorfulClusterColorStrategy(ColorStrategy):
-    def __init__(self, evolution_state: TileEvolutionState, tile_visits):
+    def __init__(
+        self, evolution_state: TileEvolutionState, tile_visits, config: Config
+    ):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
         self.max_cluster_members = max(
@@ -90,6 +107,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
             key=len,
         )
         self._cmap = matplotlib.colormaps["hsv"]
+        self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.evolution_state.memberships:
@@ -97,17 +115,20 @@ class ColorfulClusterColorStrategy(ColorStrategy):
             m = hashlib.sha256()
             m.update(str(cluster_id).encode())
             d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
-            return np.array([[self._cmap(d)[:3] + (0.5,)]])
+            return np.array(
+                [[self._cmap(d)[:3] + (self._config.color_strategy_cmap_opacity,)]]
+            )
         elif tile_xy in self.tile_visits:
-            return np.array([[[0, 0, 0, 70]]]) / 255
+            return hex_color_to_float(self._config.color_strategy_visited_color)
         else:
             return None
 
 
 class VisitTimeColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, use_first=True):
+    def __init__(self, tile_visits, config: Config, use_first=True):
         self.tile_visits = tile_visits
         self.use_first = use_first
+        self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.tile_visits:
@@ -118,39 +139,43 @@ class VisitTimeColorStrategy(ColorStrategy):
                 tile_info["first_time"] if self.use_first else tile_info["last_time"]
             )
             if pd.isna(relevant_time):
-                color = np.array([[[0, 0, 0, 70]]]) / 255
+                color = hex_color_to_float(self._config.color_strategy_visited_color)
             else:
                 last_age_days = (today - relevant_time.date()).days
                 color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-                color = np.array([[color[:3] + (0.5,)]])
+                color = np.array(
+                    [[color[:3] + (self._config.color_strategy_cmap_opacity,)]]
+                )
             return color
         else:
             return None
 
 
 class NumVisitsColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits):
+    def __init__(self, tile_visits, config: Config):
         self.tile_visits = tile_visits
+        self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
             color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
-            return np.array([[color[:3] + (0.5,)]])
+            return np.array([[color[:3] + (self._config.color_strategy_cmap_opacity,)]])
         else:
             return None
 
 
 class MissingColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits):
+    def __init__(self, tile_visits, config: Config):
         self.tile_visits = tile_visits
+        self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
         if tile_xy in self.tile_visits:
             return None
         else:
-            return np.array([[[0, 0, 0, 70]]]) / 255
+            return hex_color_to_float(self._config.color_strategy_visited_color)
 
 
 def make_explorer_blueprint(
@@ -159,6 +184,7 @@ def make_explorer_blueprint(
     config_accessor: ConfigAccessor,
     tile_getter: TileGetter,
     image_transforms: dict[str, ImageTransform],
+    config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
@@ -308,19 +334,25 @@ def make_explorer_blueprint(
             color_strategy_name = config_accessor().cluster_color_strategy
         match color_strategy_name:
             case "max_cluster":
-                color_strategy = MaxClusterColorStrategy(evolution_state, tile_visits)
+                color_strategy = MaxClusterColorStrategy(
+                    evolution_state, tile_visits, config
+                )
             case "colorful_cluster":
                 color_strategy = ColorfulClusterColorStrategy(
-                    evolution_state, tile_visits
+                    evolution_state, tile_visits, config
                 )
             case "first":
-                color_strategy = VisitTimeColorStrategy(tile_visits, use_first=True)
+                color_strategy = VisitTimeColorStrategy(
+                    tile_visits, config, use_first=True
+                )
             case "last":
-                color_strategy = VisitTimeColorStrategy(tile_visits, use_first=False)
+                color_strategy = VisitTimeColorStrategy(
+                    tile_visits, config, use_first=False
+                )
             case "visits":
-                color_strategy = NumVisitsColorStrategy(tile_visits)
+                color_strategy = NumVisitsColorStrategy(tile_visits, config)
             case "missing":
-                color_strategy = MissingColorStrategy(tile_visits)
+                color_strategy = MissingColorStrategy(tile_visits, config)
             case _:
                 raise ValueError("Unsupported color strategy.")
 

@@ -226,6 +226,7 @@ def web_ui_main(
             config_accessor,
             tile_getter,
             image_transforms,
+            config,
         ),
         "/export": make_export_blueprint(authenticator),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, search_query_history),
