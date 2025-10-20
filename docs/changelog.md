@@ -25,6 +25,7 @@ Added:
 Fixed:
 
 - Only show bookmark URL when it is defined, give an error message otherwise. ([GH-361](https://github.com/martin-ueding/geo-activity-playground/issues/361))
+- Fix layer name. ([GH-352](https://github.com/martin-ueding/geo-activity-playground/issues/000)), ([GH-360](https://github.com/martin-ueding/geo-activity-playground/issues/360))
 
 ## Version 1.11.0 — 2025-10-13
 
