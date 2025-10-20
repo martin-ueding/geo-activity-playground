@@ -184,6 +184,33 @@ def make_settings_blueprint(
             color_scheme_for_heatmap_avail=MATPLOTLIB_COLOR_SCHEMES_CONTINUOUS,
         )
 
+    @blueprint.route("/color-strategy", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def color_strategy():
+        if request.method == "POST":
+            config_accessor().color_strategy_max_cluster_color = request.form[
+                "color_strategy_max_cluster_color"
+            ]
+            config_accessor().color_strategy_max_cluster_other_color = request.form[
+                "color_strategy_max_cluster_other_color"
+            ]
+            config_accessor().color_strategy_visited_color = request.form[
+                "color_strategy_visited_color"
+            ]
+            config_accessor().color_strategy_cmap_opacity = float(
+                request.form["color_strategy_cmap_opacity"]
+            )
+            config_accessor.save()
+            flash("Updated color strategy values.", category="success")
+
+        return render_template(
+            "settings/color-strategy.html.j2",
+            color_strategy_max_cluster_color=config_accessor().color_strategy_max_cluster_color,
+            color_strategy_max_cluster_other_color=config_accessor().color_strategy_max_cluster_other_color,
+            color_strategy_visited_color=config_accessor().color_strategy_visited_color,
+            color_strategy_cmap_opacity=config_accessor().color_strategy_cmap_opacity,
+        )
+
     @blueprint.route("/manage-equipments", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def manage_equipments():
