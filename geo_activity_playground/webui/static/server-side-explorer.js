@@ -44,7 +44,7 @@ let overlay_maps = {
         maxZoom: 19,
         attribution: map_tile_attribution
     }),
-    "Mising": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=missing`, {
+    "Missing": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=missing`, {
         maxZoom: 19,
         attribution: map_tile_attribution
     }),
