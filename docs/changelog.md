@@ -21,6 +21,7 @@ Added:
 
 - Add delete feature for cluster bookmarks. ([GH-362](https://github.com/martin-ueding/geo-activity-playground/issues/362))
 - Add max cluster as a row in the cluster bookmark table. ([GH-357](https://github.com/martin-ueding/geo-activity-playground/issues/357))
+- Add settings page to change cluster colors. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
 
 Fixed:
 
