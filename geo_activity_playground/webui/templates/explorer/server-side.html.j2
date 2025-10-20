@@ -26,9 +26,9 @@
 
 {% if bookmarks %}
 <div class="btn-group mb-3" role="group" aria-label="Cluster bookmarks">
-    <button type="button" class="btn btn-primary" onclick='centerOn({{ center.bbox | safe }})'>Biggest</button>
+    <button type="button" class="btn" onclick='centerOn({{ center.bbox | safe }})'>Biggest</button>
     {% for bookmark in bookmarks %}
-    <button type="button" class="btn btn-primary" onclick='centerOn({{ bookmark.bbox | safe }})'>{{ bookmark.name
+    <button type="button" class="btn" onclick='centerOn({{ bookmark.bbox | safe }})'>{{ bookmark.name
         }}</button>
     {% endfor %}
 </div>
@@ -70,6 +70,9 @@
             <td>{{ bookmark.name }}</td>
             <td>{{ bookmark.size }}</td>
             <td>{{ '%.1f'|format(bookmark.size / max_cluster_size * 100) }} %</td>
+            <td><a class="btn btn-danger btn-sm"
+                    href="{{ url_for('settings.cluster_bookmark_delete', id=bookmark.id) }}"
+                    onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a></td>
         </tr>
         {% endfor %}
     </tbody>

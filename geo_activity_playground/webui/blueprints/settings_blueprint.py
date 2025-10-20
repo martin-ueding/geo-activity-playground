@@ -134,6 +134,15 @@ def make_settings_blueprint(
                 tile_y=request.args["tile_y"],
             )
 
+    @blueprint.route("/cluster-bookmarks/delete/<int:id>")
+    @needs_authentication(authenticator)
+    def cluster_bookmark_delete(id: int):
+        bookmark = DB.session.get_one(ExplorerTileBookmark, id)
+        flasher.flash_message(f"Bookmark {bookmark.name} deleted.", FlashTypes.SUCCESS)
+        DB.session.delete(bookmark)
+        DB.session.commit()
+        return redirect(request.referrer)
+
     @blueprint.route("/color-schemes", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def color_schemes():
