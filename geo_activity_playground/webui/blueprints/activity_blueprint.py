@@ -445,7 +445,7 @@ def make_activity_blueprint(
     def download_original(id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, id)
         path = pathlib.Path(activity.path)
-        with open(path) as f:
+        with open(path, "rb") as f:
             return Response(
                 f.read(),
                 mimetype="application/octet-stream",

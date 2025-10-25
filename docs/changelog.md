@@ -28,6 +28,7 @@ Removed:
 Fixed:
 
 - Fix division by zero issue for activities with only two points. ([GH-363](https://github.com/martin-ueding/geo-activity-playground/issues/363))
+- Fix download of binary activity files. ([GH-356](https://github.com/martin-ueding/geo-activity-playground/issues/356))
 
 ## Version 1.12.0 — 2025-10-20
 
