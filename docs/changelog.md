@@ -17,7 +17,13 @@ Types of changes
 
 ## Unreleased
 
+Added:
 
+- Support for Python 3.14.
+
+Removed:
+
+- Support for Python 3.10 and 3.10. You will need at least Python 3.12 now.
 
 ## Version 1.12.0 — 2025-10-20
 
