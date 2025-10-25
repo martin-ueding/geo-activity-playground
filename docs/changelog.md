@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Support for Python 3.14.
+- Added GitHub Action to build Docker image and publish it as `ghcr.io/martin-ueding/geo-activity-playground:latest`. ([GH-364](https://github.com/martin-ueding/geo-activity-playground/issues/364))
 
 Removed:
 
