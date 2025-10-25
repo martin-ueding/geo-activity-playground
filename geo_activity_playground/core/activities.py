@@ -133,4 +133,8 @@ def _make_value_clamp(values: pd.Series) -> tuple[float, float, Callable]:
         max(values_without_na),
         np.median(values_without_na) + 1.5 * inter_quartile_range(values_without_na),
     )
-    return low, high, lambda value: min(max((value - low) / (high - low), 0.0), 1.0)
+    return (
+        low,
+        high,
+        lambda value: min(max((value - low) / (high - low + 1e-20), 0.0), 1.0),
+    )
