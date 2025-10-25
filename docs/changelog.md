@@ -23,7 +23,11 @@ Added:
 
 Removed:
 
-- Support for Python 3.10 and 3.10. You will need at least Python 3.12 now.
+- Support for Python 3.10 and 3.11. You will need at least Python 3.12 now.
+
+Fixed:
+
+- Fix division by zero issue for activities with only two points. ([GH-363](https://github.com/martin-ueding/geo-activity-playground/issues/363))
 
 ## Version 1.12.0 — 2025-10-20
 
