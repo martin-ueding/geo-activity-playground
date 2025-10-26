@@ -21,6 +21,10 @@ Fixed:
 
 - Add alpha channel to color picker values that lack it to fix custom explorer tile schemes. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
 
+Changed:
+
+- Move tile color link further down. ([GH-365](https://github.com/martin-ueding/geo-activity-playground/issues/365))
+
 ## Version 1.12.1 — 2025-10-25
 
 Added:
