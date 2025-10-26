@@ -52,8 +52,6 @@
     </div>
 </div>
 
-<p><a href="{{ url_for('settings.color_strategy') }}">Modify color values</a>.</p>
-
 {% if bookmarks %}
 <h2 class="mb-3">Bookmarked cluster sizes</h2>
 
@@ -106,6 +104,9 @@
         {% endif %}
     </div>
 </div>
+
+<h2 class="mb-3">Tile coloring</h2>
+<p><a href="{{ url_for('settings.color_strategy') }}">Modify color values</a>.</p>
 
 <h2 class="mb-3">Tile URLs</h2>
 
