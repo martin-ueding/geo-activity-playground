@@ -188,15 +188,17 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def color_strategy():
         if request.method == "POST":
-            config_accessor().color_strategy_max_cluster_color = request.form[
-                "color_strategy_max_cluster_color"
-            ]
-            config_accessor().color_strategy_max_cluster_other_color = request.form[
-                "color_strategy_max_cluster_other_color"
-            ]
-            config_accessor().color_strategy_visited_color = request.form[
-                "color_strategy_visited_color"
-            ]
+            config_accessor().color_strategy_max_cluster_color = _add_alpha_if_needed(
+                request.form["color_strategy_max_cluster_color"]
+            )
+            config_accessor().color_strategy_max_cluster_other_color = (
+                _add_alpha_if_needed(
+                    request.form["color_strategy_max_cluster_other_color"]
+                )
+            )
+            config_accessor().color_strategy_visited_color = _add_alpha_if_needed(
+                request.form["color_strategy_visited_color"]
+            )
             config_accessor().color_strategy_cmap_opacity = float(
                 request.form["color_strategy_cmap_opacity"]
             )
@@ -624,3 +626,11 @@ def save_privacy_zones(
     config_accessor().privacy_zones = new_zone_config
     config_accessor.save()
     flash("Updated privacy zones.", category="success")
+
+
+def _add_alpha_if_needed(color_str: str) -> str:
+    if 6 <= len(color_str) <= 7:
+        color_str += "4d"
+    if len(color_str) == 7:
+        color_str = "#" + color_str
+    return color_str
