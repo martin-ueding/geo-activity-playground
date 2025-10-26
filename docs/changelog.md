@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Add alpha channel to color picker values that lack it to fix custom explorer tile schemes. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
+
 ## Version 1.12.1 — 2025-10-25
 
 Added:
