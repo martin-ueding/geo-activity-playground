@@ -60,7 +60,15 @@ overlay_maps["Colorful Cluster"].addTo(map)
 var layerControl = L.control.layers(base_maps, overlay_maps).addTo(map);
 
 if (bbox) {
-    map.fitBounds(L.geoJSON(bbox).getBounds())
+    map.fitBounds(L.geoJSON(bbox).getBounds(), { padding: [30, 30] })
+}
+
+function centerOn(bbox) {
+    map.fitBounds(L.geoJSON(bbox).getBounds(), { padding: [30, 30] })
+}
+
+if (bbox) {
+    centerOn(bbox)
 }
 
 map.on('click', e => {
@@ -103,8 +111,4 @@ map.on('click', e => {
 function downloadAs(suffix) {
     bounds = map.getBounds();
     window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
-}
-
-function centerOn(bbox) {
-    map.fitBounds(L.geoJSON(bbox).getBounds())
 }
