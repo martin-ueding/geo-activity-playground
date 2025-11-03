@@ -21,6 +21,10 @@ Added:
 
 - Add different tile layers also to square planner. ([GH-370](https://github.com/martin-ueding/geo-activity-playground/issues/370))
 
+Changed:
+
+- When showing the explorer tiles, leave a little padding around the cluster. ([GH-368](https://github.com/martin-ueding/geo-activity-playground/issues/368))
+
 ## Version 1.12.2 — 2025-10-26
 
 Fixed:
