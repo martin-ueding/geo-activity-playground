@@ -178,6 +178,18 @@ class MissingColorStrategy(ColorStrategy):
             return hex_color_to_float(self._config.color_strategy_visited_color)
 
 
+class VisitedColorStrategy(ColorStrategy):
+    def __init__(self, tile_visits, config: Config):
+        self.tile_visits = tile_visits
+        self._config = config
+
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+        if tile_xy in self.tile_visits:
+            return hex_color_to_float(self._config.color_strategy_visited_color)
+        else:
+            return None
+
+
 def make_explorer_blueprint(
     authenticator: Authenticator,
     tile_visit_accessor: TileVisitAccessor,
@@ -353,6 +365,8 @@ def make_explorer_blueprint(
                 color_strategy = NumVisitsColorStrategy(tile_visits, config)
             case "missing":
                 color_strategy = MissingColorStrategy(tile_visits, config)
+            case "visited":
+                color_strategy = VisitedColorStrategy(tile_visits, config)
             case _:
                 raise ValueError("Unsupported color strategy.")
 

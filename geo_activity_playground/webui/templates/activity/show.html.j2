@@ -281,6 +281,8 @@
         <div id="map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
         <script>
             let map{{ zoom }} = add_map("{{ zoom }}", {{ geojson | safe }})
+            L.geoJSON({{ color_line_geojson| safe }}).addTo(map{{ zoom }})
+            add_layers_to_map(map{{ zoom }}, {{ zoom }}, '{{ map_tile_attribution | safe }}', "Color", "Visited");
         </script>
     </div>
     {% endfor %}
