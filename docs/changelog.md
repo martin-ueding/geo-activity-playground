@@ -15,6 +15,16 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add reset buttons for the color strategy value settings page. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
+
+Fixed:
+
+- Modification of color strategy values now has separate color and alpha value selectors in order to make it actually work. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
+
 ## Version 1.13.0 — 2025-11-03
 
 Added:
