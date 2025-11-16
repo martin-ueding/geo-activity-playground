@@ -27,10 +27,9 @@
     <dt>Actions</dt>
     <dd>
         {% if new_bookmark_url %}
-        <a class="btn btn-small" href="{{ new_bookmark_url }}">Create Cluster Bookmark</a>
+        <a href="{{ new_bookmark_url }}">Create Cluster Bookmark</a>
         {% endif %}
-        <a class="btn btn-small"
-            href="{{ url_for('square_planner.index', zoom=zoom, x=tile_x, y=tile_y, size=square_size) }}">Open Square
+        <a href="{{ url_for('square_planner.index', zoom=zoom, x=tile_x, y=tile_y, size=square_size) }}">Open Square
             Planner</a>
     </dd>
 
