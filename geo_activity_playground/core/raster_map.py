@@ -289,3 +289,10 @@ class InverseGrayscaleImageTransform(ImageTransform):
     def transform_image(self, image: np.ndarray) -> np.ndarray:
         image = np.sum(image * [0.2126, 0.7152, 0.0722], axis=2)  # to grayscale
         return 1 - np.dstack((image, image, image))  # to rgb
+
+
+class BlankImageTransform(ImageTransform):
+    def transform_image(self, image: np.ndarray) -> np.ndarray:
+        image = np.copy(image)
+        image[:, :, :] = 0.80
+        return image

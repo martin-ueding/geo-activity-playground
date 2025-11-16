@@ -32,6 +32,7 @@ from ..core.datamodel import Photo
 from ..core.datamodel import Tag
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.paths import TIME_SERIES_DIR
+from ..core.raster_map import BlankImageTransform
 from ..core.raster_map import GrayscaleImageTransform
 from ..core.raster_map import IdentityImageTransform
 from ..core.raster_map import InverseGrayscaleImageTransform
@@ -201,6 +202,7 @@ def web_ui_main(
         "grayscale": GrayscaleImageTransform(),
         "pastel": PastelImageTransform(),
         "inverse_grayscale": InverseGrayscaleImageTransform(),
+        "blank": BlankImageTransform(),
     }
     flasher = FlaskFlasher()
     heart_rate_zone_computer = HeartRateZoneComputer(config)
