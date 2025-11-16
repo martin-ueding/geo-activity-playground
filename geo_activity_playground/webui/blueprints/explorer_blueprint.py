@@ -190,6 +190,37 @@ class VisitedColorStrategy(ColorStrategy):
             return None
 
 
+class SquarePlannerColorStrategy(ColorStrategy):
+    def __init__(
+        self,
+        tile_visits,
+        config: Config,
+        square_x: int,
+        square_y: int,
+        square_size: int,
+    ):
+        self.tile_visits = tile_visits
+        self._config = config
+        self.square_x = square_x
+        self.square_y = square_y
+        self.square_size = square_size
+
+    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+        x, y = tile_xy
+        if (
+            self.square_x <= x < self.square_x + self.square_size
+            and self.square_y <= y < self.square_y + self.square_size
+        ):
+            if tile_xy in self.tile_visits:
+                return hex_color_to_float("#00aa004d")
+            else:
+                return hex_color_to_float("#aa00004d")
+        elif tile_xy in self.tile_visits:
+            return hex_color_to_float(self._config.color_strategy_visited_color)
+        else:
+            return None
+
+
 def make_explorer_blueprint(
     authenticator: Authenticator,
     tile_visit_accessor: TileVisitAccessor,
@@ -367,6 +398,14 @@ def make_explorer_blueprint(
                 color_strategy = MissingColorStrategy(tile_visits, config)
             case "visited":
                 color_strategy = VisitedColorStrategy(tile_visits, config)
+            case "square_planner":
+                color_strategy = SquarePlannerColorStrategy(
+                    tile_visits,
+                    config,
+                    int(request.args["x"]),
+                    int(request.args["y"]),
+                    int(request.args["size"]),
+                )
             case _:
                 raise ValueError("Unsupported color strategy.")
 

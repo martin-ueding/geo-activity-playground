@@ -54,7 +54,15 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
         "Heatmap": L.tileLayer("/heatmap/tile/{z}/{x}/{y}.png", {
             maxZoom: 19,
             attribution: map_tile_attribution
-        }),
+        })
+    }
+
+    if (typeof square_size !== 'undefined') {
+        overlay_maps["Square Planner"] = L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=square_planner&x=${square_x}&y=${square_y}&size=${square_size}`, {
+            maxZoom: 19,
+            attribution: map_tile_attribution
+        });
+        overlay = "Square Planner";
     }
 
     base_maps[base].addTo(map)
