@@ -1329,6 +1329,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1140-2025-11-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.14.0 — 2025-11-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1130-2025-11-03" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.13.0 — 2025-11-03
@@ -2425,6 +2434,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1140-2025-11-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.14.0 — 2025-11-16
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1130-2025-11-03" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.13.0 — 2025-11-03
@@ -3517,6 +3535,26 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-1140-2025-11-16">Version 1.14.0 — 2025-11-16</h2>
+<p>Added:</p>
+<ul>
+<li>Add reset buttons for the color strategy value settings page. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/359">GH-359</a>)</li>
+<li>Add blank tile style for sharing screenshots without giving away the actual location. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/371">GH-371</a>)</li>
+<li>Add explorer tile tooltip action to open square planner at selected tile. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/373">GH-373</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Modify the colors in the map view of new explorer tiles per activity to make it more readable. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/366">GH-366</a>)</li>
+<li>Let square planner use server side rendering for improved performance.</li>
+<li>Render explorer map tooltip on server side.</li>
+<li>Display explorer map tooltip also on tiles that have not been explored yet.</li>
+<li>Load activity lines on main page as separate requests.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Modification of color strategy values now has separate color and alpha value selectors in order to make it actually work. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/359">GH-359</a>)</li>
+<li>Check for NaN value in <code>Activity.average_speed_moving_kmh</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/363">GH-363</a>), (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/372">GH-372</a>)</li>
+</ul>
 <h2 id="version-1130-2025-11-03">Version 1.13.0 — 2025-11-03</h2>
 <p>Added:</p>
 <ul>
