@@ -21,6 +21,10 @@ Added:
 
 - Add reset buttons for the color strategy value settings page. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
 
+Changed:
+
+- Modify the colors in the map view of new explorer tiles per activity to make it more readable. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
+
 Fixed:
 
 - Modification of color strategy values now has separate color and alpha value selectors in order to make it actually work. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
