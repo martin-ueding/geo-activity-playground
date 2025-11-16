@@ -37,8 +37,13 @@
             <dd>{{ activity.elapsed_time|td }} elapsed, {{ activity.moving_time|td }} moving</dd>
 
             <dt>Average moving speed</dt>
-            <dd>{{ activity.average_speed_moving_kmh|round(1) }} km/h = {{
-                (60/activity.average_speed_moving_kmh)|round(1) }} min/km</dd>
+            <dd>{% if activity.average_speed_moving_kmh is not none %}
+                {{ activity.average_speed_moving_kmh|round(1) }} km/h =
+                {{ (60/activity.average_speed_moving_kmh)|round(1) }} min/km
+                {% else %}
+                n/a
+                {% endif %}
+            </dd>
             <dt>Average elapsed speed</dt>
             <dd>{{ activity.average_speed_elapsed_kmh|round(1) }} km/h = {{
                 (60/activity.average_speed_elapsed_kmh)|round(1) }} min/km</dd>
