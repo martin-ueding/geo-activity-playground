@@ -1,6 +1,6 @@
 <dl>
     <dt>Tile</dt>
-    <dd>{{ tile_xy }}</dd>
+    <dd>({{ tile_x }}, {{ tile_y }}) @ {{ zoom }}</dd>
 
     {% if num_visits %}
     <dt>First visit</dt>
@@ -24,8 +24,15 @@
     <dd>{{ this_cluster_size }}</dd>
     {% endif %}
 
-    {% if new_bookmark_url %}
-    <dt>Bookmark</dt>
-    <dd><a href="{{ new_bookmark_url }}">Create cluster bookmark</a></dd>
-    {% endif %}
+    <dt>Actions</dt>
+    <dd>
+        {% if new_bookmark_url %}
+        <a class="btn btn-small" href="{{ new_bookmark_url }}">Create Cluster Bookmark</a>
+        {% endif %}
+        <a class="btn btn-small"
+            href="{{ url_for('square_planner.index', zoom=zoom, x=tile_x, y=tile_y, size=square_size) }}">Open Square
+            Planner</a>
+    </dd>
+
+
 </dl>
