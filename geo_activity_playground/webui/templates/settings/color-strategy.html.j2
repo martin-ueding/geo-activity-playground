@@ -12,10 +12,15 @@
             <input type="color" alpha class="form-control" id="max_cluster_color" name="max_cluster_color"
                 value="{{ max_cluster_color }}" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
             <label for="max_cluster_color_alpha" class="form-label">Alpha</label>
             <input type="range" class="form-range" min="0" max="255" step="1" id="max_cluster_color_alpha"
                 name="max_cluster_color_alpha" value="{{ max_cluster_color_alpha }}">
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">Reset</label>
+            <a
+                onclick="document.getElementById('max_cluster_color').value = '{{ max_cluster_color_default }}'; document.getElementById('max_cluster_color_alpha').value = '{{ max_cluster_color_alpha_default }}'">❌</a>
         </div>
     </div>
 
@@ -25,10 +30,15 @@
             <input type="color" alpha class="form-control" id="max_cluster_other_color" name="max_cluster_other_color"
                 value="{{ max_cluster_other_color }}" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
             <label for="max_cluster_other_color_alpha" class="form-label">Alpha</label>
             <input type="range" class="form-range" min="0" max="255" step="1" id="max_cluster_other_color_alpha"
                 name="max_cluster_other_color_alpha" value="{{ max_cluster_other_color_alpha }}">
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">Reset</label>
+            <a
+                onclick="document.getElementById('max_cluster_other_color').value = '{{ max_cluster_other_color_default }}'; document.getElementById('max_cluster_other_color_alpha').value = '{{ max_cluster_other_color_alpha_default }}'">❌</a>
         </div>
     </div>
 
@@ -39,10 +49,15 @@
             <input type="color" alpha class="form-control" id="visited_color" name="visited_color"
                 value="{{ visited_color }}" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
             <label for="visited_color_alpha" class="form-label">Alpha</label>
             <input type="range" class="form-range" min="0" max="255" step="1" id="visited_color_alpha"
                 name="visited_color_alpha" value="{{ visited_color_alpha }}">
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">Reset</label>
+            <a
+                onclick="document.getElementById('visited_color').value = '{{ visited_color_default }}'; document.getElementById('visited_color_alpha').value = '{{ visited_color_alpha_default }}'">❌</a>
         </div>
     </div>
 

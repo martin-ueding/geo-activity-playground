@@ -14,6 +14,7 @@ from flask import Response
 from flask import url_for
 from tqdm import tqdm
 
+from ...core.config import Config
 from ...core.config import ConfigAccessor
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
@@ -206,8 +207,12 @@ def make_settings_blueprint(
             config_accessor.save()
             flash("Updated color strategy values.", category="success")
 
+        new_config = Config()
         max_cluster_color, max_cluster_color_alpha = _split_hex_into_color_alpha(
             config_accessor().color_strategy_max_cluster_color
+        )
+        max_cluster_color_default, max_cluster_color_alpha_default = (
+            _split_hex_into_color_alpha(new_config.color_strategy_max_cluster_color)
         )
 
         max_cluster_other_color, max_cluster_other_color_alpha = (
@@ -215,19 +220,33 @@ def make_settings_blueprint(
                 config_accessor().color_strategy_max_cluster_other_color
             )
         )
+        max_cluster_other_color_default, max_cluster_other_color_alpha_default = (
+            _split_hex_into_color_alpha(
+                new_config.color_strategy_max_cluster_other_color
+            )
+        )
 
         visited_color, visited_color_alpha = _split_hex_into_color_alpha(
             config_accessor().color_strategy_visited_color
+        )
+        visited_color_default, visited_color_alpha_default = (
+            _split_hex_into_color_alpha(new_config.color_strategy_visited_color)
         )
 
         return render_template(
             "settings/color-strategy.html.j2",
             max_cluster_color=max_cluster_color,
+            max_cluster_color_default=max_cluster_color_default,
             max_cluster_color_alpha=max_cluster_color_alpha,
+            max_cluster_color_alpha_default=max_cluster_color_alpha_default,
             max_cluster_other_color=max_cluster_other_color,
+            max_cluster_other_color_default=max_cluster_other_color_default,
             max_cluster_other_color_alpha=max_cluster_other_color_alpha,
+            max_cluster_other_color_alpha_default=max_cluster_other_color_alpha_default,
             visited_color=visited_color,
+            visited_color_default=visited_color_default,
             visited_color_alpha=visited_color_alpha,
+            visited_color_alpha_default=visited_color_alpha_default,
             cmap_opacity=config_accessor().color_strategy_cmap_opacity,
         )
 
