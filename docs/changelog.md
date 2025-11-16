@@ -20,7 +20,7 @@ Types of changes
 Added:
 
 - Add different tile layers also to square planner. ([GH-370](https://github.com/martin-ueding/geo-activity-playground/issues/370))
-- Add activity line and other explorer tile layers to the map with newly explored tiles on the activity page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
+- Add activity line and other explorer tile layers to the map with newly explored tiles on the activity page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366 ))
 
 Changed:
 

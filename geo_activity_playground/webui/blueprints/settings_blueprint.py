@@ -188,29 +188,47 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def color_strategy():
         if request.method == "POST":
-            config_accessor().color_strategy_max_cluster_color = _add_alpha_if_needed(
-                request.form["color_strategy_max_cluster_color"]
+            print(request.form)
+            config_accessor().color_strategy_max_cluster_color = _combine_color(
+                request.form["max_cluster_color"],
+                int(request.form["max_cluster_color_alpha"]),
             )
-            config_accessor().color_strategy_max_cluster_other_color = (
-                _add_alpha_if_needed(
-                    request.form["color_strategy_max_cluster_other_color"]
-                )
+            config_accessor().color_strategy_max_cluster_other_color = _combine_color(
+                request.form["max_cluster_other_color"],
+                int(request.form["max_cluster_other_color_alpha"]),
             )
-            config_accessor().color_strategy_visited_color = _add_alpha_if_needed(
-                request.form["color_strategy_visited_color"]
+            config_accessor().color_strategy_visited_color = _combine_color(
+                request.form["visited_color"], int(request.form["visited_color_alpha"])
             )
             config_accessor().color_strategy_cmap_opacity = float(
-                request.form["color_strategy_cmap_opacity"]
+                request.form["cmap_opacity"]
             )
             config_accessor.save()
             flash("Updated color strategy values.", category="success")
 
+        max_cluster_color, max_cluster_color_alpha = _split_hex_into_color_alpha(
+            config_accessor().color_strategy_max_cluster_color
+        )
+
+        max_cluster_other_color, max_cluster_other_color_alpha = (
+            _split_hex_into_color_alpha(
+                config_accessor().color_strategy_max_cluster_other_color
+            )
+        )
+
+        visited_color, visited_color_alpha = _split_hex_into_color_alpha(
+            config_accessor().color_strategy_visited_color
+        )
+
         return render_template(
             "settings/color-strategy.html.j2",
-            color_strategy_max_cluster_color=config_accessor().color_strategy_max_cluster_color,
-            color_strategy_max_cluster_other_color=config_accessor().color_strategy_max_cluster_other_color,
-            color_strategy_visited_color=config_accessor().color_strategy_visited_color,
-            color_strategy_cmap_opacity=config_accessor().color_strategy_cmap_opacity,
+            max_cluster_color=max_cluster_color,
+            max_cluster_color_alpha=max_cluster_color_alpha,
+            max_cluster_other_color=max_cluster_other_color,
+            max_cluster_other_color_alpha=max_cluster_other_color_alpha,
+            visited_color=visited_color,
+            visited_color_alpha=visited_color_alpha,
+            cmap_opacity=config_accessor().color_strategy_cmap_opacity,
         )
 
     @blueprint.route("/manage-equipments", methods=["GET", "POST"])
@@ -634,3 +652,11 @@ def _add_alpha_if_needed(color_str: str) -> str:
     if len(color_str) == 7:
         color_str = "#" + color_str
     return color_str
+
+
+def _split_hex_into_color_alpha(color_str: str) -> tuple[str, int]:
+    return color_str[:7], int(color_str[7:9], base=16)
+
+
+def _combine_color(color: str, alpha: int) -> str:
+    return f"{color}{alpha:02x}"
