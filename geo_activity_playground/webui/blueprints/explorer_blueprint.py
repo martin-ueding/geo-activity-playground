@@ -538,7 +538,7 @@ def make_explorer_blueprint(
     @blueprint.route(
         "/<int:zoom>/info/<float(signed=True):latitude>/<float(signed=True):longitude>"
     )
-    def info(zoom: int, latitude: float, longitude: float) -> dict:
+    def info(zoom: int, latitude: float, longitude: float) -> str:
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         tile_xy = compute_tile(latitude, longitude, zoom)
@@ -569,8 +569,8 @@ def make_explorer_blueprint(
                 ),
             }
         else:
-            result = {}
-        return result
+            result = {"tile_xy": f"{tile_xy}"}
+        return render_template("explorer/tooltip.html.j2", **result)
 
     return blueprint
 
