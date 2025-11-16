@@ -94,15 +94,20 @@
             or <a href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
         </p>
     </div>
+
     <div class="col-md-9">
-        <div id="explorer-map" class="mb-3" style="height: 600px;"></div>
+        <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
         <script>
-            let map_tile_attribution = '{{ map_tile_attribution|safe }}';
-            let explorer_geojson = {{ explored_geojson| safe }};
-            let missing_geojson = {{ missing_geojson| safe }};
-            let square_geojson = {{ square_geojson | safe }};
+            const center_latitude = {{ center.latitude }};
+            const center_longitude = {{ center.longitude }};
+            const zoom = {{ zoom }};
+            const bbox = {{ square_geojson | safe }};
+            const map_tile_attribution = '{{ map_tile_attribution|safe }}';
+            const square_x = {{ square_x }};
+            const square_y = {{ square_y }};
+            const square_size = {{ square_size }};
         </script>
-        <script src="/static/square-planner.js" defer></script>
+        <script src="/static/server-side-explorer.js"></script>
     </div>
 </div>
 

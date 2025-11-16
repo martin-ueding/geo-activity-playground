@@ -9,6 +9,7 @@ from flask import url_for
 
 from ...core.datamodel import DB
 from ...core.datamodel import SquarePlannerBookmark
+from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.grid_file import make_explorer_rectangle
 from ...explorer.grid_file import make_explorer_tile
 from ...explorer.grid_file import make_grid_file_geojson
@@ -51,26 +52,15 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
             )
         )
 
-        missing_geojson = geojson.dumps(
-            geojson.FeatureCollection(
-                features=[
-                    make_explorer_tile(
-                        tile_x,
-                        tile_y,
-                        {},
-                        zoom,
-                    )
-                    for tile_x in range(x, x + size)
-                    for tile_y in range(y, y + size)
-                    if (tile_x, tile_y) not in set(tile_visits[zoom].keys())
-                ]
-            )
+        medians = tile_visit_accessor.tile_state["tile_history"][zoom][
+            ["tile_x", "tile_y"]
+        ].median()
+        median_lat, median_lon = get_tile_upper_left_lat_lon(
+            medians["tile_x"], medians["tile_y"], zoom
         )
 
         return render_template(
             "square_planner/index.html.j2",
-            explored_geojson=_get_explored_geojson(tile_visits[zoom].keys(), zoom),
-            missing_geojson=missing_geojson,
             square_geojson=square_geojson,
             zoom=zoom,
             square_x=x,
@@ -79,6 +69,10 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
             bookmarks=DB.session.scalars(
                 sqlalchemy.select(SquarePlannerBookmark)
             ).all(),
+            center={
+                "latitude": median_lat,
+                "longitude": median_lon,
+            },
         )
 
     @blueprint.route("/<int:zoom>/<int:x>/<int:y>/<int:size>/missing.<suffix>")
