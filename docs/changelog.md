@@ -25,6 +25,7 @@ Added:
 Changed:
 
 - Modify the colors in the map view of new explorer tiles per activity to make it more readable. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
+- Let square planner use server side rendering for improved performance.
 
 Fixed:
 
