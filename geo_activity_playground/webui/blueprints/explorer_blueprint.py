@@ -542,35 +542,40 @@ def make_explorer_blueprint(
         tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         tile_xy = compute_tile(latitude, longitude, zoom)
+        context: dict[str, Any] = {
+            "tile_x": tile_xy[0],
+            "tile_y": tile_xy[1],
+            "zoom": zoom,
+            "square_size": evolution_state.max_square_size,
+        }
         if tile_xy in tile_visits:
             tile_info = tile_visits[tile_xy]
             first = DB.session.get_one(Activity, tile_info["first_id"])
             last = DB.session.get_one(Activity, tile_info["last_id"])
-            result = {
-                "tile_xy": f"{tile_xy}",
-                "num_visits": len(tile_info["activity_ids"]),
-                "first_activity_id": first.id,
-                "first_activity_name": first.name,
-                "first_time": tile_info["first_time"].isoformat(),
-                "last_activity_id": last.id,
-                "last_activity_name": last.name,
-                "last_time": tile_info["last_time"].isoformat(),
-                "is_cluster": tile_xy in evolution_state.memberships,
-                "this_cluster_size": len(
-                    evolution_state.clusters.get(
-                        evolution_state.memberships.get(tile_xy, None), []
-                    )
-                ),
-                "new_bookmark_url": url_for(
-                    "settings.cluster_bookmark_new",
-                    zoom=zoom,
-                    tile_x=tile_xy[0],
-                    tile_y=tile_xy[1],
-                ),
-            }
-        else:
-            result = {"tile_xy": f"{tile_xy}"}
-        return render_template("explorer/tooltip.html.j2", **result)
+            context.update(
+                {
+                    "num_visits": len(tile_info["activity_ids"]),
+                    "first_activity_id": first.id,
+                    "first_activity_name": first.name,
+                    "first_time": tile_info["first_time"].isoformat(),
+                    "last_activity_id": last.id,
+                    "last_activity_name": last.name,
+                    "last_time": tile_info["last_time"].isoformat(),
+                    "is_cluster": tile_xy in evolution_state.memberships,
+                    "this_cluster_size": len(
+                        evolution_state.clusters.get(
+                            evolution_state.memberships.get(tile_xy, None), []
+                        )
+                    ),
+                    "new_bookmark_url": url_for(
+                        "settings.cluster_bookmark_new",
+                        zoom=zoom,
+                        tile_x=tile_xy[0],
+                        tile_y=tile_xy[1],
+                    ),
+                }
+            )
+        return render_template("explorer/tooltip.html.j2", **context)
 
     return blueprint
 
