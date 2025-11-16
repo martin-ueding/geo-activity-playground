@@ -16,6 +16,10 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
             maxZoom: 19,
             attribution: map_tile_attribution
         }),
+        "Blank": L.tileLayer("/tile/blank/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: map_tile_attribution
+        }),
     }
 
     let overlay_maps = {
