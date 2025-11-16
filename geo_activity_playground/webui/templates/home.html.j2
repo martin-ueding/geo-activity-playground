@@ -39,7 +39,11 @@
         <div class="card {{ '' if elem.activity.commute else 'border-primary' }}">
             <div class="card-img-top" id="map-{{ elem.activity.id }}" style="height: 200px; width: 100%;"></div>
             <script>
-                let map{{ elem.activity.id }} = add_map("{{ elem.activity.id }}", {{ elem.line_geojson | safe }})
+                fetch("/activity/{{ elem.activity.id }}/line.geojson").then(response => response.json()).then(
+                    geojson => {
+                        add_map("{{ elem.activity.id }}", geojson);
+                    }
+                )
             </script>
             <div class="card-body">
                 <a href="{{ url_for('activity.show', id=elem.activity.id) }}">

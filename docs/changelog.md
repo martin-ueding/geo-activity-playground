@@ -29,6 +29,7 @@ Changed:
 - Let square planner use server side rendering for improved performance.
 - Render explorer map tooltip on server side.
 - Display explorer map tooltip also on tiles that have not been explored yet.
+- Load activity lines on main page as separate requests.
 
 Fixed:
 
