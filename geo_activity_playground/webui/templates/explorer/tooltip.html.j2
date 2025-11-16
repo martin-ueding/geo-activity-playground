@@ -1,0 +1,31 @@
+<dl>
+    <dt>Tile</dt>
+    <dd>{{ tile_xy }}</dd>
+
+    {% if num_visits %}
+    <dt>First visit</dt>
+    <dd>
+        {{ first_time }}
+        <br />
+        <a href="/activity/{{ first_activity_id }}">{{ first_activity_name }}</a>
+    </dd>
+    <dt>Last visit</dt>
+    <dd>
+        {{ last_time }}
+        <br />
+        <a href="/activity/{{ last_activity_id }}">{{ last_activity_name }}</a>
+    </dd>
+    <dt>Number of visits</dt>
+    <dd>{{ num_visits }}</dd>
+    {% endif %}
+
+    {% if this_cluster_size %}
+    <dt>This cluster size</dt>
+    <dd>{{ this_cluster_size }}</dd>
+    {% endif %}
+
+    {% if new_bookmark_url %}
+    <dt>Bookmark</dt>
+    <dd><a href="{{ new_bookmark_url }}">Create cluster bookmark</a></dd>
+    {% endif %}
+</dl>
