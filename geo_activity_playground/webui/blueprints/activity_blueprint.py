@@ -188,6 +188,12 @@ def make_activity_blueprint(
 
         return render_template("activity/show.html.j2", **context)
 
+    @blueprint.route("/<int:id>/line.geojson")
+    def geojson_line(id: int) -> ResponseReturnValue:
+        return make_geojson_from_time_series(
+            DB.session.get_one(Activity, id).time_series
+        )
+
     @blueprint.route("/<int:id>/sharepic.png")
     def sharepic(id: int) -> ResponseReturnValue:
         activity = repository.get_activity_by_id(id)

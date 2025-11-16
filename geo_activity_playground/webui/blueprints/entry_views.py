@@ -45,12 +45,7 @@ def register_entry_views(
                 .limit(100)
             ):
                 context["latest_activities"][activity.start_local_tz.date()].append(
-                    {
-                        "activity": activity,
-                        "line_geojson": make_geojson_from_time_series(
-                            activity.time_series
-                        ),
-                    }
+                    {"activity": activity}
                 )
 
         return render_template("home.html.j2", **context)
