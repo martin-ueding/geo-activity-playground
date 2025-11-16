@@ -24,6 +24,7 @@ Added:
 Fixed:
 
 - Modification of color strategy values now has separate color and alpha value selectors in order to make it actually work. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
+- Check for NaN value in `Activity.average_speed_moving_kmh`. ([GH-363](https://github.com/martin-ueding/geo-activity-playground/issues/363)), ([GH-372](https://github.com/martin-ueding/geo-activity-playground/issues/372))
 
 ## Version 1.13.0 — 2025-11-03
 
