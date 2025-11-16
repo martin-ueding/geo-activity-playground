@@ -263,7 +263,7 @@
     zoom
     levels.</p>
 <script>
-    function add_map(id, geojson) {
+    function add_map(id, geojson, options = {}) {
         let map = L.map(`map-${id}`, {
             fullscreenControl: true
         })
@@ -272,7 +272,7 @@
             attribution: '{{ map_tile_attribution|safe }}'
         }).addTo(map)
 
-        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        let geojson_layer = L.geoJSON(geojson, options).addTo(map)
         map.fitBounds(geojson_layer.getBounds())
         return map
     }
@@ -285,8 +285,17 @@
         <p>There are {{ new_tiles[zoom] }} new tiles:</p>
         <div id="map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
         <script>
-            let map{{ zoom }} = add_map("{{ zoom }}", {{ geojson | safe }})
-            L.geoJSON({{ color_line_geojson| safe }}).addTo(map{{ zoom }})
+            let map{{ zoom }} = add_map("{{ zoom }}", {{ geojson | safe }}, {
+                style: {
+                    "color": "#ff7700",
+                    "fillOpacity": 0.0
+                }
+            })
+            L.geoJSON({{ color_line_geojson| safe }}, {
+                style: {
+                    "color": "#ff0000",
+                }
+            }).addTo(map{{ zoom }})
             add_layers_to_map(map{{ zoom }}, {{ zoom }}, '{{ map_tile_attribution | safe }}', "Color", "Visited");
         </script>
     </div>
