@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add reset buttons for the color strategy value settings page. ([GH-359](https://github.com/martin-ueding/geo-activity-playground/issues/359))
+- Add blank tile style for sharing screenshots without giving away the actual location. ([GH-371](https://github.com/martin-ueding/geo-activity-playground/issues/371))
 
 Changed:
 
