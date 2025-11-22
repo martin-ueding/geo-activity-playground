@@ -47,6 +47,7 @@ openpyxl = "^3.1.5"
 # imagecodecs = "^2025.3.30"
 # tifffile = "2025.5.10"
 timezonefinder = "^6.5.9"
+vegafusion = ">=2.0.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"
