@@ -102,12 +102,7 @@ def make_upload_blueprint(
     @blueprint.route("/execute-reload")
     @needs_authentication(authenticator)
     def execute_reload():
-        scan_for_activities(
-            repository,
-            tile_visit_accessor,
-            config,
-            skip_strava=True,
-        )
+        scan_for_activities(repository, tile_visit_accessor, config)
         flash("Scanned for new activities.", category="success")
         return redirect(url_for("index"))
 

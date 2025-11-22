@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Changed:
+
+- Scan for new Strava activities when using the "scan for new activities" option in the web UI. ([GH-350](https://github.com/martin-ueding/geo-activity-playground/issues/350))
+
 ## Version 1.14.0 — 2025-11-16
 
 Added:
