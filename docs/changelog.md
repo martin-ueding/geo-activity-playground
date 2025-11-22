@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Group pictures also on activity view.
+
 Changed:
 
 - Scan for new Strava activities when using the "scan for new activities" option in the web UI. ([GH-350](https://github.com/martin-ueding/geo-activity-playground/issues/350))
