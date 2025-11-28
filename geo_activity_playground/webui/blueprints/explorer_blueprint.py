@@ -32,6 +32,7 @@ from ...core.coordinates import Bounds
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import ExplorerTileBookmark
+from ...core.datamodel import TileVisit
 from ...core.raster_map import ImageTransform
 from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import TileGetter
@@ -549,7 +550,6 @@ def make_explorer_blueprint(
         "/<int:zoom>/info/<float(signed=True):latitude>/<float(signed=True):longitude>"
     )
     def info(zoom: int, latitude: float, longitude: float) -> str:
-        tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         tile_xy = compute_tile(latitude, longitude, zoom)
         context: dict[str, Any] = {
@@ -558,19 +558,24 @@ def make_explorer_blueprint(
             "zoom": zoom,
             "square_size": evolution_state.max_square_size,
         }
-        if tile_xy in tile_visits:
-            tile_info = tile_visits[tile_xy]
-            first = DB.session.get_one(Activity, tile_info["first_id"])
-            last = DB.session.get_one(Activity, tile_info["last_id"])
+        
+        # Query tile info from database
+        tile_visit = DB.session.query(TileVisit).filter(
+            TileVisit.zoom == zoom,
+            TileVisit.tile_x == tile_xy[0],
+            TileVisit.tile_y == tile_xy[1],
+        ).first()
+        
+        if tile_visit is not None:
             context.update(
                 {
-                    "num_visits": tile_info["visit_count"],
-                    "first_activity_id": first.id,
-                    "first_activity_name": first.name,
-                    "first_time": tile_info["first_time"].isoformat(),
-                    "last_activity_id": last.id,
-                    "last_activity_name": last.name,
-                    "last_time": tile_info["last_time"].isoformat(),
+                    "num_visits": tile_visit.visit_count,
+                    "first_activity_id": tile_visit.first_activity_id,
+                    "first_activity_name": tile_visit.first_activity.name,
+                    "first_time": tile_visit.first_time.isoformat() if tile_visit.first_time else None,
+                    "last_activity_id": tile_visit.last_activity_id,
+                    "last_activity_name": tile_visit.last_activity.name,
+                    "last_time": tile_visit.last_time.isoformat() if tile_visit.last_time else None,
                     "is_cluster": tile_xy in evolution_state.memberships,
                     "this_cluster_size": len(
                         evolution_state.clusters.get(
