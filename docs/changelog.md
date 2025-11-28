@@ -26,6 +26,7 @@ Added:
 Changed:
 
 - Make it more clear how the different Strava import mechanisms are to be used and differentiate the different guides from each other. ([GH-297](https://github.com/martin-ueding/geo-activity-playground/issues/297))
+- Move the tile history into the database.
 
 Fixed:
 
