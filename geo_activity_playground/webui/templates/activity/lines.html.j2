@@ -10,13 +10,13 @@
 
 <div class="row mb-3">
     <div class="col-md-12">
-        <div id="activity-map" style="height: 500px;"></div>
+        <div id="activity-lines-map" style="height: 500px;"></div>
         <script>
             function onEachFeature(feature, layer) {
                 layer.bindPopup(`<a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>`)
             }
 
-            var map = L.map('activity-map', {
+            var map = L.map('activity-lines-map', {
                 fullscreenControl: true
             });
             L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {

@@ -96,9 +96,9 @@
             onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
     </div>
     <div class="col-sm-12 col-md-8">
-        <div id="activity-map" style="height: 500px;" class="mb-3"></div>
+        <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
         <script>
-            var map = L.map('activity-map', {
+            var map = L.map('activity-show-map', {
                 fullscreenControl: true
             });
             L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
@@ -266,7 +266,7 @@
     levels.</p>
 <script>
     function add_map(id, geojson, options = {}) {
-        let map = L.map(`map-${id}`, {
+        let map = L.map(id, {
             fullscreenControl: true
         })
         L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
@@ -285,9 +285,9 @@
     <div class="col-md-6">
         <h3>Zoom {{ zoom }}</h3>
         <p>There are {{ new_tiles[zoom] }} new tiles:</p>
-        <div id="map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
+        <div id="new-tiles-map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
         <script>
-            let map{{ zoom }} = add_map("{{ zoom }}", {{ geojson | safe }}, {
+            let map{{ zoom }} = add_map("new-tiles-map-{{ zoom }}", {{ geojson | safe }}, {
                 style: {
                     "color": "#ff7700",
                     "fillOpacity": 0.0

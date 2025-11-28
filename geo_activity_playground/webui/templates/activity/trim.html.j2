@@ -9,7 +9,7 @@
 
 <a href="{{ url_for('.show', id=activity['id']) }}" class="btn btn-primary btn-small">Back</a>
 
-<div id="activity-map" style="height: 600px;" class="mb-3"></div>
+<div id="activity-trim-map" style="height: 600px;" class="mb-3"></div>
 <script>
     var map_tile_attribution = '{{ map_tile_attribution }}';
     var color_line_geojson = {{ color_line_geojson | safe }};
