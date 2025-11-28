@@ -54,16 +54,20 @@ class Config:
     map_tile_attribution: str = (
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
     )
-    search_queries_favorites: list[dict] = dataclasses.field(default_factory=list)
-    search_queries_last: list[dict] = dataclasses.field(default_factory=list)
-    search_queries_num_keep: int = 10
+
+
+# Field names that are valid for Config, used to filter out obsolete fields when loading
+_CONFIG_FIELDS = {f.name for f in dataclasses.fields(Config)}
 
 
 class ConfigAccessor:
     def __init__(self) -> None:
         if new_config_file().exists():
             with open(new_config_file()) as f:
-                self._config = Config(**json.load(f))
+                data = json.load(f)
+            # Filter out unknown fields to handle old config files with obsolete fields
+            filtered_data = {k: v for k, v in data.items() if k in _CONFIG_FIELDS}
+            self._config = Config(**filtered_data)
         else:
             self._config = Config()
 

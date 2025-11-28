@@ -8,9 +8,12 @@ from flask import request
 
 from ...core.activities import ActivityRepository
 from ...core.activities import make_geojson_from_time_series
-from ...core.meta_search import apply_search_query
-from ..search_util import search_query_from_form
-from ..search_util import SearchQueryHistory
+from ...core.meta_search import apply_search_filter
+from ...core.meta_search import get_stored_queries
+from ...core.meta_search import parse_search_params
+from ...core.meta_search import primitives_to_jinja
+from ...core.meta_search import register_search_query
+from ..authenticator import Authenticator
 
 
 logger = logging.getLogger(__name__)
@@ -18,18 +21,29 @@ logger = logging.getLogger(__name__)
 
 def make_hall_of_fame_blueprint(
     repository: ActivityRepository,
-    search_query_history: SearchQueryHistory,
+    authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("hall_of_fame", __name__, template_folder="templates")
 
     @blueprint.route("/")
     def index() -> str:
-        query = search_query_from_form(request.args)
-        search_query_history.register_query(query)
-        activities = apply_search_query(query)
+        primitives = parse_search_params(request.args)
+
+        if authenticator.is_authenticated():
+            register_search_query(primitives)
+
+        activities = apply_search_filter(primitives)
         df = activities
 
         nominations = nominate_activities(df)
+
+        stored_queries = get_stored_queries()
+        search_query_favorites = [
+            (str(q), q.to_url_str()) for q in stored_queries if q.is_favorite
+        ]
+        search_query_last = [
+            (str(q), q.to_url_str()) for q in stored_queries if not q.is_favorite
+        ]
 
         return render_template(
             "hall_of_fame/index.html.j2",
@@ -43,7 +57,9 @@ def make_hall_of_fame_blueprint(
                 )
                 for activity_id, reasons in nominations.items()
             ],
-            query=query.to_jinja(),
+            query=primitives_to_jinja(primitives),
+            search_query_favorites=search_query_favorites,
+            search_query_last=search_query_last,
         )
 
     return blueprint

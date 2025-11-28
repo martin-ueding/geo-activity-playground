@@ -11,13 +11,16 @@ from ...core.activities import ActivityRepository
 from ...core.config import Config
 from ...core.datamodel import DB
 from ...core.datamodel import PlotSpec
-from ...core.meta_search import apply_search_query
+from ...core.meta_search import apply_search_filter
+from ...core.meta_search import get_stored_queries
+from ...core.meta_search import parse_search_params
+from ...core.meta_search import primitives_to_jinja
+from ...core.meta_search import register_search_query
 from ...core.parametric_plot import make_parametric_plot
+from ..authenticator import Authenticator
 from ..columns import ColumnDescription
 from ..columns import META_COLUMNS
 from ..plot_util import make_kind_scale
-from ..search_util import search_query_from_form
-from ..search_util import SearchQueryHistory
 
 
 def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:
@@ -170,22 +173,35 @@ def _filter_past_year(df: pd.DataFrame) -> pd.DataFrame:
 def make_summary_blueprint(
     repository: ActivityRepository,
     config: Config,
-    search_query_history: SearchQueryHistory,
+    authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("summary", __name__, template_folder="templates")
 
     @blueprint.route("/")
     def index():
-        query = search_query_from_form(request.args)
-        search_query_history.register_query(query)
-        df = apply_search_query(query)
+        primitives = parse_search_params(request.args)
+
+        if authenticator.is_authenticated():
+            register_search_query(primitives)
+
+        df = apply_search_filter(primitives)
 
         kind_scale = make_kind_scale(repository.meta, config)
         df_without_nan = df.loc[~pd.isna(df["start_local"])]
 
+        stored_queries = get_stored_queries()
+        search_query_favorites = [
+            (str(q), q.to_url_str()) for q in stored_queries if q.is_favorite
+        ]
+        search_query_last = [
+            (str(q), q.to_url_str()) for q in stored_queries if not q.is_favorite
+        ]
+
         return render_template(
             "summary/index.html.j2",
-            query=query.to_jinja(),
+            query=primitives_to_jinja(primitives),
+            search_query_favorites=search_query_favorites,
+            search_query_last=search_query_last,
             custom_plots=[
                 (spec, make_parametric_plot(repository.meta, spec))
                 for spec in DB.session.scalars(sqlalchemy.select(PlotSpec)).all()

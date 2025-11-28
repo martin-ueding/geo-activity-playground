@@ -62,7 +62,6 @@ from .blueprints.time_zone_fixer_blueprint import make_time_zone_fixer_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
 from .flasher import FlaskFlasher
-from .search_util import SearchQueryHistory
 
 
 logger = logging.getLogger(__name__)
@@ -142,7 +141,6 @@ def create_app(
     config = config_accessor()
 
     authenticator = Authenticator(config)
-    search_query_history = SearchQueryHistory(config_accessor, authenticator)
     tile_getter = TileGetter(config.map_tile_url)
     image_transforms = {
         "color": IdentityImageTransform(),
@@ -195,7 +193,7 @@ def create_app(
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
         "/calendar": make_calendar_blueprint(repository),
-        "/eddington": register_eddington_blueprint(repository, search_query_history),
+        "/eddington": register_eddington_blueprint(repository, authenticator),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(
             authenticator,
@@ -206,9 +204,9 @@ def create_app(
             config,
         ),
         "/export": make_export_blueprint(authenticator),
-        "/hall-of-fame": make_hall_of_fame_blueprint(repository, search_query_history),
+        "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator),
         "/heatmap": make_heatmap_blueprint(
-            repository, tile_visit_accessor, config, search_query_history
+            repository, tile_visit_accessor, config, authenticator
         ),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
@@ -216,10 +214,8 @@ def create_app(
         ),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
-        "/search": make_search_blueprint(
-            repository, search_query_history, authenticator, config_accessor
-        ),
-        "/summary": make_summary_blueprint(repository, config, search_query_history),
+        "/search": make_search_blueprint(authenticator),
+        "/summary": make_summary_blueprint(repository, config, authenticator),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
         "/time-zone-fixer": make_time_zone_fixer_blueprint(
             authenticator, config, tile_visit_accessor
