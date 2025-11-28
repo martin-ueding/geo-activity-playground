@@ -1,4 +1,16 @@
 function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', overlay = "Colorful Cluster") {
+    // Get map container ID for localStorage key
+    const mapId = map.getContainer().id;
+    const storageKey = `map-layers-${mapId}`;
+    
+    // Load saved preferences if available
+    let saved = {};
+    try {
+        saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    } catch (e) {
+        console.warn('Failed to load saved map layers:', e);
+    }
+
     let base_maps = {
         "Grayscale": L.tileLayer("/tile/grayscale/{z}/{x}/{y}.png", {
             maxZoom: 19,
@@ -65,8 +77,33 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
         overlay = "Square Planner";
     }
 
-    base_maps[base].addTo(map)
-    overlay_maps[overlay].addTo(map)
+    // Use saved preferences if valid, otherwise fall back to defaults
+    const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : base;
+    const selectedOverlay = (saved.overlay && overlay_maps[saved.overlay]) ? saved.overlay : overlay;
+
+    base_maps[selectedBase].addTo(map)
+    overlay_maps[selectedOverlay].addTo(map)
 
     var layerControl = L.control.layers(base_maps, overlay_maps).addTo(map);
+
+    // Save layer selections to localStorage
+    map.on('baselayerchange', (e) => {
+        try {
+            const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            current.base = e.name;
+            localStorage.setItem(storageKey, JSON.stringify(current));
+        } catch (err) {
+            console.warn('Failed to save base layer preference:', err);
+        }
+    });
+
+    map.on('overlayadd', (e) => {
+        try {
+            const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            current.overlay = e.name;
+            localStorage.setItem(storageKey, JSON.stringify(current));
+        } catch (err) {
+            console.warn('Failed to save overlay preference:', err);
+        }
+    });
 }
