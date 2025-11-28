@@ -105,28 +105,17 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
         }
     });
 
-    map.on('overlayadd', (e) => {
+    // Helper to save all currently active overlays
+    function saveOverlays() {
         try {
             const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            if (!current.overlays) current.overlays = [];
-            if (!current.overlays.includes(e.name)) {
-                current.overlays.push(e.name);
-            }
+            current.overlays = Object.keys(overlay_maps).filter(name => map.hasLayer(overlay_maps[name]));
             localStorage.setItem(storageKey, JSON.stringify(current));
         } catch (err) {
             console.warn('Failed to save overlay preference:', err);
         }
-    });
+    }
 
-    map.on('overlayremove', (e) => {
-        try {
-            const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            if (current.overlays) {
-                current.overlays = current.overlays.filter(name => name !== e.name);
-            }
-            localStorage.setItem(storageKey, JSON.stringify(current));
-        } catch (err) {
-            console.warn('Failed to save overlay preference:', err);
-        }
-    });
+    map.on('overlayadd', saveOverlays);
+    map.on('overlayremove', saveOverlays);
 }
