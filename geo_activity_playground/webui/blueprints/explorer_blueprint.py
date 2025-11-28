@@ -165,7 +165,7 @@ class NumVisitsColorStrategy(ColorStrategy):
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
-            color = cmap(min(len(tile_info["activity_ids"]) / 50, 1.0))
+            color = cmap(min(tile_info["visit_count"] / 50, 1.0))
             return np.array([[color[:3] + (self._config.color_strategy_cmap_opacity,)]])
         else:
             return None
@@ -564,7 +564,7 @@ def make_explorer_blueprint(
             last = DB.session.get_one(Activity, tile_info["last_id"])
             context.update(
                 {
-                    "num_visits": len(tile_info["activity_ids"]),
+                    "num_visits": tile_info["visit_count"],
                     "first_activity_id": first.id,
                     "first_activity_name": first.name,
                     "first_time": tile_info["first_time"].isoformat(),

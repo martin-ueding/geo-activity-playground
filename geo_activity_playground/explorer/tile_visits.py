@@ -16,7 +16,7 @@ from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.datamodel import Activity
 from ..core.datamodel import DB
-from ..core.datamodel import TileFirstVisit
+from ..core.datamodel import TileVisit
 from ..core.paths import atomic_open
 from ..core.tasks import try_load_pickle
 from ..core.tasks import work_tracker_path
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def get_first_visits_for_activity(
     activity_id: int, zoom: Optional[int] = None
-) -> list[TileFirstVisit]:
+) -> list[TileVisit]:
     """Get all tiles that were first visited by the given activity.
 
     Args:
@@ -37,13 +37,13 @@ def get_first_visits_for_activity(
         zoom: Optional zoom level to filter by. If None, returns all zoom levels.
 
     Returns:
-        List of TileFirstVisit records.
+        List of TileVisit records where this activity was the first visitor.
     """
-    query = DB.session.query(TileFirstVisit).filter(
-        TileFirstVisit.activity_id == activity_id
+    query = DB.session.query(TileVisit).filter(
+        TileVisit.first_activity_id == activity_id
     )
     if zoom is not None:
-        query = query.filter(TileFirstVisit.zoom == zoom)
+        query = query.filter(TileVisit.zoom == zoom)
     return query.all()
 
 
@@ -60,9 +60,9 @@ def get_tile_history_df(zoom: int) -> pd.DataFrame:
         DataFrame with columns: activity_id, time, tile_x, tile_y
     """
     visits = (
-        DB.session.query(TileFirstVisit)
-        .filter(TileFirstVisit.zoom == zoom)
-        .order_by(TileFirstVisit.time)
+        DB.session.query(TileVisit)
+        .filter(TileVisit.zoom == zoom)
+        .order_by(TileVisit.first_time)
         .all()
     )
 
@@ -71,8 +71,8 @@ def get_tile_history_df(zoom: int) -> pd.DataFrame:
 
     return pd.DataFrame(
         {
-            "activity_id": [v.activity_id for v in visits],
-            "time": [pd.Timestamp(v.time) if v.time else pd.NaT for v in visits],
+            "activity_id": [v.first_activity_id for v in visits],
+            "time": [pd.Timestamp(v.first_time) if v.first_time else pd.NaT for v in visits],
             "tile_x": [v.tile_x for v in visits],
             "tile_y": [v.tile_y for v in visits],
         }
@@ -81,7 +81,7 @@ def get_tile_history_df(zoom: int) -> pd.DataFrame:
 
 def get_tile_count(zoom: int) -> int:
     """Get the count of explored tiles at a zoom level."""
-    return DB.session.query(TileFirstVisit).filter(TileFirstVisit.zoom == zoom).count()
+    return DB.session.query(TileVisit).filter(TileVisit.zoom == zoom).count()
 
 
 def get_tile_medians(zoom: int) -> tuple[int, int]:
@@ -93,8 +93,8 @@ def get_tile_medians(zoom: int) -> tuple[int, int]:
     from sqlalchemy import func
 
     result = DB.session.query(
-        func.avg(TileFirstVisit.tile_x), func.avg(TileFirstVisit.tile_y)
-    ).filter(TileFirstVisit.zoom == zoom).first()
+        func.avg(TileVisit.tile_x), func.avg(TileVisit.tile_y)
+    ).filter(TileVisit.zoom == zoom).first()
 
     if result and result[0] is not None:
         return (int(result[0]), int(result[1]))
@@ -102,7 +102,7 @@ def get_tile_medians(zoom: int) -> tuple[int, int]:
 
 
 class TileInfo(TypedDict):
-    activity_ids: set[int]
+    visit_count: int
     first_time: pd.Timestamp
     first_id: int
     last_time: pd.Timestamp
@@ -173,7 +173,7 @@ class TileVisitAccessor:
         """Complete pending migration to database. Must be called with app context."""
         if self._pending_migration is not None:
             logger.info("Completing tile_history migration to database...")
-            _migrate_tile_history_to_db(self._pending_migration)
+            _migrate_from_pickle_to_db(self._pending_migration)
             self._pending_migration = None
             logger.info("Migration complete.")
 
@@ -232,35 +232,79 @@ def _consistency_check(
     return True
 
 
-def _reset_tile_first_visits_db() -> None:
-    """Clear all TileFirstVisit records from the database."""
-    DB.session.query(TileFirstVisit).delete()
+def _reset_tile_visits_db() -> None:
+    """Clear all TileVisit records from the database."""
+    DB.session.query(TileVisit).delete()
     DB.session.commit()
-    logger.info("Cleared tile_first_visits table in database.")
+    logger.info("Cleared tile_visits table in database.")
 
 
-def _migrate_tile_history_to_db(old_tile_state: dict) -> None:
-    """Migrate existing tile_history data to the TileFirstVisit database table.
+def _migrate_from_pickle_to_db(old_tile_state: dict) -> None:
+    """Migrate existing pickle data to the TileVisit database table.
 
-    This is a one-time migration for users upgrading from pickle-only storage
-    (version 2 or earlier). It checks if the DB is empty and the pickle has
-    tile_history data, then migrates.
+    This migrates from older pickle formats (v2/v3) that had tile_history
+    or tile_visits with activity_ids sets.
     """
     # Check if DB already has data
-    existing_count = DB.session.query(TileFirstVisit).limit(1).count()
+    existing_count = DB.session.query(TileVisit).limit(1).count()
     if existing_count > 0:
         return  # Already migrated
 
-    # Check if old pickle has tile_history to migrate
+    # Try to migrate from tile_visits in pickle (has first/last info)
+    tile_visits = old_tile_state.get("tile_visits", {})
+    if tile_visits:
+        total_tiles = sum(len(visits) for visits in tile_visits.values())
+        if total_tiles > 0:
+            logger.info(f"Migrating {total_tiles} tiles from pickle to database...")
+            for zoom, visits_at_zoom in tile_visits.items():
+                batch: list[TileVisit] = []
+                for (tile_x, tile_y), info in visits_at_zoom.items():
+                    first_time = info.get("first_time")
+                    last_time = info.get("last_time")
+                    db_first_time = first_time.to_pydatetime() if pd.notna(first_time) else None
+                    db_last_time = last_time.to_pydatetime() if pd.notna(last_time) else None
+                    
+                    # Get visit count from activity_ids if present, otherwise from visit_count
+                    if "activity_ids" in info:
+                        visit_count = len(info["activity_ids"])
+                    else:
+                        visit_count = info.get("visit_count", 1)
+
+                    batch.append(
+                        TileVisit(
+                            zoom=zoom,
+                            tile_x=tile_x,
+                            tile_y=tile_y,
+                            first_activity_id=info["first_id"],
+                            first_time=db_first_time,
+                            last_activity_id=info["last_id"],
+                            last_time=db_last_time,
+                            visit_count=visit_count,
+                        )
+                    )
+
+                    if len(batch) >= 1000:
+                        DB.session.add_all(batch)
+                        DB.session.commit()
+                        batch = []
+
+                if batch:
+                    DB.session.add_all(batch)
+                    DB.session.commit()
+
+            logger.info("Migration complete.")
+            return
+
+    # Fallback: migrate from tile_history (older format)
     tile_history = old_tile_state.get("tile_history", {})
     if not tile_history:
-        return  # Nothing to migrate
+        return
 
     total_records = sum(
         len(df) for df in tile_history.values() if isinstance(df, pd.DataFrame)
     )
     if total_records == 0:
-        return  # Nothing to migrate
+        return
 
     logger.info(f"Migrating {total_records} tile first visits from pickle to database...")
 
@@ -268,28 +312,31 @@ def _migrate_tile_history_to_db(old_tile_state: dict) -> None:
         if not isinstance(tile_history_df, pd.DataFrame) or tile_history_df.empty:
             continue
 
-        batch: list[TileFirstVisit] = []
+        history_batch: list[TileVisit] = []
         for _, row in tile_history_df.iterrows():
             time = row["time"]
             db_time = time.to_pydatetime() if pd.notna(time) else None
-            batch.append(
-                TileFirstVisit(
+            activity_id = int(row["activity_id"])
+            history_batch.append(
+                TileVisit(
                     zoom=zoom,
                     tile_x=int(row["tile_x"]),
                     tile_y=int(row["tile_y"]),
-                    activity_id=int(row["activity_id"]),
-                    time=db_time,
+                    first_activity_id=activity_id,
+                    first_time=db_time,
+                    last_activity_id=activity_id,
+                    last_time=db_time,
+                    visit_count=1,
                 )
             )
 
-            # Commit in batches to avoid memory issues
-            if len(batch) >= 1000:
-                DB.session.add_all(batch)
+            if len(history_batch) >= 1000:
+                DB.session.add_all(history_batch)
                 DB.session.commit()
-                batch = []
+                history_batch = []
 
-        if batch:
-            DB.session.add_all(batch)
+        if history_batch:
+            DB.session.add_all(history_batch)
             DB.session.commit()
 
     logger.info("Migration complete.")
@@ -306,7 +353,7 @@ def compute_tile_visits_new(
     if not _consistency_check(repository, tile_visit_accessor):
         logger.warning("Need to recompute Explorer Tiles due to deleted activities.")
         tile_visit_accessor.reset()
-        _reset_tile_first_visits_db()
+        _reset_tile_visits_db()
         work_tracker.reset()
 
     for activity_id in tqdm(
@@ -330,7 +377,8 @@ def _process_activity(
     )
     for zoom in reversed(range(20)):
         activities_per_tile = tile_state["activities_per_tile"][zoom]
-        new_tile_first_visits: list[TileFirstVisit] = []
+        new_tile_visits: list[TileVisit] = []
+        tiles_to_update: list[tuple[tuple[int, int], datetime.datetime]] = []
 
         activity_tiles = activity_tiles.groupby(["tile_x", "tile_y"]).head(1)
 
@@ -341,48 +389,77 @@ def _process_activity(
             if activity.kind.consider_for_achievements:
                 if time is not None and time.tz is None:
                     time = time.tz_localize("UTC")
-                if tile not in tile_state["tile_visits"][zoom]:
-                    # Record new tile in database
+                
+                is_new_tile = tile not in tile_state["tile_visits"][zoom]
+                tile_visit = tile_state["tile_visits"][zoom][tile]
+                
+                if is_new_tile:
+                    # New tile - create DB record
                     db_time = time.to_pydatetime() if pd.notna(time) else None
-                    new_tile_first_visits.append(
-                        TileFirstVisit(
+                    new_tile_visits.append(
+                        TileVisit(
                             zoom=zoom,
                             tile_x=tile[0],
                             tile_y=tile[1],
-                            activity_id=activity_id,
-                            time=db_time,
+                            first_activity_id=activity_id,
+                            first_time=db_time,
+                            last_activity_id=activity_id,
+                            last_time=db_time,
+                            visit_count=1,
                         )
                     )
-
-                tile_visit = tile_state["tile_visits"][zoom][tile]
-                if not tile_visit:
-                    tile_visit["activity_ids"] = {activity_id}
+                    # Initialize in-memory state
+                    tile_visit["visit_count"] = 1
+                    tile_visit["first_id"] = activity_id
+                    tile_visit["first_time"] = time
+                    tile_visit["last_id"] = activity_id
+                    tile_visit["last_time"] = time
                 else:
-                    tile_visit["activity_ids"].add(activity_id)
-
-                first_time = tile_visit.get("first_time", None)
-                last_time = tile_visit.get("last_time", None)
-                if first_time is not None and first_time.tz is None:
-                    first_time = first_time.tz_localize("UTC")
-                if last_time is not None and last_time.tz is None:
-                    last_time = last_time.tz_localize("UTC")
-                try:
-                    if first_time is None or time < first_time:
-                        tile_visit["first_id"] = activity_id
-                        tile_visit["first_time"] = time
-                    if last_time is None or time > last_time:
-                        tile_visit["last_id"] = activity_id
-                        tile_visit["last_time"] = time
-                except TypeError as e:
-                    raise TypeError(
-                        f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"
-                    ) from e
+                    # Existing tile - update visit count and last visit
+                    tile_visit["visit_count"] = tile_visit.get("visit_count", 1) + 1
+                    tiles_to_update.append((tile, time))
+                    
+                    # Update first/last times in memory
+                    first_time = tile_visit.get("first_time", None)
+                    last_time = tile_visit.get("last_time", None)
+                    if first_time is not None and first_time.tz is None:
+                        first_time = first_time.tz_localize("UTC")
+                    if last_time is not None and last_time.tz is None:
+                        last_time = last_time.tz_localize("UTC")
+                    try:
+                        if first_time is None or time < first_time:
+                            tile_visit["first_id"] = activity_id
+                            tile_visit["first_time"] = time
+                        if last_time is None or time > last_time:
+                            tile_visit["last_id"] = activity_id
+                            tile_visit["last_time"] = time
+                    except TypeError as e:
+                        raise TypeError(
+                            f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"
+                        ) from e
 
             activities_per_tile[tile].add(activity_id)
 
-        # Write new first visits to database
-        if new_tile_first_visits:
-            DB.session.add_all(new_tile_first_visits)
+        # Write new tile visits to database
+        if new_tile_visits:
+            DB.session.add_all(new_tile_visits)
+            DB.session.commit()
+
+        # Update existing tiles in database
+        for tile, _ in tiles_to_update:
+            tile_visit = tile_state["tile_visits"][zoom][tile]
+            last_time = tile_visit["last_time"]
+            db_last_time = last_time.to_pydatetime() if pd.notna(last_time) else None
+            DB.session.query(TileVisit).filter(
+                TileVisit.zoom == zoom,
+                TileVisit.tile_x == tile[0],
+                TileVisit.tile_y == tile[1],
+            ).update({
+                "visit_count": tile_visit["visit_count"],
+                "last_activity_id": tile_visit["last_id"],
+                "last_time": db_last_time,
+            })
+        if tiles_to_update:
             DB.session.commit()
 
         # Move up one layer in the quad-tree.

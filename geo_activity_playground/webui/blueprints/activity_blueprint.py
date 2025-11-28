@@ -32,7 +32,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
-from ...core.datamodel import TileFirstVisit
+from ...core.datamodel import TileVisit
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
@@ -112,10 +112,10 @@ def make_activity_blueprint(
         new_tiles_per_zoom = {}
         for zoom in sorted(config.explorer_zoom_levels):
             first_visits = (
-                DB.session.query(TileFirstVisit)
+                DB.session.query(TileVisit)
                 .filter(
-                    TileFirstVisit.activity_id == activity.id,
-                    TileFirstVisit.zoom == zoom,
+                    TileVisit.first_activity_id == activity.id,
+                    TileVisit.zoom == zoom,
                 )
                 .all()
             )
