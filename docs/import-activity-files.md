@@ -1,5 +1,16 @@
 # Import Activity Files
 
+!!! tip "When to use this guide"
+    Use this guide if you have **local activity files** (GPX, FIT, TCX, etc.) from recording apps or devices.
+    
+    - You record with OsmAnd, OpenTracks, Organic Maps, or similar apps.
+    - You have a Garmin/Wahoo device that exports FIT files.
+    - You already converted a Strava archive using [Moving from Strava](moving-from-strava.md).
+    
+    **Not for you?**
+    
+    - If you have a **raw Strava archive** (ZIP file), do **not** copy its files directly here. See [Moving from Strava](moving-from-strava.md) to convert them first, or [Connect Strava API](connect-strava-api.md) to sync directly.
+
 One way to get your activities into Geo Activity Playground is by adding files to a directory in your base directory. See the options to [record activities](record-activities.md).
 
 This how-to assumes that you have a way to record activities and transfer them to your computer.
