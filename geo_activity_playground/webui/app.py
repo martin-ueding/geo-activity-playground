@@ -1,3 +1,4 @@
+import atexit
 import datetime
 import importlib
 import json
@@ -332,6 +333,13 @@ def web_ui_main(
         dir_for_source.mkdir()
         for subdir in subdirs:
             shutil.move(subdir, dir_for_source)
+
+    # Register cleanup handler to properly close database connection on shutdown
+    def cleanup():
+        with app.app_context():
+            DB.engine.dispose()
+
+    atexit.register(cleanup)
 
     app.run(host=host, port=port)
 
