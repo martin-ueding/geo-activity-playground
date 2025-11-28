@@ -137,6 +137,9 @@ def create_app(
     # Set up dependencies
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
+    # Complete any pending migration from old pickle format (requires app context)
+    with app.app_context():
+        tile_visit_accessor.complete_migration()
     config_accessor = ConfigAccessor()
     config = config_accessor()
 
