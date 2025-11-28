@@ -17,6 +17,12 @@ Types of changes
 
 ## Unreleased
 
+This is a release where I have tried out Cursor with Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.
+
+Added:
+
+- Persist layer selection in maps. ([GH-375](https://github.com/martin-ueding/geo-activity-playground/issues/375))
+
 Fixed:
 
 - The search query history is persisted in the database now (previously in the configuration file). It was broken, now it is fixed again.
