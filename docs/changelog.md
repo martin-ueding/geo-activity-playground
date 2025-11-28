@@ -23,6 +23,10 @@ Added:
 
 - Persist layer selection in maps. ([GH-375](https://github.com/martin-ueding/geo-activity-playground/issues/375))
 
+Changed:
+
+- Make it more clear how the different Strava import mechanisms are to be used and differentiate the different guides from each other. ([GH-297](https://github.com/martin-ueding/geo-activity-playground/issues/297))
+
 Fixed:
 
 - The search query history is persisted in the database now (previously in the configuration file). It was broken, now it is fixed again.
