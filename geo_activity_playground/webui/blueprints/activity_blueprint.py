@@ -32,6 +32,7 @@ from ...core.datamodel import DB
 from ...core.datamodel import Equipment
 from ...core.datamodel import Kind
 from ...core.datamodel import Tag
+from ...core.datamodel import TileFirstVisit
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
@@ -106,34 +107,25 @@ def make_activity_blueprint(
         similar_activities = [row for _, row in similar_activities.iterrows()]
         similar_activities.reverse()
 
-        new_tiles = {
-            zoom: sum(
-                tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
-                == activity.id
-            )
-            for zoom in sorted(config.explorer_zoom_levels)
-            if not tile_visit_accessor.tile_state["tile_history"][zoom].empty
-        }
-
+        # Query new tiles discovered by this activity from the database
         new_tiles_geojson = {}
         new_tiles_per_zoom = {}
         for zoom in sorted(config.explorer_zoom_levels):
-            if tile_visit_accessor.tile_state["tile_history"][zoom].empty:
-                continue
-            new_tiles = tile_visit_accessor.tile_state["tile_history"][zoom].loc[
-                tile_visit_accessor.tile_state["tile_history"][zoom]["activity_id"]
-                == activity.id
-            ]
-            if len(new_tiles):
+            first_visits = (
+                DB.session.query(TileFirstVisit)
+                .filter(
+                    TileFirstVisit.activity_id == activity.id,
+                    TileFirstVisit.zoom == zoom,
+                )
+                .all()
+            )
+            if first_visits:
                 points = make_grid_points(
-                    (
-                        (row["tile_x"], row["tile_y"])
-                        for index, row in new_tiles.iterrows()
-                    ),
+                    ((fv.tile_x, fv.tile_y) for fv in first_visits),
                     zoom,
                 )
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
-            new_tiles_per_zoom[zoom] = len(new_tiles)
+            new_tiles_per_zoom[zoom] = len(first_visits)
 
         line_color_columns_avail = dict(
             [(column.name, column) for column in TIME_SERIES_COLUMNS]
