@@ -1,4 +1,4 @@
-var map = L.map('activity-map', {
+var map = L.map('activity-trim-map', {
     fullscreenControl: true
 });
 L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
