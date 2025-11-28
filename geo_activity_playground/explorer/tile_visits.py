@@ -146,15 +146,14 @@ class TileVisitAccessor:
 
     def __init__(self) -> None:
         self.tile_state: TileState = try_load_pickle(self.PATH)
+        self._pending_migration: Optional[dict] = None
 
         if self.tile_state is None:
-            # Try loading old pickle and migrate
+            # Try loading old pickle - defer DB migration until we have app context
             old_state = try_load_pickle(self.OLD_PATH)
             if old_state is not None:
-                logger.info("Migrating from tile-state-2 to tile-state-3...")
-                # Migrate tile_history to database
-                _migrate_tile_history_to_db(old_state)
-                # Copy over the other fields
+                logger.info("Found old tile-state-2.pickle, will migrate to v3...")
+                # Copy over the non-DB fields now
                 self.tile_state = make_tile_state()
                 if "tile_visits" in old_state:
                     self.tile_state["tile_visits"] = old_state["tile_visits"]
@@ -162,12 +161,21 @@ class TileVisitAccessor:
                     self.tile_state["activities_per_tile"] = old_state["activities_per_tile"]
                 if "evolution_state" in old_state:
                     self.tile_state["evolution_state"] = old_state["evolution_state"]
+                # Store old state for DB migration later (needs app context)
+                self._pending_migration = old_state
                 self.save()
-                logger.info("Migration complete.")
             else:
                 self.tile_state = make_tile_state()
         elif self.tile_state.get("version", None) != TILE_STATE_VERSION:
             self.tile_state = make_tile_state()
+
+    def complete_migration(self) -> None:
+        """Complete pending migration to database. Must be called with app context."""
+        if self._pending_migration is not None:
+            logger.info("Completing tile_history migration to database...")
+            _migrate_tile_history_to_db(self._pending_migration)
+            self._pending_migration = None
+            logger.info("Migration complete.")
 
     def reset(self) -> None:
         self.tile_state = make_tile_state()
@@ -291,6 +299,9 @@ def compute_tile_visits_new(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
     work_tracker = WorkTracker(work_tracker_path("tile-state"))
+
+    # Complete any pending migration from old pickle format (requires app context)
+    tile_visit_accessor.complete_migration()
 
     if not _consistency_check(repository, tile_visit_accessor):
         logger.warning("Need to recompute Explorer Tiles due to deleted activities.")
