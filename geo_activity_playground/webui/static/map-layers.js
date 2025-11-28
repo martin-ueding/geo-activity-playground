@@ -34,6 +34,12 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
         }),
     }
 
+    // Build heatmap URL with optional extra args
+    let heatmap_url = "/heatmap/tile/{z}/{x}/{y}.png";
+    if (typeof heatmap_extra_args !== 'undefined' && heatmap_extra_args) {
+        heatmap_url += `?${heatmap_extra_args}`;
+    }
+
     let overlay_maps = {
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
@@ -63,7 +69,7 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
             maxZoom: 19,
             attribution: map_tile_attribution
         }),
-        "Heatmap": L.tileLayer("/heatmap/tile/{z}/{x}/{y}.png", {
+        "Heatmap": L.tileLayer(heatmap_url, {
             maxZoom: 19,
             attribution: map_tile_attribution
         })

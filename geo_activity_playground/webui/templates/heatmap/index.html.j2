@@ -13,27 +13,22 @@
         <p><a href="#" onclick="downloadAs()">Download heatmap in visible area</a></p>
 
         <script>
+            const zoom = 14;
+            const map_tile_attribution = '{{ map_tile_attribution|safe }}';
+            const heatmap_extra_args = '{{ extra_args|safe }}';
+
             let map = L.map('heatmap-map', {
                 fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],
-            zoom: 12
+                zoom: 12
             });
 
-            L.tileLayer("/tile/inverse_grayscale/{z}/{x}/{y}.png", {
-                maxZoom: 19,
-                attribution: '{{ map_tile_attribution|safe }}'
-            }).addTo(map)
-
-            L.tileLayer('/heatmap/tile/{z}/{x}/{y}.png?{{ extra_args|safe }}', {
-                maxZoom: 19,
-                attribution: '{{ map_tile_attribution|safe }}'
-            }).addTo(map)
+            add_layers_to_map(map, zoom, map_tile_attribution, "Inverse Grayscale", "Heatmap");
 
             let bbox = {{ center.bbox| safe }}
             if (bbox) {
                 map.fitBounds(L.geoJSON(bbox).getBounds())
             }
-
 
             function downloadAs() {
                 bounds = map.getBounds()
