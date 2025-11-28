@@ -79,10 +79,18 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
 
     // Use saved preferences if valid, otherwise fall back to defaults
     const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : base;
-    const selectedOverlay = (saved.overlay && overlay_maps[saved.overlay]) ? saved.overlay : overlay;
+    
+    // Overlays: saved.overlays is an array, filter to only valid ones
+    let selectedOverlays;
+    if (saved.overlays && Array.isArray(saved.overlays)) {
+        selectedOverlays = saved.overlays.filter(name => overlay_maps[name]);
+    } else {
+        // Fall back to default (single overlay as array)
+        selectedOverlays = [overlay];
+    }
 
     base_maps[selectedBase].addTo(map)
-    overlay_maps[selectedOverlay].addTo(map)
+    selectedOverlays.forEach(name => overlay_maps[name].addTo(map));
 
     var layerControl = L.control.layers(base_maps, overlay_maps).addTo(map);
 
@@ -100,7 +108,22 @@ function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', 
     map.on('overlayadd', (e) => {
         try {
             const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            current.overlay = e.name;
+            if (!current.overlays) current.overlays = [];
+            if (!current.overlays.includes(e.name)) {
+                current.overlays.push(e.name);
+            }
+            localStorage.setItem(storageKey, JSON.stringify(current));
+        } catch (err) {
+            console.warn('Failed to save overlay preference:', err);
+        }
+    });
+
+    map.on('overlayremove', (e) => {
+        try {
+            const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            if (current.overlays) {
+                current.overlays = current.overlays.filter(name => name !== e.name);
+            }
             localStorage.setItem(storageKey, JSON.stringify(current));
         } catch (err) {
             console.warn('Failed to save overlay preference:', err);
