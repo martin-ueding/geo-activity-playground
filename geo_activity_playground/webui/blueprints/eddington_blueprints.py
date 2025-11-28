@@ -11,16 +11,20 @@ from flask import request
 from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
-from ...core.meta_search import apply_search_query
+from ...core.meta_search import apply_search_filter
+from ...core.meta_search import get_stored_queries
+from ...core.meta_search import parse_search_params
+from ...core.meta_search import primitives_to_jinja
+from ...core.meta_search import register_search_query
+from ..authenticator import Authenticator
 from ..columns import column_distance
 from ..columns import column_elevation_gain
 from ..columns import ColumnDescription
-from ..search_util import search_query_from_form
-from ..search_util import SearchQueryHistory
 
 
 def register_eddington_blueprint(
-    repository: ActivityRepository, search_query_history: SearchQueryHistory
+    repository: ActivityRepository,
+    authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("eddington", __name__, template_folder="templates")
 
@@ -29,7 +33,7 @@ def register_eddington_blueprint(
         return _render_eddington_template(
             repository,
             request,
-            search_query_history,
+            authenticator,
             "distance",
             column_distance,
             [1],
@@ -40,7 +44,7 @@ def register_eddington_blueprint(
         return _render_eddington_template(
             repository,
             request,
-            search_query_history,
+            authenticator,
             "elevation_gain",
             column_elevation_gain,
             [20, 10, 1],
@@ -52,7 +56,7 @@ def register_eddington_blueprint(
 def _render_eddington_template(
     repository: ActivityRepository,
     request: Request,
-    search_query_history: SearchQueryHistory,
+    authenticator: Authenticator,
     template_name,
     column: ColumnDescription,
     divisor_values_avail: list[int],
@@ -62,10 +66,13 @@ def _render_eddington_template(
     display_name = column.display_name
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
-    query = search_query_from_form(request.args)
-    search_query_history.register_query(query)
+    primitives = parse_search_params(request.args)
+
+    if authenticator.is_authenticated():
+        register_search_query(primitives)
+
     activities = (
-        apply_search_query(query).dropna(subset=["start_local", column_name]).copy()
+        apply_search_filter(primitives).dropna(subset=["start_local", column_name]).copy()
     )
 
     assert (
@@ -78,6 +85,14 @@ def _render_eddington_template(
     en_per_week, eddington_df_per_week = _get_values_per_group(
         activities.groupby(["iso_year", "week"]), column_name, divisor
     )
+
+    stored_queries = get_stored_queries()
+    search_query_favorites = [
+        (str(q), q.to_url_str()) for q in stored_queries if q.is_favorite
+    ]
+    search_query_last = [
+        (str(q), q.to_url_str()) for q in stored_queries if not q.is_favorite
+    ]
 
     return render_template(
         f"eddington/{template_name}.html.j2",
@@ -104,7 +119,9 @@ def _render_eddington_template(
             & (eddington_df_per_week[column_name] <= en_per_week + 10 * divisor)
             & (eddington_df_per_week[column_name] % divisor == 0)
         ].to_dict(orient="records"),
-        query=query.to_jinja(),
+        query=primitives_to_jinja(primitives),
+        search_query_favorites=search_query_favorites,
+        search_query_last=search_query_last,
         yearly_eddington=_get_yearly_eddington(activities, column_name, divisor),
         eddington_number_history_plot=_get_eddington_number_history(
             activities, column_name, divisor

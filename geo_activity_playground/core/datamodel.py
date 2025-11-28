@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import shutil
+import urllib.parse
 import uuid
 import zoneinfo
 from typing import Any
@@ -527,31 +528,31 @@ class StoredSearchQuery(DB.Model):
         bits = []
 
         if data.get("name"):
-            bits.append(f"name is "{data['name']}"")
+            bits.append(f'name is "{data['name']}"')
 
         if data.get("equipment"):
             equipment_names = [
                 DB.session.get_one(Equipment, eid).name for eid in data["equipment"]
             ]
             bits.append(
-                "equipment is " + (" or ".join(f""{name}"" for name in equipment_names))
+                "equipment is " + (" or ".join(f'"{name}"' for name in equipment_names))
             )
 
         if data.get("kind"):
             kind_names = [DB.session.get_one(Kind, kid).name for kid in data["kind"]]
             bits.append(
-                "kind is " + (" or ".join(f""{name}"" for name in kind_names))
+                "kind is " + (" or ".join(f'"{name}"' for name in kind_names))
             )
 
         if data.get("tag"):
             tag_names = [DB.session.get_one(Tag, tid).tag for tid in data["tag"]]
-            bits.append("tag is " + (" or ".join(f""{name}"" for name in tag_names)))
+            bits.append("tag is " + (" or ".join(f'"{name}"' for name in tag_names)))
 
         if data.get("start_begin"):
-            bits.append(f"after "{data['start_begin']}"")
+            bits.append(f"after {data['start_begin']}")
 
         if data.get("start_end"):
-            bits.append(f"until "{data['start_end']}"")
+            bits.append(f"until {data['start_end']}")
 
         if data.get("distance_km_min"):
             bits.append(f"at least {data['distance_km_min']} km")
@@ -560,3 +561,31 @@ class StoredSearchQuery(DB.Model):
             bits.append(f"at most {data['distance_km_max']} km")
 
         return " and ".join(bits)
+
+    def to_url_str(self) -> str:
+        """Convert the stored query to a URL query string."""
+        data = json.loads(self.query_json)
+        variables = []
+
+        for equipment_id in data.get("equipment", []):
+            variables.append(("equipment", equipment_id))
+        for kind_id in data.get("kind", []):
+            variables.append(("kind", kind_id))
+        for tag_id in data.get("tag", []):
+            variables.append(("tag", tag_id))
+        if data.get("name"):
+            variables.append(("name", data["name"]))
+        if data.get("name_case_sensitive"):
+            variables.append(("name_case_sensitive", "true"))
+        if data.get("start_begin"):
+            variables.append(("start_begin", data["start_begin"]))
+        if data.get("start_end"):
+            variables.append(("start_end", data["start_end"]))
+        if data.get("distance_km_min") is not None:
+            variables.append(("distance_km_min", data["distance_km_min"]))
+        if data.get("distance_km_max") is not None:
+            variables.append(("distance_km_max", data["distance_km_max"]))
+
+        return "&".join(
+            f"{key}={urllib.parse.quote_plus(str(value))}" for key, value in variables
+        )

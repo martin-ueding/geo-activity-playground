@@ -13,19 +13,21 @@ from PIL import ImageDraw
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
-from ...core.meta_search import apply_search_query
-from ...core.meta_search import SearchQuery
-from ...core.raster_map import convert_to_grayscale
+from ...core.meta_search import apply_search_filter
+from ...core.meta_search import get_stored_queries
+from ...core.meta_search import is_search_active
+from ...core.meta_search import parse_search_params
+from ...core.meta_search import primitives_to_jinja
+from ...core.meta_search import primitives_to_url_str
+from ...core.meta_search import register_search_query
 from ...core.raster_map import GeoBounds
 from ...core.raster_map import get_sensible_zoom_level
-from ...core.raster_map import get_tile
 from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import PixelBounds
 from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import TileVisitAccessor
-from ..search_util import search_query_from_form
-from ..search_util import SearchQueryHistory
+from ..authenticator import Authenticator
 from .explorer_blueprint import bounding_box_for_biggest_cluster
 
 logger = logging.getLogger(__name__)
@@ -35,7 +37,7 @@ def make_heatmap_blueprint(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
-    search_query_history: SearchQueryHistory,
+    authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
 
@@ -46,8 +48,10 @@ def make_heatmap_blueprint(
 
     @blueprint.route("/")
     def index():
-        query = search_query_from_form(request.args)
-        search_query_history.register_query(query)
+        primitives = parse_search_params(request.args)
+
+        if authenticator.is_authenticated():
+            register_search_query(primitives)
 
         zoom = 14
         tiles = tile_histories[zoom]
@@ -56,6 +60,14 @@ def make_heatmap_blueprint(
             medians["tile_x"], medians["tile_y"], zoom
         )
         cluster_state = tile_evolution_states[zoom]
+
+        stored_queries = get_stored_queries()
+        search_query_favorites = [
+            (str(q), q.to_url_str()) for q in stored_queries if q.is_favorite
+        ]
+        search_query_last = [
+            (str(q), q.to_url_str()) for q in stored_queries if not q.is_favorite
+        ]
 
         context = {
             "center": {
@@ -69,19 +81,21 @@ def make_heatmap_blueprint(
                     else {}
                 ),
             },
-            "extra_args": query.to_url_str(),
-            "query": query.to_jinja(),
+            "extra_args": primitives_to_url_str(primitives),
+            "query": primitives_to_jinja(primitives),
+            "search_query_favorites": search_query_favorites,
+            "search_query_last": search_query_last,
         }
 
         return render_template("heatmap/index.html.j2", **context)
 
     @blueprint.route("/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(x: int, y: int, z: int):
-        query = search_query_from_form(request.args)
+        primitives = parse_search_params(request.args)
         f = io.BytesIO()
         pl.imsave(
             f,
-            _render_tile_image(x, y, z, query, config, repository, activities_per_tile),
+            _render_tile_image(x, y, z, primitives, config, repository, activities_per_tile),
             format="png",
         )
         return Response(
@@ -93,7 +107,7 @@ def make_heatmap_blueprint(
         "/download/<float:north>/<float:east>/<float:south>/<float:west>/heatmap.png"
     )
     def download(north: float, east: float, south: float, west: float):
-        query = search_query_from_form(request.args)
+        primitives = parse_search_params(request.args)
         geo_bounds = GeoBounds(south, west, north, east)
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
         pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
@@ -112,7 +126,7 @@ def make_heatmap_blueprint(
                     x,
                     y,
                     tile_bounds.zoom,
-                    query,
+                    primitives,
                     config,
                     repository,
                     activities_per_tile,
@@ -133,13 +147,13 @@ def _get_counts(
     x: int,
     y: int,
     z: int,
-    query: SearchQuery,
+    primitives: dict,
     repository: ActivityRepository,
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-    if not query.active:
+    if not is_search_active(primitives):
         tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
         if tile_count_cache_path.exists():
             try:
@@ -183,7 +197,7 @@ def _get_counts(
         tile_count_cache_path.unlink(missing_ok=True)
         tmp_path.rename(tile_count_cache_path)
     else:
-        activities = apply_search_query(query)
+        activities = apply_search_filter(primitives)
         activity_ids = activities_per_tile[z].get((x, y), set())
         for activity_id in activity_ids:
             if activity_id not in activities["id"]:
@@ -207,14 +221,14 @@ def _render_tile_image(
     x: int,
     y: int,
     z: int,
-    query: SearchQuery,
+    primitives: dict,
     config: Config,
     repository: ActivityRepository,
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels)
-    tile_counts += _get_counts(x, y, z, query, repository, activities_per_tile)
+    tile_counts += _get_counts(x, y, z, primitives, repository, activities_per_tile)
 
     tile_counts = np.sqrt(tile_counts) / 5
     tile_counts[tile_counts > 1.0] = 1.0
