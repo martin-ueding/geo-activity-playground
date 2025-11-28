@@ -510,3 +510,53 @@ class ExplorerTileBookmark(DB.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.tile_x}, {self.tile_y}) @ {self.zoom}"
+
+
+class StoredSearchQuery(DB.Model):
+    __tablename__ = "stored_search_queries"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    query_json: Mapped[str] = mapped_column(sa.Text, nullable=False, unique=True)
+    is_favorite: Mapped[bool] = mapped_column(
+        sa.Boolean, default=False, nullable=False
+    )
+    last_used: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=False)
+
+    def __str__(self) -> str:
+        data = json.loads(self.query_json)
+        bits = []
+
+        if data.get("name"):
+            bits.append(f"name is "{data['name']}"")
+
+        if data.get("equipment"):
+            equipment_names = [
+                DB.session.get_one(Equipment, eid).name for eid in data["equipment"]
+            ]
+            bits.append(
+                "equipment is " + (" or ".join(f""{name}"" for name in equipment_names))
+            )
+
+        if data.get("kind"):
+            kind_names = [DB.session.get_one(Kind, kid).name for kid in data["kind"]]
+            bits.append(
+                "kind is " + (" or ".join(f""{name}"" for name in kind_names))
+            )
+
+        if data.get("tag"):
+            tag_names = [DB.session.get_one(Tag, tid).tag for tid in data["tag"]]
+            bits.append("tag is " + (" or ".join(f""{name}"" for name in tag_names)))
+
+        if data.get("start_begin"):
+            bits.append(f"after "{data['start_begin']}"")
+
+        if data.get("start_end"):
+            bits.append(f"until "{data['start_end']}"")
+
+        if data.get("distance_km_min"):
+            bits.append(f"at least {data['distance_km_min']} km")
+
+        if data.get("distance_km_max"):
+            bits.append(f"at most {data['distance_km_max']} km")
+
+        return " and ".join(bits)
