@@ -68,11 +68,4 @@ column_elevation = ColumnDescription(
     format=".0f",
 )
 
-column_copernicus_elevation = ColumnDescription(
-    name="copernicus_elevation",
-    display_name="Elevation (Copernicus DEM)",
-    unit="m",
-    format=".0f",
-)
-
-TIME_SERIES_COLUMNS = [column_speed, column_elevation, column_copernicus_elevation]
+TIME_SERIES_COLUMNS = [column_speed, column_elevation]
