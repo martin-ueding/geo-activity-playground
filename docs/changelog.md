@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- The search query history is persisted in the database now (previously in the configuration file). It was broken, now it is fixed again.
+
 ## Version 1.15.0 — 2025-11-22
 
 Added:
