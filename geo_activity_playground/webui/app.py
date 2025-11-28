@@ -96,77 +96,65 @@ def importer_thread(
     logger.info("Importer thread is done.")
 
 
-def web_ui_main(
-    basedir: pathlib.Path,
-    skip_reload: bool,
-    host: str,
-    port: int,
-    strava_begin: Optional[str],
-    strava_end: Optional[str],
-) -> None:
-    os.chdir(basedir)
+def create_app(
+    database_uri: str = "sqlite:///database.sqlite",
+    secret_key: Optional[str] = None,
+    run_migrations: bool = True,
+) -> Flask:
+    """
+    Create and configure the Flask application.
 
-    warnings.filterwarnings("ignore", "__array__ implementation doesn't")
-    warnings.filterwarnings("ignore", '\'field "native_field_num"')
-    warnings.filterwarnings("ignore", '\'field "units"')
-    warnings.filterwarnings(
-        "ignore", r"datetime.datetime.utcfromtimestamp\(\) is deprecated"
-    )
+    This is the application factory that can be used by both production
+    code and tests.
+
+    Args:
+        database_uri: SQLAlchemy database URI. Use "sqlite:///:memory:" for tests.
+        secret_key: Flask secret key. If None, will be generated/loaded from file.
+        run_migrations: If True, run Alembic migrations. If False, use DB.create_all().
+                       Set to False for tests to speed up setup.
+
+    Returns:
+        Configured Flask application.
+    """
     app = Flask(__name__)
 
-    database_path = pathlib.Path("database.sqlite")
-    logger.info(f"Using database file at '{database_path.absolute()}'.")
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path.absolute()}"
-    # app.config["SQLALCHEMY_ECHO"] = True
-    app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+    app.config["UPLOAD_FOLDER"] = "Activities"
+    app.secret_key = secret_key or get_secret_key()
+
     DB.init_app(app)
 
-    alembic = Alembic()
-    alembic.init_app(app)
+    if run_migrations:
+        app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}
+        alembic = Alembic()
+        alembic.init_app(app)
+        with app.app_context():
+            alembic.upgrade()
+            DB.session.commit()
+    else:
+        with app.app_context():
+            DB.create_all()
 
-    with app.app_context():
-        alembic.upgrade()
-        DB.session.commit()
-        # DB.create_all()
-
+    # Set up dependencies
     repository = ActivityRepository()
     tile_visit_accessor = TileVisitAccessor()
     config_accessor = ConfigAccessor()
-    import_old_config(config_accessor)
-    import_old_strava_config(config_accessor)
+    config = config_accessor()
 
-    with app.app_context():
-        for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
-            if not activity.time_series_uuid:
-                activity.time_series_uuid = str(uuid.uuid4())
-                DB.session.commit()
-            old_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
-            if old_path.exists() and not activity.time_series_path.exists():
-                old_path.rename(activity.time_series_path)
-            if not activity.time_series_path.exists():
-                logger.error(
-                    f"Time series for {activity.id=}, expected at {activity.time_series_path}, does not exist. Deleting activity."
-                )
-                DB.session.delete(activity)
-                DB.session.commit()
+    authenticator = Authenticator(config)
+    search_query_history = SearchQueryHistory(config_accessor, authenticator)
+    tile_getter = TileGetter(config.map_tile_url)
+    image_transforms = {
+        "color": IdentityImageTransform(),
+        "grayscale": GrayscaleImageTransform(),
+        "pastel": PastelImageTransform(),
+        "inverse_grayscale": InverseGrayscaleImageTransform(),
+        "blank": BlankImageTransform(),
+    }
+    flasher = FlaskFlasher()
+    heart_rate_zone_computer = HeartRateZoneComputer(config)
 
-    if not skip_reload:
-        thread = threading.Thread(
-            target=importer_thread,
-            args=(
-                app,
-                repository,
-                tile_visit_accessor,
-                config_accessor(),
-                strava_begin,
-                strava_end,
-            ),
-        )
-        thread.start()
-
-    app.config["UPLOAD_FOLDER"] = "Activities"
-    app.secret_key = get_secret_key()
-
+    # Register template filters
     @app.template_filter()
     def dt(value: datetime.datetime):
         if pd.isna(value):
@@ -193,20 +181,7 @@ def web_ui_main(
     def isna(value):
         return pd.isna(value)
 
-    authenticator = Authenticator(config_accessor())
-    search_query_history = SearchQueryHistory(config_accessor, authenticator)
-    config = config_accessor()
-    tile_getter = TileGetter(config.map_tile_url)
-    image_transforms = {
-        "color": IdentityImageTransform(),
-        "grayscale": GrayscaleImageTransform(),
-        "pastel": PastelImageTransform(),
-        "inverse_grayscale": InverseGrayscaleImageTransform(),
-        "blank": BlankImageTransform(),
-    }
-    flasher = FlaskFlasher()
-    heart_rate_zone_computer = HeartRateZoneComputer(config)
-
+    # Register routes and blueprints
     register_entry_views(app, repository, config)
 
     blueprints = {
@@ -233,7 +208,7 @@ def web_ui_main(
         "/export": make_export_blueprint(authenticator),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, search_query_history),
         "/heatmap": make_heatmap_blueprint(
-            repository, tile_visit_accessor, config_accessor(), search_query_history
+            repository, tile_visit_accessor, config, search_query_history
         ),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
@@ -250,29 +225,20 @@ def web_ui_main(
             authenticator, config, tile_visit_accessor
         ),
         "/upload": make_upload_blueprint(
-            repository, tile_visit_accessor, config_accessor(), authenticator, flasher
+            repository, tile_visit_accessor, config, authenticator, flasher
         ),
     }
 
     for url_prefix, blueprint in blueprints.items():
         app.register_blueprint(blueprint, url_prefix=url_prefix)
 
-    base_dir = pathlib.Path("Open Street Map Tiles")
-    dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)
-    if base_dir.exists() and not dir_for_source.exists():
-        subdirs = base_dir.glob("*")
-        dir_for_source.mkdir()
-        for subdir in subdirs:
-            shutil.move(subdir, dir_for_source)
-
+    # Register context processor for global template variables
     @app.context_processor
     def inject_global_variables() -> dict:
         variables = {
             "version": _try_get_version(),
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
-            # "search_query_favorites": search_query_history.prepare_favorites(),
-            # "search_query_last": search_query_history.prepare_last(),
             "request_url": urllib.parse.quote_plus(request.url),
             "host_url": request.host_url,
         }
@@ -292,6 +258,81 @@ def web_ui_main(
             f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
         return variables
+
+    return app
+
+
+def web_ui_main(
+    basedir: pathlib.Path,
+    skip_reload: bool,
+    host: str,
+    port: int,
+    strava_begin: Optional[str],
+    strava_end: Optional[str],
+) -> None:
+    os.chdir(basedir)
+
+    warnings.filterwarnings("ignore", "__array__ implementation doesn't")
+    warnings.filterwarnings("ignore", '\'field "native_field_num"')
+    warnings.filterwarnings("ignore", '\'field "units"')
+    warnings.filterwarnings(
+        "ignore", r"datetime.datetime.utcfromtimestamp\(\) is deprecated"
+    )
+
+    database_path = pathlib.Path("database.sqlite")
+    logger.info(f"Using database file at '{database_path.absolute()}'.")
+
+    app = create_app(
+        database_uri=f"sqlite:///{database_path.absolute()}",
+        run_migrations=True,
+    )
+
+    # Import old config formats
+    config_accessor = ConfigAccessor()
+    import_old_config(config_accessor)
+    import_old_strava_config(config_accessor)
+
+    # Migrate time series files to new UUID-based naming
+    with app.app_context():
+        for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
+            if not activity.time_series_uuid:
+                activity.time_series_uuid = str(uuid.uuid4())
+                DB.session.commit()
+            old_path = TIME_SERIES_DIR() / f"{activity.id}.parquet"
+            if old_path.exists() and not activity.time_series_path.exists():
+                old_path.rename(activity.time_series_path)
+            if not activity.time_series_path.exists():
+                logger.error(
+                    f"Time series for {activity.id=}, expected at {activity.time_series_path}, does not exist. Deleting activity."
+                )
+                DB.session.delete(activity)
+                DB.session.commit()
+
+    # Start background importer thread
+    if not skip_reload:
+        repository = ActivityRepository()
+        tile_visit_accessor = TileVisitAccessor()
+        thread = threading.Thread(
+            target=importer_thread,
+            args=(
+                app,
+                repository,
+                tile_visit_accessor,
+                config_accessor(),
+                strava_begin,
+                strava_end,
+            ),
+        )
+        thread.start()
+
+    # Migrate tile cache directory structure
+    base_dir = pathlib.Path("Open Street Map Tiles")
+    dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)
+    if base_dir.exists() and not dir_for_source.exists():
+        subdirs = base_dir.glob("*")
+        dir_for_source.mkdir()
+        for subdir in subdirs:
+            shutil.move(subdir, dir_for_source)
 
     app.run(host=host, port=port)
 
