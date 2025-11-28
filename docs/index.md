@@ -38,7 +38,20 @@ If you're new, just follow these steps:
 2. [Create a base directory](create-a-base-directory.md).
 3. [Start the webserver](starting-the-webserver.md).
 4. Choose a method to [record activities](record-activities.md).
-5. Import your activities via [activity files](import-activity-files.md), [connect the Strava API](connect-strava-api.md) or [upload activity files](upload-activity-files.md) in the web interface.
+5. Import your activities (see below).
+
+### Importing your activities
+
+Choose the approach that best fits your situation:
+
+| Your situation | Guide to follow |
+|----------------|-----------------|
+| **You have GPX/FIT/TCX files** from a Garmin device, OsmAnd, or other apps | [Import activity files](import-activity-files.md) — put files in `Activities/` folder |
+| **You want to keep using Strava** but also use this tool | [Connect Strava API](connect-strava-api.md) — syncs automatically from Strava |
+| **You want to leave Strava** and stop using it entirely | [Moving from Strava](moving-from-strava.md) — converts your Strava archive |
+
+!!! warning "Don't mix these approaches"
+    If you have a Strava archive (ZIP file), do **not** simply copy its `activities/` folder into your `Activities/` folder. Use either [Connect Strava API](connect-strava-api.md) or [Moving from Strava](moving-from-strava.md) instead.
 
 Have fun. If you're stuck, [get help](get-help.md).
 

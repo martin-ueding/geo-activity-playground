@@ -1,5 +1,17 @@
 # Moving from Strava
 
+!!! tip "When to use this guide"
+    Use this guide if you want to **stop using Strava entirely** and migrate your data to Geo Activity Playground.
+    
+    - You want to delete your Strava account (or stop using it).
+    - You want your activities converted and stored locally.
+    - You'll use a different app to record future activities.
+    
+    **Not for you?**
+    
+    - If you want to **keep using Strava** and sync from it, see [Connect Strava API](connect-strava-api.md) instead.
+    - If you have **local GPX/FIT files** (not from Strava), see [Import activity files](import-activity-files.md).
+
 If you have been using Strava up to this point but want to use this project _exclusively_ from now on, this is the correct guide. Here I will show how you can convert your data from Strava into the format of this project and keep adding new data without Strava in the future.
 
 ## Download your archive from Strava
@@ -79,6 +91,9 @@ The equipment might have nonsensical seeming names like `10370891.0`. The proble
 ## Use the directory
 
 Now that the files from Strava are converted, consult the [guide on using activity files](import-activity-files.md) to proceed from here.
+
+!!! warning "Don't skip the conversion step"
+    Do **not** copy the `activities/` folder from your Strava archive directly into the `Activities/` folder. The raw Strava files often have issues (missing metadata, problematic timestamps, etc.) that cause import warnings. The `convert-strava-checkout` command properly processes these files.
 
 ## Recording more activities
 
