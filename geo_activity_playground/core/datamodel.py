@@ -513,6 +513,41 @@ class ExplorerTileBookmark(DB.Model):
         return f"{self.name} ({self.tile_x}, {self.tile_y}) @ {self.zoom}"
 
 
+class TileFirstVisit(DB.Model):
+    """Records the first time each tile was visited by an activity.
+
+    This table stores the historical record of when each explorer tile was
+    first discovered. It enables queries like "which tiles did activity X
+    discover?" without needing to scan the full tile state.
+    """
+
+    __tablename__ = "tile_first_visits"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="tile_first_visit_activity_id"),
+        nullable=False,
+        index=True,
+    )
+    activity: Mapped["Activity"] = relationship()
+    time: Mapped[Optional[datetime.datetime]] = mapped_column(
+        sa.DateTime, nullable=True
+    )
+
+    __table_args__ = (
+        sa.Index("idx_tile_first_visits_zoom_tile", "zoom", "tile_x", "tile_y"),
+        sa.UniqueConstraint(
+            "zoom", "tile_x", "tile_y", name="unique_tile_first_visit_per_zoom"
+        ),
+    )
+
+    def __repr__(self) -> str:
+        return f"TileFirstVisit(zoom={self.zoom}, x={self.tile_x}, y={self.tile_y}, activity={self.activity_id})"
+
+
 class StoredSearchQuery(DB.Model):
     __tablename__ = "stored_search_queries"
 

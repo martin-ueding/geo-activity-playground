@@ -16,6 +16,7 @@ from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.datamodel import Activity
 from ..core.datamodel import DB
+from ..core.datamodel import TileFirstVisit
 from ..core.paths import atomic_open
 from ..core.tasks import try_load_pickle
 from ..core.tasks import work_tracker_path
@@ -23,39 +24,27 @@ from ..core.tasks import WorkTracker
 from ..core.tiles import adjacent_to
 from ..core.tiles import interpolate_missing_tile
 
-# import sqlalchemy as sa
-
-# from sqlalchemy import Column
-# from sqlalchemy import ForeignKey
-# from sqlalchemy import String
-# from sqlalchemy import Table
-# from sqlalchemy.orm import DeclarativeBase
-# from sqlalchemy.orm import Mapped
-# from sqlalchemy.orm import mapped_column
-# from sqlalchemy.orm import relationship
-
 logger = logging.getLogger(__name__)
 
 
-# class VisitedTile(DB.Model):
-#     __tablename__ = "visited_tiles"
+def get_first_visits_for_activity(
+    activity_id: int, zoom: Optional[int] = None
+) -> list[TileFirstVisit]:
+    """Get all tiles that were first visited by the given activity.
 
-#     zoom: Mapped[int] = mapped_column(primary_key=True)
-#     x: Mapped[int] = mapped_column(primary_key=True)
-#     y: Mapped[int] = mapped_column(primary_key=True)
+    Args:
+        activity_id: The activity ID to query for.
+        zoom: Optional zoom level to filter by. If None, returns all zoom levels.
 
-#     first_activity_id: Mapped[int] = mapped_column(
-#         ForeignKey("Activity.id", name="first_activity_id"), nullable=True
-#     )
-#     first_activity: Mapped[Activity] = relationship(back_populates="activities")
-#     first_visit: Mapped[Optional[datetime.datetime]] = mapped_column(
-#         sa.DateTime, nullable=True
-#     )
-
-#     __table_args__ =  (
-#         sa.PrimaryKeyConstraint(zoom, x, y),
-#         {},
-#     )
+    Returns:
+        List of TileFirstVisit records.
+    """
+    query = DB.session.query(TileFirstVisit).filter(
+        TileFirstVisit.activity_id == activity_id
+    )
+    if zoom is not None:
+        query = query.filter(TileFirstVisit.zoom == zoom)
+    return query.all()
 
 
 class TileInfo(TypedDict):
@@ -172,6 +161,62 @@ def _consistency_check(
     return True
 
 
+def _reset_tile_first_visits_db() -> None:
+    """Clear all TileFirstVisit records from the database."""
+    DB.session.query(TileFirstVisit).delete()
+    DB.session.commit()
+    logger.info("Cleared tile_first_visits table in database.")
+
+
+def _migrate_tile_history_to_db(tile_state: TileState) -> None:
+    """Migrate existing tile_history data to the TileFirstVisit database table.
+
+    This is a one-time migration for users upgrading from pickle-only storage.
+    It checks if the DB is empty and the pickle has data, then migrates.
+    """
+    # Check if DB already has data
+    existing_count = DB.session.query(TileFirstVisit).limit(1).count()
+    if existing_count > 0:
+        return  # Already migrated
+
+    # Check if pickle has data to migrate
+    total_records = sum(len(df) for df in tile_state["tile_history"].values())
+    if total_records == 0:
+        return  # Nothing to migrate
+
+    logger.info(f"Migrating {total_records} tile first visits from pickle to database...")
+
+    for zoom, tile_history_df in tile_state["tile_history"].items():
+        if tile_history_df.empty:
+            continue
+
+        batch: list[TileFirstVisit] = []
+        for _, row in tile_history_df.iterrows():
+            time = row["time"]
+            db_time = time.to_pydatetime() if pd.notna(time) else None
+            batch.append(
+                TileFirstVisit(
+                    zoom=zoom,
+                    tile_x=int(row["tile_x"]),
+                    tile_y=int(row["tile_y"]),
+                    activity_id=int(row["activity_id"]),
+                    time=db_time,
+                )
+            )
+
+            # Commit in batches to avoid memory issues
+            if len(batch) >= 1000:
+                DB.session.add_all(batch)
+                DB.session.commit()
+                batch = []
+
+        if batch:
+            DB.session.add_all(batch)
+            DB.session.commit()
+
+    logger.info("Migration complete.")
+
+
 def compute_tile_visits_new(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
@@ -180,7 +225,11 @@ def compute_tile_visits_new(
     if not _consistency_check(repository, tile_visit_accessor):
         logger.warning("Need to recompute Explorer Tiles due to deleted activities.")
         tile_visit_accessor.reset()
+        _reset_tile_first_visits_db()
         work_tracker.reset()
+
+    # Migrate existing pickle data to DB (one-time migration)
+    _migrate_tile_history_to_db(tile_visit_accessor.tile_state)
 
     for activity_id in tqdm(
         work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=1
@@ -237,6 +286,7 @@ def _process_activity(
             "tile_x": [],
             "tile_y": [],
         }
+        new_tile_first_visits: list[TileFirstVisit] = []
 
         activity_tiles = activity_tiles.groupby(["tile_x", "tile_y"]).head(1)
 
@@ -252,6 +302,18 @@ def _process_activity(
                     new_tile_history_soa["time"].append(time)
                     new_tile_history_soa["tile_x"].append(tile[0])
                     new_tile_history_soa["tile_y"].append(tile[1])
+
+                    # Also record in the database
+                    db_time = time.to_pydatetime() if pd.notna(time) else None
+                    new_tile_first_visits.append(
+                        TileFirstVisit(
+                            zoom=zoom,
+                            tile_x=tile[0],
+                            tile_y=tile[1],
+                            activity_id=activity_id,
+                            time=db_time,
+                        )
+                    )
 
                 tile_visit = tile_state["tile_visits"][zoom][tile]
                 if not tile_visit:
@@ -283,6 +345,11 @@ def _process_activity(
             tile_state["tile_history"][zoom] = pd.concat(
                 [tile_state["tile_history"][zoom], pd.DataFrame(new_tile_history_soa)]
             )
+
+        # Write new first visits to database
+        if new_tile_first_visits:
+            DB.session.add_all(new_tile_first_visits)
+            DB.session.commit()
 
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
