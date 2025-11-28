@@ -513,39 +513,55 @@ class ExplorerTileBookmark(DB.Model):
         return f"{self.name} ({self.tile_x}, {self.tile_y}) @ {self.zoom}"
 
 
-class TileFirstVisit(DB.Model):
-    """Records the first time each tile was visited by an activity.
+class TileVisit(DB.Model):
+    """Records visit statistics for each explored tile.
 
-    This table stores the historical record of when each explorer tile was
-    first discovered. It enables queries like "which tiles did activity X
-    discover?" without needing to scan the full tile state.
+    This table stores aggregate information about tile visits including
+    first visit, last visit, and total visit count. It serves as the
+    source of truth for tile exploration data.
     """
 
-    __tablename__ = "tile_first_visits"
+    __tablename__ = "tile_visits"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    activity_id: Mapped[int] = mapped_column(
-        ForeignKey("activities.id", name="tile_first_visit_activity_id"),
+
+    # First visit info
+    first_activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="tile_visit_first_activity_id"),
         nullable=False,
         index=True,
     )
-    activity: Mapped["Activity"] = relationship()
-    time: Mapped[Optional[datetime.datetime]] = mapped_column(
+    first_activity: Mapped["Activity"] = relationship(foreign_keys=[first_activity_id])
+    first_time: Mapped[Optional[datetime.datetime]] = mapped_column(
         sa.DateTime, nullable=True
     )
 
+    # Last visit info
+    last_activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="tile_visit_last_activity_id"),
+        nullable=False,
+    )
+    last_activity: Mapped["Activity"] = relationship(foreign_keys=[last_activity_id])
+    last_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+        sa.DateTime, nullable=True
+    )
+
+    # Visit count
+    visit_count: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=1)
+
     __table_args__ = (
-        sa.Index("idx_tile_first_visits_zoom_tile", "zoom", "tile_x", "tile_y"),
+        sa.Index("idx_tile_visits_zoom_tile", "zoom", "tile_x", "tile_y"),
         sa.UniqueConstraint(
-            "zoom", "tile_x", "tile_y", name="unique_tile_first_visit_per_zoom"
+            "zoom", "tile_x", "tile_y", name="unique_tile_visit_per_zoom"
         ),
     )
 
     def __repr__(self) -> str:
-        return f"TileFirstVisit(zoom={self.zoom}, x={self.tile_x}, y={self.tile_y}, activity={self.activity_id})"
+        return f"TileVisit(zoom={self.zoom}, x={self.tile_x}, y={self.tile_y}, visits={self.visit_count})"
+
 
 
 class StoredSearchQuery(DB.Model):
