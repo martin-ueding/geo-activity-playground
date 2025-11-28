@@ -21,6 +21,7 @@ Fixed:
 
 - The search query history is persisted in the database now (previously in the configuration file). It was broken, now it is fixed again.
 - The Copernicus elevation data feature had been removed a while ago; there was some selector in the UI that still offered it. That is now removed as well. ([GH-377](https://github.com/martin-ueding/geo-activity-playground/issues/377))
+- Improve speed of max cluster color strategy. Previously that used a list and O(n) lookup, now it uses a set with O(1) lookup that makes this as fast as any other color strategy. ([GH-376](https://github.com/martin-ueding/geo-activity-playground/issues/376))
 
 ## Version 1.15.0 — 2025-11-22
 

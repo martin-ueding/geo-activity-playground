@@ -74,7 +74,7 @@ class ColorStrategy(abc.ABC):
 
 
 class MaxClusterColorStrategy(ColorStrategy):
-    def __init__(self, evolution_state, tile_visits, config: Config):
+    def __init__(self, evolution_state: TileEvolutionState, tile_visits, config: Config):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
         self.max_cluster_members = set(
