@@ -26,6 +26,7 @@ from ...core.raster_map import OSM_TILE_SIZE
 from ...core.raster_map import PixelBounds
 from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
+from ...explorer.tile_visits import get_tile_medians
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from .explorer_blueprint import bounding_box_for_biggest_cluster
@@ -41,9 +42,7 @@ def make_heatmap_blueprint(
 ) -> Blueprint:
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
 
-    tile_histories = tile_visit_accessor.tile_state["tile_history"]
     tile_evolution_states = tile_visit_accessor.tile_state["evolution_state"]
-    tile_visits = tile_visit_accessor.tile_state["tile_visits"]
     activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
 
     @blueprint.route("/")
@@ -54,10 +53,9 @@ def make_heatmap_blueprint(
             register_search_query(primitives)
 
         zoom = 14
-        tiles = tile_histories[zoom]
-        medians = tiles[["tile_x", "tile_y"]].median(skipna=True)
+        medians = get_tile_medians(zoom)
         median_lat, median_lon = get_tile_upper_left_lat_lon(
-            medians["tile_x"], medians["tile_y"], zoom
+            medians[0], medians[1], zoom
         )
         cluster_state = tile_evolution_states[zoom]
 

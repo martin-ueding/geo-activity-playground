@@ -15,6 +15,7 @@ from ...explorer.grid_file import make_explorer_tile
 from ...explorer.grid_file import make_grid_file_geojson
 from ...explorer.grid_file import make_grid_file_gpx
 from ...explorer.grid_file import make_grid_points
+from ...explorer.tile_visits import get_tile_medians
 from ...explorer.tile_visits import TileVisitAccessor
 
 
@@ -52,11 +53,9 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
             )
         )
 
-        medians = tile_visit_accessor.tile_state["tile_history"][zoom][
-            ["tile_x", "tile_y"]
-        ].median()
+        medians = get_tile_medians(zoom)
         median_lat, median_lon = get_tile_upper_left_lat_lon(
-            medians["tile_x"], medians["tile_y"], zoom
+            medians[0], medians[1], zoom
         )
 
         return render_template(

@@ -42,6 +42,9 @@ from ...explorer.grid_file import make_grid_file_geojson
 from ...explorer.grid_file import make_grid_file_gpx
 from ...explorer.grid_file import make_grid_points
 from ...explorer.tile_visits import compute_tile_evolution
+from ...explorer.tile_visits import get_tile_count
+from ...explorer.tile_visits import get_tile_history_df
+from ...explorer.tile_visits import get_tile_medians
 from ...explorer.tile_visits import TileEvolutionState
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
@@ -256,13 +259,14 @@ def make_explorer_blueprint(
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_histories = tile_visit_accessor.tile_state["tile_history"]
-        tiles = tile_histories[zoom]
+        tiles = get_tile_history_df(zoom)
         points = get_border_tiles(tiles, zoom, tile_bounds)
         if suffix == "geojson":
             result = make_grid_file_geojson(points)
         elif suffix == "gpx":
             result = make_grid_file_gpx(points)
+        else:
+            raise ValueError(f"Unsupported suffix: {suffix}")
 
         mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
         return Response(
@@ -290,6 +294,8 @@ def make_explorer_blueprint(
             result = make_grid_file_geojson(points)
         elif suffix == "gpx":
             result = make_grid_file_gpx(points)
+        else:
+            raise ValueError(f"Unsupported suffix: {suffix}")
 
         mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
         return Response(
@@ -304,12 +310,14 @@ def make_explorer_blueprint(
             return {"zoom_level_not_generated": zoom}
 
         tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
-        tile_history = tile_visit_accessor.tile_state["tile_history"][zoom]
 
-        medians = tile_history[["tile_x", "tile_y"]].median()
+        # Get data from database
+        medians = get_tile_medians(zoom)
         median_lat, median_lon = get_tile_upper_left_lat_lon(
-            medians["tile_x"], medians["tile_y"], zoom
+            medians[0], medians[1], zoom
         )
+        num_tiles = get_tile_count(zoom)
+        tile_history = get_tile_history_df(zoom)
 
         bookmarks: list[dict[str, Any]] = []
         for bookmark in DB.session.scalars(
@@ -353,7 +361,7 @@ def make_explorer_blueprint(
                 tile_evolution_state.square_evolution
             ),
             "zoom": zoom,
-            "num_tiles": len(tile_history),
+            "num_tiles": num_tiles,
             "num_cluster_tiles": len(tile_evolution_state.memberships),
             "square_x": tile_evolution_state.square_x,
             "square_y": tile_evolution_state.square_y,

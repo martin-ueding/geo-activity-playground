@@ -47,19 +47,66 @@ def get_first_visits_for_activity(
     return query.all()
 
 
+def get_tile_history_df(zoom: int) -> pd.DataFrame:
+    """Get tile first visits as a DataFrame, ordered chronologically.
+
+    This builds the DataFrame on-the-fly from the database, replacing
+    the old tile_history pickle storage.
+
+    Args:
+        zoom: The zoom level to query for.
+
+    Returns:
+        DataFrame with columns: activity_id, time, tile_x, tile_y
+    """
+    visits = (
+        DB.session.query(TileFirstVisit)
+        .filter(TileFirstVisit.zoom == zoom)
+        .order_by(TileFirstVisit.time)
+        .all()
+    )
+
+    if not visits:
+        return pd.DataFrame(columns=["activity_id", "time", "tile_x", "tile_y"])
+
+    return pd.DataFrame(
+        {
+            "activity_id": [v.activity_id for v in visits],
+            "time": [pd.Timestamp(v.time) if v.time else pd.NaT for v in visits],
+            "tile_x": [v.tile_x for v in visits],
+            "tile_y": [v.tile_y for v in visits],
+        }
+    )
+
+
+def get_tile_count(zoom: int) -> int:
+    """Get the count of explored tiles at a zoom level."""
+    return DB.session.query(TileFirstVisit).filter(TileFirstVisit.zoom == zoom).count()
+
+
+def get_tile_medians(zoom: int) -> tuple[int, int]:
+    """Get the median tile_x and tile_y for centering the map.
+
+    Returns:
+        Tuple of (median_tile_x, median_tile_y)
+    """
+    from sqlalchemy import func
+
+    result = DB.session.query(
+        func.avg(TileFirstVisit.tile_x), func.avg(TileFirstVisit.tile_y)
+    ).filter(TileFirstVisit.zoom == zoom).first()
+
+    if result and result[0] is not None:
+        return (int(result[0]), int(result[1]))
+    return (0, 0)
+
+
 class TileInfo(TypedDict):
     activity_ids: set[int]
     first_time: pd.Timestamp
     first_id: int
     last_time: pd.Timestamp
     last_id: int
-
-
-class TileHistoryRow(TypedDict):
-    activity_id: int
-    time: pd.Timestamp
-    tile_x: int
-    tile_y: int
 
 
 class TileEvolutionState:
@@ -84,26 +131,43 @@ class TileEvolutionState:
 
 class TileState(TypedDict):
     tile_visits: dict[int, dict[tuple[int, int], TileInfo]]
-    tile_history: dict[int, pd.DataFrame]
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]]
     evolution_state: dict[int, TileEvolutionState]
     version: int
 
 
-TILE_STATE_VERSION = 2
+# Version 3: Removed tile_history (now stored in database)
+TILE_STATE_VERSION = 3
 
 
 class TileVisitAccessor:
-    PATH = pathlib.Path("Cache/tile-state-2.pickle")
+    PATH = pathlib.Path("Cache/tile-state-3.pickle")
+    OLD_PATH = pathlib.Path("Cache/tile-state-2.pickle")
 
     def __init__(self) -> None:
         self.tile_state: TileState = try_load_pickle(self.PATH)
-        if (
-            self.tile_state is None
-            or self.tile_state.get("version", None) != TILE_STATE_VERSION
-        ):
+
+        if self.tile_state is None:
+            # Try loading old pickle and migrate
+            old_state = try_load_pickle(self.OLD_PATH)
+            if old_state is not None:
+                logger.info("Migrating from tile-state-2 to tile-state-3...")
+                # Migrate tile_history to database
+                _migrate_tile_history_to_db(old_state)
+                # Copy over the other fields
+                self.tile_state = make_tile_state()
+                if "tile_visits" in old_state:
+                    self.tile_state["tile_visits"] = old_state["tile_visits"]
+                if "activities_per_tile" in old_state:
+                    self.tile_state["activities_per_tile"] = old_state["activities_per_tile"]
+                if "evolution_state" in old_state:
+                    self.tile_state["evolution_state"] = old_state["evolution_state"]
+                self.save()
+                logger.info("Migration complete.")
+            else:
+                self.tile_state = make_tile_state()
+        elif self.tile_state.get("version", None) != TILE_STATE_VERSION:
             self.tile_state = make_tile_state()
-            # TODO: Reset work tracker
 
     def reset(self) -> None:
         self.tile_state = make_tile_state()
@@ -124,7 +188,6 @@ def make_defaultdict_set():
 def make_tile_state() -> TileState:
     tile_state: TileState = {
         "tile_visits": collections.defaultdict(make_defaultdict_dict),
-        "tile_history": collections.defaultdict(pd.DataFrame),
         "activities_per_tile": collections.defaultdict(make_defaultdict_set),
         "evolution_state": collections.defaultdict(TileEvolutionState),
         "version": TILE_STATE_VERSION,
@@ -168,26 +231,33 @@ def _reset_tile_first_visits_db() -> None:
     logger.info("Cleared tile_first_visits table in database.")
 
 
-def _migrate_tile_history_to_db(tile_state: TileState) -> None:
+def _migrate_tile_history_to_db(old_tile_state: dict) -> None:
     """Migrate existing tile_history data to the TileFirstVisit database table.
 
-    This is a one-time migration for users upgrading from pickle-only storage.
-    It checks if the DB is empty and the pickle has data, then migrates.
+    This is a one-time migration for users upgrading from pickle-only storage
+    (version 2 or earlier). It checks if the DB is empty and the pickle has
+    tile_history data, then migrates.
     """
     # Check if DB already has data
     existing_count = DB.session.query(TileFirstVisit).limit(1).count()
     if existing_count > 0:
         return  # Already migrated
 
-    # Check if pickle has data to migrate
-    total_records = sum(len(df) for df in tile_state["tile_history"].values())
+    # Check if old pickle has tile_history to migrate
+    tile_history = old_tile_state.get("tile_history", {})
+    if not tile_history:
+        return  # Nothing to migrate
+
+    total_records = sum(
+        len(df) for df in tile_history.values() if isinstance(df, pd.DataFrame)
+    )
     if total_records == 0:
         return  # Nothing to migrate
 
     logger.info(f"Migrating {total_records} tile first visits from pickle to database...")
 
-    for zoom, tile_history_df in tile_state["tile_history"].items():
-        if tile_history_df.empty:
+    for zoom, tile_history_df in tile_history.items():
+        if not isinstance(tile_history_df, pd.DataFrame) or tile_history_df.empty:
             continue
 
         batch: list[TileFirstVisit] = []
@@ -228,42 +298,12 @@ def compute_tile_visits_new(
         _reset_tile_first_visits_db()
         work_tracker.reset()
 
-    # Migrate existing pickle data to DB (one-time migration)
-    _migrate_tile_history_to_db(tile_visit_accessor.tile_state)
-
     for activity_id in tqdm(
         work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=1
     ):
         _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)
 
-    for zoom in reversed(range(20)):
-        tile_state = tile_visit_accessor.tile_state
-        if (
-            len(tile_state["tile_history"][zoom])
-            and not (
-                tile_state["tile_history"][zoom]["time"].dropna().diff().dropna()
-                >= datetime.timedelta(seconds=0)
-            ).all()
-        ):
-            logger.warning(
-                f"The order of the tile history at {zoom=} is not chronological, resetting."
-            )
-            new_tile_history_soa: dict[str, list] = {
-                "activity_id": [],
-                "time": [],
-                "tile_x": [],
-                "tile_y": [],
-            }
-            for tile, visit in tile_state["tile_visits"][zoom].items():
-                new_tile_history_soa["activity_id"].append(visit["first_id"])
-                new_tile_history_soa["time"].append(visit["first_time"])
-                new_tile_history_soa["tile_x"].append(tile[0])
-                new_tile_history_soa["tile_y"].append(tile[1])
-            tile_state["tile_history"][zoom] = pd.DataFrame(new_tile_history_soa)
-            tile_state["tile_history"][zoom].sort_values("time", inplace=True)
-            # Reset the evolution state.
-            tile_state["evolution_state"] = collections.defaultdict(TileEvolutionState)
     tile_visit_accessor.save()
     work_tracker.close()
 
@@ -279,13 +319,6 @@ def _process_activity(
     )
     for zoom in reversed(range(20)):
         activities_per_tile = tile_state["activities_per_tile"][zoom]
-
-        new_tile_history_soa: dict[str, list] = {
-            "activity_id": [],
-            "time": [],
-            "tile_x": [],
-            "tile_y": [],
-        }
         new_tile_first_visits: list[TileFirstVisit] = []
 
         activity_tiles = activity_tiles.groupby(["tile_x", "tile_y"]).head(1)
@@ -298,12 +331,7 @@ def _process_activity(
                 if time is not None and time.tz is None:
                     time = time.tz_localize("UTC")
                 if tile not in tile_state["tile_visits"][zoom]:
-                    new_tile_history_soa["activity_id"].append(activity_id)
-                    new_tile_history_soa["time"].append(time)
-                    new_tile_history_soa["tile_x"].append(tile[0])
-                    new_tile_history_soa["tile_y"].append(tile[1])
-
-                    # Also record in the database
+                    # Record new tile in database
                     db_time = time.to_pydatetime() if pd.notna(time) else None
                     new_tile_first_visits.append(
                         TileFirstVisit(
@@ -340,11 +368,6 @@ def _process_activity(
                     ) from e
 
             activities_per_tile[tile].add(activity_id)
-
-        if new_tile_history_soa["activity_id"]:
-            tile_state["tile_history"][zoom] = pd.concat(
-                [tile_state["tile_history"][zoom], pd.DataFrame(new_tile_history_soa)]
-            )
 
         # Write new first visits to database
         if new_tile_first_visits:
@@ -384,13 +407,15 @@ def _tiles_from_points(
 
 def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
     for zoom in config.explorer_zoom_levels:
+        # Get tile history from database
+        tile_history = get_tile_history_df(zoom)
         _compute_cluster_evolution(
-            tile_state["tile_history"][zoom],
+            tile_history,
             tile_state["evolution_state"][zoom],
             zoom,
         )
         _compute_square_history(
-            tile_state["tile_history"][zoom],
+            tile_history,
             tile_state["evolution_state"][zoom],
             zoom,
         )
