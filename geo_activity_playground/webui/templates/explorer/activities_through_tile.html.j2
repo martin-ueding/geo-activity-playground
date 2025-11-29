@@ -1,0 +1,85 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1>Activities Through Tile</h1>
+
+<div class="row mb-3">
+    <div class="col">
+        <p>
+            Showing {{ num_activities }} activities passing through tile ({{ tile_x }}, {{ tile_y }}) @ zoom {{ zoom }}
+            {% if radius > 0 %}
+            with radius {{ radius }} ({{ (2 * radius + 1) ** 2 }} tiles)
+            {% endif %}
+        </p>
+        {% if radius == 0 %}
+        <p>
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=1) }}">Expand to radius 1</a> |
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=2) }}">Expand to radius 2</a>
+        </p>
+        {% elif radius < 5 %}
+        <p>
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=radius+1) }}">Expand radius</a> |
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=0) }}">Reset to single tile</a>
+        </p>
+        {% else %}
+        <p>
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=0) }}">Reset to single tile</a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+{% if activities %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th class="numeric-sort">Distance / km</th>
+                        <th>Elapsed time</th>
+                        <th>Speed / km/h</th>
+                        <th>Equipment</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td><a href="{{ url_for('activity.show', id=activity.id) }}">{{ activity.name }}</a></td>
+                        <td>
+                            {% if activity.start %}
+                            {{ activity.start_local_tz|dt }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if activity.distance_km %}
+                            {{ activity.distance_km | round(1) }}
+                            {% endif %}
+                        </td>
+                        <td>{{ activity.elapsed_time|td }}</td>
+                        <td>
+                            {% if activity.average_speed_moving_kmh %}
+                            {{ activity.average_speed_moving_kmh|round(1) }}
+                            {% endif %}
+                        </td>
+                        <td>{{ activity.equipment.name if activity.equipment else '' }}</td>
+                        <td>{{ activity.kind.name if activity.kind else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No activities found passing through this tile.
+</div>
+{% endif %}
+
+{% endblock %}
+
