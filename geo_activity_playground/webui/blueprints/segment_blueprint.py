@@ -186,6 +186,7 @@ def _extract_linestring_coordinates(geojson: dict) -> list[list[float]] | None:
     - Direct LineString geometry
     - Feature with LineString geometry
     - FeatureCollection with a single LineString feature
+    - 2D coordinates [lon, lat] or 3D coordinates [lon, lat, elevation]
 
     Returns:
         List of [lon, lat] coordinate pairs, or None if not found.
@@ -207,5 +208,8 @@ def _extract_linestring_coordinates(geojson: dict) -> list[list[float]] | None:
     if geometry is None or geometry.get("type") != "LineString":
         return None
 
-    return geometry.get("coordinates", [])
+    raw_coords = geometry.get("coordinates", [])
+    
+    # Strip elevation if present (keep only [lon, lat])
+    return [[coord[0], coord[1]] for coord in raw_coords if len(coord) >= 2]
 
