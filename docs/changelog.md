@@ -15,7 +15,7 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
-## Unreleased
+## Version 1.16.0 — 2025-11-29
 
 This is a release where I have tried out Cursor with Anthropic Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.
 
