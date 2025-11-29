@@ -12,21 +12,14 @@
             with radius {{ radius }} ({{ (2 * radius + 1) ** 2 }} tiles)
             {% endif %}
         </p>
-        {% if radius == 0 %}
-        <p>
-            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=1) }}">Expand to radius 1</a> |
-            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=2) }}">Expand to radius 2</a>
-        </p>
-        {% elif radius < 5 %}
-        <p>
-            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=radius+1) }}">Expand radius</a> |
-            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=0) }}">Reset to single tile</a>
-        </p>
-        {% else %}
-        <p>
-            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=0) }}">Reset to single tile</a>
-        </p>
-        {% endif %}
+        <div class="btn-group" role="group" aria-label="Radius selection">
+            {% for r in range(6) %}
+            <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=r) }}"
+               class="btn btn-{{ 'primary' if r == radius else 'outline-primary' }}">
+                {{ r }}
+            </a>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
