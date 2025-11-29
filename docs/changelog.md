@@ -23,6 +23,7 @@ Added:
 
 - Persist layer selection in maps. ([GH-375](https://github.com/martin-ueding/geo-activity-playground/issues/375))
 - Show all routes through a tile in a table. ([GH-241](https://github.com/martin-ueding/geo-activity-playground/issues/241))
+- Add the cluster size to the cluster bookmark buttons.
 
 Changed:
 
@@ -30,6 +31,7 @@ Changed:
 - Move the tile history data frame into the database. Migration is automatic.
 - Refactor JavaScript code into ES Modules.
 - Restructure the settings page.
+- Adjust the explorer tile map to the vertical screen space.
 
 Fixed:
 
