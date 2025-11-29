@@ -64,11 +64,30 @@ export function initExplorerMap(config) {
  * These buttons center the map on a specific bounding box.
  */
 function setupCenterOnButtons(map) {
-    document.querySelectorAll('[data-center-bbox]').forEach(button => {
+    const buttons = document.querySelectorAll('[data-center-bbox]');
+    let ignoreNextMove = false;
+
+    buttons.forEach(button => {
         button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            buttons.forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+            // Ignore the map move triggered by fitBounds
+            ignoreNextMove = true;
+
             const bbox = JSON.parse(button.dataset.centerBbox);
             map.fitBounds(L.geoJSON(bbox).getBounds(), { padding: [30, 30] });
         });
+    });
+
+    // Remove active state when user manually pans or zooms
+    map.on('movestart', () => {
+        if (ignoreNextMove) {
+            ignoreNextMove = false;
+            return;
+        }
+        buttons.forEach(b => b.classList.remove('active'));
     });
 }
 
