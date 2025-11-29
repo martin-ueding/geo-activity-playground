@@ -12,6 +12,7 @@
             with radius {{ radius }} ({{ (2 * radius + 1) ** 2 }} tiles)
             {% endif %}
         </p>
+        <label class="me-2">Search Radius:</label>
         <div class="btn-group" role="group" aria-label="Radius selection">
             {% for r in range(6) %}
             <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=r) }}"
