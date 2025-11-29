@@ -1,4 +1,4 @@
-function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', overlay = "Colorful Cluster") {
+export function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', overlay = "Colorful Cluster") {
     // Get map container ID for localStorage key
     const mapId = map.getContainer().id;
     const storageKey = `map-layers-${mapId}`;

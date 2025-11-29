@@ -1,4 +1,4 @@
-var map = L.map('activity-trim-map', {
+const map = L.map('activity-trim-map', {
     fullscreenControl: true
 });
 L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
@@ -6,13 +6,16 @@ L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
     attribution: map_tile_attribution
 }).addTo(map);
 
-let copy_to_input = function (value, input) {
+function copy_to_input(value, input) {
     document.getElementById(input).value = value;
 }
 
-let layer = L.geoJSON(color_line_geojson, {
+// Expose to window for onclick handlers in dynamically generated popups
+window.copy_to_input = copy_to_input;
+
+const layer = L.geoJSON(color_line_geojson, {
     pointToLayer: function (feature, lat_lon) {
-        let p = feature.properties
+        const p = feature.properties
 
         let marker = null
         if (p.markerType == "circle") {

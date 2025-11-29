@@ -264,9 +264,11 @@
 <p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective
     zoom
     levels.</p>
-<script>
+<script type="module">
+    import { add_layers_to_map } from '/static/map-layers.js';
+
     function add_map(id, geojson, options = {}) {
-        let map = L.map(id, {
+        const map = L.map(id, {
             fullscreenControl: true
         })
         L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
@@ -274,10 +276,14 @@
             attribution: '{{ map_tile_attribution|safe }}'
         }).addTo(map)
 
-        let geojson_layer = L.geoJSON(geojson, options).addTo(map)
+        const geojson_layer = L.geoJSON(geojson, options).addTo(map)
         map.fitBounds(geojson_layer.getBounds())
         return map
     }
+
+    // Expose for subsequent module scripts
+    window.add_map = add_map;
+    window.add_layers_to_map = add_layers_to_map;
 </script>
 
 <div class="row mb-3">
@@ -286,8 +292,8 @@
         <h3>Zoom {{ zoom }}</h3>
         <p>There are {{ new_tiles[zoom] }} new tiles:</p>
         <div id="new-tiles-map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
-        <script>
-            let map{{ zoom }} = add_map("new-tiles-map-{{ zoom }}", {{ geojson | safe }}, {
+        <script type="module">
+            const map = window.add_map("new-tiles-map-{{ zoom }}", {{ geojson | safe }}, {
                 style: {
                     "color": "#ff7700",
                     "fillOpacity": 0.0
@@ -297,8 +303,8 @@
                 style: {
                     "color": "#ff0000",
                 }
-            }).addTo(map{{ zoom }})
-            add_layers_to_map(map{{ zoom }}, {{ zoom }}, '{{ map_tile_attribution | safe }}', "Color", "Visited");
+            }).addTo(map)
+            window.add_layers_to_map(map, {{ zoom }}, '{{ map_tile_attribution | safe }}', "Color", "Visited");
         </script>
     </div>
     {% endfor %}
