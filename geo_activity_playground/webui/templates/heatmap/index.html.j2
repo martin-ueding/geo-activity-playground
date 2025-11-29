@@ -12,12 +12,14 @@
         <div id="heatmap-map" style="height: 800px;"></div>
         <p><a href="#" onclick="downloadAs()">Download heatmap in visible area</a></p>
 
-        <script>
+        <script type="module">
+            import { add_layers_to_map } from '/static/map-layers.js';
+
             const zoom = 14;
             const map_tile_attribution = '{{ map_tile_attribution|safe }}';
             const heatmap_extra_args = '{{ extra_args|safe }}';
 
-            let map = L.map('heatmap-map', {
+            const map = L.map('heatmap-map', {
                 fullscreenControl: true,
                 center: [{{ center.latitude }}, {{ center.longitude }}],
                 zoom: 12
@@ -25,16 +27,19 @@
 
             add_layers_to_map(map, zoom, map_tile_attribution, "Inverse Grayscale", "Heatmap");
 
-            let bbox = {{ center.bbox| safe }}
+            const bbox = {{ center.bbox| safe }}
             if (bbox) {
                 map.fitBounds(L.geoJSON(bbox).getBounds())
             }
 
             function downloadAs() {
-                bounds = map.getBounds()
+                const bounds = map.getBounds()
                 window.location.href =
                     `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/heatmap.png?{{ extra_args|safe }}`
             }
+
+            // Expose for onclick handler
+            window.downloadAs = downloadAs;
         </script>
     </div>
 </div>

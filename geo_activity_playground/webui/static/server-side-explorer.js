@@ -1,3 +1,5 @@
+import { add_layers_to_map } from '/static/map-layers.js';
+
 let map = L.map('explorer-map', {
     fullscreenControl: true,
     center: [center_latitude, center_longitude],
@@ -31,6 +33,10 @@ map.on('click', e => {
 });
 
 function downloadAs(suffix) {
-    bounds = map.getBounds();
+    const bounds = map.getBounds();
     window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`
 }
+
+// Expose functions to window for onclick handlers in templates
+window.centerOn = centerOn;
+window.downloadAs = downloadAs;
