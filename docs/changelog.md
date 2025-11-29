@@ -28,6 +28,7 @@ Changed:
 
 - Make it more clear how the different Strava import mechanisms are to be used and differentiate the different guides from each other. ([GH-297](https://github.com/martin-ueding/geo-activity-playground/issues/297))
 - Move the tile history data frame into the database. Migration is automatic.
+- Refactor JavaScript code into ES Modules.
 
 Fixed:
 
@@ -35,6 +36,7 @@ Fixed:
 - The Copernicus elevation data feature had been removed a while ago; there was some selector in the UI that still offered it. That is now removed as well. ([GH-377](https://github.com/martin-ueding/geo-activity-playground/issues/377))
 - Improve speed of max cluster color strategy. Previously that used a list and O(n) lookup, now it uses a set with O(1) lookup that makes this as fast as any other color strategy. ([GH-376](https://github.com/martin-ueding/geo-activity-playground/issues/376))
 - Clean up database connections on shutdown to fix the warning message.
+- Detect `http://` or `https://` from reverse proxies when computing the explorer tile URLs to use with external services. ([GH-379](https://github.com/martin-ueding/geo-activity-playground/issues/379))
 
 ## Version 1.15.0 — 2025-11-22
 
