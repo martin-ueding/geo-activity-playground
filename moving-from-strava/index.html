@@ -1455,6 +1455,20 @@
 
 
 <h1 id="moving-from-strava">Moving from Strava</h1>
+<div class="admonition tip">
+<p class="admonition-title">When to use this guide</p>
+<p>Use this guide if you want to <strong>stop using Strava entirely</strong> and migrate your data to Geo Activity Playground.</p>
+<ul>
+<li>You want to delete your Strava account (or stop using it).</li>
+<li>You want your activities converted and stored locally.</li>
+<li>You'll use a different app to record future activities.</li>
+</ul>
+<p><strong>Not for you?</strong></p>
+<ul>
+<li>If you want to <strong>keep using Strava</strong> and sync from it, see <a href="../connect-strava-api/">Connect Strava API</a> instead.</li>
+<li>If you have <strong>local GPX/FIT files</strong> (not from Strava), see <a href="../import-activity-files/">Import activity files</a>.</li>
+</ul>
+</div>
 <p>If you have been using Strava up to this point but want to use this project <em>exclusively</em> from now on, this is the correct guide. Here I will show how you can convert your data from Strava into the format of this project and keep adding new data without Strava in the future.</p>
 <h2 id="download-your-archive-from-strava">Download your archive from Strava</h2>
 <p>Go to the <a href="https://www.strava.com/athlete/delete_your_account">Strava account download page</a> and request a download of your data. This will take a while and you get a notification via e-mail when it is done.</p>
@@ -1520,6 +1534,10 @@
 <p>The equipment might have nonsensical seeming names like <code>10370891.0</code>. The problem here is that Strava doesn't export the list of activities with that index. If your equipment doesn't have a nickname, it will just be such a number.</p>
 <h2 id="use-the-directory">Use the directory</h2>
 <p>Now that the files from Strava are converted, consult the <a href="../import-activity-files/">guide on using activity files</a> to proceed from here.</p>
+<div class="admonition warning">
+<p class="admonition-title">Don't skip the conversion step</p>
+<p>Do <strong>not</strong> copy the <code>activities/</code> folder from your Strava archive directly into the <code>Activities/</code> folder. The raw Strava files often have issues (missing metadata, problematic timestamps, etc.) that cause import warnings. The <code>convert-strava-checkout</code> command properly processes these files.</p>
+</div>
 <h2 id="recording-more-activities">Recording more activities</h2>
 <p>Now that you don't record via Strava, you will need some other app to <a href="../record-activities/">record activities</a>..</p>
 

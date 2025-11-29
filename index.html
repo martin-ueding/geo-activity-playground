@@ -295,6 +295,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Get started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#importing-your-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Importing your activities
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1405,6 +1420,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Get started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#importing-your-activities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Importing your activities
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1455,8 +1485,36 @@
 <li><a href="create-a-base-directory/">Create a base directory</a>.</li>
 <li><a href="starting-the-webserver/">Start the webserver</a>.</li>
 <li>Choose a method to <a href="record-activities/">record activities</a>.</li>
-<li>Import your activities via <a href="import-activity-files/">activity files</a>, <a href="connect-strava-api/">connect the Strava API</a> or <a href="upload-activity-files/">upload activity files</a> in the web interface.</li>
+<li>Import your activities (see below).</li>
 </ol>
+<h3 id="importing-your-activities">Importing your activities</h3>
+<p>Choose the approach that best fits your situation:</p>
+<table>
+<thead>
+<tr>
+<th>Your situation</th>
+<th>Guide to follow</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>You have GPX/FIT/TCX files</strong> from a Garmin device, OsmAnd, or other apps</td>
+<td><a href="import-activity-files/">Import activity files</a> — put files in <code>Activities/</code> folder</td>
+</tr>
+<tr>
+<td><strong>You want to keep using Strava</strong> but also use this tool</td>
+<td><a href="connect-strava-api/">Connect Strava API</a> — syncs automatically from Strava</td>
+</tr>
+<tr>
+<td><strong>You want to leave Strava</strong> and stop using it entirely</td>
+<td><a href="moving-from-strava/">Moving from Strava</a> — converts your Strava archive</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Don't mix these approaches</p>
+<p>If you have a Strava archive (ZIP file), do <strong>not</strong> simply copy its <code>activities/</code> folder into your <code>Activities/</code> folder. Use either <a href="connect-strava-api/">Connect Strava API</a> or <a href="moving-from-strava/">Moving from Strava</a> instead.</p>
+</div>
 <p>Have fun. If you're stuck, <a href="get-help/">get help</a>.</p>
 <h2 id="free-software">Free software</h2>
 <p>You can <a href="https://github.com/martin-ueding/geo-activity-playground">find the code on GitHub</a> where you can also file issues. If you would like to use this yourself or contribute, feel free to reach out via the contact options <a href="https://martin-ueding.de/">from my website</a>. I would especially appreciate improvements to the documentation. If you're familiar with Markdown and GitHub, you can also directly create a pull request. The code is licensed under the very permissive MIT license.</p>

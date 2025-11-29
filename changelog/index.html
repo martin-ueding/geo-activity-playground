@@ -1329,6 +1329,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1160-2025-11-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.16.0 — 2025-11-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1150-2025-11-22" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.15.0 — 2025-11-22
@@ -2443,6 +2452,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1160-2025-11-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.16.0 — 2025-11-29
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1150-2025-11-22" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.15.0 — 2025-11-22
@@ -3553,6 +3571,32 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-1160-2025-11-29">Version 1.16.0 — 2025-11-29</h2>
+<p>This is a release where I have tried out Cursor with Anthropic Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.</p>
+<p>Added:</p>
+<ul>
+<li>Persist layer selection in maps. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/375">GH-375</a>)</li>
+<li>Show all routes through a tile in a table. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/241">GH-241</a>)</li>
+<li>Add the cluster size to the cluster bookmark buttons. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/365">GH-365</a>)</li>
+<li>Show cluster bookmark buttons as active when selected until the user pans or zooms the map.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Make it more clear how the different Strava import mechanisms are to be used and differentiate the different guides from each other. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/297">GH-297</a>)</li>
+<li>Move the tile history data frame into the database. Migration is automatic.</li>
+<li>Refactor JavaScript code into ES Modules.</li>
+<li>Restructure the settings page.</li>
+<li>Adjust the explorer tile map to the vertical screen space. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/365">GH-365</a>)</li>
+<li>Explorer bookmark buttons now have an outline.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>The search query history is persisted in the database now (previously in the configuration file). It was broken, now it is fixed again.</li>
+<li>The Copernicus elevation data feature had been removed a while ago; there was some selector in the UI that still offered it. That is now removed as well. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/377">GH-377</a>)</li>
+<li>Improve speed of max cluster color strategy. Previously that used a list and O(n) lookup, now it uses a set with O(1) lookup that makes this as fast as any other color strategy. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/376">GH-376</a>)</li>
+<li>Clean up database connections on shutdown to fix the warning message.</li>
+<li>Detect <code>http://</code> or <code>https://</code> from reverse proxies when computing the explorer tile URLs to use with external services. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/379">GH-379</a>)</li>
+</ul>
 <h2 id="version-1150-2025-11-22">Version 1.15.0 — 2025-11-22</h2>
 <p>Added:</p>
 <ul>

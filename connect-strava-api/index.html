@@ -1455,6 +1455,20 @@
 
 
 <h1 id="connect-strava-api">Connect Strava API</h1>
+<div class="admonition tip">
+<p class="admonition-title">When to use this guide</p>
+<p>Use this guide if you <strong>want to keep using Strava</strong> as your primary platform and have Geo Activity Playground sync from it automatically.</p>
+<ul>
+<li>You want to continue recording with the Strava app.</li>
+<li>You want new activities to sync automatically.</li>
+<li>You're okay with your data living on Strava's servers.</li>
+</ul>
+<p><strong>Not for you?</strong></p>
+<ul>
+<li>If you want to <strong>stop using Strava entirely</strong>, see <a href="../moving-from-strava/">Moving from Strava</a> instead.</li>
+<li>If you have <strong>local GPX/FIT files</strong> (not from Strava), see <a href="../import-activity-files/">Import activity files</a>.</li>
+</ul>
+</div>
 <p>You might have all your data on the Strava service and would like to use this for additional analytics without moving your data. That is fine.</p>
 <p>If you don't mind a bit of rate-limiting, you can just directly go ahead and start the webserver. It will offer to connect with Strava.</p>
 <h2 id="your-own-strava-app">Your own Strava App</h2>
@@ -1468,6 +1482,14 @@
 <h2 id="use-export-to-avoid-rate-limiting">Use export to avoid rate limiting</h2>
 <p>When you first start this program and use the Strava API as a data source, it will download the metadata for all your activities. Then it will start to download all the time series data for each activity. Strava has a rate limiting, so after the first 200 activities it will crash and you will have to wait for 15 minutes until you can try again and it will download the next batch.</p>
 <p>Therefore it is recommended to use a Strava export in order to get started quicker. For this go to the <a href="https://www.strava.com/athlete/delete_your_account">Strava account download page</a> and download all your data. You will get a ZIP file. Unpack the files into <code>Playground/Strava Export</code>. These will be picked up there. Activities from Strava will only be downloaded after importing all these, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.</p>
+<div class="admonition warning">
+<p class="admonition-title">This is NOT the same as moving from Strava</p>
+<p>This <code>Strava Export/</code> folder is specifically for <strong>speeding up the initial Strava API sync</strong>. It does not convert or process your files — it's just a cache to avoid rate limiting.</p>
+<ul>
+<li>Do <strong>not</strong> put these files in your <code>Activities/</code> folder.</li>
+<li>If you want to <strong>leave Strava entirely</strong>, see <a href="../moving-from-strava/">Moving from Strava</a> instead.</li>
+</ul>
+</div>
 <h2 id="skip-strava-download">Skip Strava download</h2>
 <p>If you don't want to download new activities from Strava, use <code>--skip-reload</code> to have the webserver start right away.</p>
 <h2 id="rescan-all-strava-activities">Rescan all Strava activities</h2>
