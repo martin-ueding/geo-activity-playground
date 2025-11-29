@@ -240,7 +240,6 @@ def create_app(
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
             "request_url": urllib.parse.quote_plus(request.url),
-            "host_url": request.host_url,
         }
         variables["equipments_avail"] = DB.session.scalars(
             sqlalchemy.select(Equipment).order_by(Equipment.name)

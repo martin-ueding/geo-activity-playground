@@ -117,36 +117,40 @@
         Router</a>. See <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/"
         target="_blank">the documentation for this feature</a>. For your server, use the following URLs:</p>
 
-<code><pre>
-{{ host_url }}tile/grayscale/{z}/{x}/{y}.png
-{{ host_url }}tile/pastel/{z}/{x}/{y}.png
-{{ host_url }}tile/color/{z}/{x}/{y}.png
-{{ host_url }}tile/inverse_grayscale/{z}/{x}/{y}.png
-</pre></code>
+<code><pre class="tile-urls">/tile/grayscale/{z}/{x}/{y}.png
+/tile/pastel/{z}/{x}/{y}.png
+/tile/color/{z}/{x}/{y}.png
+/tile/inverse_grayscale/{z}/{x}/{y}.png</pre></code>
 
 <p>For the explorer tiles, you can use these:</p>
 
-<code><pre>
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=first
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=last
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=visits
-{{ host_url }}explorer/14/tile/{z}/{x}/{y}.png?color_strategy=missing
+<code><pre class="tile-urls">/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=first
+/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=last
+/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=visits
+/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=missing
 
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
-{{ host_url }}explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing
-</pre></code>
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=first
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=last
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
+/explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing</pre></code>
 
 <p>And for the heatmap, you can use this:</p>
 
-<code><pre>
-{{ host_url }}heatmap/tile/{z}/{x}/{y}.png
-</pre></code>
+<code><pre class="tile-urls">/heatmap/tile/{z}/{x}/{y}.png</pre></code>
+
+<script>
+// Prepend the current origin (protocol + host) to tile URLs
+// This ensures correct https:// when behind a reverse proxy
+document.querySelectorAll('pre.tile-urls').forEach(pre => {
+    pre.textContent = pre.textContent.split('\n')
+        .map(line => line.trim() ? window.location.origin + line : line)
+        .join('\n');
+});
+</script>
 
 {% endif %}
 {% endblock %}
