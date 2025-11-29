@@ -1,4 +1,28 @@
-export function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grayscale', overlay = "Colorful Cluster") {
+/**
+ * Adds base and overlay tile layers to a Leaflet map with layer control.
+ * 
+ * @param {L.Map} map - The Leaflet map instance
+ * @param {Object} config - Configuration object
+ * @param {number} config.zoom - Explorer tile zoom level
+ * @param {string} config.attribution - Map tile attribution text
+ * @param {string} [config.baseLayer='Grayscale'] - Default base layer name
+ * @param {string} [config.overlay='Colorful Cluster'] - Default overlay name
+ * @param {Object} [config.squarePlanner] - Square planner config (optional)
+ * @param {number} config.squarePlanner.x - Square X coordinate
+ * @param {number} config.squarePlanner.y - Square Y coordinate
+ * @param {number} config.squarePlanner.size - Square size
+ * @param {string} [config.heatmapExtraArgs] - Extra URL args for heatmap tiles
+ */
+export function add_layers_to_map(map, config) {
+    const {
+        zoom,
+        attribution,
+        baseLayer = 'Grayscale',
+        overlay = 'Colorful Cluster',
+        squarePlanner = null,
+        heatmapExtraArgs = null
+    } = config;
+
     // Get map container ID for localStorage key
     const mapId = map.getContainer().id;
     const storageKey = `map-layers-${mapId}`;
@@ -11,80 +35,84 @@ export function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grays
         console.warn('Failed to load saved map layers:', e);
     }
 
-    let base_maps = {
+    const base_maps = {
         "Grayscale": L.tileLayer("/tile/grayscale/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Pastel": L.tileLayer("/tile/pastel/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Color": L.tileLayer("/tile/color/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Inverse Grayscale": L.tileLayer("/tile/inverse_grayscale/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Blank": L.tileLayer("/tile/blank/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
-    }
+    };
 
     // Build heatmap URL with optional extra args
     let heatmap_url = "/heatmap/tile/{z}/{x}/{y}.png";
-    if (typeof heatmap_extra_args !== 'undefined' && heatmap_extra_args) {
-        heatmap_url += `?${heatmap_extra_args}`;
+    if (heatmapExtraArgs) {
+        heatmap_url += `?${heatmapExtraArgs}`;
     }
 
-    let overlay_maps = {
+    const overlay_maps = {
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Max Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=max_cluster`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "First Visit": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=first`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Last Visit": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=last`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Number of Visits": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=visits`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Visited": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=visited`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Missing": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=missing`, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         }),
         "Heatmap": L.tileLayer(heatmap_url, {
             maxZoom: 19,
-            attribution: map_tile_attribution
+            attribution
         })
-    }
+    };
 
-    if (typeof square_size !== 'undefined') {
-        overlay_maps["Square Planner"] = L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=square_planner&x=${square_x}&y=${square_y}&size=${square_size}`, {
-            maxZoom: 19,
-            attribution: map_tile_attribution
-        });
-        overlay = "Square Planner";
+    // Determine which overlay to select by default
+    let selectedOverlay = overlay;
+    
+    if (squarePlanner) {
+        const { x, y, size } = squarePlanner;
+        overlay_maps["Square Planner"] = L.tileLayer(
+            `/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=square_planner&x=${x}&y=${y}&size=${size}`,
+            { maxZoom: 19, attribution }
+        );
+        selectedOverlay = "Square Planner";
     }
 
     // Use saved preferences if valid, otherwise fall back to defaults
-    const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : base;
+    const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : baseLayer;
     
     // Overlays: saved.overlays is an array, filter to only valid ones
     let selectedOverlays;
@@ -92,13 +120,13 @@ export function add_layers_to_map(map, zoom, map_tile_attribution, base = 'Grays
         selectedOverlays = saved.overlays.filter(name => overlay_maps[name]);
     } else {
         // Fall back to default (single overlay as array)
-        selectedOverlays = [overlay];
+        selectedOverlays = [selectedOverlay];
     }
 
-    base_maps[selectedBase].addTo(map)
+    base_maps[selectedBase].addTo(map);
     selectedOverlays.forEach(name => overlay_maps[name].addTo(map));
 
-    var layerControl = L.control.layers(base_maps, overlay_maps).addTo(map);
+    L.control.layers(base_maps, overlay_maps).addTo(map);
 
     // Save layer selections to localStorage
     map.on('baselayerchange', (e) => {

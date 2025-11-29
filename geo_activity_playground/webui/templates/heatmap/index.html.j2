@@ -10,14 +10,10 @@
 <div class="row mb-3">
     <div class="col">
         <div id="heatmap-map" style="height: 800px;"></div>
-        <p><a href="#" onclick="downloadAs()">Download heatmap in visible area</a></p>
+        <p><a href="#" id="heatmap-download">Download heatmap in visible area</a></p>
 
         <script type="module">
             import { add_layers_to_map } from '/static/map-layers.js';
-
-            const zoom = 14;
-            const map_tile_attribution = '{{ map_tile_attribution|safe }}';
-            const heatmap_extra_args = '{{ extra_args|safe }}';
 
             const map = L.map('heatmap-map', {
                 fullscreenControl: true,
@@ -25,21 +21,25 @@
                 zoom: 12
             });
 
-            add_layers_to_map(map, zoom, map_tile_attribution, "Inverse Grayscale", "Heatmap");
+            add_layers_to_map(map, {
+                zoom: 14,
+                attribution: '{{ map_tile_attribution|safe }}',
+                baseLayer: 'Inverse Grayscale',
+                overlay: 'Heatmap',
+                heatmapExtraArgs: '{{ extra_args|safe }}' || null
+            });
 
-            const bbox = {{ center.bbox| safe }}
+            const bbox = {{ center.bbox | safe }};
             if (bbox) {
-                map.fitBounds(L.geoJSON(bbox).getBounds())
+                map.fitBounds(L.geoJSON(bbox).getBounds());
             }
 
-            function downloadAs() {
-                const bounds = map.getBounds()
+            document.getElementById('heatmap-download').addEventListener('click', (e) => {
+                e.preventDefault();
+                const bounds = map.getBounds();
                 window.location.href =
-                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/heatmap.png?{{ extra_args|safe }}`
-            }
-
-            // Expose for onclick handler
-            window.downloadAs = downloadAs;
+                    `/heatmap/download/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/heatmap.png?{{ extra_args|safe }}`;
+            });
         </script>
     </div>
 </div>

@@ -262,53 +262,59 @@
 {% if new_tiles_geojson %}
 <h2>New explorer tiles</h2>
 <p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective
-    zoom
-    levels.</p>
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function add_map(id, geojson, options = {}) {
-        const map = L.map(id, {
-            fullscreenControl: true
-        })
-        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '{{ map_tile_attribution|safe }}'
-        }).addTo(map)
-
-        const geojson_layer = L.geoJSON(geojson, options).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
-        return map
-    }
-
-    // Expose for subsequent module scripts
-    window.add_map = add_map;
-    window.add_layers_to_map = add_layers_to_map;
-</script>
+    zoom levels.</p>
 
 <div class="row mb-3">
     {% for zoom, geojson in new_tiles_geojson.items() %}
     <div class="col-md-6">
         <h3>Zoom {{ zoom }}</h3>
         <p>There are {{ new_tiles[zoom] }} new tiles:</p>
-        <div id="new-tiles-map-{{ zoom }}" style="height: 300px; width: 100%;"></div>
-        <script type="module">
-            const map = window.add_map("new-tiles-map-{{ zoom }}", {{ geojson | safe }}, {
-                style: {
-                    "color": "#ff7700",
-                    "fillOpacity": 0.0
-                }
-            })
-            L.geoJSON({{ color_line_geojson| safe }}, {
-                style: {
-                    "color": "#ff0000",
-                }
-            }).addTo(map)
-            window.add_layers_to_map(map, {{ zoom }}, '{{ map_tile_attribution | safe }}', "Color", "Visited");
-        </script>
+        <div class="new-tiles-map"
+             data-zoom="{{ zoom }}"
+             data-tiles-geojson='{{ geojson | safe }}'
+             style="height: 300px; width: 100%;"></div>
     </div>
     {% endfor %}
 </div>
+
+<script type="module">
+    import { add_layers_to_map } from '/static/map-layers.js';
+
+    const attribution = '{{ map_tile_attribution|safe }}';
+    const trackGeojson = {{ color_line_geojson | safe }};
+
+    document.querySelectorAll('.new-tiles-map').forEach(container => {
+        const zoom = parseInt(container.dataset.zoom, 10);
+        const tilesGeojson = JSON.parse(container.dataset.tilesGeojson);
+
+        const map = L.map(container, { fullscreenControl: true });
+
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution
+        }).addTo(map);
+
+        // Add new tiles layer (orange outline)
+        const tilesLayer = L.geoJSON(tilesGeojson, {
+            style: { color: "#ff7700", fillOpacity: 0.0 }
+        }).addTo(map);
+
+        // Add activity track (red line)
+        L.geoJSON(trackGeojson, {
+            style: { color: "#ff0000" }
+        }).addTo(map);
+
+        // Add explorer overlay
+        add_layers_to_map(map, {
+            zoom,
+            attribution,
+            baseLayer: 'Color',
+            overlay: 'Visited'
+        });
+
+        map.fitBounds(tilesLayer.getBounds());
+    });
+</script>
 {% endif %}
 
 {% if similar_activites|length > 0 %}
