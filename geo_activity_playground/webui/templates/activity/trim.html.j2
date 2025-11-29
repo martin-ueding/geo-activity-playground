@@ -10,11 +10,13 @@
 <a href="{{ url_for('.show', id=activity['id']) }}" class="btn btn-primary btn-small">Back</a>
 
 <div id="activity-trim-map" style="height: 600px;" class="mb-3"></div>
-<script>
-    var map_tile_attribution = '{{ map_tile_attribution }}';
-    var color_line_geojson = {{ color_line_geojson | safe }};
+<script type="module">
+    import { initActivityTrimMap } from '/static/activity-trim.js';
+    initActivityTrimMap({
+        attribution: '{{ map_tile_attribution|safe }}',
+        geojson: {{ color_line_geojson | safe }}
+    });
 </script>
-<script type="module" src="/static/activity-trim.js"></script>
 
 <form method="POST">
     <div class="mb-3">
