@@ -26,8 +26,13 @@
 
     <dt>Actions</dt>
     <dd>
+        {% if activities_through_tile_url %}
+        <a href="{{ activities_through_tile_url }}">Routes through this tile</a>
+        <br />
+        {% endif %}
         {% if new_bookmark_url %}
         <a href="{{ new_bookmark_url }}">Create Cluster Bookmark</a>
+        <br />
         {% endif %}
         <a href="{{ url_for('square_planner.index', zoom=zoom, x=tile_x, y=tile_y, size=square_size) }}">Open Square
             Planner</a>

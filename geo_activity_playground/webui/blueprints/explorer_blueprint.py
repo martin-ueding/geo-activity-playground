@@ -588,9 +588,58 @@ def make_explorer_blueprint(
                         tile_x=tile_xy[0],
                         tile_y=tile_xy[1],
                     ),
+                    "activities_through_tile_url": url_for(
+                        ".activities_through_tile",
+                        zoom=zoom,
+                        tile_x=tile_xy[0],
+                        tile_y=tile_xy[1],
+                        radius=0,
+                    ),
                 }
             )
         return render_template("explorer/tooltip.html.j2", **context)
+
+    @blueprint.route("/<int:zoom>/activities/<int:tile_x>/<int:tile_y>/<int:radius>")
+    def activities_through_tile(
+        zoom: int, tile_x: int, tile_y: int, radius: int
+    ) -> ResponseReturnValue:
+        """List all activities that pass through a tile or its vicinity.
+
+        Args:
+            zoom: The tile zoom level.
+            tile_x: The tile X coordinate.
+            tile_y: The tile Y coordinate.
+            radius: The radius of neighboring tiles to include (0 = just this tile).
+        """
+        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"][zoom]
+
+        # Collect all activity IDs from the tile and its neighbors within the radius
+        activity_ids: set[int] = set()
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                tile = (tile_x + dx, tile_y + dy)
+                if tile in activities_per_tile:
+                    activity_ids.update(activities_per_tile[tile])
+
+        # Fetch activities from database
+        activities = []
+        if activity_ids:
+            activities = (
+                DB.session.query(Activity)
+                .filter(Activity.id.in_(activity_ids))
+                .order_by(Activity.start.desc())
+                .all()
+            )
+
+        context = {
+            "zoom": zoom,
+            "tile_x": tile_x,
+            "tile_y": tile_y,
+            "radius": radius,
+            "activities": activities,
+            "num_activities": len(activities),
+        }
+        return render_template("explorer/activities_through_tile.html.j2", **context)
 
     return blueprint
 
