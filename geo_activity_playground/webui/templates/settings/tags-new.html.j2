@@ -1,7 +1,11 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('.tags_list') }}">Tags</a></li>
+<li class="breadcrumb-item active" aria-current="page">New</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Create Tag</h1>
 
 <form method="POST">
@@ -11,7 +15,6 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('.tags_list') }}" class="btn btn-secondary">Cancel</a>
 </form>
-
-
 {% endblock %}

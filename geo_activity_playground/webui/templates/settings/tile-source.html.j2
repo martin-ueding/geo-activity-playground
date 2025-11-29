@@ -1,7 +1,10 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Map Tile Source</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Tile Source</h1>
 
 <p>You can change the tile source to be whatever you like. Be aware that different sources have different licensing
@@ -29,5 +32,4 @@
 <p>This is a tile using your current tile source:</p>
 
 <p><img src="{{ test_url }}"></p>
-
 {% endblock %}

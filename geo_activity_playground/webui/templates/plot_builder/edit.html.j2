@@ -1,20 +1,17 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
 {% from "plot-macros.html.j2" import parametric_plot %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('.index') }}">Plot Builder</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit</li>
+{% endblock %}
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">Plot Builder</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit</li>
-    </ol>
-</nav>
-
-<h1 class="row mb-3">Plot Builder</h1>
+{% block settings_content %}
+<h1 class="mb-3">Edit Plot</h1>
 
 <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-lg-4">
         {% macro select_field(label, name, choices, active) %}
         <div class="mb-3">
             <label for="{{ name }}">{{ label }}</label>
@@ -48,9 +45,10 @@
             {{ select_field("Column", "column", discrete, spec.column)}}
 
             <button type="submit" class="btn btn-primary">Save & Preview</button>
+            <a href="{{ url_for('.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
-    <div class="col-md-8">
+    <div class="col-lg-8">
         {% if plot %}
         {{ parametric_plot(spec, plot, 0) }}
         {% endif %}
@@ -58,11 +56,10 @@
 </div>
 
 
-<h1 class="mb-3">JSON Export</h1>
+<h2 class="mb-3">JSON Export</h2>
 
 <p>If you want to share this plot specification with somebody else, send them the following code snippet. It contains
     the name that you have given your plot but no data from your activities.</p>
 
 <code><pre>{{ spec.to_json() }}</pre></code>
-
 {% endblock %}

@@ -1,19 +1,26 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Tags</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Tags</h1>
 
-<ul>
+<p>You can assign tags to activities to organize and filter them. Create and manage your tags below.</p>
+
+{% if tags %}
+<ul class="list-group mb-3">
     {% for tag in tags %}
-    <li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
         {{ activity_tag(tag) }}
         <a class="btn btn-sm btn-primary" href="{{ url_for('.tags_edit', id=tag.id) }}">Edit</a>
     </li>
     {% endfor %}
 </ul>
+{% else %}
+<p class="text-muted">No tags defined yet.</p>
+{% endif %}
 
-
-<a class="btn btn-primary" href="{{ url_for('.tags_new') }}">New</a>
-
+<a class="btn btn-primary" href="{{ url_for('.tags_new') }}">New Tag</a>
 {% endblock %}
