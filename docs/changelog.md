@@ -22,6 +22,7 @@ This is a release where I have tried out Cursor with Claude Opus 4.5 for coding.
 Added:
 
 - Persist layer selection in maps. ([GH-375](https://github.com/martin-ueding/geo-activity-playground/issues/375))
+- Show all routes through a tile in a table. ([GH-241](https://github.com/martin-ueding/geo-activity-playground/issues/241))
 
 Changed:
 
