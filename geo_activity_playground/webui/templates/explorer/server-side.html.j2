@@ -26,16 +26,16 @@
 
 {% if bookmarks %}
 <div class="btn-group mb-3" role="group" aria-label="Cluster bookmarks">
-    <button type="button" class="btn" data-center-bbox='{{ center.bbox | safe }}'>Biggest</button>
+    <button type="button" class="btn" data-center-bbox='{{ center.bbox | safe }}'>Biggest ({{ max_cluster_size }})</button>
     {% for bookmark in bookmarks %}
-    <button type="button" class="btn" data-center-bbox='{{ bookmark.bbox | safe }}'>{{ bookmark.name }}</button>
+    <button type="button" class="btn" data-center-bbox='{{ bookmark.bbox | safe }}'>{{ bookmark.name }} ({{ bookmark.size }})</button>
     {% endfor %}
 </div>
 {% endif %}
 
 <div class="row mb-3">
     <div class="col">
-        <div id="explorer-map" class="mb-1" style="height: 800px;"></div>
+        <div id="explorer-map" class="mb-1" style="height: min(800px, calc(100vh - 300px));"></div>
         <p>Download tiles in visible area:
             <a href="#" data-download-suffix="explored.geojson">Explored as GeoJSON</a>,
             <a href="#" data-download-suffix="explored.gpx">Explored as GPX</a>,
