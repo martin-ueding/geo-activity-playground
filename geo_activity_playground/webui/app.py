@@ -55,6 +55,7 @@ from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.photo_blueprint import make_photo_blueprint
 from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
+from .blueprints.segment_blueprint import make_segment_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
 from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
@@ -219,6 +220,7 @@ def create_app(
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
         "/search": make_search_blueprint(authenticator),
+        "/segment": make_segment_blueprint(authenticator, tile_visit_accessor),
         "/summary": make_summary_blueprint(repository, config, authenticator),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
         "/time-zone-fixer": make_time_zone_fixer_blueprint(

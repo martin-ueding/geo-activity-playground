@@ -1,0 +1,62 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Create New Segment</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-lg-8">
+        <p>
+            To create a segment, plan a route using <a href="https://bikerouter.de/" target="_blank">bikerouter.de</a>:
+        </p>
+        <ol>
+            <li>Open <a href="https://bikerouter.de/" target="_blank">bikerouter.de</a></li>
+            <li>Click on the map to set waypoints along the route you want to track</li>
+            <li>Press <kbd>X</kbd> or click the download button to export</li>
+            <li>Select <strong>GeoJSON</strong> as the format</li>
+            <li>Upload the downloaded file below</li>
+        </ol>
+        <p>
+            The segment will be matched against all your existing activities. Activities that 
+            follow the segment closely (within 50 meters) will be recorded with their entry 
+            and exit times.
+        </p>
+    </div>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="row mb-3">
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="name" class="form-label">Segment Name</label>
+                <input type="text" class="form-control" id="name" name="name" 
+                       placeholder="e.g., Morning Hill Climb" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="geojson_file" class="form-label">GeoJSON File</label>
+                <input type="file" class="form-control" id="geojson_file" name="geojson_file" 
+                       accept=".geojson,.json" required>
+                <div class="form-text">
+                    Upload a GeoJSON file containing a LineString geometry (e.g., exported from bikerouter.de).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <button type="submit" class="btn btn-primary">Create Segment</button>
+            <a href="{{ url_for('segment.index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

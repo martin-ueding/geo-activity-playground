@@ -184,6 +184,37 @@
 </div>
 {% endif %}
 
+{% if activity.segment_matches %}
+<h2 class="mb-3">Segments</h2>
+<div class="row mb-3">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Segment</th>
+                        <th>Entry Time</th>
+                        <th>Exit Time</th>
+                        <th>Duration</th>
+                        <th>Distance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in activity.segment_matches %}
+                    <tr>
+                        <td>{{ match.segment.name }}</td>
+                        <td>{{ match.entry_time | dt if match.entry_time else "—" }}</td>
+                        <td>{{ match.exit_time | dt if match.exit_time else "—" }}</td>
+                        <td>{{ match.duration | td if match.duration else "—" }}</td>
+                        <td>{% if match.distance_km %}{{ match.distance_km | round(2) }} km{% else %}—{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class=" row mb-3">
     <div class="col">

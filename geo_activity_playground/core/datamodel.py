@@ -153,6 +153,10 @@ class Activity(DB.Model):
         back_populates="activity", cascade="all, delete-orphan"
     )
 
+    segment_matches: Mapped[list["SegmentMatch"]] = relationship(
+        back_populates="activity", cascade="all, delete-orphan"
+    )
+
     def __str__(self) -> str:
         return f"{self.start} {self.name}"
 
@@ -562,6 +566,114 @@ class TileVisit(DB.Model):
     def __repr__(self) -> str:
         return f"TileVisit(zoom={self.zoom}, x={self.tile_x}, y={self.tile_y}, visits={self.visit_count})"
 
+
+
+class Segment(DB.Model):
+    """A user-defined segment (polyline) for tracking repeated efforts.
+    """
+
+    __tablename__ = "segments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(sa.String, nullable=False)
+
+    # Store the LineString coordinates as JSON: [[lon, lat], [lon, lat], ...]
+    # Using GeoJSON coordinate order (longitude first)
+    coordinates_json: Mapped[str] = mapped_column(sa.Text, nullable=False)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+
+    # Relationship to matches
+    matches: Mapped[list["SegmentMatch"]] = relationship(
+        back_populates="segment", cascade="all, delete-orphan"
+    )
+
+    @property
+    def coordinates(self) -> list[list[float]]:
+        """Get coordinates as list of [lon, lat] pairs."""
+        return json.loads(self.coordinates_json)
+
+    @coordinates.setter
+    def coordinates(self, value: list[list[float]]) -> None:
+        """Set coordinates from list of [lon, lat] pairs."""
+        self.coordinates_json = json.dumps(value)
+
+    @property
+    def length_km(self) -> float:
+        """Calculate approximate length of segment in kilometers."""
+        from .coordinates import get_distance
+
+        coords = self.coordinates
+        total = 0.0
+        for i in range(len(coords) - 1):
+            lon1, lat1 = coords[i]
+            lon2, lat2 = coords[i + 1]
+            total += get_distance(lat1, lon1, lat2, lon2)
+        return total / 1000  # Convert meters to km
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.length_km:.2f} km)"
+
+
+class SegmentMatch(DB.Model):
+    """Records when an activity passes through a segment.
+
+    Stores the entry and exit points/times for computing segment duration
+    and comparing efforts.
+    """
+
+    __tablename__ = "segment_matches"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    segment_id: Mapped[int] = mapped_column(
+        ForeignKey("segments.id", name="segment_match_segment_id"),
+        nullable=False,
+        index=True,
+    )
+    segment: Mapped["Segment"] = relationship(back_populates="matches")
+
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="segment_match_activity_id"),
+        nullable=False,
+        index=True,
+    )
+    activity: Mapped["Activity"] = relationship(back_populates="segment_matches")
+
+    # Entry point in the activity time series
+    entry_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    entry_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+        sa.DateTime, nullable=True
+    )
+
+    # Exit point in the activity time series
+    exit_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    exit_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+        sa.DateTime, nullable=True
+    )
+
+    # Computed duration for easy querying/sorting
+    duration: Mapped[Optional[datetime.timedelta]] = mapped_column(
+        sa.Interval, nullable=True
+    )
+
+    # Distance covered in this segment effort (may differ slightly from segment length)
+    distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
+
+    __table_args__ = (
+        # An activity can only match a segment once (for now - could support multiple passes later)
+        sa.UniqueConstraint(
+            "segment_id", "activity_id", name="unique_segment_activity_match"
+        ),
+    )
+
+    def __repr__(self) -> str:
+        duration_str = (
+            str(self.duration).split(".")[0] if self.duration else "unknown"
+        )
+        return f"SegmentMatch(segment={self.segment.name}, activity={self.activity_id}, duration={duration_str})"
 
 
 class StoredSearchQuery(DB.Model):

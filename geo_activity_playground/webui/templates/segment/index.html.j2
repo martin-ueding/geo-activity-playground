@@ -1,0 +1,97 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>Segments</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <a href="{{ url_for('segment.new') }}" class="btn btn-primary">Create New Segment</a>
+    </div>
+</div>
+
+{% if segments_geojson %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>Map</h2>
+        <div id="segments-map" style="height: 500px;"></div>
+        <script>
+            var map = L.map('segments-map', {
+                fullscreenControl: true
+            });
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '{{ map_tile_attribution|safe }}'
+            }).addTo(map);
+
+            function onEachFeature(feature, layer) {
+                const props = feature.properties;
+                layer.bindPopup(
+                    `<strong><a href="/segment/${props.segment_id}">${props.segment_name}</a></strong><br>` +
+                    `Length: ${props.length_km} km<br>` +
+                    `Matches: ${props.match_count}`
+                );
+            }
+
+            let geojson = L.geoJSON({{ segments_geojson | safe }}, {
+                style: function (feature) {
+                    return { 
+                        color: feature.properties.color,
+                        weight: 4,
+                        opacity: 0.8
+                    };
+                },
+                onEachFeature: onEachFeature
+            }).addTo(map);
+            map.fitBounds(geojson.getBounds());
+        </script>
+    </div>
+</div>
+{% endif %}
+
+{% if segments %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>All Segments</h2>
+        <table class="table table-striped table-sort table-arrows">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="numeric-sort">Length</th>
+                    <th class="numeric-sort">Matches</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for segment in segments %}
+                <tr>
+                    <td><a href="{{ url_for('segment.show', id=segment.id) }}">{{ segment.name }}</a></td>
+                    <td>{{ segment.length_km | round(2) }} km</td>
+                    <td>{{ segment.matches | length }}</td>
+                    <td>{{ segment.created_at | dt }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('segment.delete', id=segment.id) }}" 
+                              style="display: inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this segment?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="row mb-3">
+    <div class="col">
+        <p>No segments created yet. Create one to start tracking your repeated efforts!</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

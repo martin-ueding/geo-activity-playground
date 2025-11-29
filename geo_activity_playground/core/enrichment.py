@@ -14,6 +14,7 @@ from .datamodel import DB
 from .missing_values import some
 from .tiles import compute_tile_float
 from .time_conversion import get_timezone
+from .segments import match_new_activity_to_segments
 
 logger = logging.getLogger(__name__)
 
@@ -280,3 +281,6 @@ def update_and_commit(
         activity.replace_time_series(time_series)
     DB.session.add(activity)
     DB.session.commit()
+
+
+    match_new_activity_to_segments(activity, time_series)
