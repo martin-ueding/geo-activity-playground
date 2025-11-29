@@ -78,7 +78,9 @@ class ColorStrategy(abc.ABC):
 
 
 class MaxClusterColorStrategy(ColorStrategy):
-    def __init__(self, evolution_state: TileEvolutionState, tile_visits, config: Config):
+    def __init__(
+        self, evolution_state: TileEvolutionState, tile_visits, config: Config
+    ):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
         self.max_cluster_members = set(
@@ -367,7 +369,9 @@ def make_explorer_blueprint(
             "square_x": tile_evolution_state.square_x,
             "square_y": tile_evolution_state.square_y,
             "square_size": tile_evolution_state.max_square_size,
-            "max_cluster_size": max(map(len, tile_evolution_state.clusters.values())),
+            "max_cluster_size": max(
+                map(len, tile_evolution_state.clusters.values()), default=0
+            ),
             "bookmarks": bookmarks,
         }
         return render_template("explorer/server-side.html.j2", **context)
@@ -558,24 +562,36 @@ def make_explorer_blueprint(
             "zoom": zoom,
             "square_size": evolution_state.max_square_size,
         }
-        
+
         # Query tile info from database
-        tile_visit = DB.session.query(TileVisit).filter(
-            TileVisit.zoom == zoom,
-            TileVisit.tile_x == tile_xy[0],
-            TileVisit.tile_y == tile_xy[1],
-        ).first()
-        
+        tile_visit = (
+            DB.session.query(TileVisit)
+            .filter(
+                TileVisit.zoom == zoom,
+                TileVisit.tile_x == tile_xy[0],
+                TileVisit.tile_y == tile_xy[1],
+            )
+            .first()
+        )
+
         if tile_visit is not None:
             context.update(
                 {
                     "num_visits": tile_visit.visit_count,
                     "first_activity_id": tile_visit.first_activity_id,
                     "first_activity_name": tile_visit.first_activity.name,
-                    "first_time": tile_visit.first_time.isoformat() if tile_visit.first_time else None,
+                    "first_time": (
+                        tile_visit.first_time.isoformat()
+                        if tile_visit.first_time
+                        else None
+                    ),
                     "last_activity_id": tile_visit.last_activity_id,
                     "last_activity_name": tile_visit.last_activity.name,
-                    "last_time": tile_visit.last_time.isoformat() if tile_visit.last_time else None,
+                    "last_time": (
+                        tile_visit.last_time.isoformat()
+                        if tile_visit.last_time
+                        else None
+                    ),
                     "is_cluster": tile_xy in evolution_state.memberships,
                     "this_cluster_size": len(
                         evolution_state.clusters.get(
@@ -611,7 +627,9 @@ def make_explorer_blueprint(
             tile_y: The tile Y coordinate.
             radius: The radius of neighboring tiles to include (0 = just this tile).
         """
-        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"][zoom]
+        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"][
+            zoom
+        ]
 
         # Collect all activity IDs from the tile and its neighbors within the radius
         activity_ids: set[int] = set()
