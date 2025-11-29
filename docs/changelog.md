@@ -17,7 +17,7 @@ Types of changes
 
 ## Unreleased
 
-This is a release where I have tried out Cursor with Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.
+This is a release where I have tried out Cursor with Anthropic Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.
 
 Added:
 
@@ -29,6 +29,7 @@ Changed:
 - Make it more clear how the different Strava import mechanisms are to be used and differentiate the different guides from each other. ([GH-297](https://github.com/martin-ueding/geo-activity-playground/issues/297))
 - Move the tile history data frame into the database. Migration is automatic.
 - Refactor JavaScript code into ES Modules.
+- Restructure the settings page.
 
 Fixed:
 
