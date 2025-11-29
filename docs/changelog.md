@@ -24,6 +24,7 @@ Added:
 - Persist layer selection in maps. ([GH-375](https://github.com/martin-ueding/geo-activity-playground/issues/375))
 - Show all routes through a tile in a table. ([GH-241](https://github.com/martin-ueding/geo-activity-playground/issues/241))
 - Add the cluster size to the cluster bookmark buttons.
+- Show cluster bookmark buttons as active when selected until the user pans or zooms the map.
 
 Changed:
 
@@ -32,6 +33,7 @@ Changed:
 - Refactor JavaScript code into ES Modules.
 - Restructure the settings page.
 - Adjust the explorer tile map to the vertical screen space.
+- Explorer bookmark buttons now have an outline.
 
 Fixed:
 
