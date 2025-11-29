@@ -1,7 +1,10 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Privacy Zones</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Privacy Zones</h1>
 
 <p>You might want to remove points that are close to your home, work or relatives. For this you can define
@@ -37,10 +40,10 @@
     {% if privacy_zones %}
     <h2 class="mb-3">Existing zones</h2>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+    <div class="row row-cols-1 row-cols-lg-3 g-4 mb-3">
         {% for zone_name, zone_geojson in privacy_zones.items() %}
 
-        <div class="col-md-4">
+        <div class="col">
             <div class="mb-3">
                 <label for="zone_name_{{ loop.index }}" class="form-label">Name</label>
                 <input type="text" class="form-control" id="zone_name_{{ loop.index }}" name="zone_name"
@@ -63,7 +66,7 @@
     <h2 class="mb-3">New zone</h2>
 
     <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="mb-3">
                 <label for="new_zone_name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="new_zone_name" name="zone_name" />
@@ -78,6 +81,4 @@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
-
-
 {% endblock %}

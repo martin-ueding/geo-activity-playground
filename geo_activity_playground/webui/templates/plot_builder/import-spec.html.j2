@@ -1,14 +1,11 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('.index') }}">Plot Builder</a></li>
+<li class="breadcrumb-item active" aria-current="page">Import</li>
+{% endblock %}
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">Plot Builder</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Import</li>
-    </ol>
-</nav>
-
+{% block settings_content %}
 <h1 class="mb-3">Import Custom Plot</h1>
 
 <form method="post">
@@ -18,7 +15,6 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Import & Preview</button>
+    <a href="{{ url_for('.index') }}" class="btn btn-secondary">Cancel</a>
 </form>
-
-
 {% endblock %}

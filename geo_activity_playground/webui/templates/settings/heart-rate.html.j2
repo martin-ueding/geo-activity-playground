@@ -1,7 +1,10 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Heart Rate</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Heart Rate</h1>
 
 <p>If you have recorded activities with heart rate data, you can also let it display the heart rate zones.</p>
@@ -27,7 +30,7 @@
 </blockquote>
 
 <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-lg-4">
         <form method="POST">
             <div class="mb-3">
                 <label for="birth_year" class="form-label">Birth year</label>
@@ -49,7 +52,7 @@
     </div>
 
     {% if zone_boundaries %}
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <p>Your heart rate zone boundaries:</p>
         <table class="table">
             <thead>
@@ -98,5 +101,4 @@
     {% endif %}
 
 </div>
-
 {% endblock %}

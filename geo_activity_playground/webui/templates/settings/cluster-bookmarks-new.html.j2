@@ -1,7 +1,10 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">New Cluster Bookmark</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Create Explorer Tile Cluster Bookmark</h1>
 
 <form method="POST">
@@ -24,6 +27,4 @@
 
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
-
-
 {% endblock %}

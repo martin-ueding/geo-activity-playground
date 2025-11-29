@@ -1,11 +1,14 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Strava API</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Strava Connect</h1>
 
 <div class="row mb-3">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <p>You can connect to Strava such that it automatically downloads your activities.</p>
 
         <p>The Strava API has rather strict rate limiting. If you don't mind waiting a bit, you can just use the "client
@@ -26,7 +29,7 @@
         </p>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <form action="" method="POST">
             <div class="mb-3">
                 <label for="strava_client_id" class="form-label">Client ID</label>
@@ -43,6 +46,4 @@
         </form>
     </div>
 </div>
-
-
 {% endblock %}

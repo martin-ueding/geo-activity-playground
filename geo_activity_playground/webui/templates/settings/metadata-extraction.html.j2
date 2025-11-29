@@ -1,7 +1,10 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Metadata Extraction</li>
+{% endblock %}
 
+{% block settings_content %}
 <h1 class="mb-3">Metadata Extraction</h1>
 
 <p>If the current activity metadata is not to your liking, you can adjust how these fields are populated:</p>
@@ -18,7 +21,7 @@
 
 <form method="POST">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-6">
             {% for regex in metadata_extraction_regexes %}
             <div class="mb-3">
                 <label for="regex_{{ loop.index }}" class="form-label">Regular expression</label>
@@ -31,7 +34,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-lg-6">
             <p>Consider a directory structure <tt>Ride/Red Roadbike/2024-08-10 11-45-00 Ride with Friends.fit</tt> under Activities. 
                 You can extract <tt>kind</tt>: "Ride", <tt>equipment</tt>: "Red Roadbike", <tt>name</tt>: "Ride with Friends" 
                 with the following regular expression:</p>
@@ -49,6 +52,4 @@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
-
-
 {% endblock %}

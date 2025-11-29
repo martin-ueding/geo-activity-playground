@@ -1,9 +1,11 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Plot Builder</li>
+{% endblock %}
 
-
-<h1 class="row mb-3">Plot Builder</h1>
+{% block settings_content %}
+<h1 class="mb-3">Plot Builder</h1>
 
 <p>Build custom plots here. For inspiration, check out <a href="https://martin-ueding.github.io/geo-activity-playground/build-custom-plots/" target="_blank">the documentation</a>.</p>
 
@@ -31,7 +33,5 @@
 {% endif %}
 
 <a class="btn btn-primary" href="{{ url_for('.new') }}">New</a>
-
 <a class="btn btn-primary" href="{{ url_for('.import_spec') }}">Import</a>
-
 {% endblock %}

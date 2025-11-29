@@ -1,0 +1,111 @@
+{% extends "page.html.j2" %}
+
+{# Navigation structure for settings pages #}
+{% set settings_nav = [
+    {
+        "group": "Data Sources",
+        "entries": [
+            {"endpoint": "settings.strava", "label": "Strava API", "icon": "🔗"},
+            {"endpoint": "settings.metadata_extraction", "label": "Metadata Extraction", "icon": "📝"},
+        ]
+    },
+    {
+        "group": "Display",
+        "entries": [
+            {"endpoint": "settings.color_schemes", "label": "Color Schemes", "icon": "🎨"},
+            {"endpoint": "settings.color_strategy", "label": "Color Strategy", "icon": "🗺️"},
+            {"endpoint": "settings.tile_source", "label": "Map Tile Source", "icon": "🧭"},
+            {"endpoint": "settings.sharepic", "label": "Share Picture", "icon": "📷"},
+        ]
+    },
+    {
+        "group": "Personal",
+        "entries": [
+            {"endpoint": "settings.heart_rate", "label": "Heart Rate", "icon": "❤️"},
+        ]
+    },
+    {
+        "group": "Management",
+        "entries": [
+            {"endpoint": "settings.manage_equipments", "label": "Equipment", "icon": "🚲"},
+            {"endpoint": "settings.manage_kinds", "label": "Activity Kinds", "icon": "🏃"},
+            {"endpoint": "settings.tags_list", "label": "Tags", "icon": "🏷️"},
+        ]
+    },
+    {
+        "group": "Privacy & Processing",
+        "entries": [
+            {"endpoint": "settings.privacy_zones", "label": "Privacy Zones", "icon": "🔒"},
+            {"endpoint": "settings.segmentation", "label": "Track Segmentation", "icon": "✂️"},
+        ]
+    },
+    {
+        "group": "Advanced",
+        "entries": [
+            {"endpoint": "settings.admin_password", "label": "Admin Password", "icon": "🔑"},
+            {"endpoint": "plot_builder.index", "label": "Plot Builder", "icon": "📊"},
+        ]
+    },
+] %}
+
+{# Helper macro to check if current page is within a nav item's scope #}
+{% macro is_active(endpoint) %}
+    {%- set current = request.endpoint -%}
+    {%- if current == endpoint -%}
+        active
+    {%- elif endpoint == 'settings.tags_list' and current in ['settings.tags_list', 'settings.tags_new', 'settings.tags_edit'] -%}
+        active
+    {%- elif endpoint == 'plot_builder.index' and current and current.startswith('plot_builder.') -%}
+        active
+    {%- endif -%}
+{% endmacro %}
+
+{% block container %}
+<div class="row">
+    {# Breadcrumbs #}
+    <div class="col-12 mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">Settings</a></li>
+                {% block breadcrumbs %}{% endblock %}
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    {# Sidebar Navigation #}
+    <div class="col-lg-3 col-md-4 mb-4">
+        <div class="d-md-none mb-3">
+            <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#settingsNav" aria-expanded="false" aria-controls="settingsNav">
+                ☰ Settings Menu
+            </button>
+        </div>
+        
+        <nav id="settingsNav" class="collapse d-md-block bg-body-tertiary rounded p-3">
+            {% for group in settings_nav %}
+            <h6 class="text-body-secondary text-uppercase small fw-bold mb-2 {% if not loop.first %}mt-3{% endif %}">
+                {{ group.group }}
+            </h6>
+            <ul class="nav nav-pills flex-column mb-2">
+                {% for item in group.entries %}
+                <li class="nav-item">
+                    <a class="nav-link py-1 px-2 {{ is_active(item.endpoint) }}" 
+                       href="{{ url_for(item.endpoint) }}"
+                       {% if is_active(item.endpoint) %}aria-current="page"{% endif %}>
+                        <span class="me-2">{{ item.icon }}</span>{{ item.label }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </nav>
+    </div>
+    
+    {# Main Content Area #}
+    <div class="col-lg-9 col-md-8">
+        {% block settings_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

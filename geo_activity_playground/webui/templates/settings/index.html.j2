@@ -1,134 +1,51 @@
-{% extends "page.html.j2" %}
+{% extends "settings/base.html.j2" %}
 
-{% block container %}
-<div class="row">
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Overview</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">Settings</h1>
+
+<p class="lead">Configure how your activities are gathered, analyzed, and visualized.</p>
+
+<p>Use the navigation menu to access different configuration sections. Here's a quick overview of what you can customize:</p>
+
+<div class="row row-cols-1 row-cols-md-2 g-3 mt-2">
     <div class="col">
-        <h1>Settings</h1>
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>🔗 Data Sources</h5>
+            <p class="mb-0 small text-muted">Connect to Strava API or configure how metadata is extracted from your activity files.</p>
+        </div>
     </div>
-</div>
-
-<p>Here are various settings that control how activities are gathered, analyzed and visualized.</p>
-
-<div class="row mb-3">
-    <div class="row row-cols-1 row-cols-md-3 g-3">
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Admin password</h5>
-                    <p class="card-text">Running a public instance and want to protect it?</p>
-                    <a href="{{ url_for('.admin_password') }}" class="btn btn-primary">Set up admin password</a>
-                </div>
-            </div>
+    <div class="col">
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>🎨 Display</h5>
+            <p class="mb-0 small text-muted">Customize color schemes, map tile sources, and share picture settings.</p>
         </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Color schemes</h5>
-                    <p class="card-text">Don't like the colors in the statistics plots?</p>
-                    <a href="{{ url_for('.color_schemes') }}" class="btn btn-primary">Set up color schemes</a>
-                </div>
-            </div>
+    </div>
+    <div class="col">
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>❤️ Personal</h5>
+            <p class="mb-0 small text-muted">Set up heart rate zones based on your personal data.</p>
         </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Color strategy</h5>
-                    <p class="card-text">Don't like the cluster colors in the explorer tile map?</p>
-                    <a href="{{ url_for('.color_strategy') }}" class="btn btn-primary">Modify color strategies</a>
-                </div>
-            </div>
+    </div>
+    <div class="col">
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>🚲 Management</h5>
+            <p class="mb-0 small text-muted">Manage your equipment, activity kinds, and tags.</p>
         </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Equipment</h5>
-                    <p class="card-text">Manage your equipments here.</p>
-                    <a href="{{ url_for('.manage_equipments') }}" class="btn btn-primary">Manage equipments</a>
-                </div>
-            </div>
+    </div>
+    <div class="col">
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>🔒 Privacy & Processing</h5>
+            <p class="mb-0 small text-muted">Define privacy zones and configure track segmentation.</p>
         </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Kinds</h5>
-                    <p class="card-text">Manage your activity kinds here.</p>
-                    <a href="{{ url_for('.manage_kinds') }}" class="btn btn-primary">Manage kinds</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Heart rate</h5>
-                    <p class="card-text">Specify maximum heart rate to derive heart rate zones.</p>
-                    <a href="{{ url_for('.heart_rate') }}" class="btn btn-primary">Set up heart rate</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Map tile source</h5>
-                    <p class="card-text">Change the source of the map tiles.</p>
-                    <a href="{{ url_for('.tile_source') }}" class="btn btn-primary">Change tile source</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Metadata extraction</h5>
-                    <p class="card-text">When using activity files, one might want to extract metadata from the paths or
-                        set defaults.</p>
-                    <a href="{{ url_for('.metadata_extraction') }}" class="btn btn-primary">Set up metadata
-                        extraction</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Privacy zones</h5>
-                    <p class="card-text">Define geographic zones that shall be excluded from share pictures.</p>
-                    <a href="{{ url_for('.privacy_zones') }}" class="btn btn-primary">Set up privacy zones</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Share picture</h5>
-                    <p class="card-text">Select which metadata shall be displayed on share pictures.</p>
-                    <a href="{{ url_for('.sharepic') }}" class="btn btn-primary">Set up share picture</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Strava API</h5>
-                    <p class="card-text">Connect to the Strava API to download activities from there.</p>
-                    <a href="{{ url_for('.strava') }}" class="btn btn-primary">Set up Strava API</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Track segmentation</h5>
-                    <p class="card-text">Split tracks into multiple segments if there are breaks or jumps.</p>
-                    <a href="{{ url_for('.segmentation') }}" class="btn btn-primary">Set up track segmentations</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Tags</h5>
-                    <p class="card-text">You can assign tags to activities. Create and manage them here.</p>
-                    <a href="{{ url_for('.tags_list') }}" class="btn btn-primary">Manage tags</a>
-                </div>
-            </div>
+    </div>
+    <div class="col">
+        <div class="p-3 bg-body-tertiary rounded">
+            <h5>🔑 Advanced</h5>
+            <p class="mb-0 small text-muted">Admin password and custom plot builder.</p>
         </div>
     </div>
 </div>
