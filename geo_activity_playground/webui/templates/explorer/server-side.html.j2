@@ -26,9 +26,9 @@
 
 {% if bookmarks %}
 <div class="btn-group mb-3" role="group" aria-label="Cluster bookmarks">
-    <button type="button" class="btn" data-center-bbox='{{ center.bbox | safe }}'>Biggest ({{ max_cluster_size }})</button>
+    <button type="button" class="btn btn-outline-primary" data-center-bbox='{{ center.bbox | safe }}'>Biggest ({{ max_cluster_size }})</button>
     {% for bookmark in bookmarks %}
-    <button type="button" class="btn" data-center-bbox='{{ bookmark.bbox | safe }}'>{{ bookmark.name }} ({{ bookmark.size }})</button>
+    <button type="button" class="btn btn-outline-primary" data-center-bbox='{{ bookmark.bbox | safe }}'>{{ bookmark.name }} ({{ bookmark.size }})</button>
     {% endfor %}
 </div>
 {% endif %}
