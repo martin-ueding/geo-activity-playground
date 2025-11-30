@@ -37,17 +37,14 @@ def make_segments_blueprint(
             file = request.files["file"]
             geojson_str = file.read().decode()
             segment_coords = extract_segment_from_geojson(geojson_str)
-
             name = request.form["name"]
 
             segment = Segment(name=name)
             segment.coordinates = segment_coords
-
             DB.session.add(segment)
             DB.session.commit()
 
             flasher.flash_message(f"Created segment “{name}”.", FlashTypes.SUCCESS)
-
         return redirect(url_for(".index"))
 
     return blueprint
