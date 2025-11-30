@@ -60,26 +60,27 @@ def find_matches(
     )
     for activity_id in activity_candidates:
         activity = DB.session.get_one(Activity, activity_id)
-        distance_m, index = segment_track_distance(segment, activity)
-        print(f"{distance_m=}, {index=}")
-        if distance_m < 20:
-            ts = activity.time_series
-            i_entry = index[0]
-            i_exit = index[-1]
-            entry_time = ts["time"].iloc[i_entry]
-            exit_time = ts["time"].iloc[i_exit]
-            distance_km = (
-                ts["distance_km"].iloc[i_exit] - ts["distance_km"].iloc[i_entry]
-            )
-            segment_match = SegmentMatch(
-                segment=segment,
-                activity=activity,
-                entry_index=i_entry,
-                entry_time=entry_time,
-                exit_index=i_exit,
-                exit_time=exit_time,
-                duration=exit_time - entry_time,
-                distance_km=distance_km,
-            )
-            DB.session.add(segment_match)
-            DB.session.commit()
+        try_match_segment_activity(segment, activity)
+
+
+def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
+    distance_m, index = segment_track_distance(segment, activity)
+    if distance_m < 20:
+        ts = activity.time_series
+        i_entry = index[0]
+        i_exit = index[-1]
+        entry_time = ts["time"].iloc[i_entry]
+        exit_time = ts["time"].iloc[i_exit]
+        distance_km = ts["distance_km"].iloc[i_exit] - ts["distance_km"].iloc[i_entry]
+        segment_match = SegmentMatch(
+            segment=segment,
+            activity=activity,
+            entry_index=i_entry,
+            entry_time=entry_time,
+            exit_index=i_exit,
+            exit_time=exit_time,
+            duration=exit_time - entry_time,
+            distance_km=distance_km,
+        )
+        DB.session.add(segment_match)
+        DB.session.commit()
