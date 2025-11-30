@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1>Segment {{ segment.name }}</h1>
+<h1 class="mb-3">Segment {{ segment.name }}</h1>
 
 <script>
     function add_map(id, geojson) {
@@ -17,7 +17,7 @@
     }
 </script>
 
-<div id="map-segment" style="height: 500px; width: 100%;"></div>
+<div id="map-segment" class="mb-3" style=" height: 500px; width: 100%;"></div>
 <script>
     const activity_ids = {{ activity_ids }};
     fetch("/segments/line/{{ segment.id }}/line.geojson").then(response => response.json()).then(
@@ -43,5 +43,43 @@
         }
     )
 </script>
+
+{% for name, plot in plots.items() %}
+<h2 class="mb-3">{{ name }}</h2>
+<div class="mb-3">
+    {{ vega_direct(plot) }}
+</div>
+{% endfor %}
+
+<h2 class="mb-3">Matched activities</h2>
+
+<div class="table-responsive mb-3">
+    <table class="table table-sort table-arrows">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Activity</th>
+                <th>Direction</th>
+                <th class="numeric-sort">Distance / km</th>
+                <th>Duration</th>
+                <th>Equipment</th>
+                <th>Kind</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+            <tr>
+                <td>{{ row['entry_time']|dt }}</td>
+                <td><a href="{{ url_for('activity.show', id=row['activity_id']) }}">{{ row['activity_name'] }}</a></td>
+                <td>{{ row['direction'] }}</td>
+                <td>{{ row['distance_km'] | round(2) }}</td>
+                <td>{{ row['duration']|td }}</td>
+                <td>{{ row["equipment_name"] }}</td>
+                <td>{{ row["kind_name"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
