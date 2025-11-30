@@ -10,6 +10,8 @@ from flask.typing import ResponseReturnValue
 from ...core.datamodel import DB
 from ...core.datamodel import Segment
 from ...core.segments import extract_segment_from_geojson
+from ...core.segments import find_matches
+from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..flasher import Flasher
@@ -17,12 +19,18 @@ from ..flasher import FlashTypes
 
 
 def make_segments_blueprint(
-    authenticator: Authenticator, flasher: Flasher
+    authenticator: Authenticator,
+    tile_visit_accessor: TileVisitAccessor,
+    flasher: Flasher,
 ) -> Blueprint:
     blueprint = Blueprint("segments", __name__, template_folder="templates")
 
     @blueprint.route("/")
     def index():
+        find_matches(
+            DB.session.get_one(Segment, 1),
+            tile_visit_accessor.tile_state["activities_per_tile"][17],
+        )
         return render_template(
             "segments/index.html.j2",
             segments=DB.session.scalars(sqlalchemy.select(Segment)).all(),

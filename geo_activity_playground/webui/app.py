@@ -218,7 +218,9 @@ def create_app(
             repository, flasher, authenticator
         ),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
-        "/segments": make_segments_blueprint(authenticator, flasher),
+        "/segments": make_segments_blueprint(
+            authenticator, tile_visit_accessor, flasher
+        ),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
         "/search": make_search_blueprint(authenticator),
         "/summary": make_summary_blueprint(repository, config, authenticator),
