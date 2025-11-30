@@ -650,7 +650,7 @@ class Segment(DB.Model):
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
 
     # Coordinates as a `list[tuple[float, float]]` with lat-lon order. That is opposite to GeoJSON.
-    coordinates_geojson: Mapped[str] = mapped_column(sa.Text, nullable=False)
+    coordinates_json: Mapped[str] = mapped_column(sa.Text, nullable=False, default="[]")
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
