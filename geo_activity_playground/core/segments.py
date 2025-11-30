@@ -1,10 +1,12 @@
 import geojson
 import numpy as np
+import sqlalchemy
 
 from .coordinates import get_distance
 from .datamodel import Activity
 from .datamodel import DB
 from .datamodel import Segment
+from .datamodel import SegmentCheck
 from .datamodel import SegmentMatch
 from .tiles import compute_tile_float
 
@@ -64,7 +66,17 @@ def find_matches(
 
 
 def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
+    checks = DB.session.scalars(
+        sqlalchemy.select(SegmentCheck).where(
+            SegmentCheck.segment == segment, SegmentCheck.activity == activity
+        )
+    ).all()
+    if checks:
+        return
+
     distance_m, index = segment_track_distance(segment, activity)
+    segment_check = SegmentCheck(segment=segment, activity=activity)
+    DB.session.add(segment_check)
     if distance_m < 20:
         ts = activity.time_series
         i_entry = index[0]
@@ -83,4 +95,4 @@ def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
             distance_km=distance_km,
         )
         DB.session.add(segment_match)
-        DB.session.commit()
+    DB.session.commit()
