@@ -1,0 +1,264 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "creator": "BRouter-1.7.8",
+        "name": "Bonn - 0,3 km, 0 hm",
+        "track-length": "342",
+        "filtered ascend": "0",
+        "plain-ascend": "0",
+        "total-time": "58",
+        "total-energy": "5768",
+        "cost": "916",
+        "messages": [
+          [
+            "Longitude",
+            "Latitude",
+            "Elevation",
+            "Distance",
+            "CostPerKm",
+            "ElevCost",
+            "TurnCost",
+            "NodeCost",
+            "InitialCost",
+            "WayTags",
+            "NodeTags",
+            "Time",
+            "Energy"
+          ],
+          [
+            "7114751",
+            "50760568",
+            "50",
+            "160",
+            "2000",
+            "0",
+            "32",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "nodeaccessgranted=yes highway=crossing bicycle=yes crossing=uncontrolled",
+            "26",
+            "2678"
+          ],
+          [
+            "7114795",
+            "50760468",
+            "50",
+            "12",
+            "2000",
+            "0",
+            "20",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "nodeaccessgranted=yes highway=crossing bicycle=yes crossing=traffic_signals",
+            "28",
+            "2881"
+          ],
+          [
+            "7114760",
+            "50760335",
+            "50",
+            "21",
+            "2000",
+            "0",
+            "91",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "nodeaccessgranted=yes highway=crossing bicycle=yes crossing=traffic_signals",
+            "32",
+            "3235"
+          ],
+          [
+            "7114597",
+            "50760247",
+            "49",
+            "15",
+            "2000",
+            "0",
+            "16",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "nodeaccessgranted=yes highway=crossing bicycle=yes crossing=uncontrolled",
+            "34",
+            "3460"
+          ],
+          [
+            "7114562",
+            "50760201",
+            "49",
+            "6",
+            "2000",
+            "0",
+            "0",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "",
+            "35",
+            "3550"
+          ],
+          [
+            "7112859",
+            "50759869",
+            "50",
+            "128",
+            "2000",
+            "0",
+            "73",
+            "0",
+            "0",
+            "reversedirection=yes highway=path surface=asphalt foot=designated bicycle=designated oneway=no smoothness=good route_bicycle_icn=yes route_bicycle_ncn=yes route_bicycle_rcn=yes route_bicycle_lcn=yes",
+            "",
+            "57",
+            "5768"
+          ]
+        ],
+        "times": [
+          0,
+          6.523,
+          21.532,
+          23.058,
+          24.752,
+          25.937,
+          26.783,
+          27.459,
+          28.812,
+          30.84,
+          32.359,
+          33.85,
+          34.602,
+          35.509,
+          36.512,
+          37.468,
+          38.576,
+          39.618,
+          43.959,
+          51.225,
+          54.603,
+          57.687
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            7.113486,
+            50.761744,
+            50
+          ],
+          [
+            7.113823,
+            50.761441,
+            49.75
+          ],
+          [
+            7.114504,
+            50.760774,
+            50
+          ],
+          [
+            7.114598,
+            50.760713,
+            50
+          ],
+          [
+            7.114713,
+            50.760665,
+            50
+          ],
+          [
+            7.114762,
+            50.760611,
+            50
+          ],
+          [
+            7.114751,
+            50.760568,
+            50
+          ],
+          [
+            7.11474,
+            50.760532,
+            50
+          ],
+          [
+            7.114795,
+            50.760468,
+            50
+          ],
+          [
+            7.114875,
+            50.760372,
+            50
+          ],
+          [
+            7.11476,
+            50.760335,
+            50
+          ],
+          [
+            7.11463,
+            50.76029,
+            49.5
+          ],
+          [
+            7.114597,
+            50.760247,
+            49.5
+          ],
+          [
+            7.114562,
+            50.760201,
+            49.5
+          ],
+          [
+            7.114465,
+            50.760215,
+            49.25
+          ],
+          [
+            7.114364,
+            50.760218,
+            49
+          ],
+          [
+            7.114256,
+            50.760212,
+            49
+          ],
+          [
+            7.114153,
+            50.760199,
+            49.25
+          ],
+          [
+            7.113835,
+            50.760129,
+            50
+          ],
+          [
+            7.113296,
+            50.759997,
+            50
+          ],
+          [
+            7.11308,
+            50.759928,
+            50.5
+          ],
+          [
+            7.112859,
+            50.759869,
+            50.25
+          ]
+        ]
+      }
+    }
+  ]
+}
