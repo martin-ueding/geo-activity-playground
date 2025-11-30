@@ -15,6 +15,8 @@ from ...core.activities import ActivityRepository
 from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
+from ...core.datamodel import Segment
+from ...core.segments import find_matches
 from ...explorer.tile_visits import compute_tile_evolution
 from ...explorer.tile_visits import compute_tile_visits_new
 from ...explorer.tile_visits import TileVisitAccessor
@@ -130,3 +132,9 @@ def scan_for_activities(
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
+
+    for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
+        find_matches(
+            segment,
+            tile_visit_accessor.tile_state["activities_per_tile"][17],
+        )
