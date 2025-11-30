@@ -1,4 +1,6 @@
+import altair as alt
 import geojson
+import pandas as pd
 import sqlalchemy
 from flask import Blueprint
 from flask import redirect
@@ -73,10 +75,57 @@ def make_segments_blueprint(
     @blueprint.route("/show/<int:id>")
     def show(id: int) -> ResponseReturnValue:
         segment = DB.session.get_one(Segment, id)
+        df = segment_df(segment)
         return render_template(
             "segments/show.html.j2",
             segment=segment,
             activity_ids=[match.activity_id for match in segment.matches],
+            plots=make_plots(df),
+            table=df.to_dict("records"),
         )
 
     return blueprint
+
+
+def segment_df(segment: Segment) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "distance_km": abs(match.distance_km),
+            "duration_s": abs(match.duration.total_seconds()),
+            "duration": abs(match.duration),
+            "direction": (
+                "Forward" if match.duration.total_seconds() > 0 else "Backward"
+            ),
+            "entry_time": match.entry_time,
+            "exit_time": match.exit_time,
+            "activity_id": match.activity.id,
+            "activity_name": match.activity.name,
+            "equipment_name": (
+                match.activity.equipment.name
+                if match.activity.equipment is not None
+                else ""
+            ),
+            "kind_name": (
+                match.activity.kind.name if match.activity.kind is not None else ""
+            ),
+        }
+        for match in segment.matches
+    ).sort_values("entry_time", ascending=False)
+
+
+def make_plots(df: pd.DataFrame) -> dict[str, str]:
+    duration_histogram = (
+        alt.Chart(df, width=500)
+        .mark_bar()
+        .encode(
+            alt.X("duration_s", bin=alt.Bin(step=15), title="Duration / s"),
+            alt.Y("count()"),
+            alt.Color("direction", title="Direction"),
+        )
+        .interactive(bind_y=False)
+        .to_json(format="vega")
+    )
+
+    return {
+        "Duration Histogram": duration_histogram,
+    }
