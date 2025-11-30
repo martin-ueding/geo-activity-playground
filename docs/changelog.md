@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Add segments and a little statistics. Unfortunately they don't work yet when a single track contains the segment multiple times (on the way back, multiple laps). That needs to be extended in a future version.
+
 ## Version 1.16.0 — 2025-11-29
 
 This is a release where I have tried out Cursor with Anthropic Claude Opus 4.5 for coding. It was primarily to get experience with it and see how useful the AI coding tools actually are.
