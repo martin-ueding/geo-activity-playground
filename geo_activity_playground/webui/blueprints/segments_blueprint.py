@@ -72,6 +72,11 @@ def make_segments_blueprint(
 
     @blueprint.route("/show/<int:id>")
     def show(id: int) -> ResponseReturnValue:
-        pass
+        segment = DB.session.get_one(Segment, id)
+        return render_template(
+            "segments/show.html.j2",
+            segment=segment,
+            activity_ids=[match.activity_id for match in segment.matches],
+        )
 
     return blueprint
