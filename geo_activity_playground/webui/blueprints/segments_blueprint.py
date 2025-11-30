@@ -27,10 +27,6 @@ def make_segments_blueprint(
 
     @blueprint.route("/")
     def index():
-        find_matches(
-            DB.session.get_one(Segment, 1),
-            tile_visit_accessor.tile_state["activities_per_tile"][17],
-        )
         return render_template(
             "segments/index.html.j2",
             segments=DB.session.scalars(sqlalchemy.select(Segment)).all(),
@@ -57,6 +53,11 @@ def make_segments_blueprint(
             DB.session.commit()
 
             flasher.flash_message(f"Created segment “{name}”.", FlashTypes.SUCCESS)
+
+            find_matches(
+                segment,
+                tile_visit_accessor.tile_state["activities_per_tile"][17],
+            )
         return redirect(url_for(".index"))
 
     @blueprint.route("/line/<int:id>/line.geojson")
