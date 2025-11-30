@@ -157,6 +157,10 @@ class Activity(DB.Model):
         back_populates="activity", cascade="all, delete-orphan"
     )
 
+    segment_checks: Mapped[list["SegmentCheck"]] = relationship(
+        back_populates="activity", cascade="all, delete-orphan"
+    )
+
     def __str__(self) -> str:
         return f"{self.start} {self.name}"
 
@@ -660,6 +664,10 @@ class Segment(DB.Model):
         back_populates="segment", cascade="all, delete-orphan"
     )
 
+    checks: Mapped[list["SegmentCheck"]] = relationship(
+        back_populates="segment", cascade="all, delete-orphan"
+    )
+
     @property
     def coordinates(self) -> list[list[float]]:
         """Get coordinates as list of [lat, lon] pairs."""
@@ -742,3 +750,35 @@ class SegmentMatch(DB.Model):
     def __repr__(self) -> str:
         duration_str = str(self.duration).split(".")[0] if self.duration else "unknown"
         return f"SegmentMatch(segment={self.segment.name}, activity={self.activity_id}, duration={duration_str})"
+
+
+class SegmentCheck(DB.Model):
+    """Records when an activity passes through a segment.
+
+    Stores the entry and exit points/times for computing segment duration
+    and comparing efforts.
+    """
+
+    __tablename__ = "segment_checks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    segment_id: Mapped[int] = mapped_column(
+        ForeignKey("segments.id", name="segment_check_segment_id"),
+        nullable=False,
+        index=True,
+    )
+    segment: Mapped["Segment"] = relationship(back_populates="checks")
+
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="segment_check_activity_id"),
+        nullable=False,
+        index=True,
+    )
+    activity: Mapped["Activity"] = relationship(back_populates="segment_checks")
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "segment_id", "activity_id", name="unique_segment_activity_check"
+        ),
+    )
