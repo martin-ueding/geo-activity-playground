@@ -3,6 +3,54 @@
 {% block container %}
 <h1>Segments</h1>
 
+
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(id, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '{{ map_tile_attribution|safe }}'
+        }).addTo(map)
+
+        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        map.fitBounds(geojson_layer.getBounds())
+        return map
+    }
+</script>
+
+<div class="row row-cols-1 row-cols-lg-3 g-4 mb-3">
+    {% for segment in segments %}
+
+    <div class="card">
+        <div class="card-img-top" id="map-segment-{{ segment.id }}" style="height: 200px; width: 100%;"></div>
+        <script>
+            fetch("/segments/line/{{ segment.id }}/line.geojson").then(response => response.json()).then(
+                geojson => {
+                    add_map("map-segment-{{ segment.id }}", geojson);
+                }
+            )
+        </script>
+        <div class="card-body">
+            <a href="{{ url_for('.show', id=segment.id) }}">
+                <h5 class="card-title">{{ segment.name }}</h5>
+            </a>
+            <p class="card-text">
+                Length: {{ '%.2f'|format(segment.length_km) }} km
+                <br />
+                Matches: {{ segment.matches|length }}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div class="col">
+
+</div>
+
 <h2>New Segment</h2>
 
 <p>To create a new segment, go to <a href="https://bikerouter.de/" target="_blank">Bike Router</a>, create the segment
