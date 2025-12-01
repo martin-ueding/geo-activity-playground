@@ -26,7 +26,7 @@ So although that data is good, it isn't of the right kind for this project.
 
 ## LiDAR data
 
-Looking at [Bike Router](https://bikerouter.de/), which uses [Sonny’s LiDAR Digital Terrain Models of Europe](https://sonny.4lima.de/), has a bit more accuracy. There the bridge seems to have a better height:
+Looking at [Bikerouter](https://bikerouter.de/), which uses [Sonny’s LiDAR Digital Terrain Models of Europe](https://sonny.4lima.de/), has a bit more accuracy. There the bridge seems to have a better height:
 
 ![](images/elevation-from-bikerouter.png)
 
