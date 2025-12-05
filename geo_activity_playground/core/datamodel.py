@@ -740,13 +740,6 @@ class SegmentMatch(DB.Model):
     # Distance covered in this segment effort (may differ slightly from segment length)
     distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
 
-    __table_args__ = (
-        # An activity can only match a segment once (for now - could support multiple passes later)
-        sa.UniqueConstraint(
-            "segment_id", "activity_id", name="unique_segment_activity_match"
-        ),
-    )
-
     def __repr__(self) -> str:
         duration_str = str(self.duration).split(".")[0] if self.duration else "unknown"
         return f"SegmentMatch(segment={self.segment.name}, activity={self.activity_id}, duration={duration_str})"
