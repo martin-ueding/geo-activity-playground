@@ -57,6 +57,7 @@ nav:
     - elevation-gain-from-noisy-data.md
     - time-zone-handling-sucks.md
     - satellite-elevation-isnt-helpful.md
+    - segment-matching.md
   - Other:
     - acknowledgments.md
     - similar-projects.md
