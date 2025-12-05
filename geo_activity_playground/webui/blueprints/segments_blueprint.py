@@ -10,6 +10,7 @@ from flask import request
 from flask import url_for
 from flask.typing import ResponseReturnValue
 
+from ...core.config import Config
 from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Segment
@@ -27,6 +28,7 @@ def make_segments_blueprint(
     authenticator: Authenticator,
     tile_visit_accessor: TileVisitAccessor,
     flasher: Flasher,
+    config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("segments", __name__, template_folder="templates")
 
@@ -62,6 +64,7 @@ def make_segments_blueprint(
             find_matches(
                 segment,
                 tile_visit_accessor.tile_state["activities_per_tile"][17],
+                config,
             )
         return redirect(url_for(".index"))
 
@@ -101,7 +104,7 @@ def make_segments_blueprint(
     def match_info(activity_id: int, segment_id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, activity_id)
         segment = DB.session.get_one(Segment, segment_id)
-        distance_m, index, distance_matrix = segment_track_distance(segment, activity)
+        distance_m, index, distance_matrix = segment_track_distance(segment, activity, config)
         np.save(f"distance-{activity.id}-{segment.id}.npy", distance_matrix)
 
         segment_index, track_index = np.meshgrid(*map(np.arange, distance_matrix.shape))

@@ -50,6 +50,8 @@ class Config:
     strava_client_code: Optional[str] = None
     time_diff_threshold_seconds: Optional[int] = 30
     upload_password: Optional[str] = None
+    segment_max_distance: int = 20
+    segment_split_distance: int = 100
     map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
     map_tile_attribution: str = (
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
