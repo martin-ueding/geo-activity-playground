@@ -104,7 +104,9 @@ def make_segments_blueprint(
     def match_info(activity_id: int, segment_id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, activity_id)
         segment = DB.session.get_one(Segment, segment_id)
-        distance_m, index, distance_matrix = segment_track_distance(segment, activity, config)
+        distance_m, index, distance_matrix = segment_track_distance(
+            segment, activity, config
+        )
         np.save(f"distance-{activity.id}-{segment.id}.npy", distance_matrix)
 
         segment_index, track_index = np.meshgrid(*map(np.arange, distance_matrix.shape))
@@ -182,11 +184,11 @@ def make_plots(df: pd.DataFrame) -> dict[str, str]:
     )
 
     duration_boxplot = (
-        alt.Chart(df)
+        alt.Chart(df, width=500)
         .mark_boxplot()
         .encode(
-            alt.X("direction", title="Direction"),
-            alt.Y("duration_s", title="Duration / s"),
+            alt.Y("direction", title="Direction"),
+            alt.X("duration_s", title="Duration / s"),
             alt.Color("direction", title="Direction"),
         )
         .to_json(format="vega")
