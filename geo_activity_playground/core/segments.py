@@ -19,7 +19,7 @@ def extract_segment_from_geojson(geojson_str: str) -> list[list[float]]:
 
 def segment_track_distance(
     segment: Segment, activity: Activity
-) -> tuple[float, np.ndarray]:
+) -> tuple[float, np.ndarray, np.ndarray]:
     """
     Computes asymmetric distance between a segment and a track in meters.
 
@@ -35,7 +35,7 @@ def segment_track_distance(
     d = get_distance(slat[:, None], slon[:, None], tlat[None, :], tlon[None, :])
     min_d = np.min(d, axis=1)
     index = np.argmin(d, axis=1)
-    return np.max(min_d), index
+    return np.max(min_d), index, d
 
 
 def tiles_for_segment(segment: Segment, level: int) -> set[tuple[int, int]]:
@@ -74,7 +74,7 @@ def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
     if checks:
         return
 
-    distance_m, index = segment_track_distance(segment, activity)
+    distance_m, index, distance_matrix = segment_track_distance(segment, activity)
     segment_check = SegmentCheck(segment=segment, activity=activity)
     DB.session.add(segment_check)
     if distance_m < 20:

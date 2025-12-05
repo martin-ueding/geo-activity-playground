@@ -1,5 +1,6 @@
 import altair as alt
 import geojson
+import numpy as np
 import pandas as pd
 import sqlalchemy
 from flask import Blueprint
@@ -9,10 +10,12 @@ from flask import request
 from flask import url_for
 from flask.typing import ResponseReturnValue
 
+from ...core.datamodel import Activity
 from ...core.datamodel import DB
 from ...core.datamodel import Segment
 from ...core.segments import extract_segment_from_geojson
 from ...core.segments import find_matches
+from ...core.segments import segment_track_distance
 from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
@@ -82,6 +85,45 @@ def make_segments_blueprint(
             activity_ids=[match.activity_id for match in segment.matches],
             plots=make_plots(df),
             table=df.to_dict("records"),
+        )
+
+    @blueprint.route("/match-info/<int:activity_id>/<int:segment_id>")
+    def match_info(activity_id: int, segment_id: int) -> ResponseReturnValue:
+        activity = DB.session.get_one(Activity, activity_id)
+        segment = DB.session.get_one(Segment, segment_id)
+        distance_m, index, distance_matrix = segment_track_distance(segment, activity)
+        np.save(f"distance-{activity.id}-{segment.id}.npy", distance_matrix)
+
+        segment_index, track_index = np.meshgrid(*map(np.arange, distance_matrix.shape))
+
+        distance_df = pd.DataFrame(
+            {
+                "distance_m": distance_matrix.ravel(),
+                "segment_index": segment_index.ravel(),
+                "track_index": track_index.ravel(),
+            }
+        )
+
+        distance_chart = (
+            alt.Chart(distance_df)
+            .mark_rect()
+            .encode(
+                alt.X("track_index", title="Track Index"),
+                alt.Y("segment_index", title="Segment Index"),
+                alt.Color(
+                    "distance_m",
+                    scale=alt.Scale(scheme="viridis"),
+                    title="Distance / m",
+                ),
+            )
+            .to_json(format="vega")
+        )
+
+        return render_template(
+            "segments/match-info.html.j2",
+            activity=activity,
+            segment=segment,
+            distance_chart=distance_chart,
         )
 
     return blueprint

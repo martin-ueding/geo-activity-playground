@@ -1,0 +1,51 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1 class="mb-3">Segment {{ segment.name }} and {{ activity.name }}</h1>
+
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(id, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '{{ map_tile_attribution|safe }}'
+        }).addTo(map)
+
+        return map
+    }
+</script>
+
+<div id="map-segment" class="mb-3" style=" height: 500px; width: 100%;"></div>
+<script>
+    const activity_ids = {{ activity_ids }};
+    fetch("/segments/line/{{ segment.id }}/line.geojson").then(response => response.json()).then(
+        geojson => {
+            const map = add_map("map-segment", geojson)
+
+
+            let geojson_layer = L.geoJSON(geojson, {
+                style: { color: "#ff0000", fillOpacity: 0.0 }
+            })
+            map.fitBounds(geojson_layer.getBounds())
+
+            let promises = [];
+            promises.push(fetch(`/activity/{{ activity.id }}/line.geojson`).then(response => response.json()).then(geojson => {
+                L.geoJSON(geojson, {
+                    style: { color: "#0000ff", fillOpacity: 0.3 }
+                }).addTo(map)
+            }))
+
+            Promise.all(promises).then(() => { geojson_layer.addTo(map) })
+        }
+    )
+</script>
+
+<h2 class="mb-3">Distance chart</h2>
+<div class="mb-3">
+    {{ vega_direct(distance_chart) }}
+</div>
+
+
+{% endblock %}
