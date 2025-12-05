@@ -519,13 +519,16 @@ def _compute_cluster_evolution(
 
     rows = []
     for index, row in tqdm(
-        tiles.iloc[s.cluster_start :].iterrows(),
+        tiles.iterrows(),
         desc=f"Cluster evolution for {zoom=}",
         delay=1,
     ):
         new_clusters = False
         # Current tile.
         tile = (row["tile_x"], row["tile_y"])
+
+        if tile in s.num_neighbors:
+            continue
 
         # This tile is new, therefore it doesn't have an entries in the neighbor list yet.
         s.num_neighbors[tile] = 0
@@ -598,11 +601,13 @@ def _compute_square_history(
 ) -> None:
     rows = []
     for index, row in tqdm(
-        tiles.iloc[s.square_start :].iterrows(),
+        tiles.iterrows(),
         desc=f"Square evolution for {zoom=}",
         delay=1,
     ):
         tile = (row["tile_x"], row["tile_y"])
+        if tile in s.visited_tiles:
+            continue
         x, y = tile
         s.visited_tiles.add(tile)
         for square_size in itertools.count(s.max_square_size + 1):
