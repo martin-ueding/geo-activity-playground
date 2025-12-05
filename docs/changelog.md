@@ -24,6 +24,7 @@ Added:
 Fixed:
 
 - Multiple passes through a segment will now be separated. This works if the distance is at least 100 m in between the passes. ([GH-236](https://github.com/martin-ueding/geo-activity-playground/issues/236))
+- Fix name of “Bikerouter”. ([GH-381](https://github.com/martin-ueding/geo-activity-playground/issues/381))
 
 ## Version 1.17.0 — 2025-11-30
 
