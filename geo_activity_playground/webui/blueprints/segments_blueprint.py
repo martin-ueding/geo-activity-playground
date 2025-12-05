@@ -182,12 +182,12 @@ def make_plots(df: pd.DataFrame) -> dict[str, str]:
     )
 
     duration_boxplot = (
-        alt.Chart(df, width=300)
+        alt.Chart(df)
         .mark_boxplot()
         .encode(
-            alt.X("direction:N", title="Direction"),
-            alt.Y("duration_s:Q", title="Duration / s"),
-            alt.Color("direction:N", title="Direction"),
+            alt.X("direction", title="Direction"),
+            alt.Y("duration_s", title="Duration / s"),
+            alt.Color("direction", title="Direction"),
         )
         .to_json(format="vega")
     )
