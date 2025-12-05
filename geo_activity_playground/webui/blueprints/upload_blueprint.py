@@ -136,5 +136,5 @@ def scan_for_activities(
     for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
         find_matches(
             segment,
-            tile_visit_accessor.tile_state["activities_per_tile"][17],
+            tile_visit_accessor.tile_state["activities_per_tile"][17], config
         )
