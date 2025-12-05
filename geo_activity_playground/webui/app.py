@@ -171,7 +171,7 @@ def create_app(
 
     @app.template_filter()
     def td(v: datetime.timedelta):
-        if pd.isna(v):
+        if pd.isna(v) or v is None:
             return "—"
         else:
             seconds = v.total_seconds()
@@ -179,6 +179,11 @@ def create_app(
             m = int(seconds // 60 % 60)
             s = int(seconds // 1 % 60)
             return f"{h}:{m:02d}:{s:02d}"
+
+    @app.template_filter()
+    def abs_td(v: datetime.timedelta):
+        """Format timedelta as absolute value (ignoring direction)."""
+        return td(abs(v) if v is not None and not pd.isna(v) else v)
 
     @app.template_filter()
     def isna(value):
