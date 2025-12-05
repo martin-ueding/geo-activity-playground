@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Delete button for segments. ([GH-236](https://github.com/martin-ueding/geo-activity-playground/issues/236))
+- Boxplot to compare forward vs. backward on segments.
 
 Fixed:
 
