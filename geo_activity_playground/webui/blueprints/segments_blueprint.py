@@ -94,7 +94,7 @@ def make_segments_blueprint(
         name = segment.name
         DB.session.delete(segment)
         DB.session.commit()
-        flasher.flash_message(f"Deleted segment "{name}".", FlashTypes.SUCCESS)
+        flasher.flash_message(f"Deleted segment “{name}”.", FlashTypes.SUCCESS)
         return redirect(url_for(".index"))
 
     @blueprint.route("/match-info/<int:activity_id>/<int:segment_id>")
