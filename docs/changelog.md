@@ -15,6 +15,16 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Added:
+
+- Delete button for segments. ([GH-236](https://github.com/martin-ueding/geo-activity-playground/issues/236))
+
+Fixed:
+
+- Multiple passes through a segment will now be separated. This works if the distance is at least 100 m in between the passes. ([GH-236](https://github.com/martin-ueding/geo-activity-playground/issues/236))
+
 ## Version 1.17.0 — 2025-11-30
 
 Added:
