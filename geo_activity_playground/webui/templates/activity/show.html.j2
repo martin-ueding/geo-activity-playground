@@ -184,6 +184,31 @@
 </div>
 {% endif %}
 
+{% if activity.segment_matches %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>Matched Segments</h2>
+        <div class="table-responsive">
+            <table class="table table-sort table-arrows">
+                <thead>
+                    <tr>
+                        <th>Segment Name</th>
+                        <th>Duration in Segment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in activity.segment_matches %}
+                    <tr>
+                        <td><a href="{{ url_for('segments.show', id=match.segment.id) }}">{{ match.segment.name }}</a></td>
+                        <td>{{ match.duration|abs_td }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class=" row mb-3">
     <div class="col">
