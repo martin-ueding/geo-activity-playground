@@ -2,6 +2,7 @@ import geojson
 import numpy as np
 import sqlalchemy
 
+from .config import Config
 from .coordinates import get_distance
 from .datamodel import Activity
 from .datamodel import DB
@@ -18,7 +19,7 @@ def extract_segment_from_geojson(geojson_str: str) -> list[list[float]]:
 
 
 def segment_track_distance(
-    segment: Segment, activity: Activity
+    segment: Segment, activity: Activity, config: Config
 ) -> Iterator[tuple[float, np.ndarray]]:
     """
     Computes asymmetric distance between a segment and a track in meters.
@@ -32,7 +33,7 @@ def segment_track_distance(
     tlat = ts["latitude"].to_numpy()
     tlon = ts["longitude"].to_numpy()
     d = get_distance(slat[:, None], slon[:, None], tlat[None, :], tlon[None, :])
-    close_mask = np.min(d, axis=0) < 100
+    close_mask = np.min(d, axis=0) < config.segment_split_distance
     mask_diff = np.diff(np.array(close_mask, dtype=np.int32))
     begins = np.where(mask_diff == 1)[0]
     ends = np.where(mask_diff == -1)[0]
@@ -59,7 +60,9 @@ def activity_candidates_for_tiles(
 
 
 def find_matches(
-    segment: Segment, activities_per_tile: dict[tuple[int, int], set[int]]
+    segment: Segment,
+    activities_per_tile: dict[tuple[int, int], set[int]],
+    config: Config,
 ) -> None:
     segment_tiles = tiles_for_segment(segment, 17)
     activity_candidates = activity_candidates_for_tiles(
@@ -67,10 +70,12 @@ def find_matches(
     )
     for activity_id in activity_candidates:
         activity = DB.session.get_one(Activity, activity_id)
-        try_match_segment_activity(segment, activity)
+        try_match_segment_activity(segment, activity, config)
 
 
-def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
+def try_match_segment_activity(
+    segment: Segment, activity: Activity, config: Config
+) -> None:
     checks = DB.session.scalars(
         sqlalchemy.select(SegmentCheck).where(
             SegmentCheck.segment == segment, SegmentCheck.activity == activity
@@ -81,8 +86,8 @@ def try_match_segment_activity(segment: Segment, activity: Activity) -> None:
 
     segment_check = SegmentCheck(segment=segment, activity=activity)
     DB.session.add(segment_check)
-    for distance_m, index in segment_track_distance(segment, activity):
-        if distance_m < 20:
+    for distance_m, index in segment_track_distance(segment, activity, config):
+        if distance_m < config.segment_max_distance:
             ts = activity.time_series
             i_entry = index[0]
             i_exit = index[-1]

@@ -224,7 +224,7 @@ def create_app(
         ),
         "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
         "/segments": make_segments_blueprint(
-            authenticator, tile_visit_accessor, flasher
+            authenticator, tile_visit_accessor, flasher, config
         ),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
         "/search": make_search_blueprint(authenticator),
