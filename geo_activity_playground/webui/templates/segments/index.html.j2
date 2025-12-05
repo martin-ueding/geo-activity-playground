@@ -41,6 +41,8 @@
                 <br />
                 Matches: {{ segment.matches|length }}
             </p>
+            <a class="btn btn-sm btn-danger" href="{{ url_for('.delete', id=segment.id) }}"
+                onclick="if(!confirm('Are you sure to delete this segment?')){ event.preventDefault() }">Delete</a>
         </div>
     </div>
     {% endfor %}

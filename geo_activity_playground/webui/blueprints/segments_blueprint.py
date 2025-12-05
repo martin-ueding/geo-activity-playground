@@ -87,6 +87,16 @@ def make_segments_blueprint(
             table=df.to_dict("records"),
         )
 
+    @blueprint.route("/delete/<int:id>")
+    @needs_authentication(authenticator)
+    def delete(id: int) -> ResponseReturnValue:
+        segment = DB.session.get_one(Segment, id)
+        name = segment.name
+        DB.session.delete(segment)
+        DB.session.commit()
+        flasher.flash_message(f"Deleted segment "{name}".", FlashTypes.SUCCESS)
+        return redirect(url_for(".index"))
+
     @blueprint.route("/match-info/<int:activity_id>/<int:segment_id>")
     def match_info(activity_id: int, segment_id: int) -> ResponseReturnValue:
         activity = DB.session.get_one(Activity, activity_id)
