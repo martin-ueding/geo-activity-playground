@@ -154,6 +154,17 @@
                                 <li><a class="dropdown-item" href="{{ url_for('export.index') }}">Data Export</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('time_zone_fixer.index') }}">Time Zone
                                         Fixer</a></li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                    <form action="{{ url_for('admin.shutdown') }}" method="POST" style="margin: 0;"
+                                          onsubmit="return confirm('Are you sure you want to shut down the server? This will terminate the application.');">
+                                        <button type="submit" class="dropdown-item text-danger">Shutdown Server</button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
 
