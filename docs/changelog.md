@@ -17,6 +17,11 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add internationalization to prepare project for translation into different languages. ([GH-386](https://github.com/martin-ueding/geo-activity-playground/issues/386))
+- Translate the project into German using Claude Opus with minor manual fixes. ([GH-386](https://github.com/martin-ueding/geo-activity-playground/issues/386))
+
 Fixed:
 
 - Fix typing import. ([GH-384](https://github.com/martin-ueding/geo-activity-playground/issues/384))
