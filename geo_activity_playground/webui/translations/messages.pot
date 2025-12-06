@@ -1,0 +1,170 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-12-06 20:38+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: geo_activity_playground/webui/templates/page.html.j2:10
+#: geo_activity_playground/webui/templates/page.html.j2:51
+msgid "Geo Activity Playground"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:54
+msgid "Toggle navigation"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:64
+msgid "Activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:67
+msgid "Calendar"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:68
+msgid "Overview & Search"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:69
+msgid "Bubble Chart"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:77
+msgid "Statistics"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:80
+msgid "Summary Statistics"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:82
+msgid "Hall of Fame"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:84
+msgid "Eddington Number"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:86
+msgid "Elevation Eddington Number"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:88
+msgid "Equipment"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:89
+msgid "Segments"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:96
+msgid "Explorer"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:99
+msgid "Explorer Tiles (Zoom 14)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:100
+msgid "Squadratinhos (Zoom 17)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:107
+msgid "Square Planner (Zoom 14)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:109
+msgid "Square Planner (Zoom 17)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:114
+msgid "Heatmap"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:120
+msgid "Photo Map"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:127
+msgid "Admin"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:130
+msgid "Upload Activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:132
+msgid "Upload Photos"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:134
+msgid "Scan New Activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:141
+msgid "Plot Builder"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:143
+msgid "Settings"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:144
+msgid "Data Export"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:145
+msgid "Time Zone Fixer"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:153
+msgid ""
+"Are you sure you want to shut down the server? This will terminate the "
+"application."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:154
+msgid "Shutdown Server"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:164
+msgid "Toggle theme"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:165
+msgid "Theme"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:171
+msgid "Light"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:177
+msgid "Dark"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:183
+msgid "Auto"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:210
+msgid "Version"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/page.html.j2:219
+msgid "Documentation"
+msgstr ""
+
