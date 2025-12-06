@@ -42,6 +42,7 @@ from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
+from .blueprints.admin_blueprint import make_admin_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.bubble_chart_blueprint import make_bubble_chart_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
@@ -200,6 +201,7 @@ def create_app(
             config,
             heart_rate_zone_computer,
         ),
+        "/admin": make_admin_blueprint(authenticator),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
         "/calendar": make_calendar_blueprint(repository),
