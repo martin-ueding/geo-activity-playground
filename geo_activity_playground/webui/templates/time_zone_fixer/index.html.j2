@@ -2,30 +2,22 @@
 
 {% block container %}
 
-<h1 class="mb-3">Time Zone Fixer</h1>
+<h1 class="mb-3">{{ _('Time Zone Fixer') }}</h1>
 
-<p>Prior to version 1.3.0, activity times were interpreted in the local time zone. If your software recorded in UTC, it
-    was assumed that this was your local time zone. This assumption was often wrong. With version 1.3.0, this got fixed.
-    Activities will be imported using UTC or specified time zone. They will then be localized into the time zone of the
-    activity position.</p>
+<p>{{ _('Prior to version 1.3.0, activity times were interpreted in the local time zone. If your software recorded in UTC, it was assumed that this was your local time zone. This assumption was often wrong. With version 1.3.0, this got fixed. Activities will be imported using UTC or specified time zone. They will then be localized into the time zone of the activity position.') }}</p>
 
-<p>Use this tool to fix activities which were imported with an older version.</p>
+<p>{{ _('Use this tool to fix activities which were imported with an older version.') }}</p>
 
-<p>Your activities are shown in the local time zone of the activity but no time zone is shown. </p>
+<p>{{ _('Your activities are shown in the local time zone of the activity but no time zone is shown.') }}</p>
 <p><a class="btn btn-small btn-danger" href="{{ url_for('.local_to_utc') }}"
-        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times as local time
-        zone</a></p>
+        onclick="if(!confirm('{{ _('Are you sure to run this?') }}')){event.preventDefault()}">{{ _('Interpret times as local time zone') }}</a></p>
 
-<p>Your activities seem to be UTC and don't confirm to the local time zone. You have the impression that all the times
-    are off.</p>
+<p>{{ _('Your activities seem to be UTC and don\'t conform to the local time zone. You have the impression that all the times are off.') }}</p>
 <p><a class="btn btn-small btn-danger" href="{{ url_for('.utc_to_utc') }}"
-        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Interpret times as UTC</a></p>
+        onclick="if(!confirm('{{ _('Are you sure to run this?') }}')){event.preventDefault()}">{{ _('Interpret times as UTC') }}</a></p>
 
-<p>Everything seems broken. You want to reload all your activities. Be aware that with Strava API that can take ages due
-    to the rate limiting. Also be aware that this will delete all changes that you did after importing the activity
-    (changing the name, equipment, adding tags, trimming the activity). </p>
+<p>{{ _('Everything seems broken. You want to reload all your activities. Be aware that with Strava API that can take ages due to the rate limiting. Also be aware that this will delete all changes that you did after importing the activity (changing the name, equipment, adding tags, trimming the activity).') }}</p>
 <p><a class="btn btn-small btn-danger" href="{{ url_for('.truncate_activities') }}"
-        onclick="if(!confirm('Are you sure to run this?')){ event.preventDefault() }">Throw all activities away and
-        rescan</a></p>
+        onclick="if(!confirm('{{ _('Are you sure to run this?') }}')){event.preventDefault()}">{{ _('Throw all activities away and rescan') }}</a></p>
 
 {% endblock %}

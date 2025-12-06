@@ -1,35 +1,33 @@
 {% extends "settings/base.html.j2" %}
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item active" aria-current="page">Map Tile Source</li>
+<li class="breadcrumb-item active" aria-current="page">{{ _('Map Tile Source') }}</li>
 {% endblock %}
 
 {% block settings_content %}
-<h1 class="mb-3">Tile Source</h1>
+<h1 class="mb-3">{{ _('Tile Source') }}</h1>
 
-<p>You can change the tile source to be whatever you like. Be aware that different sources have different licensing
-    constraints. It is on you to make sure that you are allowed to use the tiles from the source that you enter. See <a
-        href="https://wiki.openstreetmap.org/wiki/Raster_tile_providers" target="_blank">this list of raster tile
-        providers</a> for inspiration.</p>
+<p>{{ _('You can change the tile source to be whatever you like. Be aware that different sources have different licensing constraints. It is on you to make sure that you are allowed to use the tiles from the source that you enter. See') }} <a
+        href="https://wiki.openstreetmap.org/wiki/Raster_tile_providers" target="_blank">{{ _('this list of raster tile providers') }}</a> {{ _('for inspiration.') }}</p>
 
 
 <form action="" method="POST" class="mb-3">
     <div class="mb-3">
-        <label for="map_tile_url" class="form-label">Map tile URL</label>
+        <label for="map_tile_url" class="form-label">{{ _('Map tile URL') }}</label>
         <input type="text" class="form-control" id="map_tile_url" name="map_tile_url" value="{{ map_tile_url }}" />
     </div>
     <div class="mb-3">
-        <label for="map_tile_attribution" class="form-label">Map tile attribution</label>
+        <label for="map_tile_attribution" class="form-label">{{ _('Map tile attribution') }}</label>
         <input type="text" class="form-control" id="map_tile_attribution" name="map_tile_attribution"
             value="{{ map_tile_attribution|e }}" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 
-<h2>Test image</h2>
+<h2>{{ _('Test image') }}</h2>
 
-<p>This is a tile using your current tile source:</p>
+<p>{{ _('This is a tile using your current tile source:') }}</p>
 
 <p><img src="{{ test_url }}"></p>
 {% endblock %}

@@ -2,17 +2,17 @@
 
 {% block container %}
 
-<h1>Activities Through Tile</h1>
+<h1>{{ _('Activities Through Tile') }}</h1>
 
 <div class="row mb-3">
     <div class="col">
         <p>
-            Showing {{ num_activities }} activities passing through tile ({{ tile_x }}, {{ tile_y }}) @ zoom {{ zoom }}
+            {{ _('Showing') }} {{ num_activities }} {{ _('activities passing through tile') }} ({{ tile_x }}, {{ tile_y }}) @ {{ _('zoom') }} {{ zoom }}
             {% if radius > 0 %}
-            with radius {{ radius }} ({{ (2 * radius + 1) ** 2 }} tiles)
+            {{ _('with radius') }} {{ radius }} ({{ (2 * radius + 1) ** 2 }} {{ _('tiles') }})
             {% endif %}
         </p>
-        <label class="me-2">Search Radius:</label>
+        <label class="me-2">{{ _('Search Radius:') }}</label>
         <div class="btn-group" role="group" aria-label="Radius selection">
             {% for r in range(6) %}
             <a href="{{ url_for('.activities_through_tile', zoom=zoom, tile_x=tile_x, tile_y=tile_y, radius=r) }}"
@@ -31,13 +31,13 @@
             <table class="table table-sort table-arrows">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th class="numeric-sort">Distance / km</th>
-                        <th>Elapsed time</th>
-                        <th>Speed / km/h</th>
-                        <th>Equipment</th>
-                        <th>Kind</th>
+                        <th>{{ _('Name') }}</th>
+                        <th>{{ _('Date') }}</th>
+                        <th class="numeric-sort">{{ _('Distance / km') }}</th>
+                        <th>{{ _('Elapsed time') }}</th>
+                        <th>{{ _('Speed / km/h') }}</th>
+                        <th>{{ _('Equipment') }}</th>
+                        <th>{{ _('Kind') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,7 +71,7 @@
 </div>
 {% else %}
 <div class="alert alert-info">
-    No activities found passing through this tile.
+    {{ _('No activities found passing through this tile.') }}
 </div>
 {% endif %}
 

@@ -1,21 +1,21 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1>Authentication</h1>
+<h1>{{ _('Authentication') }}</h1>
 
 {% if is_authenticated %}
-<p>You are either logged in or don't have a password set. You can do everything.</p>
+<p>{{ _('You are either logged in or don\'t have a password set. You can do everything.') }}</p>
 
-<a class="btn btn-primary" href="{{ url_for('.logout') }}">Log Out</a>
+<a class="btn btn-primary" href="{{ url_for('.logout') }}">{{ _('Log Out') }}</a>
 {% else %}
 <form method="POST">
     <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">{{ _('Password') }}</label>
         <input type="password" class="form-control" id="password" name="password" />
     </div>
 
     <input type="hidden" name="redirect" value="{{ redirect }}" />
-    <button type="submit" class="btn btn-primary">Log In</button>
+    <button type="submit" class="btn btn-primary">{{ _('Log In') }}</button>
 </form>
 {% endif %}
 

@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1 class="mb-3">Eddington Number</h1>
+<h1 class="mb-3">{{ _('Eddington Number') }}</h1>
 
 <div class="mb-3">
     {% include "search_form.html.j2" %}
@@ -9,29 +9,25 @@
 
 <div class="row mb-3">
     <div class="col-md-4">
-        <h2>Definition</h2>
+        <h2>{{ _('Definition') }}</h2>
 
-        <p>Your Eddington number is <b>{{ eddington_number }}</b>.</p>
+        <p>{{ _('Your Eddington number is') }} <b>{{ eddington_number }}</b>.</p>
 
-        <p>That means that on {{ eddington_number }} separate days you
-            have recorded activities exceeding {{ eddington_number }} km. Going far is one thing, going often is
-            another. But going far often is hard. Also if you increment the Eddington number, all days with less
-            distance will not count any more. It becomes increasingly hard to increment the Eddington number because you
-            don't only need to achieve a higher count, but all shorter activities don't count towards the bigger number.
+        <p>{{ _('That means that on') }} {{ eddington_number }} {{ _('separate days you have recorded activities exceeding') }} {{ eddington_number }} km. {{ _('Going far is one thing, going often is another. But going far often is hard. Also if you increment the Eddington number, all days with less distance will not count any more. It becomes increasingly hard to increment the Eddington number because you don\'t only need to achieve a higher count, but all shorter activities don\'t count towards the bigger number.') }}
         </p>
     </div>
 
     <div class="col-md-8">
-        <h2>Missing days</h2>
+        <h2>{{ _('Missing days') }}</h2>
 
-        <p>How many more days do you need to increment your Eddington number?</p>
+        <p>{{ _('How many more days do you need to increment your Eddington number?') }}</p>
 
         <table class="table">
             <thead>
                 <tr>
-                    <th>Distance / km</th>
-                    <th>Count</th>
-                    <th>Missing days</th>
+                    <th>{{ _('Distance / km') }}</th>
+                    <th>{{ _('Count') }}</th>
+                    <th>{{ _('Missing days') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,33 +45,32 @@
 
 <div class="row mb-1">
     <div class="col">
-        <h2>Plot</h2>
+        <h2>{{ _('Plot') }}</h2>
 
-        <p>In a graphical representation, the Eddington number is the distance where the red line intersects with the
-            blue area.</p>
+        <p>{{ _('In a graphical representation, the Eddington number is the distance where the red line intersects with the blue area.') }}</p>
 
         {{ vega_direct(logarithmic_plot) }}
     </div>
 </div>
 
 <div class="mb-3">
-    <h2 class="mb-3">Eddington number history</h2>
+    <h2 class="mb-3">{{ _('Eddington number history') }}</h2>
 
-    <p>How did the Eddington number evolve over time?</p>
+    <p>{{ _('How did the Eddington number evolve over time?') }}</p>
 
     {{ vega_direct(eddington_number_history_plot) }}
 </div>
 
 <div class="mb-3">
-    <h2 class="mb-3">Yearly Eddington number</h2>
+    <h2 class="mb-3">{{ _('Yearly Eddington number') }}</h2>
 
-    <p>If we only consider the activities within one calendar year for the Eddington number, we get the following:</p>
+    <p>{{ _('If we only consider the activities within one calendar year for the Eddington number, we get the following:') }}</p>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Year</th>
-                <th>Eddington number</th>
+                <th>{{ _('Year') }}</th>
+                <th>{{ _('Eddington number') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -90,7 +85,7 @@
 </div>
 
 
-<h2 class="mb-3">Eddington number per Week</h2>
+<h2 class="mb-3">{{ _('Eddington number per Week') }}</h2>
 
 <div class="row mb-3">
     <div class="col-md-8">
@@ -101,9 +96,9 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Distance / km</th>
-                    <th>Count</th>
-                    <th>Missing weeks</th>
+                    <th>{{ _('Distance / km') }}</th>
+                    <th>{{ _('Count') }}</th>
+                    <th>{{ _('Missing weeks') }}</th>
                 </tr>
             </thead>
             <tbody>

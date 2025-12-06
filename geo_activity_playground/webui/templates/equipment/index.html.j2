@@ -3,7 +3,7 @@
 {% block container %}
 <div class="row mb-3">
     <div class="col">
-        <h1>Equipment</h1>
+        <h1>{{ _('Equipment') }}</h1>
     </div>
 </div>
 
@@ -12,10 +12,10 @@
         <table class="table table-sort table-arrows">
             <thead>
                 <tr>
-                    <th>Equipment</th>
-                    <th style="text-align: right;">Distance / km</th>
-                    <th style="text-align: right;">First use</th>
-                    <th style="text-align: right;">Last use</th>
+                    <th>{{ _('Equipment') }}</th>
+                    <th style="text-align: right;">{{ _('Distance / km') }}</th>
+                    <th style="text-align: right;">{{ _('First use') }}</th>
+                    <th style="text-align: right;">{{ _('Last use') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,14 +34,14 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Monthly Equipment Usage</h2>
+        <h2>{{ _('Monthly Equipment Usage') }}</h2>
         {{ vega_direct(stacked_area_chart) }}
     </div>
 </div>
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Details for each equipment</h2>
+        <h2>{{ _('Details for each equipment') }}</h2>
     </div>
 </div>
 

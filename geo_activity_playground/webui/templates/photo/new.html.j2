@@ -1,13 +1,13 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1>Upload Photo</h1>
+<h1>{{ _('Upload Photo') }}</h1>
 
 <form method="POST" enctype="multipart/form-data">
     <div class="mb-3">
-        <label for="file" class="form-label">Photo file</label>
+        <label for="file" class="form-label">{{ _('Photo file') }}</label>
         <input type="file" name="file" id="file" class="form-control" multiple>
     </div>
-    <button type="submit" class="btn btn-primary">Upload</button>
+    <button type="submit" class="btn btn-primary">{{ _('Upload') }}</button>
 </form>
 {% endblock %}

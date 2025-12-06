@@ -11,17 +11,17 @@
     <div class="col-sm-12 col-md-4">
         <dl>
             {% if activity.kind %}
-            <dt>Kind</dt>
+            <dt>{{ _('Kind') }}</dt>
             <dd>{{ activity.kind.name }}</dd>
             {% endif %}
 
             {% if activity.equipment %}
-            <dt>Equipment</dt>
+            <dt>{{ _('Equipment') }}</dt>
             <dd>{{ activity.equipment.name }}</dd>
             {% endif %}
 
             {% if activity.tags %}
-            <dt>Tags</dt>
+            <dt>{{ _('Tags') }}</dt>
             <dd>
                 {% for tag in activity.tags %}
                 {{ activity_tag(tag) }}
@@ -29,71 +29,71 @@
             </dd>
             {% endif %}
 
-            <dt>Distance</dt>
+            <dt>{{ _('Distance') }}</dt>
             <dd>{{ activity.distance_km|round(1) }} km</dd>
 
             {% if activity.elapsed_time %}
-            <dt>Duration</dt>
-            <dd>{{ activity.elapsed_time|td }} elapsed, {{ activity.moving_time|td }} moving</dd>
+            <dt>{{ _('Duration') }}</dt>
+            <dd>{{ activity.elapsed_time|td }} {{ _('elapsed') }}, {{ activity.moving_time|td }} {{ _('moving') }}</dd>
 
-            <dt>Average moving speed</dt>
+            <dt>{{ _('Average moving speed') }}</dt>
             <dd>{% if activity.average_speed_moving_kmh is not none %}
                 {{ activity.average_speed_moving_kmh|round(1) }} km/h =
                 {{ (60/activity.average_speed_moving_kmh)|round(1) }} min/km
                 {% else %}
-                n/a
+                {{ _('n/a') }}
                 {% endif %}
             </dd>
-            <dt>Average elapsed speed</dt>
+            <dt>{{ _('Average elapsed speed') }}</dt>
             <dd>{{ activity.average_speed_elapsed_kmh|round(1) }} km/h = {{
                 (60/activity.average_speed_elapsed_kmh)|round(1) }} min/km</dd>
             {% endif %}
             {% if date is defined %}
-            <dt>Start time</dt>
+            <dt>{{ _('Start time') }}</dt>
             <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }} {{ activity.iana_timezone }}
             </dd>
             {% endif %}
 
             {% if activity.calories %}
-            <dt>Calories</dt>
+            <dt>{{ _('Calories') }}</dt>
             <dd>{{ activity.calories }}</dd>
             {% endif %}
 
             {% if activity.steps %}
-            <dt>Steps</dt>
+            <dt>{{ _('Steps') }}</dt>
             <dd>{{ activity.steps }}</dd>
             {% endif %}
 
             {% if activity.elevation_gain %}
-            <dt>Elevation gain</dt>
+            <dt>{{ _('Elevation gain') }}</dt>
             <dd>{{ activity.elevation_gain|round(0)|int }} m</dd>
             {% endif %}
 
             {% if new_tiles[14] %}
-            <dt>New Explorer Tiles</dt>
+            <dt>{{ _('New Explorer Tiles') }}</dt>
             <dd>{{ new_tiles[14] }}</dd>
             {% endif %}
 
             {% if new_tiles[17] %}
-            <dt>New Squadratinhos</dt>
+            <dt>{{ _('New Squadratinhos') }}</dt>
             <dd>{{ new_tiles[17] }}</dd>
             {% endif %}
 
-            <dt>ID</dt>
+            <dt>{{ _('ID') }}</dt>
             <dd>{{ activity.id }}</dd>
-            <dt>Upstream ID</dt>
+            <dt>{{ _('Upstream ID') }}</dt>
             <dd>{{ activity.upstream_id }}</dd>
-            <dt>Source path</dt>
+            <dt>{{ _('Source path') }}</dt>
             <dd><a href="{{ url_for('.download_original', id=activity.id) }}">{{ activity.path }}</a></dd>
-            <dt>Time series path</dt>
+            <dt>{{ _('Time series path') }}</dt>
             <dd>{{ activity.time_series_path }}</dd>
         </dl>
 
-        <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">Edit</a>
-        <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">Trim</a>
+        <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Edit') }}</a>
+        <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Trim') }}</a>
         <a class="btn btn-small btn-danger" href="{{ url_for('.delete', id=activity.id) }}"
-            onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
+            onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
     </div>
     <div class="col-sm-12 col-md-8">
         <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
@@ -159,8 +159,8 @@
 
         <div class="mb-3" style="padding-top: 10px;">
             <form method="GET">
-                <label class="form-label">Line Color by</label>
-                <select class="form-select" aria-label="Line Color by" name="line_color_column"
+                <label class="form-label">{{ _('Line Color by') }}</label>
+                <select class="form-select" aria-label="{{ _('Line Color by') }}" name="line_color_column"
                     onchange="this.form.submit()">
                     {% for name, column in line_color_columns_avail.items() %}
                     <option {% if name==line_color_column %} selected {% endif %} value="{{ name }}">{{
@@ -174,7 +174,7 @@
 </div>
 
 {% if activity.photos %}
-<h2 class="mb-3">Photos</h2>
+<h2 class="mb-3">{{ _('Photos') }}</h2>
 <div class="row mb-3">
     {% for photo in activity.photos %}
     <div class="col-md-3">
@@ -187,13 +187,13 @@
 {% if activity.segment_matches %}
 <div class="row mb-3">
     <div class="col">
-        <h2>Matched Segments</h2>
+        <h2>{{ _('Matched Segments') }}</h2>
         <div class="table-responsive">
             <table class="table table-sort table-arrows">
                 <thead>
                     <tr>
-                        <th>Segment Name</th>
-                        <th>Duration in Segment</th>
+                        <th>{{ _('Segment Name') }}</th>
+                        <th>{{ _('Duration in Segment') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -212,7 +212,7 @@
 
 <div class=" row mb-3">
     <div class="col">
-        <h2>Distance & speed</h2>
+        <h2>{{ _('Distance & speed') }}</h2>
     </div>
 </div>
 
@@ -231,7 +231,7 @@
 {% if elevation_time_plot is defined %}
 <div class="row mb-3">
     <div class="col">
-        <h2>Elevation</h2>
+        <h2>{{ _('Elevation') }}</h2>
     </div>
 </div>
 
@@ -248,7 +248,7 @@
 {% endif %}
 
 {% if heartrate_time_plot is defined %}
-<h2>Heart rate</h2>
+<h2>{{ _('Heart rate') }}</h2>
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -258,16 +258,15 @@
         {% if heart_zones_plot is defined %}
         {{ vega_direct(heart_zones_plot) }}
         {% else %}
-        <p>Your activity has heart data, but this program doesn't know your maximum heart rate (or birth year) and
-            therefore cannot compute the heart rate zones. Go to the <a
-                href="{{ url_for('settings.heart_rate') }}">settings</a>.</p>
+        <p>{{ _('Your activity has heart data, but this program doesn\'t know your maximum heart rate (or birth year) and therefore cannot compute the heart rate zones. Go to the') }} <a
+                href="{{ url_for('settings.heart_rate') }}">{{ _('settings') }}</a>.</p>
         {% endif %}
     </div>
 </div>
 {% endif %}
 
 {% if cadence_time_plot is defined %}
-<h2>Cadence</h2>
+<h2>{{ _('Cadence') }}</h2>
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -277,23 +276,21 @@
 {% endif %}
 
 
-<h2>Share picture</h2>
+<h2>{{ _('Share picture') }}</h2>
 
 <p><img class="img-fluid" src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
 
-<p>Not happy with the displayed data? <a href="{{ url_for('settings.sharepic') }}">Change share picture
-        settings</a>.</p>
+<p>{{ _('Not happy with the displayed data?') }} <a href="{{ url_for('settings.sharepic') }}">{{ _('Change share picture settings') }}</a>.</p>
 
 {% if new_tiles_geojson %}
-<h2>New explorer tiles</h2>
-<p>With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective
-    zoom levels.</p>
+<h2>{{ _('New explorer tiles') }}</h2>
+<p>{{ _('With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective zoom levels.') }}</p>
 
 <div class="row mb-3">
     {% for zoom, geojson in new_tiles_geojson.items() %}
     <div class="col-md-6">
-        <h3>Zoom {{ zoom }}</h3>
-        <p>There are {{ new_tiles[zoom] }} new tiles:</p>
+        <h3>{{ _('Zoom') }} {{ zoom }}</h3>
+        <p>{{ _('There are') }} {{ new_tiles[zoom] }} {{ _('new tiles:') }}</p>
         <div class="new-tiles-map"
              data-zoom="{{ zoom }}"
              data-tiles-geojson='{{ geojson | safe }}'
@@ -345,19 +342,19 @@
 {% if similar_activites|length > 0 %}
 <div class="row mb-3">
     <div class="col">
-        <h2>Activities with the same name</h2>
+        <h2>{{ _('Activities with the same name') }}</h2>
 
-        <p><a href="{{ url_for('.name', name=activity['name']) }}">Overview over these activities</a></p>
+        <p><a href="{{ url_for('.name', name=activity['name']) }}">{{ _('Overview over these activities') }}</a></p>
 
         <div class="table-responsive">
             <table class="table table-sort table-arrows">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th class="numeric-sort">Distance / km</th>
-                        <th>Elapsed time</th>
-                        <th>Equipment</th>
-                        <th>Kind</th>
+                        <th>{{ _('Date') }}</th>
+                        <th class="numeric-sort">{{ _('Distance / km') }}</th>
+                        <th>{{ _('Elapsed time') }}</th>
+                        <th>{{ _('Equipment') }}</th>
+                        <th>{{ _('Kind') }}</th>
                     </tr>
                 </thead>
                 <tbody>

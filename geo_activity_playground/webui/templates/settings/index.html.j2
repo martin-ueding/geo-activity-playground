@@ -1,51 +1,51 @@
 {% extends "settings/base.html.j2" %}
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item active" aria-current="page">Overview</li>
+<li class="breadcrumb-item active" aria-current="page">{{ _('Overview') }}</li>
 {% endblock %}
 
 {% block settings_content %}
-<h1 class="mb-3">Settings</h1>
+<h1 class="mb-3">{{ _('Settings') }}</h1>
 
-<p class="lead">Configure how your activities are gathered, analyzed, and visualized.</p>
+<p class="lead">{{ _('Configure how your activities are gathered, analyzed, and visualized.') }}</p>
 
-<p>Use the navigation menu to access different configuration sections. Here's a quick overview of what you can customize:</p>
+<p>{{ _('Use the navigation menu to access different configuration sections. Here\'s a quick overview of what you can customize:') }}</p>
 
 <div class="row row-cols-1 row-cols-md-2 g-3 mt-2">
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>🔗 Data Sources</h5>
-            <p class="mb-0 small text-muted">Connect to Strava API or configure how metadata is extracted from your activity files.</p>
+            <h5>🔗 {{ _('Data Sources') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Connect to Strava API or configure how metadata is extracted from your activity files.') }}</p>
         </div>
     </div>
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>🎨 Display</h5>
-            <p class="mb-0 small text-muted">Customize color schemes, map tile sources, and share picture settings.</p>
+            <h5>🎨 {{ _('Display') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Customize color schemes, map tile sources, and share picture settings.') }}</p>
         </div>
     </div>
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>❤️ Personal</h5>
-            <p class="mb-0 small text-muted">Set up heart rate zones based on your personal data.</p>
+            <h5>❤️ {{ _('Personal') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Set up heart rate zones based on your personal data.') }}</p>
         </div>
     </div>
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>🚲 Management</h5>
-            <p class="mb-0 small text-muted">Manage your equipment, activity kinds, and tags.</p>
+            <h5>🚲 {{ _('Management') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Manage your equipment, activity kinds, and tags.') }}</p>
         </div>
     </div>
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>🔒 Privacy & Processing</h5>
-            <p class="mb-0 small text-muted">Define privacy zones and configure track segmentation.</p>
+            <h5>🔒 {{ _('Privacy & Processing') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Define privacy zones and configure track segmentation.') }}</p>
         </div>
     </div>
     <div class="col">
         <div class="p-3 bg-body-tertiary rounded">
-            <h5>🔑 Advanced</h5>
-            <p class="mb-0 small text-muted">Admin password and custom plot builder.</p>
+            <h5>🔑 {{ _('Advanced') }}</h5>
+            <p class="mb-0 small text-muted">{{ _('Admin password and custom plot builder.') }}</p>
         </div>
     </div>
 </div>

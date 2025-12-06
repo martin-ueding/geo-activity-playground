@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1 class="mb-3">Segment {{ segment.name }} and {{ activity.name }}</h1>
+<h1 class="mb-3">{{ _('Segment') }} {{ segment.name }} {{ _('and') }} {{ activity.name }}</h1>
 
 <script>
     function add_map(id, geojson) {
@@ -42,7 +42,7 @@
     )
 </script>
 
-<h2 class="mb-3">Distance chart</h2>
+<h2 class="mb-3">{{ _('Distance chart') }}</h2>
 <div class="mb-3">
     {{ vega_direct(distance_chart) }}
 </div>

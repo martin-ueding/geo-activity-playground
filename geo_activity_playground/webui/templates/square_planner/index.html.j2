@@ -3,7 +3,7 @@
 {% block container %}
 <div class="row mb-3">
     <div class="col">
-        <h1>Square Planner</h1>
+        <h1>{{ _('Square Planner') }}</h1>
     </div>
 </div>
 
@@ -89,9 +89,9 @@
             </tr>
         </table>
 
-        <p>Download missing tiles as <a
+        <p>{{ _('Download missing tiles as') }} <a
                 href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.geojson">GeoJSON</a>
-            or <a href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
+            {{ _('or') }} <a href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
         </p>
     </div>
 
@@ -119,27 +119,27 @@
 <form class="row row-cols-lg-auto g-3 align-items-center bm-3 mb-3" method="POST"
     action="{{ url_for('.save_bookmark', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">
     <div class="col-12">
-        <label class="visually-hidden" for="inlineFormInputGroupUsername">Name</label>
-        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Name" name="name">
+        <label class="visually-hidden" for="inlineFormInputGroupUsername">{{ _('Name') }}</label>
+        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="{{ _('Name') }}" name="name">
     </div>
 
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Create bookmark</button>
+        <button type="submit" class="btn btn-primary">{{ _('Create bookmark') }}</button>
     </div>
 </form>
 
 
 {% if bookmarks %}
-<h2 class="mb-3">Bookmarks</h2>
+<h2 class="mb-3">{{ _('Bookmarks') }}</h2>
 <table class="table mb-3">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Zoom</th>
+            <th>{{ _('Name') }}</th>
+            <th>{{ _('Zoom') }}</th>
             <th>X</th>
             <th>Y</th>
-            <th>Size</th>
-            <th>Actions</th>
+            <th>{{ _('Size') }}</th>
+            <th>{{ _('Actions') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -152,9 +152,9 @@
             <td>{{ bookmark.size }}</td>
             <td>
                 <a class="btn btn-small btn-primary"
-                    href="{{ url_for('.index', zoom=bookmark.zoom, x=bookmark.x, y=bookmark.y, size=bookmark.size) }}">Open</a>
+                    href="{{ url_for('.index', zoom=bookmark.zoom, x=bookmark.x, y=bookmark.y, size=bookmark.size) }}">{{ _('Open') }}</a>
                 <a class="btn btn-small btn-danger" href="{{ url_for('.delete_bookmark', id=bookmark.id) }}"
-                    onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a>
+                    onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
             </td>
         </tr>
         {% endfor %}
