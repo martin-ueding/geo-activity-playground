@@ -19,6 +19,7 @@ import sqlalchemy
 from flask import Flask
 from flask import request
 from flask_alembic import Alembic
+from flask_babel import Babel
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
@@ -123,6 +124,24 @@ def create_app(
     app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = secret_key or get_secret_key()
+
+    # Configure Babel for internationalization
+    app.config["BABEL_DEFAULT_LOCALE"] = "en"
+    app.config["BABEL_SUPPORTED_LOCALES"] = ["en", "de"]
+    app.config["BABEL_TRANSLATION_DIRECTORIES"] = "translations"
+
+    def get_locale():
+        # Try to get locale from query parameter first (for testing)
+        if "lang" in request.args:
+            lang = request.args.get("lang")
+            if lang in app.config["BABEL_SUPPORTED_LOCALES"]:
+                return lang
+        # Fall back to browser's preferred language
+        return request.accept_languages.best_match(
+            app.config["BABEL_SUPPORTED_LOCALES"]
+        )
+
+    babel = Babel(app, locale_selector=get_locale)
 
     DB.init_app(app)
 

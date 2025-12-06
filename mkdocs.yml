@@ -48,6 +48,7 @@ nav:
     - using-git-version-via-docker-compose.md
     - using-git-version-via-docker-compose-and-tailscale-vpn.md
     - change-database-schema.md
+    - update-and-extend-translations.md
   - Reference:
     - advanced-metadata-extraction.md
   - Explanation:
