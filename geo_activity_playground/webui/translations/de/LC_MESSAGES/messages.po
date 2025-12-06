@@ -73,7 +73,7 @@ msgstr "Segmente"
 
 #: geo_activity_playground/webui/templates/page.html.j2:96
 msgid "Explorer"
-msgstr "Explorer"
+msgstr "Kacheln"
 
 #: geo_activity_playground/webui/templates/page.html.j2:99
 msgid "Explorer Tiles (Zoom 14)"
@@ -81,7 +81,7 @@ msgstr "Explorer-Kacheln (Zoom 14)"
 
 #: geo_activity_playground/webui/templates/page.html.j2:100
 msgid "Squadratinhos (Zoom 17)"
-msgstr "Squadratinhos (Zoom 17)"
+msgstr "Kleine Kacheln (Zoom 17)"
 
 #: geo_activity_playground/webui/templates/page.html.j2:107
 msgid "Square Planner (Zoom 14)"
@@ -113,7 +113,7 @@ msgstr "Fotos hochladen"
 
 #: geo_activity_playground/webui/templates/page.html.j2:134
 msgid "Scan New Activities"
-msgstr "Neue Aktivitäten scannen"
+msgstr "Neue Aktivitäten einlesen"
 
 #: geo_activity_playground/webui/templates/page.html.j2:141
 msgid "Plot Builder"
@@ -145,7 +145,7 @@ msgstr "Server herunterfahren"
 
 #: geo_activity_playground/webui/templates/page.html.j2:164
 msgid "Toggle theme"
-msgstr "Design wechseln"
+msgstr "Hell/dunkel wechseln"
 
 #: geo_activity_playground/webui/templates/page.html.j2:165
 msgid "Theme"
