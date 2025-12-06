@@ -37,6 +37,7 @@ Fixed:
 
 - Multiple passes through a segment will now be separated. This works if the distance is at least 100 m in between the passes. This distance is adjustable via the config option `segment_split_distance`. ([GH-236](https://github.com/martin-ueding/geo-activity-playground/issues/236))
 - Fix name of “Bikerouter”. ([GH-381](https://github.com/martin-ueding/geo-activity-playground/issues/381))
+- Fix a bad interaction between incremental explorer cluster and square computation and reordering of activities. ([GH-382](https://github.com/martin-ueding/geo-activity-playground/issues/382))
 
 ## Version 1.17.0 — 2025-11-30
 
