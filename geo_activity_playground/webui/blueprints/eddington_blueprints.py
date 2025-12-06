@@ -9,6 +9,7 @@ from flask import render_template
 from flask import Request
 from flask import request
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.meta_search import apply_search_filter
@@ -170,7 +171,7 @@ def _make_eddington_plot(
                     eddington_df,
                     height=500,
                     width=800,
-                    title=f"{display_name} Eddington Number {en}",
+                    title=_("%(display_name)s Eddington Number %(en)s") % {"display_name": display_name, "en": en},
                 )
                 .mark_area(interpolate="step")
                 .encode(
@@ -182,14 +183,14 @@ def _make_eddington_plot(
                     alt.Y(
                         "total",
                         scale=alt.Scale(domainMax=en / divisor * 1.5),
-                        title=f"{interval} exceeding {display_name}",
+                        title=_("%(interval)s exceeding %(display_name)s") % {"interval": interval, "display_name": display_name},
                     ),
                     [
                         alt.Tooltip(column_name, title=display_name),
                         alt.Tooltip(
-                            "total", title=f"{interval} exceeding {display_name}"
+                            "total", title=_("%(interval)s exceeding %(display_name)s") % {"interval": interval, "display_name": display_name}
                         ),
-                        alt.Tooltip("missing", title=f"{interval} missing for next"),
+                        alt.Tooltip("missing", title=_("%(interval)s missing for next") % {"interval": interval}),
                     ],
                 )
             )
@@ -265,7 +266,7 @@ def _get_eddington_number_history(
         alt.Chart(history)
         .mark_line(interpolate="step-after")
         .encode(
-            alt.X("date", title="Date"),
-            alt.Y("eddington_number", title="Eddington number"),
+            alt.X("date", title=_("Date")),
+            alt.Y("eddington_number", title=_("Eddington number")),
         )
     ).to_json(format="vega")

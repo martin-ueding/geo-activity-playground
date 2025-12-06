@@ -9,6 +9,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ...core.config import Config
 from ...core.datamodel import Activity
@@ -123,12 +124,12 @@ def make_segments_blueprint(
             alt.Chart(distance_df)
             .mark_rect()
             .encode(
-                alt.X("track_index", title="Track Index"),
-                alt.Y("segment_index", title="Segment Index"),
+                alt.X("track_index", title=_("Track Index")),
+                alt.Y("segment_index", title=_("Segment Index")),
                 alt.Color(
                     "distance_m",
                     scale=alt.Scale(scheme="viridis"),
-                    title="Distance / m",
+                    title=_("Distance / m"),
                 ),
             )
             .to_json(format="vega")
@@ -175,9 +176,9 @@ def make_plots(df: pd.DataFrame) -> dict[str, str]:
         alt.Chart(df, width=500)
         .mark_bar()
         .encode(
-            alt.X("duration_s", bin=alt.Bin(step=15), title="Duration / s"),
+            alt.X("duration_s", bin=alt.Bin(step=15), title=_("Duration / s")),
             alt.Y("count()"),
-            alt.Color("direction", title="Direction"),
+            alt.Color("direction", title=_("Direction")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -187,14 +188,14 @@ def make_plots(df: pd.DataFrame) -> dict[str, str]:
         alt.Chart(df, width=500)
         .mark_boxplot()
         .encode(
-            alt.Y("direction", title="Direction"),
-            alt.X("duration_s", title="Duration / s"),
-            alt.Color("direction", title="Direction"),
+            alt.Y("direction", title=_("Direction")),
+            alt.X("duration_s", title=_("Duration / s")),
+            alt.Color("direction", title=_("Direction")),
         )
         .to_json(format="vega")
     )
 
     return {
-        "Duration Histogram": duration_histogram,
-        "Duration by Direction": duration_boxplot,
+        _("Duration Histogram"): duration_histogram,
+        _("Duration by Direction"): duration_boxplot,
     }

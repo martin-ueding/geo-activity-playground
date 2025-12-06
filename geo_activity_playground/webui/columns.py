@@ -1,5 +1,7 @@
 import dataclasses
 
+from flask_babel import lazy_gettext as _
+
 
 @dataclasses.dataclass
 class ColumnDescription:
@@ -11,37 +13,37 @@ class ColumnDescription:
 
 column_distance = ColumnDescription(
     name="distance_km",
-    display_name="Distance",
+    display_name=_("Distance"),
     unit="km",
     format=".1f",
 )
 column_elevation_gain = ColumnDescription(
     name="elevation_gain",
-    display_name="Elevation Gain",
+    display_name=_("Elevation Gain"),
     unit="m",
     format=".0f",
 )
 column_hours = ColumnDescription(
     name="hours",
-    display_name="Elapsed Time",
+    display_name=_("Elapsed Time"),
     unit="h",
     format=".1f",
 )
 column_hours_moving = ColumnDescription(
     name="hours_moving",
-    display_name="Moving Time",
+    display_name=_("Moving Time"),
     unit="h",
     format=".1f",
 )
 column_calories = ColumnDescription(
     name="calories",
-    display_name="Energy",
+    display_name=_("Energy"),
     unit="kcal",
     format=".1f",
 )
 column_steps = ColumnDescription(
     name="steps",
-    display_name="Steps",
+    display_name=_("Steps"),
     unit="1",
     format=".1f",
 )
@@ -56,14 +58,14 @@ META_COLUMNS = [
 
 column_speed = ColumnDescription(
     name="speed",
-    display_name="Speed",
+    display_name=_("Speed"),
     unit="km/h",
     format=".1f",
 )
 
 column_elevation = ColumnDescription(
     name="elevation",
-    display_name="Elevation",
+    display_name=_("Elevation"),
     unit="m",
     format=".0f",
 )

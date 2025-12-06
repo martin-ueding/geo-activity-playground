@@ -9,6 +9,7 @@ import sqlalchemy
 from flask import render_template
 from flask import Response
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.activities import make_geojson_from_time_series
@@ -62,16 +63,16 @@ def _last_30_days_meta_plot(
             meta.loc[meta["start_local"] > before_30_days],
             width=700,
             height=200,
-            title=f"{column.display_name} per day",
+            title=_("%(display_name)s per day") % {"display_name": column.display_name},
         )
         .mark_bar()
         .encode(
-            alt.X("yearmonthdate(start_local)", title="Date"),
+            alt.X("yearmonthdate(start_local)", title=_("Date")),
             alt.Y(f"sum({column.name})", title=f"{column.name} / {column.unit}"),
-            alt.Color("kind", scale=kind_scale, title="Kind"),
+            alt.Color("kind", scale=kind_scale, title=_("Kind")),
             [
-                alt.Tooltip("yearmonthdate(start_local)", title="Date"),
-                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("yearmonthdate(start_local)", title=_("Date")),
+                alt.Tooltip("kind", title=_("Kind")),
                 alt.Tooltip(
                     f"sum({column.name})",
                     format=column.format,

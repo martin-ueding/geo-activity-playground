@@ -6,6 +6,7 @@ import sqlalchemy
 from flask import Blueprint
 from flask import render_template
 from flask import request
+from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
@@ -27,18 +28,19 @@ def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             df,
-            title=f"{column.display_name} per Year",
+            title=_("%(display_name)s per Year") % {"display_name": column.display_name},
         )
         .mark_bar()
         .encode(
-            alt.X("year:O", title="Year"),
+            alt.X("year:O", title=_("Year")),
             alt.Y(
-                f"sum({column.name})", title=f"{column.display_name} / {column.unit}"
+                f"sum({column.name})",
+                title=f"{column.display_name} / {column.unit}",
             ),
-            alt.Color("kind", title="Kind"),
+            alt.Color("kind", title=_("Kind")),
             [
-                alt.Tooltip("year", title="Year"),
-                alt.Tooltip("kind", title="Kind"),
+                alt.Tooltip("year", title=_("Year")),
+                alt.Tooltip("kind", title=_("Kind")),
                 alt.Tooltip(
                     f"sum({column.name})",
                     title=f"{column.display_name} / {column.unit}",
@@ -69,16 +71,16 @@ def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             year_cumulative,
-            title=f"Cumulative {column.display_name} per Year",
+            title=_("Cumulative %(display_name)s per Year") % {"display_name": column.display_name},
         )
         .mark_line()
         .encode(
-            alt.X("week", title="Week"),
+            alt.X("week", title=_("Week")),
             alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
-            alt.Color("iso_year:N", title="Year"),
+            alt.Color("iso_year:N", title=_("Year")),
             [
-                alt.Tooltip("week", title="Week"),
-                alt.Tooltip("iso_year:N", title="Year"),
+                alt.Tooltip("week", title=_("Week")),
+                alt.Tooltip("iso_year:N", title=_("Year")),
                 alt.Tooltip(
                     column.name,
                     title=f"{column.display_name} / {column.unit}",
@@ -95,18 +97,18 @@ def plot_per_iso_week(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             df,
-            title=f"{column.display_name} per Week",
+            title=_("%(display_name)s per Week") % {"display_name": column.display_name},
         )
         .mark_circle()
         .encode(
-            alt.X("week:O", title="ISO Week"),
-            alt.Y("iso_year:O", title="ISO Year"),
+            alt.X("week:O", title=_("ISO Week")),
+            alt.Y("iso_year:O", title=_("ISO Year")),
             alt.Size(
                 f"sum({column.name})", title=f"{column.display_name} / {column.unit}"
             ),
             [
-                alt.Tooltip("iso_year", title="ISO Year"),
-                alt.Tooltip("week", title="ISO Week"),
+                alt.Tooltip("iso_year", title=_("ISO Year")),
+                alt.Tooltip("week", title=_("ISO Week")),
                 alt.Tooltip(
                     f"sum({column.name})",
                     title=f"{column.display_name} / {column.unit}",
@@ -123,11 +125,11 @@ def heatmap_per_day(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             _filter_past_year(df),
-            title=f"{column.display_name} per day",
+            title=_("%(display_name)s per day") % {"display_name": column.display_name},
         )
         .mark_rect()
         .encode(
-            alt.X("iso_year_week:O", title="ISO Year and Week"),
+            alt.X("iso_year_week:O", title=_("ISO Year and Week")),
             alt.Y(
                 "iso_day:O",
                 # scale=alt.Scale(
@@ -142,7 +144,7 @@ def heatmap_per_day(df: pd.DataFrame, column: ColumnDescription) -> str:
                 #         "Sunday",
                 #     ],
                 # ),
-                title="ISO Weekday",
+                title=_("ISO Weekday"),
             ),
             alt.Color(
                 f"sum({column.name})",
@@ -150,8 +152,8 @@ def heatmap_per_day(df: pd.DataFrame, column: ColumnDescription) -> str:
                 title=f"{column.display_name} / {column.unit}",
             ),
             [
-                alt.Tooltip("iso_year_week", title="ISO Year and Week"),
-                alt.Tooltip("iso_day", title="ISO Day"),
+                alt.Tooltip("iso_year_week", title=_("ISO Year and Week")),
+                alt.Tooltip("iso_day", title=_("ISO Day")),
                 alt.Tooltip(
                     f"sum({column.name})",
                     title=f"{column.display_name} / {column.unit}",
