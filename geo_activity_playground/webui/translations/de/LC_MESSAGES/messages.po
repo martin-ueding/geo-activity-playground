@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-06 21:00+0100\n"
+"POT-Creation-Date: 2025-12-06 21:23+0100\n"
 "PO-Revision-Date: 2025-12-06 21:30+0100\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -16,6 +16,565 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: geo_activity_playground/core/parametric_plot.py:9
+msgid "Point"
+msgstr "Punkt"
+
+#: geo_activity_playground/core/parametric_plot.py:10
+msgid "Circle"
+msgstr "Kreis"
+
+#: geo_activity_playground/core/parametric_plot.py:11
+msgid "Area"
+msgstr "Fläche"
+
+#: geo_activity_playground/core/parametric_plot.py:12
+msgid "Bar"
+msgstr "Balken"
+
+#: geo_activity_playground/core/parametric_plot.py:13
+msgid "Rectangle"
+msgstr "Rechteck"
+
+#: geo_activity_playground/core/parametric_plot.py:14
+msgid "Line"
+msgstr "Linie"
+
+#: geo_activity_playground/core/parametric_plot.py:17
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:495
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:605
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:100
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:109
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:129
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:133
+#: geo_activity_playground/webui/templates/activity/day.html.j2:40
+#: geo_activity_playground/webui/templates/activity/name.html.j2:59
+#: geo_activity_playground/webui/templates/activity/show.html.j2:354
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:28
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:99
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:16
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:36
+#: geo_activity_playground/webui/templates/segments/show.html.j2:63
+msgid "Distance / km"
+msgstr "Distanz / km"
+
+#: geo_activity_playground/core/parametric_plot.py:18
+msgid "Cumulative Distance / km"
+msgstr "Kumulative Distanz / km"
+
+#: geo_activity_playground/core/parametric_plot.py:19
+msgid "Total distance / km"
+msgstr "Gesamtdistanz / km"
+
+#: geo_activity_playground/core/parametric_plot.py:20
+msgid "Average distance / km"
+msgstr "Durchschnittliche Distanz / km"
+
+#: geo_activity_playground/core/parametric_plot.py:21
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:585
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:63
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:75
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:269
+#: geo_activity_playground/webui/blueprints/entry_views.py:70
+#: geo_activity_playground/webui/blueprints/entry_views.py:74
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:46
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:76
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:79
+#: geo_activity_playground/webui/templates/activity/day.html.j2:39
+#: geo_activity_playground/webui/templates/activity/name.html.j2:58
+#: geo_activity_playground/webui/templates/activity/show.html.j2:353
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:35
+#: geo_activity_playground/webui/templates/search/index.html.j2:15
+#: geo_activity_playground/webui/templates/segments/show.html.j2:60
+msgid "Date"
+msgstr "Datum"
+
+#: geo_activity_playground/core/parametric_plot.py:22
+msgid "Elapsed time / h"
+msgstr "Verstrichene Zeit / h"
+
+#: geo_activity_playground/core/parametric_plot.py:23
+msgid "Moving time / h"
+msgstr "Bewegungszeit / h"
+
+#: geo_activity_playground/core/parametric_plot.py:24
+msgid "Energy / kcal"
+msgstr "Energie / kcal"
+
+#: geo_activity_playground/core/parametric_plot.py:25
+#: geo_activity_playground/webui/columns.py:46
+#: geo_activity_playground/webui/templates/activity/show.html.j2:64
+msgid "Steps"
+msgstr "Schritte"
+
+#: geo_activity_playground/core/parametric_plot.py:26
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:530
+msgid "Elevation gain / m"
+msgstr "Höhenmeter / m"
+
+#: geo_activity_playground/core/parametric_plot.py:27
+msgid "Start elevation / m"
+msgstr "Starthöhe / m"
+
+#: geo_activity_playground/core/parametric_plot.py:28
+msgid "End elevation / m"
+msgstr "Endhöhe / m"
+
+#: geo_activity_playground/core/parametric_plot.py:29
+msgid "Total elevation gain / m"
+msgstr "Gesamthöhenmeter / m"
+
+#: geo_activity_playground/core/parametric_plot.py:30
+msgid "Average elevation gain / m"
+msgstr "Durchschnittliche Höhenmeter / m"
+
+#: geo_activity_playground/core/parametric_plot.py:31
+msgid "New tiles 14"
+msgstr "Neue Kacheln 14"
+
+#: geo_activity_playground/core/parametric_plot.py:32
+msgid "New tiles 17"
+msgstr "Neue Kacheln 17"
+
+#: geo_activity_playground/core/parametric_plot.py:33
+msgid "Average moving speed / km/h"
+msgstr "Durchschnittliche Bewegungsgeschwindigkeit / km/h"
+
+#: geo_activity_playground/core/parametric_plot.py:34
+msgid "Average elapsed speed / km/h"
+msgstr "Durchschnittliche Gesamtgeschwindigkeit / km/h"
+
+#: geo_activity_playground/core/parametric_plot.py:35
+msgid "Start latitude / °"
+msgstr "Startbreitengrad / °"
+
+#: geo_activity_playground/core/parametric_plot.py:36
+msgid "Start longitude / °"
+msgstr "Startlängengrad / °"
+
+#: geo_activity_playground/core/parametric_plot.py:37
+msgid "End latitude / °"
+msgstr "Endbreitengrad / °"
+
+#: geo_activity_playground/core/parametric_plot.py:38
+msgid "End longitude / °"
+msgstr "Endlängengrad / °"
+
+#: geo_activity_playground/core/parametric_plot.py:41
+#: geo_activity_playground/core/parametric_plot.py:59
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:593
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:595
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:44
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:47
+#: geo_activity_playground/webui/templates/activity/day.html.j2:43
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:24
+#: geo_activity_playground/webui/templates/activity/name.html.j2:62
+#: geo_activity_playground/webui/templates/activity/show.html.j2:19
+#: geo_activity_playground/webui/templates/activity/show.html.j2:356
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:6
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:15
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:39
+#: geo_activity_playground/webui/templates/page.html.j2:88
+#: geo_activity_playground/webui/templates/search/index.html.j2:19
+#: geo_activity_playground/webui/templates/search_form.html.j2:82
+#: geo_activity_playground/webui/templates/segments/show.html.j2:65
+msgid "Equipment"
+msgstr "Ausrüstung"
+
+#: geo_activity_playground/core/parametric_plot.py:42
+#: geo_activity_playground/core/parametric_plot.py:60
+msgid "Activity kind"
+msgstr "Aktivitätsart"
+
+#: geo_activity_playground/core/parametric_plot.py:43
+#: geo_activity_playground/core/parametric_plot.py:61
+msgid "Consider for achievements"
+msgstr "Für Erfolge berücksichtigen"
+
+#: geo_activity_playground/core/parametric_plot.py:44
+#: geo_activity_playground/core/parametric_plot.py:62
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:99
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:107
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:35
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:42
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:80
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:83
+#: geo_activity_playground/webui/templates/calendar/index.html.j2:16
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:72
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:94
+msgid "Year"
+msgstr "Jahr"
+
+#: geo_activity_playground/core/parametric_plot.py:45
+#: geo_activity_playground/core/parametric_plot.py:63
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:105
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:110
+msgid "ISO Year"
+msgstr "ISO-Jahr"
+
+#: geo_activity_playground/core/parametric_plot.py:46
+msgid "Year, Quarter"
+msgstr "Jahr, Quartal"
+
+#: geo_activity_playground/core/parametric_plot.py:47
+msgid "Year, Quarter, Month"
+msgstr "Jahr, Quartal, Monat"
+
+#: geo_activity_playground/core/parametric_plot.py:48
+msgid "Year, Month"
+msgstr "Jahr, Monat"
+
+#: geo_activity_playground/core/parametric_plot.py:49
+msgid "Quarter"
+msgstr "Quartal"
+
+#: geo_activity_playground/core/parametric_plot.py:50
+msgid "Quarter, Month"
+msgstr "Quartal, Monat"
+
+#: geo_activity_playground/core/parametric_plot.py:51
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:42
+msgid "Month"
+msgstr "Monat"
+
+#: geo_activity_playground/core/parametric_plot.py:52
+#: geo_activity_playground/core/parametric_plot.py:64
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:104
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:111
+msgid "ISO Week"
+msgstr "ISO-Woche"
+
+#: geo_activity_playground/core/parametric_plot.py:53
+msgid "Day of month"
+msgstr "Tag des Monats"
+
+#: geo_activity_playground/core/parametric_plot.py:54
+msgid "Day of week"
+msgstr "Wochentag"
+
+#: geo_activity_playground/core/parametric_plot.py:55
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:156
+msgid "ISO Day"
+msgstr "ISO-Tag"
+
+#: geo_activity_playground/core/parametric_plot.py:58
+msgid "(no grouping)"
+msgstr "(keine Gruppierung)"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:491
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:602
+#: geo_activity_playground/webui/columns.py:16
+#: geo_activity_playground/webui/templates/activity/show.html.j2:32
+#: geo_activity_playground/webui/templates/search/index.html.j2:16
+msgid "Distance"
+msgstr "Distanz"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:523
+#: geo_activity_playground/webui/columns.py:22
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:50
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:121
+msgid "Elevation Gain"
+msgstr "Höhenmeter"
+
+#: geo_activity_playground/webui/columns.py:28
+msgid "Elapsed Time"
+msgstr "Verstrichene Zeit"
+
+#: geo_activity_playground/webui/columns.py:34
+msgid "Moving Time"
+msgstr "Bewegungszeit"
+
+#: geo_activity_playground/webui/columns.py:40
+msgid "Energy"
+msgstr "Energie"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:459
+#: geo_activity_playground/webui/columns.py:61
+msgid "Speed"
+msgstr "Geschwindigkeit"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:505
+#: geo_activity_playground/webui/columns.py:68
+#: geo_activity_playground/webui/templates/activity/show.html.j2:234
+msgid "Elevation"
+msgstr "Höhe"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:462
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:494
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:508
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:526
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:544
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:558
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:706
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:719
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:734
+msgid "Time"
+msgstr "Zeit"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:463
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:482
+#: geo_activity_playground/webui/templates/activity/day.html.j2:42
+#: geo_activity_playground/webui/templates/activity/name.html.j2:61
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:38
+#: geo_activity_playground/webui/templates/search/index.html.j2:18
+msgid "Speed / km/h"
+msgstr "Geschwindigkeit / km/h"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:464
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:496
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:514
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:532
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:546
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:560
+#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
+#: geo_activity_playground/webui/templates/segments/show.html.j2:4
+msgid "Segment"
+msgstr "Segment"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:479
+msgid "Speed distribution"
+msgstr "Geschwindigkeitsverteilung"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:483
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:572
+msgid "Duration / min"
+msgstr "Dauer / min"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:512
+msgid "Elevation / m"
+msgstr "Höhe / m"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:541
+msgid "Heart Rate"
+msgstr "Herzfrequenz"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:545
+#: geo_activity_playground/webui/templates/activity/show.html.j2:251
+msgid "Heart rate"
+msgstr "Herzfrequenz"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:555
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:559
+#: geo_activity_playground/webui/templates/activity/show.html.j2:269
+msgid "Cadence"
+msgstr "Trittfrequenz"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:569
+msgid "Heart Rate Zones"
+msgstr "Herzfrequenzzonen"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:573
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:574
+msgid "Zone"
+msgstr "Zone"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:582
+msgid "Repetitions"
+msgstr "Wiederholungen"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:595
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:606
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:619
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:29
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:100
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:51
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:122
+msgid "Count"
+msgstr "Anzahl"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:615
+#: geo_activity_playground/webui/templates/activity/day.html.j2:41
+#: geo_activity_playground/webui/templates/activity/name.html.j2:60
+#: geo_activity_playground/webui/templates/activity/show.html.j2:355
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:37
+#: geo_activity_playground/webui/templates/search/index.html.j2:17
+msgid "Elapsed time"
+msgstr "Verstrichene Zeit"
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:618
+msgid "Time / min"
+msgstr "Zeit / min"
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:60
+#, python-format
+msgid "%(display_name)s per Day (Bubble Chart)"
+msgstr "%(display_name)s pro Tag (Blasendiagramm)"
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:73
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:81
+#: geo_activity_playground/webui/templates/segments/show.html.j2:61
+msgid "Activity"
+msgstr "Aktivität"
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:82
+msgid "Activity Link"
+msgstr "Aktivitäts-Link"
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:174
+#, python-format
+msgid "%(display_name)s Eddington Number %(en)s"
+msgstr "%(display_name)s Eddington-Zahl %(en)s"
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:186
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:191
+#, python-format
+msgid "%(interval)s exceeding %(display_name)s"
+msgstr "%(interval)s über %(display_name)s"
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:193
+#, python-format
+msgid "%(interval)s missing for next"
+msgstr "%(interval)s fehlen für nächste"
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:270
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:73
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:95
+msgid "Eddington number"
+msgstr "Eddington-Zahl"
+
+#: geo_activity_playground/webui/blueprints/entry_views.py:66
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:128
+#, python-format
+msgid "%(display_name)s per day"
+msgstr "%(display_name)s pro Tag"
+
+#: geo_activity_playground/webui/blueprints/entry_views.py:72
+#: geo_activity_playground/webui/blueprints/entry_views.py:75
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:104
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:111
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:127
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:131
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:40
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:43
+#: geo_activity_playground/webui/templates/activity/day.html.j2:44
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:14
+#: geo_activity_playground/webui/templates/activity/name.html.j2:63
+#: geo_activity_playground/webui/templates/activity/show.html.j2:14
+#: geo_activity_playground/webui/templates/activity/show.html.j2:357
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:40
+#: geo_activity_playground/webui/templates/search/index.html.j2:20
+#: geo_activity_playground/webui/templates/search_form.html.j2:66
+#: geo_activity_playground/webui/templates/segments/show.html.j2:66
+msgid "Kind"
+msgstr "Art"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:38
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:37
+msgid "Monthly Equipment Usage"
+msgstr "Monatliche Ausrüstungsnutzung"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:43
+msgid "Total Kilometers per Month"
+msgstr "Gesamtkilometer pro Monat"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:49
+msgid "Total Distance"
+msgstr "Gesamtdistanz"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:72
+msgid "Usage over Time"
+msgstr "Nutzung über Zeit"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:77
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:82
+msgid "Cumulative distance / km"
+msgstr "Kumulative Distanz / km"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:95
+msgid "Yearly distance"
+msgstr "Jährliche Distanz"
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:121
+msgid "Kinds"
+msgstr "Arten"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:704
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:62
+msgid "Tiles"
+msgstr "Kacheln"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:706
+msgid "Number of tiles"
+msgstr "Anzahl der Kacheln"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:716
+msgid "Cluster"
+msgstr "Cluster"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:720
+msgid "Maximum cluster size"
+msgstr "Maximale Clustergröße"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:731
+msgid "Square"
+msgstr "Quadrat"
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:735
+msgid "Maximum square size"
+msgstr "Maximale Quadratgröße"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:127
+msgid "Track Index"
+msgstr "Streckenindex"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:128
+msgid "Segment Index"
+msgstr "Segmentindex"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:132
+msgid "Distance / m"
+msgstr "Distanz / m"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:179
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:192
+msgid "Duration / s"
+msgstr "Dauer / s"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:181
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:191
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:193
+#: geo_activity_playground/webui/templates/segments/show.html.j2:62
+msgid "Direction"
+msgstr "Richtung"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:199
+msgid "Duration Histogram"
+msgstr "Dauer-Histogramm"
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:200
+msgid "Duration by Direction"
+msgstr "Dauer nach Richtung"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:31
+#, python-format
+msgid "%(display_name)s per Year"
+msgstr "%(display_name)s pro Jahr"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:74
+#, python-format
+msgid "Cumulative %(display_name)s per Year"
+msgstr "Kumulative %(display_name)s pro Jahr"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:78
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:82
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:16
+msgid "Week"
+msgstr "Woche"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:100
+#, python-format
+msgid "%(display_name)s per Week"
+msgstr "%(display_name)s pro Woche"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:132
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:155
+msgid "ISO Year and Week"
+msgstr "ISO-Jahr und Woche"
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:147
+msgid "ISO Weekday"
+msgstr "ISO-Wochentag"
 
 #: geo_activity_playground/webui/templates/home.html.j2:10
 msgid "Last 30 days"
@@ -95,21 +654,6 @@ msgstr "Eddington-Zahl"
 msgid "Elevation Eddington Number"
 msgstr "Höhenmeter-Eddington-Zahl"
 
-#: geo_activity_playground/webui/templates/activity/day.html.j2:43
-#: geo_activity_playground/webui/templates/activity/edit.html.j2:24
-#: geo_activity_playground/webui/templates/activity/name.html.j2:62
-#: geo_activity_playground/webui/templates/activity/show.html.j2:19
-#: geo_activity_playground/webui/templates/activity/show.html.j2:356
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:6
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:15
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:39
-#: geo_activity_playground/webui/templates/page.html.j2:88
-#: geo_activity_playground/webui/templates/search/index.html.j2:19
-#: geo_activity_playground/webui/templates/search_form.html.j2:82
-#: geo_activity_playground/webui/templates/segments/show.html.j2:65
-msgid "Equipment"
-msgstr "Ausrüstung"
-
 #: geo_activity_playground/webui/templates/page.html.j2:89
 #: geo_activity_playground/webui/templates/segments/index.html.j2:4
 msgid "Segments"
@@ -138,7 +682,7 @@ msgstr "Quadrat-Planer (Zoom 17)"
 #: geo_activity_playground/webui/templates/heatmap/index.html.j2:4
 #: geo_activity_playground/webui/templates/page.html.j2:114
 msgid "Heatmap"
-msgstr "Heatmap"
+msgstr "Intensitätskarte"
 
 #: geo_activity_playground/webui/templates/page.html.j2:120
 #: geo_activity_playground/webui/templates/photo/map.html.j2:4
@@ -185,8 +729,8 @@ msgid ""
 "Are you sure you want to shut down the server? This will terminate the "
 "application."
 msgstr ""
-"Möchtest du den Server wirklich herunterfahren? Die Anwendung wird dadurch "
-"beendet."
+"Möchtest du den Server wirklich herunterfahren? Die Anwendung wird "
+"dadurch beendet."
 
 #: geo_activity_playground/webui/templates/page.html.j2:154
 msgid "Shutdown Server"
@@ -257,18 +801,6 @@ msgstr "Mindestdistanz"
 msgid "Distance maximum"
 msgstr "Maximaldistanz"
 
-#: geo_activity_playground/webui/templates/activity/day.html.j2:44
-#: geo_activity_playground/webui/templates/activity/edit.html.j2:14
-#: geo_activity_playground/webui/templates/activity/name.html.j2:63
-#: geo_activity_playground/webui/templates/activity/show.html.j2:14
-#: geo_activity_playground/webui/templates/activity/show.html.j2:357
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:40
-#: geo_activity_playground/webui/templates/search/index.html.j2:20
-#: geo_activity_playground/webui/templates/search_form.html.j2:66
-#: geo_activity_playground/webui/templates/segments/show.html.j2:66
-msgid "Kind"
-msgstr "Art"
-
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:36
 #: geo_activity_playground/webui/templates/activity/show.html.j2:24
 #: geo_activity_playground/webui/templates/search_form.html.j2:98
@@ -290,41 +822,6 @@ msgstr "Gespeicherte Suchen"
 #: geo_activity_playground/webui/templates/search_form.html.j2:130
 msgid "Last queries"
 msgstr "Letzte Suchen"
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:39
-#: geo_activity_playground/webui/templates/activity/name.html.j2:58
-#: geo_activity_playground/webui/templates/activity/show.html.j2:353
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:35
-#: geo_activity_playground/webui/templates/search/index.html.j2:15
-#: geo_activity_playground/webui/templates/segments/show.html.j2:60
-msgid "Date"
-msgstr "Datum"
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:40
-#: geo_activity_playground/webui/templates/activity/name.html.j2:59
-#: geo_activity_playground/webui/templates/activity/show.html.j2:354
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:28
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:99
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:16
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:36
-#: geo_activity_playground/webui/templates/segments/show.html.j2:63
-msgid "Distance / km"
-msgstr "Distanz / km"
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:41
-#: geo_activity_playground/webui/templates/activity/name.html.j2:60
-#: geo_activity_playground/webui/templates/activity/show.html.j2:355
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:37
-#: geo_activity_playground/webui/templates/search/index.html.j2:17
-msgid "Elapsed time"
-msgstr "Verstrichene Zeit"
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:42
-#: geo_activity_playground/webui/templates/activity/name.html.j2:61
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:38
-#: geo_activity_playground/webui/templates/search/index.html.j2:18
-msgid "Speed / km/h"
-msgstr "Geschwindigkeit / km/h"
 
 #: geo_activity_playground/webui/templates/activity/day.html.j2:63
 #: geo_activity_playground/webui/templates/calendar/index.html.j2:20
@@ -356,11 +853,6 @@ msgstr "Speichern"
 #: geo_activity_playground/webui/templates/activity/lines.html.j2:7
 msgid "All Activity Lines"
 msgstr "Alle Aktivitätslinien"
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:32
-#: geo_activity_playground/webui/templates/search/index.html.j2:16
-msgid "Distance"
-msgstr "Distanz"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:36
 #: geo_activity_playground/webui/templates/segments/show.html.j2:64
@@ -394,10 +886,6 @@ msgstr "Startzeit"
 #: geo_activity_playground/webui/templates/activity/show.html.j2:59
 msgid "Calories"
 msgstr "Kalorien"
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:64
-msgid "Steps"
-msgstr "Schritte"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:69
 msgid "Elevation gain"
@@ -474,31 +962,19 @@ msgstr "Dauer im Segment"
 msgid "Distance & speed"
 msgstr "Distanz & Geschwindigkeit"
 
-#: geo_activity_playground/webui/templates/activity/show.html.j2:234
-msgid "Elevation"
-msgstr "Höhe"
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:251
-msgid "Heart rate"
-msgstr "Herzfrequenz"
-
 #: geo_activity_playground/webui/templates/activity/show.html.j2:261
 msgid ""
 "Your activity has heart data, but this program doesn't know your maximum "
 "heart rate (or birth year) and therefore cannot compute the heart rate "
 "zones. Go to the"
 msgstr ""
-"Deine Aktivität enthält Herzfrequenzdaten, aber dieses Programm kennt deine "
-"maximale Herzfrequenz (oder dein Geburtsjahr) nicht und kann daher die "
-"Herzfrequenzzonen nicht berechnen. Gehe zu den"
+"Deine Aktivität enthält Herzfrequenzdaten, aber dieses Programm kennt "
+"deine maximale Herzfrequenz (oder dein Geburtsjahr) nicht und kann daher "
+"die Herzfrequenzzonen nicht berechnen. Gehe zu den"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:262
 msgid "settings"
 msgstr "Einstellungen"
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:269
-msgid "Cadence"
-msgstr "Trittfrequenz"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:283
 msgid "Not happy with the displayed data?"
@@ -517,8 +993,8 @@ msgid ""
 "With this activity you have explored new explorer tiles. The following "
 "maps show the new tiles on the respective zoom levels."
 msgstr ""
-"Mit dieser Aktivität hast du neue Explorer-Kacheln erkundet. Die folgenden "
-"Karten zeigen die neuen Kacheln auf den jeweiligen Zoomstufen."
+"Mit dieser Aktivität hast du neue Explorer-Kacheln erkundet. Die "
+"folgenden Karten zeigen die neuen Kacheln auf den jeweiligen Zoomstufen."
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:292
 #: geo_activity_playground/webui/templates/square_planner/index.html.j2:138
@@ -562,8 +1038,8 @@ msgid ""
 "You are either logged in or don't have a password set. You can do "
 "everything."
 msgstr ""
-"Du bist entweder eingeloggt oder hast kein Passwort gesetzt. Du kannst alles "
-"tun."
+"Du bist entweder eingeloggt oder hast kein Passwort gesetzt. Du kannst "
+"alles tun."
 
 #: geo_activity_playground/webui/templates/auth/index.html.j2:9
 msgid "Log Out"
@@ -585,16 +1061,6 @@ msgstr "Blasendiagramm: Distanz"
 #: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:26
 msgid "Bubble Chart: Elevation Gain"
 msgstr "Blasendiagramm: Höhenmeter"
-
-#: geo_activity_playground/webui/templates/calendar/index.html.j2:16
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:72
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:94
-msgid "Year"
-msgstr "Jahr"
-
-#: geo_activity_playground/webui/templates/calendar/month.html.j2:16
-msgid "Week"
-msgstr "Woche"
 
 #: geo_activity_playground/webui/templates/calendar/month.html.j2:17
 msgid "Monday"
@@ -651,11 +1117,12 @@ msgid ""
 "higher count, but all shorter activities don't count towards the bigger "
 "number."
 msgstr ""
-"Weit zu fahren ist eine Sache, oft zu fahren eine andere. Aber oft weit zu "
-"fahren ist schwer. Wenn du die Eddington-Zahl erhöhst, zählen alle Tage mit "
-"weniger Distanz nicht mehr. Es wird immer schwieriger, die Eddington-Zahl zu "
-"erhöhen, weil du nicht nur eine höhere Anzahl erreichen musst, sondern alle "
-"kürzeren Aktivitäten nicht zur größeren Zahl beitragen."
+"Weit zu fahren ist eine Sache, oft zu fahren eine andere. Aber oft weit "
+"zu fahren ist schwer. Wenn du die Eddington-Zahl erhöhst, zählen alle "
+"Tage mit weniger Distanz nicht mehr. Es wird immer schwieriger, die "
+"Eddington-Zahl zu erhöhen, weil du nicht nur eine höhere Anzahl erreichen"
+" musst, sondern alle kürzeren Aktivitäten nicht zur größeren Zahl "
+"beitragen."
 
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:21
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:30
@@ -669,13 +1136,6 @@ msgstr "Fehlende Tage"
 msgid "How many more days do you need to increment your Eddington number?"
 msgstr "Wie viele weitere Tage brauchst du, um deine Eddington-Zahl zu erhöhen?"
 
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:29
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:100
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:51
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:122
-msgid "Count"
-msgstr "Anzahl"
-
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:48
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:70
 msgid "Plot"
@@ -686,8 +1146,8 @@ msgid ""
 "In a graphical representation, the Eddington number is the distance where"
 " the red line intersects with the blue area."
 msgstr ""
-"In der grafischen Darstellung ist die Eddington-Zahl die Distanz, an der die "
-"rote Linie die blaue Fläche schneidet."
+"In der grafischen Darstellung ist die Eddington-Zahl die Distanz, an der "
+"die rote Linie die blaue Fläche schneidet."
 
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:57
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:79
@@ -712,11 +1172,6 @@ msgid ""
 msgstr ""
 "Wenn wir nur die Aktivitäten innerhalb eines Kalenderjahres für die "
 "Eddington-Zahl betrachten, erhalten wir Folgendes:"
-
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:73
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:95
-msgid "Eddington number"
-msgstr "Eddington-Zahl"
 
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:88
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:110
@@ -748,8 +1203,7 @@ msgstr "ist"
 msgid ""
 "separate days you have recorded activities with an elevation gain of more"
 " than"
-msgstr ""
-"verschiedenen Tagen Aktivitäten mit mehr als"
+msgstr "verschiedenen Tagen Aktivitäten mit mehr als"
 
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:38
 msgid ""
@@ -760,24 +1214,20 @@ msgid ""
 "higher count, but all flatter activities don't count towards the bigger "
 "number."
 msgstr ""
-"Hoch zu fahren ist eine Sache, oft zu fahren eine andere. Aber oft hoch zu "
-"fahren ist schwer. Wenn du die Eddington-Zahl erhöhst, zählen alle Tage mit "
-"weniger Höhenmetern nicht mehr. Es wird immer schwieriger, die Eddington-Zahl "
-"zu erhöhen, weil du nicht nur eine höhere Anzahl erreichen musst, sondern alle "
-"flacheren Aktivitäten nicht zur größeren Zahl beitragen."
-
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:50
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:121
-msgid "Elevation Gain"
-msgstr "Höhenmeter"
+"Hoch zu fahren ist eine Sache, oft zu fahren eine andere. Aber oft hoch "
+"zu fahren ist schwer. Wenn du die Eddington-Zahl erhöhst, zählen alle "
+"Tage mit weniger Höhenmetern nicht mehr. Es wird immer schwieriger, die "
+"Eddington-Zahl zu erhöhen, weil du nicht nur eine höhere Anzahl erreichen"
+" musst, sondern alle flacheren Aktivitäten nicht zur größeren Zahl "
+"beitragen."
 
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:72
 msgid ""
 "In a graphical representation, the Eddington number is the elevation gain"
 " where the red line intersects with the blue area."
 msgstr ""
-"In der grafischen Darstellung ist die Eddington-Zahl der Höhengewinn, an dem "
-"die rote Linie die blaue Fläche schneidet."
+"In der grafischen Darstellung ist die Eddington-Zahl der Höhengewinn, an "
+"dem die rote Linie die blaue Fläche schneidet."
 
 #: geo_activity_playground/webui/templates/equipment/index.html.j2:17
 msgid "First use"
@@ -786,10 +1236,6 @@ msgstr "Erste Nutzung"
 #: geo_activity_playground/webui/templates/equipment/index.html.j2:18
 msgid "Last use"
 msgstr "Letzte Nutzung"
-
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:37
-msgid "Monthly Equipment Usage"
-msgstr "Monatliche Ausrüstungsnutzung"
 
 #: geo_activity_playground/webui/templates/equipment/index.html.j2:44
 msgid "Details for each equipment"
@@ -839,7 +1285,8 @@ msgid ""
 msgstr ""
 "Du versuchst, Explorer-Kacheln für eine Stufe aufzurufen, die noch nicht "
 "generiert wurde. Das ist kein Problem, wir generieren einfach nicht alle "
-"Stufen, um Zeit zu sparen. Wenn du es haben möchtest, aktiviere es einfach!"
+"Stufen, um Zeit zu sparen. Wenn du es haben möchtest, aktiviere es "
+"einfach!"
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:10
 msgid "Enable Zoom"
@@ -898,10 +1345,6 @@ msgstr "Fehlend als GPX"
 msgid "Bookmarked cluster sizes"
 msgstr "Gespeicherte Cluster-Größen"
 
-#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:62
-msgid "Tiles"
-msgstr "Kacheln"
-
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:63
 msgid "Relative to maximum"
 msgstr "Relativ zum Maximum"
@@ -948,7 +1391,7 @@ msgstr "Für die Explorer-Kacheln kannst du diese verwenden:"
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:138
 msgid "And for the heatmap, you can use this:"
-msgstr "Und für die Heatmap kannst du dies verwenden:"
+msgstr "Und für die Intensitätskarte kannst du dies verwenden:"
 
 #: geo_activity_playground/webui/templates/export/index.html.j2:5
 msgid "Export metadata and activities"
@@ -962,7 +1405,8 @@ msgid ""
 msgstr ""
 "Hier kannst du alle Metadaten und Aktivitäten als ZIP-Datei exportieren. "
 "Je nach gewähltem Dateiformat kann der Export einer Aktivität etwa eine "
-"Sekunde dauern. Du kannst einen Fortschrittsbalken im Terminal beobachten."
+"Sekunde dauern. Du kannst einen Fortschrittsbalken im Terminal "
+"beobachten."
 
 #: geo_activity_playground/webui/templates/export/index.html.j2:11
 #: geo_activity_playground/webui/templates/export/index.html.j2:12
@@ -989,7 +1433,7 @@ msgstr "Exportieren"
 
 #: geo_activity_playground/webui/templates/heatmap/index.html.j2:13
 msgid "Download heatmap in visible area"
-msgstr "Heatmap im sichtbaren Bereich herunterladen"
+msgstr "Intensitätskarte im sichtbaren Bereich herunterladen"
 
 #: geo_activity_playground/webui/templates/photo/new.html.j2:4
 msgid "Upload Photo"
@@ -1034,17 +1478,12 @@ msgid ""
 "create the segment that you want and download it as GeoJSON. Then upload "
 "that file with the form below."
 msgstr ""
-"erstelle das gewünschte Segment und lade es als GeoJSON herunter. Dann lade "
-"diese Datei mit dem folgenden Formular hoch."
+"erstelle das gewünschte Segment und lade es als GeoJSON herunter. Dann "
+"lade diese Datei mit dem folgenden Formular hoch."
 
 #: geo_activity_playground/webui/templates/segments/index.html.j2:66
 msgid "GeoJSON Segment File"
 msgstr "GeoJSON-Segmentdatei"
-
-#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
-#: geo_activity_playground/webui/templates/segments/show.html.j2:4
-msgid "Segment"
-msgstr "Segment"
 
 #: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
 msgid "and"
@@ -1057,14 +1496,6 @@ msgstr "Distanzdiagramm"
 #: geo_activity_playground/webui/templates/segments/show.html.j2:54
 msgid "Matched activities"
 msgstr "Erkannte Aktivitäten"
-
-#: geo_activity_playground/webui/templates/segments/show.html.j2:61
-msgid "Activity"
-msgstr "Aktivität"
-
-#: geo_activity_playground/webui/templates/segments/show.html.j2:62
-msgid "Direction"
-msgstr "Richtung"
 
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:4
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:8
@@ -1089,7 +1520,9 @@ msgstr "Übersicht"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:10
 msgid "Configure how your activities are gathered, analyzed, and visualized."
-msgstr "Konfiguriere, wie deine Aktivitäten gesammelt, analysiert und visualisiert werden."
+msgstr ""
+"Konfiguriere, wie deine Aktivitäten gesammelt, analysiert und "
+"visualisiert werden."
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:12
 msgid ""
@@ -1097,7 +1530,8 @@ msgid ""
 "Here's a quick overview of what you can customize:"
 msgstr ""
 "Verwende das Navigationsmenü, um auf verschiedene Konfigurationsbereiche "
-"zuzugreifen. Hier ist ein kurzer Überblick über das, was du anpassen kannst:"
+"zuzugreifen. Hier ist ein kurzer Überblick über das, was du anpassen "
+"kannst:"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:17
 msgid "Data Sources"
@@ -1108,8 +1542,8 @@ msgid ""
 "Connect to Strava API or configure how metadata is extracted from your "
 "activity files."
 msgstr ""
-"Verbinde dich mit der Strava-API oder konfiguriere, wie Metadaten aus deinen "
-"Aktivitätsdateien extrahiert werden."
+"Verbinde dich mit der Strava-API oder konfiguriere, wie Metadaten aus "
+"deinen Aktivitätsdateien extrahiert werden."
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:23
 msgid "Display"
@@ -1175,9 +1609,10 @@ msgid ""
 "make sure that you are allowed to use the tiles from the source that you "
 "enter. See"
 msgstr ""
-"Du kannst die Kachelquelle beliebig ändern. Beachte, dass verschiedene Quellen "
-"unterschiedliche Lizenzbedingungen haben. Es liegt an dir sicherzustellen, dass "
-"du die Kacheln aus der eingegebenen Quelle verwenden darfst. Siehe"
+"Du kannst die Kachelquelle beliebig ändern. Beachte, dass verschiedene "
+"Quellen unterschiedliche Lizenzbedingungen haben. Es liegt an dir "
+"sicherzustellen, dass du die Kacheln aus der eingegebenen Quelle "
+"verwenden darfst. Siehe"
 
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:11
 msgid "this list of raster tile providers"
@@ -1245,9 +1680,9 @@ msgid ""
 " plots show the quantity summed up for a year, differentiated by activity"
 " kind."
 msgstr ""
-"Wie viel Distanz (oder anderes) hast du innerhalb jedes Jahres zurückgelegt? "
-"Die folgenden Diagramme zeigen die Summe für ein Jahr, aufgeteilt nach "
-"Aktivitätsart."
+"Wie viel Distanz (oder anderes) hast du innerhalb jedes Jahres "
+"zurückgelegt? Die folgenden Diagramme zeigen die Summe für ein Jahr, "
+"aufgeteilt nach Aktivitätsart."
 
 #: geo_activity_playground/webui/templates/summary/index.html.j2:28
 msgid "Per week"
@@ -1258,8 +1693,9 @@ msgid ""
 "What's the distance (or else) per week? See it for all weeks in all "
 "years. The larger the circle is, the more you did in that week."
 msgstr ""
-"Wie viel Distanz (oder anderes) pro Woche? Sieh es für alle Wochen in allen "
-"Jahren. Je größer der Kreis, desto mehr hast du in dieser Woche gemacht."
+"Wie viel Distanz (oder anderes) pro Woche? Sieh es für alle Wochen in "
+"allen Jahren. Je größer der Kreis, desto mehr hast du in dieser Woche "
+"gemacht."
 
 #: geo_activity_playground/webui/templates/summary/index.html.j2:34
 msgid "Per day"
@@ -1271,8 +1707,8 @@ msgid ""
 "grouped by day of the week such that you can easily spot patterns in your"
 " daily routine."
 msgstr ""
-"Und auch feiner aufgeschlüsselt pro Tag für das vergangene Jahr. Dies ist "
-"nach Wochentag gruppiert, sodass du leicht Muster in deinem Tagesablauf "
+"Und auch feiner aufgeschlüsselt pro Tag für das vergangene Jahr. Dies ist"
+" nach Wochentag gruppiert, sodass du leicht Muster in deinem Tagesablauf "
 "erkennen kannst."
 
 #: geo_activity_playground/webui/templates/summary/index.html.j2:40
@@ -1285,9 +1721,9 @@ msgid ""
 " of the year? This lets you see how you are doing compared to previous "
 "years."
 msgstr ""
-"Wie viel Distanz (oder anderes) hast du in jedem Jahr bis zu diesem Zeitpunkt "
-"des Jahres zurückgelegt? So kannst du sehen, wie du im Vergleich zu früheren "
-"Jahren abschneidest."
+"Wie viel Distanz (oder anderes) hast du in jedem Jahr bis zu diesem "
+"Zeitpunkt des Jahres zurückgelegt? So kannst du sehen, wie du im "
+"Vergleich zu früheren Jahren abschneidest."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:7
 msgid ""
@@ -1298,23 +1734,26 @@ msgid ""
 " time zone. They will then be localized into the time zone of the "
 "activity position."
 msgstr ""
-"Vor Version 1.3.0 wurden Aktivitätszeiten in der lokalen Zeitzone interpretiert. "
-"Wenn deine Software in UTC aufgezeichnet hat, wurde angenommen, dass dies deine "
-"lokale Zeitzone war. Diese Annahme war oft falsch. Mit Version 1.3.0 wurde dies "
-"behoben. Aktivitäten werden mit UTC oder der angegebenen Zeitzone importiert. "
-"Sie werden dann in die Zeitzone der Aktivitätsposition lokalisiert."
+"Vor Version 1.3.0 wurden Aktivitätszeiten in der lokalen Zeitzone "
+"interpretiert. Wenn deine Software in UTC aufgezeichnet hat, wurde "
+"angenommen, dass dies deine lokale Zeitzone war. Diese Annahme war oft "
+"falsch. Mit Version 1.3.0 wurde dies behoben. Aktivitäten werden mit UTC "
+"oder der angegebenen Zeitzone importiert. Sie werden dann in die Zeitzone"
+" der Aktivitätsposition lokalisiert."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:9
 msgid "Use this tool to fix activities which were imported with an older version."
-msgstr "Verwende dieses Tool, um Aktivitäten zu korrigieren, die mit einer älteren Version importiert wurden."
+msgstr ""
+"Verwende dieses Tool, um Aktivitäten zu korrigieren, die mit einer "
+"älteren Version importiert wurden."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:11
 msgid ""
 "Your activities are shown in the local time zone of the activity but no "
 "time zone is shown."
 msgstr ""
-"Deine Aktivitäten werden in der lokalen Zeitzone der Aktivität angezeigt, aber "
-"keine Zeitzone wird angezeigt."
+"Deine Aktivitäten werden in der lokalen Zeitzone der Aktivität angezeigt,"
+" aber keine Zeitzone wird angezeigt."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:13
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:17
@@ -1331,8 +1770,8 @@ msgid ""
 "Your activities seem to be UTC and don't conform to the local time zone. "
 "You have the impression that all the times are off."
 msgstr ""
-"Deine Aktivitäten scheinen in UTC zu sein und entsprechen nicht der lokalen "
-"Zeitzone. Du hast den Eindruck, dass alle Zeiten falsch sind."
+"Deine Aktivitäten scheinen in UTC zu sein und entsprechen nicht der "
+"lokalen Zeitzone. Du hast den Eindruck, dass alle Zeiten falsch sind."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:17
 msgid "Interpret times as UTC"
@@ -1346,10 +1785,11 @@ msgid ""
 "the activity (changing the name, equipment, adding tags, trimming the "
 "activity)."
 msgstr ""
-"Alles scheint kaputt zu sein. Du möchtest alle Aktivitäten neu laden. Beachte, "
-"dass dies mit der Strava-API aufgrund der Ratenbegrenzung sehr lange dauern kann. "
-"Beachte auch, dass dadurch alle Änderungen gelöscht werden, die du nach dem Import "
-"der Aktivität vorgenommen hast (Umbenennung, Ausrüstung, Tags, Zuschneiden)."
+"Alles scheint kaputt zu sein. Du möchtest alle Aktivitäten neu laden. "
+"Beachte, dass dies mit der Strava-API aufgrund der Ratenbegrenzung sehr "
+"lange dauern kann. Beachte auch, dass dadurch alle Änderungen gelöscht "
+"werden, die du nach dem Import der Aktivität vorgenommen hast "
+"(Umbenennung, Ausrüstung, Tags, Zuschneiden)."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:21
 msgid "Throw all activities away and rescan"
@@ -1377,5 +1817,6 @@ msgid ""
 "Checking for new activities, importing them and adding them to the "
 "database. This might take a while …"
 msgstr ""
-"Suche nach neuen Aktivitäten, importiere sie und füge sie der Datenbank hinzu. "
-"Dies kann eine Weile dauern …"
+"Suche nach neuen Aktivitäten, importiere sie und füge sie der Datenbank "
+"hinzu. Dies kann eine Weile dauern …"
+

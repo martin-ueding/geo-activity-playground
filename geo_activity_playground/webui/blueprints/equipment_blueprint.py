@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
@@ -34,23 +35,23 @@ def make_equipment_blueprint(
 
         stacked_area_chart = (
             alt.Chart(
-                monthly_data, height=300, width=1200, title="Monthly Equipment Usage"
+                monthly_data, height=300, width=1200, title=_("Monthly Equipment Usage")
             )
             .mark_area()
             .encode(
-                x=alt.X("month:T", title="Month"),
-                y=alt.Y("total_distance:Q", title="Total Kilometers per Month"),
-                color=alt.Color("equipment:N", title="Equipment"),
+                x=alt.X("month:T", title=_("Month")),
+                y=alt.Y("total_distance:Q", title=_("Total Kilometers per Month")),
+                color=alt.Color("equipment:N", title=_("Equipment")),
                 tooltip=[
-                    alt.Tooltip("month:T", title="Date"),  # Add the date to the tooltip
-                    alt.Tooltip("equipment:N", title="Equipment"),
+                    alt.Tooltip("month:T", title=_("Date")),
+                    alt.Tooltip("equipment:N", title=_("Equipment")),
                     alt.Tooltip(
-                        "total_distance:Q", format=".0f", title="Total Distance"
+                        "total_distance:Q", format=".0f", title=_("Total Distance")
                     ),
                 ],
             )
             .interactive()
-            .to_json(format="vega")  # Specify format="vega"
+            .to_json(format="vega")
         )
 
         equipment_variables = {}
@@ -68,17 +69,17 @@ def make_equipment_blueprint(
                     total_distances,
                     height=300,
                     width=300,
-                    title="Usage over Time",
+                    title=_("Usage over Time"),
                 )
                 .mark_line(interpolate="step-after")
                 .encode(
-                    alt.X("time", title="Date"),
-                    alt.Y("total_distance_km", title="Cumulative distance / km"),
+                    alt.X("time", title=_("Date")),
+                    alt.Y("total_distance_km", title=_("Cumulative distance / km")),
                     tooltip=[
-                        alt.Tooltip("time:T", title="Date"),
+                        alt.Tooltip("time:T", title=_("Date")),
                         alt.Tooltip(
                             "total_distance_km:Q",
-                            title="Cumulative distance / km",
+                            title=_("Cumulative distance / km"),
                             format=".0f",
                         ),
                     ],
@@ -91,23 +92,23 @@ def make_equipment_blueprint(
                 alt.Chart(
                     selection,
                     height=300,
-                    title="Yearly distance",
+                    title=_("Yearly distance"),
                 )
                 .mark_bar()
                 .encode(
-                    alt.X("year(start_local):O", title="Year"),
-                    alt.Y("sum(distance_km)", title="Distance / km"),
+                    alt.X("year(start_local):O", title=_("Year")),
+                    alt.Y("sum(distance_km)", title=_("Distance / km")),
                     alt.Color(
                         "kind",
                         scale=make_kind_scale(repository.meta, config),
-                        title="Kind",
+                        title=_("Kind"),
                     ),
                     tooltip=[
-                        alt.Tooltip("year(start_local):O", title="Year"),
+                        alt.Tooltip("year(start_local):O", title=_("Year")),
                         alt.Tooltip(
-                            "sum(distance_km):Q", title="Distance / km", format=".0f"
+                            "sum(distance_km):Q", title=_("Distance / km"), format=".0f"
                         ),
-                        alt.Tooltip("kind:N", title="Kind"),
+                        alt.Tooltip("kind:N", title=_("Kind")),
                     ],
                 )
                 .to_json(format="vega")
@@ -117,19 +118,19 @@ def make_equipment_blueprint(
                 alt.Chart(
                     selection,
                     height=300,
-                    title="Kinds",
+                    title=_("Kinds"),
                 )
                 .mark_bar()
                 .encode(
                     alt.X(
                         "kind",
-                        title="Kind",
+                        title=_("Kind"),
                     ),
-                    alt.Y("sum(distance_km)", title="Distance / km"),
+                    alt.Y("sum(distance_km)", title=_("Distance / km")),
                     tooltip=[
-                        alt.Tooltip("kind:N", title="Kind"),
+                        alt.Tooltip("kind:N", title=_("Kind")),
                         alt.Tooltip(
-                            "sum(distance_km):Q", title="Distance / km", format=".0f"
+                            "sum(distance_km):Q", title=_("Distance / km"), format=".0f"
                         ),
                     ],
                 )
