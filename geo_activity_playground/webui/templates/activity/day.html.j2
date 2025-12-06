@@ -30,18 +30,18 @@
 
 <div class="row mb-3">
     <div class="col">
-        <h2>Activities</h2>
+        <h2>{{ _('Activities') }}</h2>
         <div class="table-responsive">
             <table class="table table-sort table-arrows">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Distance / km</th>
-                        <th>Elapsed time</th>
-                        <th>Speed / km/h</th>
-                        <th>Equipment</th>
-                        <th>Kind</th>
+                        <th>{{ _('Name') }}</th>
+                        <th>{{ _('Date') }}</th>
+                        <th>{{ _('Distance / km') }}</th>
+                        <th>{{ _('Elapsed time') }}</th>
+                        <th>{{ _('Speed / km/h') }}</th>
+                        <th>{{ _('Equipment') }}</th>
+                        <th>{{ _('Kind') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,7 +60,7 @@
                     {% endfor %}
                     {% if activities|length > 1 %}
                     <tr>
-                        <td><b>Total</b></td>
+                        <td><b>{{ _('Total') }}</b></td>
                         <td></td>
                         <td><b>{{ total_distance | round(1) }}</b></td>
                         <td><b>{{ total_elapsed_time|td }}</b></td>
@@ -74,7 +74,7 @@
     </div>
 </div>
 
-<h2>Share picture</h2>
+<h2>{{ _('Share picture') }}</h2>
 
 <p><img class="img-fluid" src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-06 20:38+0100\n"
+"POT-Creation-Date: 2025-12-06 21:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,32 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: geo_activity_playground/webui/templates/home.html.j2:10
+msgid "Last 30 days"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/home.html.j2:31
+msgid "Latest activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/home.html.j2:67
+msgid "You don't have activities yet. Either put some files into a directory"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/home.html.j2:68
+msgid "upload activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:39
+#: geo_activity_playground/webui/templates/home.html.j2:68
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:94
+msgid "or"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/home.html.j2:68
+msgid "set up Strava API"
+msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:10
 #: geo_activity_playground/webui/templates/page.html.j2:51
@@ -26,10 +52,14 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/activity/day.html.j2:33
+#: geo_activity_playground/webui/templates/activity/name.html.j2:51
 #: geo_activity_playground/webui/templates/page.html.j2:64
 msgid "Activities"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/calendar/index.html.j2:6
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:6
 #: geo_activity_playground/webui/templates/page.html.j2:67
 msgid "Calendar"
 msgstr ""
@@ -47,13 +77,16 @@ msgid "Statistics"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:80
+#: geo_activity_playground/webui/templates/summary/index.html.j2:7
 msgid "Summary Statistics"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/hall_of_fame/index.html.j2:5
 #: geo_activity_playground/webui/templates/page.html.j2:82
 msgid "Hall of Fame"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:4
 #: geo_activity_playground/webui/templates/page.html.j2:84
 msgid "Eddington Number"
 msgstr ""
@@ -62,11 +95,23 @@ msgstr ""
 msgid "Elevation Eddington Number"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/activity/day.html.j2:43
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:24
+#: geo_activity_playground/webui/templates/activity/name.html.j2:62
+#: geo_activity_playground/webui/templates/activity/show.html.j2:19
+#: geo_activity_playground/webui/templates/activity/show.html.j2:356
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:6
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:15
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:39
 #: geo_activity_playground/webui/templates/page.html.j2:88
+#: geo_activity_playground/webui/templates/search/index.html.j2:19
+#: geo_activity_playground/webui/templates/search_form.html.j2:82
+#: geo_activity_playground/webui/templates/segments/show.html.j2:65
 msgid "Equipment"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:89
+#: geo_activity_playground/webui/templates/segments/index.html.j2:4
 msgid "Segments"
 msgstr ""
 
@@ -90,11 +135,13 @@ msgstr ""
 msgid "Square Planner (Zoom 17)"
 msgstr ""
 
+#: geo_activity_playground/webui/templates/heatmap/index.html.j2:4
 #: geo_activity_playground/webui/templates/page.html.j2:114
 msgid "Heatmap"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:120
+#: geo_activity_playground/webui/templates/photo/map.html.j2:4
 msgid "Photo Map"
 msgstr ""
 
@@ -119,6 +166,8 @@ msgid "Plot Builder"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:143
+#: geo_activity_playground/webui/templates/settings/base.html.j2:69
+#: geo_activity_playground/webui/templates/settings/index.html.j2:8
 msgid "Settings"
 msgstr ""
 
@@ -127,6 +176,7 @@ msgid "Data Export"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:145
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:5
 msgid "Time Zone Fixer"
 msgstr ""
 
@@ -166,5 +216,1098 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:219
 msgid "Documentation"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:18
+msgid "Activity Filter"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:38
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:9
+#: geo_activity_playground/webui/templates/activity/name.html.j2:57
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:34
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:61
+#: geo_activity_playground/webui/templates/search/index.html.j2:14
+#: geo_activity_playground/webui/templates/search_form.html.j2:29
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:122
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:123
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:137
+msgid "Name"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:38
+msgid "Case sensitive"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:44
+msgid "After"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:49
+msgid "Until"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:55
+msgid "Distance minimum"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:60
+msgid "Distance maximum"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:44
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:14
+#: geo_activity_playground/webui/templates/activity/name.html.j2:63
+#: geo_activity_playground/webui/templates/activity/show.html.j2:14
+#: geo_activity_playground/webui/templates/activity/show.html.j2:357
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:40
+#: geo_activity_playground/webui/templates/search/index.html.j2:20
+#: geo_activity_playground/webui/templates/search_form.html.j2:66
+#: geo_activity_playground/webui/templates/segments/show.html.j2:66
+msgid "Kind"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:36
+#: geo_activity_playground/webui/templates/activity/show.html.j2:24
+#: geo_activity_playground/webui/templates/search_form.html.j2:98
+msgid "Tags"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:114
+msgid "Filter"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:117
+msgid "Reset"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:123
+msgid "Favorite queries"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search_form.html.j2:130
+msgid "Last queries"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:39
+#: geo_activity_playground/webui/templates/activity/name.html.j2:58
+#: geo_activity_playground/webui/templates/activity/show.html.j2:353
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:35
+#: geo_activity_playground/webui/templates/search/index.html.j2:15
+#: geo_activity_playground/webui/templates/segments/show.html.j2:60
+msgid "Date"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:40
+#: geo_activity_playground/webui/templates/activity/name.html.j2:59
+#: geo_activity_playground/webui/templates/activity/show.html.j2:354
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:28
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:99
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:16
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:36
+#: geo_activity_playground/webui/templates/segments/show.html.j2:63
+msgid "Distance / km"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:41
+#: geo_activity_playground/webui/templates/activity/name.html.j2:60
+#: geo_activity_playground/webui/templates/activity/show.html.j2:355
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:37
+#: geo_activity_playground/webui/templates/search/index.html.j2:17
+msgid "Elapsed time"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:42
+#: geo_activity_playground/webui/templates/activity/name.html.j2:61
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:38
+#: geo_activity_playground/webui/templates/search/index.html.j2:18
+msgid "Speed / km/h"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:63
+#: geo_activity_playground/webui/templates/calendar/index.html.j2:20
+msgid "Total"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/day.html.j2:77
+#: geo_activity_playground/webui/templates/activity/show.html.j2:279
+msgid "Share picture"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:5
+msgid "Edit Activity"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:16
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:26
+msgid "None"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:50
+#: geo_activity_playground/webui/templates/activity/trim.html.j2:32
+#: geo_activity_playground/webui/templates/settings/admin-password.html.j2:18
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:21
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:25
+msgid "Save"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/lines.html.j2:7
+msgid "All Activity Lines"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:32
+#: geo_activity_playground/webui/templates/search/index.html.j2:16
+msgid "Distance"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:36
+#: geo_activity_playground/webui/templates/segments/show.html.j2:64
+msgid "Duration"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:37
+msgid "elapsed"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:37
+msgid "moving"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:39
+msgid "Average moving speed"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:44
+msgid "n/a"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:47
+msgid "Average elapsed speed"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:52
+msgid "Start time"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:59
+msgid "Calories"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:64
+msgid "Steps"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:69
+msgid "Elevation gain"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:74
+msgid "New Explorer Tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:79
+msgid "New Squadratinhos"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:83
+msgid "ID"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:85
+msgid "Upstream ID"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:87
+msgid "Source path"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:89
+msgid "Time series path"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:93
+msgid "Edit"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:94
+msgid "Trim"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:96
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+msgid "Are you sure to delete this?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:96
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
+#: geo_activity_playground/webui/templates/segments/index.html.j2:45
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+msgid "Delete"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:162
+#: geo_activity_playground/webui/templates/activity/show.html.j2:163
+msgid "Line Color by"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:177
+msgid "Photos"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:190
+msgid "Matched Segments"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:195
+#: geo_activity_playground/webui/templates/segments/index.html.j2:62
+msgid "Segment Name"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:196
+msgid "Duration in Segment"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:215
+msgid "Distance & speed"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:234
+msgid "Elevation"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:251
+msgid "Heart rate"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:261
+msgid ""
+"Your activity has heart data, but this program doesn't know your maximum "
+"heart rate (or birth year) and therefore cannot compute the heart rate "
+"zones. Go to the"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:262
+msgid "settings"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:269
+msgid "Cadence"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:283
+msgid "Not happy with the displayed data?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:283
+msgid "Change share picture settings"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:286
+msgid "New explorer tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:287
+msgid ""
+"With this activity you have explored new explorer tiles. The following "
+"maps show the new tiles on the respective zoom levels."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:292
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:138
+msgid "Zoom"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:293
+msgid "There are"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:293
+msgid "new tiles:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:345
+msgid "Activities with the same name"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/show.html.j2:347
+msgid "Overview over these activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/trim.html.j2:10
+msgid "Back"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/trim.html.j2:23
+msgid "Begin"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/activity/trim.html.j2:28
+msgid "End"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/auth/index.html.j2:4
+msgid "Authentication"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/auth/index.html.j2:7
+msgid ""
+"You are either logged in or don't have a password set. You can do "
+"everything."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/auth/index.html.j2:9
+msgid "Log Out"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/auth/index.html.j2:13
+#: geo_activity_playground/webui/templates/settings/admin-password.html.j2:14
+msgid "Password"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/auth/index.html.j2:18
+msgid "Log In"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:7
+msgid "Bubble Chart: Distance"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:26
+msgid "Bubble Chart: Elevation Gain"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/index.html.j2:16
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:72
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:94
+msgid "Year"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:16
+msgid "Week"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:17
+msgid "Monday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:18
+msgid "Tuesday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:19
+msgid "Wednesday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:20
+msgid "Thursday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:21
+msgid "Friday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:22
+msgid "Saturday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:23
+msgid "Sunday"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:12
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:34
+msgid "Definition"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:14
+msgid "Your Eddington number is"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:16
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:38
+msgid "That means that on"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:16
+msgid "separate days you have recorded activities exceeding"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:16
+msgid ""
+"Going far is one thing, going often is another. But going far often is "
+"hard. Also if you increment the Eddington number, all days with less "
+"distance will not count any more. It becomes increasingly hard to "
+"increment the Eddington number because you don't only need to achieve a "
+"higher count, but all shorter activities don't count towards the bigger "
+"number."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:21
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:30
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:43
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:52
+msgid "Missing days"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:23
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:45
+msgid "How many more days do you need to increment your Eddington number?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:29
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:100
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:51
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:122
+msgid "Count"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:48
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:70
+msgid "Plot"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:50
+msgid ""
+"In a graphical representation, the Eddington number is the distance where"
+" the red line intersects with the blue area."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:57
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:79
+msgid "Eddington number history"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:59
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:81
+msgid "How did the Eddington number evolve over time?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:65
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:87
+msgid "Yearly Eddington number"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:67
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:89
+msgid ""
+"If we only consider the activities within one calendar year for the "
+"Eddington number, we get the following:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:73
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:95
+msgid "Eddington number"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:88
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:110
+msgid "Eddington number per Week"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:101
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:123
+msgid "Missing weeks"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:4
+msgid "Eddington Number for Elevation Gain"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:14
+msgid "Divisor"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:36
+msgid "Your Eddington number with divisor"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:36
+msgid "is"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:38
+msgid ""
+"separate days you have recorded activities with an elevation gain of more"
+" than"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:38
+msgid ""
+"Going high is one thing, going often is another. But going high often is "
+"hard. Also if you increment the Eddington number, all days with less "
+"elevation gain will not count any more. It becomes increasingly hard to "
+"increment the Eddington number because you don't only need to achieve a "
+"higher count, but all flatter activities don't count towards the bigger "
+"number."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:50
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:121
+msgid "Elevation Gain"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:72
+msgid ""
+"In a graphical representation, the Eddington number is the elevation gain"
+" where the red line intersects with the blue area."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:17
+msgid "First use"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:18
+msgid "Last use"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:37
+msgid "Monthly Equipment Usage"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:44
+msgid "Details for each equipment"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:5
+msgid "Activities Through Tile"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:10
+msgid "Showing"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:10
+msgid "activities passing through tile"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:10
+msgid "zoom"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:12
+msgid "with radius"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:12
+msgid "tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:15
+msgid "Search Radius:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:74
+msgid "No activities found passing through this tile."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:5
+msgid "Explorer Tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:8
+msgid ""
+"You try to access explorer tiles for a level that hasn't been generated "
+"before. That is not a problem, we just don't generate all levels to save "
+"a bit of time. If you want to have it, just enable it!"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:10
+msgid "Enable Zoom"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:16
+msgid "You have"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:16
+msgid "explored tiles. There are"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:16
+msgid "cluster tiles in total. Your largest cluster consists of"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:16
+msgid "tiles. Your largest square has size"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:19
+msgid "Open the"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:20
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:6
+msgid "Square Planner"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:20
+msgid "to plan the next extension."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:36
+msgid "Download tiles in visible area:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:37
+msgid "Explored as GeoJSON"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:38
+msgid "Explored as GPX"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:39
+msgid "Missing as GeoJSON"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:40
+msgid "Missing as GPX"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:56
+msgid "Bookmarked cluster sizes"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:62
+msgid "Tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:63
+msgid "Relative to maximum"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:68
+msgid "Max Cluster"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:88
+msgid "Tile history"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:108
+msgid "Tile coloring"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:109
+msgid "Modify color values"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:111
+msgid "Tile URLs"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:113
+msgid "You can use the overlay tiles with other services like"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:114
+msgid "See"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:115
+msgid "the documentation for this feature"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:115
+msgid "For your server, use the following URLs:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:122
+msgid "For the explorer tiles, you can use these:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:138
+msgid "And for the heatmap, you can use this:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:5
+msgid "Export metadata and activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:7
+msgid ""
+"Here you can export all metadata and activities as a ZIP file. Depending "
+"on the file format chosen, exporting an activity can take around one "
+"second. You can observe a progress bar in the terminal."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:11
+#: geo_activity_playground/webui/templates/export/index.html.j2:12
+msgid "Metadata format"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:17
+#: geo_activity_playground/webui/templates/export/index.html.j2:31
+msgid "OpenDocument Spreadsheet (LibreOffice)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:22
+#: geo_activity_playground/webui/templates/export/index.html.j2:24
+msgid "Activity time series format"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:25
+msgid "No export of activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/export/index.html.j2:34
+msgid "Export"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/heatmap/index.html.j2:13
+msgid "Download heatmap in visible area"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/photo/new.html.j2:4
+msgid "Upload Photo"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/photo/new.html.j2:8
+msgid "Photo file"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/photo/new.html.j2:11
+#: geo_activity_playground/webui/templates/segments/index.html.j2:69
+#: geo_activity_playground/webui/templates/upload/index.html.j2:19
+msgid "Upload"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/search/index.html.j2:5
+msgid "Activities Overview & Search"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:40
+msgid "Length"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:42
+msgid "Matches"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:45
+msgid "Are you sure to delete this segment?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:56
+msgid "New Segment"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:58
+msgid "To create a new segment, go to"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:58
+msgid ""
+"create the segment that you want and download it as GeoJSON. Then upload "
+"that file with the form below."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/index.html.j2:66
+msgid "GeoJSON Segment File"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
+#: geo_activity_playground/webui/templates/segments/show.html.j2:4
+msgid "Segment"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
+msgid "and"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/match-info.html.j2:45
+msgid "Distance chart"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/show.html.j2:54
+msgid "Matched activities"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/show.html.j2:61
+msgid "Activity"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/segments/show.html.j2:62
+msgid "Direction"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/admin-password.html.j2:4
+#: geo_activity_playground/webui/templates/settings/admin-password.html.j2:8
+msgid "Admin Password"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/admin-password.html.j2:10
+msgid ""
+"To protect the settings and the upload functionality, you may specify a "
+"password."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:82
+msgid "Settings Menu"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:4
+msgid "Overview"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:10
+msgid "Configure how your activities are gathered, analyzed, and visualized."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:12
+msgid ""
+"Use the navigation menu to access different configuration sections. "
+"Here's a quick overview of what you can customize:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:17
+msgid "Data Sources"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:18
+msgid ""
+"Connect to Strava API or configure how metadata is extracted from your "
+"activity files."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:23
+msgid "Display"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:24
+msgid "Customize color schemes, map tile sources, and share picture settings."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:29
+msgid "Personal"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:30
+msgid "Set up heart rate zones based on your personal data."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:35
+msgid "Management"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:36
+msgid "Manage your equipment, activity kinds, and tags."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:41
+msgid "Privacy & Processing"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:42
+msgid "Define privacy zones and configure track segmentation."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:47
+msgid "Advanced"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/index.html.j2:48
+msgid "Admin password and custom plot builder."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
+msgid "Share Picture"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:10
+msgid "What data fields shall be displayed on the share picture?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
+msgid "Map Tile Source"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:8
+msgid "Tile Source"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:10
+msgid ""
+"You can change the tile source to be whatever you like. Be aware that "
+"different sources have different licensing constraints. It is on you to "
+"make sure that you are allowed to use the tiles from the source that you "
+"enter. See"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:11
+msgid "this list of raster tile providers"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:11
+msgid "for inspiration."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:16
+msgid "Map tile URL"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:20
+msgid "Map tile attribution"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:28
+msgid "Test image"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:30
+msgid "This is a tile using your current tile source:"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:92
+msgid "Download missing tiles as"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:127
+msgid "Create bookmark"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:133
+msgid "Bookmarks"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:141
+msgid "Size"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:142
+msgid "Actions"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:155
+msgid "Open"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:14
+msgid "Custom plots"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:18
+msgid "Edit this plot"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:22
+msgid "Per year and kind"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:24
+msgid ""
+"How much distance (or else) did you cover within each year? The following"
+" plots show the quantity summed up for a year, differentiated by activity"
+" kind."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:28
+msgid "Per week"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:30
+msgid ""
+"What's the distance (or else) per week? See it for all weeks in all "
+"years. The larger the circle is, the more you did in that week."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:34
+msgid "Per day"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:36
+msgid ""
+"And also more fine-grained per day for the past rolling year. This is "
+"grouped by day of the week such that you can easily spot patterns in your"
+" daily routine."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:40
+msgid "Cumulative per year"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/summary/index.html.j2:42
+msgid ""
+"How much distance (or else) have you covered in each year up to that time"
+" of the year? This lets you see how you are doing compared to previous "
+"years."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:7
+msgid ""
+"Prior to version 1.3.0, activity times were interpreted in the local time"
+" zone. If your software recorded in UTC, it was assumed that this was "
+"your local time zone. This assumption was often wrong. With version "
+"1.3.0, this got fixed. Activities will be imported using UTC or specified"
+" time zone. They will then be localized into the time zone of the "
+"activity position."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:9
+msgid "Use this tool to fix activities which were imported with an older version."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:11
+msgid ""
+"Your activities are shown in the local time zone of the activity but no "
+"time zone is shown."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:13
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:17
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:21
+msgid "Are you sure to run this?"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:13
+msgid "Interpret times as local time zone"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:15
+msgid ""
+"Your activities seem to be UTC and don't conform to the local time zone. "
+"You have the impression that all the times are off."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:17
+msgid "Interpret times as UTC"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:19
+msgid ""
+"Everything seems broken. You want to reload all your activities. Be aware"
+" that with Strava API that can take ages due to the rate limiting. Also "
+"be aware that this will delete all changes that you did after importing "
+"the activity (changing the name, equipment, adding tags, trimming the "
+"activity)."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:21
+msgid "Throw all activities away and rescan"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/upload/index.html.j2:4
+msgid "Upload Activity"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/upload/index.html.j2:8
+msgid "Activity file"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/upload/index.html.j2:12
+#: geo_activity_playground/webui/templates/upload/index.html.j2:13
+msgid "Target directory"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/upload/reload.html.j2:4
+msgid "Reloading"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/upload/reload.html.j2:6
+msgid ""
+"Checking for new activities, importing them and adding them to the "
+"database. This might take a while …"
 msgstr ""
 

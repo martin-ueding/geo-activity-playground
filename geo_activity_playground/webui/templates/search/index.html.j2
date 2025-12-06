@@ -2,7 +2,7 @@
 
 {% block container %}
 
-<h1 class="row mb-3">Activities Overview & Search</h1>
+<h1 class="row mb-3">{{ _('Activities Overview & Search') }}</h1>
 
 <div class="mb-3">
     {% include "search_form.html.j2" %}
@@ -11,13 +11,13 @@
 <table class="table table-sort table-arrows">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th class="numeric-sort">Distance</th>
-            <th>Elapsed time</th>
-            <th>Speed / km/h</th>
-            <th>Equipment</th>
-            <th>Kind</th>
+            <th>{{ _('Name') }}</th>
+            <th>{{ _('Date') }}</th>
+            <th class="numeric-sort">{{ _('Distance') }}</th>
+            <th>{{ _('Elapsed time') }}</th>
+            <th>{{ _('Speed / km/h') }}</th>
+            <th>{{ _('Equipment') }}</th>
+            <th>{{ _('Kind') }}</th>
         </tr>
     </thead>
     <tbody>

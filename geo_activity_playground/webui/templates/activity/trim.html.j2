@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<a href="{{ url_for('.show', id=activity['id']) }}" class="btn btn-primary btn-small">Back</a>
+<a href="{{ url_for('.show', id=activity['id']) }}" class="btn btn-primary btn-small">{{ _('Back') }}</a>
 
 <div id="activity-trim-map" style="height: 600px;" class="mb-3"></div>
 <script type="module">
@@ -20,16 +20,16 @@
 
 <form method="POST">
     <div class="mb-3">
-        <label for="begin" class="form-label">Begin</label>
+        <label for="begin" class="form-label">{{ _('Begin') }}</label>
         <input type="number" class="form-control" id="begin" name="begin" value="{{ activity.index_begin }}" />
     </div>
 
     <div class="mb-3">
-        <label for="end" class="form-label">End</label>
+        <label for="end" class="form-label">{{ _('End') }}</label>
         <input type="number" class="form-control" id="end" name="end" value="{{ activity.index_end }}" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 
 {% endblock %}

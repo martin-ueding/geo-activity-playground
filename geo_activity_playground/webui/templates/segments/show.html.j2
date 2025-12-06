@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1 class="mb-3">Segment {{ segment.name }}</h1>
+<h1 class="mb-3">{{ _('Segment') }} {{ segment.name }}</h1>
 
 <script>
     function add_map(id, geojson) {
@@ -51,19 +51,19 @@
 </div>
 {% endfor %}
 
-<h2 class="mb-3">Matched activities</h2>
+<h2 class="mb-3">{{ _('Matched activities') }}</h2>
 
 <div class="table-responsive mb-3">
     <table class="table table-sort table-arrows">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Activity</th>
-                <th>Direction</th>
-                <th class="numeric-sort">Distance / km</th>
-                <th>Duration</th>
-                <th>Equipment</th>
-                <th>Kind</th>
+                <th>{{ _('Date') }}</th>
+                <th>{{ _('Activity') }}</th>
+                <th>{{ _('Direction') }}</th>
+                <th class="numeric-sort">{{ _('Distance / km') }}</th>
+                <th>{{ _('Duration') }}</th>
+                <th>{{ _('Equipment') }}</th>
+                <th>{{ _('Kind') }}</th>
             </tr>
         </thead>
         <tbody>

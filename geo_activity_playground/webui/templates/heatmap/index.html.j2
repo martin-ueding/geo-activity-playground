@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1 class="mb-3">Heatmap</h1>
+<h1 class="mb-3">{{ _('Heatmap') }}</h1>
 
 <div class="mb-3">
     {% include "search_form.html.j2" %}
@@ -10,7 +10,7 @@
 <div class="row mb-3">
     <div class="col">
         <div id="heatmap-map" style="height: 800px;"></div>
-        <p><a href="#" id="heatmap-download">Download heatmap in visible area</a></p>
+        <p><a href="#" id="heatmap-download">{{ _('Download heatmap in visible area') }}</a></p>
 
         <script type="module">
             import { add_layers_to_map } from '/static/map-layers.js';

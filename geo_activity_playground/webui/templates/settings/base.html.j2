@@ -66,7 +66,7 @@
     <div class="col-12 mb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">Settings</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('settings.index') }}">{{ _('Settings') }}</a></li>
                 {% block breadcrumbs %}{% endblock %}
             </ol>
         </nav>
@@ -79,7 +79,7 @@
         <div class="d-md-none mb-3">
             <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" 
                     data-bs-target="#settingsNav" aria-expanded="false" aria-controls="settingsNav">
-                ☰ Settings Menu
+                ☰ {{ _('Settings Menu') }}
             </button>
         </div>
         

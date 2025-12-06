@@ -1,7 +1,7 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
-<h1>Segments</h1>
+<h1>{{ _('Segments') }}</h1>
 
 
 <script>
@@ -37,12 +37,12 @@
                 <h5 class="card-title">{{ segment.name }}</h5>
             </a>
             <p class="card-text">
-                Length: {{ '%.2f'|format(segment.length_km) }} km
+                {{ _('Length') }}: {{ '%.2f'|format(segment.length_km) }} km
                 <br />
-                Matches: {{ segment.matches|length }}
+                {{ _('Matches') }}: {{ segment.matches|length }}
             </p>
             <a class="btn btn-sm btn-danger" href="{{ url_for('.delete', id=segment.id) }}"
-                onclick="if(!confirm('Are you sure to delete this segment?')){ event.preventDefault() }">Delete</a>
+                onclick="if(!confirm('{{ _('Are you sure to delete this segment?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
         </div>
     </div>
     {% endfor %}
@@ -53,20 +53,19 @@
 
 </div>
 
-<h2>New Segment</h2>
+<h2>{{ _('New Segment') }}</h2>
 
-<p>To create a new segment, go to <a href="https://bikerouter.de/" target="_blank">Bikerouter</a>, create the segment
-    that you want and download it as GeoJSON. Then upload that file with the form below.</p>
+<p>{{ _('To create a new segment, go to') }} <a href="https://bikerouter.de/" target="_blank">Bikerouter</a>, {{ _('create the segment that you want and download it as GeoJSON. Then upload that file with the form below.') }}</p>
 
 <form method="post" enctype="multipart/form-data" action="{{ url_for('.new') }}">
     <div class="mb-3">
-        <label for="name" class="form-label">Segment Name</label>
+        <label for="name" class="form-label">{{ _('Segment Name') }}</label>
         <input type="text" class="form-control" id="name" name="name" />
     </div>
     <div class="mb-3">
-        <label for="file" class="form-label">GeoJSON Segment File</label>
+        <label for="file" class="form-label">{{ _('GeoJSON Segment File') }}</label>
         <input type="file" name="file" id="file" class="form-control" multiple>
     </div>
-    <button type="submit" class="btn btn-primary">Upload</button>
+    <button type="submit" class="btn btn-primary">{{ _('Upload') }}</button>
 </form>
 {% endblock %}

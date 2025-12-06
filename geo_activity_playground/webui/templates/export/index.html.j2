@@ -2,37 +2,36 @@
 
 {% block container %}
 
-<h1>Export metadata and activities</h1>
+<h1>{{ _('Export metadata and activities') }}</h1>
 
-<p>Here you can export all metadata and activities as a ZIP file. Depending on the file format chosen, exporting an
-    activity can take around one second. You can observe a progress bar in the terminal.</p>
+<p>{{ _('Here you can export all metadata and activities as a ZIP file. Depending on the file format chosen, exporting an activity can take around one second. You can observe a progress bar in the terminal.') }}</p>
 
 <form method="get" enctype="multipart/form-data" action="{{ url_for('.export') }}">
     <div class="mb-3">
-        <label for="meta_format" class="form-label">Metadata format</label>
-        <select name="meta_format" id="meta_format" class="form-select" aria-label="Metadata format">
+        <label for="meta_format" class="form-label">{{ _('Metadata format') }}</label>
+        <select name="meta_format" id="meta_format" class="form-select" aria-label="{{ _('Metadata format') }}">
             <option value="parquet">Parquet</option>
             {# <option value="json">JSON</option> #}
             <option value="csv">CSV</option>
             <option value="xlsx">Excel</option>
-            <option value="ods">OpenDocument Spreadsheet (LibreOffice)</option>
+            <option value="ods">{{ _('OpenDocument Spreadsheet (LibreOffice)') }}</option>
         </select>
     </div>
 
     <div class="mb-3">
-        <label for="activity_format" class="form-label">Activity time series format</label>
+        <label for="activity_format" class="form-label">{{ _('Activity time series format') }}</label>
         <select name="activity_format" id="activity_format" class="form-select"
-            aria-label="Activity time series format">
-            <option value="">No export of activities</option>
+            aria-label="{{ _('Activity time series format') }}">
+            <option value="">{{ _('No export of activities') }}</option>
             <option value="parquet">Parquet</option>
             <option value="csv">CSV</option>
             <option value="geojson">GeoJSON</option>
             <option value="gpx">GPX</option>
             <option value="xlsx">Excel</option>
-            <option value="ods">OpenDocument Spreadsheet (LibreOffice)</option>
+            <option value="ods">{{ _('OpenDocument Spreadsheet (LibreOffice)') }}</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Export</button>
+    <button type="submit" class="btn btn-primary">{{ _('Export') }}</button>
 </form>
 
 

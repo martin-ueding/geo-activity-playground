@@ -7,7 +7,7 @@
 {% if latest_activities %}
 <div class="row mb-3">
     <div class="col">
-        <h2>Last 30 days</h2>
+        <h2>{{ _('Last 30 days') }}</h2>
         {{ tabbed_vega(last_30_days_plot) }}
     </div>
 </div>
@@ -28,7 +28,7 @@
     }
 </script>
 
-<h2>Latest activities</h2>
+<h2>{{ _('Latest activities') }}</h2>
 
 {% for date, date_data in latest_activities.items() %}
 <h3>{{ date }}</h3>
@@ -64,9 +64,8 @@
 {% endfor %}
 {% endfor %}
 {% else %}
-<p>You don't have activities yet. Either put some files into a directory <tt>Activities</tt>, <a
-        href="{{ url_for('upload.index') }}">upload activities</a> or <a href="{{ url_for('settings.strava') }}">set up
-        Strava API</a>.</p>
+<p>{{ _('You don\'t have activities yet. Either put some files into a directory') }} <tt>Activities</tt>, <a
+        href="{{ url_for('upload.index') }}">{{ _('upload activities') }}</a> {{ _('or') }} <a href="{{ url_for('settings.strava') }}">{{ _('set up Strava API') }}</a>.</p>
 {% endif %}
 
 {% endblock %}

@@ -1,13 +1,13 @@
 {% extends "settings/base.html.j2" %}
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item active" aria-current="page">Share Picture</li>
+<li class="breadcrumb-item active" aria-current="page">{{ _('Share Picture') }}</li>
 {% endblock %}
 
 {% block settings_content %}
-<h1 class="mb-3">Share Picture</h1>
+<h1 class="mb-3">{{ _('Share Picture') }}</h1>
 
-<p>What data fields shall be displayed on the share picture?</p>
+<p>{{ _('What data fields shall be displayed on the share picture?') }}</p>
 
 <form method="POST">
     {% for name, label, checked in names %}
@@ -18,6 +18,6 @@
     </div>
     {% endfor %}
     <div class="clearfix mb-3"></div>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 {% endblock %}

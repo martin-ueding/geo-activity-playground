@@ -12,10 +12,10 @@
 <div class="accordion" id="search_form_accordion">
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button {{ '' if query.active else 'collapsed' }}" type="button"
+                <button class="accordion-button {{ '' if query.active else 'collapsed' }}" type="button"
                 data-bs-toggle="collapse" data-bs-target="#search_form" aria-expanded="true"
                 aria-controls="search_form">
-                Activity Filter
+                {{ _('Activity Filter') }}
             </button>
         </h2>
         <div id="search_form" class="accordion-collapse collapse {{ 'show' if query.active else '' }}"
@@ -26,7 +26,7 @@
                         <form>
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label for="name" class="form-label">Name</label>
+                                    <label for="name" class="form-label">{{ _('Name') }}</label>
                                     <input type="text" class="form-control" id="name" name="name"
                                         value="{{ query.name }}">
 
@@ -35,35 +35,35 @@
                                             value="true" id="name_case_sensitive" {% if query.name_case_sensitive %}
                                             checked {% endif %}>
                                         <label class="form-check-label" for="name_case_sensitive">
-                                            Case sensitive
+                                            {{ _('Case sensitive') }}
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="col-6">
-                                    <label for="start_begin" class="form-label">After</label>
+                                    <label for="start_begin" class="form-label">{{ _('After') }}</label>
                                     <input type="date" class="form-control" id="start_begin" name="start_begin"
                                         value="{{ query.start_begin }}">
                                 </div>
                                 <div class="col-6">
-                                    <label for="start_end" class="form-label">Until</label>
+                                    <label for="start_end" class="form-label">{{ _('Until') }}</label>
                                     <input type="date" class="form-control" id="start_end" name="start_end"
                                         value="{{ query.start_end }}">
                                 </div>
 
                                 <div class="col-6">
-                                    <label for="distance_km_min" class="form-label">Distance minimum</label>
+                                    <label for="distance_km_min" class="form-label">{{ _('Distance minimum') }}</label>
                                     <input type="number" class="form-control" id="distance_km_min"
                                         name="distance_km_min" value="{{ query.distance_km_min }}">
                                 </div>
                                 <div class="col-6">
-                                    <label for="distance_km_max" class="form-label">Distance maximum</label>
+                                    <label for="distance_km_max" class="form-label">{{ _('Distance maximum') }}</label>
                                     <input type="number" class="form-control" id="distance_km_max"
                                         name="distance_km_max" value="{{ query.distance_km_max }}">
                                 </div>
 
                                 <div class="col-12">
-                                    <label for="" class="form-label">Kind</label>
+                                    <label for="" class="form-label">{{ _('Kind') }}</label>
                                     <div class="form-control">
                                         {% for kind in kinds_avail %}
                                         <div class="form-check form-check-inline">
@@ -79,7 +79,7 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label for="" class="form-label">Equipment</label>
+                                    <label for="" class="form-label">{{ _('Equipment') }}</label>
                                     <div class="form-control">
                                         {% for equipment in equipments_avail %}
                                         <div class="form-check form-check-inline">
@@ -95,7 +95,7 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label for="" class="form-label">Tags</label>
+                                    <label for="" class="form-label">{{ _('Tags') }}</label>
                                     <div class="form-control">
                                         {% for tag in tags_avail %}
                                         <div class="form-check form-check-inline">
@@ -111,23 +111,23 @@
                                 </div>
 
                                 <div class="col-6">
-                                    <button type="submit" class="btn btn-primary">Filter</button>
+                                    <button type="submit" class="btn btn-primary">{{ _('Filter') }}</button>
                                 </div>
                                 <div class="col-6">
-                                    <a class="btn btn-danger" href="?">Reset</a>
+                                    <a class="btn btn-danger" href="?">{{ _('Reset') }}</a>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="col-4">
-                        <h5 class="mb-3">Favorite queries</h5>
+                        <h5 class="mb-3">{{ _('Favorite queries') }}</h5>
                         <ul class="mb-3">
                             {% for description, url_parameters in search_query_favorites %}
                             {{ _show_search_query(description, url_parameters, True, request_url) }}
                             {% endfor %}
                         </ul>
 
-                        <h5 class="mb-3">Last queries</h5>
+                        <h5 class="mb-3">{{ _('Last queries') }}</h5>
                         <ol class="mb-3">
                             {% for description, url_parameters in search_query_last %}
                             {{ _show_search_query(description, url_parameters, False, request_url) }}

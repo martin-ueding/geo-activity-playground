@@ -2,25 +2,22 @@
 
 {% block container %}
 
-<h1>Explorer Tiles</h1>
+<h1>{{ _('Explorer Tiles') }}</h1>
 
 {% if zoom_level_not_generated %}
-<p>You try to access explorer tiles for a level that hasn't been generated before. That is not a problem, we just don't
-    generate all levels to save a bit of time. If you want to have it, just enable it!</p>
+<p>{{ _('You try to access explorer tiles for a level that hasn\'t been generated before. That is not a problem, we just don\'t generate all levels to save a bit of time. If you want to have it, just enable it!') }}</p>
 
-<a href="{{ url_for('.enable_zoom_level', zoom=zoom_level_not_generated) }}" class="btn btn-primary">Enable Zoom {{
+<a href="{{ url_for('.enable_zoom_level', zoom=zoom_level_not_generated) }}" class="btn btn-primary">{{ _('Enable Zoom') }} {{
     zoom_level_not_generated }}</a>
 {% else %}
 
 <div class="row mb-3">
     <div class="col">
-        <p>You have {{ num_tiles }} explored tiles. There are {{ num_cluster_tiles }} cluster tiles in
-            total. Your largest cluster consists of {{ max_cluster_size }} tiles. Your largest square has size
+        <p>{{ _('You have') }} {{ num_tiles }} {{ _('explored tiles. There are') }} {{ num_cluster_tiles }} {{ _('cluster tiles in total. Your largest cluster consists of') }} {{ max_cluster_size }} {{ _('tiles. Your largest square has size') }}
             {{ square_size }}².
         </p>
-        <p>Open the <a
-                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">Square
-                Planner</a> to plan the next extension.</p>
+        <p>{{ _('Open the') }} <a
+                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">{{ _('Square Planner') }}</a> {{ _('to plan the next extension.') }}</p>
     </div>
 </div>
 
@@ -36,11 +33,11 @@
 <div class="row mb-3">
     <div class="col">
         <div id="explorer-map" class="mb-1" style="height: min(800px, calc(100vh - 300px));"></div>
-        <p>Download tiles in visible area:
-            <a href="#" data-download-suffix="explored.geojson">Explored as GeoJSON</a>,
-            <a href="#" data-download-suffix="explored.gpx">Explored as GPX</a>,
-            <a href="#" data-download-suffix="missing.geojson">Missing as GeoJSON</a> or
-            <a href="#" data-download-suffix="missing.gpx">Missing as GPX</a>.
+        <p>{{ _('Download tiles in visible area:') }}
+            <a href="#" data-download-suffix="explored.geojson">{{ _('Explored as GeoJSON') }}</a>,
+            <a href="#" data-download-suffix="explored.gpx">{{ _('Explored as GPX') }}</a>,
+            <a href="#" data-download-suffix="missing.geojson">{{ _('Missing as GeoJSON') }}</a> {{ _('or') }}
+            <a href="#" data-download-suffix="missing.gpx">{{ _('Missing as GPX') }}</a>.
         </p>
         <script type="module">
             import { initExplorerMap } from '/static/server-side-explorer.js';
@@ -56,19 +53,19 @@
 </div>
 
 {% if bookmarks %}
-<h2 class="mb-3">Bookmarked cluster sizes</h2>
+<h2 class="mb-3">{{ _('Bookmarked cluster sizes') }}</h2>
 
 <table class="table mb-3">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Tiles</th>
-            <th>Relative to maximum</th>
+            <th>{{ _('Name') }}</th>
+            <th>{{ _('Tiles') }}</th>
+            <th>{{ _('Relative to maximum') }}</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Max Cluster</td>
+            <td>{{ _('Max Cluster') }}</td>
             <td>{{ max_cluster_size }}</td>
             <td></td>
             <td></td>
@@ -80,7 +77,7 @@
             <td>{{ '%.1f'|format(bookmark.size / max_cluster_size * 100) }} %</td>
             <td><a class="btn btn-danger btn-sm"
                     href="{{ url_for('settings.cluster_bookmark_delete', id=bookmark.id) }}"
-                    onclick="if(!confirm('Are you sure to Delete This?')){ event.preventDefault() }">Delete</a></td>
+                    onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -88,7 +85,7 @@
 
 {% endif %}
 
-<h2 class="mb-3">Tile history</h2>
+<h2 class="mb-3">{{ _('Tile history') }}</h2>
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -108,21 +105,21 @@
     </div>
 </div>
 
-<h2 class="mb-3">Tile coloring</h2>
-<p><a href="{{ url_for('settings.color_strategy') }}">Modify color values</a>.</p>
+<h2 class="mb-3">{{ _('Tile coloring') }}</h2>
+<p><a href="{{ url_for('settings.color_strategy') }}">{{ _('Modify color values') }}</a>.</p>
 
-<h2 class="mb-3">Tile URLs</h2>
+<h2 class="mb-3">{{ _('Tile URLs') }}</h2>
 
-<p>You can use the overlay tiles with other services like <a href="https://bikerouter.de/" target="_blank">Bike
-        Router</a>. See <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/"
-        target="_blank">the documentation for this feature</a>. For your server, use the following URLs:</p>
+<p>{{ _('You can use the overlay tiles with other services like') }} <a href="https://bikerouter.de/" target="_blank">Bike
+        Router</a>. {{ _('See') }} <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/"
+        target="_blank">{{ _('the documentation for this feature') }}</a>. {{ _('For your server, use the following URLs:') }}</p>
 
 <code><pre class="tile-urls">/tile/grayscale/{z}/{x}/{y}.png
 /tile/pastel/{z}/{x}/{y}.png
 /tile/color/{z}/{x}/{y}.png
 /tile/inverse_grayscale/{z}/{x}/{y}.png</pre></code>
 
-<p>For the explorer tiles, you can use these:</p>
+<p>{{ _('For the explorer tiles, you can use these:') }}</p>
 
 <code><pre class="tile-urls">/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster
 /explorer/14/tile/{z}/{x}/{y}.png?color_strategy=max_cluster
@@ -138,7 +135,7 @@
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=visits
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing</pre></code>
 
-<p>And for the heatmap, you can use this:</p>
+<p>{{ _('And for the heatmap, you can use this:') }}</p>
 
 <code><pre class="tile-urls">/heatmap/tile/{z}/{x}/{y}.png</pre></code>
 
