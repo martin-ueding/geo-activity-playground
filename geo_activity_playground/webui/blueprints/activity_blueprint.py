@@ -19,6 +19,7 @@ from flask import request
 from flask import Response
 from flask import url_for
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 from PIL import Image
 from PIL import ImageDraw
 
@@ -455,12 +456,12 @@ def make_activity_blueprint(
 
 def speed_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Speed")
+        alt.Chart(time_series, title=_("Speed"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("speed", title="Speed / km/h"),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.X("time", title=_("Time")),
+            alt.Y("speed", title=_("Speed / km/h")),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -475,11 +476,11 @@ def speed_distribution_plot(time_series: pd.DataFrame) -> str:
         }
     ).dropna()
     return (
-        alt.Chart(df.loc[df["speed"] > 0], title="Speed distribution")
+        alt.Chart(df.loc[df["speed"] > 0], title=_("Speed distribution"))
         .mark_bar()
         .encode(
-            alt.X("speed", bin=alt.Bin(step=5), title="Speed / km/h"),
-            alt.Y("sum(step)", title="Duration / min"),
+            alt.X("speed", bin=alt.Bin(step=5), title=_("Speed / km/h")),
+            alt.Y("sum(step)", title=_("Duration / min")),
         )
         .to_json(format="vega")
     )
@@ -487,12 +488,12 @@ def speed_distribution_plot(time_series: pd.DataFrame) -> str:
 
 def distance_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Distance")
+        alt.Chart(time_series, title=_("Distance"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("distance_km", title="Distance / km"),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.X("time", title=_("Time")),
+            alt.Y("distance_km", title=_("Distance / km")),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive()
         .to_json(format="vega")
@@ -501,16 +502,16 @@ def distance_time_plot(time_series: pd.DataFrame) -> str:
 
 def elevation_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Elevation")
+        alt.Chart(time_series, title=_("Elevation"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
+            alt.X("time", title=_("Time")),
             alt.Y(
                 "elevation",
                 scale=alt.Scale(zero=False),
-                title="Elevation / m",
+                title=_("Elevation / m"),
             ),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -519,16 +520,16 @@ def elevation_time_plot(time_series: pd.DataFrame) -> str:
 
 def elevation_gain_cum_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Elevation Gain")
+        alt.Chart(time_series, title=_("Elevation Gain"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
+            alt.X("time", title=_("Time")),
             alt.Y(
                 "elevation_gain_cum",
                 scale=alt.Scale(zero=False),
-                title="Elevation gain / m",
+                title=_("Elevation gain / m"),
             ),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -537,12 +538,12 @@ def elevation_gain_cum_plot(time_series: pd.DataFrame) -> str:
 
 def heart_rate_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Heart Rate")
+        alt.Chart(time_series, title=_("Heart Rate"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("heartrate", scale=alt.Scale(zero=False), title="Heart rate"),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.X("time", title=_("Time")),
+            alt.Y("heartrate", scale=alt.Scale(zero=False), title=_("Heart rate")),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -551,12 +552,12 @@ def heart_rate_time_plot(time_series: pd.DataFrame) -> str:
 
 def cadence_time_plot(time_series: pd.DataFrame) -> str:
     return (
-        alt.Chart(time_series, title="Cadence")
+        alt.Chart(time_series, title=_("Cadence"))
         .mark_line()
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("cadence", title="Cadence"),
-            alt.Color("segment_id:N", title="Segment"),
+            alt.X("time", title=_("Time")),
+            alt.Y("cadence", title=_("Cadence")),
+            alt.Color("segment_id:N", title=_("Segment")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -565,12 +566,12 @@ def cadence_time_plot(time_series: pd.DataFrame) -> str:
 
 def heart_rate_zone_plot(heart_zones: pd.DataFrame) -> str:
     return (
-        alt.Chart(heart_zones, title="Heart Rate Zones")
+        alt.Chart(heart_zones, title=_("Heart Rate Zones"))
         .mark_bar()
         .encode(
-            alt.X("minutes", title="Duration / min"),
-            alt.Y("heartzone:O", title="Zone"),
-            alt.Color("heartzone:O", scale=alt.Scale(scheme="turbo"), title="Zone"),
+            alt.X("minutes", title=_("Duration / min")),
+            alt.Y("heartzone:O", title=_("Zone")),
+            alt.Color("heartzone:O", scale=alt.Scale(scheme="turbo"), title=_("Zone")),
         )
         .to_json(format="vega")
     )
@@ -578,10 +579,10 @@ def heart_rate_zone_plot(heart_zones: pd.DataFrame) -> str:
 
 def name_tick_plot(meta: pd.DataFrame) -> str:
     return (
-        alt.Chart(meta, title="Repetitions")
+        alt.Chart(meta, title=_("Repetitions"))
         .mark_tick()
         .encode(
-            alt.X("start_local", title="Date"),
+            alt.X("start_local", title=_("Date")),
         )
         .to_json(format="vega")
     )
@@ -589,20 +590,20 @@ def name_tick_plot(meta: pd.DataFrame) -> str:
 
 def name_equipment_plot(meta: pd.DataFrame) -> str:
     return (
-        alt.Chart(meta, title="Equipment")
+        alt.Chart(meta, title=_("Equipment"))
         .mark_bar()
-        .encode(alt.X("count()", title="Count"), alt.Y("equipment", title="Equipment"))
+        .encode(alt.X("count()", title=_("Count")), alt.Y("equipment", title=_("Equipment")))
         .to_json(format="vega")
     )
 
 
 def name_distance_plot(meta: pd.DataFrame) -> str:
     return (
-        alt.Chart(meta, title="Distance")
+        alt.Chart(meta, title=_("Distance"))
         .mark_bar()
         .encode(
-            alt.X("distance_km", bin=True, title="Distance / km"),
-            alt.Y("count()", title="Count"),
+            alt.X("distance_km", bin=True, title=_("Distance / km")),
+            alt.Y("count()", title=_("Count")),
         )
         .to_json(format="vega")
     )
@@ -611,11 +612,11 @@ def name_distance_plot(meta: pd.DataFrame) -> str:
 def name_minutes_plot(meta: pd.DataFrame) -> str:
     minutes = meta["elapsed_time"].dt.total_seconds() / 60
     return (
-        alt.Chart(pd.DataFrame({"minutes": minutes}), title="Elapsed time")
+        alt.Chart(pd.DataFrame({"minutes": minutes}), title=_("Elapsed time"))
         .mark_bar()
         .encode(
-            alt.X("minutes", bin=True, title="Time / min"),
-            alt.Y("count()", title="Count"),
+            alt.X("minutes", bin=True, title=_("Time / min")),
+            alt.Y("count()", title=_("Count")),
         )
         .to_json(format="vega")
     )

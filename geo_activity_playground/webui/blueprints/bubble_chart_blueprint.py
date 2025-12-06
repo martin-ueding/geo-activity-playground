@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ..columns import column_distance
 from ..columns import column_elevation_gain
@@ -56,10 +57,10 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
 
 def _make_bubble_chart(bubble_data, column: ColumnDescription):
     return (
-        alt.Chart(bubble_data, title=f"{column.display_name} per Day (Bubble Chart)")
+        alt.Chart(bubble_data, title=_("%(display_name)s per Day (Bubble Chart)") % {"display_name": column.display_name})
         .mark_circle()
         .encode(
-            x=alt.X("date:T", title="Date"),
+            x=alt.X("date:T", title=_("Date")),
             y=alt.Y(
                 f"{column.name}:Q",
                 title=f"{column.display_name} ({column.unit})",
@@ -69,16 +70,16 @@ def _make_bubble_chart(bubble_data, column: ColumnDescription):
                 scale=alt.Scale(range=[10, 300]),
                 title=f"{column.display_name}",
             ),
-            color=alt.Color("activity:N", title="Activity"),
+            color=alt.Color("activity:N", title=_("Activity")),
             tooltip=[
-                alt.Tooltip("date:T", title="Date"),
+                alt.Tooltip("date:T", title=_("Date")),
                 alt.Tooltip(
                     f"{column.name}:Q",
                     title=f"{column.display_name} ({column.unit})",
                     format=column.format,
                 ),
-                alt.Tooltip("activity:N", title="Activity"),
-                alt.Tooltip("activity_url:N", title="Activity Link"),
+                alt.Tooltip("activity:N", title=_("Activity")),
+                alt.Tooltip("activity_url:N", title=_("Activity Link")),
             ],
         )
         .properties(height=800, width=1200)
