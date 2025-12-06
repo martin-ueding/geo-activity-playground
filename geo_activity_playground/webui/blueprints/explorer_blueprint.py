@@ -25,6 +25,7 @@ from flask import request
 from flask import Response
 from flask import url_for
 from flask.typing import ResponseReturnValue
+from flask_babel import gettext as _
 
 from ...core.config import Config
 from ...core.config import ConfigAccessor
@@ -700,9 +701,9 @@ def plot_tile_evolution(tiles: pd.DataFrame) -> str:
         return ""
     tiles["count"] = np.arange(1, len(tiles) + 1)
     return (
-        alt.Chart(tiles, title="Tiles")
+        alt.Chart(tiles, title=_("Tiles"))
         .mark_line(interpolate="step-after")
-        .encode(alt.X("time", title="Time"), alt.Y("count", title="Number of tiles"))
+        .encode(alt.X("time", title=_("Time")), alt.Y("count", title=_("Number of tiles")))
         .interactive(bind_y=False)
         .to_json(format="vega")
     )
@@ -712,11 +713,11 @@ def plot_cluster_evolution(cluster_evolution: pd.DataFrame) -> str:
     if len(cluster_evolution) == 0:
         return ""
     return (
-        alt.Chart(cluster_evolution, title="Cluster")
+        alt.Chart(cluster_evolution, title=_("Cluster"))
         .mark_line(interpolate="step-after")
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("max_cluster_size", title="Maximum cluster size"),
+            alt.X("time", title=_("Time")),
+            alt.Y("max_cluster_size", title=_("Maximum cluster size")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")
@@ -727,11 +728,11 @@ def plot_square_evolution(square_evolution: pd.DataFrame) -> str:
     if len(square_evolution) == 0:
         return ""
     return (
-        alt.Chart(square_evolution, title="Square")
+        alt.Chart(square_evolution, title=_("Square"))
         .mark_line(interpolate="step-after")
         .encode(
-            alt.X("time", title="Time"),
-            alt.Y("max_square_size", title="Maximum square size"),
+            alt.X("time", title=_("Time")),
+            alt.Y("max_square_size", title=_("Maximum square size")),
         )
         .interactive(bind_y=False)
         .to_json(format="vega")

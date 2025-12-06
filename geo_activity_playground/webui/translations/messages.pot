@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-06 21:00+0100\n"
+"POT-Creation-Date: 2025-12-06 21:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,565 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: geo_activity_playground/core/parametric_plot.py:9
+msgid "Point"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:10
+msgid "Circle"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:11
+msgid "Area"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:12
+msgid "Bar"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:13
+msgid "Rectangle"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:14
+msgid "Line"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:17
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:495
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:605
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:100
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:109
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:129
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:133
+#: geo_activity_playground/webui/templates/activity/day.html.j2:40
+#: geo_activity_playground/webui/templates/activity/name.html.j2:59
+#: geo_activity_playground/webui/templates/activity/show.html.j2:354
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:28
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:99
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:16
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:36
+#: geo_activity_playground/webui/templates/segments/show.html.j2:63
+msgid "Distance / km"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:18
+msgid "Cumulative Distance / km"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:19
+msgid "Total distance / km"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:20
+msgid "Average distance / km"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:21
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:585
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:63
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:75
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:269
+#: geo_activity_playground/webui/blueprints/entry_views.py:70
+#: geo_activity_playground/webui/blueprints/entry_views.py:74
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:46
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:76
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:79
+#: geo_activity_playground/webui/templates/activity/day.html.j2:39
+#: geo_activity_playground/webui/templates/activity/name.html.j2:58
+#: geo_activity_playground/webui/templates/activity/show.html.j2:353
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:35
+#: geo_activity_playground/webui/templates/search/index.html.j2:15
+#: geo_activity_playground/webui/templates/segments/show.html.j2:60
+msgid "Date"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:22
+msgid "Elapsed time / h"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:23
+msgid "Moving time / h"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:24
+msgid "Energy / kcal"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:25
+#: geo_activity_playground/webui/columns.py:46
+#: geo_activity_playground/webui/templates/activity/show.html.j2:64
+msgid "Steps"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:26
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:530
+msgid "Elevation gain / m"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:27
+msgid "Start elevation / m"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:28
+msgid "End elevation / m"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:29
+msgid "Total elevation gain / m"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:30
+msgid "Average elevation gain / m"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:31
+msgid "New tiles 14"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:32
+msgid "New tiles 17"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:33
+msgid "Average moving speed / km/h"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:34
+msgid "Average elapsed speed / km/h"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:35
+msgid "Start latitude / °"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:36
+msgid "Start longitude / °"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:37
+msgid "End latitude / °"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:38
+msgid "End longitude / °"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:41
+#: geo_activity_playground/core/parametric_plot.py:59
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:593
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:595
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:44
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:47
+#: geo_activity_playground/webui/templates/activity/day.html.j2:43
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:24
+#: geo_activity_playground/webui/templates/activity/name.html.j2:62
+#: geo_activity_playground/webui/templates/activity/show.html.j2:19
+#: geo_activity_playground/webui/templates/activity/show.html.j2:356
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:6
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:15
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:39
+#: geo_activity_playground/webui/templates/page.html.j2:88
+#: geo_activity_playground/webui/templates/search/index.html.j2:19
+#: geo_activity_playground/webui/templates/search_form.html.j2:82
+#: geo_activity_playground/webui/templates/segments/show.html.j2:65
+msgid "Equipment"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:42
+#: geo_activity_playground/core/parametric_plot.py:60
+msgid "Activity kind"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:43
+#: geo_activity_playground/core/parametric_plot.py:61
+msgid "Consider for achievements"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:44
+#: geo_activity_playground/core/parametric_plot.py:62
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:99
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:107
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:35
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:42
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:80
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:83
+#: geo_activity_playground/webui/templates/calendar/index.html.j2:16
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:72
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:94
+msgid "Year"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:45
+#: geo_activity_playground/core/parametric_plot.py:63
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:105
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:110
+msgid "ISO Year"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:46
+msgid "Year, Quarter"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:47
+msgid "Year, Quarter, Month"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:48
+msgid "Year, Month"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:49
+msgid "Quarter"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:50
+msgid "Quarter, Month"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:51
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:42
+msgid "Month"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:52
+#: geo_activity_playground/core/parametric_plot.py:64
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:104
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:111
+msgid "ISO Week"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:53
+msgid "Day of month"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:54
+msgid "Day of week"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:55
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:156
+msgid "ISO Day"
+msgstr ""
+
+#: geo_activity_playground/core/parametric_plot.py:58
+msgid "(no grouping)"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:491
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:602
+#: geo_activity_playground/webui/columns.py:16
+#: geo_activity_playground/webui/templates/activity/show.html.j2:32
+#: geo_activity_playground/webui/templates/search/index.html.j2:16
+msgid "Distance"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:523
+#: geo_activity_playground/webui/columns.py:22
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:50
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:121
+msgid "Elevation Gain"
+msgstr ""
+
+#: geo_activity_playground/webui/columns.py:28
+msgid "Elapsed Time"
+msgstr ""
+
+#: geo_activity_playground/webui/columns.py:34
+msgid "Moving Time"
+msgstr ""
+
+#: geo_activity_playground/webui/columns.py:40
+msgid "Energy"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:459
+#: geo_activity_playground/webui/columns.py:61
+msgid "Speed"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:505
+#: geo_activity_playground/webui/columns.py:68
+#: geo_activity_playground/webui/templates/activity/show.html.j2:234
+msgid "Elevation"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:462
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:494
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:508
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:526
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:544
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:558
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:706
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:719
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:734
+msgid "Time"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:463
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:482
+#: geo_activity_playground/webui/templates/activity/day.html.j2:42
+#: geo_activity_playground/webui/templates/activity/name.html.j2:61
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:38
+#: geo_activity_playground/webui/templates/search/index.html.j2:18
+msgid "Speed / km/h"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:464
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:496
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:514
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:532
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:546
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:560
+#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
+#: geo_activity_playground/webui/templates/segments/show.html.j2:4
+msgid "Segment"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:479
+msgid "Speed distribution"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:483
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:572
+msgid "Duration / min"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:512
+msgid "Elevation / m"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:541
+msgid "Heart Rate"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:545
+#: geo_activity_playground/webui/templates/activity/show.html.j2:251
+msgid "Heart rate"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:555
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:559
+#: geo_activity_playground/webui/templates/activity/show.html.j2:269
+msgid "Cadence"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:569
+msgid "Heart Rate Zones"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:573
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:574
+msgid "Zone"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:582
+msgid "Repetitions"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:595
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:606
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:619
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:29
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:100
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:51
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:122
+msgid "Count"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:615
+#: geo_activity_playground/webui/templates/activity/day.html.j2:41
+#: geo_activity_playground/webui/templates/activity/name.html.j2:60
+#: geo_activity_playground/webui/templates/activity/show.html.j2:355
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:37
+#: geo_activity_playground/webui/templates/search/index.html.j2:17
+msgid "Elapsed time"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/activity_blueprint.py:618
+msgid "Time / min"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:60
+#, python-format
+msgid "%(display_name)s per Day (Bubble Chart)"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:73
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:81
+#: geo_activity_playground/webui/templates/segments/show.html.j2:61
+msgid "Activity"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:82
+msgid "Activity Link"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:174
+#, python-format
+msgid "%(display_name)s Eddington Number %(en)s"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:186
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:191
+#, python-format
+msgid "%(interval)s exceeding %(display_name)s"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:193
+#, python-format
+msgid "%(interval)s missing for next"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/eddington_blueprints.py:270
+#: geo_activity_playground/webui/templates/eddington/distance.html.j2:73
+#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:95
+msgid "Eddington number"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/entry_views.py:66
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:128
+#, python-format
+msgid "%(display_name)s per day"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/entry_views.py:72
+#: geo_activity_playground/webui/blueprints/entry_views.py:75
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:104
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:111
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:127
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:131
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:40
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:43
+#: geo_activity_playground/webui/templates/activity/day.html.j2:44
+#: geo_activity_playground/webui/templates/activity/edit.html.j2:14
+#: geo_activity_playground/webui/templates/activity/name.html.j2:63
+#: geo_activity_playground/webui/templates/activity/show.html.j2:14
+#: geo_activity_playground/webui/templates/activity/show.html.j2:357
+#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:40
+#: geo_activity_playground/webui/templates/search/index.html.j2:20
+#: geo_activity_playground/webui/templates/search_form.html.j2:66
+#: geo_activity_playground/webui/templates/segments/show.html.j2:66
+msgid "Kind"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:38
+#: geo_activity_playground/webui/templates/equipment/index.html.j2:37
+msgid "Monthly Equipment Usage"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:43
+msgid "Total Kilometers per Month"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:49
+msgid "Total Distance"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:72
+msgid "Usage over Time"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:77
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:82
+msgid "Cumulative distance / km"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:95
+msgid "Yearly distance"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/equipment_blueprint.py:121
+msgid "Kinds"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:704
+#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:62
+msgid "Tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:706
+msgid "Number of tiles"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:716
+msgid "Cluster"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:720
+msgid "Maximum cluster size"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:731
+msgid "Square"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/explorer_blueprint.py:735
+msgid "Maximum square size"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:127
+msgid "Track Index"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:128
+msgid "Segment Index"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:132
+msgid "Distance / m"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:179
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:192
+msgid "Duration / s"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:181
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:191
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:193
+#: geo_activity_playground/webui/templates/segments/show.html.j2:62
+msgid "Direction"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:199
+msgid "Duration Histogram"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/segments_blueprint.py:200
+msgid "Duration by Direction"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:31
+#, python-format
+msgid "%(display_name)s per Year"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:74
+#, python-format
+msgid "Cumulative %(display_name)s per Year"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:78
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:82
+#: geo_activity_playground/webui/templates/calendar/month.html.j2:16
+msgid "Week"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:100
+#, python-format
+msgid "%(display_name)s per Week"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:132
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:155
+msgid "ISO Year and Week"
+msgstr ""
+
+#: geo_activity_playground/webui/blueprints/summary_blueprint.py:147
+msgid "ISO Weekday"
+msgstr ""
 
 #: geo_activity_playground/webui/templates/home.html.j2:10
 msgid "Last 30 days"
@@ -93,21 +652,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:86
 msgid "Elevation Eddington Number"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:43
-#: geo_activity_playground/webui/templates/activity/edit.html.j2:24
-#: geo_activity_playground/webui/templates/activity/name.html.j2:62
-#: geo_activity_playground/webui/templates/activity/show.html.j2:19
-#: geo_activity_playground/webui/templates/activity/show.html.j2:356
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:6
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:15
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:39
-#: geo_activity_playground/webui/templates/page.html.j2:88
-#: geo_activity_playground/webui/templates/search/index.html.j2:19
-#: geo_activity_playground/webui/templates/search_form.html.j2:82
-#: geo_activity_playground/webui/templates/segments/show.html.j2:65
-msgid "Equipment"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/page.html.j2:89
@@ -255,18 +799,6 @@ msgstr ""
 msgid "Distance maximum"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/activity/day.html.j2:44
-#: geo_activity_playground/webui/templates/activity/edit.html.j2:14
-#: geo_activity_playground/webui/templates/activity/name.html.j2:63
-#: geo_activity_playground/webui/templates/activity/show.html.j2:14
-#: geo_activity_playground/webui/templates/activity/show.html.j2:357
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:40
-#: geo_activity_playground/webui/templates/search/index.html.j2:20
-#: geo_activity_playground/webui/templates/search_form.html.j2:66
-#: geo_activity_playground/webui/templates/segments/show.html.j2:66
-msgid "Kind"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:36
 #: geo_activity_playground/webui/templates/activity/show.html.j2:24
 #: geo_activity_playground/webui/templates/search_form.html.j2:98
@@ -287,41 +819,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/search_form.html.j2:130
 msgid "Last queries"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:39
-#: geo_activity_playground/webui/templates/activity/name.html.j2:58
-#: geo_activity_playground/webui/templates/activity/show.html.j2:353
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:35
-#: geo_activity_playground/webui/templates/search/index.html.j2:15
-#: geo_activity_playground/webui/templates/segments/show.html.j2:60
-msgid "Date"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:40
-#: geo_activity_playground/webui/templates/activity/name.html.j2:59
-#: geo_activity_playground/webui/templates/activity/show.html.j2:354
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:28
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:99
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:16
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:36
-#: geo_activity_playground/webui/templates/segments/show.html.j2:63
-msgid "Distance / km"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:41
-#: geo_activity_playground/webui/templates/activity/name.html.j2:60
-#: geo_activity_playground/webui/templates/activity/show.html.j2:355
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:37
-#: geo_activity_playground/webui/templates/search/index.html.j2:17
-msgid "Elapsed time"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/day.html.j2:42
-#: geo_activity_playground/webui/templates/activity/name.html.j2:61
-#: geo_activity_playground/webui/templates/explorer/activities_through_tile.html.j2:38
-#: geo_activity_playground/webui/templates/search/index.html.j2:18
-msgid "Speed / km/h"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/activity/day.html.j2:63
@@ -355,11 +852,6 @@ msgstr ""
 msgid "All Activity Lines"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/activity/show.html.j2:32
-#: geo_activity_playground/webui/templates/search/index.html.j2:16
-msgid "Distance"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/activity/show.html.j2:36
 #: geo_activity_playground/webui/templates/segments/show.html.j2:64
 msgid "Duration"
@@ -391,10 +883,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:59
 msgid "Calories"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:64
-msgid "Steps"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:69
@@ -472,14 +960,6 @@ msgstr ""
 msgid "Distance & speed"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/activity/show.html.j2:234
-msgid "Elevation"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:251
-msgid "Heart rate"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/activity/show.html.j2:261
 msgid ""
 "Your activity has heart data, but this program doesn't know your maximum "
@@ -489,10 +969,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:262
 msgid "settings"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/activity/show.html.j2:269
-msgid "Cadence"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:283
@@ -577,16 +1053,6 @@ msgstr ""
 msgid "Bubble Chart: Elevation Gain"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/calendar/index.html.j2:16
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:72
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:94
-msgid "Year"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/calendar/month.html.j2:16
-msgid "Week"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/calendar/month.html.j2:17
 msgid "Monday"
 msgstr ""
@@ -655,13 +1121,6 @@ msgstr ""
 msgid "How many more days do you need to increment your Eddington number?"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:29
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:100
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:51
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:122
-msgid "Count"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:48
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:70
 msgid "Plot"
@@ -693,11 +1152,6 @@ msgstr ""
 msgid ""
 "If we only consider the activities within one calendar year for the "
 "Eddington number, we get the following:"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/eddington/distance.html.j2:73
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:95
-msgid "Eddington number"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:88
@@ -742,11 +1196,6 @@ msgid ""
 "number."
 msgstr ""
 
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:50
-#: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:121
-msgid "Elevation Gain"
-msgstr ""
-
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:72
 msgid ""
 "In a graphical representation, the Eddington number is the elevation gain"
@@ -759,10 +1208,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/equipment/index.html.j2:18
 msgid "Last use"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/equipment/index.html.j2:37
-msgid "Monthly Equipment Usage"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/equipment/index.html.j2:44
@@ -867,10 +1312,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:56
 msgid "Bookmarked cluster sizes"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/explorer/server-side.html.j2:62
-msgid "Tiles"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:63
@@ -1008,11 +1449,6 @@ msgid "GeoJSON Segment File"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
-#: geo_activity_playground/webui/templates/segments/show.html.j2:4
-msgid "Segment"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/segments/match-info.html.j2:4
 msgid "and"
 msgstr ""
 
@@ -1022,14 +1458,6 @@ msgstr ""
 
 #: geo_activity_playground/webui/templates/segments/show.html.j2:54
 msgid "Matched activities"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/segments/show.html.j2:61
-msgid "Activity"
-msgstr ""
-
-#: geo_activity_playground/webui/templates/segments/show.html.j2:62
-msgid "Direction"
 msgstr ""
 
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:4
