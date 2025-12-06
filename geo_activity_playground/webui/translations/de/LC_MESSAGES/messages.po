@@ -138,7 +138,7 @@ msgstr "Quadrat-Planer (Zoom 17)"
 #: geo_activity_playground/webui/templates/heatmap/index.html.j2:4
 #: geo_activity_playground/webui/templates/page.html.j2:114
 msgid "Heatmap"
-msgstr "Heatmap"
+msgstr "Intensitätskarte"
 
 #: geo_activity_playground/webui/templates/page.html.j2:120
 #: geo_activity_playground/webui/templates/photo/map.html.j2:4
@@ -948,7 +948,7 @@ msgstr "Für die Explorer-Kacheln kannst du diese verwenden:"
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:138
 msgid "And for the heatmap, you can use this:"
-msgstr "Und für die Heatmap kannst du dies verwenden:"
+msgstr "Und für die Intensitätskarte kannst du dies verwenden:"
 
 #: geo_activity_playground/webui/templates/export/index.html.j2:5
 msgid "Export metadata and activities"
@@ -989,7 +989,7 @@ msgstr "Exportieren"
 
 #: geo_activity_playground/webui/templates/heatmap/index.html.j2:13
 msgid "Download heatmap in visible area"
-msgstr "Heatmap im sichtbaren Bereich herunterladen"
+msgstr "Intensitätskarte im sichtbaren Bereich herunterladen"
 
 #: geo_activity_playground/webui/templates/photo/new.html.j2:4
 msgid "Upload Photo"
