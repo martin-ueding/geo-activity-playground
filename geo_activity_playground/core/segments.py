@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+
 import geojson
 import numpy as np
 import sqlalchemy
