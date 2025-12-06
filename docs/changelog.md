@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix typing import. ([GH-384](https://github.com/martin-ueding/geo-activity-playground/issues/384))
+
 ## Version 1.18.0 — 2025-12-05
 
 Added:
