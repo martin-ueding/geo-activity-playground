@@ -91,7 +91,8 @@
 
         <p>{{ _('Download missing tiles as') }} <a
                 href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.geojson">GeoJSON</a>
-            {{ _('or') }} <a href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
+            {{ _('or') }} <a
+                href="/square-planner/{{ zoom }}/{{ square_x }}/{{ square_y }}/{{ square_size }}/missing.gpx">GPX</a>.
         </p>
     </div>
 
@@ -105,10 +106,11 @@
                 zoom: {{ zoom }},
                 attribution: '{{ map_tile_attribution|safe }}',
                 bbox: {{ square_geojson | safe }},
+                overlay: "Square Planner",
                 squarePlanner: {
-                    x: {{ square_x }},
-                    y: {{ square_y }},
-                    size: {{ square_size }}
+                x: {{ square_x }},
+                y: {{ square_y }},
+                size: {{ square_size }}
                 }
             });
         </script>
@@ -120,7 +122,8 @@
     action="{{ url_for('.save_bookmark', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">
     <div class="col-12">
         <label class="visually-hidden" for="inlineFormInputGroupUsername">{{ _('Name') }}</label>
-        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="{{ _('Name') }}" name="name">
+        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="{{ _('Name') }}"
+            name="name">
     </div>
 
     <div class="col-12">
@@ -152,9 +155,11 @@
             <td>{{ bookmark.size }}</td>
             <td>
                 <a class="btn btn-small btn-primary"
-                    href="{{ url_for('.index', zoom=bookmark.zoom, x=bookmark.x, y=bookmark.y, size=bookmark.size) }}">{{ _('Open') }}</a>
+                    href="{{ url_for('.index', zoom=bookmark.zoom, x=bookmark.x, y=bookmark.y, size=bookmark.size) }}">{{
+                    _('Open') }}</a>
                 <a class="btn btn-small btn-danger" href="{{ url_for('.delete_bookmark', id=bookmark.id) }}"
-                    onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
+                    onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{
+                    _('Delete') }}</a>
             </td>
         </tr>
         {% endfor %}
