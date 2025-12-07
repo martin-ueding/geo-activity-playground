@@ -15,6 +15,12 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix default overlay map for square planner.
+
 ## Version 1.19.0 — 2025-12-06
 
 Added:
