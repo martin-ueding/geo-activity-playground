@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-06 21:23+0100\n"
+"POT-Creation-Date: 2025-12-13 08:59+0100\n"
 "PO-Revision-Date: 2025-12-06 21:30+0100\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -179,6 +179,7 @@ msgstr "Endlängengrad / °"
 #: geo_activity_playground/webui/templates/search/index.html.j2:19
 #: geo_activity_playground/webui/templates/search_form.html.j2:82
 #: geo_activity_playground/webui/templates/segments/show.html.j2:65
+#: geo_activity_playground/webui/templates/settings/base.html.j2:37
 msgid "Equipment"
 msgstr "Ausrüstung"
 
@@ -346,6 +347,7 @@ msgid "Elevation / m"
 msgstr "Höhe / m"
 
 #: geo_activity_playground/webui/blueprints/activity_blueprint.py:541
+#: geo_activity_playground/webui/templates/settings/base.html.j2:31
 msgid "Heart Rate"
 msgstr "Herzfrequenz"
 
@@ -706,11 +708,12 @@ msgid "Scan New Activities"
 msgstr "Neue Aktivitäten einlesen"
 
 #: geo_activity_playground/webui/templates/page.html.j2:141
+#: geo_activity_playground/webui/templates/settings/base.html.j2:25
 msgid "Plot Builder"
 msgstr "Diagramm-Editor"
 
 #: geo_activity_playground/webui/templates/page.html.j2:143
-#: geo_activity_playground/webui/templates/settings/base.html.j2:69
+#: geo_activity_playground/webui/templates/settings/base.html.j2:70
 #: geo_activity_playground/webui/templates/settings/index.html.j2:8
 msgid "Settings"
 msgstr "Einstellungen"
@@ -775,9 +778,9 @@ msgstr "Aktivitätsfilter"
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:61
 #: geo_activity_playground/webui/templates/search/index.html.j2:14
 #: geo_activity_playground/webui/templates/search_form.html.j2:29
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:122
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:123
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:137
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:124
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:125
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:140
 msgid "Name"
 msgstr "Name"
 
@@ -804,6 +807,7 @@ msgstr "Maximaldistanz"
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:36
 #: geo_activity_playground/webui/templates/activity/show.html.j2:24
 #: geo_activity_playground/webui/templates/search_form.html.j2:98
+#: geo_activity_playground/webui/templates/settings/base.html.j2:39
 msgid "Tags"
 msgstr "Tags"
 
@@ -845,6 +849,7 @@ msgstr "Keine"
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:50
 #: geo_activity_playground/webui/templates/activity/trim.html.j2:32
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:18
+#: geo_activity_playground/webui/templates/settings/language.html.j2:28
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:21
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:25
 msgid "Save"
@@ -925,14 +930,14 @@ msgstr "Zuschneiden"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:96
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:161
 msgid "Are you sure to delete this?"
 msgstr "Möchtest du das wirklich löschen?"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:96
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
 #: geo_activity_playground/webui/templates/segments/index.html.j2:45
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:162
 msgid "Delete"
 msgstr "Löschen"
 
@@ -997,7 +1002,7 @@ msgstr ""
 "folgenden Karten zeigen die neuen Kacheln auf den jeweiligen Zoomstufen."
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:292
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:138
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:141
 msgid "Zoom"
 msgstr "Zoom"
 
@@ -1499,6 +1504,7 @@ msgstr "Erkannte Aktivitäten"
 
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:4
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:8
+#: geo_activity_playground/webui/templates/settings/base.html.j2:47
 msgid "Admin Password"
 msgstr "Admin-Passwort"
 
@@ -1510,7 +1516,79 @@ msgstr ""
 "Um die Einstellungen und die Upload-Funktion zu schützen, kannst du ein "
 "Passwort festlegen."
 
-#: geo_activity_playground/webui/templates/settings/base.html.j2:82
+#: geo_activity_playground/webui/templates/settings/base.html.j2:6
+#: geo_activity_playground/webui/templates/settings/index.html.j2:17
+msgid "Data Sources"
+msgstr "Datenquellen"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:8
+msgid "Strava API"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:9
+msgid "Metadata Extraction"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:13
+#: geo_activity_playground/webui/templates/settings/index.html.j2:23
+msgid "Display"
+msgstr "Anzeige"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:15
+msgid "Color Schemes"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:16
+msgid "Color Strategy"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:17
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
+msgid "Map Tile Source"
+msgstr "Kartenkachelquelle"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:18
+#: geo_activity_playground/webui/templates/settings/language.html.j2:4
+msgid "Language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:22
+msgid "Analysis"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:24
+msgid "Track Segmentation"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:29
+#: geo_activity_playground/webui/templates/settings/index.html.j2:29
+msgid "Personal"
+msgstr "Persönlich"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:35
+#: geo_activity_playground/webui/templates/settings/index.html.j2:35
+msgid "Management"
+msgstr "Verwaltung"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:38
+msgid "Activity Kinds"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:43
+msgid "Privacy & Security"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:45
+msgid "Privacy Zones"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:46
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
+msgid "Share Picture"
+msgstr "Teilbild"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:83
 msgid "Settings Menu"
 msgstr "Einstellungsmenü"
 
@@ -1533,10 +1611,6 @@ msgstr ""
 "zuzugreifen. Hier ist ein kurzer Überblick über das, was du anpassen "
 "kannst:"
 
-#: geo_activity_playground/webui/templates/settings/index.html.j2:17
-msgid "Data Sources"
-msgstr "Datenquellen"
-
 #: geo_activity_playground/webui/templates/settings/index.html.j2:18
 msgid ""
 "Connect to Strava API or configure how metadata is extracted from your "
@@ -1545,25 +1619,13 @@ msgstr ""
 "Verbinde dich mit der Strava-API oder konfiguriere, wie Metadaten aus "
 "deinen Aktivitätsdateien extrahiert werden."
 
-#: geo_activity_playground/webui/templates/settings/index.html.j2:23
-msgid "Display"
-msgstr "Anzeige"
-
 #: geo_activity_playground/webui/templates/settings/index.html.j2:24
 msgid "Customize color schemes, map tile sources, and share picture settings."
 msgstr "Passe Farbschemata, Kartenkachelquellen und Teilbild-Einstellungen an."
 
-#: geo_activity_playground/webui/templates/settings/index.html.j2:29
-msgid "Personal"
-msgstr "Persönlich"
-
 #: geo_activity_playground/webui/templates/settings/index.html.j2:30
 msgid "Set up heart rate zones based on your personal data."
 msgstr "Richte Herzfrequenzzonen basierend auf deinen persönlichen Daten ein."
-
-#: geo_activity_playground/webui/templates/settings/index.html.j2:35
-msgid "Management"
-msgstr "Verwaltung"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:36
 msgid "Manage your equipment, activity kinds, and tags."
@@ -1585,18 +1647,45 @@ msgstr "Erweitert"
 msgid "Admin password and custom plot builder."
 msgstr "Admin-Passwort und benutzerdefinierter Diagramm-Editor."
 
-#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
-#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
-msgid "Share Picture"
-msgstr "Teilbild"
+#: geo_activity_playground/webui/templates/settings/language.html.j2:8
+msgid "Language Preference"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:10
+msgid ""
+"Choose your preferred language for the user interface. This setting will "
+"override your browser's language preference."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:14
+msgid "Preferred Language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:15
+msgid "Select language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:16
+msgid "Auto (use browser language)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:24
+msgid "Leave as \"Auto\" to automatically detect from your browser settings."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:32
+msgid "Note"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:33
+msgid ""
+"Your language preference is saved in the config.json file and will be "
+"used for all browsers accessing this application."
+msgstr ""
 
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:10
 msgid "What data fields shall be displayed on the share picture?"
 msgstr "Welche Datenfelder sollen auf dem Teilbild angezeigt werden?"
-
-#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
-msgid "Map Tile Source"
-msgstr "Kartenkachelquelle"
 
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:8
 msgid "Tile Source"
@@ -1642,23 +1731,23 @@ msgstr "Dies ist eine Kachel mit deiner aktuellen Kachelquelle:"
 msgid "Download missing tiles as"
 msgstr "Fehlende Kacheln herunterladen als"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:127
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:130
 msgid "Create bookmark"
 msgstr "Lesezeichen erstellen"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:133
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:136
 msgid "Bookmarks"
 msgstr "Lesezeichen"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:141
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:144
 msgid "Size"
 msgstr "Größe"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:142
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:145
 msgid "Actions"
 msgstr "Aktionen"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:155
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:159
 msgid "Open"
 msgstr "Öffnen"
 
