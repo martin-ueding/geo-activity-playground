@@ -12,6 +12,11 @@ Recording:
 
 - [OpenTracks App](https://opentracksapp.com/): Records activities on Android, available via F-Droid store.
 
+Tile hunting:
+
+- [Explorer Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv): Android app for tile hunting.
+- [Wandrio](https://wandrio.net/): Android and iOS app for tile hunting.
+
 Non-cloud analysis:
 
 - [Running Free by Michael Simons](https://biking.michael-simons.eu/)
