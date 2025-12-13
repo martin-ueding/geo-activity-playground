@@ -28,6 +28,7 @@ from ..authenticator import Authenticator
 from ..authenticator import needs_authentication
 from ..flasher import Flasher
 from ..flasher import FlashTypes
+from ..i18n import SUPPORTED_LANGUAGES
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
     "lightgreyred",
@@ -97,6 +98,34 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def index():
         return render_template("settings/index.html.j2")
+
+    @blueprint.route("/language", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def language():
+        if request.method == "POST":
+            lang = request.form.get("language", "")
+            if lang:
+                config_accessor().preferred_language = lang
+                flasher.flash_message(
+                    "Language preference updated.", FlashTypes.SUCCESS
+                )
+            else:
+                # Empty string means "Auto"
+                config_accessor().preferred_language = None
+                flasher.flash_message(
+                    "Language preference cleared. Using browser language.",
+                    FlashTypes.SUCCESS,
+                )
+            config_accessor.save()
+            # Redirect to refresh the page with new language
+            return redirect(url_for("settings.language"))
+        
+        current_language = config_accessor().preferred_language or ""
+        return render_template(
+            "settings/language.html.j2",
+            available_languages=SUPPORTED_LANGUAGES,
+            current_language=current_language,
+        )
 
     @blueprint.route("/admin-password", methods=["GET", "POST"])
     @needs_authentication(authenticator)
