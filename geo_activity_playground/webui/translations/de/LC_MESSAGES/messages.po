@@ -1523,11 +1523,11 @@ msgstr "Datenquellen"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:8
 msgid "Strava API"
-msgstr ""
+msgstr "Strava API"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:9
 msgid "Metadata Extraction"
-msgstr ""
+msgstr "Metadatenextraktion"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:13
 #: geo_activity_playground/webui/templates/settings/index.html.j2:23
@@ -1536,11 +1536,11 @@ msgstr "Anzeige"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:15
 msgid "Color Schemes"
-msgstr ""
+msgstr "Farbschemata"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:16
 msgid "Color Strategy"
-msgstr ""
+msgstr "Farbstrategie"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:17
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
@@ -1550,15 +1550,15 @@ msgstr "Kartenkachelquelle"
 #: geo_activity_playground/webui/templates/settings/base.html.j2:18
 #: geo_activity_playground/webui/templates/settings/language.html.j2:4
 msgid "Language"
-msgstr ""
+msgstr "Sprache"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:22
 msgid "Analysis"
-msgstr ""
+msgstr "Analyse"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:24
 msgid "Track Segmentation"
-msgstr ""
+msgstr "Streckensegmentierung"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:29
 #: geo_activity_playground/webui/templates/settings/index.html.j2:29
@@ -1572,15 +1572,15 @@ msgstr "Verwaltung"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:38
 msgid "Activity Kinds"
-msgstr ""
+msgstr "Aktivitätsarten"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:43
 msgid "Privacy & Security"
-msgstr ""
+msgstr "Datenschutz & Sicherheit"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:45
 msgid "Privacy Zones"
-msgstr ""
+msgstr "Privatsphärezonen"
 
 #: geo_activity_playground/webui/templates/settings/base.html.j2:46
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
@@ -1649,39 +1649,43 @@ msgstr "Admin-Passwort und benutzerdefinierter Diagramm-Editor."
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:8
 msgid "Language Preference"
-msgstr ""
+msgstr "Spracheinstellung"
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:10
 msgid ""
 "Choose your preferred language for the user interface. This setting will "
 "override your browser's language preference."
 msgstr ""
+"Wähle deine bevorzugte Sprache für die Benutzeroberfläche. Diese Einstellung "
+"überschreibt die Spracheinstellung deines Browsers."
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:14
 msgid "Preferred Language"
-msgstr ""
+msgstr "Bevorzugte Sprache"
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:15
 msgid "Select language"
-msgstr ""
+msgstr "Sprache auswählen"
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:16
 msgid "Auto (use browser language)"
-msgstr ""
+msgstr "Automatisch (Browser-Sprache verwenden)"
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:24
 msgid "Leave as \"Auto\" to automatically detect from your browser settings."
-msgstr ""
+msgstr "Auf \"Automatisch\" belassen, um automatisch aus den Browser-Einstellungen zu erkennen."
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:32
 msgid "Note"
-msgstr ""
+msgstr "Hinweis"
 
 #: geo_activity_playground/webui/templates/settings/language.html.j2:33
 msgid ""
 "Your language preference is saved in the config.json file and will be "
 "used for all browsers accessing this application."
 msgstr ""
+"Deine Spracheinstellung wird in der config.json-Datei gespeichert und wird "
+"für alle Browser verwendet, die auf diese Anwendung zugreifen."
 
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:10
 msgid "What data fields shall be displayed on the share picture?"
