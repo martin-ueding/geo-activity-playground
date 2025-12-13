@@ -17,6 +17,12 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Dutch localization. ([GH-383](https://github.com/martin-ueding/geo-activity-playground/discussions/383))
+- Language settings where you can override your browser preference. ([GH-386](https://github.com/martin-ueding/geo-activity-playground/issues/386))
+- Mention tile hunting apps in documentation.
+
 Fixed:
 
 - Fix default overlay map for square planner.
