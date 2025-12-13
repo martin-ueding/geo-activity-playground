@@ -40,6 +40,7 @@ class Config:
     kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
     metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
     num_processes: Optional[int] = 1
+    preferred_language: Optional[str] = None
     privacy_zones: dict[str, list[list[float]]] = dataclasses.field(
         default_factory=dict
     )

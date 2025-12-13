@@ -42,6 +42,9 @@ from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .authenticator import Authenticator
+from .i18n import DEFAULT_LANGUAGE
+from .i18n import SUPPORTED_LANGUAGE_CODES
+from .i18n import SUPPORTED_LANGUAGES
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
@@ -126,8 +129,8 @@ def create_app(
     app.secret_key = secret_key or get_secret_key()
 
     # Configure Babel for internationalization
-    app.config["BABEL_DEFAULT_LOCALE"] = "en"
-    app.config["BABEL_SUPPORTED_LOCALES"] = ["en", "de"]
+    app.config["BABEL_DEFAULT_LOCALE"] = DEFAULT_LANGUAGE
+    app.config["BABEL_SUPPORTED_LOCALES"] = SUPPORTED_LANGUAGE_CODES
     app.config["BABEL_TRANSLATION_DIRECTORIES"] = "translations"
 
     def get_locale():
@@ -136,6 +139,12 @@ def create_app(
             lang = request.args.get("lang")
             if lang in app.config["BABEL_SUPPORTED_LOCALES"]:
                 return lang
+        
+        # Check config file for user preference
+        if config.preferred_language:
+            if config.preferred_language in app.config["BABEL_SUPPORTED_LOCALES"]:
+                return config.preferred_language
+        
         # Fall back to browser's preferred language
         return request.accept_languages.best_match(
             app.config["BABEL_SUPPORTED_LOCALES"]

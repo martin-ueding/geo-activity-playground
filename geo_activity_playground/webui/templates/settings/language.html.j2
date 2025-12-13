@@ -1,0 +1,36 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Language') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Language Preference') }}</h1>
+
+<p>{{ _('Choose your preferred language for the user interface. This setting will override your browser\'s language preference.') }}</p>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="language" class="form-label">{{ _('Preferred Language') }}</label>
+        <select class="form-select" id="language" name="language" aria-label="{{ _('Select language') }}">
+            <option value="">{{ _('Auto (use browser language)') }}</option>
+            {% for lang in available_languages %}
+            <option value="{{ lang.code }}" {% if lang.code == current_language %}selected{% endif %}>
+                {{ lang.native_name }} ({{ lang.name }})
+            </option>
+            {% endfor %}
+        </select>
+        <div class="form-text">
+            {{ _('Leave as "Auto" to automatically detect from your browser settings.') }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+</form>
+
+<div class="alert alert-info mt-4">
+    <h6 class="alert-heading">{{ _('Note') }}</h6>
+    <p class="mb-0">{{ _('Your language preference is saved in the config.json file and will be used for all browsers accessing this application.') }}</p>
+</div>
+{% endblock %}
+
