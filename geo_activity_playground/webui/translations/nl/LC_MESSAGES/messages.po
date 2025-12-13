@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-06 21:23+0100\n"
+"POT-Creation-Date: 2025-12-13 08:59+0100\n"
 "PO-Revision-Date: 2025-12-13 08:39+0100\n"
 "Last-Translator: \n"
 "Language: nl\n"
@@ -179,6 +179,7 @@ msgstr "Eindlengtegraad / °"
 #: geo_activity_playground/webui/templates/search/index.html.j2:19
 #: geo_activity_playground/webui/templates/search_form.html.j2:82
 #: geo_activity_playground/webui/templates/segments/show.html.j2:65
+#: geo_activity_playground/webui/templates/settings/base.html.j2:37
 msgid "Equipment"
 msgstr "Uitrusting"
 
@@ -346,6 +347,7 @@ msgid "Elevation / m"
 msgstr "Hoogte / m"
 
 #: geo_activity_playground/webui/blueprints/activity_blueprint.py:541
+#: geo_activity_playground/webui/templates/settings/base.html.j2:31
 msgid "Heart Rate"
 msgstr "Hartslag"
 
@@ -706,11 +708,12 @@ msgid "Scan New Activities"
 msgstr "Scan nieuwe activiteiten"
 
 #: geo_activity_playground/webui/templates/page.html.j2:141
+#: geo_activity_playground/webui/templates/settings/base.html.j2:25
 msgid "Plot Builder"
 msgstr "Grafiekbouwer"
 
 #: geo_activity_playground/webui/templates/page.html.j2:143
-#: geo_activity_playground/webui/templates/settings/base.html.j2:69
+#: geo_activity_playground/webui/templates/settings/base.html.j2:70
 #: geo_activity_playground/webui/templates/settings/index.html.j2:8
 msgid "Settings"
 msgstr "Instellingen"
@@ -729,7 +732,8 @@ msgid ""
 "Are you sure you want to shut down the server? This will terminate the "
 "application."
 msgstr ""
-"Weet je zeker dat je de server wilt afsluiten? Dit beëindigt de applicatie."
+"Weet je zeker dat je de server wilt afsluiten? Dit beëindigt de "
+"applicatie."
 
 #: geo_activity_playground/webui/templates/page.html.j2:154
 msgid "Shutdown Server"
@@ -774,9 +778,9 @@ msgstr "Activiteitenfilter"
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:61
 #: geo_activity_playground/webui/templates/search/index.html.j2:14
 #: geo_activity_playground/webui/templates/search_form.html.j2:29
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:122
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:123
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:137
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:124
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:125
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:140
 msgid "Name"
 msgstr "Naam"
 
@@ -803,6 +807,7 @@ msgstr "Maximale afstand"
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:36
 #: geo_activity_playground/webui/templates/activity/show.html.j2:24
 #: geo_activity_playground/webui/templates/search_form.html.j2:98
+#: geo_activity_playground/webui/templates/settings/base.html.j2:39
 msgid "Tags"
 msgstr "Tags"
 
@@ -844,6 +849,7 @@ msgstr "Geen"
 #: geo_activity_playground/webui/templates/activity/edit.html.j2:50
 #: geo_activity_playground/webui/templates/activity/trim.html.j2:32
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:18
+#: geo_activity_playground/webui/templates/settings/language.html.j2:28
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:21
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:25
 msgid "Save"
@@ -924,14 +930,14 @@ msgstr "Inkorten"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:96
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:161
 msgid "Are you sure to delete this?"
 msgstr "Weet je zeker dat je dit wilt verwijderen?"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:96
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:80
 #: geo_activity_playground/webui/templates/segments/index.html.j2:45
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:157
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:162
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -967,8 +973,8 @@ msgid ""
 "heart rate (or birth year) and therefore cannot compute the heart rate "
 "zones. Go to the"
 msgstr ""
-"Je activiteit bevat hartslaggegevens, maar dit programma kent je maximale "
-"hartslag (of geboortejaar) niet en kan daarom de hartslagzones niet "
+"Je activiteit bevat hartslaggegevens, maar dit programma kent je maximale"
+" hartslag (of geboortejaar) niet en kan daarom de hartslagzones niet "
 "berekenen. Ga naar de"
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:262
@@ -996,7 +1002,7 @@ msgstr ""
 "kaarten tonen de nieuwe tegels op de respectievelijke zoomniveaus."
 
 #: geo_activity_playground/webui/templates/activity/show.html.j2:292
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:138
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:141
 msgid "Zoom"
 msgstr "Zoom"
 
@@ -1036,8 +1042,7 @@ msgstr "Authenticatie"
 msgid ""
 "You are either logged in or don't have a password set. You can do "
 "everything."
-msgstr ""
-"Je bent ingelogd of hebt geen wachtwoord ingesteld. Je kunt alles doen."
+msgstr "Je bent ingelogd of hebt geen wachtwoord ingesteld. Je kunt alles doen."
 
 #: geo_activity_playground/webui/templates/auth/index.html.j2:9
 msgid "Log Out"
@@ -1168,8 +1173,8 @@ msgid ""
 "If we only consider the activities within one calendar year for the "
 "Eddington number, we get the following:"
 msgstr ""
-"Als we alleen de activiteiten binnen één kalenderjaar beschouwen voor het "
-"Eddington-getal, krijgen we het volgende:"
+"Als we alleen de activiteiten binnen één kalenderjaar beschouwen voor het"
+" Eddington-getal, krijgen we het volgende:"
 
 #: geo_activity_playground/webui/templates/eddington/distance.html.j2:88
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:110
@@ -1202,8 +1207,8 @@ msgid ""
 "separate days you have recorded activities with an elevation gain of more"
 " than"
 msgstr ""
-"verschillende dagen heb je activiteiten geregistreerd met een hoogteverschil "
-"van meer dan"
+"verschillende dagen heb je activiteiten geregistreerd met een "
+"hoogteverschil van meer dan"
 
 #: geo_activity_playground/webui/templates/eddington/elevation_gain.html.j2:38
 msgid ""
@@ -1215,8 +1220,8 @@ msgid ""
 "number."
 msgstr ""
 "Hoog gaan is één ding, vaak gaan is iets anders. Maar vaak hoog gaan is "
-"moeilijk. Als je het Eddington-getal verhoogt, tellen alle dagen met minder "
-"hoogteverschil niet meer mee. Het wordt steeds moeilijker om het "
+"moeilijk. Als je het Eddington-getal verhoogt, tellen alle dagen met "
+"minder hoogteverschil niet meer mee. Het wordt steeds moeilijker om het "
 "Eddington-getal te verhogen omdat je niet alleen een hoger aantal moet "
 "bereiken, maar alle vlakkere activiteiten niet meetellen voor het hogere "
 "getal."
@@ -1283,9 +1288,9 @@ msgid ""
 "before. That is not a problem, we just don't generate all levels to save "
 "a bit of time. If you want to have it, just enable it!"
 msgstr ""
-"Je probeert toegang te krijgen tot verkennertegels voor een niveau dat nog "
-"niet is gegenereerd. Dat is geen probleem, we genereren niet alle niveaus "
-"om wat tijd te besparen. Als je het wilt, schakel het gewoon in!"
+"Je probeert toegang te krijgen tot verkennertegels voor een niveau dat "
+"nog niet is gegenereerd. Dat is geen probleem, we genereren niet alle "
+"niveaus om wat tijd te besparen. Als je het wilt, schakel het gewoon in!"
 
 #: geo_activity_playground/webui/templates/explorer/server-side.html.j2:10
 msgid "Enable Zoom"
@@ -1498,6 +1503,7 @@ msgstr "Overeenkomende activiteiten"
 
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:4
 #: geo_activity_playground/webui/templates/settings/admin-password.html.j2:8
+#: geo_activity_playground/webui/templates/settings/base.html.j2:47
 msgid "Admin Password"
 msgstr "Beheerderswachtwoord"
 
@@ -1509,7 +1515,79 @@ msgstr ""
 "Om de instellingen en uploadfunctionaliteit te beschermen, kun je een "
 "wachtwoord opgeven."
 
-#: geo_activity_playground/webui/templates/settings/base.html.j2:82
+#: geo_activity_playground/webui/templates/settings/base.html.j2:6
+#: geo_activity_playground/webui/templates/settings/index.html.j2:17
+msgid "Data Sources"
+msgstr "Gegevensbronnen"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:8
+msgid "Strava API"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:9
+msgid "Metadata Extraction"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:13
+#: geo_activity_playground/webui/templates/settings/index.html.j2:23
+msgid "Display"
+msgstr "Weergave"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:15
+msgid "Color Schemes"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:16
+msgid "Color Strategy"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:17
+#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
+msgid "Map Tile Source"
+msgstr "Kaartbron"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:18
+#: geo_activity_playground/webui/templates/settings/language.html.j2:4
+msgid "Language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:22
+msgid "Analysis"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:24
+msgid "Track Segmentation"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:29
+#: geo_activity_playground/webui/templates/settings/index.html.j2:29
+msgid "Personal"
+msgstr "Persoonlijk"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:35
+#: geo_activity_playground/webui/templates/settings/index.html.j2:35
+msgid "Management"
+msgstr "Beheer"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:38
+msgid "Activity Kinds"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:43
+msgid "Privacy & Security"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:45
+msgid "Privacy Zones"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:46
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
+#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
+msgid "Share Picture"
+msgstr "Deel afbeelding"
+
+#: geo_activity_playground/webui/templates/settings/base.html.j2:83
 msgid "Settings Menu"
 msgstr "Instellingenmenu"
 
@@ -1519,7 +1597,9 @@ msgstr "Overzicht"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:10
 msgid "Configure how your activities are gathered, analyzed, and visualized."
-msgstr "Configureer hoe je activiteiten worden verzameld, geanalyseerd en gevisualiseerd."
+msgstr ""
+"Configureer hoe je activiteiten worden verzameld, geanalyseerd en "
+"gevisualiseerd."
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:12
 msgid ""
@@ -1527,39 +1607,24 @@ msgid ""
 "Here's a quick overview of what you can customize:"
 msgstr ""
 "Gebruik het navigatiemenu om toegang te krijgen tot verschillende "
-"configuratiesecties. Hier is een snel overzicht van wat je kunt aanpassen:"
-
-#: geo_activity_playground/webui/templates/settings/index.html.j2:17
-msgid "Data Sources"
-msgstr "Gegevensbronnen"
+"configuratiesecties. Hier is een snel overzicht van wat je kunt "
+"aanpassen:"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:18
 msgid ""
 "Connect to Strava API or configure how metadata is extracted from your "
 "activity files."
 msgstr ""
-"Verbind met Strava API of configureer hoe metadata uit je activiteitsbestanden "
-"wordt geëxtraheerd."
-
-#: geo_activity_playground/webui/templates/settings/index.html.j2:23
-msgid "Display"
-msgstr "Weergave"
+"Verbind met Strava API of configureer hoe metadata uit je "
+"activiteitsbestanden wordt geëxtraheerd."
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:24
 msgid "Customize color schemes, map tile sources, and share picture settings."
 msgstr "Pas kleurenschema's, kaartbronnen en deelafbeelding instellingen aan."
 
-#: geo_activity_playground/webui/templates/settings/index.html.j2:29
-msgid "Personal"
-msgstr "Persoonlijk"
-
 #: geo_activity_playground/webui/templates/settings/index.html.j2:30
 msgid "Set up heart rate zones based on your personal data."
 msgstr "Stel hartslagzones in op basis van je persoonlijke gegevens."
-
-#: geo_activity_playground/webui/templates/settings/index.html.j2:35
-msgid "Management"
-msgstr "Beheer"
 
 #: geo_activity_playground/webui/templates/settings/index.html.j2:36
 msgid "Manage your equipment, activity kinds, and tags."
@@ -1581,18 +1646,45 @@ msgstr "Geavanceerd"
 msgid "Admin password and custom plot builder."
 msgstr "Beheerderswachtwoord en aangepaste grafiekbouwer."
 
-#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
-#: geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
-msgid "Share Picture"
-msgstr "Deel afbeelding"
+#: geo_activity_playground/webui/templates/settings/language.html.j2:8
+msgid "Language Preference"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:10
+msgid ""
+"Choose your preferred language for the user interface. This setting will "
+"override your browser's language preference."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:14
+msgid "Preferred Language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:15
+msgid "Select language"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:16
+msgid "Auto (use browser language)"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:24
+msgid "Leave as \"Auto\" to automatically detect from your browser settings."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:32
+msgid "Note"
+msgstr ""
+
+#: geo_activity_playground/webui/templates/settings/language.html.j2:33
+msgid ""
+"Your language preference is saved in the config.json file and will be "
+"used for all browsers accessing this application."
+msgstr ""
 
 #: geo_activity_playground/webui/templates/settings/sharepic.html.j2:10
 msgid "What data fields shall be displayed on the share picture?"
 msgstr "Welke gegevensvelden moeten worden weergegeven op de deelafbeelding?"
-
-#: geo_activity_playground/webui/templates/settings/tile-source.html.j2:4
-msgid "Map Tile Source"
-msgstr "Kaartbron"
 
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:8
 msgid "Tile Source"
@@ -1606,9 +1698,9 @@ msgid ""
 "enter. See"
 msgstr ""
 "Je kunt de tegelbron wijzigen naar wat je wilt. Wees je ervan bewust dat "
-"verschillende bronnen verschillende licentiebeperkingen hebben. Het is aan "
-"jou om ervoor te zorgen dat je de tegels mag gebruiken van de bron die je "
-"invoert. Zie"
+"verschillende bronnen verschillende licentiebeperkingen hebben. Het is "
+"aan jou om ervoor te zorgen dat je de tegels mag gebruiken van de bron "
+"die je invoert. Zie"
 
 #: geo_activity_playground/webui/templates/settings/tile-source.html.j2:11
 msgid "this list of raster tile providers"
@@ -1638,23 +1730,23 @@ msgstr "Dit is een tegel met je huidige tegelbron:"
 msgid "Download missing tiles as"
 msgstr "Download ontbrekende tegels als"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:127
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:130
 msgid "Create bookmark"
 msgstr "Bladwijzer maken"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:133
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:136
 msgid "Bookmarks"
 msgstr "Bladwijzers"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:141
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:144
 msgid "Size"
 msgstr "Grootte"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:142
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:145
 msgid "Actions"
 msgstr "Acties"
 
-#: geo_activity_playground/webui/templates/square_planner/index.html.j2:155
+#: geo_activity_playground/webui/templates/square_planner/index.html.j2:159
 msgid "Open"
 msgstr "Open"
 
@@ -1702,8 +1794,8 @@ msgid ""
 "grouped by day of the week such that you can easily spot patterns in your"
 " daily routine."
 msgstr ""
-"En ook meer gedetailleerd per dag voor het afgelopen rollende jaar. Dit is "
-"gegroepeerd per dag van de week zodat je gemakkelijk patronen in je "
+"En ook meer gedetailleerd per dag voor het afgelopen rollende jaar. Dit "
+"is gegroepeerd per dag van de week zodat je gemakkelijk patronen in je "
 "dagelijkse routine kunt ontdekken."
 
 #: geo_activity_playground/webui/templates/summary/index.html.j2:40
@@ -1730,23 +1822,25 @@ msgid ""
 "activity position."
 msgstr ""
 "Vóór versie 1.3.0 werden activiteitstijden geïnterpreteerd in de lokale "
-"tijdzone. Als je software in UTC opnam, werd aangenomen dat dit je lokale "
-"tijdzone was. Deze aanname was vaak fout. Met versie 1.3.0 is dit "
+"tijdzone. Als je software in UTC opnam, werd aangenomen dat dit je lokale"
+" tijdzone was. Deze aanname was vaak fout. Met versie 1.3.0 is dit "
 "opgelost. Activiteiten worden geïmporteerd met UTC of de opgegeven "
 "tijdzone. Ze worden dan gelokaliseerd naar de tijdzone van de "
 "activiteitspositie."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:9
 msgid "Use this tool to fix activities which were imported with an older version."
-msgstr "Gebruik deze tool om activiteiten te corrigeren die met een oudere versie zijn geïmporteerd."
+msgstr ""
+"Gebruik deze tool om activiteiten te corrigeren die met een oudere versie"
+" zijn geïmporteerd."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:11
 msgid ""
 "Your activities are shown in the local time zone of the activity but no "
 "time zone is shown."
 msgstr ""
-"Je activiteiten worden weergegeven in de lokale tijdzone van de activiteit, "
-"maar er wordt geen tijdzone getoond."
+"Je activiteiten worden weergegeven in de lokale tijdzone van de "
+"activiteit, maar er wordt geen tijdzone getoond."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:13
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:17
@@ -1778,11 +1872,11 @@ msgid ""
 "the activity (changing the name, equipment, adding tags, trimming the "
 "activity)."
 msgstr ""
-"Alles lijkt kapot. Je wilt al je activiteiten opnieuw laden. Wees je ervan "
-"bewust dat dit met Strava API lang kan duren vanwege de rate limiting. Wees "
-"je er ook van bewust dat dit alle wijzigingen verwijdert die je hebt gedaan "
-"na het importeren van de activiteit (naam wijzigen, uitrusting, tags "
-"toevoegen, activiteit inkorten)."
+"Alles lijkt kapot. Je wilt al je activiteiten opnieuw laden. Wees je "
+"ervan bewust dat dit met Strava API lang kan duren vanwege de rate "
+"limiting. Wees je er ook van bewust dat dit alle wijzigingen verwijdert "
+"die je hebt gedaan na het importeren van de activiteit (naam wijzigen, "
+"uitrusting, tags toevoegen, activiteit inkorten)."
 
 #: geo_activity_playground/webui/templates/time_zone_fixer/index.html.j2:21
 msgid "Throw all activities away and rescan"
@@ -1812,3 +1906,4 @@ msgid ""
 msgstr ""
 "Controleren op nieuwe activiteiten, importeren en toevoegen aan de "
 "database. Dit kan even duren …"
+
