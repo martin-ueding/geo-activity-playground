@@ -51,7 +51,7 @@ This scans all Python files and Jinja2 templates for `_()` calls and updates the
 After extracting new strings, update all existing language catalogs:
 
 ```bash
-poetry run pybabel update -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations
+poetry run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations
 ```
 
 This merges new strings into each language's `.po` file, marking them as untranslated (with empty `msgstr`).
@@ -113,7 +113,7 @@ You can test translations by:
 | Task | Command |
 |------|---------|
 | Extract strings | `poetry run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .` |
-| Update existing languages | `poetry run pybabel update -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations` |
+| Update existing languages | `poetry run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations` |
 | Add new language | `poetry run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l LANG` |
 | Compile translations | `poetry run pybabel compile -d geo_activity_playground/webui/translations` |
 
