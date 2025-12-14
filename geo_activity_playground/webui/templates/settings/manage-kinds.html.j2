@@ -10,6 +10,9 @@
 <p>Apart from bicycle rides and runs, you might also record your car and train rides. If you don't want to include these
     for achievements like explorer tiles, you can enter the activity kinds that should not be considered here.</p>
 
+<p>You can also map alternative names to canonical kinds. For example, if some service exports "Ride" but you want to use "Radfahrt", 
+    set "Ride" to be replaced by "Radfahrt". When activities are imported with "Ride", they will automatically use "Radfahrt" instead.</p>
+
 <form method="POST">
     <div class="row g-3 mb-1">
         <div class="col">
@@ -18,17 +21,31 @@
         <div class="col">
             <label class="form-label">Consider for Achievements</label>
         </div>
+        <div class="col">
+            <label class="form-label">Replaced By (Alternative Name)</label>
+        </div>
     </div>
     {% for kind in kinds %}
     <div class="row g-3 mb-1">
         <input type="hidden" name="id" value="{{ kind.id }}" />
         <div class="col">
-
             <input type="text" class="form-control" name="name" value="{{ kind.name }}" />
         </div>
         <div class="col">
             <input type="checkbox" class="form-check-input" name="consider_for_achievements" value="{{ kind.id }}" {% if
                 kind.consider_for_achievements %} checked {% endif %} />
+        </div>
+        <div class="col">
+            <select class="form-select" name="replaced_by_id">
+                <option value="">— None (canonical kind) —</option>
+                {% for other_kind in kinds %}
+                    {% if other_kind.id != kind.id %}
+                        <option value="{{ other_kind.id }}" {% if kind.replaced_by_id == other_kind.id %}selected{% endif %}>
+                            {{ other_kind.name }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         </div>
     </div>
     {% endfor %}
@@ -41,6 +58,14 @@
         <div class="col">
             <input type="checkbox" class="form-check-input" id="consider_for_achievements_new"
                 name="consider_for_achievements" value="new" />
+        </div>
+        <div class="col">
+            <select class="form-select" name="replaced_by_id">
+                <option value="">— None (canonical kind) —</option>
+                {% for kind in kinds %}
+                    <option value="{{ kind.id }}">{{ kind.name }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
 
