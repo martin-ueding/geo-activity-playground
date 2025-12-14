@@ -24,6 +24,10 @@ class ActivityParseError(BaseException):
     pass
 
 
+class NoGeoDataError(ActivityParseError):
+    pass
+
+
 def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
     suffixes = [s.lower() for s in path.suffixes]
     activity = Activity()
@@ -42,7 +46,10 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
         try:
             timeseries = read_gpx_activity(path, opener)
         except gpxpy.gpx.GPXException as e:
-            raise ActivityParseError(f"Syntax error while parsing GPX file") from e
+            if str(e) == "latitude is mandatory in None (got None)":
+                raise NoGeoDataError() from e
+            else:
+                raise ActivityParseError(f"Syntax error while parsing GPX file") from e
         except UnicodeDecodeError as e:
             raise ActivityParseError(f"Encoding issue") from e
     elif file_type == ".fit":
