@@ -427,26 +427,12 @@ class Kind(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
 
-def canonicalize_kind(kind: Kind) -> Kind:
-    visited = set()
-    current = kind
-    while current.replaced_by is not None:
-        current = current.replaced_by
-        if current.id in visited:
-            logger.warning(
-                f"Cycle detected in kind replacement chain for kind {current.id} ({current.name}). "
-                "Breaking cycle."
-            )
-            return current
-        visited.add(current.id)
-    return current
-
-
 def get_or_make_kind(name: str) -> Kind:
     kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
         assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
-        return canonicalize_kind(kinds[0])
+        kind = kinds[0]
+        return kind.replaced_by or kind
     else:
         kind = Kind(
             name=name,
