@@ -1638,7 +1638,7 @@
 <p>This scans all Python files and Jinja2 templates for <code>_()</code> calls and updates the template file.</p>
 <h2 id="updating-existing-translations">Updating Existing Translations</h2>
 <p>After extracting new strings, update all existing language catalogs:</p>
-<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>pybabel<span class="w"> </span>update<span class="w"> </span>-i<span class="w"> </span>geo_activity_playground/webui/translations/messages.pot<span class="w"> </span>-d<span class="w"> </span>geo_activity_playground/webui/translations
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>pybabel<span class="w"> </span>update<span class="w"> </span>--no-fuzzy-matching<span class="w"> </span>-i<span class="w"> </span>geo_activity_playground/webui/translations/messages.pot<span class="w"> </span>-d<span class="w"> </span>geo_activity_playground/webui/translations
 </code></pre></div>
 <p>This merges new strings into each language's <code>.po</code> file, marking them as untranslated (with empty <code>msgstr</code>).</p>
 <h2 id="adding-a-new-language">Adding a New Language</h2>
@@ -1697,7 +1697,7 @@
 </tr>
 <tr>
 <td>Update existing languages</td>
-<td><code>poetry run pybabel update -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations</code></td>
+<td><code>poetry run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations</code></td>
 </tr>
 <tr>
 <td>Add new language</td>

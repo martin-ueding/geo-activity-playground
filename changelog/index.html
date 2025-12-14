@@ -1375,6 +1375,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1200-2025-12-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.20.0 — 2025-12-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1190-2025-12-06" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.19.0 — 2025-12-06
@@ -2525,6 +2534,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1200-2025-12-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1.20.0 — 2025-12-14
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1190-2025-12-06" class="md-nav__link">
     <span class="md-ellipsis">
       Version 1.19.0 — 2025-12-06
@@ -3671,6 +3689,20 @@ Types of changes
 ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
+<h2 id="version-1200-2025-12-14">Version 1.20.0 — 2025-12-14</h2>
+<p>Added:</p>
+<ul>
+<li>Add Dutch localization. (<a href="https://github.com/martin-ueding/geo-activity-playground/discussions/383">GH-383</a>)</li>
+<li>Add language settings where you can override your browser preference. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/386">GH-386</a>)</li>
+<li>Mention tile hunting apps in documentation.</li>
+<li>Allow activity kinds to be replaced by other ones. This is useful when you have a bunch of activities with an older name or the Strava API gives you activity names that you don't like. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/355">GH-355</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix default overlay map for square planner.</li>
+<li>Ignore comment lines from CSV file to suppress import errors from these <code>#error#</code> activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/380">GH-380</a>)</li>
+<li>Less error messages for GPX files that don't have latitude/longitude data in them. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/380">GH-380</a>)</li>
+</ul>
 <h2 id="version-1190-2025-12-06">Version 1.19.0 — 2025-12-06</h2>
 <p>Added:</p>
 <ul>
@@ -3691,6 +3723,7 @@ Types of changes
 <ul>
 <li>Multiple passes through a segment will now be separated. This works if the distance is at least 100 m in between the passes. This distance is adjustable via the config option <code>segment_split_distance</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/236">GH-236</a>)</li>
 <li>Fix name of “Bikerouter”. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/381">GH-381</a>)</li>
+<li>Fix a bad interaction between incremental explorer cluster and square computation and reordering of activities. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/382">GH-382</a>)</li>
 </ul>
 <h2 id="version-1170-2025-11-30">Version 1.17.0 — 2025-11-30</h2>
 <p>Added:</p>
