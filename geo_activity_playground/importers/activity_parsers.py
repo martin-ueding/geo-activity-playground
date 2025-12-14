@@ -292,6 +292,9 @@ def read_kml_activity(path: pathlib.Path, opener) -> pd.DataFrame:
         kml_dict = xmltodict.parse(f)
     doc = kml_dict["kml"]["Document"]
     rows = []
+    lat = None
+    lon = None
+    elevation = None
     for keypoint_folder in _list_or_scalar(doc["Folder"]):
         for placemark in _list_or_scalar(keypoint_folder["Placemark"]):
             for track in _list_or_scalar(placemark.get("gx:Track", [])):
