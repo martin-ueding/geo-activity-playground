@@ -19,6 +19,7 @@ from ..explorer.tile_visits import compute_tile_evolution
 from ..explorer.tile_visits import compute_tile_visits_new
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity_parsers import ActivityParseError
+from .activity_parsers import NoGeoDataError
 from .activity_parsers import read_activity
 
 logger = logging.getLogger(__name__)
@@ -100,6 +101,11 @@ def import_from_file(
     logger.info(f"Importing {path} …")
     try:
         activity, time_series = read_activity(path)
+    except NoGeoDataError as e:
+        logger.warning(
+            f"Activity with {path=} has no geospatial series data, skipping."
+        )
+        return
     except ActivityParseError as e:
         logger.error(f"Error while parsing file {path}:")
         traceback.print_exc()
