@@ -182,10 +182,10 @@ def _fit_speed_unit_factor(unit: str) -> float:
 
 
 def _first_of_tuple(value: Union[float, tuple[float, float]]) -> float:
-    try:
-        return float(value)
-    except TypeError:
+    if isinstance(value, tuple):
         return float(value[0])
+    else:
+        return float(value)
 
 
 def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
