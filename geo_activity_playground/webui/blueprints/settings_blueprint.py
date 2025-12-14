@@ -309,95 +309,113 @@ def make_settings_blueprint(
             equipments=equipments,
         )
 
-    @blueprint.route("/manage-kinds", methods=["GET", "POST"])
+    @blueprint.route("/manage-kinds")
     @needs_authentication(authenticator)
     def manage_kinds():
+        kinds = DB.session.scalars(sqlalchemy.select(Kind).order_by(Kind.name)).all()
+        return render_template(
+            "settings/kinds-list.html.j2",
+            kinds=kinds,
+        )
+
+    @blueprint.route("/manage-kinds/new", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def kinds_new():
         if request.method == "POST":
-            print(request.form)
-            ids = request.form.getlist("id")
-            names = request.form.getlist("name")
-            consider_for_achievements = request.form.getlist(
-                "consider_for_achievements"
-            )
-            replaced_by_ids = request.form.getlist("replaced_by_id")
-            assert len(ids) == len(names) == len(replaced_by_ids)
+            name = request.form.get("name", "").strip()
+            if not name:
+                flasher.flash_message("Kind name is required.", FlashTypes.DANGER)
+                return redirect(url_for(".kinds_new"))
             
-            # First pass: update names and consider_for_achievements, collect replaced_by changes
-            replaced_by_changes = {}
-            for id, name, replaced_by_id_str in zip(ids, names, replaced_by_ids):
-                if id:
-                    kind = DB.session.get_one(Kind, int(id))
-                    old_name = kind.name
-                    kind.name = name
-                    kind.consider_for_achievements = id in consider_for_achievements
-                    
-                    # Handle replaced_by_id
-                    old_replaced_by_id = kind.replaced_by_id
-                    new_replaced_by_id = (
-                        int(replaced_by_id_str) if replaced_by_id_str else None
+            consider_for_achievements = request.form.get("consider_for_achievements") == "on"
+            default_equipment_id = request.form.get("default_equipment_id")
+            default_equipment_id = int(default_equipment_id) if default_equipment_id else None
+            replaced_by_id = request.form.get("replaced_by_id")
+            replaced_by_id = int(replaced_by_id) if replaced_by_id else None
+            
+            kind = Kind(name=name, consider_for_achievements=consider_for_achievements)
+            if default_equipment_id:
+                kind.default_equipment_id = default_equipment_id
+            if replaced_by_id:
+                kind.replaced_by_id = replaced_by_id
+            
+            DB.session.add(kind)
+            DB.session.commit()
+            flasher.flash_message(f"Kind '{name}' added.", FlashTypes.SUCCESS)
+            return redirect(url_for(".manage_kinds"))
+        
+        kinds = DB.session.scalars(sqlalchemy.select(Kind).order_by(Kind.name)).all()
+        equipments = DB.session.scalars(
+            sqlalchemy.select(Equipment).order_by(Equipment.name)
+        ).all()
+        return render_template(
+            "settings/kinds-new.html.j2",
+            kinds=kinds,
+            equipments=equipments,
+        )
+
+    @blueprint.route("/manage-kinds/edit/<int:id>", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def kinds_edit(id: int):
+        kind = DB.session.get_one(Kind, id)
+        
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            if not name:
+                flasher.flash_message("Kind name is required.", FlashTypes.DANGER)
+                return redirect(url_for(".kinds_edit", id=id))
+            
+            consider_for_achievements = request.form.get("consider_for_achievements") == "on"
+            default_equipment_id = request.form.get("default_equipment_id")
+            default_equipment_id = int(default_equipment_id) if default_equipment_id else None
+            replaced_by_id = request.form.get("replaced_by_id")
+            replaced_by_id = int(replaced_by_id) if replaced_by_id else None
+            
+            # Check for cycles: if setting A -> B, ensure B doesn't point to A (directly or indirectly)
+            old_replaced_by_id = kind.replaced_by_id
+            if replaced_by_id is not None:
+                if replaced_by_id == id:
+                    flasher.flash_message(
+                        f"Cannot set '{name}' to be replaced by itself: "
+                        "this would create a self-reference.",
+                        FlashTypes.DANGER,
                     )
-                    
-                    # Check for cycles: if setting A -> B, ensure B doesn't point to A (directly or indirectly)
-                    if new_replaced_by_id is not None:
-                        if new_replaced_by_id == int(id):
+                    replaced_by_id = old_replaced_by_id
+                else:
+                    target_kind = DB.session.get_one(Kind, replaced_by_id)
+                    # Check if target_kind or any in its chain points back to this kind
+                    visited = set()
+                    current = target_kind
+                    while current.replaced_by_id is not None:
+                        if current.id == id:
                             flasher.flash_message(
-                                f"Cannot set '{name}' to be replaced by itself: "
-                                "this would create a self-reference.",
+                                f"Cannot set '{name}' to be replaced by '{target_kind.name}': "
+                                "this would create a cycle.",
                                 FlashTypes.DANGER,
                             )
-                            new_replaced_by_id = old_replaced_by_id
-                        else:
-                            target_kind = DB.session.get_one(Kind, new_replaced_by_id)
-                            # Check if target_kind or any in its chain points back to this kind
-                            visited = set()
-                            current = target_kind
-                            while current.replaced_by_id is not None:
-                                if current.id == int(id):
-                                    flasher.flash_message(
-                                        f"Cannot set '{name}' to be replaced by '{target_kind.name}': "
-                                        "this would create a cycle.",
-                                        FlashTypes.DANGER,
-                                    )
-                                    new_replaced_by_id = old_replaced_by_id
-                                    break
-                                if current.id in visited:
-                                    break
-                                visited.add(current.id)
-                                current = current.replaced_by
-                                if current is None:
-                                    break
-                    
-                    # Track if replaced_by changed for migration
-                    if old_replaced_by_id != new_replaced_by_id:
-                        replaced_by_changes[int(id)] = {
-                            "old": old_replaced_by_id,
-                            "new": new_replaced_by_id,
-                            "kind": kind,
-                        }
-                    
-                    kind.replaced_by_id = new_replaced_by_id
-                if not id and name:
-                    kind = Kind(name=name)
-                    if consider_for_achievements:
-                        kind.consider_for_achievements = (
-                            "new" in consider_for_achievements
-                        )
-                    if replaced_by_id_str:
-                        kind.replaced_by_id = int(replaced_by_id_str)
-                    DB.session.add(kind)
-                    flasher.flash_message(f"Kind '{name}' added.", FlashTypes.SUCCESS)
+                            replaced_by_id = old_replaced_by_id
+                            break
+                        if current.id in visited:
+                            break
+                        visited.add(current.id)
+                        current = current.replaced_by
+                        if current is None:
+                            break
             
-            DB.session.flush()  # Flush to get IDs for new kinds
+            # Update kind
+            kind.name = name
+            kind.consider_for_achievements = consider_for_achievements
+            kind.default_equipment_id = default_equipment_id
+            kind.replaced_by_id = replaced_by_id
             
-            # Second pass: migrate activities when replaced_by is set
-            for kind_id, change_info in replaced_by_changes.items():
-                kind = change_info["kind"]
-                if change_info["new"] is not None:
+            # Migrate activities if replaced_by changed
+            if old_replaced_by_id != replaced_by_id:
+                if replaced_by_id is not None:
                     # This kind is now an alias - migrate all its activities to the canonical kind
                     canonical_kind = kind.replaced_by
                     if canonical_kind:
                         activities_to_migrate = DB.session.scalars(
-                            sqlalchemy.select(Activity).where(Activity.kind_id == kind_id)
+                            sqlalchemy.select(Activity).where(Activity.kind_id == id)
                         ).all()
                         count = len(activities_to_migrate)
                         for activity in activities_to_migrate:
@@ -407,7 +425,7 @@ def make_settings_blueprint(
                                 f"Migrated {count} activities from '{kind.name}' to '{canonical_kind.name}'.",
                                 FlashTypes.SUCCESS,
                             )
-                elif change_info["old"] is not None:
+                elif old_replaced_by_id is not None:
                     # This kind is no longer an alias - activities stay with this kind
                     flasher.flash_message(
                         f"'{kind.name}' is now a canonical kind. Activities remain unchanged.",
@@ -415,11 +433,29 @@ def make_settings_blueprint(
                     )
             
             DB.session.commit()
+            flasher.flash_message(f"Kind '{name}' updated.", FlashTypes.SUCCESS)
+            return redirect(url_for(".manage_kinds"))
+        
         kinds = DB.session.scalars(sqlalchemy.select(Kind).order_by(Kind.name)).all()
+        equipments = DB.session.scalars(
+            sqlalchemy.select(Equipment).order_by(Equipment.name)
+        ).all()
         return render_template(
-            "settings/manage-kinds.html.j2",
+            "settings/kinds-edit.html.j2",
+            kind=kind,
             kinds=kinds,
+            equipments=equipments,
         )
+
+    @blueprint.route("/manage-kinds/delete/<int:id>")
+    @needs_authentication(authenticator)
+    def kinds_delete(id: int):
+        kind = DB.session.get_one(Kind, id)
+        kind_name = kind.name
+        DB.session.delete(kind)
+        DB.session.commit()
+        flasher.flash_message(f"Kind '{kind_name}' deleted.", FlashTypes.SUCCESS)
+        return redirect(url_for(".manage_kinds"))
 
     @blueprint.route("/heart-rate", methods=["GET", "POST"])
     @needs_authentication(authenticator)
