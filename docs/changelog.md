@@ -27,6 +27,7 @@ Added:
 Fixed:
 
 - Fix default overlay map for square planner.
+- Ignore comment lines from CSV file to suppress import errors from these `#error#` activities. ([GH-380](https://github.com/martin-ueding/geo-activity-playground/issues/380))
 
 ## Version 1.19.0 — 2025-12-06
 
