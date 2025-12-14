@@ -56,6 +56,8 @@
         active
     {%- elif endpoint == 'settings.tags_list' and current in ['settings.tags_list', 'settings.tags_new', 'settings.tags_edit'] -%}
         active
+    {%- elif endpoint == 'settings.manage_kinds' and current in ['settings.manage_kinds', 'settings.kinds_new', 'settings.kinds_edit', 'settings.kinds_delete'] -%}
+        active
     {%- elif endpoint == 'plot_builder.index' and current and current.startswith('plot_builder.') -%}
         active
     {%- endif -%}

@@ -1,0 +1,58 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('.manage_kinds') }}">Activity Kinds</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">Edit Kind</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ kind.name }}" required />
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="consider_for_achievements" name="consider_for_achievements" 
+                {% if kind.consider_for_achievements %}checked{% endif %} />
+            <label class="form-check-label" for="consider_for_achievements">
+                Consider for Achievements
+            </label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="default_equipment_id" class="form-label">Default Equipment</label>
+        <select class="form-select" id="default_equipment_id" name="default_equipment_id">
+            <option value="">— None —</option>
+            {% for equipment in equipments %}
+                <option value="{{ equipment.id }}" {% if kind.default_equipment_id == equipment.id %}selected{% endif %}>
+                    {{ equipment.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="replaced_by_id" class="form-label">Replaced By (Alternative Name)</label>
+        <select class="form-select" id="replaced_by_id" name="replaced_by_id">
+            <option value="">— None (canonical kind) —</option>
+            {% for other_kind in kinds %}
+                {% if other_kind.id != kind.id %}
+                    <option value="{{ other_kind.id }}" {% if kind.replaced_by_id == other_kind.id %}selected{% endif %}>
+                        {{ other_kind.name }}
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <div class="form-text">If this is an alternative name for another kind, select the canonical kind here.</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('.manage_kinds') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
+
