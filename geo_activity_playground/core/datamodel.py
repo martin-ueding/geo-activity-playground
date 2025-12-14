@@ -426,44 +426,27 @@ class Kind(DB.Model):
 
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
 
-    def get_canonical_kind(self) -> "Kind":
-        """Resolve the canonical kind by following the replaced_by chain.
-        
-        Returns self if this is already canonical (no replaced_by), or the
-        final kind in the chain if this is an alias.
-        """
-        visited = set()
-        current = self
-        while current.replaced_by_id is not None:
-            if current.id in visited:
-                # Cycle detected - break it by returning current
-                logger.warning(
-                    f"Cycle detected in kind replacement chain for kind {current.id} ({current.name}). "
-                    "Breaking cycle."
-                )
-                return current
-            visited.add(current.id)
-            current = current.replaced_by
-            if current is None:
-                # Broken reference - return self
-                logger.warning(
-                    f"Broken replaced_by reference for kind {self.id} ({self.name}). "
-                    "Returning original kind."
-                )
-                return self
-        return current
+
+def canonicalize_kind(kind: Kind) -> Kind:
+    visited = set()
+    current = kind
+    while current.replaced_by is not None:
+        current = current.replaced_by
+        if current.id in visited:
+            logger.warning(
+                f"Cycle detected in kind replacement chain for kind {current.id} ({current.name}). "
+                "Breaking cycle."
+            )
+            return current
+        visited.add(current.id)
+    return current
 
 
 def get_or_make_kind(name: str) -> Kind:
-    """Get or create a kind by name. If the kind has a replaced_by relationship,
-    returns the canonical kind instead.
-    """
     kinds = DB.session.scalars(sqlalchemy.select(Kind).where(Kind.name == name)).all()
     if kinds:
         assert len(kinds) == 1, f"There must be only one kind with name '{name}'."
-        kind = kinds[0]
-        # If this kind is an alias, return the canonical kind
-        return kind.get_canonical_kind()
+        return canonicalize_kind(kinds[0])
     else:
         kind = Kind(
             name=name,
