@@ -19,8 +19,8 @@ Types of changes
 
 Added:
 
-- Dutch localization. ([GH-383](https://github.com/martin-ueding/geo-activity-playground/discussions/383))
-- Language settings where you can override your browser preference. ([GH-386](https://github.com/martin-ueding/geo-activity-playground/issues/386))
+- Add Dutch localization. ([GH-383](https://github.com/martin-ueding/geo-activity-playground/discussions/383))
+- Add language settings where you can override your browser preference. ([GH-386](https://github.com/martin-ueding/geo-activity-playground/issues/386))
 - Mention tile hunting apps in documentation.
 - Allow activity kinds to be replaced by other ones. This is useful when you have a bunch of activities with an older name or the Strava API gives you activity names that you don't like. ([GH-355](https://github.com/martin-ueding/geo-activity-playground/issues/355))
 
