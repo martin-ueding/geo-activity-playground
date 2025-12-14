@@ -24,6 +24,8 @@ def parse_csv(text: str) -> list[list]:
     result: list[list] = []
     while index < len(text):
         line, index = _parse_line(text, index)
+        if line[0].startswith("#"):
+            continue
         result.append(line)
         assert len(line) == len(
             result[0]

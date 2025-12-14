@@ -9,6 +9,7 @@ def test_parse_csv() -> None:
     data = """
 A,B,C
 a,"b,b",c
+#error#,foo,bar
 d,"e
 f",g
 """
