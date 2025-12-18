@@ -26,7 +26,7 @@ Then plan a route that goes through as many tiles as possible. Download the rout
 
 The above is nice to plan the route, perhaps you also want to take the missing tiles along to do spontaneous tile hunting.
 
-A possibility should be [Organic Maps](https://organicmaps.app/) which is a FOSS app that can display offline maps and also show GPX files.
+[Organic Maps](https://organicmaps.app/), or the community fork [CoMaps](https://www.comaps.app/), are FOSS apps that can display offline maps and missing tiles GPX files on Android or iOS devices.
 
 Another method is to use Open Street Map uMap, either the one hosted in [Germany](https://umap.openstreetmap.de/) or [France](https://umap.openstreetmap.fr/). Then you can create a new personal map (consider limiting the access rights, default is public) and upload the GeoJSON file. Then you can use that map on the code to see your position and the missing tiles:
 
