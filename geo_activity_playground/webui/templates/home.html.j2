@@ -22,7 +22,9 @@
             attribution: '{{ map_tile_attribution|safe }}'
         }).addTo(map)
 
-        let geojson_layer = L.geoJSON(geojson).addTo(map)
+        let geojson_layer = L.geoJSON(geojson, {
+            useSimpleStyle: true
+        }).addTo(map)
         map.fitBounds(geojson_layer.getBounds())
         return map
     }
@@ -65,7 +67,8 @@
 {% endfor %}
 {% else %}
 <p>{{ _('You don\'t have activities yet. Either put some files into a directory') }} <tt>Activities</tt>, <a
-        href="{{ url_for('upload.index') }}">{{ _('upload activities') }}</a> {{ _('or') }} <a href="{{ url_for('settings.strava') }}">{{ _('set up Strava API') }}</a>.</p>
+        href="{{ url_for('upload.index') }}">{{ _('upload activities') }}</a> {{ _('or') }} <a
+        href="{{ url_for('settings.strava') }}">{{ _('set up Strava API') }}</a>.</p>
 {% endif %}
 
 {% endblock %}
