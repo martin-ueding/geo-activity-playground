@@ -26,7 +26,7 @@ export function add_layers_to_map(map, config) {
     // Get map container ID for localStorage key
     const mapId = map.getContainer().id;
     const storageKey = `map-layers-${mapId}`;
-    
+
     // Load saved preferences if available
     let saved = {};
     try {
@@ -96,12 +96,16 @@ export function add_layers_to_map(map, config) {
         "Heatmap": L.tileLayer(heatmap_url, {
             maxZoom: 19,
             attribution
-        })
+        }), 
+        "Mapterhorn": L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
+            maxZoom: 19,
+            attribution: "https://mapterhorn.com/"
+        }),
     };
 
     // Determine which overlay to select by default
     let selectedOverlay = overlay;
-    
+
     if (squarePlanner) {
         const { x, y, size } = squarePlanner;
         overlay_maps["Square Planner"] = L.tileLayer(
@@ -113,7 +117,7 @@ export function add_layers_to_map(map, config) {
 
     // Use saved preferences if valid, otherwise fall back to defaults
     const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : baseLayer;
-    
+
     // Overlays: saved.overlays is an array, filter to only valid ones
     let selectedOverlays;
     if (saved.overlays && Array.isArray(saved.overlays)) {
