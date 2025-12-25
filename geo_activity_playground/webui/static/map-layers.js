@@ -65,6 +65,11 @@ export function add_layers_to_map(map, config) {
     }
 
     const overlay_maps = {
+        "Mapterhorn": L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
+            maxZoom: 19,
+            attribution: "https://mapterhorn.com/",
+            opacity: 0.6
+        }),
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
             attribution
@@ -96,10 +101,6 @@ export function add_layers_to_map(map, config) {
         "Heatmap": L.tileLayer(heatmap_url, {
             maxZoom: 19,
             attribution
-        }), 
-        "Mapterhorn": L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
-            maxZoom: 19,
-            attribution: "https://mapterhorn.com/"
         }),
     };
 
