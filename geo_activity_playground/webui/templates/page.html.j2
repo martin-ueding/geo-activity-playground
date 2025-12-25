@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="/static/leaflet/MarkerCluster.Default.css" />
     <script src="/static/leaflet/leaflet.markercluster.js"></script>
 
+    <script src="/static/leaflet/leaflet-simplestyle.min.js"></script>
+
     <!-- Vega for plots.-->
     <script src="/static/vega/vega@5.js"></script>
     <script src="/static/vega/vega-lite@4.js"></script>
@@ -64,9 +66,12 @@
                                 {{ _('Activities') }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('calendar.index') }}">{{ _('Calendar') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('search.index') }}">{{ _('Overview & Search') }}</a>
-                                <li><a class="dropdown-item" href="{{ url_for('bubble_chart.index') }}">{{ _('Bubble Chart') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('calendar.index') }}">{{ _('Calendar')
+                                        }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('search.index') }}">{{ _('Overview &
+                                        Search') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('bubble_chart.index') }}">{{ _('Bubble
+                                        Chart') }}</a>
                                 </li>
                             </ul>
                         </li>
@@ -77,16 +82,22 @@
                                 {{ _('Statistics') }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('summary.index') }}">{{ _('Summary Statistics') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('summary.index') }}">{{ _('Summary
+                                        Statistics') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('hall_of_fame.index') }}">{{ _('Hall of Fame') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('hall_of_fame.index') }}">{{ _('Hall of
+                                        Fame') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('eddington.distance') }}">{{ _('Eddington Number') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('eddington.distance') }}">{{ _('Eddington
+                                        Number') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('eddington.elevation_gain') }}">{{ _('Elevation Eddington Number') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('eddington.elevation_gain') }}">{{
+                                        _('Elevation Eddington Number') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('equipment.index') }}">{{ _('Equipment') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('segments.index') }}">{{ _('Segments') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('equipment.index') }}">{{ _('Equipment')
+                                        }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('segments.index') }}">{{ _('Segments')
+                                        }}</a></li>
                             </ul>
                         </li>
 
@@ -96,28 +107,32 @@
                                 {{ _('Explorer') }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('explorer.server_side', zoom=14) }}">{{ _('Explorer Tiles (Zoom 14)') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('explorer.server_side', zoom=17) }}">{{ _('Squadratinhos (Zoom 17)') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('explorer.server_side', zoom=14) }}">{{
+                                        _('Explorer Tiles (Zoom 14)') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('explorer.server_side', zoom=17) }}">{{
+                                        _('Squadratinhos (Zoom 17)') }}</a></li>
 
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
 
-                                <li><a class="dropdown-item"
-                                        href="{{ url_for('square_planner.landing', zoom=14) }}">{{ _('Square Planner (Zoom 14)') }}</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ url_for('square_planner.landing', zoom=17) }}">{{ _('Square Planner (Zoom 17)') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('square_planner.landing', zoom=14) }}">{{
+                                        _('Square Planner (Zoom 14)') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('square_planner.landing', zoom=17) }}">{{
+                                        _('Square Planner (Zoom 17)') }}</a></li>
                             </ul>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('heatmap.index') }}">{{ _('Heatmap') }}</a>
+                            <a class="nav-link" aria-current="page" href="{{ url_for('heatmap.index') }}">{{
+                                _('Heatmap') }}</a>
                         </li>
                         {% endif %}
 
                         {% if photo_count > 0 %}
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ url_for('photo.map') }}">{{ _('Photo Map') }}</a>
+                            <a class="nav-link" aria-current="page" href="{{ url_for('photo.map') }}">{{ _('Photo Map')
+                                }}</a>
                         </li>
                         {% endif %}
 
@@ -127,22 +142,29 @@
                                 {{ _('Admin') }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('upload.index') }}">{{ _('Upload Activities') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('upload.index') }}">{{ _('Upload
+                                        Activities') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('photo.new') }}">{{ _('Upload Photos') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('photo.new') }}">{{ _('Upload Photos')
+                                        }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('upload.reload') }}">{{ _('Scan New Activities') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('upload.reload') }}">{{ _('Scan New
+                                        Activities') }}</a>
                                 </li>
 
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
 
-                                <li><a class="dropdown-item" href="{{ url_for('plot_builder.index') }}">{{ _('Plot Builder') }}</a>
+                                <li><a class="dropdown-item" href="{{ url_for('plot_builder.index') }}">{{ _('Plot
+                                        Builder') }}</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('settings.index') }}">{{ _('Settings') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('export.index') }}">{{ _('Data Export') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('time_zone_fixer.index') }}">{{ _('Time Zone Fixer') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('settings.index') }}">{{ _('Settings')
+                                        }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('export.index') }}">{{ _('Data Export')
+                                        }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('time_zone_fixer.index') }}">{{ _('Time
+                                        Zone Fixer') }}</a></li>
 
                                 <li>
                                     <hr class="dropdown-divider">
@@ -150,8 +172,9 @@
 
                                 <li>
                                     <form action="{{ url_for('admin.shutdown') }}" method="POST" style="margin: 0;"
-                                          onsubmit="return confirm('{{ _('Are you sure you want to shut down the server? This will terminate the application.') }}');">
-                                        <button type="submit" class="dropdown-item text-danger">{{ _('Shutdown Server') }}</button>
+                                        onsubmit="return confirm('{{ _('Are you sure you want to shut down the server? This will terminate the application.') }}');">
+                                        <button type="submit" class="dropdown-item text-danger">{{ _('Shutdown Server')
+                                            }}</button>
                                     </form>
                                 </li>
                             </ul>

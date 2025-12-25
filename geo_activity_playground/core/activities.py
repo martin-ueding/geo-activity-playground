@@ -78,14 +78,43 @@ class ActivityRepository:
 
 
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
-    fc = geojson.FeatureCollection(
-        features=[
+    features = []
+    for _, group in time_series.groupby("segment_id"):
+        features.append(
             geojson.LineString(
                 [(lon, lat) for lat, lon in zip(group["latitude"], group["longitude"])]
             )
-            for _, group in time_series.groupby("segment_id")
-        ]
+        )
+
+    # Add start point marker
+    first_point = time_series.iloc[0]
+    features.append(
+        geojson.Feature(
+            geometry=geojson.Point((first_point["longitude"], first_point["latitude"])),
+            properties={
+                "marker-color": "#00FF00",
+                "marker-symbol": "circle",
+                "marker-size": "medium",
+            },
+        )
     )
+
+    # Add end point marker
+    last_point = time_series.iloc[-1]
+    features.append(
+        geojson.Feature(
+            geometry=geojson.Point((last_point["longitude"], last_point["latitude"])),
+            properties={
+                "marker-color": "#FFFFFF",
+                "marker-symbol": "circle",
+                "marker-size": "medium",
+                "stroke": "#000000",
+                "stroke-width": 2,
+            },
+        )
+    )
+
+    fc = geojson.FeatureCollection(features=features)
     return geojson.dumps(fc)
 
 
