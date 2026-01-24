@@ -125,9 +125,9 @@ def make_activity_blueprint(
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(first_visits)
 
-        line_color_columns_avail = dict(
-            [(column.name, column) for column in TIME_SERIES_COLUMNS]
-        )
+        line_color_columns_avail = {
+            column.name: column for column in TIME_SERIES_COLUMNS
+        }
         line_color_column = (
             request.args.get("line_color_column")
             or next(iter(line_color_columns_avail.values())).name
@@ -659,7 +659,9 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
     draw = ImageDraw.Draw(img, mode="RGBA")
 
     for time_series in time_series_list:
-        for _, group in time_series.groupby("segment_id"):
+        for _index, group in time_series.groupby("segment_id"):
+            tile_xz = group["x"] * 2**zoom
+            tile_yz = group["y"] * 2**zoom
             yx = list(
                 zip(
                     (tile_xz - tile_xz_center[0]) * OSM_TILE_SIZE + target_width / 2,
