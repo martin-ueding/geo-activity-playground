@@ -589,7 +589,9 @@ def name_equipment_plot(meta: pd.DataFrame) -> str:
     return (
         alt.Chart(meta, title=_("Equipment"))
         .mark_bar()
-        .encode(alt.X("count()", title=_("Count")), alt.Y("equipment", title=_("Equipment")))
+        .encode(
+            alt.X("count()", title=_("Count")), alt.Y("equipment", title=_("Equipment"))
+        )
         .to_json(format="vega")
     )
 
