@@ -163,7 +163,7 @@ def _make_eddington_plot(
     column_name: str,
     display_name: str,
     divisor: int,
-) -> dict:
+) -> str:
     x = list(range(1, max(eddington_df[column_name]) + 1))
     y = [v / divisor for v in x]
     return (
@@ -248,7 +248,7 @@ def _get_yearly_eddington(
 
 def _get_eddington_number_history(
     meta: pd.DataFrame, columnName: str, divisor: int
-) -> dict:
+) -> str:
 
     daily_elevation_gains = meta.groupby("date").apply(
         lambda group2: int(group2[columnName].sum()), include_groups=False
