@@ -92,6 +92,7 @@ select = [
 ignore = [
     "E501", # line too long, handled by formatter
     "B905", # zip() without an explicit strict= parameter
+    "ARG001", # Unused function argument
 ]
 
 [tool.ruff.lint.isort]
