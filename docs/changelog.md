@@ -35,6 +35,7 @@ Fixed:
 - Change unit of heart rate from Hz to 1/min. ([GH-399](https://github.com/martin-ueding/geo-activity-playground/issues/399))
 - Recover from `AttributeError` that could happen during startup.
 - Unify Pandas datetime instances to nanosecond resolution if needed.
+- Do not crash when a historic search query references a now deleted activity kind.
 
 ## Version 1.20.0 — 2025-12-14
 
