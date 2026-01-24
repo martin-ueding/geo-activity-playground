@@ -64,7 +64,8 @@ def _render_eddington_template(
 ) -> str:
 
     column_name = column.name
-    display_name = column.display_name
+    display_name = str(column.display_name)
+    print(repr(display_name))
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
     primitives = parse_search_params(request.args)
