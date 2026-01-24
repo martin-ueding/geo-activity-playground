@@ -7,6 +7,7 @@ Open source projects:
 - [Wanderer](https://wanderer.to/): Self-hosted activity tracker with ActivityPub support.
 - [FitTrackee](https://docs.fittrackee.org/en/index.html): Self-hosted activity tracker with upload functionality and multi-user support.
 - [CubeTrek](https://cubetrek.com/): Self-hosted server for displaying activities with a focus on elevation data and 3D visualization.
+- [MyTourbook](https://mytourbook.sourceforge.io/mytourbook/).
 
 Recording:
 
