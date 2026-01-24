@@ -20,6 +20,13 @@ Types of changes
 Added:
 
 - Add start and end markers to each track in landing page view.
+- Add Mapterhorn tiles. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
+- Add instructions for Google Gemini such that a few things become easier.
+- Add references to MyTourbook, Endurain and FitPub to the documentation.
+
+Changed:
+
+- ⚠️ Switch project management from Poetry to uv. If you are a user that install this package via `pip install`, `pipx install`, `uv tool install`, you don't need to change anything. If you are a developer, you will now need to use `uv run` instead of `poetry run`.
 
 ## Version 1.20.0 — 2025-12-14
 
