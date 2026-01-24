@@ -12,7 +12,7 @@ Types of changes
     *Fixed* for any bug fixes.
     *Security* in case of vulnerabilities.
 
-([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
+ ([GH-000](https://github.com/martin-ueding/geo-activity-playground/issues/000))
 -->
 
 ## Unreleased
@@ -28,6 +28,10 @@ Added:
 Changed:
 
 - ⚠️ Switch project management from Poetry to uv. If you are a user that install this package via `pip install`, `pipx install`, `uv tool install`, you don't need to change anything. If you are a developer, you will now need to use `uv run` instead of `poetry run`.
+
+Fixed:
+
+- Change unit of heart rate from Hz to 1/min. ([GH-399](https://github.com/martin-ueding/geo-activity-playground/issues/399))
 
 ## Version 1.20.0 — 2025-12-14
 
