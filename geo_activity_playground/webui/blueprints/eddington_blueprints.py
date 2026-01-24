@@ -73,7 +73,9 @@ def _render_eddington_template(
         register_search_query(primitives)
 
     activities = (
-        apply_search_filter(primitives).dropna(subset=["start_local", column_name]).copy()
+        apply_search_filter(primitives)
+        .dropna(subset=["start_local", column_name])
+        .copy()
     )
 
     assert (
@@ -171,7 +173,8 @@ def _make_eddington_plot(
                     eddington_df,
                     height=500,
                     width=800,
-                    title=_("%(display_name)s Eddington Number %(en)s") % {"display_name": display_name, "en": en},
+                    title=_("%(display_name)s Eddington Number %(en)s")
+                    % {"display_name": display_name, "en": en},
                 )
                 .mark_area(interpolate="step")
                 .encode(
@@ -183,14 +186,21 @@ def _make_eddington_plot(
                     alt.Y(
                         "total",
                         scale=alt.Scale(domainMax=en / divisor * 1.5),
-                        title=_("%(interval)s exceeding %(display_name)s") % {"interval": interval, "display_name": display_name},
+                        title=_("%(interval)s exceeding %(display_name)s")
+                        % {"interval": interval, "display_name": display_name},
                     ),
                     [
                         alt.Tooltip(column_name, title=display_name),
                         alt.Tooltip(
-                            "total", title=_("%(interval)s exceeding %(display_name)s") % {"interval": interval, "display_name": display_name}
+                            "total",
+                            title=_("%(interval)s exceeding %(display_name)s")
+                            % {"interval": interval, "display_name": display_name},
                         ),
-                        alt.Tooltip("missing", title=_("%(interval)s missing for next") % {"interval": interval}),
+                        alt.Tooltip(
+                            "missing",
+                            title=_("%(interval)s missing for next")
+                            % {"interval": interval},
+                        ),
                     ],
                 )
             )
