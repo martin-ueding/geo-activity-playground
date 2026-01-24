@@ -94,9 +94,7 @@ class Activity(DB.Model):
     index_end: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # Temporal data:
-    start: Mapped[datetime.datetime | None] = mapped_column(
-        sa.DateTime, nullable=True
-    )
+    start: Mapped[datetime.datetime | None] = mapped_column(sa.DateTime, nullable=True)
     iana_timezone: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     elapsed_time: Mapped[datetime.timedelta | None] = mapped_column(
         sa.Interval, nullable=True
@@ -261,7 +259,9 @@ def get_or_make_tag(tag: str) -> Tag:
         return tag
 
 
-def query_activity_meta(clauses: list = []) -> pd.DataFrame:
+def query_activity_meta(clauses: list | None = None) -> pd.DataFrame:
+    if clauses is None:
+        clauses = []
     rows = DB.session.execute(
         sqlalchemy.select(
             Activity.id,
@@ -375,9 +375,9 @@ def get_or_make_equipment(name: str, config: Config) -> Equipment:
         sqlalchemy.select(Equipment).where(Equipment.name == name)
     ).all()
     if equipments:
-        assert (
-            len(equipments) == 1
-        ), f"There must be only one equipment with name '{name}'."
+        assert len(equipments) == 1, (
+            f"There must be only one equipment with name '{name}'."
+        )
         return equipments[0]
     else:
         equipment = Equipment(
@@ -583,7 +583,7 @@ class StoredSearchQuery(DB.Model):
         bits = []
 
         if data.get("name"):
-            bits.append(f'name is "{data['name']}"')
+            bits.append(f'name is "{data["name"]}"')
 
         if data.get("equipment"):
             equipment_names = [
