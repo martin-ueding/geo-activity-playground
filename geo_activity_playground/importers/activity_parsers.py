@@ -169,7 +169,7 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                     if "total_strides" in fields:
                         activity.steps = 2 * int(values["total_strides"])
 
-    return activity, pd.DataFrame(rows)
+    return activity, pd.DataFrame.from_records(rows)
 
 
 def _fit_speed_unit_factor(unit: str) -> float:

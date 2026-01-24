@@ -28,6 +28,7 @@ Added:
 Changed:
 
 - ⚠️ Switch project management from Poetry to uv. If you are a user that install this package via `pip install`, `pipx install`, `uv tool install`, you don't need to change anything. If you are a developer, you will now need to use `uv run` instead of `poetry run`.
+- For some reason, there are errors in Pandas when the import happens in a separate thread. For the time being, I need to import new activities first.
 
 Fixed:
 
