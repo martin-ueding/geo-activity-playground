@@ -42,9 +42,6 @@ from ..core.raster_map import PastelImageTransform
 from ..core.raster_map import TileGetter
 from ..explorer.tile_visits import TileVisitAccessor
 from .authenticator import Authenticator
-from .i18n import DEFAULT_LANGUAGE
-from .i18n import SUPPORTED_LANGUAGE_CODES
-from .i18n import SUPPORTED_LANGUAGES
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
@@ -69,7 +66,9 @@ from .blueprints.time_zone_fixer_blueprint import make_time_zone_fixer_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint
 from .blueprints.upload_blueprint import scan_for_activities
 from .flasher import FlaskFlasher
-
+from .i18n import DEFAULT_LANGUAGE
+from .i18n import SUPPORTED_LANGUAGE_CODES
+from .i18n import SUPPORTED_LANGUAGES
 
 logger = logging.getLogger(__name__)
 
@@ -139,12 +138,12 @@ def create_app(
             lang = request.args.get("lang")
             if lang in app.config["BABEL_SUPPORTED_LOCALES"]:
                 return lang
-        
+
         # Check config file for user preference
         if config.preferred_language:
             if config.preferred_language in app.config["BABEL_SUPPORTED_LOCALES"]:
                 return config.preferred_language
-        
+
         # Fall back to browser's preferred language
         return request.accept_languages.best_match(
             app.config["BABEL_SUPPORTED_LOCALES"]
@@ -362,6 +361,7 @@ def web_ui_main(
             ),
         )
         thread.start()
+        thread.join()
 
     # Migrate tile cache directory structure
     base_dir = pathlib.Path("Open Street Map Tiles")
