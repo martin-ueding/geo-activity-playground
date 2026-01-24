@@ -58,7 +58,9 @@ def enrichment_normalize_time(
     if not pd.api.types.is_dtype_equal(
         time_series["time"].dtype, "datetime64[ns, UTC]"
     ):
-        time_series["time"] = time_series["time"].dt.tz_convert(tz_utc)
+        time_series["time"] = (
+            time_series["time"].dt.tz_convert(tz_utc).astype("datetime64[ns, UTC]")
+        )
         changed = True
 
     assert pd.api.types.is_dtype_equal(
