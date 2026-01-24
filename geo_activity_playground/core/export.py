@@ -8,9 +8,7 @@ import pandas as pd
 import sqlalchemy
 from tqdm import tqdm
 
-from .datamodel import Activity
-from .datamodel import DB
-from .datamodel import query_activity_meta
+from .datamodel import DB, Activity, query_activity_meta
 
 
 def export_all(meta_format: str, activity_format: str) -> bytes:

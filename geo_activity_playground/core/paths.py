@@ -1,5 +1,4 @@
 import contextlib
-import functools
 import pathlib
 import typing
 

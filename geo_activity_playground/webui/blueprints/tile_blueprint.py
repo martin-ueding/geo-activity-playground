@@ -2,11 +2,9 @@ import io
 
 import matplotlib.pyplot as pl
 import numpy as np
-from flask import Blueprint
-from flask import Response
+from flask import Blueprint, Response
 
-from ...core.raster_map import ImageTransform
-from ...core.raster_map import TileGetter
+from ...core.raster_map import ImageTransform, TileGetter
 
 
 def make_tile_blueprint(

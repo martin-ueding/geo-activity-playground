@@ -3,11 +3,8 @@ import functools
 import json
 import logging
 import pathlib
-from typing import Optional
 
-from .paths import new_config_file
-from .paths import strava_dynamic_config_path
-
+from .paths import new_config_file, strava_dynamic_config_path
 
 try:
     import tomllib
@@ -20,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class Config:
-    birth_year: Optional[int] = None
+    birth_year: int | None = None
     cluster_color_strategy: str = "colorful_cluster"
     color_scheme_for_counts: str = "teals"
     color_scheme_for_kind: str = "category10"
@@ -34,13 +31,13 @@ class Config:
         default_factory=lambda: [14, 17]
     )
     heart_rate_resting: int = 0
-    heart_rate_maximum: Optional[int] = None
+    heart_rate_maximum: int | None = None
     ignore_suffixes: list[str] = dataclasses.field(default_factory=list)
     kind_renames: dict[str, str] = dataclasses.field(default_factory=dict)
     kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
     metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
-    num_processes: Optional[int] = 1
-    preferred_language: Optional[str] = None
+    num_processes: int | None = 1
+    preferred_language: str | None = None
     privacy_zones: dict[str, list[list[float]]] = dataclasses.field(
         default_factory=dict
     )
@@ -48,9 +45,9 @@ class Config:
     sharepic_suppressed_fields: list[str] = dataclasses.field(default_factory=list)
     strava_client_id: int = 131693
     strava_client_secret: str = "0ccc0100a2c218512a7ef0cea3b0e322fb4b4365"
-    strava_client_code: Optional[str] = None
-    time_diff_threshold_seconds: Optional[int] = 30
-    upload_password: Optional[str] = None
+    strava_client_code: str | None = None
+    time_diff_threshold_seconds: int | None = 30
+    upload_password: str | None = None
     segment_max_distance: int = 20
     segment_split_distance: int = 100
     map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"

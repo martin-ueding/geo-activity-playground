@@ -1,8 +1,6 @@
 import pytest
 
-from .csv_parser import _parse_cell
-from .csv_parser import _parse_line
-from .csv_parser import parse_csv
+from .csv_parser import _parse_cell, _parse_line, parse_csv
 
 
 def test_parse_csv() -> None:

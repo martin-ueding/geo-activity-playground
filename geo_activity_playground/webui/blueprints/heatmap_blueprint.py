@@ -4,30 +4,29 @@ import pathlib
 
 import matplotlib.pylab as pl
 import numpy as np
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import Response
-from PIL import Image
-from PIL import ImageDraw
+from flask import Blueprint, Response, render_template, request
+from PIL import Image, ImageDraw
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
-from ...core.meta_search import apply_search_filter
-from ...core.meta_search import get_stored_queries
-from ...core.meta_search import is_search_active
-from ...core.meta_search import parse_search_params
-from ...core.meta_search import primitives_to_jinja
-from ...core.meta_search import primitives_to_url_str
-from ...core.meta_search import register_search_query
-from ...core.raster_map import GeoBounds
-from ...core.raster_map import get_sensible_zoom_level
-from ...core.raster_map import OSM_TILE_SIZE
-from ...core.raster_map import PixelBounds
+from ...core.meta_search import (
+    apply_search_filter,
+    get_stored_queries,
+    is_search_active,
+    parse_search_params,
+    primitives_to_jinja,
+    primitives_to_url_str,
+    register_search_query,
+)
+from ...core.raster_map import (
+    OSM_TILE_SIZE,
+    GeoBounds,
+    PixelBounds,
+    get_sensible_zoom_level,
+)
 from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.tile_visits import get_tile_medians
-from ...explorer.tile_visits import TileVisitAccessor
+from ...explorer.tile_visits import TileVisitAccessor, get_tile_medians
 from ..authenticator import Authenticator
 from .explorer_blueprint import bounding_box_for_biggest_cluster
 

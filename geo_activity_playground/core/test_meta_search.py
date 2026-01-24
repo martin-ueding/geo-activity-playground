@@ -1,12 +1,13 @@
-import datetime
 
 from werkzeug.datastructures import MultiDict
 
-from .meta_search import is_search_active
-from .meta_search import parse_search_params
-from .meta_search import primitives_to_jinja
-from .meta_search import primitives_to_json
-from .meta_search import primitives_to_url_str
+from .meta_search import (
+    is_search_active,
+    parse_search_params,
+    primitives_to_jinja,
+    primitives_to_json,
+    primitives_to_url_str,
+)
 
 
 def test_empty_query() -> None:

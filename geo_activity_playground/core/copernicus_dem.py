@@ -1,7 +1,6 @@
 import functools
 import math
 import pathlib
-from typing import Optional
 
 import boto3
 import botocore.config
@@ -34,12 +33,12 @@ def _ensure_copernicus_file(p: pathlib.Path) -> None:
     )
     try:
         s3.download_file("copernicus-dem-90m", f"{p.stem}/{p.name}", p)
-    except botocore.exceptions.ClientError as e:
+    except botocore.exceptions.ClientError:
         pass
 
 
 @functools.lru_cache(9)
-def _get_elevation_arrays(p: pathlib.Path) -> Optional[np.ndarray]:
+def _get_elevation_arrays(p: pathlib.Path) -> np.ndarray | None:
 
     _ensure_copernicus_file(p)
     if not p.exists():
@@ -52,7 +51,7 @@ def _get_elevation_arrays(p: pathlib.Path) -> Optional[np.ndarray]:
 
 
 @functools.lru_cache(1)
-def _get_interpolator(lat: int, lon: int) -> Optional[RegularGridInterpolator]:
+def _get_interpolator(lat: int, lon: int) -> RegularGridInterpolator | None:
     arrays = _get_elevation_arrays(_s3_path(lat, lon))
     # If we don't have data for the current center, we cannot do anything.
     if arrays is None:

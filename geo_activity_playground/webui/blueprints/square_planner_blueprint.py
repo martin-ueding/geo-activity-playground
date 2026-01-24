@@ -1,22 +1,17 @@
 import geojson
 import sqlalchemy
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import Blueprint, Response, redirect, render_template, request, url_for
 
-from ...core.datamodel import DB
-from ...core.datamodel import SquarePlannerBookmark
+from ...core.datamodel import DB, SquarePlannerBookmark
 from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.grid_file import make_explorer_rectangle
-from ...explorer.grid_file import make_explorer_tile
-from ...explorer.grid_file import make_grid_file_geojson
-from ...explorer.grid_file import make_grid_file_gpx
-from ...explorer.grid_file import make_grid_points
-from ...explorer.tile_visits import get_tile_medians
-from ...explorer.tile_visits import TileVisitAccessor
+from ...explorer.grid_file import (
+    make_explorer_rectangle,
+    make_explorer_tile,
+    make_grid_file_geojson,
+    make_grid_file_gpx,
+    make_grid_points,
+)
+from ...explorer.tile_visits import TileVisitAccessor, get_tile_medians
 
 
 def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blueprint:

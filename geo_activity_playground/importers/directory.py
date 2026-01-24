@@ -9,18 +9,20 @@ from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
-from ..core.datamodel import Activity
-from ..core.datamodel import DB
-from ..core.datamodel import DEFAULT_UNKNOWN_NAME
-from ..core.datamodel import get_or_make_equipment
-from ..core.datamodel import get_or_make_kind
+from ..core.datamodel import (
+    DB,
+    DEFAULT_UNKNOWN_NAME,
+    Activity,
+    get_or_make_equipment,
+    get_or_make_kind,
+)
 from ..core.enrichment import update_and_commit
-from ..explorer.tile_visits import compute_tile_evolution
-from ..explorer.tile_visits import compute_tile_visits_new
-from ..explorer.tile_visits import TileVisitAccessor
-from .activity_parsers import ActivityParseError
-from .activity_parsers import NoGeoDataError
-from .activity_parsers import read_activity
+from ..explorer.tile_visits import (
+    TileVisitAccessor,
+    compute_tile_evolution,
+    compute_tile_visits_new,
+)
+from .activity_parsers import ActivityParseError, NoGeoDataError, read_activity
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ def import_from_directory(
         if path.is_file()
         and path.suffixes
         and not path.stem.startswith(".")
-        and not path.suffix in config.ignore_suffixes
+        and path.suffix not in config.ignore_suffixes
     ]
     activity_paths.sort()
 
@@ -101,12 +103,12 @@ def import_from_file(
     logger.info(f"Importing {path} …")
     try:
         activity, time_series = read_activity(path)
-    except NoGeoDataError as e:
+    except NoGeoDataError:
         logger.warning(
             f"Activity with {path=} has no geospatial series data, skipping."
         )
         return
-    except ActivityParseError as e:
+    except ActivityParseError:
         logger.error(f"Error while parsing file {path}:")
         traceback.print_exc()
         return

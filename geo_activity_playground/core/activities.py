@@ -1,23 +1,20 @@
 import datetime
-import functools
 import logging
-from collections.abc import Callable
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
-from typing import Optional
 
 import geojson
 import matplotlib
 import numpy as np
 import pandas as pd
 import sqlalchemy
-from tqdm import tqdm
 
-from geo_activity_playground.core.datamodel import Activity
-from geo_activity_playground.core.datamodel import ActivityMeta
-from geo_activity_playground.core.datamodel import DB
-from geo_activity_playground.core.datamodel import Kind
-from geo_activity_playground.core.datamodel import query_activity_meta
+from geo_activity_playground.core.datamodel import (
+    DB,
+    Activity,
+    Kind,
+    query_activity_meta,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +32,7 @@ class ActivityRepository:
             ).all()
         )
 
-    def last_activity_date(self) -> Optional[datetime.datetime]:
+    def last_activity_date(self) -> datetime.datetime | None:
         result = DB.session.scalars(
             sqlalchemy.select(Activity).order_by(Activity.start)
         ).all()

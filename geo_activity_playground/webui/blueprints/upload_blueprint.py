@@ -1,32 +1,30 @@
 import os
 import pathlib
-from typing import Optional
 
 import sqlalchemy
-from flask import Blueprint
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import (
+    Blueprint,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import Segment
+from ...core.datamodel import DB, Activity, Segment
 from ...core.segments import find_matches
-from ...explorer.tile_visits import compute_tile_evolution
-from ...explorer.tile_visits import compute_tile_visits_new
-from ...explorer.tile_visits import TileVisitAccessor
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    compute_tile_evolution,
+    compute_tile_visits_new,
+)
 from ...importers.directory import import_from_directory
 from ...importers.strava_api import import_from_strava_api
 from ...importers.strava_checkout import import_from_strava_checkout
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-from ..flasher import Flasher
-from ..flasher import FlashTypes
+from ..authenticator import Authenticator, needs_authentication
+from ..flasher import Flasher, FlashTypes
 
 
 def make_upload_blueprint(
@@ -115,8 +113,8 @@ def scan_for_activities(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
-    strava_begin: Optional[str] = None,
-    strava_end: Optional[str] = None,
+    strava_begin: str | None = None,
+    strava_end: str | None = None,
     skip_strava: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():

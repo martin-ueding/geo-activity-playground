@@ -13,7 +13,6 @@ from PIL import Image
 from .config import Config
 from .tiles import compute_tile_float
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -130,7 +129,7 @@ def get_sensible_zoom_level(
     return TileBounds(zoom, x_tile_min, y_tile_min, x_tile_max, y_tile_max)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_tile(zoom: int, x: int, y: int, url_template: str) -> Image.Image:
     destination = osm_tile_path(x, y, zoom, url_template)
     if not destination.exists():

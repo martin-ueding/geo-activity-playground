@@ -1,27 +1,21 @@
 import json
 
 import sqlalchemy
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from flask.typing import RouteCallable
 
 from ...core.activities import ActivityRepository
 from ...core.datamodel import DB
-from ...core.parametric_plot import GROUP_BY_VARIABLES
-from ...core.parametric_plot import make_parametric_plot
-from ...core.parametric_plot import MARKS
-from ...core.parametric_plot import PlotSpec
-from ...core.parametric_plot import VARIABLES_1
-from ...core.parametric_plot import VARIABLES_2
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-from ..flasher import Flasher
-from ..flasher import FlashTypes
+from ...core.parametric_plot import (
+    GROUP_BY_VARIABLES,
+    MARKS,
+    VARIABLES_1,
+    VARIABLES_2,
+    PlotSpec,
+    make_parametric_plot,
+)
+from ..authenticator import Authenticator, needs_authentication
+from ..flasher import Flasher, FlashTypes
 
 
 def make_plot_builder_blueprint(

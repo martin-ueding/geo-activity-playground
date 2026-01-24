@@ -2,32 +2,25 @@ import json
 import re
 import urllib.parse
 from typing import Any
-from typing import Optional
 
 import sqlalchemy
-from flask import Blueprint
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import (
+    Blueprint,
+    Response,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from tqdm import tqdm
 
-from ...core.config import Config
-from ...core.config import ConfigAccessor
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import Equipment
-from ...core.datamodel import ExplorerTileBookmark
-from ...core.datamodel import Kind
-from ...core.datamodel import Tag
+from ...core.config import Config, ConfigAccessor
+from ...core.datamodel import DB, Activity, Equipment, ExplorerTileBookmark, Kind, Tag
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-from ..flasher import Flasher
-from ..flasher import FlashTypes
+from ..authenticator import Authenticator, needs_authentication
+from ..flasher import Flasher, FlashTypes
 from ..i18n import SUPPORTED_LANGUAGES
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
@@ -79,7 +72,7 @@ SHAREPIC_FIELDS = {
 }
 
 
-def int_or_none(s: str) -> Optional[int]:
+def int_or_none(s: str) -> int | None:
     if s:
         try:
             return int(s)
@@ -460,7 +453,7 @@ def make_settings_blueprint(
         heart_rate_computer = HeartRateZoneComputer(config_accessor())
         try:
             context["zone_boundaries"] = heart_rate_computer.zone_boundaries()
-        except RuntimeError as e:
+        except RuntimeError:
             pass
         return render_template("settings/heart-rate.html.j2", **context)
 

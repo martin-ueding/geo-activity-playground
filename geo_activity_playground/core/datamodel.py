@@ -1,34 +1,25 @@
 import datetime
 import json
 import logging
-import os
 import pathlib
-import shutil
 import urllib.parse
-import uuid
 import zoneinfo
-from typing import Any
-from typing import Optional
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 import numpy as np
 import pandas as pd
 import sqlalchemy
 import sqlalchemy as sa
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
-from sqlalchemy import Table
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, String, Table
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from .config import Config
-from .paths import activity_extracted_meta_dir
-from .paths import activity_extracted_time_series_dir
-from .paths import TIME_SERIES_DIR
+from .paths import (
+    TIME_SERIES_DIR,
+    activity_extracted_meta_dir,
+    activity_extracted_time_series_dir,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -90,27 +81,27 @@ class Activity(DB.Model):
 
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
-    distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
-    time_series_uuid: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    name: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    distance_km: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
+    time_series_uuid: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
     # Where it comes from:
-    path: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
-    upstream_id: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    path: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)
     index_end: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # Temporal data:
-    start: Mapped[Optional[datetime.datetime]] = mapped_column(
+    start: Mapped[datetime.datetime | None] = mapped_column(
         sa.DateTime, nullable=True
     )
-    iana_timezone: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
-    elapsed_time: Mapped[Optional[datetime.timedelta]] = mapped_column(
+    iana_timezone: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    elapsed_time: Mapped[datetime.timedelta | None] = mapped_column(
         sa.Interval, nullable=True
     )
-    moving_time: Mapped[Optional[datetime.timedelta]] = mapped_column(
+    moving_time: Mapped[datetime.timedelta | None] = mapped_column(
         sa.Interval, nullable=True
     )
 
@@ -119,7 +110,7 @@ class Activity(DB.Model):
     start_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_latitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
     end_longitude: Mapped[float] = mapped_column(sa.Float, nullable=True)
-    start_country: Mapped[Optional[str]] = mapped_column(sa.String, nullable=True)
+    start_country: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
     # Elevation data:
     elevation_gain: Mapped[float] = mapped_column(sa.Float, nullable=True)
@@ -164,14 +155,14 @@ class Activity(DB.Model):
         return f"{self.start} {self.name}"
 
     @property
-    def average_speed_moving_kmh(self) -> Optional[float]:
+    def average_speed_moving_kmh(self) -> float | None:
         if self.distance_km and self.moving_time:
             return self.distance_km / (self.moving_time.total_seconds() / 3_600)
         else:
             return None
 
     @property
-    def average_speed_elapsed_kmh(self) -> Optional[float]:
+    def average_speed_elapsed_kmh(self) -> float | None:
         if self.distance_km and self.elapsed_time:
             return self.distance_km / (self.elapsed_time.total_seconds() / 3_600)
         else:
@@ -188,7 +179,7 @@ class Activity(DB.Model):
             if "altitude" in time_series.columns:
                 time_series.rename(columns={"altitude": "elevation"}, inplace=True)
             return time_series
-        except OSError as e:
+        except OSError:
             logger.error(f"Error while reading {self.time_series_path}.")
             raise
 
@@ -230,7 +221,7 @@ class Activity(DB.Model):
             path.unlink(missing_ok=True)
 
     @property
-    def start_local_tz(self) -> Optional[datetime.datetime]:
+    def start_local_tz(self) -> datetime.datetime | None:
         if self.start and self.iana_timezone:
             return self.start.replace(
                 microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC")
@@ -239,7 +230,7 @@ class Activity(DB.Model):
             return self.start
 
     @property
-    def start_utc(self) -> Optional[datetime.datetime]:
+    def start_utc(self) -> datetime.datetime | None:
         if self.start:
             return self.start.replace(microsecond=0, tzinfo=zoneinfo.ZoneInfo("UTC"))
         else:
@@ -416,7 +407,7 @@ class Kind(DB.Model):
     )
 
     # Alternative name mapping: if this kind is an alias, replaced_by_id points to the canonical kind
-    replaced_by_id: Mapped[Optional[int]] = mapped_column(
+    replaced_by_id: Mapped[int | None] = mapped_column(
         ForeignKey("kinds.id", name="kind_replaced_by_id"), nullable=True
     )
     replaced_by: Mapped[Optional["Kind"]] = relationship(
@@ -551,7 +542,7 @@ class TileVisit(DB.Model):
         index=True,
     )
     first_activity: Mapped["Activity"] = relationship(foreign_keys=[first_activity_id])
-    first_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+    first_time: Mapped[datetime.datetime | None] = mapped_column(
         sa.DateTime, nullable=True
     )
 
@@ -561,7 +552,7 @@ class TileVisit(DB.Model):
         nullable=False,
     )
     last_activity: Mapped["Activity"] = relationship(foreign_keys=[last_activity_id])
-    last_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+    last_time: Mapped[datetime.datetime | None] = mapped_column(
         sa.DateTime, nullable=True
     )
 
@@ -733,23 +724,23 @@ class SegmentMatch(DB.Model):
 
     # Entry point in the activity time series
     entry_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    entry_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+    entry_time: Mapped[datetime.datetime | None] = mapped_column(
         sa.DateTime, nullable=True
     )
 
     # Exit point in the activity time series
     exit_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    exit_time: Mapped[Optional[datetime.datetime]] = mapped_column(
+    exit_time: Mapped[datetime.datetime | None] = mapped_column(
         sa.DateTime, nullable=True
     )
 
     # Computed duration for easy querying/sorting
-    duration: Mapped[Optional[datetime.timedelta]] = mapped_column(
+    duration: Mapped[datetime.timedelta | None] = mapped_column(
         sa.Interval, nullable=True
     )
 
     # Distance covered in this segment effort (may differ slightly from segment length)
-    distance_km: Mapped[Optional[float]] = mapped_column(sa.Float, nullable=True)
+    distance_km: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
 
     def __repr__(self) -> str:
         duration_str = str(self.duration).split(".")[0] if self.duration else "unknown"

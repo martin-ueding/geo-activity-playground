@@ -6,7 +6,6 @@ import sys
 import traceback
 import urllib.parse
 import zoneinfo
-from typing import Optional
 
 import dateutil.parser
 import numpy as np
@@ -14,17 +13,16 @@ import pandas as pd
 from tqdm import tqdm
 
 from ..core.config import Config
-from ..core.datamodel import DEFAULT_UNKNOWN_NAME
-from ..core.datamodel import get_or_make_equipment
-from ..core.datamodel import get_or_make_kind
+from ..core.datamodel import (
+    DEFAULT_UNKNOWN_NAME,
+    get_or_make_equipment,
+    get_or_make_kind,
+)
 from ..core.enrichment import update_and_commit
 from ..core.paths import activity_extracted_meta_dir
-from ..core.tasks import work_tracker_path
-from ..core.tasks import WorkTracker
-from .activity_parsers import ActivityParseError
-from .activity_parsers import read_activity
+from ..core.tasks import WorkTracker, work_tracker_path
+from .activity_parsers import ActivityParseError, read_activity
 from .csv_parser import parse_csv
-
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +137,7 @@ EXPECTED_COLUMNS = [
 ]
 
 
-def float_with_comma_or_period(x: str) -> Optional[float]:
+def float_with_comma_or_period(x: str) -> float | None:
     if len(x) == 0:
         return 0
 
@@ -173,7 +171,7 @@ def import_from_strava_checkout(config: Config) -> None:
         dayfirst = True
     else:
         logger.error(
-            f"You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
+            "You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
         )
         print(header)
         sys.exit(1)
@@ -210,7 +208,7 @@ def import_from_strava_checkout(config: Config) -> None:
 
         try:
             activity, time_series = read_activity(activity_file)
-        except ActivityParseError as e:
+        except ActivityParseError:
             logger.error(f"Error while parsing `{activity_file}`:")
             traceback.print_exc()
             continue

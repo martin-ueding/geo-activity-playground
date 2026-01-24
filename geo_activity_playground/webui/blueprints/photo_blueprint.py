@@ -4,26 +4,16 @@ import uuid
 
 import geojson
 import sqlalchemy
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import Blueprint, Response, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from PIL import Image
-from PIL import ImageOps
+from PIL import Image, ImageOps
 
 from ...core.config import ConfigAccessor
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import Photo
+from ...core.datamodel import DB, Activity, Photo
 from ...core.paths import PHOTOS_DIR
 from ...core.photos import get_metadata_from_image
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-from ..flasher import Flasher
-from ..flasher import FlashTypes
+from ..authenticator import Authenticator, needs_authentication
+from ..flasher import Flasher, FlashTypes
 
 
 def make_photo_blueprint(

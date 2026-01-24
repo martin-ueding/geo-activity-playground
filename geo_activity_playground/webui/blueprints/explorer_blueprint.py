@@ -7,8 +7,6 @@ import itertools
 import logging
 from collections.abc import Iterable
 from typing import Any
-from typing import Optional
-from typing import Union
 
 import altair as alt
 import geojson
@@ -17,40 +15,38 @@ import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
 import sqlalchemy
-from flask import Blueprint
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import (
+    Blueprint,
+    Response,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
-from ...core.config import Config
-from ...core.config import ConfigAccessor
+from ...core.config import Config, ConfigAccessor
 from ...core.coordinates import Bounds
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import ExplorerTileBookmark
-from ...core.datamodel import TileVisit
-from ...core.raster_map import ImageTransform
-from ...core.raster_map import OSM_TILE_SIZE
-from ...core.raster_map import TileGetter
-from ...core.tiles import compute_tile
-from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.grid_file import get_border_tiles
-from ...explorer.grid_file import make_grid_file_geojson
-from ...explorer.grid_file import make_grid_file_gpx
-from ...explorer.grid_file import make_grid_points
-from ...explorer.tile_visits import compute_tile_evolution
-from ...explorer.tile_visits import get_tile_count
-from ...explorer.tile_visits import get_tile_history_df
-from ...explorer.tile_visits import get_tile_medians
-from ...explorer.tile_visits import TileEvolutionState
-from ...explorer.tile_visits import TileVisitAccessor
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
+from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit
+from ...core.raster_map import OSM_TILE_SIZE, ImageTransform, TileGetter
+from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
+from ...explorer.grid_file import (
+    get_border_tiles,
+    make_grid_file_geojson,
+    make_grid_file_gpx,
+    make_grid_points,
+)
+from ...explorer.tile_visits import (
+    TileEvolutionState,
+    TileVisitAccessor,
+    compute_tile_evolution,
+    get_tile_count,
+    get_tile_history_df,
+    get_tile_medians,
+)
+from ..authenticator import Authenticator, needs_authentication
 
 alt.data_transformers.enable("vegafusion")
 
@@ -58,7 +54,7 @@ logger = logging.getLogger(__name__)
 
 
 def blend_color(
-    base: np.ndarray, addition: Union[np.ndarray, float], opacity: float
+    base: np.ndarray, addition: np.ndarray | float, opacity: float
 ) -> np.ndarray:
     return (1 - opacity) * base + opacity * addition
 
@@ -74,7 +70,7 @@ def hex_color_to_float(color: str) -> np.ndarray:
 
 class ColorStrategy(abc.ABC):
     @abc.abstractmethod
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         pass
 
 
@@ -92,7 +88,7 @@ class MaxClusterColorStrategy(ColorStrategy):
         )
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.max_cluster_members:
             return hex_color_to_float(self._config.color_strategy_max_cluster_color)
         elif tile_xy in self.evolution_state.memberships:
@@ -118,7 +114,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         self._cmap = matplotlib.colormaps["hsv"]
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.evolution_state.memberships:
             cluster_id = self.evolution_state.memberships[tile_xy]
             m = hashlib.sha256()
@@ -139,7 +135,7 @@ class VisitTimeColorStrategy(ColorStrategy):
         self.use_first = use_first
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             today = datetime.date.today()
             cmap = matplotlib.colormaps["plasma"]
@@ -165,7 +161,7 @@ class NumVisitsColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
@@ -180,7 +176,7 @@ class MissingColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             return None
         else:
@@ -192,7 +188,7 @@ class VisitedColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             return hex_color_to_float(self._config.color_strategy_visited_color)
         else:
@@ -214,7 +210,7 @@ class SquarePlannerColorStrategy(ColorStrategy):
         self.square_y = square_y
         self.square_size = square_size
 
-    def _color(self, tile_xy: tuple[int, int]) -> Optional[np.ndarray]:
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         x, y = tile_xy
         if (
             self.square_x <= x < self.square_x + self.square_size

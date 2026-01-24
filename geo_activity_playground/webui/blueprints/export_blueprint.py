@@ -1,14 +1,10 @@
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import Response
-from flask.typing import ResponseReturnValue
+from datetime import date
+
+from flask import Blueprint, Response, render_template, request
 
 from ...core.export import export_all
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
+from ..authenticator import Authenticator, needs_authentication
 
-from datetime import date
 
 def make_export_blueprint(authenticator: Authenticator) -> Blueprint:
     blueprint = Blueprint("export", __name__, template_folder="templates")

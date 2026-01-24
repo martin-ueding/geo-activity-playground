@@ -5,8 +5,7 @@ import logging
 import pathlib
 import pickle
 import zoneinfo
-from typing import Iterator
-from typing import Optional
+from collections.abc import Iterator
 from typing import TypedDict
 
 import pandas as pd
@@ -14,21 +13,16 @@ from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
-from ..core.datamodel import Activity
-from ..core.datamodel import DB
-from ..core.datamodel import TileVisit
+from ..core.datamodel import DB, TileVisit
 from ..core.paths import atomic_open
-from ..core.tasks import try_load_pickle
-from ..core.tasks import work_tracker_path
-from ..core.tasks import WorkTracker
-from ..core.tiles import adjacent_to
-from ..core.tiles import interpolate_missing_tile
+from ..core.tasks import WorkTracker, try_load_pickle, work_tracker_path
+from ..core.tiles import adjacent_to, interpolate_missing_tile
 
 logger = logging.getLogger(__name__)
 
 
 def get_first_visits_for_activity(
-    activity_id: int, zoom: Optional[int] = None
+    activity_id: int, zoom: int | None = None
 ) -> list[TileVisit]:
     """Get all tiles that were first visited by the given activity.
 
@@ -125,8 +119,8 @@ class TileEvolutionState:
         self.max_square_size = 0
         self.visited_tiles: set[tuple[int, int]] = set()
         self.square_evolution = pd.DataFrame()
-        self.square_x: Optional[int] = None
-        self.square_y: Optional[int] = None
+        self.square_x: int | None = None
+        self.square_y: int | None = None
 
 
 class TileState(TypedDict):
@@ -146,7 +140,7 @@ class TileVisitAccessor:
 
     def __init__(self) -> None:
         self.tile_state: TileState = try_load_pickle(self.PATH)
-        self._pending_migration: Optional[dict] = None
+        self._pending_migration: dict | None = None
 
         if self.tile_state is None:
             # Try loading old pickle - defer DB migration until we have app context
@@ -263,7 +257,7 @@ def _migrate_from_pickle_to_db(old_tile_state: dict) -> None:
                     last_time = info.get("last_time")
                     db_first_time = first_time.to_pydatetime() if pd.notna(first_time) else None
                     db_last_time = last_time.to_pydatetime() if pd.notna(last_time) else None
-                    
+
                     # Get visit count from activity_ids if present, otherwise from visit_count
                     if "activity_ids" in info:
                         visit_count = len(info["activity_ids"])
@@ -389,10 +383,10 @@ def _process_activity(
             if activity.kind.consider_for_achievements:
                 if time is not None and time.tz is None:
                     time = time.tz_localize("UTC")
-                
+
                 is_new_tile = tile not in tile_state["tile_visits"][zoom]
                 tile_visit = tile_state["tile_visits"][zoom][tile]
-                
+
                 if is_new_tile:
                     # New tile - create DB record
                     db_time = time.to_pydatetime() if pd.notna(time) else None
@@ -418,7 +412,7 @@ def _process_activity(
                     # Existing tile - update visit count and last visit
                     tile_visit["visit_count"] = tile_visit.get("visit_count", 1) + 1
                     tiles_to_update.append((tile, time))
-                    
+
                     # Update first/last times in memory
                     first_time = tile_visit.get("first_time", None)
                     last_time = tile_visit.get("last_time", None)

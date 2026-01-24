@@ -4,7 +4,6 @@ import pathlib
 import pprint
 import zoneinfo
 
-import dateutil.parser
 import exifread
 
 

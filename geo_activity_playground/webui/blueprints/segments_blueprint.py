@@ -3,26 +3,20 @@ import geojson
 import numpy as np
 import pandas as pd
 import sqlalchemy
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.config import Config
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import Segment
-from ...core.segments import extract_segment_from_geojson
-from ...core.segments import find_matches
-from ...core.segments import segment_track_distance
+from ...core.datamodel import DB, Activity, Segment
+from ...core.segments import (
+    extract_segment_from_geojson,
+    find_matches,
+    segment_track_distance,
+)
 from ...explorer.tile_visits import TileVisitAccessor
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-from ..flasher import Flasher
-from ..flasher import FlashTypes
+from ..authenticator import Authenticator, needs_authentication
+from ..flasher import Flasher, FlashTypes
 
 
 def make_segments_blueprint(

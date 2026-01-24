@@ -1,26 +1,22 @@
 import datetime
-from math import ceil
 
 import altair as alt
 import numpy as np
 import pandas as pd
-from flask import Blueprint
-from flask import render_template
-from flask import Request
-from flask import request
+from flask import Blueprint, Request, render_template, request
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
-from ...core.meta_search import apply_search_filter
-from ...core.meta_search import get_stored_queries
-from ...core.meta_search import parse_search_params
-from ...core.meta_search import primitives_to_jinja
-from ...core.meta_search import register_search_query
+from ...core.meta_search import (
+    apply_search_filter,
+    get_stored_queries,
+    parse_search_params,
+    primitives_to_jinja,
+    register_search_query,
+)
 from ..authenticator import Authenticator
-from ..columns import column_distance
-from ..columns import column_elevation_gain
-from ..columns import ColumnDescription
+from ..columns import ColumnDescription, column_distance, column_elevation_gain
 
 
 def register_eddington_blueprint(
