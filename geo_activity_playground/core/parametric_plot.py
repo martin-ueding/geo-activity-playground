@@ -4,7 +4,6 @@ from flask_babel import lazy_gettext as _
 
 from .datamodel import PlotSpec
 
-
 MARKS = {
     "point": _("Point"),
     "circle": _("Circle"),
@@ -133,44 +132,52 @@ def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
 
         encodings = [
             (
-                alt.X(spec.x, type="ordinal", title=VARIABLES_2[spec.x])
+                alt.X(spec.x, type="ordinal", title=str(VARIABLES_2[spec.x]))
                 if spec.mark == "rect"
-                else alt.X(spec.x, title=VARIABLES_2[spec.x])
+                else alt.X(spec.x, title=str(VARIABLES_2[spec.x]))
             ),
             (
-                alt.Y(spec.y, type="ordinal", title=VARIABLES_2[spec.y])
+                alt.Y(spec.y, type="ordinal", title=str(str(VARIABLES_2[spec.y])))
                 if spec.mark == "rect"
-                else alt.Y(spec.y, title=VARIABLES_2[spec.y])
+                else alt.Y(spec.y, title=str(VARIABLES_2[spec.y]))
             ),
         ]
         tooltips = [
-            alt.Tooltip(spec.x, title=VARIABLES_2[spec.x]),
-            alt.Tooltip(spec.y, title=VARIABLES_2[spec.y]),
+            alt.Tooltip(spec.x, title=str(VARIABLES_2[spec.x])),
+            alt.Tooltip(spec.y, title=str(VARIABLES_2[spec.y])),
         ]
 
         if spec.color:
-            encodings.append(alt.Color(spec.color, title=VARIABLES_2[spec.color]))
-            tooltips.append(alt.Tooltip(spec.color, title=VARIABLES_2[spec.color]))
+            encodings.append(alt.Color(spec.color, title=str(VARIABLES_2[spec.color])))
+            tooltips.append(alt.Tooltip(spec.color, title=str(VARIABLES_2[spec.color])))
         if spec.shape:
-            encodings.append(alt.Shape(spec.shape, title=VARIABLES_2[spec.shape]))
-            tooltips.append(alt.Tooltip(spec.shape, title=VARIABLES_2[spec.shape]))
+            encodings.append(alt.Shape(spec.shape, title=str(VARIABLES_2[spec.shape])))
+            tooltips.append(alt.Tooltip(spec.shape, title=str(VARIABLES_2[spec.shape])))
         if spec.size:
-            encodings.append(alt.Size(spec.size, title=VARIABLES_2[spec.size]))
-            tooltips.append(alt.Tooltip(spec.size, title=VARIABLES_2[spec.size]))
+            encodings.append(alt.Size(spec.size, title=str(VARIABLES_2[spec.size])))
+            tooltips.append(alt.Tooltip(spec.size, title=str(VARIABLES_2[spec.size])))
         if spec.opacity:
-            encodings.append(alt.Opacity(spec.opacity, title=VARIABLES_2[spec.opacity]))
-            tooltips.append(alt.Tooltip(spec.opacity, title=VARIABLES_2[spec.opacity]))
+            encodings.append(
+                alt.Opacity(spec.opacity, title=str(VARIABLES_2[spec.opacity]))
+            )
+            tooltips.append(
+                alt.Tooltip(spec.opacity, title=str(VARIABLES_2[spec.opacity]))
+            )
         if spec.row:
-            encodings.append(alt.Row(spec.row, title=VARIABLES_2[spec.row]))
-            tooltips.append(alt.Tooltip(spec.row, title=VARIABLES_2[spec.row]))
+            encodings.append(alt.Row(spec.row, title=str(VARIABLES_2[spec.row])))
+            tooltips.append(alt.Tooltip(spec.row, title=str(VARIABLES_2[spec.row])))
         if spec.column:
-            encodings.append(alt.Column(spec.column, title=VARIABLES_2[spec.column]))
-            tooltips.append(alt.Tooltip(spec.column, title=VARIABLES_2[spec.column]))
+            encodings.append(
+                alt.Column(spec.column, title=str(VARIABLES_2[spec.column]))
+            )
+            tooltips.append(
+                alt.Tooltip(spec.column, title=str(VARIABLES_2[spec.column]))
+            )
         if spec.facet:
             encodings.append(
-                alt.Facet(spec.facet, columns=3, title=VARIABLES_2[spec.facet])
+                alt.Facet(spec.facet, columns=3, title=str(VARIABLES_2[spec.facet]))
             )
-            tooltips.append(alt.Tooltip(spec.facet, title=VARIABLES_2[spec.facet]))
+            tooltips.append(alt.Tooltip(spec.facet, title=str(VARIABLES_2[spec.facet])))
 
         key = str(int(key) if isinstance(key, float) else key)
         chart_groups[key] = (
