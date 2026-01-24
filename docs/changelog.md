@@ -22,7 +22,8 @@ Added:
 - Add start and end markers to each track in landing page view.
 - Add Mapterhorn tiles. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
 - Add instructions for Google Gemini such that a few things become easier.
-- Add references to MyTourbook, Endurain and FitPub to the documentation.
+- Add references to the similar projects MyTourbook, Endurain and FitPub to the documentation.
+- Add reference to CoMaps to the documentation. ([GH-390](https://github.com/martin-ueding/geo-activity-playground/issues/390))
 
 Changed:
 
