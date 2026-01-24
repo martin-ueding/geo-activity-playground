@@ -19,24 +19,28 @@ Types of changes
 
 Added:
 
-- Add start and end markers to each track in landing page view.
-- Add Mapterhorn tiles. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
-- Add instructions for Google Gemini such that a few things become easier.
-- Add references to the similar projects MyTourbook, Endurain and FitPub to the documentation.
-- Add reference to CoMaps to the documentation. ([GH-390](https://github.com/martin-ueding/geo-activity-playground/issues/390))
+- Add **start and end markers** to each track in landing page view.
+- Add **Mapterhorn** tiles. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
+- Add references to the similar projects **MyTourbook**, **Endurain** and **FitPub** to the documentation.
+- Add reference to **CoMaps** to the documentation. ([GH-390](https://github.com/martin-ueding/geo-activity-playground/issues/390))
 
 Changed:
 
-- ⚠️ Switch project management from Poetry to uv. If you are a user that install this package via `pip install`, `pipx install`, `uv tool install`, you don't need to change anything. If you are a developer, you will now need to use `uv run` instead of `poetry run`.
-- For some reason, there are errors in Pandas when the import happens in a separate thread. For the time being, I need to import new activities first.
+- For some reason, there are errors in Pandas when the import happens in a separate thread. For the time being, I need to import new activities before you can interact with the server.
 
 Fixed:
 
-- Change unit of heart rate from Hz to 1/min. ([GH-399](https://github.com/martin-ueding/geo-activity-playground/issues/399))
+- Change **unit of heart rate** from Hz to 1/min. ([GH-399](https://github.com/martin-ueding/geo-activity-playground/issues/399))
 - Recover from `AttributeError` that could happen during startup.
 - Unify Pandas datetime instances to nanosecond resolution if needed.
 - Do not crash when a historic search query references a now deleted activity kind.
-- Fix rotated text in Eddington plot and custom plots. ([GH-388](https://github.com/martin-ueding/geo-activity-playground/issues/388))
+- Fix **rotated text in Eddington plot** and custom plots. ([GH-388](https://github.com/martin-ueding/geo-activity-playground/issues/388))
+
+Developers:
+
+- ⚠️ Switch project management from Poetry to **uv**. If you are a user that install this package via `pip install`, `pipx install`, `uv tool install`, you don't need to change anything. If you are a developer, you will now need to use `uv run` instead of `poetry run`.
+- Replace Black and Reorder-Python-Imports with **Ruff**, apply it to the codebase.
+- Add instructions for Google **Gemini** such that a few things become easier.
 
 ## Version 1.20.0 — 2025-12-14
 
