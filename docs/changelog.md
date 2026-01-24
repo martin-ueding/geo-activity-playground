@@ -35,6 +35,7 @@ Fixed:
 - Unify Pandas datetime instances to nanosecond resolution if needed.
 - Do not crash when a historic search query references a now deleted activity kind.
 - Fix **rotated text in Eddington plot** and custom plots. ([GH-388](https://github.com/martin-ueding/geo-activity-playground/issues/388))
+- Separate segments in share picture.
 
 Developers:
 
