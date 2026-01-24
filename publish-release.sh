@@ -2,7 +2,7 @@
 
 set -eu
 
-version="$(poetry version --short)"
+version=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
 today=$(date +%Y-%m-%d)
 
 sed -i "s/## Unreleased/## Version $version — $today/" docs/changelog.md
@@ -12,12 +12,12 @@ git ca -m "Bump version to $version"
 git push
 
 # Tag this version and upload the tag.
-git tag "$(poetry version --short)"
+git tag "$version"
 git push --tags
 
-poetry build
-poetry publish --username __token__ --password "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND"
+uv build
+uv publish --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND"
 
-poetry run mkdocs gh-deploy
+uv run mkdocs gh-deploy
 
 echo 'Go to https://github.com/martin-ueding/geo-activity-playground/releases/new to create a new release on GitHub.'

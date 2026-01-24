@@ -1,82 +1,76 @@
-[tool.poetry]
+[project]
 name = "geo-activity-playground"
 version = "1.20.0"
 description = "Analysis of geo data activities like rides, runs or hikes."
-authors = ["Martin Ueding <mu@martin-ueding.de>"]
-license = "MIT"
+authors = [{ name = "Martin Ueding", email = "mu@martin-ueding.de" }]
+license = { text = "MIT" }
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "alembic>=1.15.2",
+    "altair>=6.0.0",
+    "appdirs>=1.4.4",
+    "charset-normalizer>=3.3.2",
+    "coloredlogs>=15.0.1",
+    "fitdecode>=0.10.0",
+    "flask>=3.0.0",
+    "geojson>=3.0.1",
+    "gpxpy>=1.5.0",
+    "jinja2>=3.1.2",
+    "matplotlib>=3.10.1",
+    "numpy>=2.2.3",
+    "pandas>=2.2.3",
+    "Pillow>=11.0.0",
+    "pyarrow>=22.0.0",
+    "python-dateutil>=2.8.2",
+    "requests>=2.28.1",
+    "shapely>=2.0.5",
+    "sqlalchemy>=2.0.40",
+    "stravalib>=2.0",
+    "tcxreader>=0.4.5",
+    "tomli>=2.0.1; python_version < '3.11'",
+    "tqdm>=4.64.0",
+    "vl-convert-python>=1.0.1",
+    "xmltodict>=0.13.0",
+    "flask-sqlalchemy>=3.1.1",
+    "flask-alembic>=3.1.1",
+    "exifread>=3.2.0",
+    "openpyxl>=3.1.5",
+    "timezonefinder>=6.5.9",
+    "vegafusion>=2.0.3",
+    "flask-babel>=4.0.0",
+]
 
-[tool.poetry.scripts]
+[project.scripts]
 geo-activity-playground = "geo_activity_playground.__main__:main"
 
-[tool.poetry.dependencies]
-python = "^3.12,<3.15"
-
-alembic = "^1.15.2"
-altair = "^6.0.0"
-appdirs = "^1.4.4"
-charset-normalizer = "^3.3.2"
-coloredlogs = "^15.0.1"
-fitdecode = "^0.10.0"
-flask = "^3.0.0"
-geojson = "^3.0.1"
-gpxpy = "^1.5.0"
-jinja2 = "^3.1.2"
-matplotlib = "^3.10.1"
-numpy = "^2.2.3"
-pandas = "^2.2.3"
-Pillow = "^11.0.0"
-pyarrow = "^22.0.0"
-python-dateutil = "^2.8.2"
-requests = "^2.28.1"
-shapely = "^2.0.5"
-sqlalchemy = "^2.0.40"
-stravalib = "^2.0"
-tcxreader = "^0.4.5"
-tomli = { version = "^2.0.1", python = "<3.11" }
-tqdm = "^4.64.0"
-vl-convert-python = "^1.0.1"
-xmltodict = "^0.13.0"
-flask-sqlalchemy = "^3.1.1"
-flask-alembic = "^3.1.1"
-exifread = "^3.2.0"
-openpyxl = "^3.1.5"
-# boto3 = "^1.38.45"
-# scipy = "^1.16.0"
-# geotiff = "^0.2.10"
-# numcodecs = "<0.15.0"
-# imagecodecs = "^2025.3.30"
-# tifffile = "2025.5.10"
-timezonefinder = "^6.5.9"
-vegafusion = ">=2.0.3"
-flask-babel = "^4.0.0"
-
-[tool.poetry.group.dev.dependencies]
-black = "^24.0.0"
-ipykernel = "^6.29.5"
-mkdocs-material = "^9.4.1"
-mypy = "^1.10.0"
-notebook = "^7.2.2"
-pandas-stubs = "^2.2.2.240603"
-py-spy = "^0.3.14"
-pytest = "^8.0"
-types-decorator = "^5.1.8.20240106"
-types-paramiko = "^3.4.0.20240120"
-types-pycurl = "^7.45.2.20240106"
-types-pytz = "^2024.1.0.20240203"
-types-pyyaml = "^6.0.12.12"
-types-requests = "^2.31.0.20240125"
-types-tqdm = "^4.66.0.20240417"
-types-typed-ast = "^1.5.8.7"
-types-xmltodict = "^0.13.0.3"
-pyright = "^1.1.399"
+[dependency-groups]
+dev = [
+    "black>=24.0.0",
+    "ipykernel>=6.29.5",
+    "mkdocs-material>=9.4.1",
+    "mypy>=1.10.0",
+    "notebook>=7.2.2",
+    "pandas-stubs>=2.2.2.240603",
+    "py-spy>=0.3.14",
+    "pytest>=8.0",
+    "types-decorator>=5.1.8.20240106",
+    "types-paramiko>=3.4.0.20240120",
+    "types-pycurl>=7.45.2.20240106",
+    "types-pytz>=2024.1.0.20240203",
+    "types-pyyaml>=6.0.12.12",
+    "types-requests>=2.31.0.20240125",
+    "types-tqdm>=4.66.0.20240417",
+    "types-typed-ast>=1.5.8.7",
+    "types-xmltodict>=0.13.0.3",
+    "pyright>=1.1.399",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.mypy]
 disable_error_code = "import-untyped"
-
 
 [tool.pyright]
 include = ['geo_activity_playground']

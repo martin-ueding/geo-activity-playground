@@ -50,9 +50,9 @@ Working with thousands of activities, thousands of tiles and millions of points 
 
 I need to store the intermediate data frames that I generate with Pandas. Storing as JSON has disadvantages because dates are not properly encoded. Also it is a text format and quite verbose. The [Parquet format](https://parquet.apache.org/) is super fast and memory efficient.
 
-## Poetry
+## uv
 
-For managing all the Python package dependencies I use [Poetry](https://python-poetry.org/) which makes it very easy to have all the Python project housekeeping with one tool.
+For managing all the Python package dependencies I use [uv](https://docs.astral.sh/uv/) which makes it very easy to have all the Python project housekeeping with one tool.
 
 ## Python
 

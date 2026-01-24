@@ -11,7 +11,7 @@ repos:
     hooks:
       - id: black
         name: Code formatting
-        entry: poetry run black
+        entry: uv run black
         language: system
         files: '.*\.py'
         exclude: '.*\.py\.mako'
