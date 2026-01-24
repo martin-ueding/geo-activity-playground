@@ -1,11 +1,7 @@
 import functools
-from typing import Callable
+from collections.abc import Callable
 
-from flask import flash
-from flask import redirect
-from flask import request
-from flask import session
-from flask import url_for
+from flask import flash, redirect, request, session, url_for
 from flask.typing import RouteCallable
 
 from ..core.config import Config

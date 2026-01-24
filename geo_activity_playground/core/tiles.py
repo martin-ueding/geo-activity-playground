@@ -1,11 +1,9 @@
 import logging
 import math
-from typing import Iterator
-from typing import Optional
+from collections.abc import Iterator
 
 import numpy as np
 import pandas as pd
-
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +49,7 @@ def xy_to_latlon(x: float, y: float, zoom: int) -> tuple[float, float]:
 
 def interpolate_missing_tile(
     x1: float, y1: float, x2: float, y2: float
-) -> Optional[tuple[int, int]]:
+) -> tuple[int, int] | None:
     # We are only interested in diagonal tile combinations, therefore we skip adjacent ones.
     if int(x1) == int(x2) or int(y1) == int(y2):
         return None

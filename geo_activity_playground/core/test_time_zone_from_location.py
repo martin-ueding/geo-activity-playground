@@ -1,5 +1,4 @@
-from .time_conversion import get_country_timezone
-from .time_conversion import get_timezone
+from .time_conversion import get_country_timezone, get_timezone
 
 
 def test_time_zone_from_location() -> None:

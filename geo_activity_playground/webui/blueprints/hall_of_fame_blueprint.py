@@ -2,19 +2,17 @@ import collections
 import logging
 
 import pandas as pd
-from flask import Blueprint
-from flask import render_template
-from flask import request
+from flask import Blueprint, render_template, request
 
-from ...core.activities import ActivityRepository
-from ...core.activities import make_geojson_from_time_series
-from ...core.meta_search import apply_search_filter
-from ...core.meta_search import get_stored_queries
-from ...core.meta_search import parse_search_params
-from ...core.meta_search import primitives_to_jinja
-from ...core.meta_search import register_search_query
+from ...core.activities import ActivityRepository, make_geojson_from_time_series
+from ...core.meta_search import (
+    apply_search_filter,
+    get_stored_queries,
+    parse_search_params,
+    primitives_to_jinja,
+    register_search_query,
+)
 from ..authenticator import Authenticator
-
 
 logger = logging.getLogger(__name__)
 

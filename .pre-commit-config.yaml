@@ -2,28 +2,9 @@ default_stages:
   - pre-commit
 fail_fast: true
 repos:
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.5.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.0
     hooks:
-      - id: reorder-python-imports
-        name: Import reordering
-  - repo: local
-    hooks:
-      - id: black
-        name: Code formatting
-        entry: uv run black
-        language: system
-        files: '.*\.py'
-        exclude: '.*\.py\.mako'
-#      - id: mypy
-#        name: Static type checking
-#        entry: poetry run mypy -p geo_activity_playground
-#        language: system
-#        files: '.*\.py'
-#        pass_filenames: false
-#      - id: pytest
-#        name: Unit tests
-#        entry: poetry run pytest
-#        pass_filenames: false
-#        language: system
-#        files: '.*\.py'
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format

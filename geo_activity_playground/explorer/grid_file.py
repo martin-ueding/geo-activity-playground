@@ -1,7 +1,6 @@
 import json
 import logging
 from collections.abc import Iterable
-from typing import Optional
 
 import geojson
 import gpxpy
@@ -9,7 +8,6 @@ import pandas as pd
 
 from ..core.coordinates import Bounds
 from ..core.tiles import get_tile_upper_left_lat_lon
-
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +41,7 @@ def make_explorer_tile(
 
 
 def make_explorer_rectangle(
-    x1: int, y1: int, x2: int, y2: int, zoom: int, properties: Optional[dict] = None
+    x1: int, y1: int, x2: int, y2: int, zoom: int, properties: dict | None = None
 ) -> geojson.Feature:
     corners = [
         get_tile_upper_left_lat_lon(*args)

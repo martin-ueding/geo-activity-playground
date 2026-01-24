@@ -2,15 +2,14 @@ import datetime
 import logging
 import uuid
 import zoneinfo
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
 
 from .config import Config
 from .coordinates import get_distance
-from .datamodel import Activity
-from .datamodel import DB
+from .datamodel import DB, Activity
 from .missing_values import some
 from .tiles import compute_tile_float
 from .time_conversion import get_timezone

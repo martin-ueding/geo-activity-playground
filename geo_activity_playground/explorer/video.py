@@ -1,16 +1,11 @@
 import dataclasses
 import math
 import pathlib
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
+from collections.abc import Generator
 
 import numpy as np
 import pandas as pd
-from PIL import Image
-from PIL import ImageEnhance
+from PIL import Image, ImageEnhance
 from tqdm import tqdm
 
 from ..core.raster_map import get_tile
@@ -21,12 +16,12 @@ from ..core.raster_map import get_tile
 def build_image(
     center_x: float,
     center_y: float,
-    explored: Set[Tuple[int, int]],
+    explored: set[tuple[int, int]],
     brightness: float = 1.0,
     width: int = 1920,
     height: int = 1080,
     frame_counter: int = 0,
-) -> Optional[Image.Image]:
+) -> Image.Image | None:
     path = pathlib.Path(f"video/{frame_counter:06d}.png")
     if path.exists():
         return None
@@ -61,10 +56,10 @@ def build_image(
     return img
 
 
-def chunk_tiles(tiles: pd.DataFrame) -> List[List[Tuple[int, int]]]:
+def chunk_tiles(tiles: pd.DataFrame) -> list[list[tuple[int, int]]]:
     last_x, last_y = -1000, -1000
-    chunks: List[List[Tuple[int, int]]] = []
-    chunk: List[Tuple[int, int]] = []
+    chunks: list[list[tuple[int, int]]] = []
+    chunk: list[tuple[int, int]] = []
     for index, row in tiles.iterrows():
         x, y = row["Tile X"], row["Tile Y"]
         if abs(x - last_x) + abs(y - last_y) > 3:
@@ -80,12 +75,12 @@ def chunk_tiles(tiles: pd.DataFrame) -> List[List[Tuple[int, int]]]:
 class RenderArguments:
     center_x: float
     center_y: float
-    explored: Set[Tuple[int, int]]
+    explored: set[tuple[int, int]]
     brightness: float
 
 
 def animate_chunk(
-    chunk: List[Tuple[int, int]], explored: Set[Tuple[int, int]]
+    chunk: list[tuple[int, int]], explored: set[tuple[int, int]]
 ) -> Generator[RenderArguments, None, None]:
     if len(chunk) == 1:
         x, y = chunk[0]

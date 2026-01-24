@@ -3,7 +3,6 @@ import io
 import logging
 import pathlib
 import re
-from typing import Optional
 
 import altair as alt
 import geojson
@@ -11,41 +10,39 @@ import matplotlib
 import numpy as np
 import pandas as pd
 import sqlalchemy
-from flask import abort
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import Response
-from flask import url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
-from PIL import Image
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 
-from ...core.activities import ActivityRepository
-from ...core.activities import make_color_bar
-from ...core.activities import make_geojson_color_line
-from ...core.activities import make_geojson_from_time_series
+from ...core.activities import (
+    ActivityRepository,
+    make_color_bar,
+    make_geojson_color_line,
+    make_geojson_from_time_series,
+)
 from ...core.config import Config
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.datamodel import Equipment
-from ...core.datamodel import Kind
-from ...core.datamodel import Tag
-from ...core.datamodel import TileVisit
+from ...core.datamodel import DB, Activity, Equipment, Kind, Tag, TileVisit
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
-from ...core.raster_map import map_image_from_tile_bounds
-from ...core.raster_map import OSM_MAX_ZOOM
-from ...core.raster_map import OSM_TILE_SIZE
-from ...core.raster_map import tile_bounds_around_center
-from ...explorer.grid_file import make_grid_file_geojson
-from ...explorer.grid_file import make_grid_points
+from ...core.raster_map import (
+    OSM_MAX_ZOOM,
+    OSM_TILE_SIZE,
+    map_image_from_tile_bounds,
+    tile_bounds_around_center,
+)
+from ...explorer.grid_file import make_grid_file_geojson, make_grid_points
 from ...explorer.tile_visits import TileVisitAccessor
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
+from ..authenticator import Authenticator, needs_authentication
 from ..columns import TIME_SERIES_COLUMNS
 
 logger = logging.getLogger(__name__)
@@ -709,7 +706,7 @@ def make_sharepic(
     facts = {
         key: value
         for key, value in facts.items()
-        if not key in sharepic_suppressed_fields
+        if key not in sharepic_suppressed_fields
     }
 
     draw.text(
@@ -773,7 +770,7 @@ def make_day_sharepic(
 
 def _extract_heart_rate_zones(
     time_series: pd.DataFrame, heart_rate_zone_computer: HeartRateZoneComputer
-) -> Optional[pd.DataFrame]:
+) -> pd.DataFrame | None:
     if "heartrate" not in time_series:
         return
 

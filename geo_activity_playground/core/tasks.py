@@ -3,13 +3,9 @@ import json
 import pathlib
 import pickle
 from collections.abc import Iterable
-from typing import Any
-from typing import Generic
-from typing import Sequence
-from typing import TypeVar
+from typing import Any, TypeVar
 
-from .paths import atomic_open
-from .paths import cache_dir
+from .paths import atomic_open, cache_dir
 
 T = TypeVar("T")
 

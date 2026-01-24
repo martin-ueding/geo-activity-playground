@@ -1,13 +1,10 @@
-import os
 import logging
+import os
 
 from flask import Blueprint
-from flask import render_template
 from flask.typing import ResponseReturnValue
 
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
-
+from ..authenticator import Authenticator, needs_authentication
 
 logger = logging.getLogger(__name__)
 

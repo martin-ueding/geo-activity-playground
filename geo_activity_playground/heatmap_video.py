@@ -5,16 +5,17 @@ import pathlib
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
-from PIL import Image
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 from tqdm import tqdm
 
 from .core.activities import ActivityRepository
 from .core.config import ConfigAccessor
-from .core.raster_map import convert_to_grayscale
-from .core.raster_map import map_image_from_tile_bounds
-from .core.raster_map import OSM_TILE_SIZE
-from .core.raster_map import tile_bounds_around_center
+from .core.raster_map import (
+    OSM_TILE_SIZE,
+    convert_to_grayscale,
+    map_image_from_tile_bounds,
+    tile_bounds_around_center,
+)
 from .core.tiles import compute_tile_float
 
 

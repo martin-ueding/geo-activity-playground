@@ -1,22 +1,18 @@
-import json
 import urllib.parse
 
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
 import sqlalchemy
+from flask import Blueprint, redirect, render_template, request
 
-from ...core.datamodel import DB
-from ...core.datamodel import StoredSearchQuery
-from ...core.meta_search import apply_search_filter
-from ...core.meta_search import get_stored_queries
-from ...core.meta_search import parse_search_params
-from ...core.meta_search import primitives_to_jinja
-from ...core.meta_search import primitives_to_json
-from ...core.meta_search import register_search_query
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
+from ...core.datamodel import DB, StoredSearchQuery
+from ...core.meta_search import (
+    apply_search_filter,
+    get_stored_queries,
+    parse_search_params,
+    primitives_to_jinja,
+    primitives_to_json,
+    register_search_query,
+)
+from ..authenticator import Authenticator, needs_authentication
 
 
 def make_search_blueprint(authenticator: Authenticator) -> Blueprint:

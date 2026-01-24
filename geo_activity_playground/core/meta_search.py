@@ -1,18 +1,13 @@
 import datetime
 import json
 import urllib.parse
-from typing import Optional
 
 import dateutil.parser
 import pandas as pd
 import sqlalchemy
 from werkzeug.datastructures import MultiDict
 
-from .datamodel import Activity
-from .datamodel import DB
-from .datamodel import query_activity_meta
-from .datamodel import StoredSearchQuery
-from .datamodel import Tag
+from .datamodel import DB, Activity, StoredSearchQuery, Tag, query_activity_meta
 
 
 def parse_search_params(args: MultiDict) -> dict:
@@ -110,7 +105,7 @@ def primitives_to_jinja(primitives: dict) -> dict:
     }
 
 
-def register_search_query(primitives: dict) -> Optional[StoredSearchQuery]:
+def register_search_query(primitives: dict) -> StoredSearchQuery | None:
     """Store or update a search query in the database. Returns the stored query or None if inactive."""
     if not primitives:
         return None
@@ -203,14 +198,14 @@ def apply_search_filter(primitives: dict) -> pd.DataFrame:
     return query_activity_meta(filter_clauses)
 
 
-def _optional_float(s: Optional[str]) -> Optional[float]:
+def _optional_float(s: str | None) -> float | None:
     if s:
         return float(s)
     else:
         return None
 
 
-def _parse_date_or_none(s: Optional[str]) -> Optional[datetime.date]:
+def _parse_date_or_none(s: str | None) -> datetime.date | None:
     if not s:
         return None
     else:

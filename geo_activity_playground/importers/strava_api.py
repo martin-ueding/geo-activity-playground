@@ -4,33 +4,28 @@ import pathlib
 import pickle
 import time
 import zoneinfo
-from typing import Optional
 
 import pandas as pd
 import sqlalchemy
 from stravalib import Client
-from stravalib.exc import Fault
-from stravalib.exc import ObjectNotFound
-from stravalib.exc import RateLimitExceeded
+from stravalib.exc import Fault, ObjectNotFound, RateLimitExceeded
 from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
-from ..core.datamodel import Activity
-from ..core.datamodel import DB
-from ..core.datamodel import get_or_make_equipment
-from ..core.datamodel import get_or_make_kind
-from ..core.enrichment import apply_enrichments
+from ..core.datamodel import DB, Activity, get_or_make_equipment, get_or_make_kind
 from ..core.enrichment import update_and_commit
-from ..core.paths import activity_extracted_time_series_dir
-from ..core.paths import strava_api_dir
-from ..core.paths import strava_last_activity_date_path
-from ..core.tasks import get_state
-from ..core.tasks import set_state
-from ..explorer.tile_visits import compute_tile_evolution
-from ..explorer.tile_visits import compute_tile_visits_new
-from ..explorer.tile_visits import TileVisitAccessor
-
+from ..core.paths import (
+    activity_extracted_time_series_dir,
+    strava_api_dir,
+    strava_last_activity_date_path,
+)
+from ..core.tasks import get_state, set_state
+from ..explorer.tile_visits import (
+    TileVisitAccessor,
+    compute_tile_evolution,
+    compute_tile_visits_new,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +77,8 @@ def import_from_strava_api(
     config: Config,
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    strava_begin: Optional[str] = None,
-    strava_end: Optional[str] = None,
+    strava_begin: str | None = None,
+    strava_end: str | None = None,
 ) -> None:
     while try_import_strava(
         config, repository, tile_visit_accessor, strava_begin, strava_end
@@ -101,8 +96,8 @@ def try_import_strava(
     config: Config,
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
-    strava_begin: Optional[str] = None,
-    strava_end: Optional[str] = None,
+    strava_begin: str | None = None,
+    strava_end: str | None = None,
 ) -> bool:
     if strava_begin:
         get_after = f"{strava_begin}T00:00:00Z"

@@ -1,20 +1,13 @@
 import logging
 
 import sqlalchemy
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import Response
-from flask import url_for
+from flask import Blueprint, redirect, render_template, url_for
 
 from ...core.config import Config
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ...core.enrichment import enrichment_set_timezone
-from ...core.enrichment import update_and_commit
+from ...core.datamodel import DB, Activity
+from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...explorer.tile_visits import TileVisitAccessor
-from ..authenticator import Authenticator
-from ..authenticator import needs_authentication
+from ..authenticator import Authenticator, needs_authentication
 
 logger = logging.getLogger(__name__)
 

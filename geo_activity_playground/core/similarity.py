@@ -3,14 +3,12 @@ import pathlib
 import imagehash
 import numpy as np
 import pandas as pd
-from PIL import Image
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 from tqdm import tqdm
 
 from .activities import ActivityRepository
 from .coordinates import get_distance
 from .tasks import stored_object
-
 
 fingerprint_path = pathlib.Path("Cache/activity_fingerprints.pickle")
 distances_path = pathlib.Path("Cache/activity_distances.pickle")

@@ -4,7 +4,6 @@ import logging
 import pathlib
 import xml
 from collections.abc import Iterator
-from typing import Union
 
 import charset_normalizer
 import dateutil.parser
@@ -14,8 +13,7 @@ import pandas as pd
 import tcxreader.tcxreader
 import xmltodict
 
-from ..core.datamodel import Activity
-from ..core.datamodel import get_or_make_kind
+from ..core.datamodel import Activity, get_or_make_kind
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +31,7 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
     activity = Activity()
 
     if len(suffixes) == 0:
-        raise ActivityParseError(f"File has no suffix, ignoring")
+        raise ActivityParseError("File has no suffix, ignoring")
 
     if suffixes[-1] == ".gz":
         opener = gzip.open
@@ -49,21 +47,21 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
             if str(e) == "latitude is mandatory in None (got None)":
                 raise NoGeoDataError() from e
             else:
-                raise ActivityParseError(f"Syntax error while parsing GPX file") from e
+                raise ActivityParseError("Syntax error while parsing GPX file") from e
         except UnicodeDecodeError as e:
-            raise ActivityParseError(f"Encoding issue") from e
+            raise ActivityParseError("Encoding issue") from e
     elif file_type == ".fit":
         try:
             activity, timeseries = read_fit_activity(path, opener)
         except fitdecode.exceptions.FitError as e:
-            raise ActivityParseError(f"Error in FIT file") from e
+            raise ActivityParseError("Error in FIT file") from e
         except KeyError as e:
-            raise ActivityParseError(f"Key error while parsing FIT file") from e
+            raise ActivityParseError("Key error while parsing FIT file") from e
     elif file_type == ".tcx":
         try:
             timeseries = read_tcx_activity(path, opener)
         except xml.etree.ElementTree.ParseError as e:
-            raise ActivityParseError(f"Syntax error in TCX file") from e
+            raise ActivityParseError("Syntax error in TCX file") from e
     elif file_type in [".kml", ".kmz"]:
         timeseries = read_kml_activity(path, opener)
     elif file_type == ".csv":  # Simra csv export
@@ -181,7 +179,7 @@ def _fit_speed_unit_factor(unit: str) -> float:
         raise ActivityParseError(f"Unknown speed unit {unit}")
 
 
-def _first_of_tuple(value: Union[float, tuple[float, float]]) -> float:
+def _first_of_tuple(value: float | tuple[float, float]) -> float:
     if isinstance(value, tuple):
         return float(value[0])
     else:

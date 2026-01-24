@@ -3,13 +3,11 @@ import datetime
 
 import pandas as pd
 import sqlalchemy
-from flask import Blueprint
-from flask import render_template
+from flask import Blueprint, render_template
 from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
+from ...core.datamodel import DB, Activity
 
 
 def make_calendar_blueprint(repository: ActivityRepository) -> Blueprint:

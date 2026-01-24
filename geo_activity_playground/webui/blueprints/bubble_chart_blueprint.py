@@ -1,13 +1,10 @@
 import altair as alt
 import pandas as pd
-from flask import Blueprint
-from flask import render_template
+from flask import Blueprint, render_template
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
-from ..columns import column_distance
-from ..columns import column_elevation_gain
-from ..columns import ColumnDescription
+from ..columns import ColumnDescription, column_distance, column_elevation_gain
 
 
 def make_bubble_chart_blueprint(repository) -> Blueprint:

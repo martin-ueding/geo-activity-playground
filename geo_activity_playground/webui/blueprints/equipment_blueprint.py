@@ -1,7 +1,6 @@
 import altair as alt
 import pandas as pd
-from flask import Blueprint
-from flask import render_template
+from flask import Blueprint, render_template
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 

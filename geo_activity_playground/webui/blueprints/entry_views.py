@@ -7,19 +7,16 @@ import flask
 import pandas as pd
 import sqlalchemy
 from flask import render_template
-from flask import Response
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
-from ...core.activities import make_geojson_from_time_series
 from ...core.config import Config
-from ...core.datamodel import Activity
-from ...core.datamodel import DB
-from ..columns import column_distance
-from ..columns import column_elevation_gain
-from ..columns import ColumnDescription
-from ..columns import META_COLUMNS
+from ...core.datamodel import DB, Activity
+from ..columns import (
+    META_COLUMNS,
+    ColumnDescription,
+)
 from ..plot_util import make_kind_scale
 
 

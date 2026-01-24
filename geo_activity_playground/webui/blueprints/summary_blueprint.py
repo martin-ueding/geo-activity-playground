@@ -3,24 +3,22 @@ import datetime
 import altair as alt
 import pandas as pd
 import sqlalchemy
-from flask import Blueprint
-from flask import render_template
-from flask import request
+from flask import Blueprint, render_template, request
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
-from ...core.datamodel import DB
-from ...core.datamodel import PlotSpec
-from ...core.meta_search import apply_search_filter
-from ...core.meta_search import get_stored_queries
-from ...core.meta_search import parse_search_params
-from ...core.meta_search import primitives_to_jinja
-from ...core.meta_search import register_search_query
+from ...core.datamodel import DB, PlotSpec
+from ...core.meta_search import (
+    apply_search_filter,
+    get_stored_queries,
+    parse_search_params,
+    primitives_to_jinja,
+    register_search_query,
+)
 from ...core.parametric_plot import make_parametric_plot
 from ..authenticator import Authenticator
-from ..columns import ColumnDescription
-from ..columns import META_COLUMNS
+from ..columns import META_COLUMNS, ColumnDescription
 from ..plot_util import make_kind_scale
 
 

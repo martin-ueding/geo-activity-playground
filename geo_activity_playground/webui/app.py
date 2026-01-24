@@ -12,34 +12,31 @@ import threading
 import urllib.parse
 import uuid
 import warnings
-from typing import Optional
 
 import pandas as pd
 import sqlalchemy
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from flask_alembic import Alembic
 from flask_babel import Babel
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
-from ..core.config import ConfigAccessor
-from ..core.config import import_old_config
-from ..core.config import import_old_strava_config
-from ..core.datamodel import Activity
-from ..core.datamodel import DB
-from ..core.datamodel import Equipment
-from ..core.datamodel import Kind
-from ..core.datamodel import Photo
-from ..core.datamodel import Tag
+from ..core.config import (
+    Config,
+    ConfigAccessor,
+    import_old_config,
+    import_old_strava_config,
+)
+from ..core.datamodel import DB, Activity, Equipment, Kind, Photo, Tag
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.paths import TIME_SERIES_DIR
-from ..core.raster_map import BlankImageTransform
-from ..core.raster_map import GrayscaleImageTransform
-from ..core.raster_map import IdentityImageTransform
-from ..core.raster_map import InverseGrayscaleImageTransform
-from ..core.raster_map import PastelImageTransform
-from ..core.raster_map import TileGetter
+from ..core.raster_map import (
+    BlankImageTransform,
+    GrayscaleImageTransform,
+    IdentityImageTransform,
+    InverseGrayscaleImageTransform,
+    PastelImageTransform,
+    TileGetter,
+)
 from ..explorer.tile_visits import TileVisitAccessor
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
@@ -63,12 +60,9 @@ from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .blueprints.time_zone_fixer_blueprint import make_time_zone_fixer_blueprint
-from .blueprints.upload_blueprint import make_upload_blueprint
-from .blueprints.upload_blueprint import scan_for_activities
+from .blueprints.upload_blueprint import make_upload_blueprint, scan_for_activities
 from .flasher import FlaskFlasher
-from .i18n import DEFAULT_LANGUAGE
-from .i18n import SUPPORTED_LANGUAGE_CODES
-from .i18n import SUPPORTED_LANGUAGES
+from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
 
 logger = logging.getLogger(__name__)
 
@@ -91,8 +85,8 @@ def importer_thread(
     repository: ActivityRepository,
     tile_visit_accessor: TileVisitAccessor,
     config: Config,
-    strava_begin: Optional[str],
-    strava_end: Optional[str],
+    strava_begin: str | None,
+    strava_end: str | None,
 ) -> None:
     with app.app_context():
         scan_for_activities(
@@ -103,7 +97,7 @@ def importer_thread(
 
 def create_app(
     database_uri: str = "sqlite:///database.sqlite",
-    secret_key: Optional[str] = None,
+    secret_key: str | None = None,
     run_migrations: bool = True,
 ) -> Flask:
     """
@@ -304,8 +298,8 @@ def web_ui_main(
     skip_reload: bool,
     host: str,
     port: int,
-    strava_begin: Optional[str],
-    strava_end: Optional[str],
+    strava_begin: str | None,
+    strava_end: str | None,
 ) -> None:
     os.chdir(basedir)
 

@@ -6,11 +6,7 @@ import sqlalchemy
 
 from .config import Config
 from .coordinates import get_distance
-from .datamodel import Activity
-from .datamodel import DB
-from .datamodel import Segment
-from .datamodel import SegmentCheck
-from .datamodel import SegmentMatch
+from .datamodel import DB, Activity, Segment, SegmentCheck, SegmentMatch
 from .tiles import compute_tile_float
 
 
