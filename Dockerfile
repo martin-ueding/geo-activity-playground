@@ -9,23 +9,24 @@ RUN apt-get update && \
     apt-get install -y gcc python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml poetry.lock /app/
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install poetry and project dependencies
-RUN pip install --no-cache-dir poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --only main --no-root
+COPY pyproject.toml uv.lock /app/
+
+# Install project dependencies
+RUN uv sync --frozen --no-dev --no-install-project
 
 # Copy the rest of the application code into the container
 COPY . /app/
 
 # Install the actual project.
-RUN poetry install --only main
+RUN uv sync --frozen --no-dev
 
 RUN mkdir /data
 
 EXPOSE 5000
 
-CMD ["python", "-m", "geo_activity_playground", "--basedir", "/data", "serve", "--host", "0.0.0.0"]
+CMD ["uv", "run", "python", "-m", "geo_activity_playground", "--basedir", "/data", "serve", "--host", "0.0.0.0"]
 
 

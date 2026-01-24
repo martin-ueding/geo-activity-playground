@@ -41,7 +41,7 @@ flash(_('Activity saved successfully.'), 'success')
 After adding new translatable strings, extract them to update the `.pot` template:
 
 ```bash
-poetry run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .
+uv run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .
 ```
 
 This scans all Python files and Jinja2 templates for `_()` calls and updates the template file.
@@ -51,7 +51,7 @@ This scans all Python files and Jinja2 templates for `_()` calls and updates the
 After extracting new strings, update all existing language catalogs:
 
 ```bash
-poetry run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations
+uv run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations
 ```
 
 This merges new strings into each language's `.po` file, marking them as untranslated (with empty `msgstr`).
@@ -63,7 +63,7 @@ To add support for a new language (e.g., French):
 1. Initialize the language catalog:
 
     ```bash
-    poetry run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l fr
+    uv run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l fr
     ```
 
 2. Add the language code to the supported locales in `app.py`:
@@ -95,7 +95,7 @@ For a better editing experience, consider using a dedicated PO editor like [Poed
 After editing `.po` files, compile them into binary `.mo` files:
 
 ```bash
-poetry run pybabel compile -d geo_activity_playground/webui/translations
+uv run pybabel compile -d geo_activity_playground/webui/translations
 ```
 
 This must be done before the translations take effect. The `.mo` files are what Flask-Babel reads at runtime.
@@ -112,10 +112,10 @@ You can test translations by:
 
 | Task | Command |
 |------|---------|
-| Extract strings | `poetry run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .` |
-| Update existing languages | `poetry run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations` |
-| Add new language | `poetry run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l LANG` |
-| Compile translations | `poetry run pybabel compile -d geo_activity_playground/webui/translations` |
+| Extract strings | `uv run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .` |
+| Update existing languages | `uv run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations` |
+| Add new language | `uv run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l LANG` |
+| Compile translations | `uv run pybabel compile -d geo_activity_playground/webui/translations` |
 
 ## Typical Workflow
 

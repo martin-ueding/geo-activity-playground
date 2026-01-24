@@ -30,22 +30,16 @@ cd geo-activity-playground
 
 Either way you will now have a new directory `geo-activity-playground` which contains the code.
 
-## Set up Poetry
+## Set up uv
 
-This project uses [Poetry](https://python-poetry.org/) for dependency management.
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
-Unless you prefer a different method, install using `pipx` like so:
+Follow the [official installation guide](https://docs.astral.sh/uv/getting-started/installation/) to install `uv`.
 
-```bash
-pipx install poetry
-```
-
-You might need to [add local bin to path](add-local-bin-to-path.md) if you get “command not found” errors later on.
-
-Then you can create the development environment by letting Poetry download and install all the dependencies by executing this in the project directory:
+Then you can create the development environment by letting `uv` download and install all the dependencies by executing this in the project directory:
 
 ```bash
-poetry install
+uv sync
 ```
 
 This is all what is needed regarding dependency management.
@@ -57,7 +51,7 @@ This project also uses [pre-commit](https://pre-commit.com/) to make sure that e
 Install pre-commit:
 
 ```bash
-pipx install pre-commit
+uv tool install pre-commit
 ```
 
 And then set it up in the project directory:
@@ -68,18 +62,14 @@ pre-commit install
 
 ## Open your editor or IDE
 
-For your development environment to properly resolve all the packages, it needs to know about the virtual environment. Use Poetry to do that for you. To start VS Code (`code` on the command line), execute this from the project directory:
-
-```bash
-poetry run code .
-```
+For your development environment to properly resolve all the packages, it needs to know about the virtual environment. `uv` creates a `.venv` directory in the project root. Most IDEs will pick it up automatically.
 
 ## Starting the program
 
 In order to test your changes, you can run the server from the Git repository like so:
 
 ```bash
-poetry run geo-activity-playground --basedir path/to/your/basedir serve
+uv run geo-activity-playground --basedir path/to/your/basedir serve
 ```
 
 ## Committing changes
