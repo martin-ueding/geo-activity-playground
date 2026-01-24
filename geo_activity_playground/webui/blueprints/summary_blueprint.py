@@ -19,14 +19,14 @@ from ...core.meta_search import (
 from ...core.parametric_plot import make_parametric_plot
 from ..authenticator import Authenticator
 from ..columns import META_COLUMNS, ColumnDescription
-from ..plot_util import make_kind_scale
 
 
 def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             df,
-            title=_("%(display_name)s per Year") % {"display_name": column.display_name},
+            title=_("%(display_name)s per Year")
+            % {"display_name": column.display_name},
         )
         .mark_bar()
         .encode(
@@ -69,7 +69,8 @@ def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             year_cumulative,
-            title=_("Cumulative %(display_name)s per Year") % {"display_name": column.display_name},
+            title=_("Cumulative %(display_name)s per Year")
+            % {"display_name": column.display_name},
         )
         .mark_line()
         .encode(
@@ -95,7 +96,8 @@ def plot_per_iso_week(df: pd.DataFrame, column: ColumnDescription) -> str:
     return (
         alt.Chart(
             df,
-            title=_("%(display_name)s per Week") % {"display_name": column.display_name},
+            title=_("%(display_name)s per Week")
+            % {"display_name": column.display_name},
         )
         .mark_circle()
         .encode(
@@ -186,7 +188,6 @@ def make_summary_blueprint(
 
         df = apply_search_filter(primitives)
 
-        kind_scale = make_kind_scale(repository.meta, config)
         df_without_nan = df.loc[~pd.isna(df["start_local"])]
 
         stored_queries = get_stored_queries()
