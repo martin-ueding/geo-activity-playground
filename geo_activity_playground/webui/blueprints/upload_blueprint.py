@@ -41,7 +41,7 @@ def make_upload_blueprint(
     def index():
         pathlib.Path("Activities").mkdir(exist_ok=True, parents=True)
         directories = []
-        for root, dirs, files in os.walk("Activities"):
+        for root, _, _ in os.walk("Activities"):
             directories.append(root)
         directories.sort()
         return render_template("upload/index.html.j2", directories=directories)
@@ -133,6 +133,5 @@ def scan_for_activities(
 
     for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
         find_matches(
-            segment,
-            tile_visit_accessor.tile_state["activities_per_tile"][17], config
+            segment, tile_visit_accessor.tile_state["activities_per_tile"][17], config
         )
