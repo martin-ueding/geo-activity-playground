@@ -74,3 +74,9 @@ disable_error_code = "import-untyped"
 
 [tool.pyright]
 include = ['geo_activity_playground']
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "uv"
