@@ -30,7 +30,6 @@ from .paths import activity_extracted_meta_dir
 from .paths import activity_extracted_time_series_dir
 from .paths import TIME_SERIES_DIR
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -604,7 +603,10 @@ class StoredSearchQuery(DB.Model):
             )
 
         if data.get("kind"):
-            kind_names = [DB.session.get_one(Kind, kid).name for kid in data["kind"]]
+            kind_names = []
+            for kid in data["kind"]:
+                if kind := DB.session.get(Kind, kid):
+                    kind_names.append(kind.name)
             bits.append("kind is " + (" or ".join(f'"{name}"' for name in kind_names)))
 
         if data.get("tag"):
