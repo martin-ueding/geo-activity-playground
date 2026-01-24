@@ -11,7 +11,6 @@ from typing import TypeVar
 from .paths import atomic_open
 from .paths import cache_dir
 
-
 T = TypeVar("T")
 
 
@@ -80,6 +79,8 @@ def try_load_pickle(path: pathlib.Path) -> Any:
             with open(path, "rb") as f:
                 return pickle.load(f)
         except ModuleNotFoundError:
+            pass
+        except AttributeError:
             pass
 
 
