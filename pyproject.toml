@@ -1,6 +1,6 @@
 [project]
 name = "geo-activity-playground"
-version = "1.20.0"
+version = "1.21.0"
 description = "Analysis of geo data activities like rides, runs or hikes."
 authors = [{ name = "Martin Ueding", email = "mu@martin-ueding.de" }]
 license = { text = "MIT" }
@@ -90,8 +90,8 @@ select = [
     "ARG", # flake8-unused-arguments
 ]
 ignore = [
-    "E501", # line too long, handled by formatter
-    "B905", # zip() without an explicit strict= parameter
+    "E501",   # line too long, handled by formatter
+    "B905",   # zip() without an explicit strict= parameter
     "ARG001", # Unused function argument
 ]
 
