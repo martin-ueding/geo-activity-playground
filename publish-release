@@ -3,7 +3,7 @@
 set -eux
 
 # Bump the version according to conventional commits.
-version="$(cz bump --get-next)"
+version="$(uv run cz bump --get-next)"
 uv version "$next_version"
 
 # Update the changelog.
