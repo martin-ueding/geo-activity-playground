@@ -375,8 +375,8 @@ def make_activity_blueprint(
             if form_end:
                 activity.index_end = int(form_end)
 
-            time_series = activity.time_series
-            update_and_commit(activity, time_series, config)
+            raw_time_series = activity.raw_time_series
+            update_and_commit(activity, raw_time_series, config, force=True)
 
         cmap = matplotlib.colormaps["turbo"]
         num_points = len(activity.time_series)
