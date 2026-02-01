@@ -16,7 +16,10 @@ git tag "$version"
 git push --tags
 
 uv build
-uv publish --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND"
+uv publish \
+    --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND" \
+    "dist/geo_activity_playground-$version.tar.gz" \
+    "dist/geo_activity_playground-$version-py3-none-any.whl"
 uv run mkdocs gh-deploy
 
 uv run python3 extract-changelog.py docs/changelog.md "$version" > /tmp/release_notes.md
