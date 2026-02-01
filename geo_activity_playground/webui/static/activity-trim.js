@@ -58,24 +58,24 @@ export function initActivityTrimMap(config) {
  */
 function createTrimPopup(index, beginInputId, endInputId) {
     const container = document.createElement('div');
-    
+
     const beginBtn = document.createElement('button');
     beginBtn.className = 'btn btn-primary';
     beginBtn.textContent = 'Use as Begin';
     beginBtn.addEventListener('click', () => {
         document.getElementById(beginInputId).value = index;
     });
-    
+
     const endBtn = document.createElement('button');
     endBtn.className = 'btn btn-primary';
     endBtn.textContent = 'Use as End';
     endBtn.style.marginLeft = '0.5em';
     endBtn.addEventListener('click', () => {
-        document.getElementById(endInputId).value = index + 1;
+        document.getElementById(endInputId).value = Math.trunc(index) + 1;
     });
-    
+
     container.appendChild(beginBtn);
     container.appendChild(endBtn);
-    
+
     return container;
 }
