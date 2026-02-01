@@ -15,6 +15,10 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Remove stray "1" when trying to trim the activity end. This would lead to further errors after an activity is trimmed.
+
 ## Version 1.21.0 — 2026-02-01
 
 Added:
