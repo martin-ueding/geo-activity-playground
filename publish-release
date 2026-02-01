@@ -4,7 +4,7 @@ set -eux
 
 # Bump the version according to conventional commits.
 version="$(uv run cz bump --get-next)"
-uv version "$next_version"
+uv version "$version"
 
 # Update the changelog.
 today=$(date +%Y-%m-%d)
