@@ -28,6 +28,7 @@ uv publish \
 uv run mkdocs gh-deploy
 
 # Create a GitHub release.
-uv run python3 extract-changelog.py docs/changelog.md "$version" > /tmp/release_notes.md
-gh release create "$version" -F release_notes.md -t "$version"
-rm /tmp/release_notes.md
+release_note_file="$(mktemp --suffix .md)"
+uv run python3 extract-changelog.py docs/changelog.md "$version" > "$release_note_file"
+gh release create "$version" -F "$release_note_file" -t "$version"
+rm "$release_note_file"
