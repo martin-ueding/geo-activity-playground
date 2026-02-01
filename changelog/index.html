@@ -1620,10 +1620,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#version-1200-2026-02-01" class="md-nav__link">
+  <a href="#version-1211-2026-02-01" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version 1.20.0 — 2026-02-01
+        Version 1.21.1 — 2026-02-01
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-1210-2026-02-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.21.0 — 2026-02-01
       
     </span>
   </a>
@@ -3040,10 +3051,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#version-1200-2026-02-01" class="md-nav__link">
+  <a href="#version-1211-2026-02-01" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version 1.20.0 — 2026-02-01
+        Version 1.21.1 — 2026-02-01
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-1210-2026-02-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.21.0 — 2026-02-01
       
     </span>
   </a>
@@ -4455,7 +4477,14 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
-<h2 id="version-1200-2026-02-01">Version 1.20.0 — 2026-02-01</h2>
+<h2 id="version-1211-2026-02-01">Version 1.21.1 — 2026-02-01</h2>
+<p>Fixed:</p>
+<ul>
+<li>Remove stray "1" when trying to trim the activity end. This would lead to further errors after an activity is trimmed.</li>
+<li>Compute metrics from trimmed time series. Also recompute after trim. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/402">GH-402</a>)</li>
+<li>When the trim bound field is empty, actually remove the trim bound.</li>
+</ul>
+<h2 id="version-1210-2026-02-01">Version 1.21.0 — 2026-02-01</h2>
 <p>Added:</p>
 <ul>
 <li>Add <strong>start and end markers</strong> to each track in landing page view.</li>
