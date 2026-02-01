@@ -2,26 +2,32 @@
 
 set -eux
 
-version=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
-today=$(date +%Y-%m-%d)
+# Bump the version according to conventional commits.
+version="$(cz bump --get-next)"
+uv version "$next_version"
 
+# Update the changelog.
+today=$(date +%Y-%m-%d)
 sed -i "s/## Unreleased/## Version $version — $today/" docs/changelog.md
+
+# Commit and tag.
 git ca -m "chore: bump version to $version"
+git tag "$version"
 
 # Upload the code.
 git push
-
-# Tag this version and upload the tag.
-git tag "$version"
 git push --tags
 
+# Publish the built project.
 uv build
 uv publish \
     --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND" \
-    "dist/geo_activity_playground-$version.tar.gz" \
     "dist/geo_activity_playground-$version-py3-none-any.whl"
+
+# Deploy documentation.
 uv run mkdocs gh-deploy
 
+# Create a GitHub release.
 uv run python3 extract-changelog.py docs/changelog.md "$version" > /tmp/release_notes.md
 gh release create "$version" -F release_notes.md -t "$version"
 rm /tmp/release_notes.md
