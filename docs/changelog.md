@@ -18,7 +18,7 @@ Types of changes
 Fixed:
 
 - Remove stray "1" when trying to trim the activity end. This would lead to further errors after an activity is trimmed.
-- Compute metrics from trimmed time series. Also recompute after trim.([GH-402](https://github.com/martin-ueding/geo-activity-playground/issues/402))
+- Compute metrics from trimmed time series. Also recompute after trim. ([GH-402](https://github.com/martin-ueding/geo-activity-playground/issues/402))
 - When the trim bound field is empty, actually remove the trim bound.
 
 ## Version 1.21.0 — 2026-02-01

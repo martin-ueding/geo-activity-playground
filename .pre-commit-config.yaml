@@ -12,6 +12,6 @@ repos:
     hooks:
       - id: github-issues-in-changelog
         name: Auto-Link GitHub Issues in Changelog
-        entry: sed -i -E 's# GH-([0-9]+)#([GH-\1](https://github.com/martin-ueding/geo-activity-playground/issues/\1))#g' docs/changelog.md
+        entry: sed -i -E 's# GH-([0-9]+)# ([GH-\1](https://github.com/martin-ueding/geo-activity-playground/issues/\1))#g' docs/changelog.md
         language: system
         pass_filenames: false
