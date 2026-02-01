@@ -1,6 +1,6 @@
 [project]
 name = "geo-activity-playground"
-version = "1.21.0"
+version = "1.21.1"
 description = "Analysis of geo data activities like rides, runs or hikes."
 authors = [{ name = "Martin Ueding", email = "mu@martin-ueding.de" }]
 license = { text = "MIT" }
