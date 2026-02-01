@@ -31,8 +31,8 @@ Changed:
 Fixed:
 
 - Change **unit of heart rate** from Hz to 1/min. ([GH-399](https://github.com/martin-ueding/geo-activity-playground/issues/399))
-- Recover from `AttributeError` that could happen during startup.
-- Unify Pandas datetime instances to nanosecond resolution if needed.
+- Recover from `AttributeError` that could happen during startup when the tile visits are corrupted.
+- Unify Pandas datetime instances to nanosecond resolution if needed. GH-400
 - Do not crash when a historic search query references a now deleted activity kind.
 - Fix **rotated text in Eddington plot** and custom plots. ([GH-388](https://github.com/martin-ueding/geo-activity-playground/issues/388))
 - Separate segments in share picture.
