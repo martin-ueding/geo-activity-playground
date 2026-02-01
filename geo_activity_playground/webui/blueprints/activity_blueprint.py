@@ -372,8 +372,12 @@ def make_activity_blueprint(
 
             if form_begin:
                 activity.index_begin = int(form_begin)
+            else:
+                activity.index_begin = None
             if form_end:
                 activity.index_end = int(form_end)
+            else:
+                activity.index_end = None
 
             raw_time_series = activity.raw_time_series
             update_and_commit(activity, raw_time_series, config, force=True)
