@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 version=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
 today=$(date +%Y-%m-%d)
