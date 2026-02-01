@@ -6,7 +6,7 @@ version=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
 today=$(date +%Y-%m-%d)
 
 sed -i "s/## Unreleased/## Version $version — $today/" docs/changelog.md
-git ca -m "Bump version to $version"
+git ca -m "chore: bump version to $version"
 
 # Upload the code.
 git push
