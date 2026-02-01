@@ -13,6 +13,8 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
 ## Version 1.21.0 — 2026-02-01
 
 Added:
