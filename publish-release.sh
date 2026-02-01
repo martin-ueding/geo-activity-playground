@@ -17,7 +17,8 @@ git push --tags
 
 uv build
 uv publish --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND"
-
 uv run mkdocs gh-deploy
 
-echo 'Go to https://github.com/martin-ueding/geo-activity-playground/releases/new to create a new release on GitHub.'
+uv run python3 extract-changelog.py docs/changelog.md "$version" > /tmp/release_notes.md
+gh release create "$version" -F release_notes.md -t "Version $version"
+rm /tmp/release_notes.md
