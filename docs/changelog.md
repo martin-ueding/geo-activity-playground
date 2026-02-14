@@ -13,6 +13,13 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Added:
+
+- Add **tile state reset** into Settings → Technical Maintenance.
+- Add **heatmap reset** into Settings → Technical Maintenance.
+
 ## Version 1.21.1 — 2026-02-01
 
 Fixed:
