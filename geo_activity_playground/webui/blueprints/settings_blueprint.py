@@ -1,6 +1,8 @@
 import json
 import logging
+import pathlib
 import re
+import shutil
 import urllib.parse
 from typing import Any
 
@@ -126,6 +128,15 @@ def make_settings_blueprint(
                 )
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "reset_heatmap_cache":
+                logger.info("User requested reset of heatmap cache.")
+                heatmap_cache_dir = pathlib.Path("Cache/Heatmap")
+                if heatmap_cache_dir.exists():
+                    shutil.rmtree(heatmap_cache_dir)
+                flasher.flash_message(
+                    _("Heatmap cache has been cleared."),
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))
