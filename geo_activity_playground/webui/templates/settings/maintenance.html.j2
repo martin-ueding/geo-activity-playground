@@ -23,4 +23,21 @@
         </form>
     </div>
 </div>
+
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Heatmap Cache') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('The heatmap tiles are cached for performance. If you change activity kinds or if tiles seem incorrect, you can clear the cache to force a re-render.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to clear the heatmap cache?') }}');">
+            <input type="hidden" name="action" value="reset_heatmap_cache">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Reset heatmap cache') }}
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}
