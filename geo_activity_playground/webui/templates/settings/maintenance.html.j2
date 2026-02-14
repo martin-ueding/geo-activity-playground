@@ -1,0 +1,26 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Technical Maintenance') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Technical Maintenance') }}</h1>
+
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Explorer Tiles') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Sometimes the tile visit state gets corrupted and needs to be re-indexed. This will clear the current tile visit cache and re-scan all activities to rebuild it.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to reset the tile visit state? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="reset_tile_visit_state">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Reset tile visit state') }}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

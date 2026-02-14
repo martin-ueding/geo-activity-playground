@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 import urllib.parse
 from typing import Any
@@ -13,15 +14,26 @@ from flask import (
     request,
     url_for,
 )
+from flask_babel import gettext as _
 from tqdm import tqdm
 
+from ...core.activities import ActivityRepository
 from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import DB, Activity, Equipment, ExplorerTileBookmark, Kind, Tag
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
+from ...core.tasks import WorkTracker, work_tracker_path
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    _reset_tile_visits_db,
+    compute_tile_evolution,
+    compute_tile_visits_new,
+)
 from ..authenticator import Authenticator, needs_authentication
 from ..flasher import Flasher, FlashTypes
 from ..i18n import SUPPORTED_LANGUAGES
+
+logger = logging.getLogger(__name__)
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
     "lightgreyred",
@@ -82,7 +94,11 @@ def int_or_none(s: str) -> int | None:
 
 
 def make_settings_blueprint(
-    config_accessor: ConfigAccessor, authenticator: Authenticator, flasher: Flasher
+    config_accessor: ConfigAccessor,
+    authenticator: Authenticator,
+    flasher: Flasher,
+    repository: ActivityRepository,
+    tile_visit_accessor: TileVisitAccessor,
 ) -> Blueprint:
     strava_login_helper = StravaLoginHelper(config_accessor)
     blueprint = Blueprint("settings", __name__, template_folder="templates")
@@ -91,6 +107,29 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def index():
         return render_template("settings/index.html.j2")
+
+    @blueprint.route("/maintenance", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def maintenance():
+        if request.method == "POST":
+            action = request.form.get("action")
+            if action == "reset_tile_visit_state":
+                logger.info("User requested reset of tile visit state.")
+                tile_visit_accessor.reset()
+                _reset_tile_visits_db()
+                work_tracker = WorkTracker(work_tracker_path("tile-state"))
+                work_tracker.reset()
+                work_tracker.close()
+                compute_tile_visits_new(repository, tile_visit_accessor)
+                compute_tile_evolution(
+                    tile_visit_accessor.tile_state, config_accessor()
+                )
+                flasher.flash_message(
+                    _("Tile visit state has been reset and re-indexed."),
+                    FlashTypes.SUCCESS,
+                )
+            return redirect(url_for(".maintenance"))
+        return render_template("settings/maintenance.html.j2")
 
     @blueprint.route("/language", methods=["GET", "POST"])
     @needs_authentication(authenticator)

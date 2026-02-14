@@ -143,7 +143,7 @@ def create_app(
             app.config["BABEL_SUPPORTED_LOCALES"]
         )
 
-    babel = Babel(app, locale_selector=get_locale)
+    Babel(app, locale_selector=get_locale)
 
     DB.init_app(app)
 
@@ -245,7 +245,9 @@ def create_app(
         "/plot-builder": make_plot_builder_blueprint(
             repository, flasher, authenticator
         ),
-        "/settings": make_settings_blueprint(config_accessor, authenticator, flasher),
+        "/settings": make_settings_blueprint(
+            config_accessor, authenticator, flasher, repository, tile_visit_accessor
+        ),
         "/segments": make_segments_blueprint(
             authenticator, tile_visit_accessor, flasher, config
         ),
