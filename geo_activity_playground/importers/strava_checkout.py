@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import pathlib
 import shutil
@@ -6,6 +7,7 @@ import sys
 import traceback
 import urllib.parse
 import zoneinfo
+from collections.abc import Sequence
 
 import dateutil.parser
 import numpy as np
@@ -34,109 +36,6 @@ def nan_as_none(elem):
         return elem
 
 
-EXPECTED_COLUMNS = [
-    "Activity ID",
-    "Activity Date",
-    "Activity Name",
-    "Activity Type",
-    "Activity Description",
-    "Elapsed Time",
-    "Distance",
-    "Max Heart Rate",
-    "Relative Effort",
-    "Commute",
-    "Activity Private Note",
-    "Activity Gear",
-    "Filename",
-    "Athlete Weight",
-    "Bike Weight",
-    "Elapsed Time",
-    "Moving Time",
-    "Distance",
-    "Max Speed",
-    "Average Speed",
-    "Elevation Gain",
-    "Elevation Loss",
-    "Elevation Low",
-    "Elevation High",
-    "Max Grade",
-    "Average Grade",
-    "Average Positive Grade",
-    "Average Negative Grade",
-    "Max Cadence",
-    "Average Cadence",
-    "Max Heart Rate",
-    "Average Heart Rate",
-    "Max Watts",
-    "Average Watts",
-    "Calories",
-    "Max Temperature",
-    "Average Temperature",
-    "Relative Effort",
-    "Total Work",
-    "Number of Runs",
-    "Uphill Time",
-    "Downhill Time",
-    "Other Time",
-    "Perceived Exertion",
-    "Type",
-    "Start Time",
-    "Weighted Average Power",
-    "Power Count",
-    "Prefer Perceived Exertion",
-    "Perceived Relative Effort",
-    "Commute",
-    "Total Weight Lifted",
-    "From Upload",
-    "Grade Adjusted Distance",
-    "Weather Observation Time",
-    "Weather Condition",
-    "Weather Temperature",
-    "Apparent Temperature",
-    "Dewpoint",
-    "Humidity",
-    "Weather Pressure",
-    "Wind Speed",
-    "Wind Gust",
-    "Wind Bearing",
-    "Precipitation Intensity",
-    "Sunrise Time",
-    "Sunset Time",
-    "Moon Phase",
-    "Bike",
-    "Gear",
-    "Precipitation Probability",
-    "Precipitation Type",
-    "Cloud Cover",
-    "Weather Visibility",
-    "UV Index",
-    "Weather Ozone",
-    "Jump Count",
-    "Total Grit",
-    "Average Flow",
-    "Flagged",
-    "Average Elapsed Speed",
-    "Dirt Distance",
-    "Newly Explored Distance",
-    "Newly Explored Dirt Distance",
-    "Activity Count",
-    "Total Steps",
-    "Carbon Saved",
-    "Pool Length",
-    "Training Load",
-    "Intensity",
-    "Average Grade Adjusted Pace",
-    "Timer Time",
-    "Total Cycles",
-    "Regeneration",
-    "Mit Haustier",
-    "Wettbewerb",
-    "Langer Lauf",
-    "Für einen guten Zweck",
-    "Media",
-]
-
-
 def float_with_comma_or_period(x: str) -> float | None:
     if len(x) == 0:
         return 0
@@ -146,28 +45,22 @@ def float_with_comma_or_period(x: str) -> float | None:
     return float(x)
 
 
+def normalize_header(header: Sequence[str]) -> list[str]:
+    with open(pathlib.Path(__file__).parent / "strava-csv-mapping.json") as f:
+        mapping = json.load(f)
+    return [mapping.get(h, h) for h in header]
+
+
 def import_from_strava_checkout(config: Config) -> None:
     checkout_path = pathlib.Path("Strava Export")
     with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
     header = rows[0]
 
-    if len(header) != len(EXPECTED_COLUMNS):
-        logger.error(
-            f"You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. Your file has {len(header)} but we expect {len(EXPECTED_COLUMNS)}. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
-        )
-        print(header)
-        sys.exit(1)
-
-    if header[0] == EXPECTED_COLUMNS[0]:
+    if header[0] == "Activity ID":
         dayfirst = False
     elif header[0] == "Aktivitäts-ID":
-        new_header = list(EXPECTED_COLUMNS)
-        if len(new_header) > len(header):
-            new_header = new_header[: len(header)]
-        elif len(new_header) < len(header):
-            new_header += [f"Ignored_{i}" for i in range(len(header) - len(new_header))]
-        header = new_header
+        header = normalize_header(header)
         dayfirst = True
     else:
         logger.error(
@@ -253,10 +146,7 @@ def convert_strava_checkout(
 
     # Handle German localization.
     if activities.columns[0] == "Aktivitäts-ID":
-        assert len(activities.columns) == len(
-            EXPECTED_COLUMNS
-        ), "Strava seems to have changed for format again. Please file a bug report at https://github.com/martin-ueding/geo-activity-playground/issues and include the first line of the 'activities.csv'."
-        activities.columns = EXPECTED_COLUMNS
+        activities.columns = normalize_header(activities.columns)
 
     for _, row in tqdm(activities.iterrows(), desc="Import activity files"):
         # Some people have manually added activities without position data. These don't have a file there. We'll skip these.

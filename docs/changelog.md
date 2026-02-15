@@ -13,6 +13,12 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Fixed:
+
+- Make **Strava checkout import** more robust by allowing different lengths headers. In the past, this has to breaking changes whenever Strava added a new column to their export. Some people had older checkouts around, these became broken as well. Instead of expecting a fixed number of columns, we just map the known German ones to English names. We don't need the additional columns, hence we don't need a translation for these either. ([GH-393](https://github.com/martin-ueding/geo-activity-playground/issues/393)), ([GH-403](https://github.com/martin-ueding/geo-activity-playground/issues/403))
+
 ## Version 1.22.0 — 2026-02-14
 
 Added:
