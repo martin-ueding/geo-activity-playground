@@ -878,6 +878,7 @@ dev = [
     { name = "mkdocs-material" },
     { name = "mypy" },
     { name = "notebook" },
+    { name = "odfpy" },
     { name = "pandas-stubs" },
     { name = "py-spy" },
     { name = "pyright" },
@@ -937,6 +938,7 @@ dev = [
     { name = "mkdocs-material", specifier = ">=9.4.1" },
     { name = "mypy", specifier = ">=1.10.0" },
     { name = "notebook", specifier = ">=7.2.2" },
+    { name = "odfpy", specifier = ">=1.4.1" },
     { name = "pandas-stubs", specifier = ">=2.2.2.240603" },
     { name = "py-spy", specifier = ">=0.3.14" },
     { name = "pyright", specifier = ">=1.1.399" },
@@ -2013,6 +2015,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/00/a5/9f8ca5856b8940492fc24fbe13c1bc34d65ddf4079097cf9e53164d094e1/numpy-2.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:8f085da926c0d491ffff3096f91078cc97ea67e7e6b65e490bc8dcda65663be2", size = 12627117, upload-time = "2026-01-10T06:44:38.828Z" },
     { url = "https://files.pythonhosted.org/packages/ad/0d/eca3d962f9eef265f01a8e0d20085c6dd1f443cbffc11b6dede81fd82356/numpy-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:6436cffb4f2bf26c974344439439c95e152c9a527013f26b3577be6c2ca64295", size = 10667121, upload-time = "2026-01-10T06:44:41.644Z" },
 ]
+
+[[package]]
+name = "odfpy"
+version = "1.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "defusedxml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/97/73/8ade73f6749177003f7ce3304f524774adda96e6aaab30ea79fd8fda7934/odfpy-1.4.1.tar.gz", hash = "sha256:db766a6e59c5103212f3cc92ec8dd50a0f3a02790233ed0b52148b70d3c438ec", size = 717045, upload-time = "2020-01-18T16:55:48.852Z" }
 
 [[package]]
 name = "openpyxl"
