@@ -304,12 +304,13 @@ def query_activity_meta(clauses: list | None = None) -> pd.DataFrame:
 
         start_local = []
         for start, iana_timezone in zip(df["start"], df["iana_timezone"]):
-            if pd.isna(start) or iana_timezone is None:
+            tz = "UTC" if pd.isna(iana_timezone) else iana_timezone
+            if pd.isna(start):
                 start_local.append(start)
             else:
                 start_local.append(
                     start.tz_localize(zoneinfo.ZoneInfo("UTC"))
-                    .tz_convert(iana_timezone)
+                    .tz_convert(zoneinfo.ZoneInfo(tz))
                     .tz_localize(None)
                 )
         df["start_local"] = start_local
