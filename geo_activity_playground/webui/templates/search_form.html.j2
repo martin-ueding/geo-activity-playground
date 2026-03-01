@@ -110,6 +110,22 @@
                                     </div>
                                 </div>
 
+                                <div class="col-12">
+                                    <label for="" class="form-label">{{ _('Exclude tags') }}</label>
+                                    <div class="form-control">
+                                        {% for tag in tags_avail %}
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="tag_exclude"
+                                                value="{{ tag.id }}" id="tag_exclude_{{ tag.id }}" {% if tag.id in query.tag_exclude %}
+                                                checked {% endif %}>
+                                            <label class="form-check-label" for="tag_exclude_{{ tag.id }}">
+                                                {{ activity_tag(tag) }}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
                                 <div class="col-6">
                                     <button type="submit" class="btn btn-primary">{{ _('Filter') }}</button>
                                 </div>

@@ -13,6 +13,12 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Added:
+
+- Add **tag exclusion** as a filter criterion. GH-410
+
 ## Version 1.22.1 — 2026-02-15
 
 Fixed:
