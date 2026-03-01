@@ -41,6 +41,13 @@ def test_parse_name_case_sensitive() -> None:
     assert primitives == {"name": "Test", "name_case_sensitive": True}
 
 
+def test_parse_tag_exclude() -> None:
+    args = MultiDict([("tag_exclude", "1"), ("tag_exclude", "3")])
+    primitives = parse_search_params(args)
+    assert primitives == {"tag_exclude": [1, 3]}
+    assert is_search_active(primitives)
+
+
 def test_parse_distance() -> None:
     args = MultiDict([("distance_km_min", "10"), ("distance_km_max", "50.5")])
     primitives = parse_search_params(args)
@@ -62,13 +69,27 @@ def test_primitives_to_url_str() -> None:
     assert "name=Test+Query" in url_str
 
 
+def test_primitives_to_url_str_tag_exclude() -> None:
+    primitives = {"tag_exclude": [1, 2]}
+    url_str = primitives_to_url_str(primitives)
+    assert "tag_exclude=1" in url_str
+    assert "tag_exclude=2" in url_str
+
+
 def test_primitives_to_jinja() -> None:
     primitives = {"equipment": [1], "name": "Test"}
     jinja_dict = primitives_to_jinja(primitives)
     assert jinja_dict["equipment"] == [1]
     assert jinja_dict["name"] == "Test"
     assert jinja_dict["kind"] == []  # Default value
+    assert jinja_dict["tag_exclude"] == []  # Default value
     assert jinja_dict["active"] == True
+
+
+def test_primitives_to_jinja_tag_exclude() -> None:
+    primitives = {"tag_exclude": [1, 2]}
+    jinja_dict = primitives_to_jinja(primitives)
+    assert jinja_dict["tag_exclude"] == [1, 2]
 
 
 def test_primitives_to_jinja_empty() -> None:

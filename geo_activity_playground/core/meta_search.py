@@ -26,6 +26,10 @@ def parse_search_params(args: MultiDict) -> dict:
     if tag:
         result["tag"] = tag
 
+    tag_exclude = list(map(int, args.getlist("tag_exclude")))
+    if tag_exclude:
+        result["tag_exclude"] = tag_exclude
+
     name = args.get("name", None)
     if name:
         result["name"] = name
@@ -71,6 +75,8 @@ def primitives_to_url_str(primitives: dict) -> str:
         variables.append(("kind", kind_id))
     for tag_id in primitives.get("tag", []):
         variables.append(("tag", tag_id))
+    for tag_id in primitives.get("tag_exclude", []):
+        variables.append(("tag_exclude", tag_id))
     if primitives.get("name"):
         variables.append(("name", primitives["name"]))
     if primitives.get("name_case_sensitive"):
@@ -95,6 +101,7 @@ def primitives_to_jinja(primitives: dict) -> dict:
         "equipment": primitives.get("equipment", []),
         "kind": primitives.get("kind", []),
         "tag": primitives.get("tag", []),
+        "tag_exclude": primitives.get("tag_exclude", []),
         "name": primitives.get("name", ""),
         "name_case_sensitive": primitives.get("name_case_sensitive", False),
         "start_begin": primitives.get("start_begin", ""),
@@ -170,6 +177,16 @@ def apply_search_filter(primitives: dict) -> pd.DataFrame:
         filter_clauses.append(
             sqlalchemy.or_(
                 *[Activity.tags.any(Tag.id == tid) for tid in primitives["tag"]]
+            )
+        )
+
+    if primitives.get("tag_exclude"):
+        filter_clauses.append(
+            sqlalchemy.and_(
+                *[
+                    ~Activity.tags.any(Tag.id == tid)
+                    for tid in primitives["tag_exclude"]
+                ]
             )
         )
 

@@ -604,6 +604,14 @@ class StoredSearchQuery(DB.Model):
             tag_names = [DB.session.get_one(Tag, tid).tag for tid in data["tag"]]
             bits.append("tag is " + (" or ".join(f'"{name}"' for name in tag_names)))
 
+        if data.get("tag_exclude"):
+            tag_names = [
+                DB.session.get_one(Tag, tid).tag for tid in data["tag_exclude"]
+            ]
+            bits.append(
+                "tag is not " + (" or ".join(f'"{name}"' for name in tag_names))
+            )
+
         if data.get("start_begin"):
             bits.append(f"after {data['start_begin']}")
 
@@ -629,6 +637,8 @@ class StoredSearchQuery(DB.Model):
             variables.append(("kind", kind_id))
         for tag_id in data.get("tag", []):
             variables.append(("tag", tag_id))
+        for tag_id in data.get("tag_exclude", []):
+            variables.append(("tag_exclude", tag_id))
         if data.get("name"):
             variables.append(("name", data["name"]))
         if data.get("name_case_sensitive"):
