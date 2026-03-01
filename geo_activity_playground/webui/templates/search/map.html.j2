@@ -1,0 +1,84 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="row mb-3">{{ _('Activities Overview & Search (Map)') }}</h1>
+
+<div class="mb-3">
+    {% include "search_form.html.j2" %}
+</div>
+
+<p class="mb-2">
+    <a href="{{ url_for('search.index') }}?{{ base_query_str }}">{{ _('Table view') }}</a>
+</p>
+
+<script>
+    function add_map(id, geojson) {
+        let map = L.map(`map-${id}`, {
+            fullscreenControl: true
+        })
+        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '{{ map_tile_attribution|safe }}'
+        }).addTo(map)
+
+        let geojson_layer = L.geoJSON(geojson, {
+            useSimpleStyle: true
+        }).addTo(map)
+        map.fitBounds(geojson_layer.getBounds())
+        return map
+    }
+</script>
+
+{% if activities_page %}
+{% for activity_batch in activities_page|batch(3) %}
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+    {% for index, activity in activity_batch %}
+    <div class="col">
+        <div class="card">
+            <div class="card-img-top" id="map-{{ activity['id'] }}" style="height: 200px; width: 100%;"></div>
+            <script>
+                fetch("/activity/{{ activity['id'] }}/line.geojson").then(response => response.json()).then(
+                    geojson => {
+                        add_map("{{ activity['id'] }}", geojson);
+                    }
+                )
+            </script>
+            <div class="card-body">
+                <a href="{{ url_for('activity.show', id=activity['id']) }}">
+                    <h5 class="card-title">{{ activity['name'] }}</h5>
+                </a>
+                <p class="card-text">{{ activity['equipment'] }} · {{ activity['kind'] }}</p>
+                {% if activity['start_local'] is defined and not activity['start_local']|isna %}
+                <p class="card-text"><small class="text-body-secondary">{{ activity['start_local']|dt }} {{ activity['iana_timezone'] }}</small></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% if total_pages > 1 %}
+<nav aria-label="{{ _('Pagination') }}" class="mt-3">
+    <ul class="pagination justify-content-center flex-wrap">
+        <li class="page-item {{ 'disabled' if page <= 1 }}">
+            <a class="page-link" href="?{% if base_query_str %}{{ base_query_str }}&{% endif %}page={{ page - 1 }}" {{ 'aria-disabled=true' if page <= 1 }}>{{ _('Previous') }}</a>
+        </li>
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {{ 'active' if p == page }}">
+            <a class="page-link" href="?{% if base_query_str %}{{ base_query_str }}&{% endif %}page={{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if page >= total_pages }}">
+            <a class="page-link" href="?{% if base_query_str %}{{ base_query_str }}&{% endif %}page={{ page + 1 }}" {{ 'aria-disabled=true' if page >= total_pages }}>{{ _('Next') }}</a>
+        </li>
+    </ul>
+</nav>
+<p class="text-center text-body-secondary">{{ _('%(start)s – %(end)s of %(total)s')|format(start=(page - 1) * per_page + 1 if total else 0, end=min(page * per_page, total), total=total) }}</p>
+{% endif %}
+{% else %}
+<p>{{ _('No activities match the filter.') }}</p>
+{% endif %}
+
+{% endblock %}

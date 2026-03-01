@@ -252,7 +252,7 @@ def create_app(
             authenticator, tile_visit_accessor, flasher, config
         ),
         "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
-        "/search": make_search_blueprint(authenticator),
+        "/search": make_search_blueprint(authenticator, config),
         "/summary": make_summary_blueprint(repository, config, authenticator),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
         "/time-zone-fixer": make_time_zone_fixer_blueprint(

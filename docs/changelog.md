@@ -18,6 +18,7 @@ Types of changes
 Added:
 
 - Add **tag exclusion** as a filter criterion. GH-410
+- Add search function with maps like on the start page. GH-408
 
 Fixed:
 
