@@ -19,6 +19,10 @@ Added:
 
 - Add **tag exclusion** as a filter criterion. GH-410
 
+Fixed:
+
+- Fix time zone conversion for activities where this happens to be `NULL`. GH-405
+
 ## Version 1.22.1 — 2026-02-15
 
 Fixed:
