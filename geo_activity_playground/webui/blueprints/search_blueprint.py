@@ -1,8 +1,10 @@
+import math
 import urllib.parse
 
 import sqlalchemy
 from flask import Blueprint, redirect, render_template, request
 
+from ...core.config import Config
 from ...core.datamodel import DB, StoredSearchQuery
 from ...core.meta_search import (
     apply_search_filter,
@@ -10,13 +12,15 @@ from ...core.meta_search import (
     parse_search_params,
     primitives_to_jinja,
     primitives_to_json,
+    primitives_to_url_str,
     register_search_query,
 )
 from ..authenticator import Authenticator, needs_authentication
 
 
-def make_search_blueprint(authenticator: Authenticator) -> Blueprint:
+def make_search_blueprint(authenticator: Authenticator, config: Config) -> Blueprint:
     blueprint = Blueprint("search", __name__, template_folder="templates")
+    per_page = config.search_map_tiles_per_page
 
     @blueprint.route("/")
     def index():
@@ -38,6 +42,46 @@ def make_search_blueprint(authenticator: Authenticator) -> Blueprint:
         return render_template(
             "search/index.html.j2",
             activities=reversed(list(activities.iterrows())),
+            query=primitives_to_jinja(primitives),
+            search_query_favorites=search_query_favorites,
+            search_query_last=search_query_last,
+        )
+
+    @blueprint.route("/map")
+    def map_view():
+        primitives = parse_search_params(request.args)
+        page = max(1, int(request.args.get("page", 1)))
+
+        if authenticator.is_authenticated():
+            register_search_query(primitives)
+
+        activities = apply_search_filter(primitives)
+        total = len(activities)
+        total_pages = math.ceil(total / per_page) if total else 1
+        page = min(page, total_pages) if total_pages else 1
+        start = (page - 1) * per_page
+        newest_first = activities.iloc[::-1]
+        page_df = newest_first.iloc[start : start + per_page]
+        activities_page = list(page_df.iterrows())
+
+        stored_queries = get_stored_queries()
+        search_query_favorites = [
+            (str(q), q.to_url_str()) for q in stored_queries if q.is_favorite
+        ]
+        search_query_last = [
+            (str(q), q.to_url_str()) for q in stored_queries if not q.is_favorite
+        ]
+
+        base_query_str = primitives_to_url_str(primitives)
+
+        return render_template(
+            "search/map.html.j2",
+            activities_page=activities_page,
+            total=total,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages,
+            base_query_str=base_query_str,
             query=primitives_to_jinja(primitives),
             search_query_favorites=search_query_favorites,
             search_query_last=search_query_last,
