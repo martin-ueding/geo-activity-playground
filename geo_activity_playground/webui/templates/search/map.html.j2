@@ -75,7 +75,7 @@
         </li>
     </ul>
 </nav>
-<p class="text-center text-body-secondary">{{ _('%(start)s – %(end)s of %(total)s') % {'start': (page - 1) * per_page + 1 if total else 0, 'end': min(page * per_page, total), 'total': total} }}</p>
+<p class="text-center text-body-secondary">{{ pagination_first }} – {{ pagination_last }} {{ _('of') }} {{ total }}</p>
 {% endif %}
 {% else %}
 <p>{{ _('No activities match the filter.') }}</p>

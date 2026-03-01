@@ -59,9 +59,9 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
         total = len(activities)
         total_pages = math.ceil(total / per_page) if total else 1
         page = min(page, total_pages) if total_pages else 1
-        start = (page - 1) * per_page
+        slice_start = (page - 1) * per_page
         newest_first = activities.iloc[::-1]
-        page_df = newest_first.iloc[start : start + per_page]
+        page_df = newest_first.iloc[slice_start : slice_start + per_page]
         activities_page = list(page_df.iterrows())
 
         stored_queries = get_stored_queries()
@@ -73,6 +73,8 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
         ]
 
         base_query_str = primitives_to_url_str(primitives)
+        pagination_first = (page - 1) * per_page + 1 if total else 0
+        pagination_last = min(page * per_page, total)
 
         return render_template(
             "search/map.html.j2",
@@ -81,6 +83,8 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
             page=page,
             per_page=per_page,
             total_pages=total_pages,
+            pagination_first=pagination_first,
+            pagination_last=pagination_last,
             base_query_str=base_query_str,
             query=primitives_to_jinja(primitives),
             search_query_favorites=search_query_favorites,
