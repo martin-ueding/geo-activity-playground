@@ -17,12 +17,12 @@ Types of changes
 
 Added:
 
-- Add **tag exclusion** as a filter criterion. GH-410
-- Add search function with maps like on the start page. GH-408
+- Add **tag exclusion** as a filter criterion. ([GH-410](https://github.com/martin-ueding/geo-activity-playground/issues/410))
+- Add search function with maps like on the start page. ([GH-408](https://github.com/martin-ueding/geo-activity-playground/issues/408))
 
 Fixed:
 
-- Fix time zone conversion for activities where this happens to be `NULL`. GH-405
+- Fix time zone conversion for activities where this happens to be `NULL`. ([GH-405](https://github.com/martin-ueding/geo-activity-playground/issues/405))
 
 ## Version 1.22.1 — 2026-02-15
 
