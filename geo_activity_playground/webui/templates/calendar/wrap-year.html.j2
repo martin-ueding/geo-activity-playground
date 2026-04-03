@@ -1,0 +1,151 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h1 class="mb-0">{{ _('Year Wrap') }}{% if year %} {{ year }}{% endif %}</h1>
+        <div class="d-flex gap-2">
+            {% if previous_year %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('.wrap_year', year=previous_year) }}">← {{ previous_year }}</a>
+            {% endif %}
+            {% if next_year %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('.wrap_year', year=next_year) }}">{{ next_year }} →</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if years %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="d-flex flex-wrap gap-1">
+            {% for available_year in years %}
+            <a class="btn {% if available_year == year %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
+                href="{{ url_for('.wrap_year', year=available_year) }}">{{ available_year }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if metrics %}
+<div class="row g-3 mb-3">
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-primary h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('Activities') }}</div>
+                <div class="display-6 fw-semibold">{{ metrics.activities }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-info h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('Distance') }}</div>
+                <div class="display-6 fw-semibold">{{ '%.0f'|format(metrics.distance_km) }}<span class="fs-6"> km</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-success h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('Elevation') }}</div>
+                <div class="display-6 fw-semibold">{{ '%.0f'|format(metrics.elevation_gain) }}<span class="fs-6"> m</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-warning h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('Moving Time') }}</div>
+                <div class="display-6 fw-semibold">{{ '%.0f'|format(metrics.moving_hours) }}<span class="fs-6"> h</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-danger h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('New Tiles (z17)') }}</div>
+                <div class="display-6 fw-semibold">{{ metrics.new_tiles }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-secondary h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('Max Square') }}</div>
+                <div class="display-6 fw-semibold">{{ metrics.max_square_size }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="alert alert-primary mb-0">
+            <strong>{{ _('Year rank by distance') }}:</strong> #{{ year_rank }}
+        </div>
+    </div>
+</div>
+
+{% if monthly_plot %}
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct(monthly_plot) }}
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-3">
+    <div class="col-md-6 mb-3 mb-md-0">
+        {% if kind_plot %}
+        {{ vega_direct(kind_plot) }}
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        {% if equipment_plot %}
+        {{ vega_direct(equipment_plot) }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ _('Month') }}</th>
+                        <th class="text-end">{{ _('Activities') }}</th>
+                        <th class="text-end">{{ _('Distance / km') }}</th>
+                        <th class="text-end">{{ _('Elevation / m') }}</th>
+                        <th class="text-end">{{ _('Moving / h') }}</th>
+                        <th class="text-end">{{ _('New Tiles') }}</th>
+                        <th class="text-end">{{ _('Max Square') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in monthly_table %}
+                    <tr>
+                        <td><a href="{{ url_for('.wrap_month', year=year, month=row.month|int) }}">{{ '%02d'|format(row.month|int) }}</a></td>
+                        <td class="text-end">{{ row.activities|int }}</td>
+                        <td class="text-end">{{ '%.1f'|format(row.distance_km) }}</td>
+                        <td class="text-end">{{ row.elevation_gain|int }}</td>
+                        <td class="text-end">{{ '%.1f'|format(row.moving_hours) }}</td>
+                        <td class="text-end">{{ row.new_tiles|int }}</td>
+                        <td class="text-end">{{ row.max_square_size|int }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col">
+        <div class="alert alert-info">{{ _('No activities available yet for a year wrap.') }}</div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
