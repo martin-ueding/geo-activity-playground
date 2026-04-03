@@ -48,6 +48,7 @@ from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
+from ...importers.strava_api import refresh_activity_names_from_strava
 from ..authenticator import Authenticator, needs_authentication
 from ..flasher import Flasher, FlashTypes
 from ..i18n import SUPPORTED_LANGUAGES
@@ -222,6 +223,16 @@ def make_settings_blueprint(
                     _(
                         "Local activity state has been wiped. Equipment, kinds, and Strava API credentials were preserved."
                     ),
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "refresh_strava_activity_names":
+                logger.info("User requested Strava activity name refresh.")
+                updated_names = refresh_activity_names_from_strava(config_accessor())
+                flasher.flash_message(
+                    _(
+                        "Refreshed activity names from Strava. Updated %(updated_names)s activities."
+                    )
+                    % {"updated_names": updated_names},
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))
