@@ -70,11 +70,15 @@ export function add_layers_to_map(map, config) {
         pane.style.zIndex = "380";
     }
 
+    if (!(L.gridLayer && L.gridLayer.relief)) {
+        console.error("leaflet-relief is required for Mapterhorn hillshade but is not available.");
+    }
+
     const overlay_maps = {
         "Mapterhorn Hillshade": (L.gridLayer && L.gridLayer.relief)
             ? L.gridLayer.relief({
                 mode: "hillshade",
-                tileSize: 512,
+                tileSize: 256,
                 elevationUrl: L.GridLayer.Relief.elevationUrls.mapterhorn,
                 elevationExtractor: L.GridLayer.Relief.elevationExtractors.mapterhorn,
                 attribution: L.GridLayer.Relief.elevationAttributions.mapterhorn,
@@ -82,12 +86,7 @@ export function add_layers_to_map(map, config) {
                 maxZoom: 17,
                 pane: mapterhornPaneName
             })
-            : L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
-                maxZoom: 17,
-                attribution: "https://mapterhorn.com/",
-                pane: mapterhornPaneName,
-                opacity: 0.6
-            }),
+            : L.layerGroup(),
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
             attribution
