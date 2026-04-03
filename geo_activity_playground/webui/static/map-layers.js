@@ -85,8 +85,7 @@ export function add_layers_to_map(map, config) {
                 elevationExtractor: L.GridLayer.Relief.elevationExtractors.mapterhorn,
                 attribution: L.GridLayer.Relief.elevationAttributions.mapterhorn,
                 hillshadeColorFunction: (intensity) => {
-                    const lifted = 1 - (1 - intensity) ** 2;
-                    const gray = Math.round(255 * lifted);
+                    const gray = Math.round(255 * intensity);
                     return [gray, gray, gray];
                 },
                 opacity: 0.5,
