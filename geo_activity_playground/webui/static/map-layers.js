@@ -64,11 +64,18 @@ export function add_layers_to_map(map, config) {
         heatmap_url += `?${heatmapExtraArgs}`;
     }
 
+    const mapterhornPaneName = "mapterhorn-shade";
+    if (!map.getPane(mapterhornPaneName)) {
+        const pane = map.createPane(mapterhornPaneName);
+        pane.style.zIndex = "240";
+    }
+
     const overlay_maps = {
         "Mapterhorn": L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
             maxZoom: 19,
             attribution: "https://mapterhorn.com/",
-            opacity: 0.6
+            opacity: 1.0,
+            pane: mapterhornPaneName
         }),
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
