@@ -40,4 +40,21 @@
         </form>
     </div>
 </div>
+
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Activity Data Repair') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Repairs all activities by re-running enrichment on raw time series data. Use this when activity trimming, share picture rendering, or map data has become inconsistent after previous processing errors.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to repair all activities? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="repair_activities">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Repair activities') }}
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}

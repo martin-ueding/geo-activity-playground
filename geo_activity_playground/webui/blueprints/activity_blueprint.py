@@ -383,7 +383,7 @@ def make_activity_blueprint(
             update_and_commit(activity, raw_time_series, config, force=True)
 
         cmap = matplotlib.colormaps["turbo"]
-        num_points = len(activity.time_series)
+        num_points = max(len(activity.raw_time_series), 1)
         begin = activity.index_begin or 0
         end = activity.index_end or num_points
 
@@ -627,23 +627,29 @@ def name_minutes_plot(meta: pd.DataFrame) -> str:
 
 def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
     all_time_series = pd.concat(time_series_list)
-    tile_x = all_time_series["x"]
-    tile_y = all_time_series["y"]
-    tile_width = tile_x.max() - tile_x.min()
-    tile_height = tile_y.max() - tile_y.min()
+    finite_mask = np.isfinite(all_time_series["x"]) & np.isfinite(all_time_series["y"])
+    all_time_series = all_time_series.loc[finite_mask]
 
     target_width = 600
     target_height = 600
     footer_height = 100
     target_map_height = target_height - footer_height
 
-    zoom = int(
-        min(
-            np.log2(target_width / tile_width / OSM_TILE_SIZE),
-            np.log2(target_map_height / tile_height / OSM_TILE_SIZE),
-            OSM_MAX_ZOOM,
-        )
-    )
+    if len(all_time_series) == 0:
+        return Image.new("RGB", (target_width, target_height), "black")
+
+    tile_x = all_time_series["x"]
+    tile_y = all_time_series["y"]
+    tile_width = tile_x.max() - tile_x.min()
+    tile_height = tile_y.max() - tile_y.min()
+
+    zoom_candidates = [OSM_MAX_ZOOM]
+    if tile_width > 0:
+        zoom_candidates.append(np.log2(target_width / tile_width / OSM_TILE_SIZE))
+    if tile_height > 0:
+        zoom_candidates.append(np.log2(target_map_height / tile_height / OSM_TILE_SIZE))
+    zoom_float = min(zoom_candidates)
+    zoom = int(np.clip(np.floor(zoom_float), 0, OSM_MAX_ZOOM))
 
     tile_xz = tile_x * 2**zoom
     tile_yz = tile_y * 2**zoom
@@ -663,6 +669,11 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
     draw = ImageDraw.Draw(img, mode="RGBA")
 
     for time_series in time_series_list:
+        time_series = time_series.loc[
+            np.isfinite(time_series["x"]) & np.isfinite(time_series["y"])
+        ]
+        if len(time_series) == 0:
+            continue
         for _index, group in time_series.groupby("segment_id"):
             tile_xz = group["x"] * 2**zoom
             tile_yz = group["y"] * 2**zoom
