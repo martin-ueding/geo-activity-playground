@@ -1,5 +1,6 @@
 import datetime
 import json
+from types import SimpleNamespace
 
 import sqlalchemy
 
@@ -20,6 +21,7 @@ from geo_activity_playground.core.datamodel import (
     TileVisit,
     activity_tag_association_table,
 )
+from geo_activity_playground.importers import strava_api
 
 
 def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path):
@@ -176,3 +178,98 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
     assert list((tmp_path / "Photos").iterdir()) == []
 
     assert (tmp_path / "Strava API" / "strava_tokens.json").exists()
+
+
+class _FakeStravaClient:
+    def __init__(self, pages):
+        self._pages = pages
+        self.calls: list[tuple[int, int]] = []
+
+    def get_activities(self, page: int, per_page: int):
+        self.calls.append((page, per_page))
+        return self._pages.get(page, [])
+
+
+def test_refresh_strava_activity_names_updates_matching_records(
+    client, app, monkeypatch
+):
+    with app.app_context():
+        equipment = Equipment(name="Road Bike")
+        kind = Kind(
+            name="Ride", consider_for_achievements=True, default_equipment=equipment
+        )
+        activity = Activity(
+            name="Morning Ride",
+            equipment=equipment,
+            kind=kind,
+            upstream_id="11",
+            time_series_uuid="test-uuid",
+        )
+        DB.session.add_all([equipment, kind, activity])
+        DB.session.commit()
+
+    first_page = [SimpleNamespace(id=11, name="Updated from Strava")] + [
+        SimpleNamespace(id=1_000 + i, name=f"Irrelevant {i}") for i in range(199)
+    ]
+    fake_client = _FakeStravaClient(pages={1: first_page, 2: []})
+
+    def client_factory(*, access_token):
+        assert access_token == "token"
+        return fake_client
+
+    monkeypatch.setattr(strava_api, "Client", client_factory)
+    monkeypatch.setattr(strava_api, "get_current_access_token", lambda _: "token")
+
+    response = client.post(
+        "/settings/maintenance", data={"action": "refresh_strava_activity_names"}
+    )
+
+    assert response.status_code == 302
+    assert fake_client.calls == [(1, 200), (2, 200)]
+
+    with app.app_context():
+        refreshed = DB.session.scalar(
+            sqlalchemy.select(Activity).where(Activity.upstream_id == "11")
+        )
+        assert refreshed is not None
+        assert refreshed.name == "Updated from Strava"
+
+
+def test_refresh_strava_activity_names_is_noop_if_names_match(client, app, monkeypatch):
+    with app.app_context():
+        equipment = Equipment(name="Road Bike")
+        kind = Kind(
+            name="Ride", consider_for_achievements=True, default_equipment=equipment
+        )
+        activity = Activity(
+            name="Already Synced",
+            equipment=equipment,
+            kind=kind,
+            upstream_id="11",
+            time_series_uuid="test-uuid",
+        )
+        DB.session.add_all([equipment, kind, activity])
+        DB.session.commit()
+
+    fake_client = _FakeStravaClient(
+        pages={1: [SimpleNamespace(id=11, name="Already Synced")], 2: []}
+    )
+
+    def client_factory(*, access_token):
+        assert access_token == "token"
+        return fake_client
+
+    monkeypatch.setattr(strava_api, "Client", client_factory)
+    monkeypatch.setattr(strava_api, "get_current_access_token", lambda _: "token")
+
+    response = client.post(
+        "/settings/maintenance", data={"action": "refresh_strava_activity_names"}
+    )
+    assert response.status_code == 302
+
+    with app.app_context():
+        refreshed = DB.session.scalar(
+            sqlalchemy.select(Activity).where(Activity.upstream_id == "11")
+        )
+        assert refreshed is not None
+        assert refreshed.name == "Already Synced"

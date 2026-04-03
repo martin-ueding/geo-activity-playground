@@ -73,6 +73,68 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
+def refresh_activity_names_from_strava(config: Config) -> int:
+    updated_names = 0
+    while True:
+        try:
+            updated_names += _refresh_activity_names_from_strava_once(config)
+            return updated_names
+        except RateLimitExceeded:
+            pass
+        except Fault as e:
+            if "Too Many Requests" not in str(e):
+                raise
+
+        now = datetime.datetime.now()
+        next_quarter = round_to_next_quarter_hour(now)
+        seconds_to_wait = (next_quarter - now).total_seconds() + 10
+        logger.warning(
+            f"Strava rate limit exceeded, will try again at {next_quarter.isoformat()}."
+        )
+        time.sleep(seconds_to_wait)
+
+
+def _refresh_activity_names_from_strava_once(config: Config) -> int:
+    client = Client(access_token=get_current_access_token(config))
+    updated_names = 0
+    page = 1
+
+    while True:
+        strava_activities = list(client.get_activities(page=page, per_page=200))
+        if not strava_activities:
+            break
+
+        names_by_upstream_id = {
+            str(activity.id): activity.name
+            for activity in strava_activities
+            if activity.id is not None and activity.name
+        }
+        if names_by_upstream_id:
+            activities = DB.session.scalars(
+                sqlalchemy.select(Activity).where(
+                    Activity.upstream_id.in_(names_by_upstream_id.keys())
+                )
+            ).all()
+            for activity in activities:
+                updated_name = names_by_upstream_id[activity.upstream_id]
+                if activity.name != updated_name:
+                    logger.info(
+                        "Updating activity %s name from %r to %r.",
+                        activity.id,
+                        activity.name,
+                        updated_name,
+                    )
+                    activity.name = updated_name
+                    updated_names += 1
+            DB.session.commit()
+
+        if len(strava_activities) < 200:
+            break
+        page += 1
+
+    return updated_names
+
+
 def import_from_strava_api(
     config: Config,
     repository: ActivityRepository,

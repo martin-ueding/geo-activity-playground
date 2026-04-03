@@ -58,6 +58,23 @@
     </div>
 </div>
 
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Refresh Strava Activity Names') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Fetches activity summaries from Strava with paginated API calls and updates local activity names by matching upstream IDs. This keeps Strava as the source of truth for activity titles without re-importing everything.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to refresh activity names from Strava? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="refresh_strava_activity_names">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Refresh activity names from Strava') }}
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="card border-danger mb-3">
     <div class="card-header bg-danger text-white">
         <h5 class="card-title mb-0">{{ _('Wipe Local Activity State') }}</h5>
