@@ -31,6 +31,7 @@ Fixed:
 - Make the **square planner** always show the actual square planner tiles to fix it. ([GH-396](https://github.com/martin-ueding/geo-activity-playground/issues/396))
 - Make **activity trimming and share picture rendering** robust against broken/empty tile coordinates to prevent crashes and recover from corrupted activity state. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
 - Render **Mapterhorn hillshade** correctly in Leaflet by decoding Terrarium DEM tiles via `leaflet-relief` instead of showing raw Terrain RGB colors. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
+- Mark **unparseable Strava checkout activities** as done so they are skipped on future imports instead of repeatedly failing and spamming logs. ([GH-380](https://github.com/martin-ueding/geo-activity-playground/issues/380))
 
 ## Version 1.23.0 — 2026-03-01
 
