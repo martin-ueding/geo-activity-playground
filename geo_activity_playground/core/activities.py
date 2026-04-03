@@ -45,7 +45,7 @@ class ActivityRepository:
         query = sqlalchemy.select(Activity.id)
         if only_achievements:
             query = query.where(Kind.consider_for_achievements)
-        result = DB.session.scalars(query.order_by(Activity.start)).all()
+        result = DB.session.scalars(query.order_by(Activity.start, Activity.id)).all()
         return result
 
     def iter_activities(self, new_to_old=True, drop_na=False) -> Sequence[Activity]:

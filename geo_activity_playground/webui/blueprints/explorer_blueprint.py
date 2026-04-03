@@ -45,6 +45,7 @@ from ...explorer.tile_visits import (
     get_tile_count,
     get_tile_history_df,
     get_tile_medians,
+    get_tile_visits,
 )
 from ..authenticator import Authenticator, needs_authentication
 
@@ -62,9 +63,9 @@ def blend_color(
 @functools.cache
 def hex_color_to_float(color: str) -> np.ndarray:
     values = [int("".join(x), base=16) / 255 for x in itertools.batched(color[1:], 2)]
-    assert (
-        min(values) >= 0.0 and max(values) <= 1.0
-    ), f"All {values=} must be within 0.0 and 1.0."
+    assert min(values) >= 0.0 and max(values) <= 1.0, (
+        f"All {values=} must be within 0.0 and 1.0."
+    )
     return np.array([[values]])
 
 
@@ -244,6 +245,7 @@ def make_explorer_blueprint(
             config_accessor().explorer_zoom_levels.sort()
             config_accessor.save()
             compute_tile_evolution(tile_visit_accessor.tile_state, config_accessor())
+            tile_visit_accessor.save()
             flash(f"Enabled {zoom=} for explorer tiles.", category="success")
         else:
             flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
@@ -285,8 +287,7 @@ def make_explorer_blueprint(
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tile_visits = tile_visit_accessor.tile_state["tile_visits"]
-        tiles = tile_visits[zoom]
+        tiles = get_tile_visits(zoom)
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
         )
@@ -375,7 +376,7 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
-        tile_visits = tile_visit_accessor.tile_state["tile_visits"][zoom]
+        tile_visits = get_tile_visits(zoom)
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 
         # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
@@ -699,7 +700,9 @@ def plot_tile_evolution(tiles: pd.DataFrame) -> str:
     return (
         alt.Chart(tiles, title=_("Tiles"))
         .mark_line(interpolate="step-after")
-        .encode(alt.X("time", title=_("Time")), alt.Y("count", title=_("Number of tiles")))
+        .encode(
+            alt.X("time", title=_("Time")), alt.Y("count", title=_("Number of tiles"))
+        )
         .interactive(bind_y=False)
         .to_json(format="vega")
     )
