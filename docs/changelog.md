@@ -19,8 +19,8 @@ Added:
 
 - Add **historical explorer cluster views** with checkpointed cluster-history replay in SQLite, activity-level cluster delta overlays, and a time cutoff slider on the explorer page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
 - Add per-tag **activity-name regex extraction** with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. ([GH-412](https://github.com/martin-ueding/geo-activity-playground/issues/412))
-- Add **activity data repair** action into Settings → Technical Maintenance 
-- Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Add **activity data repair** action into Settings → Technical Maintenance to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))
 - Extract **activity name and kind from GPX track metadata** (`trk/name`, `trk/type`) during import. ([GH-339](https://github.com/martin-ueding/geo-activity-playground/issues/339))
 - Add **local activity state wipe** action into Settings → Technical Maintenance to truncate activity-related data, clear local caches/time series/photos, and reset Strava sync progress while preserving equipment, kinds, and Strava API credentials. ([GH-355](https://github.com/martin-ueding/geo-activity-playground/issues/355))
 - Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
