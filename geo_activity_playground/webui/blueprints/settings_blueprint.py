@@ -24,6 +24,8 @@ from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import (
     DB,
     Activity,
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
     Equipment,
     ExplorerTileBookmark,
     Kind,
@@ -135,6 +137,8 @@ def _truncate_user_content_tables() -> None:
     DB.session.execute(sqlalchemy.delete(SegmentMatch))
     DB.session.execute(sqlalchemy.delete(SegmentCheck))
     DB.session.execute(sqlalchemy.delete(TileVisit))
+    DB.session.execute(sqlalchemy.delete(ClusterHistoryEvent))
+    DB.session.execute(sqlalchemy.delete(ClusterHistoryCheckpoint))
     DB.session.execute(sqlalchemy.delete(Photo))
     DB.session.execute(sqlalchemy.delete(Activity))
     DB.session.execute(sqlalchemy.delete(Segment))

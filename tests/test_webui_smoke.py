@@ -5,6 +5,14 @@ These tests verify that routes load without crashing.
 They don't check for correctness, just that pages render with HTTP 200.
 """
 
+import datetime as dt
+
+from geo_activity_playground.core.datamodel import DB, Activity, TileVisit
+from geo_activity_playground.explorer.tile_visits import (
+    get_tile_history_df,
+    rebuild_cluster_history_for_zoom,
+)
+
 
 def test_home_page_loads(client):
     """Test that the home page loads with an empty database."""
@@ -30,3 +38,31 @@ def test_wrap_month_page_loads_without_data(client):
     response = client.get("/calendar/wrap/2026/1")
     assert response.status_code == 200
     assert b"Month Wrap" in response.data
+
+
+def test_cluster_history_endpoints_load(client, app):
+    with app.app_context():
+        activity = Activity(id=1, name="Ride")
+        DB.session.add(activity)
+        DB.session.add(
+            TileVisit(
+                zoom=14,
+                tile_x=100,
+                tile_y=200,
+                first_activity_id=1,
+                first_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                last_activity_id=1,
+                last_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                visit_count=1,
+            )
+        )
+        DB.session.commit()
+        rebuild_cluster_history_for_zoom(14, get_tile_history_df(14))
+
+    snapshot = client.get("/explorer/14/cluster-history/snapshot.geojson?event_index=1")
+    assert snapshot.status_code == 200
+    assert snapshot.is_json
+
+    diff = client.get("/explorer/14/cluster-history/activity/1/diff.geojson")
+    assert diff.status_code == 200
+    assert diff.is_json

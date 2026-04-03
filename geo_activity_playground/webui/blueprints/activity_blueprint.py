@@ -108,6 +108,7 @@ def make_activity_blueprint(
         # Query new tiles discovered by this activity from the database
         new_tiles_geojson = {}
         new_tiles_per_zoom = {}
+        cluster_diff_geojson_urls = {}
         for zoom in sorted(config.explorer_zoom_levels):
             first_visits = (
                 DB.session.query(TileVisit)
@@ -124,6 +125,11 @@ def make_activity_blueprint(
                 )
                 new_tiles_geojson[zoom] = make_grid_file_geojson(points)
             new_tiles_per_zoom[zoom] = len(first_visits)
+            cluster_diff_geojson_urls[zoom] = url_for(
+                "explorer.cluster_history_activity_diff",
+                zoom=zoom,
+                activity_id=activity.id,
+            )
 
         line_color_columns_avail = {
             column.name: column for column in TIME_SERIES_COLUMNS
@@ -139,6 +145,7 @@ def make_activity_blueprint(
             "similar_activites": similar_activities,
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
+            "cluster_diff_geojson_urls": cluster_diff_geojson_urls,
         }
 
         if not pd.isna(time_series["time"]).all():

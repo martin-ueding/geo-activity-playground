@@ -7,6 +7,8 @@ import sqlalchemy
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
     Equipment,
     ExplorerTileBookmark,
     Kind,
@@ -149,6 +151,8 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
             Tag,
             Photo,
             TileVisit,
+            ClusterHistoryEvent,
+            ClusterHistoryCheckpoint,
             Segment,
             SegmentMatch,
             SegmentCheck,

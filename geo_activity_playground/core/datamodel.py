@@ -575,6 +575,47 @@ class TileVisit(DB.Model):
         return f"TileVisit(zoom={self.zoom}, x={self.tile_x}, y={self.tile_y}, visits={self.visit_count})"
 
 
+class ClusterHistoryEvent(DB.Model):
+    __tablename__ = "cluster_history_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    event_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="cluster_history_event_activity_id"),
+        nullable=False,
+        index=True,
+    )
+    activity: Mapped["Activity"] = relationship(foreign_keys=[activity_id])
+    time: Mapped[datetime.datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    __table_args__ = (
+        sa.Index("idx_cluster_history_events_zoom_index", "zoom", "event_index"),
+        sa.Index("idx_cluster_history_events_zoom_time", "zoom", "time"),
+        sa.UniqueConstraint("zoom", "event_index", name="uq_cluster_history_events"),
+    )
+
+
+class ClusterHistoryCheckpoint(DB.Model):
+    __tablename__ = "cluster_history_checkpoints"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    event_index: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    time: Mapped[datetime.datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    max_cluster_size: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+    payload_json: Mapped[str] = mapped_column(sa.Text, nullable=False, default="{}")
+
+    __table_args__ = (
+        sa.Index("idx_cluster_history_checkpoints_zoom_index", "zoom", "event_index"),
+        sa.UniqueConstraint(
+            "zoom", "event_index", name="uq_cluster_history_checkpoints"
+        ),
+    )
+
+
 class StoredSearchQuery(DB.Model):
     __tablename__ = "stored_search_queries"
 
