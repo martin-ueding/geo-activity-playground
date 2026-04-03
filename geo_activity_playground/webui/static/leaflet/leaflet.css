@@ -65,9 +65,6 @@
 	mix-blend-mode: plus-lighter;
 }
 
-.leaflet-container .leaflet-mapterhorn-hillshade-pane canvas.leaflet-tile {
-	mix-blend-mode: multiply;
-}
 
 .leaflet-container.leaflet-touch-zoom {
 	-ms-touch-action: pan-x pan-y;
