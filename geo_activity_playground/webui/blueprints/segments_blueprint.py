@@ -12,6 +12,7 @@ from ...core.datamodel import DB, Activity, Segment
 from ...core.segments import (
     extract_segment_from_geojson,
     find_matches,
+    rematch_segment,
     segment_track_distance,
 )
 from ...explorer.tile_visits import TileVisitAccessor
@@ -94,6 +95,21 @@ def make_segments_blueprint(
         DB.session.commit()
         flasher.flash_message(f"Deleted segment “{name}”.", FlashTypes.SUCCESS)
         return redirect(url_for(".index"))
+
+    @blueprint.route("/rematch/<int:id>", methods=["POST"])
+    @needs_authentication(authenticator)
+    def rematch(id: int) -> ResponseReturnValue:
+        segment = DB.session.get_one(Segment, id)
+        deleted_matches, _ = rematch_segment(
+            segment,
+            tile_visit_accessor.tile_state["activities_per_tile"][17],
+            config,
+        )
+        flasher.flash_message(
+            f"Re-matched segment “{segment.name}” after deleting {deleted_matches} previous matches.",
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".show", id=segment.id))
 
     @blueprint.route("/match-info/<int:activity_id>/<int:segment_id>")
     def match_info(activity_id: int, segment_id: int) -> ResponseReturnValue:

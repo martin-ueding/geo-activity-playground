@@ -2,6 +2,12 @@
 
 {% block container %}
 <h1 class="mb-3">{{ _('Segment') }} {{ segment.name }}</h1>
+<form method="post" action="{{ url_for('.rematch', id=segment.id) }}" class="mb-3">
+    <button type="submit" class="btn btn-warning"
+        onclick="if(!confirm('{{ _('Delete old matches and re-run matching for this segment?') }}')){event.preventDefault()}">
+        {{ _('Re-match Segment') }}
+    </button>
+</form>
 
 <script>
     function add_map(id, geojson) {

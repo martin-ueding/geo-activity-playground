@@ -141,6 +141,35 @@ def find_matches(
         try_match_segment_activity(segment, activity, config)
 
 
+def rematch_segment(
+    segment: Segment,
+    activities_per_tile: dict[tuple[int, int], set[int]],
+    config: Config,
+) -> tuple[int, int]:
+    deleted_matches = DB.session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count(SegmentMatch.id)).where(
+            SegmentMatch.segment_id == segment.id
+        )
+    )
+    deleted_checks = DB.session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count(SegmentCheck.id)).where(
+            SegmentCheck.segment_id == segment.id
+        )
+    )
+
+    DB.session.execute(
+        sqlalchemy.delete(SegmentMatch).where(SegmentMatch.segment_id == segment.id)
+    )
+    DB.session.execute(
+        sqlalchemy.delete(SegmentCheck).where(SegmentCheck.segment_id == segment.id)
+    )
+    DB.session.commit()
+
+    find_matches(segment, activities_per_tile, config)
+
+    return int(deleted_matches or 0), int(deleted_checks or 0)
+
+
 def try_match_segment_activity(
     segment: Segment, activity: Activity, config: Config
 ) -> None:
