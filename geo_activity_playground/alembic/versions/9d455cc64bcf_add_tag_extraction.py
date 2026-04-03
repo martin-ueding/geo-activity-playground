@@ -15,7 +15,7 @@ def upgrade() -> None:
     with op.batch_alter_table("tags", schema=None) as batch_op:
         batch_op.add_column(sa.Column("extraction_regex", sa.String(), nullable=True))
         batch_op.add_column(
-            sa.Column("extraction_destructive", sa.Boolean(), nullable=False)
+            sa.Column("extraction_destructive", sa.Boolean(), nullable=True)
         )
 
     # ### end Alembic commands ###
