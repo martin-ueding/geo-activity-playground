@@ -38,6 +38,7 @@ Fixed:
 - Fix **segment detail page crash** when a segment has no matches by handling empty segment match tables robustly. ([GH-394](https://github.com/martin-ueding/geo-activity-playground/issues/394))
 - Fix **segment length computation**.
 - Fix **heatmap tile rendering after activity deletion** by removing deleted activity IDs from tile state and skipping stale IDs during heatmap count generation. ([GH-392](https://github.com/martin-ueding/geo-activity-playground/issues/392))
+- Skip activities with **fewer than two track points** during enrichment/import to avoid crashes on malformed single-point tracks. ([GH-406](https://github.com/martin-ueding/geo-activity-playground/issues/406))
 
 ## Version 1.23.0 — 2026-03-01
 
