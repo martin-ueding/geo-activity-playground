@@ -17,6 +17,7 @@ Types of changes
 
 Added:
 
+- Extract **activity name and kind from GPX track metadata** (`trk/name`, `trk/type`) during import. ([GH-339](https://github.com/martin-ueding/geo-activity-playground/issues/339))
 - Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
 - Add per-tag **activity-name regex extraction** with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. ([GH-412](https://github.com/martin-ueding/geo-activity-playground/issues/412))
 - Add **breadcrumbs to segment view**.

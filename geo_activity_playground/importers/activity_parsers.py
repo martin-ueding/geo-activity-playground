@@ -42,7 +42,7 @@ def read_activity(path: pathlib.Path) -> tuple[Activity, pd.DataFrame]:
 
     if file_type == ".gpx":
         try:
-            timeseries = read_gpx_activity(path, opener)
+            activity, timeseries = read_gpx_activity(path, opener)
         except gpxpy.gpx.GPXException as e:
             if str(e) == "latitude is mandatory in None (got None)":
                 raise NoGeoDataError() from e
@@ -186,7 +186,8 @@ def _first_of_tuple(value: float | tuple[float, float]) -> float:
         return float(value)
 
 
-def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
+def read_gpx_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]:
+    activity = Activity()
     points = []
     with open(path, "rb") as f:
         content = f.read()
@@ -199,6 +200,10 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
         gpx = gpxpy.parse(decoded)
 
     for track in gpx.tracks:
+        if activity.name is None and track.name:
+            activity.name = track.name
+        if activity.kind is None and track.type:
+            activity.kind = get_or_make_kind(track.type)
         for segment in track.segments:
             for point in segment.points:
                 if isinstance(point.time, datetime.datetime):
@@ -236,7 +241,7 @@ def read_gpx_activity(path: pathlib.Path, open) -> pd.DataFrame:
     # Some files don't have elevation information. In these cases we remove the column.
     if "elevation" in df.columns and not df["elevation"].any():
         del df["elevation"]
-    return df
+    return activity, df
 
 
 def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
