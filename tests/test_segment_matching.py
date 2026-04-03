@@ -1,16 +1,10 @@
-from dataclasses import dataclass
 from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 
+from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.segments import segment_track_distance
-
-
-@dataclass
-class TestConfig:
-    segment_max_distance: float = 20.0
-    segment_split_distance: float = 100.0
 
 
 def make_activity(coordinates: list[list[float]]) -> SimpleNamespace:
@@ -28,7 +22,7 @@ def make_segment(coordinates: list[list[float]]) -> SimpleNamespace:
     return SimpleNamespace(coordinates=coordinates)
 
 
-def first_distance(segment, activity, config: TestConfig) -> float:
+def first_distance(segment, activity, config: Config) -> float:
     matches = list(segment_track_distance(segment, activity, config))
     assert len(matches) == 1
     distance_m, _ = matches[0]
@@ -36,7 +30,7 @@ def first_distance(segment, activity, config: TestConfig) -> float:
 
 
 def test_segment_distance_zero_when_segment_is_contained() -> None:
-    config = TestConfig(segment_split_distance=150.0)
+    config = Config(segment_split_distance=150)
     segment = make_segment([[0.0, 0.0], [0.0, 0.001]])
     activity = make_activity(
         [
@@ -53,7 +47,7 @@ def test_segment_distance_zero_when_segment_is_contained() -> None:
 
 
 def test_segment_distance_positive_for_crossing_line() -> None:
-    config = TestConfig(segment_split_distance=300.0)
+    config = Config(segment_split_distance=300)
     segment = make_segment([[0.0, 0.0], [0.0, 0.001], [0.0, 0.002]])
     activity = make_activity(
         [
@@ -69,11 +63,8 @@ def test_segment_distance_positive_for_crossing_line() -> None:
     assert distance_m > 0.0
 
 
-@pytest.mark.xfail(
-    reason="Known limitation: point-to-point matching misses sparse overlap."
-)
-def test_sparse_collinear_overlap_should_be_zero_but_is_not_yet() -> None:
-    config = TestConfig(segment_split_distance=100.0)
+def test_sparse_collinear_overlap_has_zero_distance() -> None:
+    config = Config(segment_split_distance=100)
     segment = make_segment([[0.0, 0.0005], [0.0, 0.0015]])
     activity = make_activity(
         [

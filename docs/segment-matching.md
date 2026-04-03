@@ -16,13 +16,12 @@ Although they are shown as solid lines in these images, both the segment as well
 
 ![](images/segment-drawing-1.jpg)
 
-What we use is an asymmetric Hausdorff distance. For every point in the segment, we pick the closest point in the track and take this distance. In the drawing, take segment point "a", then the closest track point is "b". For each segment point, we will get a distance to the track in this way. From all these distances, we take the maximum. This is a measure for the biggest distance between segment and track. If this maximum distance is closer than a threshold (say 20 meters), we consider the segment contained in the track.
+What we use is an asymmetric Hausdorff distance. For every point in the segment, we pick the closest point on the track polyline (that is, on any line segment between two consecutive track points) and take this distance. For each segment point, we will get a distance to the track in this way. From all these distances, we take the maximum. This is a measure for the biggest distance between segment and track. If this maximum distance is closer than a threshold (say 20 meters), we consider the segment contained in the track.
 
-Here is the code that is used. We have four one-dimensional arrays that contain the segment latitude and longitude (`slat` and `slon`) as well as the track latitude and longitude (`tlat` and `tlon`). We use NumPy slices with `None` in order to convert these to two-dimensional arrays and compute the distances. The first axis (`axis=0`) corresponds to the sequence points, the second axis (`axis=1`) to the track points. We compute the minimum along the track axis to pick the closest track point to every sequence point. And then we take the maximum of these minimum distances to get the one-sided Hausdorff distance.
+Here is the code shape that is used. We still keep one-dimensional arrays for segment latitude/longitude (`slat`, `slon`) and track latitude/longitude (`tlat`, `tlon`). But the key distance step is now point-to-polyline, not point-to-point:
 
 ```python
-d = get_distance(slat[:, None], slon[:, None], tlat[None, :], tlon[None, :])
-min_d = np.min(d, axis=1)
+min_d = _point_polyline_distance_m(slat, slon, tlat, tlon)
 return np.max(min_d)
 ```
 
@@ -62,11 +61,12 @@ We can see two diagonal lines here and the plot is mostly symmetric across the m
 
 What we basically want is to find these diagonals, even if they occur multiple times or even in reverse. But it needs to be a full diagonal such that the whole segment is traversed.
 
-We now divide this into segments by requiring that a segment match _candidate_ needs to have continuous proximity between segment and track. We take a threshold of 100 meters in order to enforce that between passes through the same segment, one needs to clear the segment by at least 100 meters. We create a mask and take the derivative. Whenever it jumps to +1 or -1, we are entering or exiting the segment.
+We now divide this into segments by requiring that a segment match _candidate_ needs to have continuous proximity between segment and track. We take a threshold of 100 meters in order to enforce that between passes through the same segment, one needs to clear the segment by at least 100 meters. We compute the distance from every track point to the segment polyline, create a mask, and take the derivative. Whenever it jumps to +1 or -1, we are entering or exiting the segment.
 
 ```python
-close_mask = np.min(d, axis=0) < 100
-mask_diff = np.diff(np.array(close_mask, dtype=np.int32))
+close_d = _point_polyline_distance_m(tlat, tlon, slat, slon)
+close_mask = close_d < 100
+mask_diff = np.diff(np.array(np.concatenate(([False], close_mask, [False])), dtype=np.int32))
 begins = np.where(mask_diff == 1)
 ends = np.where(mask_diff == -1)
 begins, ends
@@ -78,12 +78,16 @@ In our case, we get these indices:
 (array([ 309, 7583]), array([ 398, 7673]))
 ```
 
-So we enter at track point 309 and exit at 398, then enter again at 7583 and exit again at 7673. This gives us two segments. We can slice these out of the distance matrix and then create two distinct matches from that.
+So we enter at track point 309 and exit at 398, then enter again at 7583 and exit again at 7673. This gives us two segments. For each slice, we compute point-to-polyline distances from segment points to the sliced track polyline, and we also derive representative entry/exit indices from nearest sampled track points.
 
 ```python
 for begin, end in zip(begins, ends):
-    d_slice = d[:, begin:end]
-    min_d = np.min(d_slice, axis=1)
+    tlat_slice = tlat[begin:end]
+    tlon_slice = tlon[begin:end]
+    min_d = _point_polyline_distance_m(slat, slon, tlat_slice, tlon_slice)
+    d_slice = get_distance(
+        slat[:, None], slon[:, None], tlat_slice[None, :], tlon_slice[None, :]
+    )
     index = begin + np.argmin(d_slice, axis=1)
     print(np.max(min_d), index)
 ```
@@ -97,4 +101,4 @@ And now we have two matches. We have one where the maximum distance from any seg
  7641 7642 7644 7645 7649 7655 7657 7660]
 ```
 
-This solves the matching problem for cases where we pass the segment multiple times, but each with some distance. If we wanted to match laps on a segment that is a closed loop, this would still fail and we would need yet another approach to this.
+This solves the matching problem for cases where we pass the segment multiple times, but each with some distance. It also fixes the sparse-sampling case where track and segment are collinear but no sampled point pairs are close enough. If we wanted to match laps on a segment that is a closed loop, this would still fail and we would need yet another approach to this.
