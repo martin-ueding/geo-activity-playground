@@ -3,6 +3,7 @@ import datetime as dt
 import sqlalchemy
 
 from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
@@ -52,3 +53,14 @@ def test_rematch_segment_deletes_checks_and_matches_before_matching(app) -> None
             DB.session.scalar(sqlalchemy.select(sqlalchemy.func.count(SegmentCheck.id)))
             == 0
         )
+
+
+def test_segment_length_km_uses_lat_lon_coordinate_order() -> None:
+    segment = Segment(name="Order Test")
+    segment.coordinates = [[50.0, 7.0], [50.0, 7.1]]
+
+    expected_km = get_distance(50.0, 7.0, 50.0, 7.1) / 1000
+    wrong_order_km = get_distance(7.0, 50.0, 7.1, 50.0) / 1000
+
+    assert segment.length_km == expected_km
+    assert segment.length_km != wrong_order_km

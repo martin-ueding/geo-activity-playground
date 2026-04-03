@@ -699,8 +699,8 @@ class Segment(DB.Model):
         coords = self.coordinates
         total = 0.0
         for i in range(len(coords) - 1):
-            lon1, lat1 = coords[i]
-            lon2, lat2 = coords[i + 1]
+            lat1, lon1 = coords[i]
+            lat2, lon2 = coords[i + 1]
             total += get_distance(lat1, lon1, lat2, lon2)
         return total / 1000  # Convert meters to km
 
