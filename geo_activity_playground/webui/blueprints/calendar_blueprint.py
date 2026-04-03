@@ -148,6 +148,46 @@ def _plot_daily_progress(daily: pd.DataFrame) -> str:
     )
 
 
+def _format_elapsed_time(value: object) -> str:
+    if value is None or pd.isna(value):
+        return "—"
+    total_seconds = int(pd.Timedelta(value).total_seconds())
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+    return f"{hours}:{minutes:02d}:{seconds:02d}"
+
+
+def _outstanding_activities(period: pd.DataFrame) -> list[dict]:
+    if len(period) == 0:
+        return []
+
+    categories = [
+        ("distance_km", _("Longest distance"), lambda value: f"{float(value):.1f} km"),
+        ("elapsed_time", _("Longest time"), _format_elapsed_time),
+        ("num_new_tiles_17", _("Most new tiles"), lambda value: f"{int(value)}"),
+    ]
+
+    nominations: dict[int, dict] = {}
+    for column, title, formatter in categories:
+        if column not in period.columns or pd.isna(period[column]).all():
+            continue
+        row_index = period[column].idxmax()
+        row = period.loc[row_index]
+        activity_id = int(row["id"])
+        nomination = nominations.setdefault(
+            activity_id,
+            {
+                "id": activity_id,
+                "name": str(row["name"]),
+                "date": row["start_local"],
+                "reasons": [],
+            },
+        )
+        nomination["reasons"].append({"title": title, "value": formatter(row[column])})
+    return list(nominations.values())
+
+
 def make_calendar_blueprint(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> Blueprint:
@@ -240,6 +280,7 @@ def make_calendar_blueprint(
                 year_rank=None,
                 previous_year=None,
                 next_year=None,
+                outstanding_activities=[],
             )
         latest_year = int(meta["year"].max())
         return redirect(url_for(".wrap_year", year=latest_year))
@@ -262,6 +303,7 @@ def make_calendar_blueprint(
                     year_rank=None,
                     previous_year=None,
                     next_year=None,
+                    outstanding_activities=[],
                 )
             return redirect(url_for(".wrap_year", year=years[-1]))
 
@@ -332,6 +374,7 @@ def make_calendar_blueprint(
             year_rank=year_rank,
             previous_year=previous_year,
             next_year=next_year,
+            outstanding_activities=_outstanding_activities(period),
         )
 
     @blueprint.route("/wrap/<int:year>/<int:month>")
@@ -357,6 +400,7 @@ def make_calendar_blueprint(
                 equipment_plot="",
                 previous_month=None,
                 next_month=None,
+                outstanding_activities=[],
             )
 
         tile_visits = _tile_first_visits(17)
@@ -425,6 +469,7 @@ def make_calendar_blueprint(
             ),
             previous_month=previous_month,
             next_month=next_month,
+            outstanding_activities=_outstanding_activities(period),
         )
 
     return blueprint

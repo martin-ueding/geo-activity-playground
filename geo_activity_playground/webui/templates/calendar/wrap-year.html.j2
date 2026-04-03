@@ -88,6 +88,33 @@
     </div>
 </div>
 
+{% if outstanding_activities %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>{{ _('Outstanding activities') }}</h2>
+    </div>
+</div>
+<div class="row row-cols-1 row-cols-lg-3 g-3 mb-3">
+    {% for activity in outstanding_activities %}
+    <div class="col">
+        <div class="card h-100 border-warning-subtle">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <a href="{{ url_for('activity.show', id=activity.id) }}">{{ activity.name }}</a>
+                </h5>
+                <p class="text-body-secondary mb-2">{{ activity.date|dt }}</p>
+                <ul class="mb-0" style='list-style-type: "🏆 "'>
+                    {% for reason in activity.reasons %}
+                    <li><strong>{{ reason.title }}:</strong> {{ reason.value }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% if monthly_plot %}
 <div class="row mb-3">
     <div class="col">
