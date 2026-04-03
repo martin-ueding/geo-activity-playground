@@ -4,7 +4,6 @@ import logging
 import pathlib
 import shutil
 import sys
-import traceback
 import urllib.parse
 import zoneinfo
 from collections.abc import Sequence
@@ -101,9 +100,10 @@ def import_from_strava_checkout(config: Config) -> None:
 
         try:
             activity, time_series = read_activity(activity_file)
-        except ActivityParseError:
-            logger.error(f"Error while parsing `{activity_file}`:")
-            traceback.print_exc()
+        except ActivityParseError as e:
+            logger.warning(f"Skipping `{activity_file}` due to parse error: {e}")
+            logger.debug(f"Parser traceback for `{activity_file}`", exc_info=True)
+            work_tracker.mark_done(activity_id)
             continue
 
         work_tracker.mark_done(activity_id)
