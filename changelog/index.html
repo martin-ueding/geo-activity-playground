@@ -1620,6 +1620,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1240-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.24.0 — 2026-04-03
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1230-2026-03-01" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3084,6 +3095,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1240-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.24.0 — 2026-04-03
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1230-2026-03-01" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4543,6 +4565,32 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+<h2 id="version-1240-2026-04-03">Version 1.24.0 — 2026-04-03</h2>
+<p>Added:</p>
+<ul>
+<li>Add <strong>historical explorer cluster views</strong> with checkpointed cluster-history replay in SQLite, activity-level cluster delta overlays, and a time cutoff slider on the explorer page. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/366">GH-366</a>)</li>
+<li>Add per-tag <strong>activity-name regex extraction</strong> with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/412">GH-412</a>)</li>
+<li>Add <strong>activity data repair</strong> action into Settings → Technical Maintenance to reprocess all activities from raw time series data. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/398">GH-398</a>)</li>
+<li>Add flashy <strong>Year &amp; Month Wrap</strong> pages with yearly/monthly activity summaries and progress highlights. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/374">GH-374</a>)</li>
+<li>Extract <strong>activity name and kind from GPX track metadata</strong> (<code>trk/name</code>, <code>trk/type</code>) during import. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/339">GH-339</a>)</li>
+<li>Add <strong>local activity state wipe</strong> action into Settings → Technical Maintenance to truncate activity-related data, clear local caches/time series/photos, and reset Strava sync progress while preserving equipment, kinds, and Strava API credentials. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/355">GH-355</a>)</li>
+<li>Add UI option to <strong>re-match existing segments to activities</strong>. This is useful when there is an update to the segment matching algorithm and one wants to try that. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/413">GH-413</a>)</li>
+<li>Add maintenance action to <strong>refresh activity names from Strava</strong> via paginated API calls and upstream ID matching, without a full re-import. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/369">GH-369</a>)</li>
+<li>Add <strong>breadcrumbs to segment view</strong>.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Fix <strong>explorer tile inconsistency</strong> that came from inconsistent parallel data structures. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/411">GH-411</a>)</li>
+<li>Fix <strong>segment matching</strong> for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/413">GH-413</a>)</li>
+<li>Render <strong>Mapterhorn hillshade</strong> correctly in Leaflet by decoding Terrarium DEM tiles via <code>leaflet-relief</code> instead of showing raw Terrain RGB colors. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/389">GH-389</a>)</li>
+<li>Make the <strong>square planner</strong> always show the actual square planner tiles to fix it. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/396">GH-396</a>)</li>
+<li>Make <strong>activity trimming and share picture rendering</strong> robust against broken/empty tile coordinates to prevent crashes and recover from corrupted activity state. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/398">GH-398</a>)</li>
+<li>Mark <strong>Strava GPX activities without latitude/longitude</strong> as done so they are skipped on future imports instead of repeatedly failing and spamming logs. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/380">GH-380</a>)</li>
+<li>Fix <strong>segment detail page crash</strong> when a segment has no matches by handling empty segment match tables robustly. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/394">GH-394</a>)</li>
+<li>Fix <strong>segment length computation</strong>.</li>
+<li>Fix <strong>heatmap tile rendering after activity deletion</strong> by removing deleted activity IDs from tile state and skipping stale IDs during heatmap count generation. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/392">GH-392</a>)</li>
+<li>Skip activities with <strong>fewer than two track points</strong> during enrichment/import to avoid crashes on malformed single-point tracks. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/406">GH-406</a>)</li>
+</ul>
 <h2 id="version-1230-2026-03-01">Version 1.23.0 — 2026-03-01</h2>
 <p>Added:</p>
 <ul>
@@ -4556,7 +4604,7 @@ Types of changes
 <h2 id="version-1221-2026-02-15">Version 1.22.1 — 2026-02-15</h2>
 <p>Fixed:</p>
 <ul>
-<li>Make <strong>Strava checkout import</strong> more robust by allowing different lengths headers. In the past, this has to breaking changes whenever Strava added a new column to their export. Some people had older checkouts around, these became broken as well. Instead of expecting a fixed number of columns, we just map the known German ones to English names. We don't need the additional columns, hence we don't need a translation for these either. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/393">GH-393</a>), (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/403">GH-403</a>)</li>
+<li>Make <strong>Strava checkout import</strong> more robust by allowing different lengths headers. In the past, this has to breaking changes whenever Strava added a new column to their export. Some people had older checkouts around, these became broken as well. Instead of expecting a fixed number of columns, we just map the known German ones to English names. We don't need the additional columns, hence we don't need a translation for these either. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/393">GH-393</a>, <a href="https://github.com/martin-ueding/geo-activity-playground/issues/403">GH-403</a>)</li>
 </ul>
 <h2 id="version-1220-2026-02-14">Version 1.22.0 — 2026-02-14</h2>
 <p>Added:</p>
