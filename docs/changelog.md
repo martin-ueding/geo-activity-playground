@@ -30,6 +30,7 @@ Fixed:
 - Fix **explorer tile inconsistency** that came from inconsistent parallel data structures. ([GH-411](https://github.com/martin-ueding/geo-activity-playground/issues/411))
 - Make the **square planner** always show the actual square planner tiles to fix it. ([GH-396](https://github.com/martin-ueding/geo-activity-playground/issues/396))
 - Make **activity trimming and share picture rendering** robust against broken/empty tile coordinates to prevent crashes and recover from corrupted activity state. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Render **Mapterhorn hillshade** correctly in Leaflet by decoding Terrarium DEM tiles via `leaflet-relief` instead of showing raw Terrain RGB colors. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
 
 ## Version 1.23.0 — 2026-03-01
 

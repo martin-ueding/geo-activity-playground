@@ -64,19 +64,21 @@ export function add_layers_to_map(map, config) {
         heatmap_url += `?${heatmapExtraArgs}`;
     }
 
-    const mapterhornPaneName = "mapterhorn-shade";
-    if (!map.getPane(mapterhornPaneName)) {
-        const pane = map.createPane(mapterhornPaneName);
-        pane.style.zIndex = "240";
-    }
-
     const overlay_maps = {
-        "Mapterhorn": L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
-            maxZoom: 19,
-            attribution: "https://mapterhorn.com/",
-            opacity: 1.0,
-            pane: mapterhornPaneName
-        }),
+        "Mapterhorn Hillshade": (L.gridLayer && L.gridLayer.relief)
+            ? L.gridLayer.relief({
+                mode: "hillshade",
+                tileSize: 512,
+                elevationUrl: L.GridLayer.Relief.elevationUrls.mapterhorn,
+                elevationExtractor: L.GridLayer.Relief.elevationExtractors.mapterhorn,
+                attribution: L.GridLayer.Relief.elevationAttributions.mapterhorn,
+                opacity: 0.8,
+                maxZoom: 17
+            })
+            : L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
+                maxZoom: 17,
+                attribution: "https://mapterhorn.com/"
+            }),
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
             attribution
@@ -132,7 +134,8 @@ export function add_layers_to_map(map, config) {
     if (squarePlanner) {
         selectedOverlays = [selectedOverlay];
     } else if (saved.overlays && Array.isArray(saved.overlays)) {
-        selectedOverlays = saved.overlays.filter(name => overlay_maps[name]);
+        const savedOverlays = saved.overlays.filter(name => overlay_maps[name]);
+        selectedOverlays = savedOverlays.length > 0 ? savedOverlays : [selectedOverlay];
     } else {
         // Fall back to default (single overlay as array)
         selectedOverlays = [selectedOverlay];
