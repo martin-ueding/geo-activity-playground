@@ -79,7 +79,7 @@ function initClusterHistoryLayer(map, zoom, clusterHistory) {
             weight: 2,
             fillOpacity: 0.15
         }
-    }).addTo(map);
+    });
 
     const loadSnapshot = (eventIndex) => {
         fetch(`/explorer/${zoom}/cluster-history/snapshot.geojson?event_index=${eventIndex}`)
@@ -90,15 +90,30 @@ function initClusterHistoryLayer(map, zoom, clusterHistory) {
             });
     };
 
+    const updateHistoryLayerVisibility = (eventIndex) => {
+        const showHistory = eventIndex < clusterHistory.maxEventIndex;
+        if (!showHistory) {
+            clusterLayer.clearLayers();
+            if (map.hasLayer(clusterLayer)) {
+                map.removeLayer(clusterLayer);
+            }
+            return;
+        }
+        if (!map.hasLayer(clusterLayer)) {
+            clusterLayer.addTo(map);
+        }
+        loadSnapshot(eventIndex);
+    };
+
     slider.max = String(clusterHistory.maxEventIndex);
     slider.value = String(clusterHistory.initialEventIndex);
     label.textContent = String(clusterHistory.initialEventIndex);
-    loadSnapshot(clusterHistory.initialEventIndex);
+    updateHistoryLayerVisibility(clusterHistory.initialEventIndex);
 
     slider.addEventListener('input', () => {
         const eventIndex = Number.parseInt(slider.value, 10) || 0;
         label.textContent = String(eventIndex);
-        loadSnapshot(eventIndex);
+        updateHistoryLayerVisibility(eventIndex);
     });
 }
 
