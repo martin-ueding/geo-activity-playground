@@ -13,6 +13,12 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Fixed:
+
+- Fix **segment matching** for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. (GH-413)
+
 ## Version 1.23.0 — 2026-03-01
 
 Added:

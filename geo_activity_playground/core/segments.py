@@ -22,7 +22,9 @@ def segment_track_distance(
     """
     Computes asymmetric distance between a segment and a track in meters.
 
-    It uses a one-sided Hausdorff distance. For every point in the segment, it computes the minimum distance to a point in the track. The maximum of these minimum distances is the result.
+    It uses a one-sided Hausdorff distance. For every point in the segment, it
+    computes the minimum distance to the track polyline (point-to-segment
+    distance). The maximum of these minimum distances is the result.
 
     See docs/segment-matching.md for a more detailed explanation.
     """
@@ -30,16 +32,84 @@ def segment_track_distance(
     ts = activity.time_series
     tlat = ts["latitude"].to_numpy()
     tlon = ts["longitude"].to_numpy()
-    d = get_distance(slat[:, None], slon[:, None], tlat[None, :], tlon[None, :])
-    close_mask = np.min(d, axis=0) < config.segment_split_distance
-    mask_diff = np.diff(np.array(close_mask, dtype=np.int32))
+
+    close_d = _point_polyline_distance_m(tlat, tlon, slat, slon)
+    close_mask = close_d < config.segment_split_distance
+
+    padded = np.concatenate(([False], close_mask, [False]))
+    mask_diff = np.diff(np.array(padded, dtype=np.int32))
     begins = np.where(mask_diff == 1)[0]
     ends = np.where(mask_diff == -1)[0]
+
     for begin, end in zip(begins, ends):
-        d_slice = d[:, begin:end]
-        min_d = np.min(d_slice, axis=1)
+        if end - begin <= 0:
+            continue
+
+        tlat_slice = tlat[begin:end]
+        tlon_slice = tlon[begin:end]
+        min_d = _point_polyline_distance_m(slat, slon, tlat_slice, tlon_slice)
+
+        d_slice = get_distance(
+            slat[:, None], slon[:, None], tlat_slice[None, :], tlon_slice[None, :]
+        )
         index = begin + np.argmin(d_slice, axis=1)
-        yield np.max(min_d), index
+        yield float(np.max(min_d)), index
+
+
+def _point_polyline_distance_m(
+    point_lat: np.ndarray,
+    point_lon: np.ndarray,
+    line_lat: np.ndarray,
+    line_lon: np.ndarray,
+) -> np.ndarray:
+    """
+    Minimum distance in meters from points to a polyline.
+    """
+    if len(line_lat) == 0:
+        return np.full(len(point_lat), np.inf)
+
+    if len(line_lat) == 1:
+        return get_distance(point_lat, point_lon, line_lat[0], line_lon[0])
+
+    lat0 = float(np.mean(np.concatenate((point_lat, line_lat))))
+    px, py = _latlon_to_local_xy_m(point_lat, point_lon, lat0)
+    lx, ly = _latlon_to_local_xy_m(line_lat, line_lon, lat0)
+    return _point_to_polyline_distance_xy(px, py, lx, ly)
+
+
+def _latlon_to_local_xy_m(
+    lat: np.ndarray, lon: np.ndarray, lat0_deg: float
+) -> tuple[np.ndarray, np.ndarray]:
+    earth_radius = 6_371_000.0
+    lat_rad = np.radians(lat)
+    lon_rad = np.radians(lon)
+    lat0_rad = np.radians(lat0_deg)
+    x = earth_radius * lon_rad * np.cos(lat0_rad)
+    y = earth_radius * lat_rad
+    return x, y
+
+
+def _point_to_polyline_distance_xy(
+    px: np.ndarray, py: np.ndarray, lx: np.ndarray, ly: np.ndarray
+) -> np.ndarray:
+    ax = lx[:-1][None, :]
+    ay = ly[:-1][None, :]
+    bx = lx[1:][None, :]
+    by = ly[1:][None, :]
+
+    vx = bx - ax
+    vy = by - ay
+    seg_len2 = np.maximum(vx * vx + vy * vy, 1e-12)
+
+    wx = px[:, None] - ax
+    wy = py[:, None] - ay
+    t = np.clip((wx * vx + wy * vy) / seg_len2, 0.0, 1.0)
+
+    cx = ax + t * vx
+    cy = ay + t * vy
+    dx = px[:, None] - cx
+    dy = py[:, None] - cy
+    return np.sqrt(np.min(dx * dx + dy * dy, axis=1))
 
 
 def tiles_for_segment(segment: Segment, level: int) -> set[tuple[int, int]]:
