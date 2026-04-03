@@ -28,7 +28,9 @@ from geo_activity_playground.explorer.tile_visits import (
     invalidate_tile_visits_cache,
     make_tile_state,
     rebuild_cluster_history_for_zoom,
+    remove_activity_from_tile_state,
 )
+from geo_activity_playground.webui.blueprints.heatmap_blueprint import _get_counts
 
 
 def test_accessor_removes_persisted_tile_visits_key(app) -> None:
@@ -75,6 +77,32 @@ def test_get_tile_visits_uses_db_only(app) -> None:
         visits = get_tile_visits(14)
         assert (3, 4) in visits
         assert visits[(3, 4)]["visit_count"] == 1
+
+
+def test_remove_activity_from_tile_state_removes_all_references() -> None:
+    tile_state = make_tile_state()
+    tile_state["activities_per_tile"][17][(1, 2)] = {1, 2}
+    tile_state["activities_per_tile"][17][(2, 3)] = {2}
+    tile_state["activities_per_tile"][18][(4, 5)] = {2, 3}
+
+    removed = remove_activity_from_tile_state(tile_state, 2)
+
+    assert removed == 3
+    assert tile_state["activities_per_tile"][17][(1, 2)] == {1}
+    assert (2, 3) not in tile_state["activities_per_tile"][17]
+    assert tile_state["activities_per_tile"][18][(4, 5)] == {3}
+
+
+def test_heatmap_counts_skip_deleted_activity_ids(app) -> None:
+    class Repository:
+        def get_time_series(self, activity_id: int) -> pd.DataFrame:
+            if activity_id == 2:
+                raise ValueError("Cannot find activity 2 in DB.session.")
+            return pd.DataFrame({"x": [0.5], "y": [0.5], "segment_id": [0]})
+
+    activities_per_tile = {17: {(1, 2): {1, 2}}}
+    _ = _get_counts(1, 2, 17, {}, Repository(), activities_per_tile)
+    assert activities_per_tile[17][(1, 2)] == {1, 2}
 
 
 def test_process_activity_updates_first_and_last_fields_in_db(app) -> None:

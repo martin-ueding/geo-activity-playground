@@ -37,6 +37,7 @@ Fixed:
 - Mark **Strava GPX activities without latitude/longitude** as done so they are skipped on future imports instead of repeatedly failing and spamming logs. ([GH-380](https://github.com/martin-ueding/geo-activity-playground/issues/380))
 - Fix **segment detail page crash** when a segment has no matches by handling empty segment match tables robustly. ([GH-394](https://github.com/martin-ueding/geo-activity-playground/issues/394))
 - Fix **segment length computation**.
+- Fix **heatmap tile rendering after activity deletion** by removing deleted activity IDs from tile state and skipping stale IDs during heatmap count generation. ([GH-392](https://github.com/martin-ueding/geo-activity-playground/issues/392))
 
 ## Version 1.23.0 — 2026-03-01
 

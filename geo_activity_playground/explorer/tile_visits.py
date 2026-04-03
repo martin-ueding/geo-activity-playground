@@ -340,6 +340,22 @@ def _normalize_tile_state(raw_state: dict) -> TileState:
     return tile_state
 
 
+def remove_activity_from_tile_state(tile_state: TileState, activity_id: int) -> int:
+    removed_references = 0
+    for activities_per_tile in tile_state["activities_per_tile"].values():
+        empty_tiles: list[tuple[int, int]] = []
+        for tile, tile_activity_ids in activities_per_tile.items():
+            if activity_id not in tile_activity_ids:
+                continue
+            tile_activity_ids.discard(activity_id)
+            removed_references += 1
+            if not tile_activity_ids:
+                empty_tiles.append(tile)
+        for tile in empty_tiles:
+            del activities_per_tile[tile]
+    return removed_references
+
+
 def _consistency_check(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> bool:
