@@ -225,7 +225,7 @@ def create_app(
         "/admin": make_admin_blueprint(authenticator),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
-        "/calendar": make_calendar_blueprint(repository),
+        "/calendar": make_calendar_blueprint(repository, tile_visit_accessor),
         "/eddington": register_eddington_blueprint(repository, authenticator),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(
