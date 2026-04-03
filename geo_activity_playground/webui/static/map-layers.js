@@ -119,9 +119,12 @@ export function add_layers_to_map(map, config) {
     // Use saved preferences if valid, otherwise fall back to defaults
     const selectedBase = (saved.base && base_maps[saved.base]) ? saved.base : baseLayer;
 
-    // Overlays: saved.overlays is an array, filter to only valid ones
+    // In square planner mode the active overlay must be deterministic and tied to URL
+    // parameters; saved overlays can otherwise hide the planner layer.
     let selectedOverlays;
-    if (saved.overlays && Array.isArray(saved.overlays)) {
+    if (squarePlanner) {
+        selectedOverlays = [selectedOverlay];
+    } else if (saved.overlays && Array.isArray(saved.overlays)) {
         selectedOverlays = saved.overlays.filter(name => overlay_maps[name]);
     } else {
         // Fall back to default (single overlay as array)
