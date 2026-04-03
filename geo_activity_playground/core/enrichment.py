@@ -296,6 +296,13 @@ def update_and_commit(
     config: Config,
     force: bool = False,
 ) -> None:
+    if len(time_series) < 2:
+        logger.warning(
+            "Skipping activity %r because it has fewer than two track points.",
+            activity.path or activity.upstream_id or activity.name or "<unknown>",
+        )
+        return
+
     if activity.id is None:
         apply_tag_extraction_from_database(activity)
     changed = apply_enrichments(activity, time_series, config, force)
