@@ -57,4 +57,21 @@
         </form>
     </div>
 </div>
+
+<div class="card border-danger mb-3">
+    <div class="card-header bg-danger text-white">
+        <h5 class="card-title mb-0">{{ _('Wipe Local Activity State') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('This deletes all imported activities and related local state. It truncates most database tables, clears the Cache, Time Series, and Photos directories, and resets Strava sync progress. Equipment, kinds, and Strava API credentials are preserved.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to wipe local activity state? This cannot be undone.') }}');">
+            <input type="hidden" name="action" value="wipe_local_state">
+            <button type="submit" class="btn btn-danger">
+                {{ _('Wipe local activity state') }}
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}
