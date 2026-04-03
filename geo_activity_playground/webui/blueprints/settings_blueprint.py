@@ -21,7 +21,23 @@ from tqdm import tqdm
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config, ConfigAccessor
-from ...core.datamodel import DB, Activity, Equipment, ExplorerTileBookmark, Kind, Tag
+from ...core.datamodel import (
+    DB,
+    Activity,
+    Equipment,
+    ExplorerTileBookmark,
+    Kind,
+    Photo,
+    PlotSpec,
+    Segment,
+    SegmentCheck,
+    SegmentMatch,
+    SquarePlannerBookmark,
+    StoredSearchQuery,
+    Tag,
+    TileVisit,
+    activity_tag_association_table,
+)
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
@@ -113,6 +129,35 @@ def _reprocess_all_activities(
         update_and_commit(activity, time_series, config, force=force)
 
 
+def _truncate_user_content_tables() -> None:
+    DB.session.execute(sqlalchemy.delete(activity_tag_association_table))
+    DB.session.execute(sqlalchemy.delete(SegmentMatch))
+    DB.session.execute(sqlalchemy.delete(SegmentCheck))
+    DB.session.execute(sqlalchemy.delete(TileVisit))
+    DB.session.execute(sqlalchemy.delete(Photo))
+    DB.session.execute(sqlalchemy.delete(Activity))
+    DB.session.execute(sqlalchemy.delete(Segment))
+    DB.session.execute(sqlalchemy.delete(Tag))
+    DB.session.execute(sqlalchemy.delete(ExplorerTileBookmark))
+    DB.session.execute(sqlalchemy.delete(SquarePlannerBookmark))
+    DB.session.execute(sqlalchemy.delete(PlotSpec))
+    DB.session.execute(sqlalchemy.delete(StoredSearchQuery))
+    DB.session.commit()
+
+
+def _wipe_local_state() -> None:
+    _truncate_user_content_tables()
+
+    for directory in [
+        pathlib.Path("Cache"),
+        pathlib.Path("Time Series"),
+        pathlib.Path("Photos"),
+    ]:
+        if directory.exists():
+            shutil.rmtree(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+
+
 def make_settings_blueprint(
     config_accessor: ConfigAccessor,
     authenticator: Authenticator,
@@ -168,6 +213,15 @@ def make_settings_blueprint(
                 )
                 flasher.flash_message(
                     _("Activities have been repaired and reprocessed."),
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "wipe_local_state":
+                logger.info("User requested wipe of local activity state.")
+                _wipe_local_state()
+                flasher.flash_message(
+                    _(
+                        "Local activity state has been wiped. Equipment, kinds, and Strava API credentials were preserved."
+                    ),
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))

@@ -21,6 +21,7 @@ Added:
 - Add per-tag **activity-name regex extraction** with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. ([GH-412](https://github.com/martin-ueding/geo-activity-playground/issues/412))
 - Add **breadcrumbs to segment view**.
 - Add **activity data repair** action into Settings → Technical Maintenance to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Add **local activity state wipe** action into Settings → Technical Maintenance to truncate activity-related data, clear local caches/time series/photos, and reset Strava sync progress while preserving equipment, kinds, and Strava API credentials. ([GH-355](https://github.com/martin-ueding/geo-activity-playground/issues/355))
 - Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))
 
 Fixed:
