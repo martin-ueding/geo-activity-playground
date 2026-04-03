@@ -64,6 +64,12 @@ export function add_layers_to_map(map, config) {
         heatmap_url += `?${heatmapExtraArgs}`;
     }
 
+    const mapterhornPaneName = "mapterhorn-hillshade";
+    if (!map.getPane(mapterhornPaneName)) {
+        const pane = map.createPane(mapterhornPaneName);
+        pane.style.zIndex = "380";
+    }
+
     const overlay_maps = {
         "Mapterhorn Hillshade": (L.gridLayer && L.gridLayer.relief)
             ? L.gridLayer.relief({
@@ -72,12 +78,15 @@ export function add_layers_to_map(map, config) {
                 elevationUrl: L.GridLayer.Relief.elevationUrls.mapterhorn,
                 elevationExtractor: L.GridLayer.Relief.elevationExtractors.mapterhorn,
                 attribution: L.GridLayer.Relief.elevationAttributions.mapterhorn,
-                opacity: 0.8,
-                maxZoom: 17
+                opacity: 0.6,
+                maxZoom: 17,
+                pane: mapterhornPaneName
             })
             : L.tileLayer("https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", {
                 maxZoom: 17,
-                attribution: "https://mapterhorn.com/"
+                attribution: "https://mapterhorn.com/",
+                pane: mapterhornPaneName,
+                opacity: 0.6
             }),
         "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
             maxZoom: 19,
