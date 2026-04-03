@@ -320,7 +320,7 @@ def make_calendar_blueprint(
                 previous_year=None,
                 next_year=None,
                 outstanding_activities=[],
-                primary_zoom=17,
+                primary_zoom=14,
                 zoom_stats=[],
             )
         latest_year = int(meta["year"].max())
@@ -345,14 +345,18 @@ def make_calendar_blueprint(
                     previous_year=None,
                     next_year=None,
                     outstanding_activities=[],
-                    primary_zoom=17,
+                    primary_zoom=14,
                     zoom_stats=[],
                 )
             return redirect(url_for(".wrap_year", year=years[-1]))
 
         period = meta.loc[meta["year"] == year].copy()
         selected_zooms = sorted(set(config.explorer_zoom_levels))
-        primary_zoom = selected_zooms[-1] if selected_zooms else 17
+        primary_zoom = (
+            14
+            if 14 in selected_zooms
+            else (selected_zooms[0] if selected_zooms else 14)
+        )
         square = _square_evolution_frame(tile_visit_accessor, primary_zoom)
 
         monthly_activity = (
@@ -480,12 +484,16 @@ def make_calendar_blueprint(
                 previous_month=None,
                 next_month=None,
                 outstanding_activities=[],
-                primary_zoom=17,
+                primary_zoom=14,
                 zoom_stats=[],
             )
 
         selected_zooms = sorted(set(config.explorer_zoom_levels))
-        primary_zoom = selected_zooms[-1] if selected_zooms else 17
+        primary_zoom = (
+            14
+            if 14 in selected_zooms
+            else (selected_zooms[0] if selected_zooms else 14)
+        )
         square = _square_evolution_frame(tile_visit_accessor, primary_zoom)
 
         _, max_day = calendar.monthrange(year, month)
