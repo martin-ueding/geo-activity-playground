@@ -41,7 +41,7 @@ from ...core.raster_map import (
     tile_bounds_around_center,
 )
 from ...explorer.grid_file import make_grid_file_geojson, make_grid_points
-from ...explorer.tile_visits import TileVisitAccessor
+from ...explorer.tile_visits import TileVisitAccessor, remove_activity_from_tile_state
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TIME_SERIES_COLUMNS
 
@@ -445,6 +445,11 @@ def make_activity_blueprint(
         activity.delete_data()
         DB.session.delete(activity)
         DB.session.commit()
+        removed_references = remove_activity_from_tile_state(
+            tile_visit_accessor.tile_state, id
+        )
+        if removed_references:
+            tile_visit_accessor.save()
         return redirect(url_for("index"))
 
     @blueprint.route("/download-original/<id>")

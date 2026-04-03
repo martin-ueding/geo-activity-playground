@@ -92,7 +92,9 @@ def make_heatmap_blueprint(
         f = io.BytesIO()
         pl.imsave(
             f,
-            _render_tile_image(x, y, z, primitives, config, repository, activities_per_tile),
+            _render_tile_image(
+                x, y, z, primitives, config, repository, activities_per_tile
+            ),
             format="png",
         )
         return Response(
@@ -173,11 +175,17 @@ def _get_counts(
                 )
                 tile_counts = np.zeros(tile_pixels, dtype=np.int32)
                 parsed_activities.clear()
-            for activity_id in list(activity_ids):
+            for activity_id in activity_ids:
                 if activity_id in parsed_activities:
                     continue
+                try:
+                    time_series = repository.get_time_series(activity_id)
+                except ValueError:
+                    logger.warning(
+                        f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
+                    )
+                    continue
                 parsed_activities.add(activity_id)
-                time_series = repository.get_time_series(activity_id)
                 for _, group in time_series.groupby("segment_id"):
                     xy_pixels = (
                         np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
@@ -199,7 +207,13 @@ def _get_counts(
         for activity_id in activity_ids:
             if activity_id not in activities["id"]:
                 continue
-            time_series = repository.get_time_series(activity_id)
+            try:
+                time_series = repository.get_time_series(activity_id)
+            except ValueError:
+                logger.warning(
+                    f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
+                )
+                continue
             for _, group in time_series.groupby("segment_id"):
                 xy_pixels = (
                     np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
