@@ -68,6 +68,8 @@ export function add_layers_to_map(map, config) {
     if (!map.getPane(mapterhornPaneName)) {
         const pane = map.createPane(mapterhornPaneName);
         pane.style.zIndex = "380";
+        pane.style.mixBlendMode = "multiply";
+        pane.style.pointerEvents = "none";
     }
 
     if (!(L.gridLayer && L.gridLayer.relief)) {
@@ -82,7 +84,12 @@ export function add_layers_to_map(map, config) {
                 elevationUrl: L.GridLayer.Relief.elevationUrls.mapterhorn,
                 elevationExtractor: L.GridLayer.Relief.elevationExtractors.mapterhorn,
                 attribution: L.GridLayer.Relief.elevationAttributions.mapterhorn,
-                opacity: 0.6,
+                hillshadeColorFunction: (intensity) => {
+                    const lifted = 1 - (1 - intensity) ** 3;
+                    const gray = Math.round(255 * lifted);
+                    return [gray, gray, gray];
+                },
+                opacity: 0.5,
                 maxZoom: 17,
                 pane: mapterhornPaneName
             })
