@@ -188,6 +188,25 @@ def _outstanding_activities(period: pd.DataFrame) -> list[dict]:
     return list(nominations.values())
 
 
+def _square_size_at(square_history: pd.DataFrame, checkpoints: pd.Series) -> pd.Series:
+    if len(square_history) == 0:
+        return pd.Series([0] * len(checkpoints), dtype="int64")
+
+    history = square_history[["time", "max_square_size"]].sort_values("time").copy()
+    probe = pd.DataFrame({"checkpoint": pd.to_datetime(checkpoints)}).sort_values(
+        "checkpoint"
+    )
+    merged = pd.merge_asof(
+        probe,
+        history,
+        left_on="checkpoint",
+        right_on="time",
+        direction="backward",
+    )
+    merged["max_square_size"] = merged["max_square_size"].fillna(0).astype("int64")
+    return merged["max_square_size"].reset_index(drop=True)
+
+
 def make_calendar_blueprint(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> Blueprint:
@@ -311,7 +330,6 @@ def make_calendar_blueprint(
         tile_visits = _tile_first_visits(17)
         tile_year = tile_visits.loc[tile_visits["year"] == year].copy()
         square = _square_evolution_frame(tile_visit_accessor, 17)
-        square_year = square.loc[square["year"] == year].copy()
 
         monthly_activity = (
             period.groupby("month", dropna=False)
@@ -328,18 +346,17 @@ def make_calendar_blueprint(
             if len(tile_year)
             else pd.DataFrame({"month": [], "new_tiles": []})
         )
-        monthly_square = (
-            square_year.groupby("month")["max_square_size"]
-            .max()
-            .rename("max_square_size")
-            .reset_index()
-            if len(square_year)
-            else pd.DataFrame({"month": [], "max_square_size": []})
-        )
         monthly = pd.DataFrame({"month": list(range(1, 13))})
         monthly = monthly.merge(monthly_activity, on="month", how="left")
         monthly = monthly.merge(monthly_tiles, on="month", how="left")
-        monthly = monthly.merge(monthly_square, on="month", how="left")
+        month_end = pd.to_datetime(
+            {
+                "year": [year] * len(monthly),
+                "month": monthly["month"],
+                "day": [1] * len(monthly),
+            }
+        ) + pd.offsets.MonthEnd(1)
+        monthly["max_square_size"] = _square_size_at(square, month_end)
         monthly = monthly.fillna(0)
 
         yearly_distance = (
@@ -408,9 +425,6 @@ def make_calendar_blueprint(
             (tile_visits["year"] == year) & (tile_visits["month"] == month)
         ].copy()
         square = _square_evolution_frame(tile_visit_accessor, 17)
-        square_month = square.loc[
-            (square["year"] == year) & (square["month"] == month)
-        ].copy()
 
         _, max_day = calendar.monthrange(year, month)
         daily_activity = (
@@ -428,18 +442,17 @@ def make_calendar_blueprint(
             if len(tile_month)
             else pd.DataFrame({"day": [], "new_tiles": []})
         )
-        daily_square = (
-            square_month.groupby("day")["max_square_size"]
-            .max()
-            .rename("max_square_size")
-            .reset_index()
-            if len(square_month)
-            else pd.DataFrame({"day": [], "max_square_size": []})
-        )
         daily = pd.DataFrame({"day": list(range(1, max_day + 1))})
         daily = daily.merge(daily_activity, on="day", how="left")
         daily = daily.merge(daily_tiles, on="day", how="left")
-        daily = daily.merge(daily_square, on="day", how="left")
+        day_end = pd.to_datetime(
+            {
+                "year": [year] * len(daily),
+                "month": [month] * len(daily),
+                "day": daily["day"],
+            }
+        )
+        daily["max_square_size"] = _square_size_at(square, day_end)
         daily = daily.fillna(0)
 
         month_index = months.index((year, month))
