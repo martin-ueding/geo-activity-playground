@@ -4,6 +4,7 @@ import logging
 import pathlib
 import shutil
 import sys
+import traceback
 import urllib.parse
 import zoneinfo
 from collections.abc import Sequence
@@ -22,7 +23,7 @@ from ..core.datamodel import (
 from ..core.enrichment import update_and_commit
 from ..core.paths import activity_extracted_meta_dir
 from ..core.tasks import WorkTracker, work_tracker_path
-from .activity_parsers import ActivityParseError, read_activity
+from .activity_parsers import ActivityParseError, NoGeoDataError, read_activity
 from .csv_parser import parse_csv
 
 logger = logging.getLogger(__name__)
@@ -100,10 +101,14 @@ def import_from_strava_checkout(config: Config) -> None:
 
         try:
             activity, time_series = read_activity(activity_file)
-        except ActivityParseError as e:
-            logger.warning(f"Skipping `{activity_file}` due to parse error: {e}")
+        except NoGeoDataError:
+            logger.warning(f"Skipping `{activity_file}` due to missing geo data.")
             logger.debug(f"Parser traceback for `{activity_file}`", exc_info=True)
             work_tracker.mark_done(activity_id)
+            continue
+        except ActivityParseError:
+            logger.error(f"Error while parsing `{activity_file}`:")
+            traceback.print_exc()
             continue
 
         work_tracker.mark_done(activity_id)
