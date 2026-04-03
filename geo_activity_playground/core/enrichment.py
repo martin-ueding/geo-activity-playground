@@ -95,7 +95,16 @@ def enrichment_rename_altitude(
 def enrichment_compute_tile_xy(
     activity: Activity, time_series: pd.DataFrame, config: Config, force: bool
 ) -> bool:
-    if "x" not in time_series.columns:
+    x_missing = "x" not in time_series.columns
+    y_missing = "y" not in time_series.columns
+    xy_invalid = (
+        not x_missing
+        and not y_missing
+        and not (
+            np.isfinite(time_series["x"]).all() and np.isfinite(time_series["y"]).all()
+        )
+    )
+    if force or x_missing or y_missing or xy_invalid:
         x, y = compute_tile_float(time_series["latitude"], time_series["longitude"], 0)
         time_series["x"] = x
         time_series["y"] = y

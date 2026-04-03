@@ -95,6 +95,23 @@ def int_or_none(s: str) -> int | None:
     return None
 
 
+def _reprocess_all_activities(
+    config: Config,
+    *,
+    force: bool,
+    use_raw_time_series: bool,
+    desc: str,
+) -> None:
+    for activity in tqdm(
+        DB.session.scalars(sqlalchemy.select(Activity)).all(),
+        desc=desc,
+    ):
+        time_series = (
+            activity.raw_time_series if use_raw_time_series else activity.time_series
+        )
+        update_and_commit(activity, time_series, config, force=force)
+
+
 def make_settings_blueprint(
     config_accessor: ConfigAccessor,
     authenticator: Authenticator,
@@ -138,6 +155,18 @@ def make_settings_blueprint(
                     shutil.rmtree(heatmap_cache_dir)
                 flasher.flash_message(
                     _("Heatmap cache has been cleared."),
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "repair_activities":
+                logger.info("User requested repair of activities.")
+                _reprocess_all_activities(
+                    config_accessor(),
+                    force=True,
+                    use_raw_time_series=True,
+                    desc="Repairing activities",
+                )
+                flasher.flash_message(
+                    _("Activities have been repaired and reprocessed."),
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))
@@ -617,12 +646,12 @@ def make_settings_blueprint(
             config_accessor().time_diff_threshold_seconds = threshold
             config_accessor.save()
             flash(f"Threshold set to {threshold}.", category="success")
-            for activity in tqdm(
-                DB.session.scalars(sqlalchemy.select(Activity)).all(),
+            _reprocess_all_activities(
+                config_accessor(),
+                force=False,
+                use_raw_time_series=False,
                 desc="Recomputing segments",
-            ):
-                time_series = activity.time_series
-                update_and_commit(activity, time_series, config_accessor())
+            )
         return render_template(
             "settings/segmentation.html.j2",
             threshold=config_accessor().time_diff_threshold_seconds,
