@@ -11,6 +11,7 @@ from .config import Config
 from .coordinates import get_distance
 from .datamodel import DB, Activity
 from .missing_values import some
+from .tag_extraction import apply_tag_extraction_from_database
 from .tiles import compute_tile_float
 from .time_conversion import get_timezone
 
@@ -290,8 +291,13 @@ def apply_enrichments(
 
 
 def update_and_commit(
-    activity: Activity, time_series: pd.DataFrame, config: Config, force: bool = False
+    activity: Activity,
+    time_series: pd.DataFrame,
+    config: Config,
+    force: bool = False,
 ) -> None:
+    if activity.id is None:
+        apply_tag_extraction_from_database(activity)
     changed = apply_enrichments(activity, time_series, config, force)
     if not activity.time_series_uuid:
         activity.time_series_uuid = str(uuid.uuid4())

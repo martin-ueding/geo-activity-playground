@@ -242,6 +242,10 @@ class Tag(DB.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     tag: Mapped[str] = mapped_column(String, unique=True)
     color: Mapped[str] = mapped_column(String, nullable=True)
+    extraction_regex: Mapped[str | None] = mapped_column(String, nullable=True)
+    extraction_destructive: Mapped[bool] = mapped_column(
+        sa.Boolean, nullable=False, default=False
+    )
 
     activities: Mapped[list[Activity]] = relationship(
         secondary=activity_tag_association_table, back_populates="tags"

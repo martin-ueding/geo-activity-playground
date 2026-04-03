@@ -11,12 +11,26 @@
 <form method="POST">
     <div class="mb-3">
         <label for="tag" class="form-label">Tag</label>
-        <input type="text" class="form-control" id="tag" name="tag" value="{{ tag.tag }}" />
+        <input type="text" class="form-control" id="tag" name="tag" value="{{ tag.tag }}" required />
     </div>
 
     <div class="mb-3">
         <label for="color" class="form-label">Color</label>
         <input type="color" class="form-control" id="color" name="color" value="{{ tag.color or '#0d6efd' }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="extraction_regex" class="form-label">Extraction Regex</label>
+        <input type="text" class="form-control" id="extraction_regex" name="extraction_regex" value="{{ tag.extraction_regex or '' }}" />
+        <div class="form-text">Matches against activity name. If it matches, this tag is applied automatically.</div>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" value="on" id="extraction_destructive" name="extraction_destructive" {% if tag.extraction_destructive %}checked{% endif %}>
+        <label class="form-check-label" for="extraction_destructive">
+            Destructive extraction
+        </label>
+        <div class="form-text">Remove the matched part from the activity name, then normalize whitespace.</div>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>

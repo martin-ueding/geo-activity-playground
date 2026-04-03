@@ -24,6 +24,7 @@ from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import DB, Activity, Equipment, ExplorerTileBookmark, Kind, Tag
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
+from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
 from ...core.tasks import WorkTracker, work_tracker_path
 from ...explorer.tile_visits import (
     TileVisitAccessor,
@@ -706,32 +707,105 @@ def make_settings_blueprint(
     def tags_list():
         return render_template(
             "settings/tags-list.html.j2",
-            tags=DB.session.scalars(sqlalchemy.select(Tag)).all(),
+            tags=DB.session.scalars(sqlalchemy.select(Tag).order_by(Tag.tag)).all(),
         )
 
     @blueprint.route("/tags/new", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def tags_new():
         if request.method == "POST":
-            tag_str = request.form["tag"]
-            tag = Tag(tag=tag_str)
+            tag_str = request.form["tag"].strip()
+            extraction_regex = request.form.get("extraction_regex", "").strip() or None
+            extraction_destructive = request.form.get("extraction_destructive") == "on"
+            color = request.form.get("color", "").strip() or None
+
+            if extraction_regex is not None:
+                try:
+                    re.compile(extraction_regex)
+                except re.error as e:
+                    flasher.flash_message(
+                        f"Cannot parse extraction regex due to error: {e}",
+                        FlashTypes.DANGER,
+                    )
+                    return render_template(
+                        "settings/tags-new.html.j2",
+                        tag_value=tag_str,
+                        color_value=color or "#0d6efd",
+                        extraction_regex_value=extraction_regex or "",
+                        extraction_destructive_value=extraction_destructive,
+                    )
+
+            tag = Tag(
+                tag=tag_str,
+                color=color,
+                extraction_regex=extraction_regex,
+                extraction_destructive=extraction_destructive,
+            )
             DB.session.add(tag)
             DB.session.commit()
             return redirect(url_for(".tags_list"))
         else:
-            return render_template("settings/tags-new.html.j2")
+            return render_template(
+                "settings/tags-new.html.j2",
+                tag_value="",
+                color_value="#0d6efd",
+                extraction_regex_value="",
+                extraction_destructive_value=False,
+            )
 
     @blueprint.route("/tags/edit/<int:id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def tags_edit(id: int):
         tag = DB.session.get_one(Tag, id)
         if request.method == "POST":
+            new_extraction_regex = (
+                request.form.get("extraction_regex", "").strip() or None
+            )
+            if new_extraction_regex is not None:
+                try:
+                    re.compile(new_extraction_regex)
+                except re.error as e:
+                    flasher.flash_message(
+                        f"Cannot parse extraction regex due to error: {e}",
+                        FlashTypes.DANGER,
+                    )
+                    return render_template("settings/tags-edit.html.j2", tag=tag)
+
             tag.tag = request.form["tag"]
             tag.color = request.form["color"]
+            tag.extraction_regex = new_extraction_regex
+            tag.extraction_destructive = (
+                request.form.get("extraction_destructive") == "on"
+            )
             DB.session.commit()
             return redirect(url_for(".tags_list"))
         else:
             return render_template("settings/tags-edit.html.j2", tag=tag)
+
+    @blueprint.route("/tags/scan-existing", methods=["POST"])
+    @needs_authentication(authenticator)
+    def tags_scan_existing():
+        tags = get_tags_with_extraction_regex()
+        if not tags:
+            flasher.flash_message(
+                "There are no tags with extraction regex configured.",
+                FlashTypes.WARNING,
+            )
+            return redirect(url_for(".tags_list"))
+
+        activities = DB.session.scalars(
+            sqlalchemy.select(Activity).order_by(Activity.id)
+        ).all()
+        changed = 0
+        for activity in activities:
+            if apply_tag_extraction(activity, tags):
+                changed += 1
+        DB.session.commit()
+        flasher.flash_message(
+            f"Scanned {len(activities)} activities and updated {changed}.",
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".tags_list"))
 
     @blueprint.route("/tile-source", methods=["GET", "POST"])
     @needs_authentication(authenticator)
