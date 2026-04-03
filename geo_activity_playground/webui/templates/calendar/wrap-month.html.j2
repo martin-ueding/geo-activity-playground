@@ -68,8 +68,16 @@
     <div class="col-md-4 col-lg-2">
         <div class="card border-danger h-100">
             <div class="card-body">
-                <div class="text-uppercase small text-muted">{{ _('New Tiles (z17)') }}</div>
+                <div class="text-uppercase small text-muted">{{ _('New Tiles (z%(zoom)d)', zoom=primary_zoom) }}</div>
                 <div class="display-6 fw-semibold">{{ metrics.new_tiles }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card border-dark h-100">
+            <div class="card-body">
+                <div class="text-uppercase small text-muted">{{ _('New Cluster Tiles (z%(zoom)d)', zoom=primary_zoom) }}</div>
+                <div class="display-6 fw-semibold">{{ metrics.new_cluster_tiles }}</div>
             </div>
         </div>
     </div>
@@ -82,6 +90,36 @@
         </div>
     </div>
 </div>
+
+{% if zoom_stats %}
+<div class="row mb-3">
+    <div class="col">
+        <h2>{{ _('Explorer tile stats by zoom') }}</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ _('Zoom') }}</th>
+                        <th class="text-end">{{ _('New tiles') }}</th>
+                        <th class="text-end">{{ _('New cluster tiles') }}</th>
+                        <th class="text-end">{{ _('Max square') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in zoom_stats %}
+                    <tr>
+                        <td>{{ row.zoom }}</td>
+                        <td class="text-end">{{ row.new_tiles }}</td>
+                        <td class="text-end">{{ row.new_cluster_tiles }}</td>
+                        <td class="text-end">{{ row.max_square_size }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 {% if outstanding_activities %}
 <div class="row mb-3">
@@ -143,6 +181,7 @@
                         <th class="text-end">{{ _('Elevation / m') }}</th>
                         <th class="text-end">{{ _('Moving / h') }}</th>
                         <th class="text-end">{{ _('New Tiles') }}</th>
+                        <th class="text-end">{{ _('New Cluster Tiles') }}</th>
                         <th class="text-end">{{ _('Max Square') }}</th>
                     </tr>
                 </thead>
@@ -155,6 +194,7 @@
                         <td class="text-end">{{ row.elevation_gain|int }}</td>
                         <td class="text-end">{{ '%.1f'|format(row.moving_hours) }}</td>
                         <td class="text-end">{{ row.new_tiles|int }}</td>
+                        <td class="text-end">{{ row.new_cluster_tiles|int }}</td>
                         <td class="text-end">{{ row.max_square_size|int }}</td>
                     </tr>
                     {% endfor %}
