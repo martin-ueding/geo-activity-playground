@@ -1,6 +1,12 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">{{ _('Segments') }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ segment.name }}</li>
+    </ol>
+</nav>
 <h1 class="mb-3">{{ _('Segment') }} {{ segment.name }}</h1>
 <form method="post" action="{{ url_for('.rematch', id=segment.id) }}" class="mb-3">
     <button type="submit" class="btn btn-warning"
