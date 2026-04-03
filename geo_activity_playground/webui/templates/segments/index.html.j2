@@ -41,6 +41,12 @@
                 <br />
                 {{ _('Matches') }}: {{ segment.matches|length }}
             </p>
+            <form method="post" action="{{ url_for('.rematch', id=segment.id) }}" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-warning"
+                    onclick="if(!confirm('{{ _('Delete old matches and re-run matching for this segment?') }}')){event.preventDefault()}">
+                    {{ _('Re-match') }}
+                </button>
+            </form>
             <a class="btn btn-sm btn-danger" href="{{ url_for('.delete', id=segment.id) }}"
                 onclick="if(!confirm('{{ _('Are you sure to delete this segment?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
         </div>
