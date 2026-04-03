@@ -17,11 +17,11 @@ Types of changes
 
 Added:
 
-- Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. (GH-413)
+- Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
 
 Fixed:
 
-- Fix **segment matching** for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. (GH-413)
+- Fix **segment matching** for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
 
 ## Version 1.23.0 — 2026-03-01
 
