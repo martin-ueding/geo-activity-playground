@@ -12,6 +12,7 @@
  * @param {number} config.squarePlanner.y - Square Y coordinate
  * @param {number} config.squarePlanner.size - Square size
  * @param {string} [config.heatmapExtraArgs] - Extra URL args for heatmap tiles
+ * @param {number} [config.historyEventIndex] - Optional cluster-history cutoff index
  */
 export function add_layers_to_map(map, config) {
     const {
@@ -20,7 +21,8 @@ export function add_layers_to_map(map, config) {
         baseLayer = 'Grayscale',
         overlay = 'Colorful Cluster',
         squarePlanner = null,
-        heatmapExtraArgs = null
+        heatmapExtraArgs = null,
+        historyEventIndex = null
     } = config;
 
     // Get map container ID for localStorage key
@@ -76,6 +78,10 @@ export function add_layers_to_map(map, config) {
         console.error("leaflet-relief is required for Mapterhorn hillshade but is not available.");
     }
 
+    const historyParam = Number.isInteger(historyEventIndex)
+        ? `&event_index=${historyEventIndex}`
+        : '';
+
     const overlay_maps = {
         "Mapterhorn Hillshade": (L.gridLayer && L.gridLayer.relief)
             ? L.gridLayer.relief({
@@ -93,11 +99,11 @@ export function add_layers_to_map(map, config) {
                 pane: mapterhornPaneName
             })
             : L.layerGroup(),
-        "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster`, {
+        "Colorful Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=colorful_cluster${historyParam}`, {
             maxZoom: 19,
             attribution
         }),
-        "Max Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=max_cluster`, {
+        "Max Cluster": L.tileLayer(`/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=max_cluster${historyParam}`, {
             maxZoom: 19,
             attribution
         }),

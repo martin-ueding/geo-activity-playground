@@ -34,6 +34,7 @@ from ...core.raster_map import OSM_TILE_SIZE, ImageTransform, TileGetter
 from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
 from ...explorer.grid_file import (
     get_border_tiles,
+    make_explorer_tile,
     make_grid_file_geojson,
     make_grid_file_gpx,
     make_grid_points,
@@ -42,6 +43,10 @@ from ...explorer.tile_visits import (
     TileEvolutionState,
     TileVisitAccessor,
     compute_tile_evolution,
+    get_cluster_history_latest_event_index,
+    get_cluster_state_at_cutoff,
+    get_cluster_tile_diff_for_activity,
+    get_cluster_tiles_at_cutoff,
     get_tile_count,
     get_tile_history_df,
     get_tile_medians,
@@ -128,6 +133,67 @@ class ColorfulClusterColorStrategy(ColorStrategy):
             return hex_color_to_float(self._config.color_strategy_visited_color)
         else:
             return None
+
+
+def _replay_root(
+    parents: dict[tuple[int, int], tuple[int, int]], tile: tuple[int, int]
+) -> tuple[int, int]:
+    root = tile
+    while parents[root] != root:
+        root = parents[root]
+    return root
+
+
+class HistoricalColorfulClusterColorStrategy(ColorStrategy):
+    def __init__(self, state, config: Config):
+        self._config = config
+        self._cmap = matplotlib.colormaps["hsv"]
+        self._color_by_tile: dict[tuple[int, int], np.ndarray] = {}
+        self._visited_tiles = set(state.visited_tiles)
+        for tile in state.cluster_tiles:
+            cluster_id = _replay_root(state.parents, tile)
+            m = hashlib.sha256()
+            m.update(str(cluster_id).encode())
+            d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
+            self._color_by_tile[tile] = np.array(
+                [[self._cmap(d)[:3] + (self._config.color_strategy_cmap_opacity,)]]
+            )
+
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+        color = self._color_by_tile.get(tile_xy)
+        if color is not None:
+            return color
+        if tile_xy in self._visited_tiles:
+            return hex_color_to_float(self._config.color_strategy_visited_color)
+        return None
+
+
+class HistoricalMaxClusterColorStrategy(ColorStrategy):
+    def __init__(self, state, config: Config):
+        self._config = config
+        max_root = max(
+            state.component_sizes, key=state.component_sizes.get, default=None
+        )
+        self._max_members: set[tuple[int, int]] = set()
+        if max_root is not None:
+            self._max_members = {
+                tile
+                for tile in state.cluster_tiles
+                if _replay_root(state.parents, tile) == max_root
+            }
+        self._cluster_tiles = set(state.cluster_tiles)
+        self._visited_tiles = set(state.visited_tiles)
+
+    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+        if tile_xy in self._max_members:
+            return hex_color_to_float(self._config.color_strategy_max_cluster_color)
+        if tile_xy in self._cluster_tiles:
+            return hex_color_to_float(
+                self._config.color_strategy_max_cluster_other_color
+            )
+        if tile_xy in self._visited_tiles:
+            return hex_color_to_float(self._config.color_strategy_visited_color)
+        return None
 
 
 class VisitTimeColorStrategy(ColorStrategy):
@@ -311,6 +377,14 @@ def make_explorer_blueprint(
             return {"zoom_level_not_generated": zoom}
 
         tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        latest_history_event_index = get_cluster_history_latest_event_index(zoom)
+        selected_history_event_index = request.args.get(
+            "event_index", default=latest_history_event_index, type=int
+        )
+        selected_history_event_index = max(
+            0,
+            min(selected_history_event_index, latest_history_event_index),
+        )
 
         # Get data from database
         medians = get_tile_medians(zoom)
@@ -371,6 +445,8 @@ def make_explorer_blueprint(
                 map(len, tile_evolution_state.clusters.values()), default=0
             ),
             "bookmarks": bookmarks,
+            "latest_history_event_index": latest_history_event_index,
+            "selected_history_event_index": selected_history_event_index,
         }
         return render_template("explorer/server-side.html.j2", **context)
 
@@ -378,6 +454,14 @@ def make_explorer_blueprint(
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
         tile_visits = get_tile_visits(zoom)
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        history_event_index = request.args.get("event_index", type=int)
+        historical_state = None
+        if history_event_index is not None:
+            history_event_index = max(
+                0,
+                min(history_event_index, get_cluster_history_latest_event_index(zoom)),
+            )
+            historical_state = get_cluster_state_at_cutoff(zoom, history_event_index)
 
         # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         # grayscale = image_transforms["grayscale"].transform_image(map_tile)
@@ -390,13 +474,23 @@ def make_explorer_blueprint(
             color_strategy_name = config_accessor().cluster_color_strategy
         match color_strategy_name:
             case "max_cluster":
-                color_strategy = MaxClusterColorStrategy(
-                    evolution_state, tile_visits, config
-                )
+                if historical_state is None:
+                    color_strategy = MaxClusterColorStrategy(
+                        evolution_state, tile_visits, config
+                    )
+                else:
+                    color_strategy = HistoricalMaxClusterColorStrategy(
+                        historical_state, config
+                    )
             case "colorful_cluster":
-                color_strategy = ColorfulClusterColorStrategy(
-                    evolution_state, tile_visits, config
-                )
+                if historical_state is None:
+                    color_strategy = ColorfulClusterColorStrategy(
+                        evolution_state, tile_visits, config
+                    )
+                else:
+                    color_strategy = HistoricalColorfulClusterColorStrategy(
+                        historical_state, config
+                    )
             case "first":
                 color_strategy = VisitTimeColorStrategy(
                     tile_visits, config, use_first=True
@@ -656,6 +750,46 @@ def make_explorer_blueprint(
             "num_activities": len(activities),
         }
         return render_template("explorer/activities_through_tile.html.j2", **context)
+
+    @blueprint.route("/<int:zoom>/cluster-history/snapshot.geojson")
+    def cluster_history_snapshot(zoom: int) -> ResponseReturnValue:
+        latest_event_index = get_cluster_history_latest_event_index(zoom)
+        cutoff = request.args.get("event_index", type=int)
+        if cutoff is None:
+            cutoff = latest_event_index
+        cutoff = max(0, min(cutoff, latest_event_index))
+        cluster_tiles = get_cluster_tiles_at_cutoff(zoom, cutoff)
+        geojson_str = make_grid_file_geojson(make_grid_points(cluster_tiles, zoom))
+        return Response(geojson_str, mimetype="application/json")
+
+    @blueprint.route(
+        "/<int:zoom>/cluster-history/activity/<int:activity_id>/diff.geojson"
+    )
+    def cluster_history_activity_diff(
+        zoom: int, activity_id: int
+    ) -> ResponseReturnValue:
+        added, removed = get_cluster_tile_diff_for_activity(zoom, activity_id)
+        features = [
+            make_explorer_tile(
+                tile_x=tile_x,
+                tile_y=tile_y,
+                properties={"delta": "added"},
+                zoom=zoom,
+            )
+            for tile_x, tile_y in sorted(added)
+        ] + [
+            make_explorer_tile(
+                tile_x=tile_x,
+                tile_y=tile_y,
+                properties={"delta": "removed"},
+                zoom=zoom,
+            )
+            for tile_x, tile_y in sorted(removed)
+        ]
+        return Response(
+            geojson.dumps(geojson.FeatureCollection(features)),
+            mimetype="application/json",
+        )
 
     return blueprint
 

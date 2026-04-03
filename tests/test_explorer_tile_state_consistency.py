@@ -1,22 +1,33 @@
 import datetime as dt
 import pickle
+import time
 from types import SimpleNamespace
 
 import pandas as pd
 import sqlalchemy as sa
 
 from geo_activity_playground.core.activities import ActivityRepository
-from geo_activity_playground.core.datamodel import DB, Activity, TileVisit
+from geo_activity_playground.core.datamodel import (
+    DB,
+    Activity,
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
+    TileVisit,
+)
 from geo_activity_playground.explorer.tile_visits import (
+    CLUSTER_CHECKPOINT_INTERVAL,
     TileEvolutionState,
     TileVisitAccessor,
     _compute_cluster_evolution,
     _process_activity,
     _tiles_from_points,
+    get_cluster_tile_diff_for_activity,
+    get_cluster_tiles_at_cutoff,
     get_tile_history_df,
     get_tile_visits,
     invalidate_tile_visits_cache,
     make_tile_state,
+    rebuild_cluster_history_for_zoom,
 )
 
 
@@ -209,3 +220,143 @@ def test_deterministic_ordering_for_activity_and_tile_history(app) -> None:
         history = get_tile_history_df(14)
         assert history.iloc[0]["activity_id"] == 1
         assert tuple(history.iloc[0][["tile_x", "tile_y"]]) == (1, 1)
+
+
+def test_cluster_history_projection_and_checkpoints(app) -> None:
+    with app.app_context():
+        activity = Activity(id=1, name="Ride")
+        DB.session.add(activity)
+        for i in range(CLUSTER_CHECKPOINT_INTERVAL + 5):
+            DB.session.add(
+                TileVisit(
+                    zoom=14,
+                    tile_x=i,
+                    tile_y=0,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 0, 0)
+                    + dt.timedelta(seconds=i),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 0, 0)
+                    + dt.timedelta(seconds=i),
+                    visit_count=1,
+                )
+            )
+        DB.session.commit()
+
+        history = get_tile_history_df(14)
+        rebuild_cluster_history_for_zoom(14, history)
+
+        assert DB.session.query(ClusterHistoryEvent).filter(
+            ClusterHistoryEvent.zoom == 14
+        ).count() == len(history)
+        checkpoint_indices = [
+            row.event_index
+            for row in DB.session.scalars(
+                sa.select(ClusterHistoryCheckpoint)
+                .where(ClusterHistoryCheckpoint.zoom == 14)
+                .order_by(ClusterHistoryCheckpoint.event_index)
+            ).all()
+        ]
+        assert checkpoint_indices[-1] == len(history)
+        assert CLUSTER_CHECKPOINT_INTERVAL in checkpoint_indices
+
+
+def test_cluster_history_diff_for_activity(app) -> None:
+    with app.app_context():
+        DB.session.add_all([Activity(id=1, name="A1"), Activity(id=2, name="A2")])
+        DB.session.add_all(
+            [
+                TileVisit(
+                    zoom=14,
+                    tile_x=-1,
+                    tile_y=0,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=-1,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 1, 0),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 1, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=1,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 2, 0),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 2, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=1,
+                    tile_y=0,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 3, 0),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 3, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=0,
+                    first_activity_id=2,
+                    first_time=dt.datetime(2026, 1, 1, 10, 4, 0),
+                    last_activity_id=2,
+                    last_time=dt.datetime(2026, 1, 1, 10, 4, 0),
+                    visit_count=1,
+                ),
+            ]
+        )
+        DB.session.commit()
+
+        history = get_tile_history_df(14)
+        rebuild_cluster_history_for_zoom(14, history)
+        before = get_cluster_tiles_at_cutoff(14, 4)
+        after = get_cluster_tiles_at_cutoff(14, 5)
+        added, removed = get_cluster_tile_diff_for_activity(14, 2)
+
+        assert (0, 0) not in before
+        assert (0, 0) in after
+        assert added == {(0, 0)}
+        assert removed == set()
+
+
+def test_cluster_history_replay_latency_bound(app) -> None:
+    with app.app_context():
+        activity = Activity(id=1, name="Ride")
+        DB.session.add(activity)
+        for i in range(2_000):
+            DB.session.add(
+                TileVisit(
+                    zoom=14,
+                    tile_x=i,
+                    tile_y=0,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2026, 1, 1, 10, 0, 0)
+                    + dt.timedelta(seconds=i),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2026, 1, 1, 10, 0, 0)
+                    + dt.timedelta(seconds=i),
+                    visit_count=1,
+                )
+            )
+        DB.session.commit()
+
+        history = get_tile_history_df(14)
+        rebuild_cluster_history_for_zoom(14, history)
+
+        start = time.perf_counter()
+        _ = get_cluster_tiles_at_cutoff(14, 2_000)
+        elapsed = time.perf_counter() - start
+        assert elapsed < 1.0

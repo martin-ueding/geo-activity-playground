@@ -2,6 +2,7 @@ import collections
 import datetime
 import functools
 import itertools
+import json
 import logging
 import pathlib
 import pickle
@@ -15,7 +16,12 @@ from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
-from ..core.datamodel import DB, TileVisit
+from ..core.datamodel import (
+    DB,
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
+    TileVisit,
+)
 from ..core.paths import atomic_open
 from ..core.tasks import WorkTracker, try_load_pickle, work_tracker_path
 from ..core.tiles import adjacent_to, interpolate_missing_tile
@@ -132,6 +138,126 @@ class TileEvolutionState:
         self.square_evolution = pd.DataFrame()
         self.square_x: int | None = None
         self.square_y: int | None = None
+
+
+class ClusterReplayState:
+    def __init__(self) -> None:
+        self.visited_tiles: set[tuple[int, int]] = set()
+        self.neighbor_counts: dict[tuple[int, int], int] = {}
+        self.cluster_tiles: set[tuple[int, int]] = set()
+        self.parents: dict[tuple[int, int], tuple[int, int]] = {}
+        self.component_sizes: dict[tuple[int, int], int] = {}
+        self.max_cluster_size = 0
+
+
+CLUSTER_CHECKPOINT_INTERVAL = 1_000
+
+
+def _find_root(
+    parents: dict[tuple[int, int], tuple[int, int]], tile: tuple[int, int]
+) -> tuple[int, int]:
+    root = tile
+    while parents[root] != root:
+        root = parents[root]
+    while parents[tile] != tile:
+        parent = parents[tile]
+        parents[tile] = root
+        tile = parent
+    return root
+
+
+def _union_roots(
+    state: ClusterReplayState,
+    left: tuple[int, int],
+    right: tuple[int, int],
+) -> None:
+    left_root = _find_root(state.parents, left)
+    right_root = _find_root(state.parents, right)
+    if left_root == right_root:
+        return
+    if state.component_sizes[left_root] < state.component_sizes[right_root]:
+        left_root, right_root = right_root, left_root
+    state.parents[right_root] = left_root
+    state.component_sizes[left_root] += state.component_sizes[right_root]
+    del state.component_sizes[right_root]
+    if state.component_sizes[left_root] > state.max_cluster_size:
+        state.max_cluster_size = state.component_sizes[left_root]
+
+
+def _activate_cluster_tile(state: ClusterReplayState, tile: tuple[int, int]) -> None:
+    if tile in state.cluster_tiles:
+        return
+    state.cluster_tiles.add(tile)
+    state.parents[tile] = tile
+    state.component_sizes[tile] = 1
+    if state.max_cluster_size < 1:
+        state.max_cluster_size = 1
+    for other in adjacent_to(tile):
+        if other in state.cluster_tiles:
+            _union_roots(state, tile, other)
+
+
+def apply_cluster_history_event(
+    state: ClusterReplayState, tile: tuple[int, int]
+) -> int | None:
+    if tile in state.visited_tiles:
+        return None
+    previous_max = state.max_cluster_size
+    state.visited_tiles.add(tile)
+    state.neighbor_counts.setdefault(tile, 0)
+
+    for other in adjacent_to(tile):
+        if other in state.visited_tiles:
+            state.neighbor_counts[tile] += 1
+            state.neighbor_counts[other] = state.neighbor_counts.get(other, 0) + 1
+            if state.neighbor_counts[other] == 4:
+                _activate_cluster_tile(state, other)
+
+    if state.neighbor_counts[tile] == 4:
+        _activate_cluster_tile(state, tile)
+
+    if state.max_cluster_size > previous_max:
+        return state.max_cluster_size
+    return None
+
+
+def _state_to_payload(state: ClusterReplayState) -> str:
+    payload = {
+        "visited_tiles": [list(tile) for tile in sorted(state.visited_tiles)],
+        "neighbor_counts": [
+            [tile[0], tile[1], count]
+            for tile, count in sorted(state.neighbor_counts.items())
+        ],
+        "cluster_tiles": [list(tile) for tile in sorted(state.cluster_tiles)],
+        "parents": [
+            [tile[0], tile[1], parent[0], parent[1]]
+            for tile, parent in sorted(state.parents.items())
+        ],
+        "component_sizes": [
+            [tile[0], tile[1], size]
+            for tile, size in sorted(state.component_sizes.items())
+        ],
+        "max_cluster_size": state.max_cluster_size,
+    }
+    return json.dumps(payload, separators=(",", ":"))
+
+
+def _state_from_payload(payload_json: str) -> ClusterReplayState:
+    raw = json.loads(payload_json)
+    state = ClusterReplayState()
+    state.visited_tiles = {tuple(tile) for tile in raw.get("visited_tiles", [])}
+    state.neighbor_counts = {
+        (entry[0], entry[1]): entry[2] for entry in raw.get("neighbor_counts", [])
+    }
+    state.cluster_tiles = {tuple(tile) for tile in raw.get("cluster_tiles", [])}
+    state.parents = {
+        (entry[0], entry[1]): (entry[2], entry[3]) for entry in raw.get("parents", [])
+    }
+    state.component_sizes = {
+        (entry[0], entry[1]): entry[2] for entry in raw.get("component_sizes", [])
+    }
+    state.max_cluster_size = raw.get("max_cluster_size", 0)
+    return state
 
 
 class TileState(TypedDict):
@@ -501,6 +627,7 @@ def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
     for zoom in config.explorer_zoom_levels:
         # Get tile history from database
         tile_history = get_tile_history_df(zoom)
+        rebuild_cluster_history_for_zoom(zoom, tile_history)
         _compute_cluster_evolution(
             tile_history,
             tile_state["evolution_state"][zoom],
@@ -511,6 +638,148 @@ def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
             tile_state["evolution_state"][zoom],
             zoom,
         )
+
+
+def rebuild_cluster_history_for_zoom(zoom: int, tile_history: pd.DataFrame) -> None:
+    DB.session.query(ClusterHistoryEvent).filter(
+        ClusterHistoryEvent.zoom == zoom
+    ).delete()
+    DB.session.query(ClusterHistoryCheckpoint).filter(
+        ClusterHistoryCheckpoint.zoom == zoom
+    ).delete()
+
+    state = ClusterReplayState()
+    event_batch: list[ClusterHistoryEvent] = []
+    checkpoint_batch: list[ClusterHistoryCheckpoint] = []
+
+    for event_index, row in enumerate(tile_history.itertuples(index=False), start=1):
+        tile = (int(row.tile_x), int(row.tile_y))
+        event_batch.append(
+            ClusterHistoryEvent(
+                zoom=zoom,
+                event_index=event_index,
+                activity_id=int(row.activity_id),
+                time=(row.time.to_pydatetime() if pd.notna(row.time) else None),
+                tile_x=tile[0],
+                tile_y=tile[1],
+            )
+        )
+
+        apply_cluster_history_event(state, tile)
+
+        if event_index % CLUSTER_CHECKPOINT_INTERVAL == 0:
+            checkpoint_batch.append(
+                ClusterHistoryCheckpoint(
+                    zoom=zoom,
+                    event_index=event_index,
+                    time=(row.time.to_pydatetime() if pd.notna(row.time) else None),
+                    max_cluster_size=state.max_cluster_size,
+                    payload_json=_state_to_payload(state),
+                )
+            )
+
+        if len(event_batch) >= 1_000:
+            DB.session.add_all(event_batch)
+            event_batch = []
+        if len(checkpoint_batch) >= 50:
+            DB.session.add_all(checkpoint_batch)
+            checkpoint_batch = []
+
+    if event_batch:
+        DB.session.add_all(event_batch)
+    if len(tile_history) > 0 and len(tile_history) % CLUSTER_CHECKPOINT_INTERVAL != 0:
+        last = tile_history.iloc[-1]
+        checkpoint_batch.append(
+            ClusterHistoryCheckpoint(
+                zoom=zoom,
+                event_index=len(tile_history),
+                time=(last["time"].to_pydatetime() if pd.notna(last["time"]) else None),
+                max_cluster_size=state.max_cluster_size,
+                payload_json=_state_to_payload(state),
+            )
+        )
+    if checkpoint_batch:
+        DB.session.add_all(checkpoint_batch)
+
+    DB.session.commit()
+
+
+def get_cluster_history_cutoff_for_activity(
+    zoom: int, activity_id: int
+) -> tuple[int | None, int | None]:
+    first_event = DB.session.scalar(
+        sa.select(sa.func.min(ClusterHistoryEvent.event_index)).where(
+            ClusterHistoryEvent.zoom == zoom,
+            ClusterHistoryEvent.activity_id == activity_id,
+        )
+    )
+    last_event = DB.session.scalar(
+        sa.select(sa.func.max(ClusterHistoryEvent.event_index)).where(
+            ClusterHistoryEvent.zoom == zoom,
+            ClusterHistoryEvent.activity_id == activity_id,
+        )
+    )
+    if first_event is None or last_event is None:
+        return None, None
+    return int(first_event), int(last_event)
+
+
+def get_cluster_history_latest_event_index(zoom: int) -> int:
+    latest = DB.session.scalar(
+        sa.select(sa.func.max(ClusterHistoryEvent.event_index)).where(
+            ClusterHistoryEvent.zoom == zoom
+        )
+    )
+    return int(latest or 0)
+
+
+def get_cluster_tiles_at_cutoff(zoom: int, event_index: int) -> set[tuple[int, int]]:
+    return set(get_cluster_state_at_cutoff(zoom, event_index).cluster_tiles)
+
+
+def get_cluster_state_at_cutoff(zoom: int, event_index: int) -> ClusterReplayState:
+    if event_index <= 0:
+        return ClusterReplayState()
+
+    checkpoint = DB.session.scalar(
+        sa.select(ClusterHistoryCheckpoint)
+        .where(
+            ClusterHistoryCheckpoint.zoom == zoom,
+            ClusterHistoryCheckpoint.event_index <= event_index,
+        )
+        .order_by(ClusterHistoryCheckpoint.event_index.desc())
+        .limit(1)
+    )
+    if checkpoint is None:
+        state = ClusterReplayState()
+        start_event_index = 0
+    else:
+        state = _state_from_payload(checkpoint.payload_json)
+        start_event_index = checkpoint.event_index
+
+    events = DB.session.scalars(
+        sa.select(ClusterHistoryEvent)
+        .where(
+            ClusterHistoryEvent.zoom == zoom,
+            ClusterHistoryEvent.event_index > start_event_index,
+            ClusterHistoryEvent.event_index <= event_index,
+        )
+        .order_by(ClusterHistoryEvent.event_index)
+    ).all()
+    for event in events:
+        apply_cluster_history_event(state, (event.tile_x, event.tile_y))
+    return state
+
+
+def get_cluster_tile_diff_for_activity(
+    zoom: int, activity_id: int
+) -> tuple[set[tuple[int, int]], set[tuple[int, int]]]:
+    first_event, last_event = get_cluster_history_cutoff_for_activity(zoom, activity_id)
+    if first_event is None or last_event is None:
+        return set(), set()
+    before = get_cluster_tiles_at_cutoff(zoom, first_event - 1)
+    after = get_cluster_tiles_at_cutoff(zoom, last_event)
+    return after - before, before - after
 
 
 def _compute_cluster_evolution(

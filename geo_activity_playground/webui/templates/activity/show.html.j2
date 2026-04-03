@@ -294,6 +294,7 @@
         <div class="new-tiles-map"
              data-zoom="{{ zoom }}"
              data-tiles-geojson='{{ geojson | safe }}'
+             data-cluster-diff-url="{{ cluster_diff_geojson_urls[zoom] }}"
              style="height: 300px; width: 100%;"></div>
     </div>
     {% endfor %}
@@ -308,6 +309,7 @@
     document.querySelectorAll('.new-tiles-map').forEach(container => {
         const zoom = parseInt(container.dataset.zoom, 10);
         const tilesGeojson = JSON.parse(container.dataset.tilesGeojson);
+        const clusterDiffUrl = container.dataset.clusterDiffUrl;
 
         const map = L.map(container, { fullscreenControl: true });
 
@@ -333,6 +335,19 @@
             baseLayer: 'Color',
             overlay: 'Visited'
         });
+
+        fetch(clusterDiffUrl)
+            .then(response => response.json())
+            .then(diffGeojson => {
+                L.geoJSON(diffGeojson, {
+                    style: function (feature) {
+                        if (feature?.properties?.delta === 'added') {
+                            return { color: "#0066ff", weight: 2, fillOpacity: 0.2 };
+                        }
+                        return { color: "#cc0000", weight: 2, fillOpacity: 0.2 };
+                    }
+                }).addTo(map);
+            });
 
         map.fitBounds(tilesLayer.getBounds());
     });

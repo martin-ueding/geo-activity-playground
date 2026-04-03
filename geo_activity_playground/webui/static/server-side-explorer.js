@@ -11,6 +11,7 @@ import { add_layers_to_map } from '/static/map-layers.js';
  * @param {string} config.attribution - Map tile attribution
  * @param {Object} [config.bbox] - Initial bounding box as GeoJSON (optional)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
+ * @param {Object} [config.clusterHistory] - Cluster history config
  */
 export function initExplorerMap(config) {
     const {
@@ -20,7 +21,8 @@ export function initExplorerMap(config) {
         zoom,
         attribution,
         bbox = null,
-        squarePlanner = null
+        squarePlanner = null,
+        clusterHistory = null
     } = config;
 
     const map = L.map(elementId, {
@@ -32,8 +34,13 @@ export function initExplorerMap(config) {
     add_layers_to_map(map, {
         zoom,
         attribution,
-        squarePlanner
+        squarePlanner,
+        historyEventIndex: clusterHistory ? clusterHistory.initialEventIndex : null
     });
+
+    if (clusterHistory && clusterHistory.maxEventIndex > 0) {
+        initClusterHistoryLayer(map, zoom, clusterHistory);
+    }
 
     // Fit to bounding box if provided
     if (bbox) {
@@ -57,6 +64,42 @@ export function initExplorerMap(config) {
     setupDownloadLinks(map, zoom);
 
     return map;
+}
+
+function initClusterHistoryLayer(map, zoom, clusterHistory) {
+    const slider = document.getElementById('cluster-history-slider');
+    const label = document.getElementById('cluster-history-value');
+    if (!slider || !label) {
+        return;
+    }
+
+    const clusterLayer = L.geoJSON(null, {
+        style: {
+            color: '#0057e7',
+            weight: 2,
+            fillOpacity: 0.15
+        }
+    }).addTo(map);
+
+    const loadSnapshot = (eventIndex) => {
+        fetch(`/explorer/${zoom}/cluster-history/snapshot.geojson?event_index=${eventIndex}`)
+            .then(response => response.json())
+            .then(data => {
+                clusterLayer.clearLayers();
+                clusterLayer.addData(data);
+            });
+    };
+
+    slider.max = String(clusterHistory.maxEventIndex);
+    slider.value = String(clusterHistory.initialEventIndex);
+    label.textContent = String(clusterHistory.initialEventIndex);
+    loadSnapshot(clusterHistory.initialEventIndex);
+
+    slider.addEventListener('input', () => {
+        const eventIndex = Number.parseInt(slider.value, 10) || 0;
+        label.textContent = String(eventIndex);
+        loadSnapshot(eventIndex);
+    });
 }
 
 /**

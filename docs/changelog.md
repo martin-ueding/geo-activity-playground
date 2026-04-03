@@ -17,6 +17,7 @@ Types of changes
 
 Added:
 
+- Add **historical explorer cluster views** with checkpointed cluster-history replay in SQLite, activity-level cluster delta overlays, and a time cutoff slider on the explorer page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
 - Add per-tag **activity-name regex extraction** with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. ([GH-412](https://github.com/martin-ueding/geo-activity-playground/issues/412))
 - Add **activity data repair** action into Settings → Technical Maintenance 
 - Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
