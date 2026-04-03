@@ -156,7 +156,19 @@ def make_segments_blueprint(
 
 
 def segment_df(segment: Segment) -> pd.DataFrame:
-    return pd.DataFrame(
+    columns = [
+        "distance_km",
+        "duration_s",
+        "duration",
+        "direction",
+        "entry_time",
+        "exit_time",
+        "activity_id",
+        "activity_name",
+        "equipment_name",
+        "kind_name",
+    ]
+    rows = [
         {
             "distance_km": abs(match.distance_km),
             "duration_s": abs(match.duration.total_seconds()),
@@ -178,7 +190,10 @@ def segment_df(segment: Segment) -> pd.DataFrame:
             ),
         }
         for match in segment.matches
-    ).sort_values("entry_time", ascending=False)
+    ]
+    return pd.DataFrame.from_records(rows, columns=columns).sort_values(
+        "entry_time", ascending=False
+    )
 
 
 def make_plots(df: pd.DataFrame) -> dict[str, str]:
