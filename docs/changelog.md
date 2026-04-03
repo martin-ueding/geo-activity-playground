@@ -17,24 +17,24 @@ Types of changes
 
 Added:
 
-- Extract **activity name and kind from GPX track metadata** (`trk/name`, `trk/type`) during import. ([GH-339](https://github.com/martin-ueding/geo-activity-playground/issues/339))
-- Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
 - Add per-tag **activity-name regex extraction** with optional destructive name cleanup, and a settings action to scan existing activities with tag extraction rules. ([GH-412](https://github.com/martin-ueding/geo-activity-playground/issues/412))
-- Add **breadcrumbs to segment view**.
-- Add **activity data repair** action into Settings → Technical Maintenance to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Add **activity data repair** action into Settings → Technical Maintenance 
+- Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))to reprocess all activities from raw time series data. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
+- Extract **activity name and kind from GPX track metadata** (`trk/name`, `trk/type`) during import. ([GH-339](https://github.com/martin-ueding/geo-activity-playground/issues/339))
 - Add **local activity state wipe** action into Settings → Technical Maintenance to truncate activity-related data, clear local caches/time series/photos, and reset Strava sync progress while preserving equipment, kinds, and Strava API credentials. ([GH-355](https://github.com/martin-ueding/geo-activity-playground/issues/355))
-- Add flashy **Year & Month Wrap** pages with yearly/monthly activity summaries and progress highlights. ([GH-374](https://github.com/martin-ueding/geo-activity-playground/issues/374))
+- Add UI option to **re-match existing segments to activities**. This is useful when there is an update to the segment matching algorithm and one wants to try that. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
+- Add **breadcrumbs to segment view**.
 
 Fixed:
 
-- Fix **segment matching** for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
-- Fix **segment detail page crash** when a segment has no matches by handling empty segment match tables robustly. ([GH-394](https://github.com/martin-ueding/geo-activity-playground/issues/394))
-- Fix **segment length computation**.
 - Fix **explorer tile inconsistency** that came from inconsistent parallel data structures. ([GH-411](https://github.com/martin-ueding/geo-activity-playground/issues/411))
+- Fix **segment matching** for cases where the activity is sparse. This might happen when the GPS tracker uses only a few samples or the speed is very high. ([GH-413](https://github.com/martin-ueding/geo-activity-playground/issues/413))
+- Render **Mapterhorn hillshade** correctly in Leaflet by decoding Terrarium DEM tiles via `leaflet-relief` instead of showing raw Terrain RGB colors. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
 - Make the **square planner** always show the actual square planner tiles to fix it. ([GH-396](https://github.com/martin-ueding/geo-activity-playground/issues/396))
 - Make **activity trimming and share picture rendering** robust against broken/empty tile coordinates to prevent crashes and recover from corrupted activity state. ([GH-398](https://github.com/martin-ueding/geo-activity-playground/issues/398))
-- Render **Mapterhorn hillshade** correctly in Leaflet by decoding Terrarium DEM tiles via `leaflet-relief` instead of showing raw Terrain RGB colors. ([GH-389](https://github.com/martin-ueding/geo-activity-playground/issues/389))
 - Mark **Strava GPX activities without latitude/longitude** as done so they are skipped on future imports instead of repeatedly failing and spamming logs. ([GH-380](https://github.com/martin-ueding/geo-activity-playground/issues/380))
+- Fix **segment detail page crash** when a segment has no matches by handling empty segment match tables robustly. ([GH-394](https://github.com/martin-ueding/geo-activity-playground/issues/394))
+- Fix **segment length computation**.
 
 ## Version 1.23.0 — 2026-03-01
 
