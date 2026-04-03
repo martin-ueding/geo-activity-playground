@@ -126,6 +126,7 @@ def make_settings_blueprint(
                 compute_tile_evolution(
                     tile_visit_accessor.tile_state, config_accessor()
                 )
+                tile_visit_accessor.save()
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
                     FlashTypes.SUCCESS,
