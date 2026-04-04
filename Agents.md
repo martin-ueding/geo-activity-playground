@@ -14,4 +14,4 @@ If similar functionality already exist, please asks me to generalize it before c
 
 You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there. I let the users know about the status when I make changes.
 
-Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious.
+Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious. New changelog entries always go into a `## Unreleased` section, not to existing released versions.
