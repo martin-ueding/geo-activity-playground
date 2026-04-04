@@ -30,7 +30,17 @@ from ...core.activities import (
     make_geojson_from_time_series,
 )
 from ...core.config import Config
-from ...core.datamodel import DB, Activity, Equipment, Kind, Tag, TileVisit
+from ...core.datamodel import (
+    DB,
+    DEFAULT_UNKNOWN_NAME,
+    Activity,
+    Equipment,
+    Kind,
+    Tag,
+    TileVisit,
+    get_or_make_equipment,
+    get_or_make_kind,
+)
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.privacy_zones import PrivacyZone
@@ -339,16 +349,16 @@ def make_activity_blueprint(
             activity.name = request.form.get("name")
 
             form_equipment = request.form.get("equipment")
-            if form_equipment == "null":
-                activity.equipment = None
-            else:
+            if form_equipment and form_equipment != "null":
                 activity.equipment = DB.session.get_one(Equipment, int(form_equipment))
+            else:
+                activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME, config)
 
             form_kind = request.form.get("kind")
-            if form_kind == "null":
-                activity.kind = None
-            else:
+            if form_kind and form_kind != "null":
                 activity.kind = DB.session.get_one(Kind, int(form_kind))
+            else:
+                activity.kind = get_or_make_kind(DEFAULT_UNKNOWN_NAME)
 
             form_tags = request.form.getlist("tag")
             activity.tags = [

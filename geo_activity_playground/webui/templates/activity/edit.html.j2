@@ -13,9 +13,8 @@
     <div class="mb-3">
         <label for="kind" class="form-label">{{ _('Kind') }}</label>
         <select class="form-control" id="kind" name="kind">
-            <option value="null" {% if activity.kind==None %} selected {% endif %}>{{ _('None') }}</option>
             {% for kind in kinds %}
-            <option value="{{ kind.id }}" {% if activity.kind==kind %} selected {% endif %}>{{ kind.name }}</option>
+            <option value="{{ kind.id }}" {% if activity.kind==kind or (activity.kind==None and kind.name=="Unknown") %} selected {% endif %}>{{ kind.name }}</option>
             {% endfor %}
         </select>
     </div>
@@ -23,9 +22,8 @@
     <div class="mb-3">
         <label for="equipment" class="form-label">{{ _('Equipment') }}</label>
         <select class="form-control" id="equipment" name="equipment">
-            <option value="null" {% if activity.equipment==None %} selected {% endif %}>{{ _('None') }}</option>
             {% for equipment in equipments %}
-            <option value="{{ equipment.id }}" {% if activity.equipment==equipment %} selected {% endif %}>
+            <option value="{{ equipment.id }}" {% if activity.equipment==equipment or (activity.equipment==None and equipment.name=="Unknown") %} selected {% endif %}>
                 {{ equipment.name }}
             </option>
             {% endfor %}
