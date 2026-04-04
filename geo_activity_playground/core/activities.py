@@ -142,6 +142,33 @@ def make_geojson_color_line(time_series: pd.DataFrame, column: str) -> str:
     return geojson.dumps(feature_collection)
 
 
+def make_geojson_line_segments_with_columns(
+    time_series: pd.DataFrame, columns: Sequence[str]
+) -> str:
+    features = [
+        geojson.Feature(
+            geometry=geojson.LineString(
+                coordinates=[
+                    [row["longitude"], row["latitude"]],
+                    [next_row["longitude"], next_row["latitude"]],
+                ]
+            ),
+            properties={
+                column: (
+                    float(next_row[column])
+                    if column in next_row and np.isfinite(next_row[column])
+                    else None
+                )
+                for column in columns
+            },
+        )
+        for _, group in time_series.groupby("segment_id")
+        for (_, row), (_, next_row) in zip(group.iterrows(), group.iloc[1:].iterrows())
+    ]
+    feature_collection = geojson.FeatureCollection(features)
+    return geojson.dumps(feature_collection)
+
+
 def make_color_bar(time_series: pd.Series, format: str) -> dict[str, Any]:
     low, high, clamp_value = _make_value_clamp(time_series)
     cmap = matplotlib.colormaps["viridis"]

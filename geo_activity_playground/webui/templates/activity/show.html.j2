@@ -106,10 +106,145 @@
                 attribution: '{{ map_tile_attribution|safe }}'
             }).addTo(map);
 
-            let geojson = L.geoJSON({{ color_line_geojson| safe }}, {
-                style: function (feature) { return { color: feature.properties.color ? feature.properties.color : 'red' } }
-            }).addTo(map)
-            map.fitBounds(geojson.getBounds());
+            const trackGeojson = {{ color_line_geojson|safe }};
+            const viridisStops = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
+            let selectedLineColorColumn = '{{ line_color_column|default("", true) }}';
+            const statsByColumn = {};
+
+            function quantile(sortedValues, q) {
+                if (!sortedValues.length) {
+                    return null;
+                }
+                const position = (sortedValues.length - 1) * q;
+                const lower = Math.floor(position);
+                const upper = Math.ceil(position);
+                if (lower === upper) {
+                    return sortedValues[lower];
+                }
+                return sortedValues[lower] + (position - lower) * (sortedValues[upper] - sortedValues[lower]);
+            }
+
+            function parseHexColor(hexColor) {
+                return {
+                    r: parseInt(hexColor.slice(1, 3), 16),
+                    g: parseInt(hexColor.slice(3, 5), 16),
+                    b: parseInt(hexColor.slice(5, 7), 16)
+                };
+            }
+
+            function interpolateColor(a, b, t) {
+                return {
+                    r: Math.round(a.r + (b.r - a.r) * t),
+                    g: Math.round(a.g + (b.g - a.g) * t),
+                    b: Math.round(a.b + (b.b - a.b) * t)
+                };
+            }
+
+            function colorForNormalizedValue(value) {
+                if (!Number.isFinite(value)) {
+                    return '#ff0000';
+                }
+                const normalized = Math.min(Math.max(value, 0), 1);
+                const position = normalized * (viridisStops.length - 1);
+                const lower = Math.floor(position);
+                const upper = Math.ceil(position);
+                const lowerColor = parseHexColor(viridisStops[lower]);
+                const upperColor = parseHexColor(viridisStops[upper]);
+                const rgb = interpolateColor(lowerColor, upperColor, position - lower);
+                return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            }
+
+            function computeColumnStats(column) {
+                if (!column) {
+                    return null;
+                }
+                if (statsByColumn[column]) {
+                    return statsByColumn[column];
+                }
+                const values = trackGeojson.features
+                    .map(feature => feature?.properties?.[column])
+                    .filter(value => Number.isFinite(value))
+                    .sort((a, b) => a - b);
+                if (!values.length) {
+                    statsByColumn[column] = null;
+                    return null;
+                }
+                const low = values[0];
+                const median = quantile(values, 0.5);
+                const iqr = quantile(values, 0.75) - quantile(values, 0.25);
+                const high = Math.min(values.at(-1), median + 1.5 * iqr);
+                statsByColumn[column] = { low, high };
+                return statsByColumn[column];
+            }
+
+            function normalizeValue(value, stats) {
+                return Math.min(Math.max((value - stats.low) / (stats.high - stats.low + 1e-20), 0), 1);
+            }
+
+            function formatValue(value, format) {
+                if (format === '.0f') {
+                    return `${Math.round(value)}`;
+                }
+                if (format === '.1f') {
+                    return value.toFixed(1);
+                }
+                return `${value}`;
+            }
+
+            function updateLineColorBar(column) {
+                const bar = document.getElementById('line-color-bar');
+                if (!bar) {
+                    return;
+                }
+                const select = document.getElementById('line-color-column-select');
+                const selectedOption = select?.selectedOptions?.[0];
+                const unit = selectedOption?.dataset?.unit || '';
+                const format = selectedOption?.dataset?.format || '.1f';
+                const stats = computeColumnStats(column);
+                if (!stats) {
+                    bar.innerHTML = '';
+                    return;
+                }
+                const spans = Array.from({ length: 10 }, (_, index) => {
+                    const ratio = index / 9;
+                    const value = stats.low + ratio * (stats.high - stats.low);
+                    const color = colorForNormalizedValue(ratio);
+                    return `<span class="colorbar" style="width: 15px; background-color: ${color}">${formatValue(value, format)}</span>`;
+                }).join('');
+                bar.innerHTML = `${spans} ${unit}`;
+            }
+
+            function styleTrackFeature(feature) {
+                if (feature.geometry.type !== 'LineString') {
+                    return { color: '#ff0000', weight: 4 };
+                }
+                const stats = computeColumnStats(selectedLineColorColumn);
+                const value = feature?.properties?.[selectedLineColorColumn];
+                if (!stats || !Number.isFinite(value)) {
+                    return { color: '#ff0000', weight: 4 };
+                }
+                return { color: colorForNormalizedValue(normalizeValue(value, stats)), weight: 4 };
+            }
+
+            const trackLayer = L.geoJSON(trackGeojson, {
+                style: styleTrackFeature
+            }).addTo(map);
+            map.fitBounds(trackLayer.getBounds());
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const lineColorColumnSelect = document.getElementById('line-color-column-select');
+                if (!lineColorColumnSelect) {
+                    return;
+                }
+                lineColorColumnSelect.addEventListener('change', function () {
+                    selectedLineColorColumn = this.value;
+                    trackLayer.setStyle(styleTrackFeature);
+                    updateLineColorBar(selectedLineColorColumn);
+                });
+                selectedLineColorColumn = lineColorColumnSelect.value;
+                trackLayer.setStyle(styleTrackFeature);
+                updateLineColorBar(selectedLineColorColumn);
+            });
 
 
             fetch("{{ url_for('photo.map_for_activity', activity_id = activity.id) }}")
@@ -149,25 +284,18 @@
             }
         </style>
 
-        {% if line_color_bar %}
-        <div>
-            {% for value, color in line_color_bar.colors %}
-            <span class="colorbar" style="width: 15px; background-color: {{ color }}">{{ value }}</span>
-            {% endfor %}
-            {{ line_color_columns_avail[line_color_column].unit }}
-        </div>
+        {% if line_color_columns %}
+        <div id="line-color-bar"></div>
 
         <div class="mb-3" style="padding-top: 10px;">
-            <form method="GET">
-                <label class="form-label">{{ _('Line Color by') }}</label>
-                <select class="form-select" aria-label="{{ _('Line Color by') }}" name="line_color_column"
-                    onchange="this.form.submit()">
-                    {% for name, column in line_color_columns_avail.items() %}
-                    <option {% if name==line_color_column %} selected {% endif %} value="{{ name }}">{{
-                        column.display_name }}</option>
+            <label class="form-label" for="line-color-column-select">{{ _('Line Color by') }}</label>
+            <select id="line-color-column-select" class="form-select" aria-label="{{ _('Line Color by') }}"
+                name="line_color_column">
+                    {% for name, column in line_color_columns.items() %}
+                    <option {% if name==line_color_column %} selected {% endif %} value="{{ name }}"
+                        data-unit="{{ column.unit }}" data-format="{{ column.format }}">{{ column.display_name }}</option>
                     {% endfor %}
-                </select>
-            </form>
+            </select>
         </div>
         {% endif %}
     </div>

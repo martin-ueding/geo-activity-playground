@@ -25,9 +25,8 @@ from PIL import Image, ImageDraw
 
 from ...core.activities import (
     ActivityRepository,
-    make_color_bar,
-    make_geojson_color_line,
     make_geojson_from_time_series,
+    make_geojson_line_segments_with_columns,
 )
 from ...core.config import Config
 from ...core.datamodel import (
@@ -144,10 +143,6 @@ def make_activity_blueprint(
         line_color_columns_avail = {
             column.name: column for column in TIME_SERIES_COLUMNS
         }
-        line_color_column = (
-            request.args.get("line_color_column")
-            or next(iter(line_color_columns_avail.values())).name
-        )
 
         context = {
             "activity": activity,
@@ -162,19 +157,22 @@ def make_activity_blueprint(
             context.update(
                 {
                     "distance_time_plot": distance_time_plot(time_series),
-                    "color_line_geojson": make_geojson_color_line(
-                        time_series, line_color_column
+                    "color_line_geojson": make_geojson_line_segments_with_columns(
+                        time_series, tuple(line_color_columns_avail)
                     ),
                     "speed_time_plot": speed_time_plot(time_series),
                     "speed_distribution_plot": speed_distribution_plot(time_series),
-                    "line_color_bar": make_color_bar(
-                        time_series[line_color_column],
-                        line_color_columns_avail[line_color_column].format,
-                    ),
                     "date": activity.start_local_tz.date(),
                     "time": activity.start_local_tz.time(),
-                    "line_color_column": line_color_column,
-                    "line_color_columns_avail": line_color_columns_avail,
+                    "line_color_column": next(iter(line_color_columns_avail)),
+                    "line_color_columns": {
+                        name: {
+                            "display_name": str(column.display_name),
+                            "unit": column.unit,
+                            "format": column.format,
+                        }
+                        for name, column in line_color_columns_avail.items()
+                    },
                 }
             )
 
