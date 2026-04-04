@@ -496,7 +496,7 @@ def make_calendar_blueprint(
         )
         square = _square_evolution_frame(tile_visit_accessor, primary_zoom)
 
-        _, max_day = calendar.monthrange(year, month)
+        max_day = calendar.monthrange(year, month)[1]
         daily_activity = (
             period.groupby("day", dropna=False)
             .agg(
