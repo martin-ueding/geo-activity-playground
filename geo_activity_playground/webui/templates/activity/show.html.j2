@@ -97,6 +97,7 @@
     </div>
     <div class="col-sm-12 col-md-8">
         <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
+        <script src="/static/progress-markers.js"></script>
         <script>
             var map = L.map('activity-show-map', {
                 fullscreenControl: true
@@ -107,6 +108,7 @@
             }).addTo(map);
 
             const trackGeojson = {{ color_line_geojson|safe }};
+            const progressMarkerGeojson = {{ progress_marker_geojson|safe }};
             const viridisStops = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
             let selectedLineColorColumn = '{{ line_color_column|default("", true) }}';
             const statsByColumn = {};
@@ -228,6 +230,13 @@
 
             const trackLayer = L.geoJSON(trackGeojson, {
                 style: styleTrackFeature
+            }).addTo(map);
+            L.geoJSON(progressMarkerGeojson, {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng, {
+                        icon: window.progressMarkerIcon(feature?.properties?.marker_progress)
+                    });
+                }
             }).addTo(map);
             map.fitBounds(trackLayer.getBounds());
 

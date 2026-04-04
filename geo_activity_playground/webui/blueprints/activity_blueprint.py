@@ -27,6 +27,7 @@ from ...core.activities import (
     ActivityRepository,
     make_geojson_from_time_series,
     make_geojson_line_segments_with_columns,
+    make_geojson_progress_markers_from_time_series,
 )
 from ...core.config import Config
 from ...core.datamodel import (
@@ -147,6 +148,9 @@ def make_activity_blueprint(
         context = {
             "activity": activity,
             "color_line_geojson": line_json,
+            "progress_marker_geojson": make_geojson_progress_markers_from_time_series(
+                time_series
+            ),
             "similar_activites": similar_activities,
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
