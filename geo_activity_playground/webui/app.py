@@ -26,7 +26,15 @@ from ..core.config import (
     import_old_config,
     import_old_strava_config,
 )
-from ..core.datamodel import DB, Activity, Equipment, Kind, Photo, Tag
+from ..core.datamodel import (
+    DB,
+    DEFAULT_UNKNOWN_NAME,
+    Activity,
+    Equipment,
+    Kind,
+    Photo,
+    Tag,
+)
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import (
@@ -65,6 +73,50 @@ from .flasher import FlaskFlasher
 from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
 
 logger = logging.getLogger(__name__)
+
+
+def _migrate_null_activity_fields_to_unknown(config: Config) -> None:
+    activities = DB.session.scalars(
+        sqlalchemy.select(Activity).where(
+            sqlalchemy.or_(
+                Activity.kind_id.is_(None),
+                Activity.equipment_id.is_(None),
+            )
+        )
+    ).all()
+    if not activities:
+        return
+
+    unknown_kind = DB.session.scalar(
+        sqlalchemy.select(Kind).where(Kind.name == DEFAULT_UNKNOWN_NAME)
+    )
+    if unknown_kind is None:
+        unknown_kind = Kind(name=DEFAULT_UNKNOWN_NAME, consider_for_achievements=True)
+        DB.session.add(unknown_kind)
+
+    unknown_equipment = DB.session.scalar(
+        sqlalchemy.select(Equipment).where(Equipment.name == DEFAULT_UNKNOWN_NAME)
+    )
+    if unknown_equipment is None:
+        unknown_equipment = Equipment(
+            name=DEFAULT_UNKNOWN_NAME,
+            offset_km=config.equipment_offsets.get(DEFAULT_UNKNOWN_NAME, 0),
+        )
+        DB.session.add(unknown_equipment)
+
+    for activity in activities:
+        if activity.kind is None:
+            activity.kind = unknown_kind
+        if activity.equipment is None:
+            activity.equipment = unknown_equipment
+
+    if activities:
+        logger.info(
+            "Migrated %d activities with NULL kind/equipment to '%s'.",
+            len(activities),
+            DEFAULT_UNKNOWN_NAME,
+        )
+    DB.session.commit()
 
 
 def get_secret_key():
@@ -166,6 +218,8 @@ def create_app(
         tile_visit_accessor.complete_migration()
     config_accessor = ConfigAccessor()
     config = config_accessor()
+    with app.app_context():
+        _migrate_null_activity_fields_to_unknown(config)
 
     authenticator = Authenticator(config)
     tile_getter = TileGetter(config.map_tile_url)

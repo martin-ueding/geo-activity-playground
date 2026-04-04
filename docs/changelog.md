@@ -26,6 +26,7 @@ Fixed:
 - Clarify **bubble chart semantics** by labeling it per-activity and adding helper text that each bubble is one activity. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
 - Keep **navbar menus above map preview controls** by adding app-level stacking rules so Firefox no longer renders Leaflet controls over dropdown menus. ([GH-415](https://github.com/martin-ueding/geo-activity-playground/issues/415))
 - Improve **Strava checkout import diagnostics** by explicitly checking for the required `Activity ID` column and printing the full parsed header as JSON when it is missing, so users can paste actionable data into issue reports. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
+- Prevent activities from ending up with **NULL kind/equipment** by mapping edit-form “none” values to explicit `Unknown` entries and automatically migrating existing `NULL` values to `Unknown` during startup. ([GH-354](https://github.com/martin-ueding/geo-activity-playground/issues/354))
 
 ## Version 1.24.0 — 2026-04-03
 
