@@ -798,6 +798,41 @@ def get_cluster_tile_diff_for_activity(
     return after - before, before - after
 
 
+def get_cluster_tile_activations_df(zoom: int) -> pd.DataFrame:
+    events = DB.session.scalars(
+        sa.select(ClusterHistoryEvent)
+        .where(ClusterHistoryEvent.zoom == zoom)
+        .order_by(ClusterHistoryEvent.event_index)
+    ).all()
+    if not events:
+        return pd.DataFrame(
+            columns=["time", "event_index", "activity_id", "tile_x", "tile_y"]
+        )
+
+    state = ClusterReplayState()
+    rows: list[dict[str, object]] = []
+    for event in events:
+        event_tile = (event.tile_x, event.tile_y)
+        candidates = [event_tile, *adjacent_to(event_tile)]
+        active_before = {tile for tile in candidates if tile in state.cluster_tiles}
+        apply_cluster_history_event(state, event_tile)
+        for tile in candidates:
+            if tile in active_before or tile not in state.cluster_tiles:
+                continue
+            rows.append(
+                {
+                    "time": pd.Timestamp(event.time)
+                    if event.time is not None
+                    else pd.NaT,
+                    "event_index": event.event_index,
+                    "activity_id": event.activity_id,
+                    "tile_x": tile[0],
+                    "tile_y": tile[1],
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def _compute_cluster_evolution(
     tiles: pd.DataFrame, s: TileEvolutionState, zoom: int
 ) -> None:

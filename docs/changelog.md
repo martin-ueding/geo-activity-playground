@@ -17,6 +17,7 @@ Types of changes
 
 Fixed:
 
+- Count **new cluster tiles** by activation time in Year/Month Wrap (when a tile becomes a cluster tile), fixing edge cases where bridge activities merged clusters but the wrap still showed zero. ([GH-417](https://github.com/martin-ueding/geo-activity-playground/issues/417))
 - Fix **Month Wrap crash** caused by shadowing the gettext translation function `_` with `calendar.monthrange`, which raised `TypeError: 'Day' object is not callable` on monthly wrap pages. ([GH-416](https://github.com/martin-ueding/geo-activity-playground/issues/416))
 - Clarify **bubble chart semantics** by labeling it per-activity and adding helper text that each bubble is one activity. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
 - Keep **navbar menus above map preview controls** by adding app-level stacking rules so Firefox no longer renders Leaflet controls over dropdown menus. ([GH-415](https://github.com/martin-ueding/geo-activity-playground/issues/415))
