@@ -4,29 +4,23 @@ In this how-to guide you will install the latest stable version of this project 
 
 I don't have a Mac myself, hence I cannot test whether this guide works. Please be so kind and give feedback if it doesn't work.
 
-## Installing Homebrew
+## Installing uv
 
-As a first step, install [Homebrew](https://brew.sh/) if you haven't done so already. For this, follow the instruction on their website. At the time of writing they suggest to open the _Terminal_ application and pasting in the following:
+As a next step, install [uv](https://docs.astral.sh/uv/getting-started/installation/). If you prefer Homebrew, you can use `brew install uv`. Otherwise, use the official installer:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool update-shell
 ```
 
-## Installing pipx
+`uv tool update-shell` ensures the user-local executable directory (usually `~/.local/bin`) is available on your `PATH`.
 
-Then as a next step, [install pipx](https://pipx.pypa.io/stable/installation/#on-macos). This makes use of Homebrew. At the time of writing you need to execute these commands in the terminal:
+## Installation via uv tool
 
-```bash
-brew install pipx
-pipx ensurepath
-```
-
-## Installation via pipx
-
-Now you have `pipx` available and can install the project with this:
+Now you have `uv` available and can install the project with this:
 
 ```bash
-pipx install geo-activity-playground
+uv tool install geo-activity-playground
 ```
 
 ## Testing whether it works
@@ -46,5 +40,5 @@ If you get an error that reads like “command not found”, then you need to [a
 At some later point you likely want to upgrade to the latest version. For this use the following command:
 
 ```bash
-pipx upgrade --pip-args "--upgrade-strategy eager" geo-activity-playground
+uv tool upgrade geo-activity-playground
 ```
