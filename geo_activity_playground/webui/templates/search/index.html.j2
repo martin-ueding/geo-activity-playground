@@ -12,6 +12,41 @@
     <a href="{{ url_for('search.map_view') }}?{{ base_query_str }}">{{ _('Map view') }}</a>
 </p>
 
+<div class="row row-cols-1 row-cols-md-4 g-3 mb-3">
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Activities') }}</div>
+                <div class="fs-4 fw-semibold">{{ total }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total distance') }}</div>
+                <div class="fs-4 fw-semibold">{{ '%.1f'|format(total_distance_km) }} km</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total elevation gain') }}</div>
+                <div class="fs-4 fw-semibold">{{ '%.0f'|format(total_elevation_gain_m) }} m</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total elapsed time') }}</div>
+                <div class="fs-4 fw-semibold">{{ total_elapsed_time|td }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <table class="table table-sort table-arrows">
     <thead>
         <tr>
