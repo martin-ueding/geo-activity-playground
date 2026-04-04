@@ -38,6 +38,19 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
             register_search_query(primitives)
 
         activities = apply_search_filter(primitives)
+        total = len(activities)
+        elapsed_seconds = (
+            activities["elapsed_time"].dt.total_seconds().fillna(0).sum()
+            if total
+            else 0
+        )
+        total_elapsed_time = datetime.timedelta(seconds=float(elapsed_seconds))
+        total_distance_km = (
+            float(activities["distance_km"].fillna(0).sum()) if total else 0.0
+        )
+        total_elevation_gain_m = (
+            float(activities["elevation_gain"].fillna(0).sum()) if total else 0.0
+        )
 
         stored_queries = get_stored_queries()
         search_query_favorites = [
@@ -50,6 +63,10 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
         return render_template(
             "search/index.html.j2",
             activities=reversed(list(activities.iterrows())),
+            total=total,
+            total_elapsed_time=total_elapsed_time,
+            total_distance_km=total_distance_km,
+            total_elevation_gain_m=total_elevation_gain_m,
             base_query_str=primitives_to_url_str(primitives),
             query=primitives_to_jinja(primitives),
             search_query_favorites=search_query_favorites,
