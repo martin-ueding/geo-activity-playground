@@ -17,6 +17,7 @@ Types of changes
 
 Fixed:
 
+- Fix **Month Wrap crash** caused by shadowing the gettext translation function `_` with `calendar.monthrange`, which raised `TypeError: 'Day' object is not callable` on monthly wrap pages. ([GH-416](https://github.com/martin-ueding/geo-activity-playground/issues/416))
 - Clarify **bubble chart semantics** by labeling it per-activity and adding helper text that each bubble is one activity. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
 
 ## Version 1.24.0 — 2026-04-03
