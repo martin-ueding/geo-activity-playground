@@ -23,6 +23,7 @@ Added:
 Changed:
 
 - Switch **activity map line coloring** (speed/elevation) to client-side rendering by shipping both metrics in the activity GeoJSON and recoloring in the browser without a page reload.
+- Modernize **Linux/macOS installation docs** from `pipx` to `uv tool`, including `uv tool update-shell` for PATH setup, `uv` package-manager install commands where available, and Astral's official installer for Ubuntu/Debian.
 
 Fixed:
 
