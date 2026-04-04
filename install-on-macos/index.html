@@ -426,10 +426,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installing-homebrew" class="md-nav__link">
+  <a href="#installing-uv" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing Homebrew
+        Installing uv
       
     </span>
   </a>
@@ -437,21 +437,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installing-pipx" class="md-nav__link">
+  <a href="#installation-via-uv-tool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing pipx
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation-via-pipx" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation via pipx
+        Installation via uv tool
       
     </span>
   </a>
@@ -1354,6 +1343,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../incremental-cluster-algorithm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental Cluster Algorithm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../eddington-number/" class="md-nav__link">
         
   
@@ -1713,10 +1730,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installing-homebrew" class="md-nav__link">
+  <a href="#installing-uv" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing Homebrew
+        Installing uv
       
     </span>
   </a>
@@ -1724,21 +1741,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installing-pipx" class="md-nav__link">
+  <a href="#installation-via-uv-tool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing pipx
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation-via-pipx" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation via pipx
+        Installation via uv tool
       
     </span>
   </a>
@@ -1787,18 +1793,15 @@
 <h1 id="install-on-macos">Install on macOS</h1>
 <p>In this how-to guide you will install the latest stable version of this project on macOS.</p>
 <p>I don't have a Mac myself, hence I cannot test whether this guide works. Please be so kind and give feedback if it doesn't work.</p>
-<h2 id="installing-homebrew">Installing Homebrew</h2>
-<p>As a first step, install <a href="https://brew.sh/">Homebrew</a> if you haven't done so already. For this, follow the instruction on their website. At the time of writing they suggest to open the <em>Terminal</em> application and pasting in the following:</p>
-<div class="highlight"><pre><span></span><code>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+<h2 id="installing-uv">Installing uv</h2>
+<p>As a next step, install <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. If you prefer Homebrew, you can use <code>brew install uv</code>. Otherwise, use the official installer:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+uv<span class="w"> </span>tool<span class="w"> </span>update-shell
 </code></pre></div>
-<h2 id="installing-pipx">Installing pipx</h2>
-<p>Then as a next step, <a href="https://pipx.pypa.io/stable/installation/#on-macos">install pipx</a>. This makes use of Homebrew. At the time of writing you need to execute these commands in the terminal:</p>
-<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>pipx
-pipx<span class="w"> </span>ensurepath
-</code></pre></div>
-<h2 id="installation-via-pipx">Installation via pipx</h2>
-<p>Now you have <code>pipx</code> available and can install the project with this:</p>
-<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
+<p><code>uv tool update-shell</code> ensures the user-local executable directory (usually <code>~/.local/bin</code>) is available on your <code>PATH</code>.</p>
+<h2 id="installation-via-uv-tool">Installation via uv tool</h2>
+<p>Now you have <code>uv</code> available and can install the project with this:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 <h2 id="testing-whether-it-works">Testing whether it works</h2>
 <p>Next you can try to start the program to see whether the installation has worked correctly by just entering the following into the terminal:</p>
@@ -1808,7 +1811,7 @@ pipx<span class="w"> </span>ensurepath
 <p>If you get an error that reads like “command not found”, then you need to <a href="../add-local-bin-to-path/">add local bin to PATH</a>.</p>
 <h2 id="installing-updates">Installing updates</h2>
 <p>At some later point you likely want to upgrade to the latest version. For this use the following command:</p>
-<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>upgrade<span class="w"> </span>--pip-args<span class="w"> </span><span class="s2">&quot;--upgrade-strategy eager&quot;</span><span class="w"> </span>geo-activity-playground
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>upgrade<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 
 

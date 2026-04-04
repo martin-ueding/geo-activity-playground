@@ -1321,6 +1321,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../incremental-cluster-algorithm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental Cluster Algorithm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../eddington-number/" class="md-nav__link">
         
   
@@ -1720,7 +1748,7 @@
 
 <h1 id="install-on-linux">Install on Linux</h1>
 <p>In this how-to guide you will install the latest stable version of this project on Linux.</p>
-<p>The best way to install this project is using <code>pipx</code> as it decouples each program from the other ones. First ensure that you have it installed by running the command applicable to your Linux distribution:</p>
+<p>The best way to install this project is using <code>uv tool</code> as it installs command-line tools into isolated environments. First ensure that you have <code>uv</code> installed by running the command applicable to your Linux distribution:</p>
 <table>
 <thead>
 <tr>
@@ -1731,20 +1759,26 @@
 <tbody>
 <tr>
 <td>Ubuntu, Debian</td>
-<td><code>sudo apt install pipx</code></td>
+<td>Use the official installer (shown below)</td>
 </tr>
 <tr>
 <td>Fedora, RedHat</td>
-<td><code>sudo dnf install pipx</code></td>
+<td><code>sudo dnf install uv</code></td>
 </tr>
 <tr>
 <td>Arch, Manjaro</td>
-<td><code>sudo pacman -Syu python-pipx</code></td>
+<td><code>sudo pacman -Syu uv</code></td>
 </tr>
 </tbody>
 </table>
-<p>Then, using <code>pipx</code>, you install the latest version using this command:</p>
-<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
+<p>In distro repositories, the package name is generally <code>uv</code>. On Ubuntu and Debian, availability in official repos depends on the release, so the official installer is the most reliable option.</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</code></pre></div>
+<p>After installing <code>uv</code>, ensure its tool binary directory is on your <code>PATH</code>:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>update-shell
+</code></pre></div>
+<p>Then, using <code>uv tool</code>, install the latest version with this command:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 <h2 id="testing-whether-it-works">Testing whether it works</h2>
 <p>Next you can try to start the program to see whether the installation has worked correctly by just entering the following into the terminal:</p>
@@ -1754,7 +1788,7 @@
 <p>If you get an error that reads like “command not found”, then you need to <a href="../add-local-bin-to-path/">add local bin to PATH</a>.</p>
 <h2 id="installing-updates">Installing updates</h2>
 <p>At some later point you likely want to upgrade to the latest version. For this use the following command:</p>
-<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>upgrade<span class="w"> </span>--pip-args<span class="w"> </span><span class="s2">&quot;--upgrade-strategy eager&quot;</span><span class="w"> </span>geo-activity-playground
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>upgrade<span class="w"> </span>geo-activity-playground
 </code></pre></div>
 
 

@@ -1248,6 +1248,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../incremental-cluster-algorithm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental Cluster Algorithm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../eddington-number/" class="md-nav__link">
         
   
@@ -1618,6 +1646,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-1250-2026-04-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.25.0 — 2026-04-04
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#version-1240-2026-04-03" class="md-nav__link">
@@ -3095,6 +3134,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1250-2026-04-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.25.0 — 2026-04-04
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1240-2026-04-03" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4565,6 +4615,30 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+<h2 id="version-1250-2026-04-04">Version 1.25.0 — 2026-04-04</h2>
+<p>Added:</p>
+<ul>
+<li>Add <strong>Strava archive ZIP upload</strong> in Settings → Strava as an alternative onboarding path: upload a Strava export archive, extract it into <code>Strava Export</code>, and replace any existing checkout there. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/249">GH-249</a>)</li>
+<li>Add <strong>distance-based clock-style progress markers</strong> (start, quarter, half, three-quarter, end) on both the landing page map cards and activity detail map. These replace the old start and end markers.</li>
+<li>Add <strong>aggregate map + totals</strong> to Search as Map: filtered activities now show total distance, total elevation gain, total elapsed time, and a combined overview map (capped to 100 lines). (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/408">GH-408</a>)</li>
+<li>Add <strong>aggregate totals</strong> to Search table view, mirroring Search as Map with filtered totals for activity count, distance, elevation gain, and elapsed time. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/408">GH-408</a>)</li>
+<li>Add Diataxis <strong>explanation page</strong> for the incremental explorer cluster algorithm, including hand-drawn step-by-step visuals.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Switch <strong>activity map line coloring</strong> (speed/elevation) to client-side rendering by shipping both metrics in the activity GeoJSON and recoloring in the browser without a page reload.</li>
+<li>Modernize <strong>Linux/macOS installation docs</strong> from <code>pipx</code> to <code>uv tool</code>, including <code>uv tool update-shell</code> for PATH setup, <code>uv</code> package-manager install commands where available, and Astral's official installer for Ubuntu/Debian.</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Count <strong>new cluster tiles</strong> by activation time in Year/Month Wrap (when a tile becomes a cluster tile), fixing edge cases where bridge activities merged clusters but the wrap still showed zero. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/417">GH-417</a>)</li>
+<li>Fix <strong>Month Wrap crash</strong> caused by shadowing the gettext translation function <code>_</code> with <code>calendar.monthrange</code>, which raised <code>TypeError: 'Day' object is not callable</code> on monthly wrap pages. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/416">GH-416</a>)</li>
+<li>Clarify <strong>bubble chart semantics</strong> by labeling it per-activity and adding helper text that each bubble is one activity. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/418">GH-418</a>)</li>
+<li>Keep <strong>navbar menus above map preview controls</strong> by adding app-level stacking rules so Firefox no longer renders Leaflet controls over dropdown menus. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/415">GH-415</a>)</li>
+<li>Improve <strong>Strava checkout import diagnostics</strong> by explicitly checking for the required <code>Activity ID</code> column and printing the full parsed header as JSON when it is missing, so users can paste actionable data into issue reports. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/414">GH-414</a>)</li>
+<li>Prevent activities from ending up with <strong>NULL kind/equipment</strong> by mapping edit-form “none” values to explicit <code>Unknown</code> entries and automatically migrating existing <code>NULL</code> values to <code>Unknown</code> during startup. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/354">GH-354</a>)</li>
+<li>Fix <strong>search view toggle</strong> so users can switch back from table view to Search as Map via a dedicated Map view link. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/408">GH-408</a>)</li>
+</ul>
 <h2 id="version-1240-2026-04-03">Version 1.24.0 — 2026-04-03</h2>
 <p>Added:</p>
 <ul>
