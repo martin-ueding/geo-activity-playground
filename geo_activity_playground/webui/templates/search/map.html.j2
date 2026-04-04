@@ -12,8 +12,55 @@
     <a href="{{ url_for('search.index') }}?{{ base_query_str }}">{{ _('Table view') }}</a>
 </p>
 
+<div class="row row-cols-1 row-cols-md-4 g-3 mb-3">
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Activities') }}</div>
+                <div class="fs-4 fw-semibold">{{ total }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total distance') }}</div>
+                <div class="fs-4 fw-semibold">{{ '%.1f'|format(total_distance_km) }} km</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total elevation gain') }}</div>
+                <div class="fs-4 fw-semibold">{{ '%.0f'|format(total_elevation_gain_m) }} m</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-body-secondary small">{{ _('Total elapsed time') }}</div>
+                <div class="fs-4 fw-semibold">{{ total_elapsed_time|td }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if aggregate_map_count > 0 %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5 mb-2">{{ _('Aggregate map overview') }}</h2>
+        <p class="text-body-secondary mb-3">
+            {{ _('Showing latest') }} {{ aggregate_map_count }} {{ _('activities on one map.') }}
+        </p>
+        <div id="map-aggregate" style="height: 360px; width: 100%;"></div>
+    </div>
+</div>
+{% endif %}
+
 <script>
-    function add_map(id, geojson) {
+    function add_map(id, geojson, options = {}) {
         let map = L.map(`map-${id}`, {
             fullscreenControl: true
         })
@@ -23,12 +70,29 @@
         }).addTo(map)
 
         let geojson_layer = L.geoJSON(geojson, {
-            useSimpleStyle: true
+            useSimpleStyle: true,
+            style: feature => ({
+                color: feature?.properties?.color || "#3388ff",
+                weight: options.weight || 4,
+                opacity: options.opacity || 1
+            })
         }).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
+        if (geojson_layer.getLayers().length > 0) {
+            map.fitBounds(geojson_layer.getBounds(), { padding: [10, 10] })
+        }
         return map
     }
 </script>
+
+{% if aggregate_map_count > 0 %}
+<script>
+    fetch("{{ url_for('search.map_aggregate_geojson') }}?{{ base_query_str }}")
+        .then(response => response.json())
+        .then(geojson => {
+            add_map("aggregate", geojson, { weight: 3, opacity: 0.8 });
+        });
+</script>
+{% endif %}
 
 {% if activities_page %}
 {% for activity_batch in activities_page|batch(3) %}

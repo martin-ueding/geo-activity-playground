@@ -8,6 +8,10 @@
     {% include "search_form.html.j2" %}
 </div>
 
+<p class="mb-2">
+    <a href="{{ url_for('search.map_view') }}?{{ base_query_str }}">{{ _('Map view') }}</a>
+</p>
+
 <table class="table table-sort table-arrows">
     <thead>
         <tr>
