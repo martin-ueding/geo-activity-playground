@@ -18,6 +18,7 @@ Types of changes
 Added:
 
 - Add **Strava archive ZIP upload** in Settings → Strava as an alternative onboarding path: upload a Strava export archive, extract it into `Strava Export`, and replace any existing checkout there. ([GH-249](https://github.com/martin-ueding/geo-activity-playground/issues/249))
+- Add **distance-based clock-style progress markers** (start, quarter, half, three-quarter, end) on both the landing page map cards and activity detail map. These replace the old start and end markers.
 
 Changed:
 

@@ -13,6 +13,10 @@
 </div>
 
 <script>
+    function getProgressMarkerIcon(progress) {
+        return window.progressMarkerIcon(progress);
+    }
+
     function add_map(id, geojson) {
         let map = L.map(`map-${id}`, {
             fullscreenControl: true
@@ -23,12 +27,25 @@
         }).addTo(map)
 
         let geojson_layer = L.geoJSON(geojson, {
-            useSimpleStyle: true
+            style: function (feature) {
+                if (feature?.geometry?.type === "LineString") {
+                    return { color: "#3388ff", weight: 4 };
+                }
+                return {};
+            },
+            pointToLayer: function (feature, latlng) {
+                const progress = feature?.properties?.marker_progress;
+                if (Number.isFinite(progress)) {
+                    return L.marker(latlng, { icon: getProgressMarkerIcon(progress) });
+                }
+                return L.circleMarker(latlng);
+            }
         }).addTo(map)
         map.fitBounds(geojson_layer.getBounds())
         return map
     }
 </script>
+<script src="/static/progress-markers.js"></script>
 
 <h2>{{ _('Latest activities') }}</h2>
 

@@ -19,6 +19,9 @@ from geo_activity_playground.core.datamodel import (
 logger = logging.getLogger(__name__)
 
 
+MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
+
+
 class ActivityRepository:
     def __len__(self) -> int:
         return DB.session.scalars(
@@ -74,6 +77,13 @@ class ActivityRepository:
         return df
 
 
+def make_geojson_progress_markers_from_time_series(time_series: pd.DataFrame) -> str:
+    feature_collection = geojson.FeatureCollection(
+        _make_progress_marker_features(time_series)
+    )
+    return geojson.dumps(feature_collection)
+
+
 def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
     features = []
     for _, group in time_series.groupby("segment_id"):
@@ -83,33 +93,7 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
             )
         )
 
-    # Add start point marker
-    first_point = time_series.iloc[0]
-    features.append(
-        geojson.Feature(
-            geometry=geojson.Point((first_point["longitude"], first_point["latitude"])),
-            properties={
-                "marker-color": "#00FF00",
-                "marker-symbol": "circle",
-                "marker-size": "medium",
-            },
-        )
-    )
-
-    # Add end point marker
-    last_point = time_series.iloc[-1]
-    features.append(
-        geojson.Feature(
-            geometry=geojson.Point((last_point["longitude"], last_point["latitude"])),
-            properties={
-                "marker-color": "#FFFFFF",
-                "marker-symbol": "circle",
-                "marker-size": "medium",
-                "stroke": "#000000",
-                "stroke-width": 2,
-            },
-        )
-    )
+    features.extend(_make_progress_marker_features(time_series))
 
     fc = geojson.FeatureCollection(features=features)
     return geojson.dumps(fc)
@@ -191,3 +175,46 @@ def _make_value_clamp(values: pd.Series) -> tuple[float, float, Callable]:
         high,
         lambda value: min(max((value - low) / (high - low + 1e-20), 0.0), 1.0),
     )
+
+
+def _make_progress_marker_features(time_series: pd.DataFrame) -> list[geojson.Feature]:
+    if time_series.empty:
+        return []
+    marker_points = _progress_marker_points(time_series)
+    return [
+        geojson.Feature(
+            geometry=geojson.Point((point["longitude"], point["latitude"])),
+            properties={"marker_progress": progress},
+        )
+        for progress in MARKER_PROGRESS_STOPS
+        for point in [marker_points[progress]]
+    ]
+
+
+def _progress_marker_points(time_series: pd.DataFrame) -> dict[float, pd.Series]:
+    if (
+        "distance_km" not in time_series
+        or (distance := pd.to_numeric(time_series["distance_km"], errors="coerce"))
+        .isna()
+        .all()
+    ):
+        final_index = len(time_series) - 1
+        return {
+            progress: time_series.iloc[int(round(final_index * progress))]
+            for progress in MARKER_PROGRESS_STOPS
+        }
+
+    valid_rows = time_series.loc[distance.notna()]
+    valid_distance = distance.loc[distance.notna()]
+    start_distance = float(valid_distance.iloc[0])
+    total_distance = float(valid_distance.iloc[-1] - start_distance)
+    if total_distance <= 0:
+        point = valid_rows.iloc[0]
+        return {progress: point for progress in MARKER_PROGRESS_STOPS}
+
+    result: dict[float, pd.Series] = {}
+    for progress in MARKER_PROGRESS_STOPS:
+        target_distance = start_distance + progress * total_distance
+        nearest_index = (valid_distance - target_distance).abs().idxmin()
+        result[progress] = time_series.loc[nearest_index]
+    return result
