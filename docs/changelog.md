@@ -25,6 +25,7 @@ Fixed:
 - Fix **Month Wrap crash** caused by shadowing the gettext translation function `_` with `calendar.monthrange`, which raised `TypeError: 'Day' object is not callable` on monthly wrap pages. ([GH-416](https://github.com/martin-ueding/geo-activity-playground/issues/416))
 - Clarify **bubble chart semantics** by labeling it per-activity and adding helper text that each bubble is one activity. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
 - Keep **navbar menus above map preview controls** by adding app-level stacking rules so Firefox no longer renders Leaflet controls over dropdown menus. ([GH-415](https://github.com/martin-ueding/geo-activity-playground/issues/415))
+- Improve **Strava checkout import diagnostics** by explicitly checking for the required `Activity ID` column and printing the full parsed header as JSON when it is missing, so users can paste actionable data into issue reports. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
 
 ## Version 1.24.0 — 2026-04-03
 

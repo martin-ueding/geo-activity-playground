@@ -69,6 +69,15 @@ def import_from_strava_checkout(config: Config) -> None:
         print(header)
         sys.exit(1)
 
+    if "Activity ID" not in header:
+        logger.error(
+            "Could not find required column 'Activity ID' in Strava checkout header. "
+            "Please open an issue at https://github.com/martin-ueding/geo-activity-playground/issues "
+            "and paste the following JSON header there:"
+        )
+        print(json.dumps(header, ensure_ascii=False))
+        sys.exit(1)
+
     table = {
         header[i]: [rows[r][i] for r in range(1, len(rows))] for i in range(len(header))
     }
