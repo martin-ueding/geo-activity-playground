@@ -19,6 +19,7 @@ Added:
 
 - Add **Strava archive ZIP upload** in Settings → Strava as an alternative onboarding path: upload a Strava export archive, extract it into `Strava Export`, and replace any existing checkout there. ([GH-249](https://github.com/martin-ueding/geo-activity-playground/issues/249))
 - Add **distance-based clock-style progress markers** (start, quarter, half, three-quarter, end) on both the landing page map cards and activity detail map. These replace the old start and end markers.
+- Add **aggregate map + totals** to Search as Map: filtered activities now show total distance, total elevation gain, total elapsed time, and a combined overview map (capped to 100 lines). ([GH-408](https://github.com/martin-ueding/geo-activity-playground/issues/408))
 
 Changed:
 
@@ -33,6 +34,7 @@ Fixed:
 - Keep **navbar menus above map preview controls** by adding app-level stacking rules so Firefox no longer renders Leaflet controls over dropdown menus. ([GH-415](https://github.com/martin-ueding/geo-activity-playground/issues/415))
 - Improve **Strava checkout import diagnostics** by explicitly checking for the required `Activity ID` column and printing the full parsed header as JSON when it is missing, so users can paste actionable data into issue reports. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
 - Prevent activities from ending up with **NULL kind/equipment** by mapping edit-form “none” values to explicit `Unknown` entries and automatically migrating existing `NULL` values to `Unknown` during startup. ([GH-354](https://github.com/martin-ueding/geo-activity-playground/issues/354))
+- Fix **search view toggle** so users can switch back from table view to Search as Map via a dedicated Map view link. ([GH-408](https://github.com/martin-ueding/geo-activity-playground/issues/408))
 
 ## Version 1.24.0 — 2026-04-03
 
