@@ -21,6 +21,7 @@ from geo_activity_playground.explorer.tile_visits import (
     _compute_cluster_evolution,
     _process_activity,
     _tiles_from_points,
+    get_cluster_tile_activations_df,
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
     get_tile_history_df,
@@ -358,6 +359,85 @@ def test_cluster_history_diff_for_activity(app) -> None:
         assert (0, 0) in after
         assert added == {(0, 0)}
         assert removed == set()
+
+
+def test_cluster_tile_activations_use_activation_time_not_first_visit(app) -> None:
+    with app.app_context():
+        DB.session.add_all(
+            [
+                Activity(id=1, name="A1"),
+                Activity(id=2, name="A2"),
+                Activity(id=3, name="A3"),
+                Activity(id=4, name="A4"),
+                Activity(id=5, name="A5"),
+            ]
+        )
+        DB.session.add_all(
+            [
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=0,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2025, 6, 1, 10, 0, 0),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2025, 6, 1, 10, 0, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=-1,
+                    tile_y=0,
+                    first_activity_id=2,
+                    first_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                    last_activity_id=2,
+                    last_time=dt.datetime(2026, 1, 1, 10, 0, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=-1,
+                    first_activity_id=3,
+                    first_time=dt.datetime(2026, 1, 1, 10, 1, 0),
+                    last_activity_id=3,
+                    last_time=dt.datetime(2026, 1, 1, 10, 1, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=0,
+                    tile_y=1,
+                    first_activity_id=4,
+                    first_time=dt.datetime(2026, 1, 1, 10, 2, 0),
+                    last_activity_id=4,
+                    last_time=dt.datetime(2026, 1, 1, 10, 2, 0),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=1,
+                    tile_y=0,
+                    first_activity_id=5,
+                    first_time=dt.datetime(2026, 1, 1, 10, 3, 0),
+                    last_activity_id=5,
+                    last_time=dt.datetime(2026, 1, 1, 10, 3, 0),
+                    visit_count=1,
+                ),
+            ]
+        )
+        DB.session.commit()
+
+        history = get_tile_history_df(14)
+        rebuild_cluster_history_for_zoom(14, history)
+        activations = get_cluster_tile_activations_df(14)
+
+        center = activations.loc[
+            (activations["tile_x"] == 0) & (activations["tile_y"] == 0)
+        ]
+        assert len(center) == 1
+        assert center.iloc[0]["time"].year == 2026
+        assert center.iloc[0]["activity_id"] == 5
 
 
 def test_cluster_history_replay_latency_bound(app) -> None:

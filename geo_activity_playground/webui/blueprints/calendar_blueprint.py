@@ -12,7 +12,7 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import Config
 from ...core.datamodel import DB, Activity, TileVisit
-from ...explorer.tile_visits import TileVisitAccessor
+from ...explorer.tile_visits import TileVisitAccessor, get_cluster_tile_activations_df
 
 
 def _meta_with_local_start(repository: ActivityRepository) -> pd.DataFrame:
@@ -35,7 +35,7 @@ def _meta_with_local_start(repository: ActivityRepository) -> pd.DataFrame:
     return meta.loc[~pd.isna(meta["start_local"])].copy()
 
 
-def _tile_first_visits(zoom: int, cluster_tiles: set[tuple[int, int]]) -> pd.DataFrame:
+def _tile_first_visits(zoom: int) -> pd.DataFrame:
     rows = DB.session.execute(
         sqlalchemy.select(
             TileVisit.first_time, TileVisit.tile_x, TileVisit.tile_y
@@ -46,17 +46,27 @@ def _tile_first_visits(zoom: int, cluster_tiles: set[tuple[int, int]]) -> pd.Dat
         frame["year"] = pd.Series(dtype="int64")
         frame["month"] = pd.Series(dtype="int64")
         frame["day"] = pd.Series(dtype="int64")
-        frame["is_cluster"] = pd.Series(dtype="bool")
         return frame
     frame["first_time"] = pd.to_datetime(frame["first_time"])
     frame = frame.loc[~pd.isna(frame["first_time"])].copy()
     frame["year"] = frame["first_time"].dt.year
     frame["month"] = frame["first_time"].dt.month
     frame["day"] = frame["first_time"].dt.day
-    frame["is_cluster"] = [
-        (int(tile_x), int(tile_y)) in cluster_tiles
-        for tile_x, tile_y in zip(frame["tile_x"], frame["tile_y"])
-    ]
+    return frame
+
+
+def _cluster_tile_activations(zoom: int) -> pd.DataFrame:
+    frame = get_cluster_tile_activations_df(zoom)
+    if len(frame) == 0:
+        frame["year"] = pd.Series(dtype="int64")
+        frame["month"] = pd.Series(dtype="int64")
+        frame["day"] = pd.Series(dtype="int64")
+        return frame
+    frame["time"] = pd.to_datetime(frame["time"])
+    frame = frame.loc[~pd.isna(frame["time"])].copy()
+    frame["year"] = frame["time"].dt.year
+    frame["month"] = frame["time"].dt.month
+    frame["day"] = frame["time"].dt.day
     return frame
 
 
@@ -371,15 +381,15 @@ def make_calendar_blueprint(
         )
 
         zoom_stats = []
-        tile_year_primary = pd.DataFrame(
-            columns=["year", "month", "day", "is_cluster"],
-        )
+        tile_year_primary = pd.DataFrame(columns=["year", "month", "day"])
+        cluster_year_primary = pd.DataFrame(columns=["year", "month", "day"])
         for zoom in selected_zooms:
-            cluster_tiles = set(
-                tile_visit_accessor.tile_state["evolution_state"][zoom].memberships
-            )
-            tile_visits = _tile_first_visits(zoom, cluster_tiles)
+            tile_visits = _tile_first_visits(zoom)
+            cluster_activations = _cluster_tile_activations(zoom)
             tile_year = tile_visits.loc[tile_visits["year"] == year].copy()
+            cluster_year = cluster_activations.loc[
+                cluster_activations["year"] == year
+            ].copy()
             square_zoom = _square_evolution_frame(tile_visit_accessor, zoom)
             year_end = pd.Series([pd.Timestamp(year=year, month=12, day=31)])
             square_size = int(_square_size_at(square_zoom, year_end).iloc[0])
@@ -387,12 +397,13 @@ def make_calendar_blueprint(
                 {
                     "zoom": zoom,
                     "new_tiles": int(len(tile_year)),
-                    "new_cluster_tiles": int(tile_year["is_cluster"].sum()),
+                    "new_cluster_tiles": int(len(cluster_year)),
                     "max_square_size": square_size,
                 }
             )
             if zoom == primary_zoom:
                 tile_year_primary = tile_year
+                cluster_year_primary = cluster_year
 
         monthly_tiles = (
             tile_year_primary.groupby("month").size().rename("new_tiles").reset_index()
@@ -400,12 +411,11 @@ def make_calendar_blueprint(
             else pd.DataFrame({"month": [], "new_tiles": []})
         )
         monthly_cluster_tiles = (
-            tile_year_primary.loc[tile_year_primary["is_cluster"]]
-            .groupby("month")
+            cluster_year_primary.groupby("month")
             .size()
             .rename("new_cluster_tiles")
             .reset_index()
-            if len(tile_year_primary)
+            if len(cluster_year_primary)
             else pd.DataFrame({"month": [], "new_cluster_tiles": []})
         )
         monthly = pd.DataFrame({"month": list(range(1, 13))})
@@ -436,7 +446,7 @@ def make_calendar_blueprint(
             "elevation_gain": float(period["elevation_gain"].sum()),
             "moving_hours": float(period["hours_moving"].sum()),
             "new_tiles": int(len(tile_year_primary)),
-            "new_cluster_tiles": int(tile_year_primary["is_cluster"].sum()),
+            "new_cluster_tiles": int(len(cluster_year_primary)),
             "max_square_size": int(monthly["max_square_size"].max()),
         }
 
@@ -508,16 +518,17 @@ def make_calendar_blueprint(
             .reset_index()
         )
         zoom_stats = []
-        tile_month_primary = pd.DataFrame(
-            columns=["year", "month", "day", "is_cluster"],
-        )
+        tile_month_primary = pd.DataFrame(columns=["year", "month", "day"])
+        cluster_month_primary = pd.DataFrame(columns=["year", "month", "day"])
         for zoom in selected_zooms:
-            cluster_tiles = set(
-                tile_visit_accessor.tile_state["evolution_state"][zoom].memberships
-            )
-            tile_visits = _tile_first_visits(zoom, cluster_tiles)
+            tile_visits = _tile_first_visits(zoom)
+            cluster_activations = _cluster_tile_activations(zoom)
             tile_month = tile_visits.loc[
                 (tile_visits["year"] == year) & (tile_visits["month"] == month)
+            ].copy()
+            cluster_month = cluster_activations.loc[
+                (cluster_activations["year"] == year)
+                & (cluster_activations["month"] == month)
             ].copy()
             square_zoom = _square_evolution_frame(tile_visit_accessor, zoom)
             month_end = pd.Series([pd.Timestamp(year=year, month=month, day=max_day)])
@@ -526,12 +537,13 @@ def make_calendar_blueprint(
                 {
                     "zoom": zoom,
                     "new_tiles": int(len(tile_month)),
-                    "new_cluster_tiles": int(tile_month["is_cluster"].sum()),
+                    "new_cluster_tiles": int(len(cluster_month)),
                     "max_square_size": square_size,
                 }
             )
             if zoom == primary_zoom:
                 tile_month_primary = tile_month
+                cluster_month_primary = cluster_month
 
         daily_tiles = (
             tile_month_primary.groupby("day").size().rename("new_tiles").reset_index()
@@ -539,12 +551,11 @@ def make_calendar_blueprint(
             else pd.DataFrame({"day": [], "new_tiles": []})
         )
         daily_cluster_tiles = (
-            tile_month_primary.loc[tile_month_primary["is_cluster"]]
-            .groupby("day")
+            cluster_month_primary.groupby("day")
             .size()
             .rename("new_cluster_tiles")
             .reset_index()
-            if len(tile_month_primary)
+            if len(cluster_month_primary)
             else pd.DataFrame({"day": [], "new_cluster_tiles": []})
         )
         daily = pd.DataFrame({"day": list(range(1, max_day + 1))})
@@ -571,7 +582,7 @@ def make_calendar_blueprint(
             "elevation_gain": float(period["elevation_gain"].sum()),
             "moving_hours": float(period["hours_moving"].sum()),
             "new_tiles": int(len(tile_month_primary)),
-            "new_cluster_tiles": int(tile_month_primary["is_cluster"].sum()),
+            "new_cluster_tiles": int(len(cluster_month_primary)),
             "max_square_size": int(daily["max_square_size"].max()),
         }
 
