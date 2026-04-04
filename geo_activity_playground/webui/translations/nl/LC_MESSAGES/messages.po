@@ -400,8 +400,8 @@ msgstr "Tijd / min"
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:60
 #, python-format
-msgid "%(display_name)s per Day (Bubble Chart)"
-msgstr "%(display_name)s per dag (bellengrafiek)"
+msgid "%(display_name)s per Activity (Bubble Chart)"
+msgstr "%(display_name)s per activiteit (bellengrafiek)"
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:73
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:81
@@ -1061,7 +1061,11 @@ msgstr "Inloggen"
 msgid "Bubble Chart: Distance"
 msgstr "Bellengrafiek: Afstand"
 
-#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:26
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:8
+msgid "Each bubble represents one activity."
+msgstr "Elke bel staat voor een activiteit."
+
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:27
 msgid "Bubble Chart: Elevation Gain"
 msgstr "Bellengrafiek: Hoogteverschil"
 

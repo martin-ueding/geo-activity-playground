@@ -400,7 +400,7 @@ msgstr ""
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:60
 #, python-format
-msgid "%(display_name)s per Day (Bubble Chart)"
+msgid "%(display_name)s per Activity (Bubble Chart)"
 msgstr ""
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:73
@@ -1054,7 +1054,11 @@ msgstr ""
 msgid "Bubble Chart: Distance"
 msgstr ""
 
-#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:26
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:8
+msgid "Each bubble represents one activity."
+msgstr ""
+
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:27
 msgid "Bubble Chart: Elevation Gain"
 msgstr ""
 

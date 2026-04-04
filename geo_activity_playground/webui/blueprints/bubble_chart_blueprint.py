@@ -54,7 +54,11 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
 
 def _make_bubble_chart(bubble_data, column: ColumnDescription):
     return (
-        alt.Chart(bubble_data, title=_("%(display_name)s per Day (Bubble Chart)") % {"display_name": column.display_name})
+        alt.Chart(
+            bubble_data,
+            title=_("%(display_name)s per Activity (Bubble Chart)")
+            % {"display_name": column.display_name},
+        )
         .mark_circle()
         .encode(
             x=alt.X("date:T", title=_("Date")),
