@@ -1,5 +1,7 @@
 import datetime
+import io
 import json
+import zipfile
 from types import SimpleNamespace
 
 import sqlalchemy
@@ -277,3 +279,28 @@ def test_refresh_strava_activity_names_is_noop_if_names_match(client, app, monke
         )
         assert refreshed is not None
         assert refreshed.name == "Already Synced"
+
+
+def test_strava_checkout_upload_replaces_existing_checkout(client, tmp_path):
+    checkout_dir = tmp_path / "Strava Export"
+    checkout_dir.mkdir(parents=True)
+    (checkout_dir / "old.txt").write_text("old", encoding="utf-8")
+
+    archive_bytes = io.BytesIO()
+    with zipfile.ZipFile(archive_bytes, mode="w") as archive:
+        archive.writestr("activities.csv", "Activity ID,Filename\n1,activities/a.fit\n")
+        archive.writestr("activities/a.fit", "dummy-fit")
+    archive_bytes.seek(0)
+
+    response = client.post(
+        "/settings/strava-upload",
+        data={"strava_checkout_zip": (archive_bytes, "strava-export.zip")},
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 302
+    assert not (checkout_dir / "old.txt").exists()
+    assert (checkout_dir / "activities.csv").exists()
+    assert (checkout_dir / "activities" / "a.fit").read_text(
+        encoding="utf-8"
+    ) == "dummy-fit"

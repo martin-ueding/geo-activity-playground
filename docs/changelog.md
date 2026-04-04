@@ -15,6 +15,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add **Strava archive ZIP upload** in Settings → Strava as an alternative onboarding path: upload a Strava export archive, extract it into `Strava Export`, and replace any existing checkout there. ([GH-249](https://github.com/martin-ueding/geo-activity-playground/issues/249))
+
 Fixed:
 
 - Count **new cluster tiles** by activation time in Year/Month Wrap (when a tile becomes a cluster tile), fixing edge cases where bridge activities merged clusters but the wrap still showed zero. ([GH-417](https://github.com/martin-ueding/geo-activity-playground/issues/417))
