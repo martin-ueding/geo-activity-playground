@@ -70,12 +70,25 @@
         }).addTo(map)
 
         let geojson_layer = L.geoJSON(geojson, {
-            useSimpleStyle: true,
-            style: feature => ({
-                color: feature?.properties?.color || "#3388ff",
-                weight: options.weight || 4,
-                opacity: options.opacity || 1
-            })
+            style: feature => {
+                if (feature?.geometry?.type === "LineString") {
+                    return {
+                        color: feature?.properties?.color || "#3388ff",
+                        weight: options.weight || 4,
+                        opacity: options.opacity || 1
+                    };
+                }
+                return {};
+            },
+            pointToLayer: (feature, latlng) => {
+                const progress = feature?.properties?.marker_progress;
+                if (Number.isFinite(progress)) {
+                    return L.marker(latlng, {
+                        icon: window.progressMarkerIcon(progress)
+                    });
+                }
+                return L.circleMarker(latlng);
+            }
         }).addTo(map)
         if (geojson_layer.getLayers().length > 0) {
             map.fitBounds(geojson_layer.getBounds(), { padding: [10, 10] })
