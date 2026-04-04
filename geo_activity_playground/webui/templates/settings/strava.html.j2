@@ -46,4 +46,24 @@
         </form>
     </div>
 </div>
+
+<hr class="my-4">
+
+<div class="row mb-3">
+    <div class="col-lg-6">
+        <h2 class="h4">Import Strava Archive</h2>
+        <p>Download your account archive from <a href="https://www.strava.com/athlete/delete_your_account" target="_blank">Strava</a> and upload the ZIP file here.</p>
+        <p>The ZIP file will be extracted into <code>Strava Export</code>. Any existing checkout in that location will be replaced.</p>
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ url_for('settings.strava_upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="strava_checkout_zip" class="form-label">Strava archive ZIP</label>
+                <input type="file" class="form-control" id="strava_checkout_zip" name="strava_checkout_zip" accept=".zip,application/zip" required>
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary">Upload Archive</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
