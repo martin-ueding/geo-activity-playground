@@ -13,6 +13,12 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+## Unreleased
+
+Fixed:
+
+- Clarify **bubble chart semantics** by labeling it per-activity and adding helper text that each bubble is one activity. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
+
 ## Version 1.24.0 — 2026-04-03
 
 Added:

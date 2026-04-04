@@ -400,8 +400,8 @@ msgstr "Zeit / min"
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:60
 #, python-format
-msgid "%(display_name)s per Day (Bubble Chart)"
-msgstr "%(display_name)s pro Tag (Blasendiagramm)"
+msgid "%(display_name)s per Activity (Bubble Chart)"
+msgstr "%(display_name)s pro Aktivität (Blasendiagramm)"
 
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:73
 #: geo_activity_playground/webui/blueprints/bubble_chart_blueprint.py:81
@@ -1063,7 +1063,11 @@ msgstr "Anmelden"
 msgid "Bubble Chart: Distance"
 msgstr "Blasendiagramm: Distanz"
 
-#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:26
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:8
+msgid "Each bubble represents one activity."
+msgstr "Jede Blase steht für eine Aktivität."
+
+#: geo_activity_playground/webui/templates/bubble_chart/index.html.j2:27
 msgid "Bubble Chart: Elevation Gain"
 msgstr "Blasendiagramm: Höhenmeter"
 
