@@ -1,6 +1,6 @@
 # LLM Instructions
 
-These are the instructions for an LLM coding agent like Gemini.
+These are the instructions for an LLM coding agent.
 
 This project is a Flask application that uses SQLAlchemy for persistence.
 
@@ -12,4 +12,4 @@ This project is i18n'ed. Use `_(…)` for user facing strings.
 
 If similar functionality already exist, please asks me to generalize it before creating duplicated code.
 
-Do not run the tests, I will run them.
+You can likely use the `gh` command line utility to make use of GitHub.
