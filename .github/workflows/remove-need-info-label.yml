@@ -1,46 +1,154 @@
-name: Remove "need info" label on reply
+name: Move issue back to In Progress on reply
 
 on:
   issue_comment:
     types: [created]
 
 jobs:
-  remove-need-info-label:
+  move-back-to-in-progress:
     runs-on: ubuntu-latest
-    
-    # Only run if the comment is not from the issue author
-    # if: github.event.comment.user.login == github.event.issue.user.login
-    
-    steps:
-    - name: Check if issue has "need info" label
-      id: check-label
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const labels = context.payload.issue.labels;
-          const hasNeedInfoLabel = labels.some(label => 
-            label.name.toLowerCase() === 'information needed'
-          );
-          return hasNeedInfoLabel;
-        result-encoding: string
+    if: github.actor != 'martin-ueding' && github.event.issue.pull_request == null
+    permissions:
+      issues: read
+      repository-projects: write
 
-    - name: Remove "need info" label
-      if: steps.check-label.outputs.result == 'true'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const labels = context.payload.issue.labels;
-          const needInfoLabel = labels.find(label => 
-            label.name.toLowerCase() === 'information needed'
-          );
-          
-          if (needInfoLabel) {
-            await github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: needInfoLabel.name
-            });
-            
-            console.log(`Removed label: ${needInfoLabel.name}`);
-          }
+    steps:
+      - name: Move project item to In Progress
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const WAITING_STATUS = 'Waiting for User Feedback';
+            const IN_PROGRESS_STATUS = 'In Progress';
+
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const issueData = await github.graphql(
+              `
+              query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issueNumber) {
+                    id
+                    projectItems(first: 20) {
+                      nodes {
+                        id
+                        project {
+                          id
+                          title
+                        }
+                        fieldValues(first: 50) {
+                          nodes {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                              field {
+                                ... on ProjectV2SingleSelectField {
+                                  id
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              `,
+              { owner, repo, issueNumber },
+            );
+
+            const items = issueData.repository?.issue?.projectItems?.nodes ?? [];
+            if (!items.length) {
+              core.info(`Issue #${issueNumber} is not in any project.`);
+              return;
+            }
+
+            let targetItem = null;
+            let statusFieldId = null;
+            let projectId = null;
+
+            for (const item of items) {
+              const fieldValues = item.fieldValues?.nodes ?? [];
+              for (const value of fieldValues) {
+                if (value?.field?.name === 'Status' && value.name === WAITING_STATUS) {
+                  targetItem = item;
+                  statusFieldId = value.field.id;
+                  projectId = item.project.id;
+                  break;
+                }
+              }
+              if (targetItem) {
+                break;
+              }
+            }
+
+            if (!targetItem || !statusFieldId || !projectId) {
+              core.info(
+                `Issue #${issueNumber} is not in status "${WAITING_STATUS}" in any linked project item.`,
+              );
+              return;
+            }
+
+            const projectData = await github.graphql(
+              `
+              query($projectId: ID!) {
+                node(id: $projectId) {
+                  ... on ProjectV2 {
+                    field(name: "Status") {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              `,
+              { projectId },
+            );
+
+            const statusField = projectData.node?.field;
+            const inProgressOption = statusField?.options?.find(
+              (option) => option.name === IN_PROGRESS_STATUS,
+            );
+
+            if (!inProgressOption) {
+              core.setFailed(
+                `Could not find "${IN_PROGRESS_STATUS}" option in Status field for project ${projectId}.`,
+              );
+              return;
+            }
+
+            await github.graphql(
+              `
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(
+                  input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: { singleSelectOptionId: $optionId }
+                  }
+                ) {
+                  projectV2Item {
+                    id
+                  }
+                }
+              }
+              `,
+              {
+                projectId,
+                itemId: targetItem.id,
+                fieldId: statusFieldId,
+                optionId: inProgressOption.id,
+              },
+            );
+
+            core.info(
+              `Moved issue #${issueNumber} from "${WAITING_STATUS}" to "${IN_PROGRESS_STATUS}" in project "${targetItem.project.title}".`,
+            );
