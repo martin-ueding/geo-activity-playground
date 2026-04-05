@@ -1648,6 +1648,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1260-2026-04-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.26.0 — 2026-04-05
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1250-2026-04-04" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3134,6 +3145,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1260-2026-04-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.26.0 — 2026-04-05
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1250-2026-04-04" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4615,6 +4637,25 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+<!-- next version below this line -->
+
+<h2 id="version-1260-2026-04-05">Version 1.26.0 — 2026-04-05</h2>
+<p>Added:</p>
+<ul>
+<li>Add <strong>favorite-search heatmap cache</strong>: heatmap tiles can now be cached per stored search query when that query is marked as favorite, in addition to the existing global (no-search) cache. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/420">GH-420</a>)</li>
+<li>Add configurable <strong>heatmap cache size threshold</strong> via <code>heatmap_cache_min_activities</code> (default: <code>5</code>): tiles are only cached when enough activities are present, and startup drops existing cache entries below the configured threshold.</li>
+<li>Add detailed <strong>Strava checkout header debug logging</strong> during import: log the raw parsed header as JSON, log whether EN/DE/unknown header handling was selected, and log the effective header JSON after normalization to help diagnose locale/header-mapping mismatches. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/414">GH-414</a>)</li>
+<li>Add per-day variants of the <strong>bubble charts</strong> (distance and elevation gain), where each bubble aggregates one day and links to the activity day overview page. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/418">GH-418</a>)</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Move <strong>heatmap tile cache storage</strong> from filesystem (<code>Cache/Heatmap</code>) into the database, including automatic startup import of legacy filesystem cache and cleanup of imported files after successful migration.</li>
+<li>Organize the <strong>bubble chart page</strong> into nested Bootstrap tabs with two layers: Activities vs Daily, and Distance vs Elevation Gain.</li>
+</ul>
+<p>Security:</p>
+<ul>
+<li>Require login for <strong>data export</strong> routes when an admin password is configured, preventing anonymous metadata/activity bulk exports. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/419">GH-419</a>)</li>
+</ul>
 <h2 id="version-1250-2026-04-04">Version 1.25.0 — 2026-04-04</h2>
 <p>Added:</p>
 <ul>
