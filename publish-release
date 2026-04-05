@@ -8,7 +8,9 @@ uv version "$version"
 
 # Update the changelog.
 today=$(date +%Y-%m-%d)
-sed -i "s/## Unreleased/## Version $version — $today/" docs/changelog.md
+next_version_marker="<!-- next version below this line -->"
+grep -Fq "$next_version_marker" docs/changelog.md
+sed -i "0,/^## Unreleased$/s//## Version $version — $today/" docs/changelog.md
 
 # Commit and tag.
 git ca -m "chore: bump version to $version"
@@ -32,3 +34,10 @@ release_note_file="$(mktemp --suffix .md)"
 uv run python3 extract-changelog.py docs/changelog.md "$version" > "$release_note_file"
 gh release create "$version" -F "$release_note_file" -t "$version"
 rm "$release_note_file"
+
+# Prepare changelog for ongoing development.
+sed -i "0,/^$next_version_marker$/s//$next_version_marker\\
+\\
+## Unreleased\\
+/" docs/changelog.md
+git ca -m "docs: add unreleased section to changelog"

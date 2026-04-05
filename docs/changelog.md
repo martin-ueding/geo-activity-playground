@@ -13,6 +13,8 @@ Types of changes
     *Security* in case of vulnerabilities.
 -->
 
+<!-- next version below this line -->
+
 ## Unreleased
 
 Added:
