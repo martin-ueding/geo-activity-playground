@@ -22,6 +22,7 @@ Added:
 - Add **favorite-search heatmap cache**: heatmap tiles can now be cached per stored search query when that query is marked as favorite, in addition to the existing global (no-search) cache. ([GH-420](https://github.com/martin-ueding/geo-activity-playground/issues/420))
 - Add configurable **heatmap cache size threshold** via `heatmap_cache_min_activities` (default: `5`): tiles are only cached when enough activities are present, and startup drops existing cache entries below the configured threshold.
 - Add detailed **Strava checkout header debug logging** during import: log the raw parsed header as JSON, log whether EN/DE/unknown header handling was selected, and log the effective header JSON after normalization to help diagnose locale/header-mapping mismatches. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
+- Add per-day variants of the **bubble charts** (distance and elevation gain), where each bubble aggregates one day and links to the activity day overview page. ([GH-418](https://github.com/martin-ueding/geo-activity-playground/issues/418))
 
 Changed:
 
