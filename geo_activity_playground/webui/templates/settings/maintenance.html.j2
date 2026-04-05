@@ -32,12 +32,58 @@
         <p class="card-text">
             {{ _('The heatmap tiles are cached for performance. If you change activity kinds or if tiles seem incorrect, you can clear the cache to force a re-render.') }}
         </p>
-        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to clear the heatmap cache?') }}');">
-            <input type="hidden" name="action" value="reset_heatmap_cache">
-            <button type="submit" class="btn btn-warning">
-                {{ _('Reset heatmap cache') }}
-            </button>
-        </form>
+        <p class="mb-2"><strong>{{ _('Cached tiles:') }}</strong> {{ heatmap_cache_total_tiles }}</p>
+
+        {% if heatmap_cache_stats %}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-striped align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">{{ _('Search query') }}</th>
+                    <th scope="col" class="text-end">{{ _('Tiles') }}</th>
+                    <th scope="col" class="text-end">{{ _('Cached activities') }}</th>
+                    <th scope="col">{{ _('Last used') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in heatmap_cache_stats %}
+                <tr>
+                    <td>
+                        {{ row.description }}
+                        {% if row.is_favorite is not none %}
+                            {% if row.is_favorite %}
+                                <span class="badge text-bg-success ms-1">{{ _('favorite') }}</span>
+                            {% else %}
+                                <span class="badge text-bg-secondary ms-1">{{ _('not favorite') }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ row.num_tiles }}</td>
+                    <td class="text-end">{{ row.num_activities }}</td>
+                    <td>{% if row.last_used %}{{ row.last_used|dt }}{% else %}{{ _('never') }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-3">{{ _('No heatmap cache tiles are stored.') }}</p>
+        {% endif %}
+
+        <div class="d-flex flex-wrap gap-2">
+            <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to clear all heatmap cache tiles?') }}');">
+                <input type="hidden" name="action" value="reset_heatmap_cache">
+                <button type="submit" class="btn btn-warning">
+                    {{ _('Drop all heatmap cache') }}
+                </button>
+            </form>
+            <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to remove stale heatmap cache tiles (unused for six months, including never-used imported tiles)?') }}');">
+                <input type="hidden" name="action" value="cleanup_heatmap_cache_stale">
+                <button type="submit" class="btn btn-outline-warning">
+                    {{ _('Drop stale heatmap cache (6 months)') }}
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

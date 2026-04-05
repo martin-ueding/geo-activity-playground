@@ -13,6 +13,7 @@ from geo_activity_playground.core.datamodel import (
     ClusterHistoryEvent,
     Equipment,
     ExplorerTileBookmark,
+    HeatmapTileCache,
     Kind,
     Photo,
     PlotSpec,
@@ -97,6 +98,16 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
             is_favorite=False,
             last_used=datetime.datetime(2024, 1, 1),
         )
+        heatmap_cache = HeatmapTileCache(
+            zoom=14,
+            tile_x=1,
+            tile_y=2,
+            search_query_id=None,
+            counts=b"not-used",
+            included_activity_ids=[1],
+            num_activities=1,
+            last_used=datetime.datetime(2024, 1, 1),
+        )
 
         DB.session.add_all(
             [
@@ -113,6 +124,7 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
                 square_bookmark,
                 plot_spec,
                 stored_query,
+                heatmap_cache,
             ]
         )
         DB.session.commit()
@@ -162,6 +174,7 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
             SquarePlannerBookmark,
             PlotSpec,
             StoredSearchQuery,
+            HeatmapTileCache,
         ]:
             assert (
                 DB.session.scalar(
@@ -184,6 +197,82 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
     assert list((tmp_path / "Photos").iterdir()) == []
 
     assert (tmp_path / "Strava API" / "strava_tokens.json").exists()
+
+
+def test_reset_heatmap_cache_clears_db_table(client, app):
+    with app.app_context():
+        cache = HeatmapTileCache(
+            zoom=14,
+            tile_x=1,
+            tile_y=2,
+            search_query_id=None,
+            counts=b"payload",
+            included_activity_ids=[],
+            num_activities=0,
+            last_used=datetime.datetime(2024, 1, 1),
+        )
+        DB.session.add(cache)
+        DB.session.commit()
+
+    response = client.post(
+        "/settings/maintenance", data={"action": "reset_heatmap_cache"}
+    )
+    assert response.status_code == 302
+
+    with app.app_context():
+        assert (
+            DB.session.scalar(
+                sqlalchemy.select(sqlalchemy.func.count()).select_from(HeatmapTileCache)
+            )
+            == 0
+        )
+
+
+def test_cleanup_heatmap_cache_stale_removes_old_and_never_used_entries(client, app):
+    now = datetime.datetime.now()
+    with app.app_context():
+        stale = HeatmapTileCache(
+            zoom=14,
+            tile_x=1,
+            tile_y=1,
+            search_query_id=None,
+            counts=b"a",
+            included_activity_ids=[],
+            num_activities=0,
+            last_used=now - datetime.timedelta(days=400),
+        )
+        never_used = HeatmapTileCache(
+            zoom=14,
+            tile_x=1,
+            tile_y=2,
+            search_query_id=None,
+            counts=b"b",
+            included_activity_ids=[],
+            num_activities=0,
+            last_used=None,
+        )
+        recent = HeatmapTileCache(
+            zoom=14,
+            tile_x=1,
+            tile_y=3,
+            search_query_id=None,
+            counts=b"c",
+            included_activity_ids=[],
+            num_activities=0,
+            last_used=now - datetime.timedelta(days=10),
+        )
+        DB.session.add_all([stale, never_used, recent])
+        DB.session.commit()
+
+    response = client.post(
+        "/settings/maintenance", data={"action": "cleanup_heatmap_cache_stale"}
+    )
+    assert response.status_code == 302
+
+    with app.app_context():
+        remaining = DB.session.scalars(sqlalchemy.select(HeatmapTileCache)).all()
+        assert len(remaining) == 1
+        assert remaining[0].tile_y == 3
 
 
 class _FakeStravaClient:

@@ -12,6 +12,7 @@ from matplotlib.colors import to_hex
 
 from ...core.config import Config
 from ...core.datamodel import DB, Activity, StoredSearchQuery
+from ...core.heatmap_cache import delete_heatmap_cache_for_query
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -222,6 +223,7 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
         if stored:
             stored.is_favorite = False
             DB.session.commit()
+            delete_heatmap_cache_for_query(stored.id)
 
         return redirect(urllib.parse.unquote_plus(request.args["redirect"]))
 
