@@ -25,6 +25,7 @@
 <div class="row mb-3">
     <div class="col">
         <h1>{{ _('Bubble Chart: Elevation Gain') }}</h1>
+        <p class="text-muted">{{ _('Each bubble represents one activity.') }}</p>
         <div id="bubble-chart-elevation-gain"></div>
         <script>
             const chartSpecElevationGain = {{ bubble_chart_elevation_gain | safe }};
@@ -34,6 +35,42 @@
                     if (item && item.datum && item.datum.activity_url) {
                         // Redirect to the activity URL
                         window.location.href = item.datum.activity_url;
+                    }
+                });
+            }).catch(console.error);
+        </script>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _('Bubble Chart: Distance per Day') }}</h1>
+        <p class="text-muted">{{ _('Each bubble represents one day. Click a bubble to open the day overview.') }}</p>
+        <div id="bubble-chart-day-distance"></div>
+        <script>
+            const chartSpecDayDistance = {{ bubble_chart_day_distance | safe }};
+            vegaEmbed('#bubble-chart-day-distance', chartSpecDayDistance).then((result) => {
+                result.view.addEventListener('click', (event, item) => {
+                    if (item && item.datum && item.datum.day_url) {
+                        window.location.href = item.datum.day_url;
+                    }
+                });
+            }).catch(console.error);
+        </script>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _('Bubble Chart: Elevation Gain per Day') }}</h1>
+        <p class="text-muted">{{ _('Each bubble represents one day. Click a bubble to open the day overview.') }}</p>
+        <div id="bubble-chart-day-elevation-gain"></div>
+        <script>
+            const chartSpecDayElevationGain = {{ bubble_chart_day_elevation_gain | safe }};
+            vegaEmbed('#bubble-chart-day-elevation-gain', chartSpecDayElevationGain).then((result) => {
+                result.view.addEventListener('click', (event, item) => {
+                    if (item && item.datum && item.datum.day_url) {
+                        window.location.href = item.datum.day_url;
                     }
                 });
             }).catch(console.error);

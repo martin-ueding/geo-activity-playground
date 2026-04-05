@@ -1,6 +1,6 @@
 import altair as alt
 import pandas as pd
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, url_for
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
@@ -12,20 +12,16 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
 
     @blueprint.route("/", endpoint="index")
     def bubble_chart() -> ResponseReturnValue:
-        activities = repository.meta
+        activities = repository.meta.copy()
 
-        # Ensure 'activity_id' exists in the activities DataFrame
-        if "activity_id" not in activities.columns:
-            activities["activity_id"] = (
-                activities.index
-            )  # Use index as fallback if missing
+        if "id" not in activities.columns:
+            activities["id"] = activities.index
 
-        # Prepare the bubble chart data
         bubble_data = activities[
             [
                 "start_local",
                 "kind",
-                "activity_id",
+                "id",
                 column_distance.name,
                 column_elevation_gain.name,
             ]
@@ -33,12 +29,27 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
             columns={
                 "start_local": "date",
                 "kind": "activity",
-                "activity_id": "id",
             }
         )
         bubble_data["date"] = pd.to_datetime(bubble_data["date"]).dt.date
         bubble_data["activity_url"] = bubble_data["id"].apply(
-            lambda x: f"/activity/{x}"
+            lambda x: url_for("activity.show", id=x)
+        )
+        day_bubble_data = (
+            bubble_data.groupby("date", as_index=False)
+            .agg(
+                {
+                    column_distance.name: "sum",
+                    column_elevation_gain.name: "sum",
+                    "id": "count",
+                }
+            )
+            .rename(columns={"id": "activities"})
+        )
+        day_bubble_data["day_url"] = day_bubble_data["date"].apply(
+            lambda date: url_for(
+                "activity.day", year=date.year, month=date.month, day=date.day
+            )
         )
 
         return render_template(
@@ -46,6 +57,12 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
             bubble_chart_distance=_make_bubble_chart(bubble_data, column_distance),
             bubble_chart_elevation_gain=_make_bubble_chart(
                 bubble_data, column_elevation_gain
+            ),
+            bubble_chart_day_distance=_make_day_bubble_chart(
+                day_bubble_data, column_distance
+            ),
+            bubble_chart_day_elevation_gain=_make_day_bubble_chart(
+                day_bubble_data, column_elevation_gain
             ),
         )
 
@@ -81,6 +98,43 @@ def _make_bubble_chart(bubble_data, column: ColumnDescription):
                 ),
                 alt.Tooltip("activity:N", title=_("Activity")),
                 alt.Tooltip("activity_url:N", title=_("Activity Link")),
+            ],
+        )
+        .properties(height=800, width=1200)
+        .interactive()
+        .to_json(format="vega")
+    )
+
+
+def _make_day_bubble_chart(day_bubble_data, column: ColumnDescription):
+    return (
+        alt.Chart(
+            day_bubble_data,
+            title=_("%(display_name)s per Day (Bubble Chart)")
+            % {"display_name": column.display_name},
+        )
+        .mark_circle()
+        .encode(
+            x=alt.X("date:T", title=_("Date")),
+            y=alt.Y(
+                f"{column.name}:Q",
+                title=f"{column.display_name} ({column.unit})",
+            ),
+            size=alt.Size(
+                f"{column.name}:Q",
+                scale=alt.Scale(range=[10, 600]),
+                title=f"{column.display_name}",
+            ),
+            color=alt.Color("activities:Q", title=_("Activities")),
+            tooltip=[
+                alt.Tooltip("date:T", title=_("Date")),
+                alt.Tooltip(
+                    f"{column.name}:Q",
+                    title=f"{column.display_name} ({column.unit})",
+                    format=column.format,
+                ),
+                alt.Tooltip("activities:Q", title=_("Activities")),
+                alt.Tooltip("day_url:N", title=_("Day Link")),
             ],
         )
         .properties(height=800, width=1200)
