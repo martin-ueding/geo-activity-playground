@@ -2,79 +2,163 @@
 
 {% block container %}
 
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ _('Bubble Chart: Distance') }}</h1>
+<h1>{{ _('Bubble Charts') }}</h1>
+
+<ul class="nav nav-tabs mb-3" id="bubble-layer-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link active"
+            id="bubble-activities-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#bubble-activities-pane"
+            type="button"
+            role="tab"
+            aria-controls="bubble-activities-pane"
+            aria-selected="true"
+        >{{ _('Activities') }}</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button
+            class="nav-link"
+            id="bubble-daily-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#bubble-daily-pane"
+            type="button"
+            role="tab"
+            aria-controls="bubble-daily-pane"
+            aria-selected="false"
+        >{{ _('Daily') }}</button>
+    </li>
+</ul>
+
+<div class="tab-content mb-3" id="bubble-layer-content">
+    <div
+        class="tab-pane fade show active"
+        id="bubble-activities-pane"
+        role="tabpanel"
+        aria-labelledby="bubble-activities-tab"
+        tabindex="0"
+    >
         <p class="text-muted">{{ _('Each bubble represents one activity.') }}</p>
-        <div id="bubble-chart-distance"></div>
-        <script>
-            const chartSpecDistance = {{ bubble_chart_distance | safe }};
-            vegaEmbed('#bubble-chart-distance', chartSpecDistance).then((result) => {
-                // Add a click event listener to the chart
-                result.view.addEventListener('click', (event, item) => {
-                    if (item && item.datum && item.datum.activity_url) {
-                        // Redirect to the activity URL
-                        window.location.href = item.datum.activity_url;
-                    }
-                });
-            }).catch(console.error);
-        </script>
+        <ul class="nav nav-tabs mb-3" id="bubble-activities-metric-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link active"
+                    id="bubble-activities-distance-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#bubble-activities-distance-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="bubble-activities-distance-pane"
+                    aria-selected="true"
+                >{{ _('Distance') }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link"
+                    id="bubble-activities-elevation-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#bubble-activities-elevation-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="bubble-activities-elevation-pane"
+                    aria-selected="false"
+                >{{ _('Elevation Gain') }}</button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div
+                class="tab-pane fade show active"
+                id="bubble-activities-distance-pane"
+                role="tabpanel"
+                aria-labelledby="bubble-activities-distance-tab"
+                tabindex="0"
+            >
+                <div id="bubble-chart-distance"></div>
+            </div>
+            <div
+                class="tab-pane fade"
+                id="bubble-activities-elevation-pane"
+                role="tabpanel"
+                aria-labelledby="bubble-activities-elevation-tab"
+                tabindex="0"
+            >
+                <div id="bubble-chart-elevation-gain"></div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ _('Bubble Chart: Elevation Gain') }}</h1>
-        <p class="text-muted">{{ _('Each bubble represents one activity.') }}</p>
-        <div id="bubble-chart-elevation-gain"></div>
-        <script>
-            const chartSpecElevationGain = {{ bubble_chart_elevation_gain | safe }};
-            vegaEmbed('#bubble-chart-elevation-gain', chartSpecElevationGain).then((result) => {
-                // Add a click event listener to the chart
-                result.view.addEventListener('click', (event, item) => {
-                    if (item && item.datum && item.datum.activity_url) {
-                        // Redirect to the activity URL
-                        window.location.href = item.datum.activity_url;
-                    }
-                });
-            }).catch(console.error);
-        </script>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ _('Bubble Chart: Distance per Day') }}</h1>
+    <div
+        class="tab-pane fade"
+        id="bubble-daily-pane"
+        role="tabpanel"
+        aria-labelledby="bubble-daily-tab"
+        tabindex="0"
+    >
         <p class="text-muted">{{ _('Each bubble represents one day. Click a bubble to open the day overview.') }}</p>
-        <div id="bubble-chart-day-distance"></div>
-        <script>
-            const chartSpecDayDistance = {{ bubble_chart_day_distance | safe }};
-            vegaEmbed('#bubble-chart-day-distance', chartSpecDayDistance).then((result) => {
-                result.view.addEventListener('click', (event, item) => {
-                    if (item && item.datum && item.datum.day_url) {
-                        window.location.href = item.datum.day_url;
-                    }
-                });
-            }).catch(console.error);
-        </script>
+        <ul class="nav nav-tabs mb-3" id="bubble-daily-metric-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link active"
+                    id="bubble-daily-distance-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#bubble-daily-distance-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="bubble-daily-distance-pane"
+                    aria-selected="true"
+                >{{ _('Distance') }}</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link"
+                    id="bubble-daily-elevation-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#bubble-daily-elevation-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="bubble-daily-elevation-pane"
+                    aria-selected="false"
+                >{{ _('Elevation Gain') }}</button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div
+                class="tab-pane fade show active"
+                id="bubble-daily-distance-pane"
+                role="tabpanel"
+                aria-labelledby="bubble-daily-distance-tab"
+                tabindex="0"
+            >
+                <div id="bubble-chart-day-distance"></div>
+            </div>
+            <div
+                class="tab-pane fade"
+                id="bubble-daily-elevation-pane"
+                role="tabpanel"
+                aria-labelledby="bubble-daily-elevation-tab"
+                tabindex="0"
+            >
+                <div id="bubble-chart-day-elevation-gain"></div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ _('Bubble Chart: Elevation Gain per Day') }}</h1>
-        <p class="text-muted">{{ _('Each bubble represents one day. Click a bubble to open the day overview.') }}</p>
-        <div id="bubble-chart-day-elevation-gain"></div>
-        <script>
-            const chartSpecDayElevationGain = {{ bubble_chart_day_elevation_gain | safe }};
-            vegaEmbed('#bubble-chart-day-elevation-gain', chartSpecDayElevationGain).then((result) => {
-                result.view.addEventListener('click', (event, item) => {
-                    if (item && item.datum && item.datum.day_url) {
-                        window.location.href = item.datum.day_url;
-                    }
-                });
-            }).catch(console.error);
-        </script>
-    </div>
-</div>
+<script>
+    function embedBubbleChart(targetSelector, chartSpec, urlField) {
+        vegaEmbed(targetSelector, chartSpec).then((result) => {
+            result.view.addEventListener('click', (event, item) => {
+                if (item && item.datum && item.datum[urlField]) {
+                    window.location.href = item.datum[urlField];
+                }
+            });
+        }).catch(console.error);
+    }
+
+    embedBubbleChart('#bubble-chart-distance', {{ bubble_chart_distance | safe }}, 'activity_url');
+    embedBubbleChart('#bubble-chart-elevation-gain', {{ bubble_chart_elevation_gain | safe }}, 'activity_url');
+    embedBubbleChart('#bubble-chart-day-distance', {{ bubble_chart_day_distance | safe }}, 'day_url');
+    embedBubbleChart('#bubble-chart-day-elevation-gain', {{ bubble_chart_day_elevation_gain | safe }}, 'day_url');
+</script>
 {% endblock %}

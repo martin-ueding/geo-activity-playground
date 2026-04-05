@@ -27,6 +27,7 @@ Added:
 Changed:
 
 - Move **heatmap tile cache storage** from filesystem (`Cache/Heatmap`) into the database, including automatic startup import of legacy filesystem cache and cleanup of imported files after successful migration.
+- Organize the **bubble chart page** into nested Bootstrap tabs with two layers: Activities vs Daily, and Distance vs Elevation Gain.
 
 Security:
 
