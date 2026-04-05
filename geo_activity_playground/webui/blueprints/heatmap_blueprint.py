@@ -1,20 +1,23 @@
 import io
 import logging
-import pathlib
 
 import matplotlib.pylab as pl
 import numpy as np
+import sqlalchemy
 from flask import Blueprint, Response, render_template, request
 from PIL import Image, ImageDraw
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
+from ...core.datamodel import DB, StoredSearchQuery
+from ...core.heatmap_cache import blob_to_counts, get_tile_cache, write_tile_cache
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
     is_search_active,
     parse_search_params,
     primitives_to_jinja,
+    primitives_to_json,
     primitives_to_url_str,
     register_search_query,
 )
@@ -24,7 +27,6 @@ from ...core.raster_map import (
     PixelBounds,
     get_sensible_zoom_level,
 )
-from ...core.tasks import work_tracker
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import TileVisitAccessor, get_tile_medians
 from ..authenticator import Authenticator
@@ -152,60 +154,46 @@ def _get_counts(
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-    if not is_search_active(primitives):
-        tile_count_cache_path = pathlib.Path(f"Cache/Heatmap/{z}/{x}/{y}.npy")
-        if tile_count_cache_path.exists():
+    activity_ids = activities_per_tile[z].get((x, y), set())
+
+    search_query_id: int | None = None
+    should_use_cache = True
+    if is_search_active(primitives):
+        activities = apply_search_filter(primitives)
+        matching_activity_ids = set(activities["id"].tolist())
+        activity_ids = activity_ids & matching_activity_ids
+        search_query_id = _favorite_search_query_id(primitives)
+        should_use_cache = search_query_id is not None
+
+    if should_use_cache:
+        parsed_activities: set[int] = set()
+        cache_entry = get_tile_cache(
+            zoom=z, tile_x=x, tile_y=y, search_query_id=search_query_id
+        )
+        if cache_entry:
             try:
-                tile_counts = np.load(tile_count_cache_path)
+                tile_counts = blob_to_counts(cache_entry.counts).astype(
+                    np.int32, copy=False
+                )
+                if tile_counts.shape != tile_pixels:
+                    raise ValueError("invalid tile shape in cache")
+                parsed_activities = set(cache_entry.included_activity_ids or [])
             except ValueError:
                 logger.warning(
-                    f"Heatmap count file {tile_count_cache_path} is corrupted, deleting."
+                    f"Resetting corrupted heatmap cache for {x=}/{y=}/{z=}/{search_query_id=}."
                 )
-                tile_count_cache_path.unlink()
                 tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-        tile_count_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        activity_ids = activities_per_tile[z].get((x, y), set())
+                parsed_activities = set()
 
-        with work_tracker(
-            tile_count_cache_path.with_suffix(".json")
-        ) as parsed_activities:
-            if parsed_activities - activity_ids:
-                logger.warning(
-                    f"Resetting heatmap cache for {x=}/{y=}/{z=} because activities have been removed."
-                )
-                tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-                parsed_activities.clear()
-            for activity_id in activity_ids:
-                if activity_id in parsed_activities:
-                    continue
-                try:
-                    time_series = repository.get_time_series(activity_id)
-                except ValueError:
-                    logger.warning(
-                        f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
-                    )
-                    continue
-                parsed_activities.add(activity_id)
-                for _, group in time_series.groupby("segment_id"):
-                    xy_pixels = (
-                        np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
-                        * OSM_TILE_SIZE
-                    )
-                    im = Image.new("L", tile_pixels)
-                    draw = ImageDraw.Draw(im)
-                    pixels = list(map(int, xy_pixels.flatten()))
-                    draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
-                    aim = np.array(im)
-                    tile_counts += aim
-        tmp_path = tile_count_cache_path.with_suffix(".tmp.npy")
-        np.save(tmp_path, tile_counts)
-        tile_count_cache_path.unlink(missing_ok=True)
-        tmp_path.rename(tile_count_cache_path)
-    else:
-        activities = apply_search_filter(primitives)
-        activity_ids = activities_per_tile[z].get((x, y), set())
+        if parsed_activities - activity_ids:
+            logger.warning(
+                f"Resetting heatmap cache for {x=}/{y=}/{z=}/{search_query_id=} because activities have been removed."
+            )
+            tile_counts = np.zeros(tile_pixels, dtype=np.int32)
+            parsed_activities.clear()
+
         for activity_id in activity_ids:
-            if activity_id not in activities["id"]:
+            if activity_id in parsed_activities:
                 continue
             try:
                 time_series = repository.get_time_series(activity_id)
@@ -214,18 +202,54 @@ def _get_counts(
                     f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
                 )
                 continue
-            for _, group in time_series.groupby("segment_id"):
-                xy_pixels = (
-                    np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T
-                    * OSM_TILE_SIZE
+            parsed_activities.add(activity_id)
+            _paint_activity(tile_counts, time_series, x=x, y=y, z=z)
+
+        write_tile_cache(
+            zoom=z,
+            tile_x=x,
+            tile_y=y,
+            search_query_id=search_query_id,
+            counts=tile_counts,
+            included_activity_ids=parsed_activities,
+        )
+    else:
+        for activity_id in activity_ids:
+            try:
+                time_series = repository.get_time_series(activity_id)
+            except ValueError:
+                logger.warning(
+                    f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
                 )
-                im = Image.new("L", tile_pixels)
-                draw = ImageDraw.Draw(im)
-                pixels = list(map(int, xy_pixels.flatten()))
-                draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
-                aim = np.array(im)
-                tile_counts += aim
+                continue
+            _paint_activity(tile_counts, time_series, x=x, y=y, z=z)
     return tile_counts
+
+
+def _favorite_search_query_id(primitives: dict) -> int | None:
+    query_json = primitives_to_json(primitives)
+    return DB.session.scalar(
+        sqlalchemy.select(StoredSearchQuery.id).where(
+            StoredSearchQuery.query_json == query_json,
+            StoredSearchQuery.is_favorite.is_(True),
+        )
+    )
+
+
+def _paint_activity(
+    tile_counts: np.ndarray, time_series, *, x: int, y: int, z: int
+) -> None:
+    tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
+    for _, group in time_series.groupby("segment_id"):
+        xy_pixels = (
+            np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T * OSM_TILE_SIZE
+        )
+        im = Image.new("L", tile_pixels)
+        draw = ImageDraw.Draw(im)
+        pixels = list(map(int, xy_pixels.flatten()))
+        draw.line(pixels, fill=1, width=max(3, 6 * (z - 17)))
+        aim = np.array(im)
+        tile_counts += aim
 
 
 def _render_tile_image(
