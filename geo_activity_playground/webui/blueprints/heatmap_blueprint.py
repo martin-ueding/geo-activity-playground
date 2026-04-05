@@ -149,6 +149,7 @@ def _get_counts(
     y: int,
     z: int,
     primitives: dict,
+    config: Config,
     repository: ActivityRepository,
     activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
 ) -> np.ndarray:
@@ -212,6 +213,7 @@ def _get_counts(
             search_query_id=search_query_id,
             counts=tile_counts,
             included_activity_ids=parsed_activities,
+            min_activities=config.heatmap_cache_min_activities,
         )
     else:
         for activity_id in activity_ids:
@@ -263,7 +265,9 @@ def _render_tile_image(
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels)
-    tile_counts += _get_counts(x, y, z, primitives, repository, activities_per_tile)
+    tile_counts += _get_counts(
+        x, y, z, primitives, config, repository, activities_per_tile
+    )
 
     tile_counts = np.sqrt(tile_counts) / 5
     tile_counts[tile_counts > 1.0] = 1.0

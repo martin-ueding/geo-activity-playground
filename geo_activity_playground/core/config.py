@@ -51,10 +51,9 @@ class Config:
     segment_max_distance: int = 20
     segment_split_distance: int = 100
     search_map_tiles_per_page: int = 50
+    heatmap_cache_min_activities: int = 5
     map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
-    map_tile_attribution: str = (
-        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
-    )
+    map_tile_attribution: str = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
 
 
 # Field names that are valid for Config, used to filter out obsolete fields when loading

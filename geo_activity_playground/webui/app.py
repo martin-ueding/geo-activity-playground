@@ -36,7 +36,10 @@ from ..core.datamodel import (
     Tag,
 )
 from ..core.heart_rate import HeartRateZoneComputer
-from ..core.heatmap_cache import import_legacy_heatmap_cache_from_filesystem
+from ..core.heatmap_cache import (
+    delete_small_heatmap_cache_entries,
+    import_legacy_heatmap_cache_from_filesystem,
+)
 from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import (
     BlankImageTransform,
@@ -222,6 +225,7 @@ def create_app(
     with app.app_context():
         _migrate_null_activity_fields_to_unknown(config)
         import_legacy_heatmap_cache_from_filesystem()
+        delete_small_heatmap_cache_entries(config.heatmap_cache_min_activities)
 
     authenticator = Authenticator(config)
     tile_getter = TileGetter(config.map_tile_url)

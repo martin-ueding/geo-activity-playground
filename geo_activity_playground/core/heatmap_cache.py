@@ -46,8 +46,16 @@ def write_tile_cache(
     search_query_id: int | None,
     counts: np.ndarray,
     included_activity_ids: set[int],
+    min_activities: int,
 ) -> None:
+    num_activities = len(included_activity_ids)
     cache_entry = get_tile_cache(zoom, tile_x, tile_y, search_query_id)
+    if num_activities < min_activities:
+        if cache_entry is not None:
+            DB.session.delete(cache_entry)
+            DB.session.commit()
+        return
+
     if cache_entry is None:
         cache_entry = HeatmapTileCache()
         cache_entry.zoom = zoom
@@ -60,7 +68,7 @@ def write_tile_cache(
         DB.session.add(cache_entry)
     cache_entry.counts = counts_to_blob(counts)
     cache_entry.included_activity_ids = sorted(included_activity_ids)
-    cache_entry.num_activities = len(included_activity_ids)
+    cache_entry.num_activities = num_activities
     cache_entry.last_used = datetime.datetime.now()
     DB.session.commit()
 
@@ -156,6 +164,23 @@ def import_legacy_heatmap_cache_from_filesystem() -> int:
         heatmap_cache_dir,
     )
     return imported
+
+
+def delete_small_heatmap_cache_entries(min_activities: int) -> int:
+    result = DB.session.execute(
+        sqlalchemy.delete(HeatmapTileCache).where(
+            HeatmapTileCache.num_activities < min_activities
+        )
+    )
+    DB.session.commit()
+    dropped = int(getattr(result, "rowcount", 0) or 0)
+    if dropped:
+        logger.info(
+            "Dropped %d heatmap cache entries with less than %d activities.",
+            dropped,
+            min_activities,
+        )
+    return dropped
 
 
 def _load_legacy_included_activity_ids(path: pathlib.Path) -> list[int]:

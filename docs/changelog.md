@@ -18,6 +18,7 @@ Types of changes
 Added:
 
 - Add **favorite-search heatmap cache**: heatmap tiles can now be cached per stored search query when that query is marked as favorite, in addition to the existing global (no-search) cache. ([GH-420](https://github.com/martin-ueding/geo-activity-playground/issues/420))
+- Add configurable **heatmap cache size threshold** via `heatmap_cache_min_activities` (default: `5`): tiles are only cached when enough activities are present, and startup drops existing cache entries below the configured threshold.
 
 Changed:
 
