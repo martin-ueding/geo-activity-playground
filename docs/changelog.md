@@ -24,6 +24,10 @@ Changed:
 
 - Move **heatmap tile cache storage** from filesystem (`Cache/Heatmap`) into the database, including automatic startup import of legacy filesystem cache and cleanup of imported files after successful migration.
 
+Security:
+
+- Require login for **data export** routes when an admin password is configured, preventing anonymous metadata/activity bulk exports. ([GH-419](https://github.com/martin-ueding/geo-activity-playground/issues/419))
+
 ## Version 1.25.0 — 2026-04-04
 
 Added:
