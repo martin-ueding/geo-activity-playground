@@ -56,13 +56,21 @@ def import_from_strava_checkout(config: Config) -> None:
     with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
     header = rows[0]
+    logger.debug("Strava checkout header: %s", json.dumps(header, ensure_ascii=False))
 
     if header[0] == "Activity ID":
+        logger.debug("Detected EN Strava checkout header.")
         dayfirst = False
     elif header[0] == "Aktivitäts-ID":
+        logger.debug("Detected DE Strava checkout header, normalizing to EN columns.")
         header = normalize_header(header)
         dayfirst = True
+        logger.debug(
+            "Strava checkout header (normalized to EN columns): %s",
+            json.dumps(header, ensure_ascii=False),
+        )
     else:
+        logger.debug("Detected unknown Strava checkout header format.")
         logger.error(
             "You are trying to import a Strava checkout where the `activities.csv` contains an unexpected header format. In order to import this, we need to map these to the English ones. Unfortunately Strava often changes the number of columns. This means that the program needs to be updated to match the new Strava export format. Please go to https://github.com/martin-ueding/geo-activity-playground/issues and open a new issue and share the following output in the ticket:"
         )
