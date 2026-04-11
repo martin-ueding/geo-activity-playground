@@ -38,6 +38,7 @@ dependencies = [
     "timezonefinder>=6.5.9",
     "vegafusion>=2.0.3",
     "flask-babel>=4.0.0",
+    "waitress>=3.0.2",
 ]
 
 [project.scripts]
