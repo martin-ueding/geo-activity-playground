@@ -67,7 +67,7 @@ def main() -> None:
     subparser.add_argument(
         "--http-server",
         choices=["waitress", "werkzeug"],
-        default="waitress",
+        default="werkzeug",
         help="HTTP server implementation to use",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
