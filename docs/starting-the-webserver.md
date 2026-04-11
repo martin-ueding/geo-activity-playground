@@ -30,3 +30,9 @@ Open <http://127.0.0.1:5000> to open the website in your browser and you will se
 ## Setting host and port
 
 In case you don't like the default value of `127.0.0.1:5000`, you can use the optional command line arguments `--host` and `--port` to specify your values.
+
+## Optional: choosing the HTTP server
+
+`serve` uses `--http-server waitress` by default, which is the recommended setting for normal use.
+
+There is also `--http-server werkzeug` if you explicitly want the Werkzeug server (for example while debugging server behavior). Most users can safely ignore this option.
