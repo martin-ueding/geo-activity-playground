@@ -13,14 +13,14 @@ Should that fail with “command not found”, you need to [add local bin to pat
 The webserver will start up and give you a bit of output like this:
 
 ```
-2023-11-19 17:59:23 geo_activity_playground.importers.strava_api INFO Loading metadata file …
-2023-11-19 17:59:23 stravalib.protocol.ApiV3 INFO GET 'https://www.strava.com/api/v3/athlete/activities' with params {'before': None, 'after': 1700392964, 'page': 1, 'per_page': 200}
-2023-11-19 17:59:23 geo_activity_playground.importers.strava_api INFO Checking for missing time series data …
- * Serving Flask app 'geo_activity_playground.webui.app'
- * Debug mode: off
-2023-11-19 17:59:23 werkzeug INFO WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-2023-11-19 17:59:23 werkzeug INFO Press CTRL+C to quit
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Using database file at '/home/mu/nobackup/Testsuite/database.sqlite'.
+2026-04-11 20:34:09 alembic.runtime.migration INFO Context impl SQLiteImpl.
+2026-04-11 20:34:09 alembic.runtime.migration INFO Will assume non-transactional DDL.
+Importing activity files: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 35.74it/s]
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Importer thread is done.
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Starting Waitress server at http://127.0.0.1:5000
+2026-04-11 20:34:09 waitress INFO Serving on http://127.0.0.1:5000
+
 ```
 
 The warning about the development server is fine. We are using this only to play around, not to power a web service for other users. There might be some more messages about downloading and parsing data. The first startup will take quite some time.

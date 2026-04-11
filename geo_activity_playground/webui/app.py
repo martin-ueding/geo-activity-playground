@@ -1,6 +1,7 @@
 import atexit
 import datetime
 import importlib
+import importlib.metadata
 import json
 import logging
 import os
@@ -12,9 +13,11 @@ import threading
 import urllib.parse
 import uuid
 import warnings
+from typing import Literal
 
 import pandas as pd
 import sqlalchemy
+import waitress
 from flask import Flask, request
 from flask_alembic import Alembic
 from flask_babel import Babel
@@ -362,6 +365,7 @@ def web_ui_main(
     port: int,
     strava_begin: str | None,
     strava_end: str | None,
+    http_server: Literal["waitress", "werkzeug"] = "waitress",
 ) -> None:
     os.chdir(basedir)
 
@@ -435,7 +439,12 @@ def web_ui_main(
 
     atexit.register(cleanup)
 
-    app.run(host=host, port=port)
+    if http_server == "waitress":
+        logger.info("Starting Waitress server at http://%s:%d", host, port)
+        waitress.serve(app, host=host, port=port)
+    else:
+        logger.info("Starting Werkzeug development server at http://%s:%d", host, port)
+        app.run(host=host, port=port)
 
 
 def _try_get_version():

@@ -17,7 +17,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Utilities to work with recorded activities."
     )
-    parser.set_defaults(func=lambda options: parser.print_help())
+    parser.set_defaults(func=lambda _options: parser.print_help())
     parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
     parser.add_argument(
         "--loglevel",
@@ -32,7 +32,7 @@ def main() -> None:
     subparser = subparsers.add_parser(
         "explorer-video", help="Generate video with explorer timeline."
     )
-    subparser.set_defaults(func=lambda options: explorer_video_main())
+    subparser.set_defaults(func=lambda _options: explorer_video_main())
 
     subparser = subparsers.add_parser(
         "convert-strava-checkout",
@@ -55,6 +55,7 @@ def main() -> None:
             port=options.port,
             strava_begin=options.strava_begin,
             strava_end=options.strava_end,
+            http_server=options.http_server,
         )
     )
     subparser.add_argument(
@@ -62,6 +63,12 @@ def main() -> None:
     )
     subparser.add_argument(
         "--port", default=5000, type=int, help="the port to run listen on"
+    )
+    subparser.add_argument(
+        "--http-server",
+        choices=["waitress", "werkzeug"],
+        default="waitress",
+        help="HTTP server implementation to use",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
     subparser.add_argument(
