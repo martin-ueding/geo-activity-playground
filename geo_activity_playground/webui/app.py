@@ -441,7 +441,7 @@ def web_ui_main(
 
     if http_server == "waitress":
         logger.info("Starting Waitress server at http://%s:%d", host, port)
-        waitress.serve(app, host=host, port=port)
+        waitress.serve(app, host=host, port=port, asyncore_use_poll=True)
     else:
         logger.info("Starting Werkzeug development server at http://%s:%d", host, port)
         app.run(host=host, port=port)
