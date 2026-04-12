@@ -56,6 +56,7 @@ def main() -> None:
             strava_begin=options.strava_begin,
             strava_end=options.strava_end,
             http_server=options.http_server,
+            waitress_threads=options.waitress_threads,
         )
     )
     subparser.add_argument(
@@ -69,6 +70,12 @@ def main() -> None:
         choices=["waitress", "werkzeug"],
         default="werkzeug",
         help="HTTP server implementation to use",
+    )
+    subparser.add_argument(
+        "--waitress-threads",
+        type=int,
+        default=8,
+        help="Number of Waitress worker threads",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
     subparser.add_argument(
