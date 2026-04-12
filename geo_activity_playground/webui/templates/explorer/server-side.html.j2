@@ -40,6 +40,10 @@
                 <input id="fade-frames" type="number" class="form-control" name="fade_frames" value="12" min="0" step="1">
             </div>
             <div class="col-md-2">
+                <label for="download-workers" class="form-label">{{ _('Download workers') }}</label>
+                <input id="download-workers" type="number" class="form-control" name="download_workers" value="16" min="1" step="1">
+            </div>
+            <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">{{ _('Generate explorer MP4') }}</button>
             </div>
         </form>

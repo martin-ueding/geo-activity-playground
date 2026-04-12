@@ -2,6 +2,9 @@ import dataclasses
 import math
 import os
 import pathlib
+from collections.abc import Iterable
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -10,7 +13,7 @@ from PIL import Image, ImageEnhance
 from tqdm import tqdm
 
 from ..core.config import ConfigAccessor
-from ..core.raster_map import get_tile
+from ..core.raster_map import get_tile, osm_tile_path
 
 
 @dataclasses.dataclass
@@ -23,6 +26,7 @@ class ExplorerVideoOptions:
     output_path: pathlib.Path | None = None
     steps_per_tile: int = 12
     fade_frames: int = 12
+    download_workers: int = 16
     map_tile_url: str | None = None
 
 
@@ -68,8 +72,10 @@ def chunk_tiles(tiles: pd.DataFrame) -> list[list[tuple[int, int]]]:
     last_x, last_y = -1000, -1000
     chunks: list[list[tuple[int, int]]] = []
     chunk: list[tuple[int, int]] = []
-    for row in tiles.itertuples(index=False):
-        x, y = int(row.tile_x), int(row.tile_y)
+    for tile_x, tile_y in zip(
+        tiles["tile_x"].tolist(), tiles["tile_y"].tolist(), strict=False
+    ):
+        x, y = int(tile_x), int(tile_y)
         if abs(x - last_x) + abs(y - last_y) > 3 and len(chunk) > 0:
             chunks.append(chunk)
             chunk = []
@@ -152,6 +158,54 @@ def render_frame(
     return np.asarray(image, dtype=np.uint8)
 
 
+def visible_tiles_for_frame(
+    center_x: float, center_y: float, width: int, height: int
+) -> Iterable[tuple[int, int]]:
+    tile_pixels = 256
+    x0 = center_x + 0.5 - width / (2 * tile_pixels)
+    y0 = center_y + 0.5 - height / (2 * tile_pixels)
+    min_tile_x = math.floor(x0)
+    min_tile_y = math.floor(y0)
+    tiles_x = math.ceil(width / tile_pixels) + 2
+    tiles_y = math.ceil(height / tile_pixels) + 2
+    for i in range(tiles_x):
+        for j in range(tiles_y):
+            yield (min_tile_x + i, min_tile_y + j)
+
+
+def prefetch_tiles(
+    *,
+    zoom: int,
+    frames: list[FrameSpec],
+    width: int,
+    height: int,
+    map_tile_url: str,
+    workers: int,
+) -> None:
+    required_tiles = {
+        tile
+        for frame in frames
+        for tile in visible_tiles_for_frame(
+            frame.center_x, frame.center_y, width, height
+        )
+    }
+    missing_tiles = [
+        (x, y)
+        for x, y in required_tiles
+        if not osm_tile_path(x, y, zoom, map_tile_url).exists()
+    ]
+    if len(missing_tiles) == 0:
+        return
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [
+            executor.submit(get_tile, zoom, tile_x, tile_y, map_tile_url)
+            for tile_x, tile_y in missing_tiles
+        ]
+        for future in tqdm(futures, desc="Prefetch OSM tiles", leave=False):
+            future.result()
+
+
 def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
     import imageio.v2 as imageio
 
@@ -177,11 +231,20 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
     explored: set[tuple[int, int]] = set()
     with imageio.get_writer(output_path, fps=options.fps) as writer:
         for chunk in tqdm(chunks, desc="Explorer video chunks"):
-            for frame in iter_chunk_frames(
+            frame_specs = iter_chunk_frames(
                 chunk,
                 steps_per_tile=options.steps_per_tile,
                 fade_frames=options.fade_frames,
-            ):
+            )
+            prefetch_tiles(
+                zoom=options.zoom,
+                frames=frame_specs,
+                width=options.width,
+                height=options.height,
+                map_tile_url=map_tile_url,
+                workers=options.download_workers,
+            )
+            for frame in frame_specs:
                 explored.update(frame.new_tiles)
                 data = render_frame(
                     zoom=options.zoom,
@@ -193,7 +256,7 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
                     height=options.height,
                     map_tile_url=map_tile_url,
                 )
-                writer.append_data(data)
+                cast(Any, writer).append_data(data)
     return output_path
 
 
@@ -208,6 +271,7 @@ def explorer_video_main(options) -> None:
             output_path=options.output_path,
             steps_per_tile=options.steps_per_tile,
             fade_frames=options.fade_frames,
+            download_workers=options.download_workers,
             map_tile_url=options.map_tile_url,
         )
     )
