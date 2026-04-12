@@ -235,7 +235,9 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
 
     explored: set[tuple[int, int]] = set()
     with imageio.get_writer(output_path, fps=options.fps) as writer:
-        for chunk in tqdm(chunks, desc="Explorer video chunks"):
+        for chunk_idx, chunk in enumerate(
+            tqdm(chunks, desc="Explorer video chunks"), start=1
+        ):
             frame_specs = iter_chunk_frames(
                 chunk,
                 steps_per_tile=options.steps_per_tile,
@@ -250,19 +252,26 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
                 map_tile_url=map_tile_url,
                 workers=options.download_workers,
             )
-            for frame in frame_specs:
-                explored.update(frame.new_tiles)
-                data = render_frame(
-                    zoom=options.zoom,
-                    center_x=frame.center_x,
-                    center_y=frame.center_y,
-                    explored=explored,
-                    brightness=frame.brightness,
-                    width=options.width,
-                    height=options.height,
-                    map_tile_url=map_tile_url,
-                )
-                cast(Any, writer).append_data(data)
+            with tqdm(
+                total=None,
+                desc=f"Chunk {chunk_idx} frames",
+                unit="frame",
+                leave=False,
+            ) as chunk_progress:
+                for frame in frame_specs:
+                    explored.update(frame.new_tiles)
+                    data = render_frame(
+                        zoom=options.zoom,
+                        center_x=frame.center_x,
+                        center_y=frame.center_y,
+                        explored=explored,
+                        brightness=frame.brightness,
+                        width=options.width,
+                        height=options.height,
+                        map_tile_url=map_tile_url,
+                    )
+                    cast(Any, writer).append_data(data)
+                    chunk_progress.update()
     return output_path
 
 
