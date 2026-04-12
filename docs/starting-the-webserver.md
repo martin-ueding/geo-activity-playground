@@ -34,7 +34,7 @@ Go to Explorer and open a zoom level page. There is a **Generate explorer MP4** 
 You can also use the CLI:
 
 ```bash
-geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30
+geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30 --download-workers 16
 ```
 
 ## Setting host and port

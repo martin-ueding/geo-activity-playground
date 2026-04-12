@@ -75,6 +75,12 @@ def main() -> None:
         help="Fade-in and fade-out frames per chunk (default: %(default)s)",
     )
     subparser.add_argument(
+        "--download-workers",
+        type=int,
+        default=16,
+        help="Parallel workers for OSM tile downloads (default: %(default)s)",
+    )
+    subparser.add_argument(
         "--output-path",
         type=pathlib.Path,
         default=None,

@@ -460,6 +460,7 @@ def make_explorer_blueprint(
         fps = request.form.get("fps", type=int, default=30)
         steps_per_tile = request.form.get("steps_per_tile", type=int, default=12)
         fade_frames = request.form.get("fade_frames", type=int, default=12)
+        download_workers = request.form.get("download_workers", type=int, default=16)
 
         if video_width <= 0 or video_height <= 0 or fps <= 0:
             flash(_("Width, height and FPS must be positive."), category="danger")
@@ -472,6 +473,9 @@ def make_explorer_blueprint(
                 category="danger",
             )
             return redirect(url_for(".server_side", zoom=zoom))
+        if download_workers <= 0:
+            flash(_("Download workers must be positive."), category="danger")
+            return redirect(url_for(".server_side", zoom=zoom))
 
         try:
             output_path = generate_explorer_video(
@@ -483,6 +487,7 @@ def make_explorer_blueprint(
                     fps=fps,
                     steps_per_tile=steps_per_tile,
                     fade_frames=fade_frames,
+                    download_workers=download_workers,
                 )
             )
         except Exception as exc:
