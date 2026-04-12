@@ -18,11 +18,17 @@ def main() -> None:
         description="Utilities to work with recorded activities."
     )
     parser.set_defaults(func=lambda _options: parser.print_help())
-    parser.add_argument("--basedir", type=pathlib.Path, default=pathlib.Path.cwd())
+    parser.add_argument(
+        "--basedir",
+        type=pathlib.Path,
+        default=pathlib.Path.cwd(),
+        help="Base directory for data and configuration (default: %(default)s)",
+    )
     parser.add_argument(
         "--loglevel",
         choices=["debug", "info", "warning", "error", "critical"],
         default="info",
+        help="Log verbosity level (default: %(default)s)",
     )
 
     subparsers = parser.add_subparsers(
@@ -60,22 +66,27 @@ def main() -> None:
         )
     )
     subparser.add_argument(
-        "--host", default="127.0.0.1", help="IP address to listen on"
+        "--host",
+        default="127.0.0.1",
+        help="IP address to listen on (default: %(default)s)",
     )
     subparser.add_argument(
-        "--port", default=5000, type=int, help="the port to run listen on"
+        "--port",
+        default=5000,
+        type=int,
+        help="Port to listen on (default: %(default)s)",
     )
     subparser.add_argument(
         "--http-server",
         choices=["waitress", "werkzeug"],
         default="werkzeug",
-        help="HTTP server implementation to use",
+        help="HTTP server implementation to use (default: %(default)s)",
     )
     subparser.add_argument(
         "--waitress-threads",
         type=int,
         default=8,
-        help="Number of Waitress worker threads",
+        help="Number of Waitress worker threads (default: %(default)s)",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
     subparser.add_argument(
@@ -91,9 +102,24 @@ def main() -> None:
     subparser.add_argument("latitude", type=float)
     subparser.add_argument("longitude", type=float)
     subparser.add_argument("zoom", type=int)
-    subparser.add_argument("--decay", type=float, default=0.05)
-    subparser.add_argument("--video-width", type=int, default=1920)
-    subparser.add_argument("--video-height", type=int, default=1080)
+    subparser.add_argument(
+        "--decay",
+        type=float,
+        default=0.05,
+        help="Decay factor per frame (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-width",
+        type=int,
+        default=1920,
+        help="Output video width in pixels (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-height",
+        type=int,
+        default=1080,
+        help="Output video height in pixels (default: %(default)s)",
+    )
     subparser.set_defaults(func=main_heatmap_video)
 
     subparser = subparsers.add_parser(
