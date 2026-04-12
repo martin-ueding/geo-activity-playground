@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add **Waitress** as a faster HTTP server. Werkzeug can still be used with `--http-server werkzeug` on the command line for `serve`. ([GH-422](https://github.com/martin-ueding/geo-activity-playground/issues/422))
+- **Show default values** in the CLI `--help` message.
 
 ## Version 1.26.0 — 2026-04-05
 
