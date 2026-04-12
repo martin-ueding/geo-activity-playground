@@ -38,7 +38,54 @@ def main() -> None:
     subparser = subparsers.add_parser(
         "explorer-video", help="Generate video with explorer timeline."
     )
-    subparser.set_defaults(func=lambda _options: explorer_video_main())
+    subparser.add_argument(
+        "--zoom",
+        type=int,
+        default=14,
+        help="Explorer zoom level (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-width",
+        type=int,
+        default=1920,
+        help="Output video width in pixels (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-height",
+        type=int,
+        default=1080,
+        help="Output video height in pixels (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--fps",
+        type=int,
+        default=30,
+        help="Frames per second for output video (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--steps-per-tile",
+        type=int,
+        default=12,
+        help="Interpolation frames between consecutive tiles (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--fade-frames",
+        type=int,
+        default=12,
+        help="Fade-in and fade-out frames per chunk (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--output-path",
+        type=pathlib.Path,
+        default=None,
+        help="Optional output path for MP4 file",
+    )
+    subparser.add_argument(
+        "--map-tile-url",
+        default=None,
+        help="Optional map tile URL template override",
+    )
+    subparser.set_defaults(func=explorer_video_main)
 
     subparser = subparsers.add_parser(
         "convert-strava-checkout",

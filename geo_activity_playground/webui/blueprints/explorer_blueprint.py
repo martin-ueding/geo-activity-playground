@@ -5,6 +5,7 @@ import hashlib
 import io
 import itertools
 import logging
+import pathlib
 from collections.abc import Iterable
 from typing import Any
 
@@ -52,6 +53,7 @@ from ...explorer.tile_visits import (
     get_tile_medians,
     get_tile_visits,
 )
+from ...explorer.video import ExplorerVideoOptions, generate_explorer_video
 from ..authenticator import Authenticator, needs_authentication
 
 alt.data_transformers.enable("vegafusion")
@@ -449,6 +451,52 @@ def make_explorer_blueprint(
             "selected_history_event_index": selected_history_event_index,
         }
         return render_template("explorer/server-side.html.j2", **context)
+
+    @blueprint.post("/<int:zoom>/video")
+    @needs_authentication(authenticator)
+    def generate_video(zoom: int) -> ResponseReturnValue:
+        video_width = request.form.get("video_width", type=int, default=1920)
+        video_height = request.form.get("video_height", type=int, default=1080)
+        fps = request.form.get("fps", type=int, default=30)
+        steps_per_tile = request.form.get("steps_per_tile", type=int, default=12)
+        fade_frames = request.form.get("fade_frames", type=int, default=12)
+
+        if video_width <= 0 or video_height <= 0 or fps <= 0:
+            flash(_("Width, height and FPS must be positive."), category="danger")
+            return redirect(url_for(".server_side", zoom=zoom))
+        if steps_per_tile <= 0 or fade_frames < 0:
+            flash(
+                _(
+                    "Steps per tile must be positive and fade frames must be non-negative."
+                ),
+                category="danger",
+            )
+            return redirect(url_for(".server_side", zoom=zoom))
+
+        try:
+            output_path = generate_explorer_video(
+                ExplorerVideoOptions(
+                    basedir=pathlib.Path.cwd(),
+                    zoom=zoom,
+                    width=video_width,
+                    height=video_height,
+                    fps=fps,
+                    steps_per_tile=steps_per_tile,
+                    fade_frames=fade_frames,
+                )
+            )
+        except Exception as exc:
+            logger.exception("Failed to generate explorer video")
+            flash(
+                _("Could not generate explorer video: %(error)s", error=str(exc)),
+                category="danger",
+            )
+        else:
+            flash(
+                _("Explorer video written to %(path)s", path=str(output_path)),
+                category="success",
+            )
+        return redirect(url_for(".server_side", zoom=zoom))
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:

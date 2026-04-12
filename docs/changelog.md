@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add **Waitress** as a faster HTTP server. Werkzeug can still be used with `--http-server werkzeug` on the command line for `serve`. ([GH-422](https://github.com/martin-ueding/geo-activity-playground/issues/422))
+- Revive **explorer video export** as MP4: the `explorer-video` CLI now renders from SQLite tile history, and the Explorer page offers a direct “Generate explorer MP4” action.
 - **Show default values** in the CLI `--help` message.
 
 ## Version 1.26.0 — 2026-04-05
