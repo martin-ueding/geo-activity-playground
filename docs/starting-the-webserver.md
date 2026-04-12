@@ -27,6 +27,16 @@ The warning about the development server is fine. We are using this only to play
 
 Open <http://127.0.0.1:5000> to open the website in your browser and you will see the user interface.
 
+## Explorer video export
+
+Go to Explorer and open a zoom level page. There is a **Generate explorer MP4** form where you can configure width, height, FPS, interpolation, and fade and then start rendering.
+
+You can also use the CLI:
+
+```bash
+geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30
+```
+
 ## Setting host and port
 
 In case you don't like the default value of `127.0.0.1:5000`, you can use the optional command line arguments `--host` and `--port` to specify your values.
