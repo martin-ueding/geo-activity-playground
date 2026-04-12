@@ -133,7 +133,7 @@ def get_sensible_zoom_level(
 def get_tile(zoom: int, x: int, y: int, url_template: str) -> Image.Image:
     destination = osm_tile_path(x, y, zoom, url_template)
     if not destination.exists():
-        logger.info(f"Downloading OSM tile {x=}, {y=}, {zoom=} …")
+        logger.debug(f"Downloading OSM tile {x=}, {y=}, {zoom=} …")
         url = url_template.format(x=x, y=y, zoom=zoom)
         download_file(url, destination)
     with Image.open(destination) as image:
