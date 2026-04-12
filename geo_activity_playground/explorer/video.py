@@ -26,6 +26,7 @@ class ExplorerVideoOptions:
     output_path: pathlib.Path | None = None
     steps_per_tile: int = 12
     fade_frames: int = 12
+    pause_frames: int = 12
     download_workers: int = 16
     map_tile_url: str | None = None
 
@@ -91,6 +92,7 @@ def iter_chunk_frames(
     *,
     steps_per_tile: int,
     fade_frames: int,
+    pause_frames: int,
 ) -> list[FrameSpec]:
     frames: list[FrameSpec] = []
     if len(chunk) == 0:
@@ -113,6 +115,9 @@ def iter_chunk_frames(
             frames.append(FrameSpec(center_x, center_y, 1.0, new_tiles=new_tiles))
         prev_x, prev_y = tile_x, tile_y
 
+    if pause_frames > 0:
+        for _ in range(pause_frames):
+            frames.append(FrameSpec(prev_x, prev_y, 1.0))
     if fade_frames > 0:
         for brightness in np.linspace(1.0, 0.0, fade_frames):
             frames.append(FrameSpec(prev_x, prev_y, float(brightness)))
@@ -235,6 +240,7 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
                 chunk,
                 steps_per_tile=options.steps_per_tile,
                 fade_frames=options.fade_frames,
+                pause_frames=options.pause_frames,
             )
             prefetch_tiles(
                 zoom=options.zoom,
@@ -271,6 +277,7 @@ def explorer_video_main(options) -> None:
             output_path=options.output_path,
             steps_per_tile=options.steps_per_tile,
             fade_frames=options.fade_frames,
+            pause_frames=options.pause_frames,
             download_workers=options.download_workers,
             map_tile_url=options.map_tile_url,
         )
