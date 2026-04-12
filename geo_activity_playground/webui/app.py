@@ -366,6 +366,7 @@ def web_ui_main(
     strava_begin: str | None,
     strava_end: str | None,
     http_server: Literal["waitress", "werkzeug"] = "waitress",
+    waitress_threads: int = 8,
 ) -> None:
     os.chdir(basedir)
 
@@ -440,8 +441,19 @@ def web_ui_main(
     atexit.register(cleanup)
 
     if http_server == "waitress":
-        logger.info("Starting Waitress server at http://%s:%d", host, port)
-        waitress.serve(app, host=host, port=port, asyncore_use_poll=True)
+        logger.info(
+            "Starting Waitress server at http://%s:%d with %d threads",
+            host,
+            port,
+            waitress_threads,
+        )
+        waitress.serve(
+            app,
+            host=host,
+            port=port,
+            asyncore_use_poll=True,
+            threads=waitress_threads,
+        )
     else:
         logger.info("Starting Werkzeug development server at http://%s:%d", host, port)
         app.run(host=host, port=port)
