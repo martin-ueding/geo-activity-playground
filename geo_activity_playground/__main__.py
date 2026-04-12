@@ -75,6 +75,12 @@ def main() -> None:
         help="Fade-in and fade-out frames per chunk (default: %(default)s)",
     )
     subparser.add_argument(
+        "--pause-frames",
+        type=int,
+        default=12,
+        help="Hold frames before fade-out per chunk (default: %(default)s)",
+    )
+    subparser.add_argument(
         "--download-workers",
         type=int,
         default=16,
