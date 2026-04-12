@@ -79,7 +79,7 @@ def main() -> None:
     subparser.add_argument(
         "--http-server",
         choices=["waitress", "werkzeug"],
-        default="werkzeug",
+        default="waitress",
         help="HTTP server implementation to use (default: %(default)s)",
     )
     subparser.add_argument(
