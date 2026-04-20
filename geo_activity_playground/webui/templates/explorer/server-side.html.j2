@@ -17,7 +17,7 @@
             {{ square_size }}².
         </p>
         <p>{{ _('Open the') }} <a
-                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">{{ _('Square Planner') }}</a> {{ _('to plan the next extension.') }}</p>
+                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) if square_x is not none and square_y is not none and square_size > 0 else url_for('square_planner.landing', zoom=zoom) }}">{{ _('Square Planner') }}</a> {{ _('to plan the next extension.') }}</p>
         <p>{{ _('Video export is available on the dedicated') }} <a href="{{ url_for('.video', zoom=zoom) }}">{{ _('Explorer Video Export page') }}</a>.</p>
     </div>
 </div>

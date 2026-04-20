@@ -36,6 +36,7 @@ Fixed:
 - Respect EXIF GPS hemisphere refs (`GPSLatitudeRef`, `GPSLongitudeRef`) when importing photos so coordinates west of Greenwich or south of the equator keep the correct negative sign. ([GH-427](https://github.com/martin-ueding/geo-activity-playground/issues/427))
 - Prefer non-missing timestamps when collapsing per-activity Explorer tile visits, preventing **First Visit** coloring regressions when routes include tiles with missing time data. ([GH-428](https://github.com/martin-ueding/geo-activity-playground/issues/428))
 - Skip **segment matching** for activities without a start timestamp so untimed routes are no longer checked against user-defined segments. ([GH-426](https://github.com/martin-ueding/geo-activity-playground/issues/426))
+- Fix **Explorer Square Planner link crash** when no square could be computed yet by falling back to the Square Planner landing route and defaulting missing square coordinates there.
 
 ## Version 1.26.0 — 2026-04-05
 

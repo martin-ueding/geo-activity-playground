@@ -20,13 +20,18 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
     @blueprint.route("/<int:zoom>")
     def landing(zoom: int):
         explored = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        square_x, square_y = explored.square_x, explored.square_y
+        square_size = explored.max_square_size
+        if square_x is None or square_y is None or square_size <= 0:
+            square_x, square_y = get_tile_medians(zoom)
+            square_size = 1
         return redirect(
             url_for(
                 "square_planner.index",
                 zoom=zoom,
-                x=explored.square_x,
-                y=explored.square_y,
-                size=explored.max_square_size,
+                x=square_x,
+                y=square_y,
+                size=square_size,
             )
         )
 
