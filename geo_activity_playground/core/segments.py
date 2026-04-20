@@ -173,6 +173,9 @@ def rematch_segment(
 def try_match_segment_activity(
     segment: Segment, activity: Activity, config: Config
 ) -> None:
+    if activity.start is None:
+        return
+
     checks = DB.session.scalars(
         sqlalchemy.select(SegmentCheck).where(
             SegmentCheck.segment == segment, SegmentCheck.activity == activity
