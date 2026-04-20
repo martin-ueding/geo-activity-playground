@@ -249,3 +249,48 @@ def test_wrap_uses_cluster_activation_time_for_new_cluster_tiles(client, app):
     )
     assert month_match is not None
     assert month_match.group(1) == "1"
+
+
+def test_wrap_month_uses_activity_local_timezone_for_new_tiles(client, app):
+    with app.app_context():
+        kind = Kind(name="Ride")
+        equipment = Equipment(name="Bike")
+        DB.session.add_all([kind, equipment])
+        DB.session.flush()
+        DB.session.add(
+            Activity(
+                id=1,
+                name="Midnight Ride",
+                start=dt.datetime(2025, 12, 31, 23, 30, 0),
+                iana_timezone="Europe/Berlin",
+                distance_km=10.0,
+                elevation_gain=100.0,
+                moving_time=dt.timedelta(minutes=30),
+                elapsed_time=dt.timedelta(minutes=30),
+                kind_id=kind.id,
+                equipment_id=equipment.id,
+            )
+        )
+        DB.session.add(
+            TileVisit(
+                zoom=14,
+                tile_x=0,
+                tile_y=0,
+                first_activity_id=1,
+                first_time=dt.datetime(2025, 12, 31, 23, 30, 0),
+                last_activity_id=1,
+                last_time=dt.datetime(2025, 12, 31, 23, 30, 0),
+                visit_count=1,
+            )
+        )
+        DB.session.commit()
+
+    response = client.get("/calendar/wrap/2026/1")
+    assert response.status_code == 200
+    html = response.data.decode()
+    match = re.search(
+        r"New Tiles \(z14\)</div>\s*<div class=\"display-6 fw-semibold\">(\d+)</div>",
+        html,
+    )
+    assert match is not None
+    assert match.group(1) == "1"

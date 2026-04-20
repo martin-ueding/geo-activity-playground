@@ -1,6 +1,7 @@
 import calendar
 import collections
 import datetime
+import zoneinfo
 
 import altair as alt
 import pandas as pd
@@ -35,23 +36,73 @@ def _meta_with_local_start(repository: ActivityRepository) -> pd.DataFrame:
     return meta.loc[~pd.isna(meta["start_local"])].copy()
 
 
+def _local_ymd_from_utc(
+    event_time: datetime.datetime | pd.Timestamp | None,
+    activity_start: datetime.datetime | pd.Timestamp | None,
+    iana_timezone: str | None,
+) -> tuple[int | None, int | None, int | None]:
+    if event_time is None or pd.isna(event_time):
+        if activity_start is None or pd.isna(activity_start):
+            return None, None, None
+        timestamp = pd.Timestamp(activity_start)
+    else:
+        timestamp = pd.Timestamp(event_time)
+    if timestamp.tz is None:
+        timestamp = timestamp.tz_localize(zoneinfo.ZoneInfo("UTC"))
+
+    timezone_name = "UTC" if iana_timezone is None else iana_timezone
+    try:
+        timezone = zoneinfo.ZoneInfo(timezone_name)
+    except zoneinfo.ZoneInfoNotFoundError:
+        timezone = zoneinfo.ZoneInfo("UTC")
+    local = timestamp.tz_convert(timezone)
+    return int(local.year), int(local.month), int(local.day)
+
+
 def _tile_first_visits(zoom: int) -> pd.DataFrame:
     rows = DB.session.execute(
         sqlalchemy.select(
-            TileVisit.first_time, TileVisit.tile_x, TileVisit.tile_y
-        ).where(TileVisit.zoom == zoom)
+            TileVisit.first_time,
+            TileVisit.tile_x,
+            TileVisit.tile_y,
+            Activity.start.label("activity_start"),
+            Activity.iana_timezone,
+        )
+        .where(TileVisit.zoom == zoom)
+        .join(Activity, Activity.id == TileVisit.first_activity_id)
     ).all()
-    frame = pd.DataFrame(rows, columns=["first_time", "tile_x", "tile_y"])
+    frame = pd.DataFrame(
+        rows,
+        columns=["first_time", "tile_x", "tile_y", "activity_start", "iana_timezone"],
+    )
     if len(frame) == 0:
         frame["year"] = pd.Series(dtype="int64")
         frame["month"] = pd.Series(dtype="int64")
         frame["day"] = pd.Series(dtype="int64")
         return frame
     frame["first_time"] = pd.to_datetime(frame["first_time"])
-    frame = frame.loc[~pd.isna(frame["first_time"])].copy()
-    frame["year"] = frame["first_time"].dt.year
-    frame["month"] = frame["first_time"].dt.month
-    frame["day"] = frame["first_time"].dt.day
+    frame["activity_start"] = pd.to_datetime(frame["activity_start"])
+    local_dates = [
+        _local_ymd_from_utc(
+            event_time,
+            activity_start,
+            None if pd.isna(iana_timezone) else str(iana_timezone),
+        )
+        for event_time, activity_start, iana_timezone in zip(
+            frame["first_time"],
+            frame["activity_start"],
+            frame["iana_timezone"],
+        )
+    ]
+    frame["year"] = [year for year, _, _ in local_dates]
+    frame["month"] = [month for _, month, _ in local_dates]
+    frame["day"] = [day for _, _, day in local_dates]
+    frame = frame.loc[
+        ~pd.isna(frame["year"]) & ~pd.isna(frame["month"]) & ~pd.isna(frame["day"])
+    ].copy()
+    frame["year"] = frame["year"].astype("int64")
+    frame["month"] = frame["month"].astype("int64")
+    frame["day"] = frame["day"].astype("int64")
     return frame
 
 
@@ -63,10 +114,44 @@ def _cluster_tile_activations(zoom: int) -> pd.DataFrame:
         frame["day"] = pd.Series(dtype="int64")
         return frame
     frame["time"] = pd.to_datetime(frame["time"])
-    frame = frame.loc[~pd.isna(frame["time"])].copy()
-    frame["year"] = frame["time"].dt.year
-    frame["month"] = frame["time"].dt.month
-    frame["day"] = frame["time"].dt.day
+    activity_ids = [
+        int(activity_id)
+        for activity_id in frame["activity_id"].dropna().unique()
+        if pd.notna(activity_id)
+    ]
+    activity_rows = DB.session.execute(
+        sqlalchemy.select(Activity.id, Activity.start, Activity.iana_timezone).where(
+            Activity.id.in_(activity_ids)
+        )
+    ).all()
+    activity_meta = {
+        int(activity_id): (start, iana_timezone)
+        for activity_id, start, iana_timezone in activity_rows
+    }
+    local_dates = []
+    for event_time, activity_id in zip(frame["time"], frame["activity_id"]):
+        if pd.isna(activity_id):
+            start, iana_timezone = None, None
+        else:
+            start, iana_timezone = activity_meta.get(int(activity_id), (None, None))
+        local_dates.append(
+            _local_ymd_from_utc(
+                event_time,
+                start,
+                None
+                if iana_timezone is None or pd.isna(iana_timezone)
+                else str(iana_timezone),
+            )
+        )
+    frame["year"] = [year for year, _, _ in local_dates]
+    frame["month"] = [month for _, month, _ in local_dates]
+    frame["day"] = [day for _, _, day in local_dates]
+    frame = frame.loc[
+        ~pd.isna(frame["year"]) & ~pd.isna(frame["month"]) & ~pd.isna(frame["day"])
+    ].copy()
+    frame["year"] = frame["year"].astype("int64")
+    frame["month"] = frame["month"].astype("int64")
+    frame["day"] = frame["day"].astype("int64")
     return frame
 
 
