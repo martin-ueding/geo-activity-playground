@@ -38,6 +38,7 @@ Fixed:
 - Prefer non-missing timestamps when collapsing per-activity Explorer tile visits, preventing **First Visit** coloring regressions when routes include tiles with missing time data. ([GH-428](https://github.com/martin-ueding/geo-activity-playground/issues/428))
 - Skip **segment matching** for activities without a start timestamp so untimed routes are no longer checked against user-defined segments. ([GH-426](https://github.com/martin-ueding/geo-activity-playground/issues/426))
 - Fix **Explorer Square Planner link crash** when no square could be computed yet by falling back to the Square Planner landing route and defaulting missing square coordinates there.
+- Keep **day view tables and share pictures** usable on narrow screens by hiding low-priority table columns on small breakpoints and forcing share picture previews to stay within the viewport width. ([GH-226](https://github.com/martin-ueding/geo-activity-playground/issues/226))
 
 ## Version 1.26.0 — 2026-04-05
 

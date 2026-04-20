@@ -414,7 +414,7 @@
 
 <h2>{{ _('Share picture') }}</h2>
 
-<p><img class="img-fluid" src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
+<p><img class="img-fluid sharepic-preview" src="{{ url_for('.sharepic', id=activity.id) }}" /></p>
 
 <p>{{ _('Not happy with the displayed data?') }} <a href="{{ url_for('settings.sharepic') }}">{{ _('Change share picture settings') }}</a>.</p>
 

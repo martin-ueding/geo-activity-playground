@@ -6,3 +6,9 @@
 .navbar .dropdown-menu {
     z-index: 1031;
 }
+
+.sharepic-preview {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}

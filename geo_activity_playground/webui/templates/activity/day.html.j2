@@ -36,36 +36,37 @@
                 <thead>
                     <tr>
                         <th>{{ _('Name') }}</th>
-                        <th>{{ _('Date') }}</th>
+                        <th class="d-none d-md-table-cell">{{ _('Date') }}</th>
                         <th>{{ _('Distance / km') }}</th>
                         <th>{{ _('Elapsed time') }}</th>
                         <th>{{ _('Speed / km/h') }}</th>
-                        <th>{{ _('Equipment') }}</th>
-                        <th>{{ _('Kind') }}</th>
+                        <th class="d-none d-lg-table-cell">{{ _('Equipment') }}</th>
+                        <th class="d-none d-lg-table-cell">{{ _('Kind') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for activity in activities %}
                     <tr>
-                        <td><span style="color: {{ activity['color'] }};">█</span> <a
+                        <td class="text-break"><span style="color: {{ activity['color'] }};">█</span> <a
                                 href="{{ url_for('activity.show', id=activity.id) }}">{{
                                 activity.name }}</a></td>
-                        <td>{{ activity.start_local|dt }}</td>
+                        <td class="d-none d-md-table-cell">{{ activity.start_local|dt }}</td>
                         <td>{{ activity.distance_km | round(1) }}</td>
                         <td>{{ activity.elapsed_time|td }}</td>
                         <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
-                        <td>{{ activity["equipment"] }}</td>
-                        <td>{{ activity["kind"] }}</td>
+                        <td class="d-none d-lg-table-cell">{{ activity["equipment"] }}</td>
+                        <td class="d-none d-lg-table-cell">{{ activity["kind"] }}</td>
                     </tr>
                     {% endfor %}
                     {% if activities|length > 1 %}
                     <tr>
                         <td><b>{{ _('Total') }}</b></td>
-                        <td></td>
+                        <td class="d-none d-md-table-cell"></td>
                         <td><b>{{ total_distance | round(1) }}</b></td>
                         <td><b>{{ total_elapsed_time|td }}</b></td>
                         <td></td>
-                        <td></td>
+                        <td class="d-none d-lg-table-cell"></td>
+                        <td class="d-none d-lg-table-cell"></td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -76,6 +77,6 @@
 
 <h2>{{ _('Share picture') }}</h2>
 
-<p><img class="img-fluid" src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
+<p><img class="img-fluid sharepic-preview" src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
 
 {% endblock %}
