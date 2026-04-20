@@ -33,6 +33,7 @@ Fixed:
 - Round **sharepic elapsed time** to whole seconds so generated share images no longer show microsecond precision. ([GH-429](https://github.com/martin-ueding/geo-activity-playground/issues/429))
 - Remove duplicate **Date** response headers when running behind Waitress so reverse proxies like nginx no longer log "upstream sent duplicate header line" warnings for static assets. ([GH-424](https://github.com/martin-ueding/geo-activity-playground/issues/424))
 - Respect EXIF GPS hemisphere refs (`GPSLatitudeRef`, `GPSLongitudeRef`) when importing photos so coordinates west of Greenwich or south of the equator keep the correct negative sign. ([GH-427](https://github.com/martin-ueding/geo-activity-playground/issues/427))
+- Prefer non-missing timestamps when collapsing per-activity Explorer tile visits, preventing **First Visit** coloring regressions when routes include tiles with missing time data. ([GH-428](https://github.com/martin-ueding/geo-activity-playground/issues/428))
 
 ## Version 1.26.0 — 2026-04-05
 

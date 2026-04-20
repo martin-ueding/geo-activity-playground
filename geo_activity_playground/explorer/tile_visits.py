@@ -536,7 +536,21 @@ def _process_activity(
     )
     for zoom in reversed(range(20)):
         activities_per_tile = tile_state["activities_per_tile"][zoom]
-        activity_tiles = activity_tiles.groupby(["tile_x", "tile_y"]).head(1)
+        # Keep one row per tile while preferring entries with real timestamps.
+        # This avoids freezing a tile's first/last time at NaT when the same
+        # activity has a later point on the same tile with valid time data.
+        activity_tiles = (
+            activity_tiles.assign(
+                _time_missing=activity_tiles["time"].isna(),
+            )
+            .sort_values(
+                ["tile_x", "tile_y", "_time_missing", "time"],
+                kind="stable",
+            )
+            .groupby(["tile_x", "tile_y"], sort=False)
+            .head(1)
+            .drop(columns="_time_missing")
+        )
         tiles = list(zip(activity_tiles["tile_x"], activity_tiles["tile_y"]))
         existing_by_tile: dict[tuple[int, int], TileVisit] = {}
         for i in range(0, len(tiles), 400):
@@ -558,7 +572,8 @@ def _process_activity(
             if activity.kind.consider_for_achievements:
                 if time is not None and time.tz is None:
                     time = time.tz_localize("UTC")
-                db_time = time.to_pydatetime() if pd.notna(time) else None
+                has_time = pd.notna(time)
+                db_time = time.to_pydatetime() if has_time else None
                 existing = existing_by_tile.get(tile)
                 if existing is None:
                     existing_by_tile[tile] = TileVisit(
@@ -589,12 +604,13 @@ def _process_activity(
                     if last_time is not None and last_time.tz is None:
                         last_time = last_time.tz_localize("UTC")
                     try:
-                        if first_time is None or time < first_time:
-                            existing.first_activity_id = activity_id
-                            existing.first_time = db_time
-                        if last_time is None or time > last_time:
-                            existing.last_activity_id = activity_id
-                            existing.last_time = db_time
+                        if has_time:
+                            if first_time is None or time < first_time:
+                                existing.first_activity_id = activity_id
+                                existing.first_time = db_time
+                            if last_time is None or time > last_time:
+                                existing.last_activity_id = activity_id
+                                existing.last_time = db_time
                     except TypeError as e:
                         raise TypeError(
                             f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"

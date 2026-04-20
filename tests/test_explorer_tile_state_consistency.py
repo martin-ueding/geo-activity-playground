@@ -180,6 +180,49 @@ def test_tiles_from_points_localizes_naive_time_series() -> None:
     assert rows[0][0].tzinfo is not None
 
 
+def test_process_activity_prefers_non_missing_time_for_same_tile(app) -> None:
+    with app.app_context():
+        DB.session.add(Activity(id=1, name="Mixed Time Activity"))
+        DB.session.commit()
+
+        class Repository:
+            def __init__(self) -> None:
+                self.activity = SimpleNamespace(
+                    id=1,
+                    kind=SimpleNamespace(consider_for_achievements=True),
+                )
+                self.series = pd.DataFrame(
+                    {
+                        "time": [pd.NaT, pd.Timestamp("2024-01-01T10:00:00Z")],
+                        "x": [0.25, 0.25],
+                        "y": [0.25, 0.25],
+                        "segment_id": [0, 0],
+                    }
+                )
+
+            def get_activity_by_id(self, activity_id: int):
+                assert activity_id == 1
+                return self.activity
+
+            def get_time_series(self, activity_id: int) -> pd.DataFrame:
+                assert activity_id == 1
+                return self.series
+
+        state = make_tile_state()
+        _process_activity(Repository(), state, 1)
+
+        visit = DB.session.scalar(
+            sa.select(TileVisit).where(
+                TileVisit.zoom == 14,
+                TileVisit.tile_x == 4096,
+                TileVisit.tile_y == 4096,
+            )
+        )
+        assert visit is not None
+        assert visit.first_time is not None
+        assert visit.last_time is not None
+
+
 def test_cluster_evolution_only_records_new_max_values() -> None:
     first_pair = [
         (-1, 0),
