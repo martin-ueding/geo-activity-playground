@@ -80,6 +80,30 @@ def test_get_tile_visits_uses_db_only(app) -> None:
         assert visits[(3, 4)]["visit_count"] == 1
 
 
+def test_get_tile_visits_falls_back_to_activity_start_when_time_missing(app) -> None:
+    with app.app_context():
+        activity = Activity(id=1, name="Ride", start=dt.datetime(2026, 1, 1, 10, 0, 0))
+        DB.session.add(activity)
+        DB.session.add(
+            TileVisit(
+                zoom=14,
+                tile_x=8,
+                tile_y=9,
+                first_activity_id=1,
+                first_time=None,
+                last_activity_id=1,
+                last_time=None,
+                visit_count=1,
+            )
+        )
+        DB.session.commit()
+
+        invalidate_tile_visits_cache()
+        visits = get_tile_visits(14)
+        assert visits[(8, 9)]["first_time"] == pd.Timestamp("2026-01-01T10:00:00")
+        assert visits[(8, 9)]["last_time"] == pd.Timestamp("2026-01-01T10:00:00")
+
+
 def test_remove_activity_from_tile_state_removes_all_references() -> None:
     tile_state = make_tile_state()
     tile_state["activities_per_tile"][17][(1, 2)] = {1, 2}
@@ -221,6 +245,80 @@ def test_process_activity_prefers_non_missing_time_for_same_tile(app) -> None:
         assert visit is not None
         assert visit.first_time is not None
         assert visit.last_time is not None
+
+
+def test_process_activity_uses_activity_start_when_track_times_missing(app) -> None:
+    with app.app_context():
+        DB.session.add_all(
+            [
+                Activity(
+                    id=1, name="No Track Times", start=dt.datetime(2024, 1, 1, 9, 0, 0)
+                ),
+                Activity(
+                    id=2, name="Later Visit", start=dt.datetime(2024, 1, 2, 9, 0, 0)
+                ),
+            ]
+        )
+        DB.session.commit()
+
+        class Repository:
+            def __init__(self) -> None:
+                self.activities = {
+                    1: SimpleNamespace(
+                        id=1,
+                        start=dt.datetime(2024, 1, 1, 9, 0, 0),
+                        start_utc=dt.datetime(2024, 1, 1, 9, 0, 0, tzinfo=dt.UTC),
+                        kind=SimpleNamespace(consider_for_achievements=True),
+                    ),
+                    2: SimpleNamespace(
+                        id=2,
+                        start=dt.datetime(2024, 1, 2, 9, 0, 0),
+                        start_utc=dt.datetime(2024, 1, 2, 9, 0, 0, tzinfo=dt.UTC),
+                        kind=SimpleNamespace(consider_for_achievements=True),
+                    ),
+                }
+                self.series = {
+                    1: pd.DataFrame(
+                        {
+                            "time": [pd.NaT],
+                            "x": [0.25],
+                            "y": [0.25],
+                            "segment_id": [0],
+                        }
+                    ),
+                    2: pd.DataFrame(
+                        {
+                            "time": [pd.Timestamp("2024-01-02T09:00:00Z")],
+                            "x": [0.25],
+                            "y": [0.25],
+                            "segment_id": [0],
+                        }
+                    ),
+                }
+
+            def get_activity_by_id(self, activity_id: int):
+                return self.activities[activity_id]
+
+            def get_time_series(self, activity_id: int) -> pd.DataFrame:
+                return self.series[activity_id]
+
+        repository = Repository()
+        state = make_tile_state()
+        _process_activity(repository, state, 1)
+        _process_activity(repository, state, 2)
+
+        visit = DB.session.scalar(
+            sa.select(TileVisit).where(
+                TileVisit.zoom == 14,
+                TileVisit.tile_x == 4096,
+                TileVisit.tile_y == 4096,
+            )
+        )
+        assert visit is not None
+        assert visit.first_activity_id == 1
+        assert visit.first_time == dt.datetime(2024, 1, 1, 9, 0, 0)
+        assert visit.last_activity_id == 2
+        assert visit.last_time == dt.datetime(2024, 1, 2, 9, 0, 0)
 
 
 def test_cluster_evolution_only_records_new_max_values() -> None:

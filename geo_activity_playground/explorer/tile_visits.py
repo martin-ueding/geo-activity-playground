@@ -18,6 +18,7 @@ from ..core.activities import ActivityRepository
 from ..core.config import Config
 from ..core.datamodel import (
     DB,
+    Activity,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
     TileVisit,
@@ -380,6 +381,38 @@ def _consistency_check(
             logger.info(f"Activity {last_activity_id} have been deleted.")
             return False
 
+    missing_first_time_with_known_start = (
+        DB.session.query(TileVisit.id)
+        .join(Activity, TileVisit.first_activity_id == Activity.id)
+        .filter(
+            TileVisit.first_time.is_(None),
+            Activity.start.is_not(None),
+        )
+        .limit(1)
+        .first()
+    )
+    if missing_first_time_with_known_start is not None:
+        logger.info(
+            "Detected tile visits with NULL first_time despite first activity start time."
+        )
+        return False
+
+    missing_last_time_with_known_start = (
+        DB.session.query(TileVisit.id)
+        .join(Activity, TileVisit.last_activity_id == Activity.id)
+        .filter(
+            TileVisit.last_time.is_(None),
+            Activity.start.is_not(None),
+        )
+        .limit(1)
+        .first()
+    )
+    if missing_last_time_with_known_start is not None:
+        logger.info(
+            "Detected tile visits with NULL last_time despite last activity start time."
+        )
+        return False
+
     return True
 
 
@@ -530,6 +563,7 @@ def _process_activity(
 ) -> None:
     activity = repository.get_activity_by_id(activity_id)
     time_series = repository.get_time_series(activity_id)
+    fallback_time = _fallback_timestamp_for_activity(activity)
 
     activity_tiles = pd.DataFrame(
         _tiles_from_points(time_series, 19), columns=["time", "tile_x", "tile_y"]
@@ -570,6 +604,8 @@ def _process_activity(
             tiles,
         ):
             if activity.kind.consider_for_achievements:
+                if pd.isna(time) and fallback_time is not None:
+                    time = fallback_time
                 if time is not None and time.tz is None:
                     time = time.tz_localize("UTC")
                 has_time = pd.notna(time)
@@ -625,6 +661,21 @@ def _process_activity(
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
         activity_tiles["tile_y"] //= 2
+
+
+def _fallback_timestamp_for_activity(activity: object) -> pd.Timestamp | None:
+    start_utc = getattr(activity, "start_utc", None)
+    if start_utc is None:
+        start_utc = getattr(activity, "start", None)
+    if start_utc is None:
+        return None
+
+    timestamp = pd.Timestamp(start_utc)
+    if pd.isna(timestamp):
+        return None
+    if timestamp.tz is None:
+        timestamp = timestamp.tz_localize("UTC")
+    return timestamp
 
 
 def _tiles_from_points(
@@ -939,16 +990,27 @@ def _compute_cluster_evolution(
 @functools.lru_cache(maxsize=64)
 def get_tile_visits(zoom: int) -> dict[tuple[int, int], TileInfo]:
     visits = DB.session.scalars(
-        sa.select(TileVisit).where(TileVisit.zoom == zoom)
+        sa.select(TileVisit)
+        .where(TileVisit.zoom == zoom)
+        .options(
+            sa.orm.joinedload(TileVisit.first_activity),
+            sa.orm.joinedload(TileVisit.last_activity),
+        )
     ).all()
     return {
         (visit.tile_x, visit.tile_y): {
             "visit_count": visit.visit_count,
             "first_time": (
-                pd.Timestamp(visit.first_time) if visit.first_time else pd.NaT
+                pd.Timestamp(visit.first_time or visit.first_activity.start)
+                if (visit.first_time or visit.first_activity.start)
+                else pd.NaT
             ),
             "first_id": visit.first_activity_id,
-            "last_time": pd.Timestamp(visit.last_time) if visit.last_time else pd.NaT,
+            "last_time": (
+                pd.Timestamp(visit.last_time or visit.last_activity.start)
+                if (visit.last_time or visit.last_activity.start)
+                else pd.NaT
+            ),
             "last_id": visit.last_activity_id,
         }
         for visit in visits
