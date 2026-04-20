@@ -21,11 +21,7 @@ from ..core.paths import (
     strava_last_activity_date_path,
 )
 from ..core.tasks import get_state, set_state
-from ..explorer.tile_visits import (
-    TileVisitAccessor,
-    compute_tile_evolution,
-    compute_tile_visits_new,
-)
+from ..explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
 
@@ -256,9 +252,6 @@ def try_import_strava(
 
                 update_and_commit(activity, time_series, config)
                 logger.info(f"Added activity '{activity.name}' from Strava.")
-                compute_tile_visits_new(repository, tile_visit_accessor)
-                compute_tile_evolution(tile_visit_accessor.tile_state, config)
-                tile_visit_accessor.save()
 
             if strava_begin is None and strava_end is None:
                 set_state(
