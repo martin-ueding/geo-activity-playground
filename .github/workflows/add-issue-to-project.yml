@@ -1,0 +1,75 @@
+name: Add incoming issue to project
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      repository-projects: write
+
+    steps:
+      - name: Add issue to GAP Kanban
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const PROJECT_ID = 'PVT_kwHOAA7oHM4A9xal';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issueNumber = context.issue.number;
+
+            const issueData = await github.graphql(
+              `
+              query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issueNumber) {
+                    id
+                    projectItems(first: 20) {
+                      nodes {
+                        id
+                        project {
+                          id
+                          title
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              `,
+              { owner, repo, issueNumber },
+            );
+
+            const issue = issueData.repository?.issue;
+            if (!issue) {
+              core.setFailed(`Could not load issue #${issueNumber}.`);
+              return;
+            }
+
+            const existingItem = (issue.projectItems?.nodes ?? []).find(
+              (item) => item?.project?.id === PROJECT_ID,
+            );
+            if (existingItem) {
+              core.info(`Issue #${issueNumber} is already in project "${existingItem.project.title}".`);
+              return;
+            }
+
+            await github.graphql(
+              `
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                  item {
+                    id
+                  }
+                }
+              }
+              `,
+              { projectId: PROJECT_ID, contentId: issue.id },
+            );
+
+            core.info(`Added issue #${issueNumber} to project.`);
