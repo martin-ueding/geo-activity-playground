@@ -735,7 +735,7 @@ def make_sharepic(
     if activity.start_local_tz:
         facts["start"] = f"{activity.start_local_tz.date()}"
     if activity.elapsed_time:
-        facts["elapsed_time"] = re.sub(r"^0 days ", "", f"{activity.elapsed_time}")
+        facts["elapsed_time"] = _format_elapsed_time(activity.elapsed_time)
     if activity.kind:
         facts["kind"] = f"{activity.kind.name}"
     if activity.equipment:
@@ -786,12 +786,11 @@ def make_day_sharepic(
     date = activities.iloc[0]["start_local"].date()
     distance_km = activities["distance_km"].sum()
     elapsed_time: pd.Timedelta = activities["elapsed_time"].sum()
-    elapsed_time = elapsed_time.round("s")
 
     facts = {
         "date": f"{date}",
         "distance_km": f"{distance_km:.1f} km",
-        "elapsed_time": re.sub(r"^0 days ", "", f"{elapsed_time}"),
+        "elapsed_time": _format_elapsed_time(elapsed_time),
     }
 
     draw.text(
@@ -809,6 +808,12 @@ def make_day_sharepic(
     f = io.BytesIO()
     img.save(f, format="png")
     return bytes(f.getbuffer())
+
+
+def _format_elapsed_time(elapsed_time: datetime.timedelta | pd.Timedelta) -> str:
+    rounded_seconds = round(pd.Timedelta(elapsed_time).total_seconds())
+    rounded = datetime.timedelta(seconds=rounded_seconds)
+    return re.sub(r"^0 days,? ", "", f"{rounded}")
 
 
 def _extract_heart_rate_zones(

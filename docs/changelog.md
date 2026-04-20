@@ -27,6 +27,10 @@ Changed:
 
 - Make the Explorer **cluster history overlay opt-in**: the page now waits for an explicit "Load Cluster History" click, then fetches history metadata/snapshots via dedicated API routes before showing the overlay. ([GH-430](https://github.com/martin-ueding/geo-activity-playground/issues/430))
 
+Fixed:
+
+- Round **sharepic elapsed time** to whole seconds so generated share images no longer show microsecond precision. ([GH-429](https://github.com/martin-ueding/geo-activity-playground/issues/429))
+
 ## Version 1.26.0 — 2026-04-05
 
 Added:
