@@ -11,7 +11,11 @@ from geo_activity_playground.core.datamodel import (
     SegmentCheck,
     SegmentMatch,
 )
-from geo_activity_playground.core.segments import rematch_segment, tiles_for_segment
+from geo_activity_playground.core.segments import (
+    rematch_segment,
+    tiles_for_segment,
+    try_match_segment_activity,
+)
 
 
 def test_rematch_segment_deletes_checks_and_matches_before_matching(app) -> None:
@@ -64,3 +68,35 @@ def test_segment_length_km_uses_lat_lon_coordinate_order() -> None:
 
     assert segment.length_km == expected_km
     assert segment.length_km != wrong_order_km
+
+
+def test_try_match_segment_activity_skips_activities_without_start_time(
+    app, monkeypatch
+) -> None:
+    with app.app_context():
+        segment = Segment(name="Test Segment")
+        segment.coordinates = [[50.0, 7.0], [50.001, 7.001]]
+        activity = Activity(name="Untimed Activity", start=None)
+        DB.session.add_all([segment, activity])
+        DB.session.commit()
+
+        def fail_if_called(*_args, **_kwargs):
+            raise AssertionError(
+                "segment_track_distance must not run for untimed activities"
+            )
+
+        monkeypatch.setattr(
+            "geo_activity_playground.core.segments.segment_track_distance",
+            fail_if_called,
+        )
+
+        try_match_segment_activity(segment, activity, Config())
+
+        assert (
+            DB.session.scalar(sqlalchemy.select(sqlalchemy.func.count(SegmentCheck.id)))
+            == 0
+        )
+        assert (
+            DB.session.scalar(sqlalchemy.select(sqlalchemy.func.count(SegmentMatch.id)))
+            == 0
+        )
