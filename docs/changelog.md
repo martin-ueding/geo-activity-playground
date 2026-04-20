@@ -31,6 +31,7 @@ Changed:
 
 Fixed:
 
+- Align **Month Wrap tile timelines** to each activity's local date so daily/monthly wrap charts no longer mix UTC tile events with local activity stats near day/month boundaries. ([GH-421](https://github.com/martin-ueding/geo-activity-playground/issues/421))
 - Round **sharepic elapsed time** to whole seconds so generated share images no longer show microsecond precision. ([GH-429](https://github.com/martin-ueding/geo-activity-playground/issues/429))
 - Remove duplicate **Date** response headers when running behind Waitress so reverse proxies like nginx no longer log "upstream sent duplicate header line" warnings for static assets. ([GH-424](https://github.com/martin-ueding/geo-activity-playground/issues/424))
 - Respect EXIF GPS hemisphere refs (`GPSLatitudeRef`, `GPSLongitudeRef`) when importing photos so coordinates west of Greenwich or south of the equator keep the correct negative sign. ([GH-427](https://github.com/martin-ueding/geo-activity-playground/issues/427))
