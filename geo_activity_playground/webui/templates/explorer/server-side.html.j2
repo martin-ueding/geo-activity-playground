@@ -61,19 +61,21 @@
 
 <div class="row mb-3">
     <div class="col">
-        {% if latest_history_event_index > 0 %}
-        <label class="form-label" for="cluster-history-slider">{{ _('Cluster history cutoff') }}: <span
-                id="cluster-history-value">{{ selected_history_event_index }}</span> / {{ latest_history_event_index }}</label>
-        <input
-            class="form-range mb-2"
-            type="range"
-            min="0"
-            max="{{ latest_history_event_index }}"
-            step="1"
-            value="{{ selected_history_event_index }}"
-            id="cluster-history-slider"
-        >
-        {% endif %}
+        <button type="button" id="load-cluster-history" class="btn btn-outline-primary mb-2">Load Cluster History</button>
+        <div id="cluster-history-controls" class="d-none">
+            <label class="form-label" for="cluster-history-slider">{{ _('Cluster history cutoff') }}: <span
+                    id="cluster-history-value">0</span> / <span id="cluster-history-max">0</span></label>
+            <input
+                class="form-range mb-2"
+                type="range"
+                min="0"
+                max="0"
+                step="1"
+                value="0"
+                id="cluster-history-slider"
+            >
+        </div>
+        <p id="cluster-history-status" class="text-muted small mb-2"></p>
         <div id="explorer-map" class="mb-1" style="height: min(800px, calc(100vh - 300px));"></div>
         <p>{{ _('Download tiles in visible area:') }}
             <a href="#" data-download-suffix="explored.geojson">{{ _('Explored as GeoJSON') }}</a>,
@@ -88,11 +90,7 @@
                 centerLongitude: {{ center.longitude }},
                 zoom: {{ zoom }},
                 attribution: '{{ map_tile_attribution|safe }}',
-                bbox: {{ center.bbox | safe }},
-                clusterHistory: {
-                    maxEventIndex: {{ latest_history_event_index }},
-                    initialEventIndex: {{ selected_history_event_index }}
-                }
+                bbox: {{ center.bbox | safe }}
             });
         </script>
     </div>

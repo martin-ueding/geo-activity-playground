@@ -379,14 +379,6 @@ def make_explorer_blueprint(
             return {"zoom_level_not_generated": zoom}
 
         tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
-        latest_history_event_index = get_cluster_history_latest_event_index(zoom)
-        selected_history_event_index = request.args.get(
-            "event_index", default=latest_history_event_index, type=int
-        )
-        selected_history_event_index = max(
-            0,
-            min(selected_history_event_index, latest_history_event_index),
-        )
 
         # Get data from database
         medians = get_tile_medians(zoom)
@@ -447,8 +439,6 @@ def make_explorer_blueprint(
                 map(len, tile_evolution_state.clusters.values()), default=0
             ),
             "bookmarks": bookmarks,
-            "latest_history_event_index": latest_history_event_index,
-            "selected_history_event_index": selected_history_event_index,
         }
         return render_template("explorer/server-side.html.j2", **context)
 
@@ -814,6 +804,12 @@ def make_explorer_blueprint(
         cluster_tiles = get_cluster_tiles_at_cutoff(zoom, cutoff)
         geojson_str = make_grid_file_geojson(make_grid_points(cluster_tiles, zoom))
         return Response(geojson_str, mimetype="application/json")
+
+    @blueprint.route("/<int:zoom>/cluster-history/metadata.json")
+    def cluster_history_metadata(zoom: int) -> dict[str, int]:
+        return {
+            "latest_event_index": get_cluster_history_latest_event_index(zoom),
+        }
 
     @blueprint.route(
         "/<int:zoom>/cluster-history/activity/<int:activity_id>/diff.geojson"
