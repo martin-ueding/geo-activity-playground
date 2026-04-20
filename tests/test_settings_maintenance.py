@@ -4,6 +4,7 @@ import json
 import zipfile
 from types import SimpleNamespace
 
+import pandas as pd
 import sqlalchemy
 
 from geo_activity_playground.core.datamodel import (
@@ -368,6 +369,62 @@ def test_refresh_strava_activity_names_is_noop_if_names_match(client, app, monke
         )
         assert refreshed is not None
         assert refreshed.name == "Already Synced"
+
+
+class _FakeStravaImportClient:
+    def __init__(self, activities):
+        self._activities = activities
+
+    def get_activities(self, *, after):
+        assert after == "2020-01-01T00:00:00Z"
+        return self._activities
+
+
+def test_try_import_strava_does_not_recompute_tiles_per_activity(app, monkeypatch):
+    activity = SimpleNamespace(
+        id=42,
+        name="Backfilled Ride",
+        start_date=datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC),
+        distance=12_345,
+        type=SimpleNamespace(root="Ride"),
+        elapsed_time=datetime.timedelta(hours=1),
+        gear_id=None,
+    )
+    fake_client = _FakeStravaImportClient([activity])
+
+    def client_factory(**kwargs):
+        assert kwargs["access_token"] == "token"
+        return fake_client
+
+    monkeypatch.setattr(strava_api, "Client", client_factory)
+    monkeypatch.setattr(strava_api, "get_current_access_token", lambda _: "token")
+    monkeypatch.setattr(
+        strava_api,
+        "download_strava_time_series",
+        lambda *_: pd.DataFrame(
+            {"time": [0], "latitude": [50.0], "longitude": [7.0]},
+        ),
+    )
+    monkeypatch.setattr(
+        strava_api,
+        "get_detailed_activity",
+        lambda *_: SimpleNamespace(
+            calories=123,
+            moving_time=datetime.timedelta(hours=1),
+        ),
+    )
+    monkeypatch.setattr(strava_api, "update_and_commit", lambda *_: None)
+    monkeypatch.setattr(pd.DataFrame, "to_parquet", lambda *_: None)
+
+    with app.app_context():
+        limit_exceeded = strava_api.try_import_strava(
+            config=strava_api.Config(),
+            repository=None,
+            tile_visit_accessor=None,
+            strava_begin="2020-01-01",
+        )
+
+    assert limit_exceeded is False
 
 
 def test_strava_checkout_upload_replaces_existing_checkout(client, tmp_path):
