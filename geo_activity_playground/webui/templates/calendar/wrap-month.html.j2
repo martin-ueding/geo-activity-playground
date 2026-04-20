@@ -18,15 +18,18 @@
 
 {% if months %}
 <div class="row mb-3">
-    <div class="col">
-        <div class="d-flex flex-wrap gap-1">
-            {% for available_year, available_month in months %}
-            <a class="btn {% if available_year == year and available_month == month %}btn-success{% else %}btn-outline-success{% endif %} btn-sm"
-                href="{{ url_for('.wrap_month', year=available_year, month=available_month) }}">
+    <div class="col-md-6 col-lg-4">
+        <label for="wrap-month-selector" class="form-label mb-1">{{ _('Select month') }}</label>
+        <select id="wrap-month-selector" class="form-select"
+            aria-label="{{ _('Select month') }}"
+            onchange="if (this.value) window.location.assign(this.value);">
+            {% for available_year, available_month in months|reverse %}
+            <option value="{{ url_for('.wrap_month', year=available_year, month=available_month) }}"
+                {% if available_year == year and available_month == month %}selected{% endif %}>
                 {{ available_year }}-{{ '%02d'|format(available_month) }}
-            </a>
+            </option>
             {% endfor %}
-        </div>
+        </select>
     </div>
 </div>
 {% endif %}

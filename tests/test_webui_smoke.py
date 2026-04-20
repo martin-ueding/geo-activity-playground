@@ -72,6 +72,7 @@ def test_wrap_month_page_loads_with_data(client, app):
     response = client.get("/calendar/wrap/2026/1")
     assert response.status_code == 200
     assert b"Month Wrap 2026-01" in response.data
+    assert b'id="wrap-month-selector"' in response.data
 
 
 def test_cluster_history_endpoints_load(client, app):

@@ -26,6 +26,7 @@ Added:
 Changed:
 
 - Make the Explorer **cluster history overlay opt-in**: the page now waits for an explicit "Load Cluster History" click, then fetches history metadata/snapshots via dedicated API routes before showing the overlay. ([GH-430](https://github.com/martin-ueding/geo-activity-playground/issues/430))
+- Replace the **Month Wrap month picker** button wall with a compact dropdown selector to keep long activity histories navigable. ([GH-431](https://github.com/martin-ueding/geo-activity-playground/issues/431))
 
 Fixed:
 
