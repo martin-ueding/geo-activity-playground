@@ -12,13 +12,23 @@ def ratio_to_decimal(numbers: list[exifread.utils.Ratio]) -> float:
     return deg.decimal() + min.decimal() / 60 + sec.decimal() / 3600
 
 
+def apply_ref_sign(value: float, ref: str, negative_refs: set[str]) -> float:
+    if ref.strip().upper() in negative_refs:
+        return -value
+    return value
+
+
 def get_metadata_from_image(path: pathlib.Path) -> dict:
     with open(path, "rb") as f:
         tags = exifread.process_file(f)
     metadata = {}
     try:
-        metadata["latitude"] = ratio_to_decimal(tags["GPS GPSLatitude"])
-        metadata["longitude"] = ratio_to_decimal(tags["GPS GPSLongitude"])
+        latitude = ratio_to_decimal(tags["GPS GPSLatitude"])
+        longitude = ratio_to_decimal(tags["GPS GPSLongitude"])
+        latitude_ref = str(tags.get("GPS GPSLatitudeRef", "N"))
+        longitude_ref = str(tags.get("GPS GPSLongitudeRef", "E"))
+        metadata["latitude"] = apply_ref_sign(latitude, latitude_ref, {"S"})
+        metadata["longitude"] = apply_ref_sign(longitude, longitude_ref, {"W"})
     except KeyError:
         pass
     try:
