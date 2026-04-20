@@ -31,6 +31,7 @@ Changed:
 Fixed:
 
 - Round **sharepic elapsed time** to whole seconds so generated share images no longer show microsecond precision. ([GH-429](https://github.com/martin-ueding/geo-activity-playground/issues/429))
+- Remove duplicate **Date** response headers when running behind Waitress so reverse proxies like nginx no longer log "upstream sent duplicate header line" warnings for static assets. ([GH-424](https://github.com/martin-ueding/geo-activity-playground/issues/424))
 
 ## Version 1.26.0 — 2026-04-05
 
