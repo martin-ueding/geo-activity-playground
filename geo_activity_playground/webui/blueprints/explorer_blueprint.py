@@ -442,9 +442,26 @@ def make_explorer_blueprint(
         }
         return render_template("explorer/server-side.html.j2", **context)
 
-    @blueprint.post("/<int:zoom>/video")
+    @blueprint.route("/video")
     @needs_authentication(authenticator)
-    def generate_video(zoom: int) -> ResponseReturnValue:
+    def video() -> ResponseReturnValue:
+        zoom_levels = sorted(set(config_accessor().explorer_zoom_levels))
+        selected_zoom = request.args.get("zoom", type=int)
+        if selected_zoom not in zoom_levels:
+            selected_zoom = zoom_levels[0] if zoom_levels else 14
+        return render_template(
+            "explorer/video.html.j2",
+            zoom_levels=zoom_levels,
+            selected_zoom=selected_zoom,
+        )
+
+    @blueprint.post("/video")
+    @needs_authentication(authenticator)
+    def generate_video() -> ResponseReturnValue:
+        zoom = request.form.get("zoom", type=int, default=14)
+        if zoom not in config_accessor().explorer_zoom_levels:
+            flash(_("The selected zoom level is not enabled."), category="danger")
+            return redirect(url_for(".video"))
         video_width = request.form.get("video_width", type=int, default=1920)
         video_height = request.form.get("video_height", type=int, default=1080)
         fps = request.form.get("fps", type=int, default=30)
@@ -454,7 +471,7 @@ def make_explorer_blueprint(
 
         if video_width <= 0 or video_height <= 0 or fps <= 0:
             flash(_("Width, height and FPS must be positive."), category="danger")
-            return redirect(url_for(".server_side", zoom=zoom))
+            return redirect(url_for(".video", zoom=zoom))
         if steps_per_tile <= 0 or fade_frames < 0:
             flash(
                 _(
@@ -462,10 +479,10 @@ def make_explorer_blueprint(
                 ),
                 category="danger",
             )
-            return redirect(url_for(".server_side", zoom=zoom))
+            return redirect(url_for(".video", zoom=zoom))
         if download_workers <= 0:
             flash(_("Download workers must be positive."), category="danger")
-            return redirect(url_for(".server_side", zoom=zoom))
+            return redirect(url_for(".video", zoom=zoom))
 
         try:
             output_path = generate_explorer_video(
@@ -491,7 +508,7 @@ def make_explorer_blueprint(
                 _("Explorer video written to %(path)s", path=str(output_path)),
                 category="success",
             )
-        return redirect(url_for(".server_side", zoom=zoom))
+        return redirect(url_for(".video", zoom=zoom))
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:

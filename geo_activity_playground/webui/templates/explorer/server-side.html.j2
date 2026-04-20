@@ -18,35 +18,7 @@
         </p>
         <p>{{ _('Open the') }} <a
                 href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) }}">{{ _('Square Planner') }}</a> {{ _('to plan the next extension.') }}</p>
-        <form action="{{ url_for('.generate_video', zoom=zoom) }}" method="post" class="row g-2 align-items-end mt-2">
-            <div class="col-md-2">
-                <label for="video-width" class="form-label">{{ _('Width') }}</label>
-                <input id="video-width" type="number" class="form-control" name="video_width" value="1920" min="256" step="1">
-            </div>
-            <div class="col-md-2">
-                <label for="video-height" class="form-label">{{ _('Height') }}</label>
-                <input id="video-height" type="number" class="form-control" name="video_height" value="1080" min="256" step="1">
-            </div>
-            <div class="col-md-2">
-                <label for="video-fps" class="form-label">{{ _('FPS') }}</label>
-                <input id="video-fps" type="number" class="form-control" name="fps" value="30" min="1" step="1">
-            </div>
-            <div class="col-md-2">
-                <label for="steps-per-tile" class="form-label">{{ _('Steps per tile') }}</label>
-                <input id="steps-per-tile" type="number" class="form-control" name="steps_per_tile" value="12" min="1" step="1">
-            </div>
-            <div class="col-md-2">
-                <label for="fade-frames" class="form-label">{{ _('Fade frames') }}</label>
-                <input id="fade-frames" type="number" class="form-control" name="fade_frames" value="12" min="0" step="1">
-            </div>
-            <div class="col-md-2">
-                <label for="download-workers" class="form-label">{{ _('Download workers') }}</label>
-                <input id="download-workers" type="number" class="form-control" name="download_workers" value="16" min="1" step="1">
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">{{ _('Generate explorer MP4') }}</button>
-            </div>
-        </form>
+        <p>{{ _('Video export is available on the dedicated') }} <a href="{{ url_for('.video', zoom=zoom) }}">{{ _('Explorer Video Export page') }}</a>.</p>
     </div>
 </div>
 
