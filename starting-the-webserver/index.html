@@ -564,10 +564,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#explorer-video-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explorer video export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setting-host-and-port" class="md-nav__link">
     <span class="md-ellipsis">
       
         Setting host and port
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-choosing-the-http-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: choosing the HTTP server
       
     </span>
   </a>
@@ -1697,10 +1719,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#explorer-video-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explorer video export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setting-host-and-port" class="md-nav__link">
     <span class="md-ellipsis">
       
         Setting host and port
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-choosing-the-http-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: choosing the HTTP server
       
     </span>
   </a>
@@ -1731,19 +1775,26 @@
 </code></pre></div>
 <p>Should that fail with “command not found”, you need to <a href="../add-local-bin-to-path/">add local bin to path</a>.</p>
 <p>The webserver will start up and give you a bit of output like this:</p>
-<div class="highlight"><pre><span></span><code>2023-11-19 17:59:23 geo_activity_playground.importers.strava_api INFO Loading metadata file …
-2023-11-19 17:59:23 stravalib.protocol.ApiV3 INFO GET &#39;https://www.strava.com/api/v3/athlete/activities&#39; with params {&#39;before&#39;: None, &#39;after&#39;: 1700392964, &#39;page&#39;: 1, &#39;per_page&#39;: 200}
-2023-11-19 17:59:23 geo_activity_playground.importers.strava_api INFO Checking for missing time series data …
- * Serving Flask app &#39;geo_activity_playground.webui.app&#39;
- * Debug mode: off
-2023-11-19 17:59:23 werkzeug INFO WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-2023-11-19 17:59:23 werkzeug INFO Press CTRL+C to quit
+<div class="highlight"><pre><span></span><code>2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Using database file at &#39;/home/mu/nobackup/Testsuite/database.sqlite&#39;.
+2026-04-11 20:34:09 alembic.runtime.migration INFO Context impl SQLiteImpl.
+2026-04-11 20:34:09 alembic.runtime.migration INFO Will assume non-transactional DDL.
+Importing activity files: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00, 35.74it/s]
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Importer thread is done.
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Starting Waitress server at http://127.0.0.1:5000
+2026-04-11 20:34:09 waitress INFO Serving on http://127.0.0.1:5000
 </code></pre></div>
 <p>The warning about the development server is fine. We are using this only to play around, not to power a web service for other users. There might be some more messages about downloading and parsing data. The first startup will take quite some time.</p>
 <p>Open <a href="http://127.0.0.1:5000">http://127.0.0.1:5000</a> to open the website in your browser and you will see the user interface.</p>
+<h2 id="explorer-video-export">Explorer video export</h2>
+<p>Go to Explorer and open a zoom level page. There is a <strong>Generate explorer MP4</strong> form where you can configure width, height, FPS, interpolation, and fade and then start rendering.</p>
+<p>You can also use the CLI:</p>
+<div class="highlight"><pre><span></span><code>geo-activity-playground<span class="w"> </span>--basedir<span class="w"> </span>YOUR_BASEDIR<span class="w"> </span>explorer-video<span class="w"> </span>--zoom<span class="w"> </span><span class="m">14</span><span class="w"> </span>--video-width<span class="w"> </span><span class="m">1920</span><span class="w"> </span>--video-height<span class="w"> </span><span class="m">1080</span><span class="w"> </span>--fps<span class="w"> </span><span class="m">30</span><span class="w"> </span>--download-workers<span class="w"> </span><span class="m">16</span>
+</code></pre></div>
 <h2 id="setting-host-and-port">Setting host and port</h2>
 <p>In case you don't like the default value of <code>127.0.0.1:5000</code>, you can use the optional command line arguments <code>--host</code> and <code>--port</code> to specify your values.</p>
+<h2 id="optional-choosing-the-http-server">Optional: choosing the HTTP server</h2>
+<p><code>serve</code> uses <code>--http-server waitress</code> by default, which is the recommended setting for normal use.</p>
+<p>There is also <code>--http-server werkzeug</code> if you explicitly want the Werkzeug server (for example while debugging server behavior). Most users can safely ignore this option.</p>
 
 
 

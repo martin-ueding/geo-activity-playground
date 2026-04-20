@@ -1648,6 +1648,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1270-2026-04-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.0 — 2026-04-20
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1260-2026-04-05" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3145,6 +3156,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1270-2026-04-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.0 — 2026-04-20
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1260-2026-04-05" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4639,6 +4661,30 @@ Types of changes
 
 <!-- next version below this line -->
 
+<h2 id="version-1270-2026-04-20">Version 1.27.0 — 2026-04-20</h2>
+<p>Added:</p>
+<ul>
+<li>Add <strong>Waitress</strong> as a faster HTTP server. Werkzeug can still be used with <code>--http-server werkzeug</code> on the command line for <code>serve</code>. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/422">GH-422</a>)</li>
+<li>Revive <strong>explorer video export</strong> as MP4: the <code>explorer-video</code> CLI now renders from SQLite tile history, and the Explorer page offers a direct “Generate explorer MP4” action.</li>
+<li><strong>Show default values</strong> in the CLI <code>--help</code> message.</li>
+</ul>
+<p>Changed:</p>
+<ul>
+<li>Make the Explorer <strong>cluster history overlay opt-in</strong>: the page now waits for an explicit "Load Cluster History" click, then fetches history metadata/snapshots via dedicated API routes before showing the overlay. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/430">GH-430</a>)</li>
+<li>Replace the <strong>Month Wrap month picker</strong> button wall with a compact dropdown selector to keep long activity histories navigable. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/431">GH-431</a>)</li>
+<li>Recompute <strong>Explorer tiles</strong> once after a Strava API sync batch finishes, instead of recalculating tile history after every imported backfill activity. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/349">GH-349</a>)</li>
+</ul>
+<p>Fixed:</p>
+<ul>
+<li>Align <strong>Month Wrap tile timelines</strong> to each activity's local date so daily/monthly wrap charts no longer mix UTC tile events with local activity stats near day/month boundaries. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/421">GH-421</a>)</li>
+<li>Round <strong>sharepic elapsed time</strong> to whole seconds so generated share images no longer show microsecond precision. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/429">GH-429</a>)</li>
+<li>Remove duplicate <strong>Date</strong> response headers when running behind Waitress so reverse proxies like nginx no longer log "upstream sent duplicate header line" warnings for static assets. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/424">GH-424</a>)</li>
+<li>Respect EXIF GPS hemisphere refs (<code>GPSLatitudeRef</code>, <code>GPSLongitudeRef</code>) when importing photos so coordinates west of Greenwich or south of the equator keep the correct negative sign. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/427">GH-427</a>)</li>
+<li>Fix <strong>Explorer First Visit coloring</strong> for activities with missing timestamps: tiles now use the earliest available activity time, so untimed track points no longer make a later activity appear as the first visit. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/428">GH-428</a>)</li>
+<li>Skip <strong>segment matching</strong> for activities without a start timestamp so untimed routes are no longer checked against user-defined segments. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/426">GH-426</a>)</li>
+<li>Fix <strong>Explorer Square Planner link crash</strong> when no square could be computed yet by falling back to the Square Planner landing route and defaulting missing square coordinates there.</li>
+<li>Keep <strong>day view tables and share pictures</strong> usable on narrow screens by hiding low-priority table columns on small breakpoints and forcing share picture previews to stay within the viewport width. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/226">GH-226</a>)</li>
+</ul>
 <h2 id="version-1260-2026-04-05">Version 1.26.0 — 2026-04-05</h2>
 <p>Added:</p>
 <ul>
