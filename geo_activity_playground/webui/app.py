@@ -13,7 +13,9 @@ import threading
 import urllib.parse
 import uuid
 import warnings
+from collections.abc import Iterable
 from typing import Literal
+from wsgiref.types import StartResponse, WSGIApplication, WSGIEnvironment
 
 import pandas as pd
 import sqlalchemy
@@ -80,6 +82,29 @@ from .flasher import FlaskFlasher
 from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
 
 logger = logging.getLogger(__name__)
+
+
+def _without_response_header(
+    application: WSGIApplication, header_name: str
+) -> WSGIApplication:
+    """Wrap a WSGI app and remove one response header by name."""
+
+    header_name_lower = header_name.lower()
+
+    def wrapped_application(
+        environ: WSGIEnvironment, start_response: StartResponse
+    ) -> Iterable[bytes]:
+        def filtered_start_response(status, headers, exc_info=None):
+            filtered_headers = [
+                (name, value)
+                for name, value in headers
+                if name.lower() != header_name_lower
+            ]
+            return start_response(status, filtered_headers, exc_info)
+
+        return application(environ, filtered_start_response)
+
+    return wrapped_application
 
 
 def _migrate_null_activity_fields_to_unknown(config: Config) -> None:
@@ -447,8 +472,9 @@ def web_ui_main(
             port,
             waitress_threads,
         )
+        waitress_application = _without_response_header(app, "Date")
         waitress.serve(
-            app,
+            waitress_application,
             host=host,
             port=port,
             asyncore_use_poll=True,
