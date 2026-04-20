@@ -1,0 +1,50 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1>{{ _('Explorer Video Export') }}</h1>
+
+{% if zoom_levels|length == 0 %}
+<p>{{ _('No explorer zoom levels are enabled yet.') }}</p>
+{% else %}
+<p>{{ _('Configure the render options and generate an MP4.') }}</p>
+<p><a href="{{ url_for('.server_side', zoom=selected_zoom) }}">{{ _('Back to Explorer Tiles') }}</a></p>
+
+<form action="{{ url_for('.generate_video') }}" method="post" class="row g-2 align-items-end mt-2">
+    <div class="col-md-2">
+        <label for="video-zoom" class="form-label">{{ _('Zoom level') }}</label>
+        <select id="video-zoom" class="form-select" name="zoom">
+            {% for zoom_level in zoom_levels %}
+            <option value="{{ zoom_level }}" {% if zoom_level == selected_zoom %}selected{% endif %}>{{ zoom_level }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="video-width" class="form-label">{{ _('Width') }}</label>
+        <input id="video-width" type="number" class="form-control" name="video_width" value="1920" min="256" step="1">
+    </div>
+    <div class="col-md-2">
+        <label for="video-height" class="form-label">{{ _('Height') }}</label>
+        <input id="video-height" type="number" class="form-control" name="video_height" value="1080" min="256" step="1">
+    </div>
+    <div class="col-md-2">
+        <label for="video-fps" class="form-label">{{ _('FPS') }}</label>
+        <input id="video-fps" type="number" class="form-control" name="fps" value="30" min="1" step="1">
+    </div>
+    <div class="col-md-2">
+        <label for="steps-per-tile" class="form-label">{{ _('Steps per tile') }}</label>
+        <input id="steps-per-tile" type="number" class="form-control" name="steps_per_tile" value="12" min="1" step="1">
+    </div>
+    <div class="col-md-2">
+        <label for="fade-frames" class="form-label">{{ _('Fade frames') }}</label>
+        <input id="fade-frames" type="number" class="form-control" name="fade_frames" value="12" min="0" step="1">
+    </div>
+    <div class="col-md-2">
+        <label for="download-workers" class="form-label">{{ _('Download workers') }}</label>
+        <input id="download-workers" type="number" class="form-control" name="download_workers" value="16" min="1" step="1">
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">{{ _('Generate explorer MP4') }}</button>
+    </div>
+</form>
+{% endif %}
+{% endblock %}
