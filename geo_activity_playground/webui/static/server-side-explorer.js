@@ -2,7 +2,7 @@ import { add_layers_to_map } from '/static/map-layers.js';
 
 /**
  * Initialize the explorer map.
- * 
+ *
  * @param {Object} config - Configuration object
  * @param {string} config.elementId - ID of the map container element
  * @param {number} config.centerLatitude - Initial center latitude
@@ -11,7 +11,6 @@ import { add_layers_to_map } from '/static/map-layers.js';
  * @param {string} config.attribution - Map tile attribution
  * @param {Object} [config.bbox] - Initial bounding box as GeoJSON (optional)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
- * @param {Object} [config.clusterHistory] - Cluster history config
  */
 export function initExplorerMap(config) {
     const {
@@ -21,8 +20,7 @@ export function initExplorerMap(config) {
         zoom,
         attribution,
         bbox = null,
-        squarePlanner = null,
-        clusterHistory = null
+        squarePlanner = null
     } = config;
 
     const map = L.map(elementId, {
@@ -34,13 +32,10 @@ export function initExplorerMap(config) {
     add_layers_to_map(map, {
         zoom,
         attribution,
-        squarePlanner,
-        historyEventIndex: clusterHistory ? clusterHistory.initialEventIndex : null
+        squarePlanner
     });
 
-    if (clusterHistory && clusterHistory.maxEventIndex > 0) {
-        initClusterHistoryLayer(map, zoom, clusterHistory);
-    }
+    initClusterHistoryLayer(map, zoom);
 
     // Fit to bounding box if provided
     if (bbox) {
@@ -66,10 +61,14 @@ export function initExplorerMap(config) {
     return map;
 }
 
-function initClusterHistoryLayer(map, zoom, clusterHistory) {
+function initClusterHistoryLayer(map, zoom) {
+    const loadButton = document.getElementById('load-cluster-history');
+    const controls = document.getElementById('cluster-history-controls');
     const slider = document.getElementById('cluster-history-slider');
     const label = document.getElementById('cluster-history-value');
-    if (!slider || !label) {
+    const maxLabel = document.getElementById('cluster-history-max');
+    const status = document.getElementById('cluster-history-status');
+    if (!loadButton || !controls || !slider || !label || !maxLabel || !status) {
         return;
     }
 
@@ -81,39 +80,67 @@ function initClusterHistoryLayer(map, zoom, clusterHistory) {
         }
     });
 
-    const loadSnapshot = (eventIndex) => {
-        fetch(`/explorer/${zoom}/cluster-history/snapshot.geojson?event_index=${eventIndex}`)
-            .then(response => response.json())
-            .then(data => {
-                clusterLayer.clearLayers();
-                clusterLayer.addData(data);
-            });
+    const loadSnapshot = async (eventIndex) => {
+        const response = await fetch(
+            `/explorer/${zoom}/cluster-history/snapshot.geojson?event_index=${eventIndex}`
+        );
+        if (!response.ok) {
+            throw new Error(`Loading snapshot failed with status ${response.status}`);
+        }
+        const data = await response.json();
+        clusterLayer.clearLayers();
+        clusterLayer.addData(data);
     };
 
-    const updateHistoryLayerVisibility = (eventIndex) => {
-        const showHistory = eventIndex < clusterHistory.maxEventIndex;
-        if (!showHistory) {
-            clusterLayer.clearLayers();
-            if (map.hasLayer(clusterLayer)) {
-                map.removeLayer(clusterLayer);
+    slider.disabled = true;
+
+    loadButton.addEventListener('click', async () => {
+        loadButton.disabled = true;
+        status.textContent = 'Loading cluster history...';
+
+        try {
+            const metadataResponse = await fetch(
+                `/explorer/${zoom}/cluster-history/metadata.json`
+            );
+            if (!metadataResponse.ok) {
+                throw new Error(
+                    `Loading metadata failed with status ${metadataResponse.status}`
+                );
             }
-            return;
-        }
-        if (!map.hasLayer(clusterLayer)) {
-            clusterLayer.addTo(map);
-        }
-        loadSnapshot(eventIndex);
-    };
+            const metadata = await metadataResponse.json();
+            const maxEventIndex = metadata.latest_event_index ?? 0;
 
-    slider.max = String(clusterHistory.maxEventIndex);
-    slider.value = String(clusterHistory.initialEventIndex);
-    label.textContent = String(clusterHistory.initialEventIndex);
-    updateHistoryLayerVisibility(clusterHistory.initialEventIndex);
+            if (maxEventIndex <= 0) {
+                status.textContent = 'No cluster history available.';
+                return;
+            }
+
+            slider.max = String(maxEventIndex);
+            slider.value = String(maxEventIndex);
+            label.textContent = String(maxEventIndex);
+            maxLabel.textContent = String(maxEventIndex);
+            slider.disabled = false;
+            controls.classList.remove('d-none');
+
+            if (!map.hasLayer(clusterLayer)) {
+                clusterLayer.addTo(map);
+            }
+            await loadSnapshot(maxEventIndex);
+            status.textContent = '';
+        } catch (error) {
+            console.error('Failed to load cluster history layer:', error);
+            status.textContent = 'Could not load cluster history.';
+            loadButton.disabled = false;
+        }
+    });
 
     slider.addEventListener('input', () => {
         const eventIndex = Number.parseInt(slider.value, 10) || 0;
         label.textContent = String(eventIndex);
-        updateHistoryLayerVisibility(eventIndex);
+        loadSnapshot(eventIndex).catch(error => {
+            console.error('Failed to update cluster history layer:', error);
+            status.textContent = 'Could not update cluster history.';
+        });
     });
 }
 

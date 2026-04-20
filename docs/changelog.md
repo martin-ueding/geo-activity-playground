@@ -23,6 +23,10 @@ Added:
 - Revive **explorer video export** as MP4: the `explorer-video` CLI now renders from SQLite tile history, and the Explorer page offers a direct “Generate explorer MP4” action.
 - **Show default values** in the CLI `--help` message.
 
+Changed:
+
+- Make the Explorer **cluster history overlay opt-in**: the page now waits for an explicit "Load Cluster History" click, then fetches history metadata/snapshots via dedicated API routes before showing the overlay. ([GH-430](https://github.com/martin-ueding/geo-activity-playground/issues/430))
+
 ## Version 1.26.0 — 2026-04-05
 
 Added:
