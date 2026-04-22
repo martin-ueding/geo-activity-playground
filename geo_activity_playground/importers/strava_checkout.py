@@ -46,7 +46,9 @@ def float_with_comma_or_period(x: str) -> float | None:
 
 
 def normalize_header(header: Sequence[str]) -> list[str]:
-    with open(pathlib.Path(__file__).parent / "strava-csv-mapping.json") as f:
+    with open(
+        pathlib.Path(__file__).parent / "strava-csv-mapping.json", encoding="utf-8"
+    ) as f:
         mapping = json.load(f)
     return [mapping.get(h, h) for h in header]
 
