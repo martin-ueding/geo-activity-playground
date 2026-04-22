@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Fixed:
+
+- Read Strava column mapping as UTF-8 to prevent encoding/umlaut errors on Windows. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
+
 ## Version 1.27.0 — 2026-04-20
 
 Added:
