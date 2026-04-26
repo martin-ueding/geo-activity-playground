@@ -166,7 +166,7 @@ def _square_evolution_frame(
         frame["month"] = pd.Series(dtype="int64")
         frame["day"] = pd.Series(dtype="int64")
         return frame
-    frame["time"] = pd.to_datetime(frame["time"])
+    frame["time"] = pd.to_datetime(frame["time"], utc=True).dt.tz_convert(None)
     frame = frame.loc[~pd.isna(frame["time"])].copy()
     frame["year"] = frame["time"].dt.year
     frame["month"] = frame["time"].dt.month
