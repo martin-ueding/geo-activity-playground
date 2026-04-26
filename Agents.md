@@ -40,3 +40,7 @@ ITEM_ID=$(gh project item-list 4 --owner martin-ueding --format json | jq -r ".i
 gh project item-edit --id "$ITEM_ID" --project-id "PVT_kwHOAA7oHM4A9xal" --field-id "PVTSSF_lAHOAA7oHM4A9xalzgxX-6Q" --single-select-option-id "df73e18b"
 gh issue view "$ISSUE_NUMBER" --repo "martin-ueding/geo-activity-playground" --json number,title,projectItems
 ```
+
+## Interaction with users
+
+You can access GitHub via the `gh` CLI. When interacting with users, start issue comments by stating that the following is AI generated and add the concrete model in parentheses.
