@@ -15,7 +15,7 @@ Types of changes
 
 <!-- next version below this line -->
 
-## Unreleased
+## Version 1.27.2 — 2026-04-26
 
 Fixed:
 
