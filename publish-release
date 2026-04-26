@@ -41,3 +41,4 @@ sed -i "0,/^$next_version_marker$/s//$next_version_marker\\
 ## Unreleased\\
 /" docs/changelog.md
 git ca -m "docs: add unreleased section to changelog"
+git push
