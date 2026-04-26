@@ -157,15 +157,25 @@ def make_activity_blueprint(
             "cluster_diff_geojson_urls": cluster_diff_geojson_urls,
         }
 
+        display_time_series = time_series.copy()
+        if activity.iana_timezone and not pd.isna(time_series["time"]).all():
+            display_time_series["time"] = (
+                time_series["time"]
+                .dt.tz_convert(activity.iana_timezone)
+                .dt.tz_localize(None)
+            )
+
         if not pd.isna(time_series["time"]).all():
             context.update(
                 {
-                    "distance_time_plot": distance_time_plot(time_series),
+                    "distance_time_plot": distance_time_plot(display_time_series),
                     "color_line_geojson": make_geojson_line_segments_with_columns(
                         time_series, tuple(line_color_columns_avail)
                     ),
-                    "speed_time_plot": speed_time_plot(time_series),
-                    "speed_distribution_plot": speed_distribution_plot(time_series),
+                    "speed_time_plot": speed_time_plot(display_time_series),
+                    "speed_distribution_plot": speed_distribution_plot(
+                        display_time_series
+                    ),
                     "date": activity.start_local_tz.date(),
                     "time": activity.start_local_tz.time(),
                     "line_color_column": next(iter(line_color_columns_avail)),
@@ -187,13 +197,15 @@ def make_activity_blueprint(
         ) is not None:
             context["heart_zones_plot"] = heart_rate_zone_plot(heart_zones)
         if "elevation" in time_series.columns:
-            context["elevation_time_plot"] = elevation_time_plot(time_series)
+            context["elevation_time_plot"] = elevation_time_plot(display_time_series)
         if "elevation_gain_cum" in time_series.columns:
-            context["elevation_gain_cum_plot"] = elevation_gain_cum_plot(time_series)
+            context["elevation_gain_cum_plot"] = elevation_gain_cum_plot(
+                display_time_series
+            )
         if "heartrate" in time_series.columns:
-            context["heartrate_time_plot"] = heart_rate_time_plot(time_series)
+            context["heartrate_time_plot"] = heart_rate_time_plot(display_time_series)
         if "cadence" in time_series.columns:
-            context["cadence_time_plot"] = cadence_time_plot(time_series)
+            context["cadence_time_plot"] = cadence_time_plot(display_time_series)
 
         return render_template("activity/show.html.j2", **context)
 
