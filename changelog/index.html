@@ -1648,6 +1648,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1272-2026-04-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.2 — 2026-04-26
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1271-2026-04-22" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3167,6 +3178,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1272-2026-04-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.2 — 2026-04-26
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1271-2026-04-22" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4683,6 +4705,13 @@ Types of changes
 
 <!-- next version below this line -->
 
+<h2 id="version-1272-2026-04-26">Version 1.27.2 — 2026-04-26</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix <strong>time travel in activity graphs around DST transitions</strong>: activity time-series charts (speed, distance, elevation, heart rate, etc.) now display timestamps in the activity's local timezone rather than relying on the browser to convert UTC, preventing backward jumps when the browser timezone has a DST fall-back within the activity's UTC time window. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/358">GH-358</a>)</li>
+<li>Fix <strong>Year &amp; Month Wrap internal server error</strong> caused by a dtype mismatch when merging square evolution history: normalize timestamps to tz-naive UTC so <code>merge_asof</code> keys are consistent. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/433">GH-433</a>)</li>
+<li>Fix <strong>missing Leaflet marker icons</strong> (empty squares on maps) by adding the marker PNG files to the correct <code>leaflet/images/</code> directory where Leaflet resolves them relative to its CSS. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/432">GH-432</a>)</li>
+</ul>
 <h2 id="version-1271-2026-04-22">Version 1.27.1 — 2026-04-22</h2>
 <p>Fixed:</p>
 <ul>
