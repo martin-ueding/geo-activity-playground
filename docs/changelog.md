@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Fixed:
+
+- Fix **Year & Month Wrap internal server error** caused by a dtype mismatch when merging square evolution history: normalize timestamps to tz-naive UTC so `merge_asof` keys are consistent. ([GH-433](https://github.com/martin-ueding/geo-activity-playground/issues/433))
+
 ## Version 1.27.1 — 2026-04-22
 
 Fixed:
