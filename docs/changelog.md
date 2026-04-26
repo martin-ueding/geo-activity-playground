@@ -20,6 +20,7 @@ Types of changes
 Fixed:
 
 - Fix **Year & Month Wrap internal server error** caused by a dtype mismatch when merging square evolution history: normalize timestamps to tz-naive UTC so `merge_asof` keys are consistent. ([GH-433](https://github.com/martin-ueding/geo-activity-playground/issues/433))
+- Fix **missing Leaflet marker icons** (empty squares on maps) by adding the marker PNG files to the correct `leaflet/images/` directory where Leaflet resolves them relative to its CSS. ([GH-432](https://github.com/martin-ueding/geo-activity-playground/issues/432))
 
 ## Version 1.27.1 — 2026-04-22
 
