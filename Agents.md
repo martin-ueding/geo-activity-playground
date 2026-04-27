@@ -44,3 +44,7 @@ gh issue view "$ISSUE_NUMBER" --repo "martin-ueding/geo-activity-playground" --j
 ## Interaction with users
 
 You can access GitHub via the `gh` CLI. When interacting with users, start issue comments by stating that the following is AI generated and add the concrete model in parentheses.
+
+## Issue references in commit messages
+
+When writing a ticket, use "Refs: GH-123" to mention the ticket. Do not use "fixes" or anything that would close the ticket on upload.
