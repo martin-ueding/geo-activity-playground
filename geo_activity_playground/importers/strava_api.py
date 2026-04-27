@@ -138,16 +138,24 @@ def import_from_strava_api(
     strava_begin: str | None = None,
     strava_end: str | None = None,
 ) -> None:
-    while try_import_strava(
-        config, repository, tile_visit_accessor, strava_begin, strava_end
-    ):
-        now = datetime.datetime.now()
-        next_quarter = round_to_next_quarter_hour(now)
-        seconds_to_wait = (next_quarter - now).total_seconds() + 10
-        logger.warning(
-            f"Strava rate limit exceeded, will try again at {next_quarter.isoformat()}."
+    try:
+        while try_import_strava(
+            config, repository, tile_visit_accessor, strava_begin, strava_end
+        ):
+            now = datetime.datetime.now()
+            next_quarter = round_to_next_quarter_hour(now)
+            seconds_to_wait = (next_quarter - now).total_seconds() + 10
+            logger.warning(
+                f"Strava rate limit exceeded, will try again at {next_quarter.isoformat()}."
+            )
+            time.sleep(seconds_to_wait)
+    except Fault as e:
+        logger.error(
+            "Strava API authentication failed, skipping Strava import. "
+            "Your authorization code may be expired or invalid — please follow the "
+            "Strava setup instructions to re-authorize. "
+            f"Details: {e}"
         )
-        time.sleep(seconds_to_wait)
 
 
 def try_import_strava(
