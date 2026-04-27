@@ -23,7 +23,7 @@ Importing activity files: 100%|████████████████�
 
 ```
 
-The warning about the development server is fine. We are using this only to play around, not to power a web service for other users. There might be some more messages about downloading and parsing data. The first startup will take quite some time.
+There might be some more messages about downloading and parsing data. The first startup will take quite some time.
 
 Open <http://127.0.0.1:5000> to open the website in your browser and you will see the user interface.
 
