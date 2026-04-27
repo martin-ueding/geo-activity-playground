@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Catch **Strava API authentication failure** (expired or invalid authorization code) gracefully: instead of crashing the importer thread, the error is now logged and the import continues to post-import phases. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
 
 ## Version 1.27.2 — 2026-04-26
 
