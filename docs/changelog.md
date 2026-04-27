@@ -19,6 +19,7 @@ Types of changes
 
 Fixed:
 
+- Fix **GPS speed spike filtering**: the previous outlier filter had two bugs — the threshold (`speed > 40 km/h AND diff > 10`) incorrectly flagged legitimate fast cycling and was far too low for car/train/airplane activities, and the `DataFrame.replace()` call was semantically wrong so no outliers were ever actually removed. The new filter uses a bilateral diff check: a point is a GPS spike only if the speed rose sharply (>100 km/h) coming in AND dropped sharply going out, catching isolated GPS errors while leaving sustained high speeds intact. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
 - Catch **Strava API authentication failure** (expired or invalid authorization code) gracefully: instead of crashing the importer thread, the error is now logged and the import continues to post-import phases. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
 - Fix **Year & Month Wrap internal server error** that persisted after 1.27.2: the earlier timezone fix left a datetime resolution mismatch (`datetime64[ns]` vs `datetime64[us]`) between the square evolution history and the checkpoint timestamps; align dtypes before the `merge_asof` call. ([GH-433](https://github.com/martin-ueding/geo-activity-playground/issues/433))
 
