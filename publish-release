@@ -1,44 +1,151 @@
-#!/bin/bash
+#!/usr/bin/env python3
+"""Idempotent release script for geo-activity-playground."""
 
-set -eux
+import json
+import os
+import subprocess
+import tomllib
+import urllib.error
+import urllib.request
+from datetime import date
+from pathlib import Path
 
-# Bump the version according to conventional commits.
-version="$(uv run cz bump --get-next)"
-uv version "$version"
+REPO_ROOT = Path(__file__).parent
+CHANGELOG = REPO_ROOT / "docs/changelog.md"
+PYPROJECT = REPO_ROOT / "pyproject.toml"
+PYPI_PROJECT = "geo-activity-playground"
+NEXT_VERSION_MARKER = "<!-- next version below this line -->"
 
-# Update the changelog.
-today=$(date +%Y-%m-%d)
-next_version_marker="<!-- next version below this line -->"
-grep -Fq "$next_version_marker" docs/changelog.md
-sed -i "0,/^## Unreleased$/s//## Version $version — $today/" docs/changelog.md
 
-# Commit and tag.
-git ca -m "chore: bump version to $version"
-git tag "$version"
+def run(*args: str) -> None:
+    subprocess.run(args, check=True, cwd=REPO_ROOT)
 
-# Upload the code.
-git push
-git push --tags
 
-# Publish the built project.
-uv build
-uv publish \
-    --token "$PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND" \
-    "dist/geo_activity_playground-$version-py3-none-any.whl"
+def capture(*args: str) -> str:
+    result = subprocess.run(
+        args, check=True, capture_output=True, text=True, cwd=REPO_ROOT
+    )
+    return result.stdout.strip()
 
-# Deploy documentation.
-uv run mkdocs gh-deploy
 
-# Create a GitHub release.
-release_note_file="$(mktemp --suffix .md)"
-uv run python3 extract-changelog.py docs/changelog.md "$version" > "$release_note_file"
-gh release create "$version" -F "$release_note_file" -t "$version"
-rm "$release_note_file"
+def step(label: str) -> None:
+    print(f"\n=== {label} ===")
 
-# Prepare changelog for ongoing development.
-sed -i "0,/^$next_version_marker$/s//$next_version_marker\\
-\\
-## Unreleased\\
-/" docs/changelog.md
-git ca -m "docs: add unreleased section to changelog"
-git push
+
+def main() -> None:
+    step("Determine next version")
+    version = capture("uv", "run", "cz", "bump", "--get-next")
+    print(f"Next version: {version}")
+
+    step("Set version in pyproject.toml")
+    with open(PYPROJECT, "rb") as f:
+        current_version = tomllib.load(f)["project"]["version"]
+    if current_version != version:
+        run("uv", "version", version)
+    else:
+        print(f"[skip] already at {version}")
+
+    step("Update changelog header")
+    changelog_text = CHANGELOG.read_text()
+    version_header = f"## Version {version}"
+    if version_header not in changelog_text:
+        today = date.today().isoformat()
+        CHANGELOG.write_text(
+            changelog_text.replace(
+                "## Unreleased", f"## Version {version} — {today}", 1
+            )
+        )
+    else:
+        print(f"[skip] {version_header} already present")
+
+    step("Commit version bump")
+    bump_msg = f"chore: bump version to {version}"
+    if not capture("git", "log", "--oneline", "--grep", bump_msg):
+        if capture("git", "status", "--porcelain"):
+            run("git", "commit", "-a", "-m", bump_msg)
+        else:
+            print("[skip] nothing to commit")
+    else:
+        print("[skip] bump commit already in log")
+
+    step("Create git tag")
+    if not capture("git", "tag", "-l", version):
+        run("git", "tag", version)
+    else:
+        print(f"[skip] tag {version} already exists")
+
+    step("Push commits and tags")
+    run("git", "push")
+    run("git", "push", "--tags")
+
+    step("Build wheel")
+    run("uv", "build")
+
+    step("Publish to PyPI")
+    already_published = False
+    try:
+        with urllib.request.urlopen(
+            f"https://pypi.org/pypi/{PYPI_PROJECT}/json"
+        ) as resp:
+            data = json.load(resp)
+        already_published = bool(data.get("releases", {}).get(version))
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+    if already_published:
+        print(f"[skip] {version} already on PyPI")
+    else:
+        run(
+            "uv",
+            "publish",
+            "--token",
+            os.environ["PYPI_TOKEN_GEO_ACTIVITY_PLAYGROUND"],
+            f"dist/geo_activity_playground-{version}-py3-none-any.whl",
+        )
+
+    step("Deploy documentation")
+    run("uv", "run", "mkdocs", "gh-deploy")
+
+    step("Create GitHub release")
+    gh_check = subprocess.run(
+        ["gh", "release", "view", version],
+        capture_output=True,
+        cwd=REPO_ROOT,
+    )
+    if gh_check.returncode != 0:
+        notes = capture(
+            "uv", "run", "python3", "extract-changelog.py", str(CHANGELOG), version
+        )
+        run("gh", "release", "create", version, "--notes", notes, "--title", version)
+    else:
+        print(f"[skip] GitHub release {version} already exists")
+
+    step("Restore Unreleased section in changelog")
+    changelog_text = CHANGELOG.read_text()
+    if "## Unreleased" not in changelog_text:
+        CHANGELOG.write_text(
+            changelog_text.replace(
+                NEXT_VERSION_MARKER,
+                f"{NEXT_VERSION_MARKER}\n\n## Unreleased\n",
+                1,
+            )
+        )
+    else:
+        print("[skip] ## Unreleased already present")
+
+    step("Commit and push changelog restore")
+    final_msg = "docs: add unreleased section to changelog"
+    if not capture("git", "log", "--oneline", "--grep", final_msg):
+        if capture("git", "status", "--porcelain"):
+            run("git", "commit", "-a", "-m", final_msg)
+        else:
+            print("[skip] nothing to commit")
+    else:
+        print("[skip] final commit already in log")
+    run("git", "push")
+
+    print("\nRelease complete.")
+
+
+if __name__ == "__main__":
+    main()
