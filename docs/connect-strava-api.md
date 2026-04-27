@@ -36,7 +36,11 @@ This will prompt an OAuth2 request where you have to grant permissions to your a
 
 When you first start this program and use the Strava API as a data source, it will download the metadata for all your activities. Then it will start to download all the time series data for each activity. Strava has a rate limiting, so after the first 200 activities it will crash and you will have to wait for 15 minutes until you can try again and it will download the next batch.
 
-Therefore it is recommended to use a Strava export in order to get started quicker. For this go to the [Strava account download page](https://www.strava.com/athlete/delete_your_account) and download all your data. You will get a ZIP file. Unpack the files into `Playground/Strava Export`. These will be picked up there. Activities from Strava will only be downloaded after importing all these, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.
+Therefore it is recommended to use a Strava export in order to get started quicker. Go to the [Strava account download page](https://www.strava.com/athlete/delete_your_account) and download all your data. You will receive a ZIP file.
+
+The easiest way to import it is via **Settings → Strava → Upload Strava Archive**: select the ZIP file, upload it, and the app will extract it into `Strava Export/` automatically.
+
+Alternatively, you can extract the ZIP manually and place its contents into `Playground/Strava Export`. Either way, activities from Strava will only be downloaded after importing all these local files, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.
 
 !!! warning "This is NOT the same as moving from Strava"
     This `Strava Export/` folder is specifically for **speeding up the initial Strava API sync**. It does not convert or process your files — it's just a cache to avoid rate limiting.

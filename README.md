@@ -14,20 +14,49 @@ Please see the [hosted documentation](https://martin-ueding.github.io/geo-activi
 
 ## 🚀 Features
 
-- 📍 **Activity Import & Analysis**  
-  Use your GPX, FIT, TCX, KML, or CSV files. View detailed stats like distance, elevation and more.
-
-- 🗺️ **Interactive Maps & Heatmaps**  
-  Visualize routes on a map, create heatmaps of your most frequent paths, and spot your favorite spots or missed areas.
-
-- 🧩 **Explorer Tiles**  
-  Break the world into tiles and see which ones you’ve visited — great for motivation and adventure planning!
-
-- 🛡️ **Privacy Zones**  
-  Hide or blur sensitive areas like your home or workplace. Your data stays private and local.
-
+### Activity management
+- 📍 **Activity Import**  
+  Use your GPX, FIT, TCX, KML, or CSV files. Heart rate, cadence, speed and elevation are parsed automatically.
+- ✂️ **Activity Trimming**  
+  Crop the start or end of a track to remove warm-up noise or accidental recording.
+- 🏷️ **Tags & Search**  
+  Tag activities and search by name, kind, equipment, date, distance, elevation, or tag — with a map view of results.
+- 📸 **Photo Integration**  
+  Upload geotagged photos and they are matched to the nearest activity and shown on the map.
 - 🔁 **Strava API Integration (Optional)**  
-  Import activities directly from your Strava account with a single click. No data is uploaded — it’s all stored locally.
+  Sync activities directly from your Strava account. No data is uploaded — it’s all stored locally.
+
+### Analytics & statistics
+- 📊 **Summary Dashboard**  
+  Totals and trends for distance, elevation, time, and steps — broken down by activity kind.
+- 🏆 **Hall of Fame**  
+  Your personal records: longest ride, fastest run, biggest climbing day, and more.
+- 📈 **Eddington Number**  
+  Track your Eddington number for both distance and elevation gain.
+- 🫧 **Bubble Charts**  
+  Scatter every activity as a bubble by distance vs. elevation gain, with per-day aggregates too.
+- 🎨 **Custom Plot Builder**  
+  Build your own Vega-Lite charts from activity data and share them as JSON snippets.
+- 🗓️ **Year & Month Wrap**  
+  Strava-style annual and monthly summaries with progress highlights and new tile counts.
+
+### Maps & exploration
+- 🗺️ **Interactive Maps & Heatmaps**  
+  Visualize all routes on a map and create heatmaps of your most frequent paths.
+- 🧩 **Explorer Tiles**  
+  Break the world into tiles and see which ones you’ve visited. Track your largest connected cluster, bookmark clusters across locations, and use the **Square Planner** to plan which tiles to ride next.
+- 📹 **Explorer Video Export**  
+  Generate a time-lapse MP4 of how your explored tile area grew over time.
+- 🛣️ **Segments**  
+  Define route segments via a routing service. The app automatically matches your activities to segments and tracks your times — including forward vs. backward direction comparison.
+
+### Customisation & privacy
+- 🛡️ **Privacy Zones**  
+  Blur sensitive areas like your home or workplace on all maps and heatmaps.
+- 🌍 **Internationalization**  
+  Interface available in English, German, and Dutch.
+- ⚙️ **Equipment Tracking**  
+  Manage your gear, log offset distances (for bikes with prior mileage), and see per-equipment stats.
 
 ---
 

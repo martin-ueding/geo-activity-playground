@@ -75,6 +75,22 @@ As you can see in this picture, there is a tile missing right at the top edge. I
 
 You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity. Also it shows the last activity there as well as the number of activities. If it is a local cluster, it will also show the cluster size.
 
+## Cluster history overlay
+
+The Explorer page can show how your cluster grew over time. Click **Load Cluster History** on the explorer zoom-level page to fetch the history. A time-cutoff slider then lets you scrub backwards and forwards to replay cluster growth activity by activity. Each activity also shows its own cluster delta: which tiles became cluster tiles for the first time because of it.
+
+The history is loaded on demand (not on page load) to keep the initial map fast for large histories.
+
+## Explorer video export
+
+You can export a time-lapse MP4 of your explorer tile history directly from the Explorer page. Open a zoom-level view and use the **Generate explorer MP4** form to configure width, height, FPS, interpolation, and fade, then start rendering. Once done the file is available for download.
+
+The same export is also available via the CLI:
+
+```bash
+geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30
+```
+
 ## Squadratinhos
 
 The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the _squadratinhos_ which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.
