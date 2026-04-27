@@ -43,7 +43,11 @@ gh issue view "$ISSUE_NUMBER" --repo "martin-ueding/geo-activity-playground" --j
 
 ## Interaction with users
 
-You can access GitHub via the `gh` CLI. When interacting with users, start issue comments by stating that the following is AI generated and add the concrete model in parentheses.
+You can access GitHub via the `gh` CLI. When interacting with users, start issue comments by the following:
+
+```markdown
+_The following content was AI generated ({marketing name of model and version})._
+```
 
 ## Issue references in commit messages
 
