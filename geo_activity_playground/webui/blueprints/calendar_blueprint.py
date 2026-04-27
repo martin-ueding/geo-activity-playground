@@ -309,6 +309,7 @@ def _square_size_at(square_history: pd.DataFrame, checkpoints: pd.Series) -> pd.
     probe = pd.DataFrame({"checkpoint": pd.to_datetime(checkpoints)}).sort_values(
         "checkpoint"
     )
+    history["time"] = history["time"].astype(probe["checkpoint"].dtype)
     merged = pd.merge_asof(
         probe,
         history,
