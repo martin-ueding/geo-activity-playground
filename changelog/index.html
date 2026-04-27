@@ -1648,6 +1648,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1273-2026-04-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.3 — 2026-04-27
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1272-2026-04-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3178,6 +3189,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-1273-2026-04-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 1.27.3 — 2026-04-27
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-1272-2026-04-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4705,6 +4727,13 @@ Types of changes
 
 <!-- next version below this line -->
 
+<h2 id="version-1273-2026-04-27">Version 1.27.3 — 2026-04-27</h2>
+<p>Fixed:</p>
+<ul>
+<li>Fix <strong>GPS speed spike filtering</strong>: the previous outlier filter had two bugs — the threshold (<code>speed &gt; 40 km/h AND diff &gt; 10</code>) incorrectly flagged legitimate fast cycling and was far too low for car/train/airplane activities, and the <code>DataFrame.replace()</code> call was semantically wrong so no outliers were ever actually removed. The new filter uses a bilateral diff check: a point is a GPS spike only if the speed rose sharply (&gt;100 km/h) coming in AND dropped sharply going out, catching isolated GPS errors while leaving sustained high speeds intact. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/345">GH-345</a>)</li>
+<li>Catch <strong>Strava API authentication failure</strong> (expired or invalid authorization code) gracefully: instead of crashing the importer thread, the error is now logged and the import continues to post-import phases. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/414">GH-414</a>)</li>
+<li>Fix <strong>Year &amp; Month Wrap internal server error</strong> that persisted after 1.27.2: the earlier timezone fix left a datetime resolution mismatch (<code>datetime64[ns]</code> vs <code>datetime64[us]</code>) between the square evolution history and the checkpoint timestamps; align dtypes before the <code>merge_asof</code> call. (<a href="https://github.com/martin-ueding/geo-activity-playground/issues/433">GH-433</a>)</li>
+</ul>
 <h2 id="version-1272-2026-04-26">Version 1.27.2 — 2026-04-26</h2>
 <p>Fixed:</p>
 <ul>

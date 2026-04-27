@@ -1317,6 +1317,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cluster-history-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster history overlay
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explorer-video-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explorer video export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#squadratinhos" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1763,6 +1785,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cluster-history-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster history overlay
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explorer-video-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explorer video export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#squadratinhos" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1832,6 +1876,14 @@
 <p>You can see an additional feature, the blue square. This is the one largest square which can be fit into all explored tiles. In this picture it has size 21². The idea of the square is to have a really tough challenge. Not only does one need to explore increasingly many tiles to expand the square by one unit, there must not be any gaps.</p>
 <p>As you can see in this picture, there is a tile missing right at the top edge. I will never be able to get that because that is an off-limits area of the German air force at the airport. So I can expand my square to the south only.</p>
 <p>You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity. Also it shows the last activity there as well as the number of activities. If it is a local cluster, it will also show the cluster size.</p>
+<h2 id="cluster-history-overlay">Cluster history overlay</h2>
+<p>The Explorer page can show how your cluster grew over time. Click <strong>Load Cluster History</strong> on the explorer zoom-level page to fetch the history. A time-cutoff slider then lets you scrub backwards and forwards to replay cluster growth activity by activity. Each activity also shows its own cluster delta: which tiles became cluster tiles for the first time because of it.</p>
+<p>The history is loaded on demand (not on page load) to keep the initial map fast for large histories.</p>
+<h2 id="explorer-video-export">Explorer video export</h2>
+<p>You can export a time-lapse MP4 of your explorer tile history directly from the Explorer page. Open a zoom-level view and use the <strong>Generate explorer MP4</strong> form to configure width, height, FPS, interpolation, and fade, then start rendering. Once done the file is available for download.</p>
+<p>The same export is also available via the CLI:</p>
+<div class="highlight"><pre><span></span><code>geo-activity-playground<span class="w"> </span>--basedir<span class="w"> </span>YOUR_BASEDIR<span class="w"> </span>explorer-video<span class="w"> </span>--zoom<span class="w"> </span><span class="m">14</span><span class="w"> </span>--video-width<span class="w"> </span><span class="m">1920</span><span class="w"> </span>--video-height<span class="w"> </span><span class="m">1080</span><span class="w"> </span>--fps<span class="w"> </span><span class="m">30</span>
+</code></pre></div>
 <h2 id="squadratinhos">Squadratinhos</h2>
 <p>The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the <em>squadratinhos</em> which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.</p>
 <p>These are better suited for walking and making sure that you really explored every little place in your neighborhood. Since they are so small, there are many properties which one cannot go onto, like industrial sites, airports or just a wide river.</p>
