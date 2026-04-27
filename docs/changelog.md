@@ -20,6 +20,7 @@ Types of changes
 Fixed:
 
 - Catch **Strava API authentication failure** (expired or invalid authorization code) gracefully: instead of crashing the importer thread, the error is now logged and the import continues to post-import phases. ([GH-414](https://github.com/martin-ueding/geo-activity-playground/issues/414))
+- Fix **Year & Month Wrap internal server error** that persisted after 1.27.2: the earlier timezone fix left a datetime resolution mismatch (`datetime64[ns]` vs `datetime64[us]`) between the square evolution history and the checkpoint timestamps; align dtypes before the `merge_asof` call. ([GH-433](https://github.com/martin-ueding/geo-activity-playground/issues/433))
 
 ## Version 1.27.2 — 2026-04-26
 
