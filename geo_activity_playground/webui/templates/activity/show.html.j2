@@ -92,6 +92,9 @@
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Edit') }}</a>
         <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Trim') }}</a>
+        <form method="POST" action="{{ url_for('.reenrich', id=activity.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-warning btn-small">{{ _('Re-enrich') }}</button>
+        </form>
         <a class="btn btn-small btn-danger" href="{{ url_for('.delete', id=activity.id) }}"
             onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
     </div>
