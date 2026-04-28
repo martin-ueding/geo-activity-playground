@@ -289,6 +289,18 @@ def make_settings_blueprint(
                     % {"dropped": dropped},
                     FlashTypes.SUCCESS,
                 )
+            elif action == "reenrich_all_activities":
+                logger.info("User requested re-enrichment of all activities.")
+                _reprocess_all_activities(
+                    config_accessor(),
+                    force=True,
+                    use_raw_time_series=True,
+                    desc="Re-enriching activities",
+                )
+                flasher.flash_message(
+                    _("All activities have been re-enriched."),
+                    FlashTypes.SUCCESS,
+                )
             elif action == "repair_activities":
                 logger.info("User requested repair of activities.")
                 _reprocess_all_activities(

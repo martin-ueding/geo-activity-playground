@@ -14,6 +14,7 @@ from flask import (
     Blueprint,
     Response,
     abort,
+    flash,
     redirect,
     render_template,
     request,
@@ -461,6 +462,16 @@ def make_activity_blueprint(
             activity=activity,
             color_line_geojson=geojson.dumps(fc),
         )
+
+    @blueprint.route("/<int:id>/reenrich", methods=["POST"])
+    @needs_authentication(authenticator)
+    def reenrich(id: int) -> ResponseReturnValue:
+        activity = DB.session.get(Activity, id)
+        if activity is None:
+            abort(404)
+        update_and_commit(activity, activity.raw_time_series, config, force=True)
+        flash(_("Activity has been re-enriched."), category="success")
+        return redirect(url_for(".show", id=id))
 
     @blueprint.route("/delete/<id>")
     @needs_authentication(authenticator)

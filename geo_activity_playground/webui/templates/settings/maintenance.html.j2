@@ -89,6 +89,23 @@
 
 <div class="card border-warning mb-3">
     <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Re-enrich All Activities') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Re-runs enrichment on all activities using their raw time series data. Use this to apply updated processing logic (such as GPS spike filtering) to existing activities.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to re-enrich all activities? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="reenrich_all_activities">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Re-enrich all activities') }}
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
         <h5 class="card-title mb-0">{{ _('Activity Data Repair') }}</h5>
     </div>
     <div class="card-body">

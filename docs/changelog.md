@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Added:
+
+- Add **re-enrich button** per activity and for all activities in Technical Maintenance: clicking it re-runs enrichment from the raw time series with `force=True`, applying updated processing logic such as the GPS spike filter to existing activities. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
+
 ## Version 1.27.3 — 2026-04-27
 
 Fixed:
