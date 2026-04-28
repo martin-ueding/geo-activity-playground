@@ -135,13 +135,10 @@ def main() -> None:
 
     step("Commit and push changelog restore")
     final_msg = "docs: add unreleased section to changelog"
-    if not capture("git", "log", "--oneline", "--grep", final_msg):
-        if capture("git", "status", "--porcelain"):
-            run("git", "commit", "-a", "-m", final_msg)
-        else:
-            print("[skip] nothing to commit")
+    if capture("git", "status", "--porcelain"):
+        run("git", "commit", "-a", "-m", final_msg)
     else:
-        print("[skip] final commit already in log")
+        print("[skip] nothing to commit")
     run("git", "push")
 
     print("\nRelease complete.")
