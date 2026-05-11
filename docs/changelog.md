@@ -21,6 +21,10 @@ Added:
 
 - Allow editing the **start time** of an activity from the edit page.
 
+Fixed:
+
+- Fix **day overview crash** when a route without time information has a manually set start time: the missing moving speed previously caused a `TypeError` in the template. ([GH-435](https://github.com/martin-ueding/geo-activity-playground/issues/435))
+
 
 ## Version 1.28.0 — 2026-04-28
 
