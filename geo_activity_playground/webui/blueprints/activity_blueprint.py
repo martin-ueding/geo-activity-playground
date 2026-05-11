@@ -3,6 +3,7 @@ import io
 import logging
 import pathlib
 import re
+import zoneinfo
 
 import altair as alt
 import geojson
@@ -362,6 +363,19 @@ def make_activity_blueprint(
 
         if request.method == "POST":
             activity.name = request.form.get("name")
+
+            form_start = request.form.get("start")
+            if form_start:
+                try:
+                    naive_local = datetime.datetime.fromisoformat(form_start)
+                except ValueError:
+                    flash(_("Could not parse start time."), category="danger")
+                    return redirect(url_for(".edit", id=activity.id))
+                tz_name = activity.iana_timezone or "UTC"
+                local_dt = naive_local.replace(tzinfo=zoneinfo.ZoneInfo(tz_name))
+                activity.start = local_dt.astimezone(zoneinfo.ZoneInfo("UTC")).replace(
+                    tzinfo=None
+                )
 
             form_equipment = request.form.get("equipment")
             if form_equipment and form_equipment != "null":

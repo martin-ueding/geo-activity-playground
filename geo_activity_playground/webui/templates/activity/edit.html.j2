@@ -11,6 +11,19 @@
     </div>
 
     <div class="mb-3">
+        <label for="start" class="form-label">{{ _('Start time') }}</label>
+        <input type="datetime-local" step="1" class="form-control" id="start" name="start"
+            value="{{ activity.start_local_tz.strftime('%Y-%m-%dT%H:%M:%S') if activity.start_local_tz else '' }}" />
+        <div class="form-text">
+            {% if activity.iana_timezone %}
+            {{ _('Time zone:') }} {{ activity.iana_timezone }}
+            {% else %}
+            {{ _('No time zone set; interpreted as UTC.') }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3">
         <label for="kind" class="form-label">{{ _('Kind') }}</label>
         <select class="form-control" id="kind" name="kind">
             {% for kind in kinds %}

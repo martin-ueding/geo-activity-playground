@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Allow editing the **start time** of an activity from the edit page.
+
 
 ## Version 1.28.0 — 2026-04-28
 
