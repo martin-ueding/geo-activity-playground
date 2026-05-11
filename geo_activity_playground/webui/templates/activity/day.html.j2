@@ -53,7 +53,7 @@
                         <td class="d-none d-md-table-cell">{{ activity.start_local|dt }}</td>
                         <td>{{ activity.distance_km | round(1) }}</td>
                         <td>{{ activity.elapsed_time|td }}</td>
-                        <td>{{ activity.average_speed_moving_kmh|round(1) }}</td>
+                        <td>{{ activity.average_speed_moving_kmh|round(1) if activity.average_speed_moving_kmh is not none else '—' }}</td>
                         <td class="d-none d-lg-table-cell">{{ activity["equipment"] }}</td>
                         <td class="d-none d-lg-table-cell">{{ activity["kind"] }}</td>
                     </tr>
