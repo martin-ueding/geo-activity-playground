@@ -107,7 +107,7 @@ def main() -> None:
         )
 
     step("Deploy documentation")
-    run("vitepress", "build", "docs")
+    run("npm", "run", "build")
     dist = REPO_ROOT / "docs/.vitepress/dist"
     run("git", "-C", str(dist), "init")
     run("git", "-C", str(dist), "add", "-A")
