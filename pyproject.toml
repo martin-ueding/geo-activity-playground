@@ -67,6 +67,7 @@ dev = [
     "pyright>=1.1.399",
     "commitizen>=4.13.0",
     "odfpy>=1.4.1",
+    "zensical>=0.0.43",
 ]
 
 [build-system]
