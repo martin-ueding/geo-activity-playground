@@ -13,7 +13,7 @@ import urllib.parse
 import uuid
 import warnings
 from collections.abc import Iterable
-from typing import Literal
+from typing import Any, Literal
 from wsgiref.types import StartResponse, WSGIApplication, WSGIEnvironment
 
 import pandas as pd
@@ -391,8 +391,9 @@ def web_ui_main(
     strava_end: str | None,
     hammerhead_begin: str | None = None,
     hammerhead_end: str | None = None,
-    http_server: Literal["waitress", "werkzeug"] = "waitress",
+    http_server: Literal["waitress", "werkzeug", "gunicorn"] = "waitress",
     waitress_threads: int = 8,
+    gunicorn_workers: int = 4,
 ) -> None:
     os.chdir(basedir)
 
@@ -477,6 +478,27 @@ def web_ui_main(
             asyncore_use_poll=True,
             threads=waitress_threads,
         )
+    elif http_server == "gunicorn":
+        from gunicorn.app.base import BaseApplication
+
+        class _GunicornApp(BaseApplication):
+            def load_config(self) -> None:
+                self.cfg.set("bind", f"{host}:{port}")
+                self.cfg.set("workers", gunicorn_workers)
+                self.cfg.set("worker_class", "gthread")
+                self.cfg.set("threads", waitress_threads)
+
+            def load(self) -> Any:
+                return app
+
+        logger.info(
+            "Starting Gunicorn server at http://%s:%d with %d workers × %d threads",
+            host,
+            port,
+            gunicorn_workers,
+            waitress_threads,
+        )
+        _GunicornApp().run()
     else:
         logger.info("Starting Werkzeug development server at http://%s:%d", host, port)
         app.run(host=host, port=port)

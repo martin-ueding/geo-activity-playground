@@ -41,6 +41,7 @@ dependencies = [
     "vegafusion>=2.0.3",
     "flask-babel>=4.0.0",
     "waitress>=3.0.2",
+    "gunicorn>=23.0.0",
 ]
 
 [project.scripts]

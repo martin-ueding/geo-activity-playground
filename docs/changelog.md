@@ -19,6 +19,7 @@ Types of changes
 
 Added:
 
+- Add **Gunicorn support** as an alternative HTTP server (`--http-server gunicorn`). Gunicorn uses pre-fork multiprocessing with `gthread` workers, giving true parallelism across CPU cores. Control the process count with `--gunicorn-workers` (default: 4); `--waitress-threads` sets the thread count per worker. The activity importer now also runs synchronously before the server starts, which is a prerequisite for multi-process servers.
 - Add **Hammerhead Karoo API integration** analogous to the Strava integration: register a Hammerhead OAuth app, paste the client ID/secret on the new Hammerhead settings page, and rides recorded on a Karoo head unit are downloaded automatically (FIT file per activity). ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 - Allow editing the **start time** of an activity from the edit page.
 - Add a **Table Columns** settings page that toggles which columns appear in summary tables. The segment matches table now supports optional **average speed** and **average power** columns; power is populated from the activity's power channel during matching, so re-match an existing segment to backfill values. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
