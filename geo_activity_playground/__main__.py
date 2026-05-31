@@ -141,7 +141,11 @@ def main() -> None:
     )
     subparser.add_argument(
         "--http-server",
-        choices=["waitress", "werkzeug", "gunicorn"],
+        choices=(
+            ["waitress", "werkzeug"]
+            if sys.platform == "win32"
+            else ["waitress", "werkzeug", "gunicorn"]
+        ),
         default="waitress" if sys.platform == "win32" else "gunicorn",
         help="HTTP server implementation to use (default: %(default)s)",
     )
