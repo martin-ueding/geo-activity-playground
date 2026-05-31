@@ -8,5 +8,6 @@ site
 *~
 Cache
 testdata/database.sqlite
+node_modules
 docs/.vitepress/cache
 docs/.vitepress/dist
