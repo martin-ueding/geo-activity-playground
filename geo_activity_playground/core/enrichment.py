@@ -70,12 +70,15 @@ def enrichment_normalize_time(
         time_series["time"].iloc[0],
     )
 
-    new_start = some(time_series["time"].iloc[0])
+    new_start = some(time_series["time"].iloc[activity.index_begin or 0])
     if new_start != activity.start:
         activity.start = new_start
         changed = True
 
-    new_elapsed_time = some(time_series["time"].iloc[-1] - time_series["time"].iloc[0])
+    new_elapsed_time = some(
+        time_series["time"].iloc[activity.index_end or -1]
+        - time_series["time"].iloc[activity.index_begin or 0]
+    )
     if new_elapsed_time != activity.elapsed_time:
         activity.elapsed_time = new_elapsed_time
         changed = True
