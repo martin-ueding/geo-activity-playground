@@ -65,6 +65,7 @@ from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.export_blueprint import make_export_blueprint
+from .blueprints.filter_playground_blueprint import make_filter_playground_blueprint
 from .blueprints.hall_of_fame_blueprint import make_hall_of_fame_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.photo_blueprint import make_photo_blueprint
@@ -324,6 +325,9 @@ def create_app(
             config,
         ),
         "/export": make_export_blueprint(authenticator),
+        "/filter-playground": make_filter_playground_blueprint(
+            repository, authenticator
+        ),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator),
         "/heatmap": make_heatmap_blueprint(
             repository, tile_visit_accessor, config, authenticator

@@ -19,6 +19,7 @@ Types of changes
 
 Added:
 
+- **Filter Playground**: a new page reachable via the "Filter Playground" button on any GPS activity. It lets you experiment with a Kalman filter (constant-velocity model with innovation gating) on the raw GPS track without writing anything back to the database. Three parameters can be tuned interactively — GPS noise σ, process noise σ, and chi-squared gate threshold — and the page updates a Leaflet map (original track, filtered track, excluded points) and a speed comparison plot in real time. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
 - Power time-series plot on the activity view page, shown when the activity contains power data. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
 - Power data is now extracted from FIT (standard `power` field), GPX (bare `<power>` element and Garmin TrackPointExtension v2 `PowerInWatts`), and TCX (Garmin Activity Extensions `Watts`) files. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
 - New maintenance action **Re-import time series from files** that re-reads the raw time series from the original activity files (GPX, FIT, TCX, …) for all file-based activities and re-runs enrichment. Existing metadata (name, equipment, kind, tags) is preserved, so this lets users pick up parser improvements without losing their edits.
