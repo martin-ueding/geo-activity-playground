@@ -33,13 +33,13 @@ Except when you want to know what the clocks showed. For instance, the time of w
 
 And actually, there can be a third question: What did my clock show during that event? Say you live in Helsinki, which is at +0300 during the summer. Then your clock would show 11:33:00 +0300. We can do this conversion from UTC or the local time zone of the event creator. But we need to know the user's time zone.
 
-## In this project
+## Data in this project
 
 Users in various time zones record outdoor activities with whatever device that they have. When displaying activities, we always want to show the local time of the activity. I have activities in Germany (+0100 or +0200), in Greece (+0300) and China (+0800). I don't care about comparing activity start times, I only care about the local times. Hence the local times is what I want.
 
 But when uploading pictures, we now need to figure out which activity they belong to. And then it becomes very important to figure out how the time of the activity and the time of the photo relate to. Hence we need to be able to convert everything into the same time zone, but it doesn't matter which one.
 
-Storing everything as UTC alone doesn't help, we lose the information about local time. Storing everything just in local time (but without time zone) doesn't allow to convert. It would even lead to ambiguities in case somebody goes for a run during the daylight savings time switchover. Hence the ideal storage would be local time plus time zone.
+Storing everything as UTC alone doesn't help, we lose the information about local time. Storing everything just in local time (but without time zone) doesn't allow to convert. It would even lead to ambiguities in case somebody goes for a run during the daylight savings time switchover.
 
 ## Inconsistent data
 
@@ -98,3 +98,11 @@ But Pandas does [support time zones in its `datetime64` type](https://pandas.pyd
 If we supply time zone aware data to Altair, it will pass that onto Vega and then the Browser will [convert that into the local time zone](https://altair-viz.github.io/user_guide/times_and_dates.html). That's not what I want here, the activity should be displayed in the activity's time zone, not in the viewer's.
 
 On top of this, databases like SQLite have their own time zone and [will convert dates back and forth](https://www.reddit.com/r/flask/comments/1im57ij/sqlalchemy_is_driving_me_nuts/). This doesn't make so much sense because I don't want to convert to the time zone of the database. The database should just store the times in the time zone of that time stamp. Likely that doesn't work, I would have to store the offset myself.
+
+# In this project
+
+After all these considations, here is how it is done in this project:
+
+- All user data is converted to UTC, one way of another. In the SQLite database, only UTC data is stored.
+- From the geospatial data, I infer what time zone (like “Europe/Berlin”) of the activity start point. This gets put into another database column. If one crosses countries with different daylight savings schedules, that won't be supported.
+- For displaying time, I convert into the local time zone. This way the plots are always what was shown on the clock. Also for daily statistics, I use the local time. I use naive time data there to prevent the browser from converting the time yet again.
