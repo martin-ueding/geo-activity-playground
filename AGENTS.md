@@ -16,6 +16,8 @@ You can likely use the `gh` command line utility to make use of GitHub. The tick
 
 Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious. New changelog entries always go into a `## Unreleased` section, not to existing released versions.
 
+For this particular project, you can create new commits on `main`.
+
 ## Ticket status commands (resolved IDs)
 
 Use these exact constants for this repository/project:
