@@ -392,8 +392,8 @@ def web_ui_main(
     hammerhead_begin: str | None = None,
     hammerhead_end: str | None = None,
     http_server: Literal["waitress", "werkzeug", "gunicorn"] = "gunicorn",
-    waitress_threads: int = 8,
-    gunicorn_workers: int = 4,
+    threads: int = 8,
+    workers: int = 4,
 ) -> None:
     os.chdir(basedir)
 
@@ -468,7 +468,7 @@ def web_ui_main(
             "Starting Waitress server at http://%s:%d with %d threads",
             host,
             port,
-            waitress_threads,
+            threads,
         )
         waitress_application = _without_response_header(app, "Date")
         waitress.serve(
@@ -476,7 +476,7 @@ def web_ui_main(
             host=host,
             port=port,
             asyncore_use_poll=True,
-            threads=waitress_threads,
+            threads=threads,
         )
     elif http_server == "gunicorn":
         from gunicorn.app.base import BaseApplication
@@ -484,9 +484,9 @@ def web_ui_main(
         class _GunicornApp(BaseApplication):
             def load_config(self) -> None:
                 self.cfg.set("bind", f"{host}:{port}")
-                self.cfg.set("workers", gunicorn_workers)
+                self.cfg.set("workers", workers)
                 self.cfg.set("worker_class", "gthread")
-                self.cfg.set("threads", waitress_threads)
+                self.cfg.set("threads", threads)
 
             def load(self) -> Any:
                 return app
@@ -495,8 +495,8 @@ def web_ui_main(
             "Starting Gunicorn server at http://%s:%d with %d workers × %d threads",
             host,
             port,
-            gunicorn_workers,
-            waitress_threads,
+            workers,
+            threads,
         )
         _GunicornApp().run()
     else:

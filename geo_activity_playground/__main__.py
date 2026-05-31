@@ -123,8 +123,8 @@ def main() -> None:
             hammerhead_begin=options.hammerhead_begin,
             hammerhead_end=options.hammerhead_end,
             http_server=options.http_server,
-            waitress_threads=options.waitress_threads,
-            gunicorn_workers=options.gunicorn_workers,
+            threads=options.threads,
+            workers=options.workers,
         )
     )
     subparser.add_argument(
@@ -145,16 +145,16 @@ def main() -> None:
         help="HTTP server implementation to use (default: %(default)s)",
     )
     subparser.add_argument(
-        "--waitress-threads",
+        "--threads",
         type=int,
         default=8,
-        help="Number of Waitress worker threads (default: %(default)s)",
+        help="Number of threads per server process (default: %(default)s)",
     )
     subparser.add_argument(
-        "--gunicorn-workers",
+        "--workers",
         type=int,
         default=4,
-        help="Number of Gunicorn worker processes (default: %(default)s)",
+        help="Number of worker processes (Gunicorn only, default: %(default)s)",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
     subparser.add_argument(
