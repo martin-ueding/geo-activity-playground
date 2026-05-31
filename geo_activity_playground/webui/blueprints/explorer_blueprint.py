@@ -700,7 +700,11 @@ def make_explorer_blueprint(
                         result[:, xo * width, :] = 0.5
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
-        return Response(bytes(f.getbuffer()), mimetype="image/png")
+        return Response(
+            bytes(f.getbuffer()),
+            mimetype="image/png",
+            headers={"Cache-Control": "no-cache"},
+        )
 
     @blueprint.route(
         "/<int:zoom>/info/<float(signed=True):latitude>/<float(signed=True):longitude>"

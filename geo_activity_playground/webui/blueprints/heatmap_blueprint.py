@@ -43,9 +43,6 @@ def make_heatmap_blueprint(
 ) -> Blueprint:
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
 
-    tile_evolution_states = tile_visit_accessor.tile_state["evolution_state"]
-    activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
-
     @blueprint.route("/")
     def index():
         primitives = parse_search_params(request.args)
@@ -58,7 +55,7 @@ def make_heatmap_blueprint(
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians[0], medians[1], zoom
         )
-        cluster_state = tile_evolution_states[zoom]
+        cluster_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
 
         stored_queries = get_stored_queries()
         search_query_favorites = [
@@ -95,13 +92,20 @@ def make_heatmap_blueprint(
         pl.imsave(
             f,
             _render_tile_image(
-                x, y, z, primitives, config, repository, activities_per_tile
+                x,
+                y,
+                z,
+                primitives,
+                config,
+                repository,
+                tile_visit_accessor.tile_state["activities_per_tile"],
             ),
             format="png",
         )
         return Response(
             bytes(f.getbuffer()),
             mimetype="image/png",
+            headers={"Cache-Control": "no-cache"},
         )
 
     @blueprint.route(
@@ -113,6 +117,7 @@ def make_heatmap_blueprint(
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
         pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
 
+        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
         background = np.zeros((*pixel_bounds.shape, 3))
         for x in range(tile_bounds.x1, tile_bounds.x2):
             for y in range(tile_bounds.y1, tile_bounds.y2):
@@ -138,7 +143,10 @@ def make_heatmap_blueprint(
         return Response(
             bytes(f.getbuffer()),
             mimetype="image/png",
-            headers={"Content-disposition": 'attachment; filename="heatmap.png"'},
+            headers={
+                "Content-disposition": 'attachment; filename="heatmap.png"',
+                "Cache-Control": "no-cache",
+            },
         )
 
     return blueprint

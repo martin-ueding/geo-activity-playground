@@ -2,7 +2,7 @@
 
 This is a log of all changes made to the project. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- 
+<!--
 Types of changes
 
     *Added* for new features.
@@ -27,7 +27,7 @@ Fixed:
 
 - Fix **day overview crash** when a route without time information has a manually set start time: the missing moving speed previously caused a `TypeError` in the template. ([GH-435](https://github.com/martin-ueding/geo-activity-playground/issues/435))
 - Avoid a **full tile-visit recomputation** (~30 minutes on a large database) after editing the start time of an activity that was imported without time information. The affected tile visits are now repaired incrementally and only the cluster history for zoom levels whose first-visit ordering shifted is rebuilt.
-
+- Fix **explorer tiles and heatmap not reflecting newly imported activities** until the web server was restarted. The heatmap blueprint snapshotted `tile_state` sub-dicts at startup, which became stale whenever the tile state was reset (e.g. after a consistency-check failure during import). Tile and heatmap responses now also set `Cache-Control: no-cache` so browsers no longer serve stale PNG tiles after an import. ([GH-436](https://github.com/martin-ueding/geo-activity-playground/issues/436))
 
 ## Version 1.28.0 — 2026-04-28
 
@@ -322,7 +322,7 @@ Fixed:
 Added:
 
 - Add different tile layers also to square planner. ([GH-370](https://github.com/martin-ueding/geo-activity-playground/issues/370))
-- Add activity line and other explorer tile layers to the map with newly explored tiles on the activity page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366 ))
+- Add activity line and other explorer tile layers to the map with newly explored tiles on the activity page. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
 
 Changed:
 
@@ -671,7 +671,7 @@ Changed:
 
 Removed:
 
-- Old explorer mode with client-side rendering is now deprecated as the server-side mode has the same features.  ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
+- Old explorer mode with client-side rendering is now deprecated as the server-side mode has the same features. ([GH-243](https://github.com/martin-ueding/geo-activity-playground/issues/243))
 
 Fixed:
 
@@ -823,7 +823,6 @@ Fixed:
 Fixed:
 
 - Fix import of activities into database. ([GH-257](https://github.com/martin-ueding/geo-activity-playground/issues/257))
-
 
 ## Version 0.39.0 — 2025-04-15
 
