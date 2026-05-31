@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Power time-series plot on the activity view page, shown when the activity contains power data. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
+- Power data is now extracted from FIT (standard `power` field), GPX (bare `<power>` element and Garmin TrackPointExtension v2 `PowerInWatts`), and TCX (Garmin Activity Extensions `Watts`) files. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
 
 Fixed:
 
