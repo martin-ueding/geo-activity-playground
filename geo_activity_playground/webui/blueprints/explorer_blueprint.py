@@ -92,6 +92,7 @@ class MaxClusterColorStrategy(ColorStrategy):
             max(
                 evolution_state.clusters.values(),
                 key=len,
+                default=(),
             )
         )
         self._config = config
@@ -115,10 +116,6 @@ class ColorfulClusterColorStrategy(ColorStrategy):
     ):
         self.evolution_state = evolution_state
         self.tile_visits = tile_visits
-        self.max_cluster_members = max(
-            evolution_state.clusters.values(),
-            key=len,
-        )
         self._cmap = matplotlib.colormaps["hsv"]
         self._config = config
 
