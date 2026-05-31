@@ -83,7 +83,7 @@
             <dt>{{ _('ID') }}</dt>
             <dd>{{ activity.id }}</dd>
             <dt>{{ _('Upstream ID') }}</dt>
-            <dd>{{ activity.upstream_id }}</dd>
+            <dd><span style="display:inline-block; max-width:20ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:bottom;" title="{{ activity.upstream_id }}">{{ activity.upstream_id }}</span></dd>
             <dt>{{ _('Source path') }}</dt>
             <dd><a href="{{ url_for('.download_original', id=activity.id) }}">{{ activity.path }}</a></dd>
             <dt>{{ _('Time series path') }}</dt>
