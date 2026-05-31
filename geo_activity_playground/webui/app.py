@@ -391,7 +391,7 @@ def web_ui_main(
     strava_end: str | None,
     hammerhead_begin: str | None = None,
     hammerhead_end: str | None = None,
-    http_server: Literal["waitress", "werkzeug", "gunicorn"] = "waitress",
+    http_server: Literal["waitress", "werkzeug", "gunicorn"] = "gunicorn",
     waitress_threads: int = 8,
     gunicorn_workers: int = 4,
 ) -> None:

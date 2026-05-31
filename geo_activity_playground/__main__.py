@@ -141,7 +141,7 @@ def main() -> None:
     subparser.add_argument(
         "--http-server",
         choices=["waitress", "werkzeug", "gunicorn"],
-        default="waitress",
+        default="gunicorn",
         help="HTTP server implementation to use (default: %(default)s)",
     )
     subparser.add_argument(
