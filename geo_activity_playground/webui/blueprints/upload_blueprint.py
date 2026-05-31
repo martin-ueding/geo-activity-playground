@@ -21,6 +21,7 @@ from ...explorer.tile_visits import (
     compute_tile_visits_new,
 )
 from ...importers.directory import import_from_directory
+from ...importers.hammerhead_api import import_from_hammerhead_api
 from ...importers.strava_api import import_from_strava_api
 from ...importers.strava_checkout import import_from_strava_checkout
 from ..authenticator import Authenticator, needs_authentication
@@ -86,6 +87,7 @@ def make_upload_blueprint(
             tile_visit_accessor,
             config,
             skip_strava=True,
+            skip_hammerhead=True,
         )
         latest_activity = DB.session.scalar(
             sqlalchemy.select(Activity).order_by(Activity.id.desc()).limit(1)
@@ -116,6 +118,9 @@ def scan_for_activities(
     strava_begin: str | None = None,
     strava_end: str | None = None,
     skip_strava: bool = False,
+    hammerhead_begin: str | None = None,
+    hammerhead_end: str | None = None,
+    skip_hammerhead: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
         import_from_directory(repository, tile_visit_accessor, config)
@@ -124,6 +129,14 @@ def scan_for_activities(
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(
             config, repository, tile_visit_accessor, strava_begin, strava_end
+        )
+    if config.hammerhead_client_code and not skip_hammerhead:
+        import_from_hammerhead_api(
+            config,
+            repository,
+            tile_visit_accessor,
+            hammerhead_begin,
+            hammerhead_end,
         )
 
     if len(repository) > 0:

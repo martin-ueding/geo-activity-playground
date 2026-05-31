@@ -239,6 +239,7 @@ def make_settings_blueprint(
     tile_visit_accessor: TileVisitAccessor,
 ) -> Blueprint:
     strava_login_helper = StravaLoginHelper(config_accessor)
+    hammerhead_login_helper = HammerheadLoginHelper(config_accessor)
     blueprint = Blueprint("settings", __name__, template_folder="templates")
 
     @blueprint.route("/")
@@ -902,6 +903,27 @@ def make_settings_blueprint(
         strava_login_helper.save_strava_code(code)
         return redirect(url_for(".strava"))
 
+    @blueprint.route("/hammerhead", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def hammerhead():
+        if request.method == "POST":
+            client_id = request.form["hammerhead_client_id"].strip()
+            client_secret = request.form["hammerhead_client_secret"].strip()
+            url = hammerhead_login_helper.save_hammerhead(client_id, client_secret)
+            return redirect(url)
+        return render_template(
+            "settings/hammerhead.html.j2",
+            **hammerhead_login_helper.render_hammerhead(),
+        )
+
+    @blueprint.route("/hammerhead-callback")
+    @needs_authentication(authenticator)
+    def hammerhead_callback():
+        code = request.args.get("code", type=str)
+        assert code
+        hammerhead_login_helper.save_hammerhead_code(code)
+        return redirect(url_for(".hammerhead"))
+
     @blueprint.route("/tags")
     @needs_authentication(authenticator)
     def tags_list():
@@ -1073,6 +1095,43 @@ class StravaLoginHelper:
         self._config_accessor().strava_client_code = code
         self._config_accessor.save()
         flash("Connected to Strava API", category="success")
+
+
+class HammerheadLoginHelper:
+    def __init__(self, config_accessor: ConfigAccessor) -> None:
+        self._config_accessor = config_accessor
+
+    def render_hammerhead(self) -> dict:
+        return {
+            "hammerhead_client_id": self._config_accessor().hammerhead_client_id,
+            "hammerhead_client_secret": self._config_accessor().hammerhead_client_secret,
+            "hammerhead_client_code": self._config_accessor().hammerhead_client_code,
+        }
+
+    def save_hammerhead(self, client_id: str, client_secret: str) -> str:
+        self._hammerhead_client_id = client_id
+        self._hammerhead_client_secret = client_secret
+
+        payload = {
+            "client_id": client_id,
+            "redirect_uri": url_for(".hammerhead_callback", _external=True),
+            "response_type": "code",
+            "scope": "activity:read",
+        }
+
+        arg_string = "&".join(
+            f"{key}={urllib.parse.quote(value)}" for key, value in payload.items()
+        )
+        return f"https://api.hammerhead.io/v1/auth/oauth/authorize?{arg_string}"
+
+    def save_hammerhead_code(self, code: str) -> None:
+        self._config_accessor().hammerhead_client_id = self._hammerhead_client_id
+        self._config_accessor().hammerhead_client_secret = (
+            self._hammerhead_client_secret
+        )
+        self._config_accessor().hammerhead_client_code = code
+        self._config_accessor.save()
+        flash("Connected to Hammerhead API", category="success")
 
 
 def save_privacy_zones(

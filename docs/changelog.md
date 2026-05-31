@@ -19,6 +19,7 @@ Types of changes
 
 Added:
 
+- Add **Hammerhead Karoo API integration** analogous to the Strava integration: register a Hammerhead OAuth app, paste the client ID/secret on the new Hammerhead settings page, and rides recorded on a Karoo head unit are downloaded automatically (FIT file per activity). ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 - Allow editing the **start time** of an activity from the edit page.
 
 Fixed:

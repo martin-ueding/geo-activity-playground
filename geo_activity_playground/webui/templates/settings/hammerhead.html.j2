@@ -1,0 +1,46 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Hammerhead API') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Hammerhead Connect') }}</h1>
+
+<div class="row mb-3">
+    <div class="col-lg-6">
+        <p>{{ _('You can connect to the Hammerhead Karoo API so that rides recorded on your Karoo head unit are downloaded automatically.') }}</p>
+
+        <p>{{ _('Hammerhead does not offer a shared OAuth application, so you need to register your own. Visit the') }} <a href="https://api.hammerhead.io/v1/docs" target="_blank">{{ _('Hammerhead API documentation') }}</a> {{ _('to request OAuth credentials, then paste the client ID and client secret below.') }}</p>
+
+        <p>{{ _('Make sure to set the redirect URI of your Hammerhead OAuth app to this callback URL:') }}</p>
+        <p><code>{{ url_for('settings.hammerhead_callback', _external=True) }}</code></p>
+
+        <p>
+            {{ _('Status:') }}
+            {% if hammerhead_client_code %}
+            <span class="badge text-bg-success">{{ _('Connected') }}</span>
+            {% else %}
+            <span class="badge text-bg-secondary">{{ _('Not connected') }}</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="col-lg-6">
+        <form action="" method="POST">
+            <div class="mb-3">
+                <label for="hammerhead_client_id" class="form-label">{{ _('Client ID') }}</label>
+                <input type="text" class="form-control" id="hammerhead_client_id" name="hammerhead_client_id"
+                    value="{{ hammerhead_client_id or '' }}" />
+            </div>
+            <div class="mb-3">
+                <label for="hammerhead_client_secret" class="form-label">{{ _('Client Secret') }}</label>
+                <input type="text" class="form-control" id="hammerhead_client_secret" name="hammerhead_client_secret"
+                    value="{{ hammerhead_client_secret or '' }}" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ _('Connect to Hammerhead') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
