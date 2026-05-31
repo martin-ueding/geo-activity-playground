@@ -210,6 +210,10 @@ def create_app(
     app = Flask(__name__)
 
     app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+    if database_uri.startswith("sqlite:///") and database_uri != "sqlite:///:memory:":
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+            "connect_args": {"timeout": 30},
+        }
     app.config["UPLOAD_FOLDER"] = "Activities"
     app.secret_key = secret_key or get_secret_key()
 
@@ -238,6 +242,17 @@ def create_app(
     Babel(app, locale_selector=get_locale)
 
     DB.init_app(app)
+
+    if database_uri.startswith("sqlite:///") and database_uri != "sqlite:///:memory:":
+        with app.app_context():
+
+            @sqlalchemy.event.listens_for(DB.engine, "connect")
+            def _set_sqlite_pragmas(dbapi_connection, connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.execute("PRAGMA synchronous=NORMAL")
+                cursor.execute("PRAGMA busy_timeout=30000")
+                cursor.close()
 
     if run_migrations:
         app.config["ALEMBIC"] = {"script_location": "../alembic/versions"}

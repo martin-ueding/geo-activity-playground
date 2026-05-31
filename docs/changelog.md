@@ -27,6 +27,7 @@ Fixed:
 
 - Fix **day overview crash** when a route without time information has a manually set start time: the missing moving speed previously caused a `TypeError` in the template. ([GH-435](https://github.com/martin-ueding/geo-activity-playground/issues/435))
 - Avoid a **full tile-visit recomputation** (~30 minutes on a large database) after editing the start time of an activity that was imported without time information. The affected tile visits are now repaired incrementally and only the cluster history for zoom levels whose first-visit ordering shifted is rebuilt.
+- Fix **`database is locked` crash when editing an activity** while another request (e.g. an in-flight import) was writing to the database. The SQLite engine now uses WAL journaling and a 30 s busy timeout so concurrent writers wait briefly instead of failing. ([GH-439](https://github.com/martin-ueding/geo-activity-playground/issues/439))
 - Fix **explorer tiles and heatmap not reflecting newly imported activities** until the web server was restarted. The heatmap blueprint snapshotted `tile_state` sub-dicts at startup, which became stale whenever the tile state was reset (e.g. after a consistency-check failure during import). Tile and heatmap responses now also set `Cache-Control: no-cache` so browsers no longer serve stale PNG tiles after an import. ([GH-436](https://github.com/martin-ueding/geo-activity-playground/issues/436))
 
 ## Version 1.28.0 — 2026-04-28
