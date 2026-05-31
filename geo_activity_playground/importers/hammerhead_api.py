@@ -10,13 +10,14 @@ from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
 from ..core.config import Config
-from ..core.datamodel import DB, Activity, get_or_make_kind
-from ..core.enrichment import update_and_commit
-from ..core.paths import (
-    hammerhead_api_dir,
-    hammerhead_last_activity_date_path,
+from ..core.datamodel import (
+    DB,
+    Activity,
+    HammerheadAuth,
+    get_hammerhead_auth,
+    get_or_make_kind,
 )
-from ..core.tasks import get_state, set_state
+from ..core.enrichment import update_and_commit
 from ..explorer.tile_visits import TileVisitAccessor
 from .activity_parsers import ActivityParseError, read_fit_activity
 
@@ -30,32 +31,29 @@ class HammerheadAuthError(RuntimeError):
     pass
 
 
-def _tokens_path() -> pathlib.Path:
-    return hammerhead_api_dir() / "hammerhead_tokens.json"
-
-
 def get_current_access_token(config: Config) -> str:
     if not (config.hammerhead_client_id and config.hammerhead_client_secret):
         raise HammerheadAuthError("Hammerhead client_id/client_secret not configured.")
 
-    tokens = get_state(_tokens_path(), None)
-    if not tokens:
+    auth = get_hammerhead_auth()
+
+    if not auth.access_token or not auth.refresh_token or auth.expires_at is None:
         if not config.hammerhead_client_code:
             raise HammerheadAuthError(
                 "Missing Hammerhead authorization code; reconnect on the settings page."
             )
         logger.info("Exchange Hammerhead authorization code for access token …")
-        tokens = _exchange_code_for_token(config)
+        _exchange_code_for_token(config, auth)
 
-    if tokens["expires_at"] < datetime.datetime.now().timestamp():
+    if auth.expires_at is None or auth.expires_at < datetime.datetime.now(datetime.UTC):
         logger.info("Refresh Hammerhead access token …")
-        tokens = _refresh_token(config, tokens["refresh"])
+        _refresh_token(config, auth)
 
-    set_state(_tokens_path(), tokens)
-    return tokens["access"]
+    assert auth.access_token is not None
+    return auth.access_token
 
 
-def _exchange_code_for_token(config: Config) -> dict:
+def _exchange_code_for_token(config: Config, auth: HammerheadAuth) -> None:
     response = requests.post(
         f"{HAMMERHEAD_API_BASE}/auth/oauth/token",
         data={
@@ -70,15 +68,15 @@ def _exchange_code_for_token(config: Config) -> dict:
         raise HammerheadAuthError(
             f"Hammerhead token exchange failed: {response.status_code} {response.text}"
         )
-    return _tokens_from_response(response.json())
+    _apply_token_response(auth, response.json())
 
 
-def _refresh_token(config: Config, refresh_token: str) -> dict:
+def _refresh_token(config: Config, auth: HammerheadAuth) -> None:
     response = requests.post(
         f"{HAMMERHEAD_API_BASE}/auth/oauth/token",
         data={
             "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
+            "refresh_token": auth.refresh_token,
             "client_id": config.hammerhead_client_id,
             "client_secret": config.hammerhead_client_secret,
         },
@@ -88,16 +86,17 @@ def _refresh_token(config: Config, refresh_token: str) -> dict:
         raise HammerheadAuthError(
             f"Hammerhead token refresh failed: {response.status_code} {response.text}"
         )
-    return _tokens_from_response(response.json())
+    _apply_token_response(auth, response.json())
 
 
-def _tokens_from_response(payload: dict) -> dict:
+def _apply_token_response(auth: HammerheadAuth, payload: dict) -> None:
     expires_in = int(payload.get("expires_in", 3600))
-    return {
-        "access": payload["access_token"],
-        "refresh": payload["refresh_token"],
-        "expires_at": datetime.datetime.now().timestamp() + expires_in - 60,
-    }
+    auth.access_token = payload["access_token"]
+    auth.refresh_token = payload["refresh_token"]
+    auth.expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
+        seconds=expires_in - 60
+    )
+    DB.session.commit()
 
 
 def import_from_hammerhead_api(
@@ -129,12 +128,11 @@ def _try_import_hammerhead(
     hammerhead_end: str | None,
 ) -> bool:
     access_token = get_current_access_token(config)
+    auth = get_hammerhead_auth()
     session = requests.Session()
     session.headers.update({"Authorization": f"Bearer {access_token}"})
 
-    start_date = hammerhead_begin or get_state(
-        hammerhead_last_activity_date_path(), None
-    )
+    start_date = hammerhead_begin or auth.last_activity_date
 
     page = 1
     per_page = 100
@@ -207,7 +205,8 @@ def _try_import_hammerhead(
         page += 1
 
     if newest_seen_date and hammerhead_begin is None and hammerhead_end is None:
-        set_state(hammerhead_last_activity_date_path(), newest_seen_date[:10])
+        auth.last_activity_date = newest_seen_date[:10]
+        DB.session.commit()
 
     return rate_limited
 
