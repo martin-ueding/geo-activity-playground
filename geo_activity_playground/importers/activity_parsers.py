@@ -128,6 +128,8 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                             row["calories"] = values["calories"]
                         if "cadence" in fields:
                             row["cadence"] = values["cadence"]
+                        if "power" in fields:
+                            row["power"] = values["power"]
                         if "distance" in fields:
                             row["distance"] = values["distance"]
                         if "altitude" in fields:
@@ -220,6 +222,8 @@ def read_gpx_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                 }
                 if point.extensions:
                     for ext in point.extensions:
+                        if ext.tag == "power" and ext.text:
+                            row["power"] = float(ext.text)
                         if (
                             ext.tag
                             == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}TrackPointExtension"
@@ -235,6 +239,17 @@ def read_gpx_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                                     == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}cad"
                                 ):
                                     row["cadence"] = int(float(datum.text))
+                        if (
+                            ext.tag
+                            == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v2}TrackPointExtension"
+                        ):
+                            for datum in ext:
+                                if (
+                                    datum.tag
+                                    == "{http://www.garmin.com/xmlschemas/TrackPointExtension/v2}PowerInWatts"
+                                    and datum.text
+                                ):
+                                    row["power"] = float(datum.text)
 
                 points.append(row)
     df = pd.DataFrame(points)
@@ -283,6 +298,8 @@ def read_tcx_activity(path: pathlib.Path, opener) -> pd.DataFrame:
                 row["heartrate"] = trackpoint.hr_value
             if trackpoint.cadence:
                 row["cadence"] = trackpoint.cadence
+            if trackpoint.tpx_ext.get("Watts"):
+                row["power"] = float(trackpoint.tpx_ext["Watts"])
             if trackpoint.distance:
                 row["distance"] = trackpoint.distance
             rows.append(row)
