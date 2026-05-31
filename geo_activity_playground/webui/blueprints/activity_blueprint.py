@@ -171,6 +171,10 @@ def make_activity_blueprint(
                 .dt.tz_localize(None)
             )
 
+        if activity.start_local_tz:
+            context["date"] = activity.start_local_tz.date()
+            context["time"] = activity.start_local_tz.time()
+
         if not pd.isna(time_series["time"]).all():
             context.update(
                 {
@@ -182,8 +186,6 @@ def make_activity_blueprint(
                     "speed_distribution_plot": speed_distribution_plot(
                         display_time_series
                     ),
-                    "date": activity.start_local_tz.date(),
-                    "time": activity.start_local_tz.time(),
                     "line_color_column": next(iter(line_color_columns_avail)),
                     "line_color_columns": {
                         name: {
