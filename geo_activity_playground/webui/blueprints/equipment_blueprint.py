@@ -149,6 +149,9 @@ def make_equipment_blueprint(
             "equipment_variables": equipment_variables,
             "equipment_summary": equipment_summary.to_dict(orient="records"),
             "stacked_area_chart": stacked_area_chart,
+            "visible": {
+                "distance": "distance" in config.visible_table_columns,
+            },
         }
 
         return render_template("equipment/index.html.j2", **variables)

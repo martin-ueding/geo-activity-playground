@@ -13,7 +13,7 @@
             <thead>
                 <tr>
                     <th>{{ _('Equipment') }}</th>
-                    <th style="text-align: right;">{{ _('Distance / km') }}</th>
+                    {% if visible['distance'] %}<th style="text-align: right;">{{ _('Distance / km') }}</th>{% endif %}
                     <th style="text-align: right;">{{ _('First use') }}</th>
                     <th style="text-align: right;">{{ _('Last use') }}</th>
                 </tr>
@@ -22,7 +22,7 @@
                 {% for equipment in equipment_summary %}
                 <tr>
                     <td>{{ equipment.equipment }}</td>
-                    <td style="text-align: right;">{{ equipment.total_distance_km }}</td>
+                    {% if visible['distance'] %}<td style="text-align: right;">{{ equipment.total_distance_km }}</td>{% endif %}
                     <td style="text-align: right;">{{ equipment.first_use }}</td>
                     <td style="text-align: right;">{{ equipment.last_use }}</td>
                 </tr>

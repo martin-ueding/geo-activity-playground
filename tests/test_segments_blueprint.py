@@ -14,6 +14,8 @@ def test_segment_df_handles_empty_matches() -> None:
         "duration_s",
         "duration",
         "direction",
+        "average_speed_kmh",
+        "power_avg",
         "entry_time",
         "exit_time",
         "activity_id",

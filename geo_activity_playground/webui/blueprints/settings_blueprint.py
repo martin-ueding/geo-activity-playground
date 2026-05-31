@@ -57,6 +57,7 @@ from ...explorer.tile_visits import (
 )
 from ...importers.strava_api import refresh_activity_names_from_strava
 from ..authenticator import Authenticator, needs_authentication
+from ..columns import TOGGLEABLE_TABLE_COLUMNS
 from ..flasher import Flasher, FlashTypes
 from ..i18n import SUPPORTED_LANGUAGES
 
@@ -824,6 +825,29 @@ def make_settings_blueprint(
         return render_template(
             "settings/segmentation.html.j2",
             threshold=config_accessor().time_diff_threshold_seconds,
+        )
+
+    @blueprint.route("/table-columns", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def table_columns():
+        if request.method == "POST":
+            names = request.form.getlist("name")
+            known = {col.name for col in TOGGLEABLE_TABLE_COLUMNS}
+            config_accessor().visible_table_columns = [n for n in names if n in known]
+            config_accessor.save()
+            flasher.flash_message(
+                _("Updated summary table columns."), FlashTypes.SUCCESS
+            )
+        return render_template(
+            "settings/table-columns.html.j2",
+            columns=[
+                (
+                    col.name,
+                    col.display_name,
+                    col.name in config_accessor().visible_table_columns,
+                )
+                for col in TOGGLEABLE_TABLE_COLUMNS
+            ],
         )
 
     @blueprint.route("/sharepic", methods=["GET", "POST"])
