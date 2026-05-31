@@ -7,4 +7,4 @@ dist
 site
 *~
 Cache
-database.sqlite
+testdata/database.sqlite
