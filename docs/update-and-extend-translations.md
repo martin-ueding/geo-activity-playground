@@ -4,7 +4,7 @@ This guide explains how to work with the internationalization (i18n) system in G
 
 ## Overview
 
-Translatable strings in templates are wrapped with `{{ _('...') }}` and in Python code with `_('...')`. These strings are extracted into `.pot` (template) and `.po` (language-specific) files, then compiled into binary `.mo` files that Flask-Babel uses at runtime.
+<span v-pre>Translatable strings in templates are wrapped with `{{ _('...') }}` and in Python code with `_('...')`.</span> These strings are extracted into `.pot` (template) and `.po` (language-specific) files, then compiled into binary `.mo` files that Flask-Babel uses at runtime.
 
 The translation files are located in:
 

@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Migrate the documentation from [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to [VitePress](https://vitepress.dev/) as I didn't want to watch the [collapse of MkDocs](https://fpgmaas.com/blog/collapse-of-mkdocs/) any more.
 
 ## Version 1.29.0 — 2026-05-31
 

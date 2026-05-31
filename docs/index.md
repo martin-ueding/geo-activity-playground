@@ -50,8 +50,9 @@ Choose the approach that best fits your situation:
 | **You want to keep using Strava** but also use this tool | [Connect Strava API](connect-strava-api.md) — syncs automatically from Strava |
 | **You want to leave Strava** and stop using it entirely | [Moving from Strava](moving-from-strava.md) — converts your Strava archive |
 
-!!! warning "Don't mix these approaches"
-    If you have a Strava archive (ZIP file), do **not** simply copy its `activities/` folder into your `Activities/` folder. Use either [Connect Strava API](connect-strava-api.md) or [Moving from Strava](moving-from-strava.md) instead.
+::: warning Don't mix these approaches
+If you have a Strava archive (ZIP file), do **not** simply copy its `activities/` folder into your `Activities/` folder. Use either [Connect Strava API](connect-strava-api.md) or [Moving from Strava](moving-from-strava.md) instead.
+:::
 
 Have fun. If you're stuck, [get help](get-help.md).
 

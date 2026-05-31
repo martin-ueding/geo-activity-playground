@@ -104,7 +104,13 @@ def main() -> None:
         )
 
     step("Deploy documentation")
-    run("uv", "run", "mkdocs", "gh-deploy")
+    run("vitepress", "build", "docs")
+    dist = REPO_ROOT / "docs/.vitepress/dist"
+    run("git", "-C", str(dist), "init")
+    run("git", "-C", str(dist), "add", "-A")
+    run("git", "-C", str(dist), "commit", "-m", f"docs: deploy {version}")
+    origin = capture("git", "remote", "get-url", "origin")
+    run("git", "-C", str(dist), "push", "-f", origin, "HEAD:gh-pages")
 
     step("Create GitHub release")
     gh_check = subprocess.run(
