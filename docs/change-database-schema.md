@@ -92,6 +92,10 @@ sqlite> SELECT * FROM alembic_version;
 
 So here the migration was already applied at the time of writing.
 
+## Schema anchor database
+
+A `database.sqlite` file is checked into the repository at the project root. Alembic's `sqlalchemy.url` in `alembic.ini` points to this file (as a relative path), so `--autogenerate` can compare the current model against a known-good schema state without requiring a separately configured developer database. After generating a migration, the checked-in `database.sqlite` should be upgraded along with it so it stays in sync with the latest revision.
+
 ## Summary
 
 If you want to change the data model, do the following:

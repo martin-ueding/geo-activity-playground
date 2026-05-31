@@ -6,7 +6,7 @@ This project is a Flask application that uses SQLAlchemy for persistence.
 
 Use modern Python syntax with type annotations.
 
-Don't try to generate Alembic migrations by hand. Just let me run the migration generation script myself.
+When you change the SQLAlchemy model, generate the Alembic migration yourself by running `uv run alembic revision --autogenerate -m 'MESSAGE'`. The `database.sqlite` file checked into the repository serves as the schema anchor that Alembic compares against. Add both the model change and the generated migration file in `geo_activity_playground/alembic/versions/` to git. Do not hand-write migrations — always use autogenerate.
 
 This project is i18n'ed. Use `_(…)` for user facing strings.
 
