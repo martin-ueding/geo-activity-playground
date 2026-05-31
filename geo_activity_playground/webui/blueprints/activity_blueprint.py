@@ -53,7 +53,11 @@ from ...core.raster_map import (
     tile_bounds_around_center,
 )
 from ...explorer.grid_file import make_grid_file_geojson, make_grid_points
-from ...explorer.tile_visits import TileVisitAccessor, remove_activity_from_tile_state
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    refresh_tile_visits_for_activity,
+    remove_activity_from_tile_state,
+)
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TIME_SERIES_COLUMNS
 
@@ -364,6 +368,8 @@ def make_activity_blueprint(
         if request.method == "POST":
             activity.name = request.form.get("name")
 
+            previous_start = activity.start
+            start_changed = False
             form_start = request.form.get("start")
             if form_start:
                 try:
@@ -376,6 +382,7 @@ def make_activity_blueprint(
                 activity.start = local_dt.astimezone(zoneinfo.ZoneInfo("UTC")).replace(
                     tzinfo=None
                 )
+                start_changed = activity.start != previous_start
 
             form_equipment = request.form.get("equipment")
             if form_equipment and form_equipment != "null":
@@ -395,6 +402,8 @@ def make_activity_blueprint(
             ]
 
             DB.session.commit()
+            if start_changed:
+                refresh_tile_visits_for_activity(activity.id, tile_visit_accessor)
             return redirect(url_for(".show", id=activity.id))
 
         return render_template(

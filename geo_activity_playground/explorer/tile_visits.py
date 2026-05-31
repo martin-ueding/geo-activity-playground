@@ -533,6 +533,96 @@ def _migrate_from_pickle_to_db(old_tile_state: dict) -> None:
     logger.info("Migration complete.")
 
 
+def refresh_tile_visits_for_activity(
+    activity_id: int, tile_visit_accessor: TileVisitAccessor
+) -> None:
+    """Incrementally repair tile visits after an activity's start time changed.
+
+    Recomputes first/last visitor metadata for every tile the activity touches
+    and rebuilds the cluster history for zoom levels whose first-visit ordering
+    shifted.
+    """
+    activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
+    affected_zooms: set[int] = set()
+
+    for zoom, tiles_for_zoom in activities_per_tile.items():
+        affected_tiles = [
+            tile
+            for tile, activity_ids in tiles_for_zoom.items()
+            if activity_id in activity_ids
+        ]
+        if not affected_tiles:
+            continue
+
+        relevant_activity_ids: set[int] = set()
+        for tile in affected_tiles:
+            relevant_activity_ids.update(tiles_for_zoom[tile])
+
+        starts_by_id = {
+            row.id: row.start
+            for row in DB.session.execute(
+                sa.select(Activity.id, Activity.start).where(
+                    Activity.id.in_(relevant_activity_ids)
+                )
+            )
+        }
+
+        for chunk_start in range(0, len(affected_tiles), 400):
+            chunk = affected_tiles[chunk_start : chunk_start + 400]
+            visits = {
+                (visit.tile_x, visit.tile_y): visit
+                for visit in DB.session.scalars(
+                    sa.select(TileVisit).where(
+                        TileVisit.zoom == zoom,
+                        sa.tuple_(TileVisit.tile_x, TileVisit.tile_y).in_(chunk),
+                    )
+                )
+            }
+
+            for tile in chunk:
+                visit = visits.get(tile)
+                if visit is None:
+                    continue
+                visiting_ids = tiles_for_zoom[tile]
+                earliest_id: int | None = None
+                earliest_time: datetime.datetime | None = None
+                latest_id: int | None = None
+                latest_time: datetime.datetime | None = None
+                for vid in visiting_ids:
+                    start = starts_by_id.get(vid)
+                    if start is None:
+                        continue
+                    if earliest_time is None or start < earliest_time:
+                        earliest_time = start
+                        earliest_id = vid
+                    if latest_time is None or start > latest_time:
+                        latest_time = start
+                        latest_id = vid
+
+                if earliest_id is None:
+                    # No visitor has a known start; keep the existing
+                    # first/last activity ids and NULL times.
+                    continue
+
+                if (
+                    visit.first_activity_id != earliest_id
+                    or visit.first_time != earliest_time
+                ):
+                    affected_zooms.add(zoom)
+                visit.first_activity_id = earliest_id
+                visit.first_time = earliest_time
+                visit.last_activity_id = latest_id
+                visit.last_time = latest_time
+
+        DB.session.commit()
+
+    for zoom in affected_zooms:
+        rebuild_cluster_history_for_zoom(zoom, get_tile_history_df(zoom))
+
+    invalidate_tile_visits_cache()
+    tile_visit_accessor.save()
+
+
 def compute_tile_visits_new(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
