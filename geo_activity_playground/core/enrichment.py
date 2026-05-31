@@ -210,15 +210,20 @@ def enrichment_distance(
         changed = True
 
     # A GPS spike is a point where speed rose sharply AND drops sharply at the next sample.
-    # Using diff() (current − previous) and diff(-1) (current − next) both > threshold
-    # detects isolated peaks while leaving legitimate sustained high speeds (car/train/plane) intact.
-    spike_diff_threshold = 100.0  # km/h per GPS sample
-    is_spike = (time_series["speed"].diff() > spike_diff_threshold) & (
-        time_series["speed"].diff(-1) > spike_diff_threshold
+    # We measure the rate of change in km/h per second (acceleration) rather than raw km/h
+    # per sample, so the threshold is independent of the GPS sampling interval.
+    # The bilateral check (rise AND fall) leaves legitimate sustained high speeds intact.
+    time_diff_s = time_series["time"].diff().dt.total_seconds()
+    time_diff_s_next = (-time_series["time"].diff(-1)).dt.total_seconds()
+    speed_rise_rate = time_series["speed"].diff() / time_diff_s
+    speed_fall_rate = time_series["speed"].diff(-1) / time_diff_s_next
+    spike_acceleration_threshold = 20.0  # km/h per second ≈ 5.6 m/s²
+    is_spike = (speed_rise_rate > spike_acceleration_threshold) & (
+        speed_fall_rate > spike_acceleration_threshold
     )
     if is_spike.any():
         time_series.loc[is_spike, "speed"] = np.nan
-        time_series["speed"].interpolate(inplace=True)
+        time_series["speed"] = time_series["speed"].interpolate()
         changed = True
 
     if "segment_id" not in time_series.columns:
