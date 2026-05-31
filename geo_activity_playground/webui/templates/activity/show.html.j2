@@ -417,6 +417,16 @@
 </div>
 {% endif %}
 
+{% if power_time_plot is defined %}
+<h2>{{ _('Power') }}</h2>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct(power_time_plot) }}
+    </div>
+</div>
+{% endif %}
+
 
 <h2>{{ _('Share picture') }}</h2>
 

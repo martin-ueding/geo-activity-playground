@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Power time-series plot on the activity view page, shown when the activity contains power data. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
+
 Fixed:
 
 - On Windows, Gunicorn is not supported (it depends on Unix-only modules). The default HTTP server is now **Waitress** on Windows, and Gunicorn is no longer installed as a dependency there. If `--http-server gunicorn` is passed explicitly on Windows, it falls back to Waitress with a warning. ([GH-442](https://github.com/martin-ueding/geo-activity-playground/issues/442))
