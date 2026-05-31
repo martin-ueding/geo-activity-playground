@@ -120,6 +120,8 @@ def main() -> None:
             port=options.port,
             strava_begin=options.strava_begin,
             strava_end=options.strava_end,
+            hammerhead_begin=options.hammerhead_begin,
+            hammerhead_end=options.hammerhead_end,
             http_server=options.http_server,
             waitress_threads=options.waitress_threads,
         )
@@ -153,6 +155,14 @@ def main() -> None:
     )
     subparser.add_argument(
         "--strava-end", help="End date to limit Strava sync, format YYYY-MM-DD"
+    )
+    subparser.add_argument(
+        "--hammerhead-begin",
+        help="Start date to limit Hammerhead sync, format YYYY-MM-DD",
+    )
+    subparser.add_argument(
+        "--hammerhead-end",
+        help="End date to limit Hammerhead sync, format YYYY-MM-DD",
     )
 
     subparser = subparsers.add_parser(

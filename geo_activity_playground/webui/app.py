@@ -171,10 +171,18 @@ def importer_thread(
     config: Config,
     strava_begin: str | None,
     strava_end: str | None,
+    hammerhead_begin: str | None,
+    hammerhead_end: str | None,
 ) -> None:
     with app.app_context():
         scan_for_activities(
-            repository, tile_visit_accessor, config, strava_begin, strava_end
+            repository,
+            tile_visit_accessor,
+            config,
+            strava_begin=strava_begin,
+            strava_end=strava_end,
+            hammerhead_begin=hammerhead_begin,
+            hammerhead_end=hammerhead_end,
         )
     logger.info("Importer thread is done.")
 
@@ -390,6 +398,8 @@ def web_ui_main(
     port: int,
     strava_begin: str | None,
     strava_end: str | None,
+    hammerhead_begin: str | None = None,
+    hammerhead_end: str | None = None,
     http_server: Literal["waitress", "werkzeug"] = "waitress",
     waitress_threads: int = 8,
 ) -> None:
@@ -444,6 +454,8 @@ def web_ui_main(
                 config_accessor(),
                 strava_begin,
                 strava_end,
+                hammerhead_begin,
+                hammerhead_end,
             ),
         )
         thread.start()

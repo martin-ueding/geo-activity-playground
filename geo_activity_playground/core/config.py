@@ -46,6 +46,9 @@ class Config:
     strava_client_id: int = 131693
     strava_client_secret: str = "0ccc0100a2c218512a7ef0cea3b0e322fb4b4365"
     strava_client_code: str | None = None
+    hammerhead_client_id: str | None = None
+    hammerhead_client_secret: str | None = None
+    hammerhead_client_code: str | None = None
     time_diff_threshold_seconds: int | None = 30
     upload_password: str | None = None
     segment_max_distance: int = 20
