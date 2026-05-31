@@ -34,8 +34,11 @@ def step(label: str) -> None:
 
 def main() -> None:
     step("Determine next version")
-    version = capture("uv", "run", "cz", "bump", "--get-next")
-    print(f"Next version: {version}")
+    try:
+        version = capture("uv", "run", "cz", "bump", "--get-next")
+        print(f"Next version: {version}")
+    except subprocess.CalledProcessError:
+        version = capture("uv", "version", "--short")
 
     step("Set version in pyproject.toml")
     with open(PYPROJECT, "rb") as f:
