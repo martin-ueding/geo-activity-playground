@@ -17,9 +17,9 @@ The webserver will start up and give you a bit of output like this:
 2026-04-11 20:34:09 alembic.runtime.migration INFO Context impl SQLiteImpl.
 2026-04-11 20:34:09 alembic.runtime.migration INFO Will assume non-transactional DDL.
 Importing activity files: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 35.74it/s]
-2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Importer thread is done.
-2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Starting Waitress server at http://127.0.0.1:5000
-2026-04-11 20:34:09 waitress INFO Serving on http://127.0.0.1:5000
+2026-04-11 20:34:09 geo_activity_playground.webui.app INFO Starting Gunicorn server at http://127.0.0.1:5000 with 4 workers × 8 threads
+[2026-04-11 20:34:09 +0200] [12345] [INFO] Starting gunicorn 26.0.0
+[2026-04-11 20:34:09 +0200] [12345] [INFO] Listening at: http://127.0.0.1:5000
 
 ```
 
@@ -41,8 +41,12 @@ geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-
 
 In case you don't like the default value of `127.0.0.1:5000`, you can use the optional command line arguments `--host` and `--port` to specify your values.
 
-## Optional: choosing the HTTP server
+## Optional: tuning the HTTP server
 
-`serve` uses `--http-server waitress` by default, which is the recommended setting for normal use.
+`serve` uses Gunicorn by default with 4 worker processes and 8 threads per worker. You can tune these with `--workers` and `--threads`:
 
-There is also `--http-server werkzeug` if you explicitly want the Werkzeug server (for example while debugging server behavior). Most users can safely ignore this option.
+```bash
+geo-activity-playground --basedir YOUR_BASEDIR serve --workers 8 --threads 4
+```
+
+If you prefer single-process threaded serving (the old default), pass `--http-server waitress`. For development there is also `--http-server werkzeug`.
