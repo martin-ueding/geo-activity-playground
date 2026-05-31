@@ -138,6 +138,23 @@
     </div>
 </div>
 
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Re-import Time Series from Activity Files') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Re-reads the raw time series data from the original activity files (GPX, FIT, TCX, …) for all activities that were imported from local files. Existing metadata (name, equipment, kind, tags) is preserved. Use this to pick up parser improvements or to recover from a corrupted parquet cache.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to re-import time series from activity files? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="reimport_time_series_from_files">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Re-import time series from files') }}
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="card border-danger mb-3">
     <div class="card-header bg-danger text-white">
         <h5 class="card-title mb-0">{{ _('Wipe Local Activity State') }}</h5>

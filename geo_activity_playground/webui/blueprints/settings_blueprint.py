@@ -55,6 +55,11 @@ from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
+from ...importers.activity_parsers import (
+    ActivityParseError,
+    NoGeoDataError,
+    read_activity,
+)
 from ...importers.strava_api import refresh_activity_names_from_strava
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TOGGLEABLE_TABLE_COLUMNS
@@ -136,6 +141,33 @@ def _reprocess_all_activities(
             activity.raw_time_series if use_raw_time_series else activity.time_series
         )
         update_and_commit(activity, time_series, config, force=force)
+
+
+def _reimport_time_series_from_files(config: Config) -> tuple[int, int, int]:
+    activities = DB.session.scalars(
+        sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
+    ).all()
+    reimported = skipped = errors = 0
+    for activity in tqdm(activities, desc="Re-importing time series from files"):
+        assert activity.path is not None
+        path = pathlib.Path(activity.path)
+        if not path.exists():
+            logger.warning(f"Activity file not found, skipping: {path}")
+            skipped += 1
+            continue
+        try:
+            _, time_series = read_activity(path)
+        except (ActivityParseError, NoGeoDataError) as e:
+            logger.error(f"Could not parse {path}: {e}")
+            errors += 1
+            continue
+        except Exception:
+            logger.exception(f"Unexpected error parsing {path}")
+            errors += 1
+            continue
+        update_and_commit(activity, time_series, config, force=True)
+        reimported += 1
+    return reimported, skipped, errors
 
 
 def _truncate_user_content_tables() -> None:
@@ -332,6 +364,24 @@ def make_settings_blueprint(
                         "Refreshed activity names from Strava. Updated %(updated_names)s activities."
                     )
                     % {"updated_names": updated_names},
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "reimport_time_series_from_files":
+                logger.info(
+                    "User requested re-import of time series from activity files."
+                )
+                reimported, skipped, errors = _reimport_time_series_from_files(
+                    config_accessor()
+                )
+                flasher.flash_message(
+                    _(
+                        "Re-imported time series from activity files: %(reimported)s re-imported, %(skipped)s skipped (file missing), %(errors)s errors."
+                    )
+                    % {
+                        "reimported": reimported,
+                        "skipped": skipped,
+                        "errors": errors,
+                    },
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))
