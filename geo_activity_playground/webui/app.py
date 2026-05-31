@@ -9,7 +9,6 @@ import pathlib
 import secrets
 import shutil
 import sys
-import threading
 import urllib.parse
 import uuid
 import warnings
@@ -162,29 +161,6 @@ def get_secret_key():
         with open(secret_file, "w") as f:
             json.dump(secret, f)
     return secret
-
-
-def importer_thread(
-    app: Flask,
-    repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
-    config: Config,
-    strava_begin: str | None,
-    strava_end: str | None,
-    hammerhead_begin: str | None,
-    hammerhead_end: str | None,
-) -> None:
-    with app.app_context():
-        scan_for_activities(
-            repository,
-            tile_visit_accessor,
-            config,
-            strava_begin=strava_begin,
-            strava_end=strava_end,
-            hammerhead_begin=hammerhead_begin,
-            hammerhead_end=hammerhead_end,
-        )
-    logger.info("Importer thread is done.")
 
 
 def create_app(
@@ -456,25 +432,19 @@ def web_ui_main(
                 DB.session.delete(activity)
                 DB.session.commit()
 
-    # Start background importer thread
     if not skip_reload:
         repository = ActivityRepository()
         tile_visit_accessor = TileVisitAccessor()
-        thread = threading.Thread(
-            target=importer_thread,
-            args=(
-                app,
+        with app.app_context():
+            scan_for_activities(
                 repository,
                 tile_visit_accessor,
                 config_accessor(),
-                strava_begin,
-                strava_end,
-                hammerhead_begin,
-                hammerhead_end,
-            ),
-        )
-        thread.start()
-        thread.join()
+                strava_begin=strava_begin,
+                strava_end=strava_end,
+                hammerhead_begin=hammerhead_begin,
+                hammerhead_end=hammerhead_end,
+            )
 
     # Migrate tile cache directory structure
     base_dir = pathlib.Path("Open Street Map Tiles")
