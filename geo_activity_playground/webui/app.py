@@ -479,6 +479,22 @@ def web_ui_main(
             threads=threads,
         )
     elif http_server == "gunicorn":
+        import sys
+
+        if sys.platform == "win32":
+            logger.warning(
+                "Gunicorn is not supported on Windows; falling back to Waitress."
+            )
+            waitress_application = _without_response_header(app, "Date")
+            waitress.serve(
+                waitress_application,
+                host=host,
+                port=port,
+                asyncore_use_poll=True,
+                threads=threads,
+            )
+            return
+
         from gunicorn.app.base import BaseApplication
 
         class _GunicornApp(BaseApplication):

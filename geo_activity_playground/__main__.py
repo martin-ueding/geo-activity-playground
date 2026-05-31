@@ -1,6 +1,7 @@
 import argparse
 import logging
 import pathlib
+import sys
 
 import coloredlogs
 
@@ -141,7 +142,7 @@ def main() -> None:
     subparser.add_argument(
         "--http-server",
         choices=["waitress", "werkzeug", "gunicorn"],
-        default="gunicorn",
+        default="waitress" if sys.platform == "win32" else "gunicorn",
         help="HTTP server implementation to use (default: %(default)s)",
     )
     subparser.add_argument(

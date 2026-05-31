@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- On Windows, Gunicorn is not supported (it depends on Unix-only modules). The default HTTP server is now **Waitress** on Windows, and Gunicorn is no longer installed as a dependency there. If `--http-server gunicorn` is passed explicitly on Windows, it falls back to Waitress with a warning. ([GH-442](https://github.com/martin-ueding/geo-activity-playground/issues/442))
+
 Changed:
 
 - Migrate the documentation from [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to [VitePress](https://vitepress.dev/) as I didn't want to watch the [collapse of MkDocs](https://fpgmaas.com/blog/collapse-of-mkdocs/) any more.
