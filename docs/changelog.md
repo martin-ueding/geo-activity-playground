@@ -25,6 +25,7 @@ Added:
 
 Fixed:
 
+- Remove **duplicate default markers** on the activity map: the track GeoJSON embeds progress-marker points that were being rendered twice — once as default Leaflet beach-flag pins and once as the intended quarter-progress icons. The track layer now filters out Point features so only the styled LineStrings are drawn.
 - Improve **GPS spike filter** to use acceleration (km/h per second) instead of raw speed change per sample, so short-duration spikes (e.g. 15 → 75 km/h in 1 second) are now caught regardless of the GPS sampling interval. The bilateral rise-and-fall check still prevents legitimate sustained high speeds from being removed. Also fixed a silent pandas Copy-on-Write bug that prevented the spike interpolation from taking effect. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
 - Fix **day overview crash** when a route without time information has a manually set start time: the missing moving speed previously caused a `TypeError` in the template. ([GH-435](https://github.com/martin-ueding/geo-activity-playground/issues/435))
 - Avoid a **full tile-visit recomputation** (~30 minutes on a large database) after editing the start time of an activity that was imported without time information. The affected tile visits are now repaired incrementally and only the cluster history for zoom levels whose first-visit ordering shifted is rebuilt.

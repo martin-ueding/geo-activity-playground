@@ -231,7 +231,10 @@
             }
 
             const trackLayer = L.geoJSON(trackGeojson, {
-                style: styleTrackFeature
+                style: styleTrackFeature,
+                filter: function (feature) {
+                    return feature.geometry.type !== 'Point';
+                }
             }).addTo(map);
             L.geoJSON(progressMarkerGeojson, {
                 pointToLayer: function (feature, latlng) {
@@ -464,7 +467,10 @@
 
         // Add activity track (red line)
         L.geoJSON(trackGeojson, {
-            style: { color: "#ff0000" }
+            style: { color: "#ff0000" },
+            filter: function (feature) {
+                return feature.geometry.type !== 'Point';
+            }
         }).addTo(map);
 
         // Add explorer overlay
