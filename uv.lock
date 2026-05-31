@@ -916,7 +916,6 @@ requires-dist = [
     { name = "stravalib", specifier = ">=2.0" },
     { name = "tcxreader", specifier = ">=0.4.5" },
     { name = "timezonefinder", specifier = ">=6.5.9" },
-    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.1" },
     { name = "tqdm", specifier = ">=4.64.0" },
     { name = "vegafusion", specifier = ">=2.0.3" },
     { name = "vl-convert-python", specifier = ">=1.0.1" },
