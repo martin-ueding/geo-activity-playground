@@ -51,6 +51,15 @@ class Config:
     hammerhead_client_code: str | None = None
     time_diff_threshold_seconds: int | None = 30
     upload_password: str | None = None
+    visible_table_columns: list[str] = dataclasses.field(
+        default_factory=lambda: [
+            "distance",
+            "duration",
+            "direction",
+            "equipment",
+            "kind",
+        ]
+    )
     segment_max_distance: int = 20
     segment_split_distance: int = 100
     search_map_tiles_per_page: int = 50

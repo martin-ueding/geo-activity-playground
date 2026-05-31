@@ -71,11 +71,13 @@
             <tr>
                 <th>{{ _('Date') }}</th>
                 <th>{{ _('Activity') }}</th>
-                <th>{{ _('Direction') }}</th>
-                <th class="numeric-sort">{{ _('Distance / km') }}</th>
-                <th>{{ _('Duration') }}</th>
-                <th>{{ _('Equipment') }}</th>
-                <th>{{ _('Kind') }}</th>
+                {% if visible['direction'] %}<th>{{ _('Direction') }}</th>{% endif %}
+                {% if visible['distance'] %}<th class="numeric-sort">{{ _('Distance / km') }}</th>{% endif %}
+                {% if visible['duration'] %}<th>{{ _('Duration') }}</th>{% endif %}
+                {% if visible['average_speed'] %}<th class="numeric-sort">{{ _('Avg. Speed / km/h') }}</th>{% endif %}
+                {% if visible['average_power'] %}<th class="numeric-sort">{{ _('Avg. Power / W') }}</th>{% endif %}
+                {% if visible['equipment'] %}<th>{{ _('Equipment') }}</th>{% endif %}
+                {% if visible['kind'] %}<th>{{ _('Kind') }}</th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -83,11 +85,13 @@
             <tr>
                 <td>{{ row['entry_time']|dt }}</td>
                 <td><a href="{{ url_for('activity.show', id=row['activity_id']) }}">{{ row['activity_name'] }}</a></td>
-                <td>{{ row['direction'] }}</td>
-                <td>{{ row['distance_km'] | round(2) }}</td>
-                <td>{{ row['duration']|td }}</td>
-                <td>{{ row["equipment_name"] }}</td>
-                <td>{{ row["kind_name"] }}</td>
+                {% if visible['direction'] %}<td>{{ row['direction'] }}</td>{% endif %}
+                {% if visible['distance'] %}<td>{{ row['distance_km'] | round(2) }}</td>{% endif %}
+                {% if visible['duration'] %}<td>{{ row['duration']|td }}</td>{% endif %}
+                {% if visible['average_speed'] %}<td>{% if row['average_speed_kmh'] is not none %}{{ row['average_speed_kmh'] | round(1) }}{% endif %}</td>{% endif %}
+                {% if visible['average_power'] %}<td>{% if row['power_avg'] is not none %}{{ row['power_avg'] | round(0) | int }}{% endif %}</td>{% endif %}
+                {% if visible['equipment'] %}<td>{{ row["equipment_name"] }}</td>{% endif %}
+                {% if visible['kind'] %}<td>{{ row["kind_name"] }}</td>{% endif %}
             </tr>
             {% endfor %}
         </tbody>

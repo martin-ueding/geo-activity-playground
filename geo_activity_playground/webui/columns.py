@@ -71,3 +71,58 @@ column_elevation = ColumnDescription(
 )
 
 TIME_SERIES_COLUMNS = [column_speed, column_elevation]
+
+column_duration = ColumnDescription(
+    name="duration",
+    display_name=_("Duration"),
+    unit="",
+    format="",
+)
+column_direction = ColumnDescription(
+    name="direction",
+    display_name=_("Direction"),
+    unit="",
+    format="",
+)
+column_equipment = ColumnDescription(
+    name="equipment",
+    display_name=_("Equipment"),
+    unit="",
+    format="",
+)
+column_kind = ColumnDescription(
+    name="kind",
+    display_name=_("Kind"),
+    unit="",
+    format="",
+)
+column_average_speed = ColumnDescription(
+    name="average_speed",
+    display_name=_("Average Speed"),
+    unit="km/h",
+    format=".1f",
+)
+column_average_power = ColumnDescription(
+    name="average_power",
+    display_name=_("Average Power"),
+    unit="W",
+    format=".0f",
+)
+
+# Columns that the user can toggle for summary tables across the app. The
+# `name` field doubles as the key persisted in Config.visible_table_columns
+# and is referenced from templates as `visible[<name>]`.
+TOGGLEABLE_TABLE_COLUMNS = [
+    ColumnDescription(
+        name="distance",
+        display_name=_("Distance"),
+        unit="km",
+        format=".1f",
+    ),
+    column_duration,
+    column_direction,
+    column_average_speed,
+    column_average_power,
+    column_equipment,
+    column_kind,
+]

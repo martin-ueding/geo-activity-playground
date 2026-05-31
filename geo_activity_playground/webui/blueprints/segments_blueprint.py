@@ -78,12 +78,25 @@ def make_segments_blueprint(
     def show(id: int) -> ResponseReturnValue:
         segment = DB.session.get_one(Segment, id)
         df = segment_df(segment)
+        visible = {
+            name: name in config.visible_table_columns
+            for name in (
+                "distance",
+                "duration",
+                "direction",
+                "average_speed",
+                "average_power",
+                "equipment",
+                "kind",
+            )
+        }
         return render_template(
             "segments/show.html.j2",
             segment=segment,
             activity_ids=[match.activity_id for match in segment.matches],
             plots=make_plots(df),
             table=df.to_dict("records"),
+            visible=visible,
         )
 
     @blueprint.route("/delete/<int:id>")
@@ -161,6 +174,8 @@ def segment_df(segment: Segment) -> pd.DataFrame:
         "duration_s",
         "duration",
         "direction",
+        "average_speed_kmh",
+        "power_avg",
         "entry_time",
         "exit_time",
         "activity_id",
@@ -168,29 +183,37 @@ def segment_df(segment: Segment) -> pd.DataFrame:
         "equipment_name",
         "kind_name",
     ]
-    rows = [
-        {
-            "distance_km": abs(match.distance_km),
-            "duration_s": abs(match.duration.total_seconds()),
-            "duration": abs(match.duration),
-            "direction": (
-                "Forward" if match.duration.total_seconds() > 0 else "Backward"
-            ),
-            "entry_time": match.entry_time,
-            "exit_time": match.exit_time,
-            "activity_id": match.activity.id,
-            "activity_name": match.activity.name,
-            "equipment_name": (
-                match.activity.equipment.name
-                if match.activity.equipment is not None
-                else ""
-            ),
-            "kind_name": (
-                match.activity.kind.name if match.activity.kind is not None else ""
-            ),
-        }
-        for match in segment.matches
-    ]
+    rows = []
+    for match in segment.matches:
+        duration_s = abs(match.duration.total_seconds())
+        if duration_s > 0:
+            average_speed_kmh = abs(match.distance_km) / (duration_s / 3600)
+        else:
+            average_speed_kmh = None
+        rows.append(
+            {
+                "distance_km": abs(match.distance_km),
+                "duration_s": duration_s,
+                "duration": abs(match.duration),
+                "direction": (
+                    "Forward" if match.duration.total_seconds() > 0 else "Backward"
+                ),
+                "average_speed_kmh": average_speed_kmh,
+                "power_avg": match.power_avg,
+                "entry_time": match.entry_time,
+                "exit_time": match.exit_time,
+                "activity_id": match.activity.id,
+                "activity_name": match.activity.name,
+                "equipment_name": (
+                    match.activity.equipment.name
+                    if match.activity.equipment is not None
+                    else ""
+                ),
+                "kind_name": (
+                    match.activity.kind.name if match.activity.kind is not None else ""
+                ),
+            }
+        )
     return pd.DataFrame.from_records(rows, columns=columns).sort_values(
         "entry_time", ascending=False
     )

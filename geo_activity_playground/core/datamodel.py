@@ -834,6 +834,9 @@ class SegmentMatch(DB.Model):
     # Distance covered in this segment effort (may differ slightly from segment length)
     distance_km: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
 
+    # Average power across this segment effort, when available on the activity.
+    power_avg: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
+
     def __repr__(self) -> str:
         duration_str = str(self.duration).split(".")[0] if self.duration else "unknown"
         return f"SegmentMatch(segment={self.segment.name}, activity={self.activity_id}, duration={duration_str})"

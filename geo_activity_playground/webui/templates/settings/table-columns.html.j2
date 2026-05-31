@@ -1,0 +1,23 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Table Columns') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Summary Table Columns') }}</h1>
+
+<p>{{ _('Choose which columns appear in summary tables across the app (e.g. segment matches, equipment usage). Columns that do not apply to a particular table are silently ignored.') }}</p>
+
+<form method="POST">
+    {% for name, label, checked in columns %}
+    <div class="form-check form-check-inline form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="{{ name }}" name="name" value="{{ name }}"
+            {{ 'checked' if checked else '' }} />
+        <label class="form-check-label" for="{{ name }}">{{ label }}</label>
+    </div>
+    {% endfor %}
+    <div class="clearfix mb-3"></div>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+</form>
+{% endblock %}

@@ -2,6 +2,7 @@ from collections.abc import Iterator
 
 import geojson
 import numpy as np
+import pandas as pd
 import sqlalchemy
 
 from .config import Config
@@ -196,6 +197,13 @@ def try_match_segment_activity(
             distance_km = (
                 ts["distance_km"].iloc[i_exit] - ts["distance_km"].iloc[i_entry]
             )
+            power_avg = None
+            if "power" in ts.columns:
+                power_slice = ts["power"].iloc[i_entry : i_exit + 1]
+                if not power_slice.empty:
+                    mean_power = float(power_slice.mean())
+                    if not pd.isna(mean_power):
+                        power_avg = mean_power
             segment_match = SegmentMatch(
                 segment=segment,
                 activity=activity,
@@ -205,6 +213,7 @@ def try_match_segment_activity(
                 exit_time=exit_time,
                 duration=exit_time - entry_time,
                 distance_km=distance_km,
+                power_avg=power_avg,
             )
             DB.session.add(segment_match)
     DB.session.commit()
