@@ -1,18 +1,5 @@
 # Connect Strava API
 
-::: tip When to use this guide
-Use this guide if you **want to keep using Strava** as your primary platform and have Geo Activity Playground sync from it automatically.
-
-- You want to continue recording with the Strava app.
-- You want new activities to sync automatically.
-- You're okay with your data living on Strava's servers.
-
-**Not for you?**
-
-- If you want to **stop using Strava entirely**, see [Moving from Strava](moving-from-strava.md) instead.
-- If you have **local GPX/FIT files** (not from Strava), see [Import activity files](import-activity-files.md).
-:::
-
 You might have all your data on the Strava service and would like to use this for additional analytics without moving your data. That is fine.
 
 If you don't mind a bit of rate-limiting, you can just directly go ahead and start the webserver. It will offer to connect with Strava.
@@ -43,12 +30,12 @@ The easiest way to import it is via **Settings → Strava → Upload Strava Arch
 
 Alternatively, you can extract the ZIP manually and place its contents into `Playground/Strava Export`. Either way, activities from Strava will only be downloaded after importing all these local files, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.
 
-::: warning This is NOT the same as moving from Strava
+**⚠️ This is NOT the same as moving from Strava**
+
 This `Strava Export/` folder is specifically for **speeding up the initial Strava API sync**. It does not convert or process your files — it's just a cache to avoid rate limiting.
 
 - Do **not** put these files in your `Activities/` folder.
 - If you want to **leave Strava entirely**, see [Moving from Strava](moving-from-strava.md) instead.
-:::
 
 ## Skip Strava download
 

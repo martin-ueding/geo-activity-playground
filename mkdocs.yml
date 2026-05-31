@@ -33,6 +33,7 @@ nav:
     - starting-the-webserver.md
     - record-activities.md
   - Activity Sources:
+    - activity-sources.md
     - import-activity-files.md
     - connect-strava-api.md
     - upload-activity-files.md

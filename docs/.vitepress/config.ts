@@ -31,6 +31,7 @@ export default {
       {
         text: 'Activity Sources',
         items: [
+          { text: 'Choosing an Activity Source', link: '/activity-sources' },
           { text: 'Import Activity Files', link: '/import-activity-files' },
           { text: 'Connect Strava API', link: '/connect-strava-api' },
           { text: 'Upload Activity Files', link: '/upload-activity-files' },
