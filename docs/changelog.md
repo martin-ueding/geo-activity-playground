@@ -24,6 +24,7 @@ Added:
 Fixed:
 
 - Fix **day overview crash** when a route without time information has a manually set start time: the missing moving speed previously caused a `TypeError` in the template. ([GH-435](https://github.com/martin-ueding/geo-activity-playground/issues/435))
+- Avoid a **full tile-visit recomputation** (~30 minutes on a large database) after editing the start time of an activity that was imported without time information. The affected tile visits are now repaired incrementally and only the cluster history for zoom levels whose first-visit ordering shifted is rebuilt.
 
 
 ## Version 1.28.0 — 2026-04-28
