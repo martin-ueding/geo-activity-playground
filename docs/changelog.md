@@ -24,6 +24,7 @@ Changed:
 - The Hammerhead settings page now shows step-by-step instructions for registering a developer account at `dashboard.hammerhead.io/create` to obtain OAuth credentials, replacing the previous vague wording. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 - The VitePress documentation now shows h2 and h3 headings in the right-side outline (table of contents).
 - Localhost URLs in the Docker how-to pages are now rendered as inline code instead of links, removing the need for VitePress dead-link suppression.
+- Move license file into documentation.
 
 Fixed:
 
