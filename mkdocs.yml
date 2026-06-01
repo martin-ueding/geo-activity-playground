@@ -1,5 +1,6 @@
 site_name: Geo Activity Playground
 site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
+repo_url: https://github.com/martin-ueding/geo-activity-playground
 
 theme:
   features:
@@ -73,3 +74,14 @@ markdown_extensions:
   - admonition
   - pymdownx.highlight
   - pymdownx.superfences
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/martin-ueding/geo-activity-playground
+    - icon: fontawesome/brands/mastodon
+      link: https://pypi.org/project/geo-activity-playground/
+    - icon: fontawesome/brands/python
+      link: https://bonn.social/tags/GeoActivityPlayground
+    - icon: fontawesome/regular/envelope
+      link: mailto:mu@martin-ueding.de
