@@ -19,6 +19,7 @@ Types of changes
 
 Fixed:
 
+- Backward segment matches now correctly compute average power. Previously the time-series slice used `[i_entry : i_exit + 1]`, which is empty when `i_entry > i_exit` (backward traversal), causing power to show as 0. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
 - Heatmap tiles no longer fail with a 500 error when multiple tiles are loaded concurrently and SQLite write lock contention occurs. Cache writes are now serialized via a threading lock, and any remaining transient lock errors degrade gracefully (tile is still rendered, just not cached). ([GH-436](https://github.com/martin-ueding/geo-activity-playground/issues/436))
 
 Removed:
