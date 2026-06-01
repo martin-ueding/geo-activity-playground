@@ -180,7 +180,7 @@ def _get_counts(
             cache_entry = get_tile_cache(
                 zoom=z, tile_x=x, tile_y=y, search_query_id=search_query_id
             )
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             logger.warning(
                 f"Failed to read heatmap cache for {x=}/{y=}/{z=}, recomputing."
             )
@@ -218,7 +218,7 @@ def _get_counts(
                     f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
                 )
                 continue
-            except Exception as e:
+            except sqlalchemy.exc.OperationalError as e:
                 logger.warning(
                     f"Skipping activity {activity_id} for {x=}/{y=}/{z=} due to DB error: {e}"
                 )
@@ -237,7 +237,7 @@ def _get_counts(
                 included_activity_ids=parsed_activities,
                 min_activities=config.heatmap_cache_min_activities,
             )
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             logger.warning(
                 f"Failed to write heatmap cache for {x=}/{y=}/{z=}, skipping."
             )
