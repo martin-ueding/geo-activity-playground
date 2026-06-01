@@ -44,7 +44,7 @@ from ...core.datamodel import (
     TileVisit,
     activity_tag_association_table,
 )
-from ...core.enrichment import update_and_commit
+from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.heatmap_cache import delete_all_heatmap_cache, delete_stale_heatmap_cache
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
@@ -382,6 +382,25 @@ def make_settings_blueprint(
                         "skipped": skipped,
                         "errors": errors,
                     },
+                    FlashTypes.SUCCESS,
+                )
+            elif action in ("fix_timezone_local_to_utc", "fix_timezone_utc_to_utc"):
+                from_iana = action == "fix_timezone_local_to_utc"
+                logger.info("User requested timezone fix (from_iana=%s).", from_iana)
+                config = config_accessor()
+                for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
+                    if activity.start is None:
+                        continue
+                    time_series = activity.raw_time_series
+                    enrichment_set_timezone(activity, time_series, config)
+                    if time_series["time"].dt.tz is None:
+                        time_series["time"] = time_series["time"].dt.tz_localize(
+                            activity.iana_timezone if from_iana else "UTC"
+                        )
+                    time_series["time"] = time_series["time"].dt.tz_convert("UTC")
+                    update_and_commit(activity, time_series, config)
+                flasher.flash_message(
+                    _("Activity timezones have been fixed."),
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))

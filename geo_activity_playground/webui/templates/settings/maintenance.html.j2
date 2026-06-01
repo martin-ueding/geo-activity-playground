@@ -155,6 +155,35 @@
     </div>
 </div>
 
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">{{ _('Time Zone Fixer') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Prior to version 1.3.0, activity times were interpreted in the local time zone. Use these actions to reinterpret already-imported activity timestamps.') }}
+        </p>
+        <p class="card-text">
+            {{ _('Your activities are shown in the local time zone but the times look wrong (all off by your UTC offset):') }}
+        </p>
+        <form method="POST" class="mb-3" onsubmit="return confirm('{{ _('Are you sure you want to reinterpret all activity times as local timezone and convert to UTC?') }}');">
+            <input type="hidden" name="action" value="fix_timezone_local_to_utc">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Interpret times as local time zone') }}
+            </button>
+        </form>
+        <p class="card-text">
+            {{ _('Your activities seem to be UTC but times appear off — re-apply timezone from coordinates:') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to re-apply UTC timezone to all activities?') }}');">
+            <input type="hidden" name="action" value="fix_timezone_utc_to_utc">
+            <button type="submit" class="btn btn-warning">
+                {{ _('Interpret times as UTC') }}
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="card border-danger mb-3">
     <div class="card-header bg-danger text-white">
         <h5 class="card-title mb-0">{{ _('Wipe Local Activity State') }}</h5>
