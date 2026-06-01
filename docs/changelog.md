@@ -25,7 +25,6 @@ Removed:
 
 - Remove the **Kalman filter playground** as the filter doesn't seem to improve the data situation. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
 
-
 ## Version 1.30.0 — 2026-05-31
 
 Added:
