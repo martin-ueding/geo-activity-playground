@@ -17,6 +17,13 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Explain the Strava API changes in the documentation.
+
+Removed:
+
+- Remove the client ID and secret of the Strava API app that was shipped so far. Due to the changes to the Strava API, my API app in my free Strava account won't be able to be used from 2026-07-01 onward.
 
 ## Version 1.31.0 — 2026-06-01
 
