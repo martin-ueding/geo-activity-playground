@@ -32,14 +32,17 @@ def step(label: str) -> None:
     print(f"\n=== {label} ===")
 
 
-def main() -> None:
+def determine_next_version() -> str:
     step("Determine next version")
     try:
         version = capture("uv", "run", "cz", "bump", "--get-next")
         print(f"Next version: {version}")
     except subprocess.CalledProcessError:
         version = capture("uv", "version", "--short")
+    return version
 
+
+def set_pyproject_version(version: str) -> None:
     step("Set version in pyproject.toml")
     with open(PYPROJECT, "rb") as f:
         current_version = tomllib.load(f)["project"]["version"]
@@ -48,6 +51,8 @@ def main() -> None:
     else:
         print(f"[skip] already at {version}")
 
+
+def update_changelog_header(version: str) -> None:
     step("Update changelog header")
     changelog_text = CHANGELOG.read_text()
     version_header = f"## Version {version}"
@@ -61,6 +66,8 @@ def main() -> None:
     else:
         print(f"[skip] {version_header} already present")
 
+
+def commit_version_bump(version: str) -> None:
     step("Commit version bump")
     bump_msg = f"chore: bump version to {version}"
     if not capture("git", "log", "--oneline", "--grep", bump_msg):
@@ -71,19 +78,27 @@ def main() -> None:
     else:
         print("[skip] bump commit already in log")
 
+
+def create_git_tag(version: str) -> None:
     step("Create git tag")
     if not capture("git", "tag", "-l", version):
         run("git", "tag", version)
     else:
         print(f"[skip] tag {version} already exists")
 
+
+def push_commits_and_tags() -> None:
     step("Push commits and tags")
     run("git", "push")
     run("git", "push", "--tags")
 
+
+def build_wheel() -> None:
     step("Build wheel")
     run("uv", "build")
 
+
+def publish_to_pypi(version: str) -> None:
     step("Publish to PyPI")
     already_published = False
     try:
@@ -106,6 +121,8 @@ def main() -> None:
             f"dist/geo_activity_playground-{version}-py3-none-any.whl",
         )
 
+
+def deploy_documentation(version: str) -> None:
     step("Deploy documentation")
     run("npm", "run", "build")
     dist = REPO_ROOT / "docs/.vitepress/dist"
@@ -115,6 +132,8 @@ def main() -> None:
     origin = capture("git", "remote", "get-url", "origin")
     run("git", "-C", str(dist), "push", "-f", origin, "HEAD:gh-pages")
 
+
+def create_github_release(version: str) -> None:
     step("Create GitHub release")
     gh_check = subprocess.run(
         ["gh", "release", "view", version],
@@ -129,6 +148,8 @@ def main() -> None:
     else:
         print(f"[skip] GitHub release {version} already exists")
 
+
+def restore_unreleased_section() -> None:
     step("Restore Unreleased section in changelog")
     changelog_text = CHANGELOG.read_text()
     if "## Unreleased" not in changelog_text:
@@ -142,6 +163,8 @@ def main() -> None:
     else:
         print("[skip] ## Unreleased already present")
 
+
+def commit_and_push_changelog_restore() -> None:
     step("Commit and push changelog restore")
     final_msg = "docs: add unreleased section to changelog"
     if capture("git", "status", "--porcelain"):
@@ -150,6 +173,20 @@ def main() -> None:
         print("[skip] nothing to commit")
     run("git", "push")
 
+
+def main() -> None:
+    version = determine_next_version()
+    set_pyproject_version(version)
+    update_changelog_header(version)
+    commit_version_bump(version)
+    create_git_tag(version)
+    push_commits_and_tags()
+    build_wheel()
+    publish_to_pypi(version)
+    deploy_documentation(version)
+    create_github_release(version)
+    restore_unreleased_section()
+    commit_and_push_changelog_restore()
     print("\nRelease complete.")
 
 
