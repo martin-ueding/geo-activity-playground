@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Heatmap tiles no longer fail with a 500 error when multiple tiles are loaded concurrently and SQLite write lock contention occurs. Cache writes are now serialized via a threading lock, and any remaining transient lock errors degrade gracefully (tile is still rendered, just not cached). ([GH-436](https://github.com/martin-ueding/geo-activity-playground/issues/436))
+
 Removed:
 
 - Remove the **Kalman filter playground** as the filter doesn't seem to improve the data situation. ([GH-345](https://github.com/martin-ueding/geo-activity-playground/issues/345))
