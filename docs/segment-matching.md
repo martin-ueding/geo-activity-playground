@@ -67,8 +67,8 @@ We now divide this into segments by requiring that a segment match _candidate_ n
 close_d = _point_polyline_distance_m(tlat, tlon, slat, slon)
 close_mask = close_d < 100
 mask_diff = np.diff(np.array(np.concatenate(([False], close_mask, [False])), dtype=np.int32))
-begins = np.where(mask_diff == 1)
-ends = np.where(mask_diff == -1)
+begins = np.where(mask_diff == 1)[0]
+ends = np.where(mask_diff == -1)[0]
 begins, ends
 ```
 
