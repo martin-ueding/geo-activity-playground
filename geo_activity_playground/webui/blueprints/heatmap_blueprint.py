@@ -1,5 +1,7 @@
 import io
 import logging
+from collections.abc import Generator
+from contextlib import contextmanager
 
 import matplotlib.pylab as pl
 import numpy as np
@@ -33,6 +35,15 @@ from ..authenticator import Authenticator
 from .explorer_blueprint import bounding_box_for_biggest_cluster
 
 logger = logging.getLogger(__name__)
+
+
+@contextmanager
+def _handle_db_lock(message: str) -> Generator[None, None, None]:
+    try:
+        yield
+    except sqlalchemy.exc.OperationalError:
+        logger.warning(message)
+        DB.session.rollback()
 
 
 def make_heatmap_blueprint(
@@ -176,16 +187,13 @@ def _get_counts(
 
     if should_use_cache:
         parsed_activities: set[int] = set()
-        try:
+        cache_entry = None
+        with _handle_db_lock(
+            f"Failed to read heatmap cache for {x=}/{y=}/{z=}, recomputing."
+        ):
             cache_entry = get_tile_cache(
                 zoom=z, tile_x=x, tile_y=y, search_query_id=search_query_id
             )
-        except sqlalchemy.exc.OperationalError:
-            logger.warning(
-                f"Failed to read heatmap cache for {x=}/{y=}/{z=}, recomputing."
-            )
-            DB.session.rollback()
-            cache_entry = None
         if cache_entry:
             try:
                 tile_counts = blob_to_counts(cache_entry.counts).astype(
@@ -211,23 +219,24 @@ def _get_counts(
         for activity_id in activity_ids:
             if activity_id in parsed_activities:
                 continue
-            try:
-                time_series = repository.get_time_series(activity_id)
-            except ValueError:
-                logger.warning(
-                    f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
-                )
-                continue
-            except sqlalchemy.exc.OperationalError as e:
-                logger.warning(
-                    f"Skipping activity {activity_id} for {x=}/{y=}/{z=} due to DB error: {e}"
-                )
-                DB.session.rollback()
+            time_series = None
+            with _handle_db_lock(
+                f"Skipping activity {activity_id} for {x=}/{y=}/{z=} due to DB error."
+            ):
+                try:
+                    time_series = repository.get_time_series(activity_id)
+                except ValueError:
+                    logger.warning(
+                        f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
+                    )
+            if time_series is None:
                 continue
             parsed_activities.add(activity_id)
             _paint_activity(tile_counts, time_series, x=x, y=y, z=z)
 
-        try:
+        with _handle_db_lock(
+            f"Failed to write heatmap cache for {x=}/{y=}/{z=}, skipping."
+        ):
             write_tile_cache(
                 zoom=z,
                 tile_x=x,
@@ -237,11 +246,6 @@ def _get_counts(
                 included_activity_ids=parsed_activities,
                 min_activities=config.heatmap_cache_min_activities,
             )
-        except sqlalchemy.exc.OperationalError:
-            logger.warning(
-                f"Failed to write heatmap cache for {x=}/{y=}/{z=}, skipping."
-            )
-            DB.session.rollback()
     else:
         for activity_id in activity_ids:
             try:
