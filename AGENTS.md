@@ -2,7 +2,11 @@
 
 These are the instructions for an LLM coding agent.
 
+## Project description
+
 This project is a Flask application that uses SQLAlchemy for persistence.
+
+## Python coding guidelines
 
 Use modern Python syntax with type annotations.
 
@@ -12,13 +16,21 @@ This project is i18n'ed. Use `_(…)` for user facing strings.
 
 If similar functionality already exist, please asks me to generalize it before creating duplicated code.
 
-You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there. I let the users know about the status when I make changes. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
+## Documentation
 
 Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious. New changelog entries always go into a `## Unreleased` section, not to existing released versions.
 
+I have used Material for MkDocs in the past, at the moment I use VitePress but haven't finally decided against Zensical. Hence there is a `mkdocs.yml` and also a `docs/.vitepress/config.ts`. When changing the structure of the documentation, make sure that it is updated in both configs.
+
+## Git
+
 For this particular project, you can create new commits on `main`.
 
+When writing a commit message, use "Refs: GH-123" to mention the ticket. Do not use "fixes" or anything that would close the ticket on upload.
+
 ## Ticket status commands (resolved IDs)
+
+You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there. I let the users know about the status when I make changes. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
 
 Use these exact constants for this repository/project:
 
@@ -50,7 +62,3 @@ You can access GitHub via the `gh` CLI. When interacting with users, start issue
 ```markdown
 _The following content is AI generated ({marketing name of model and version})._
 ```
-
-## Issue references in commit messages
-
-When writing a ticket, use "Refs: GH-123" to mention the ticket. Do not use "fixes" or anything that would close the ticket on upload.
