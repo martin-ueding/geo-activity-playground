@@ -176,9 +176,16 @@ def _get_counts(
 
     if should_use_cache:
         parsed_activities: set[int] = set()
-        cache_entry = get_tile_cache(
-            zoom=z, tile_x=x, tile_y=y, search_query_id=search_query_id
-        )
+        try:
+            cache_entry = get_tile_cache(
+                zoom=z, tile_x=x, tile_y=y, search_query_id=search_query_id
+            )
+        except Exception:
+            logger.warning(
+                f"Failed to read heatmap cache for {x=}/{y=}/{z=}, recomputing."
+            )
+            DB.session.rollback()
+            cache_entry = None
         if cache_entry:
             try:
                 tile_counts = blob_to_counts(cache_entry.counts).astype(
@@ -211,18 +218,30 @@ def _get_counts(
                     f"Skipping deleted activity {activity_id} for {x=}/{y=}/{z=}."
                 )
                 continue
+            except Exception as e:
+                logger.warning(
+                    f"Skipping activity {activity_id} for {x=}/{y=}/{z=} due to DB error: {e}"
+                )
+                DB.session.rollback()
+                continue
             parsed_activities.add(activity_id)
             _paint_activity(tile_counts, time_series, x=x, y=y, z=z)
 
-        write_tile_cache(
-            zoom=z,
-            tile_x=x,
-            tile_y=y,
-            search_query_id=search_query_id,
-            counts=tile_counts,
-            included_activity_ids=parsed_activities,
-            min_activities=config.heatmap_cache_min_activities,
-        )
+        try:
+            write_tile_cache(
+                zoom=z,
+                tile_x=x,
+                tile_y=y,
+                search_query_id=search_query_id,
+                counts=tile_counts,
+                included_activity_ids=parsed_activities,
+                min_activities=config.heatmap_cache_min_activities,
+            )
+        except Exception:
+            logger.warning(
+                f"Failed to write heatmap cache for {x=}/{y=}/{z=}, skipping."
+            )
+            DB.session.rollback()
     else:
         for activity_id in activity_ids:
             try:

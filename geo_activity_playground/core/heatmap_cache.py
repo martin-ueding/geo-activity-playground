@@ -4,6 +4,7 @@ import json
 import logging
 import pathlib
 import shutil
+import threading
 
 import numpy as np
 import sqlalchemy
@@ -12,6 +13,8 @@ from tqdm import tqdm
 from .datamodel import DB, HeatmapTileCache
 
 logger = logging.getLogger(__name__)
+
+_write_lock = threading.Lock()
 
 
 def counts_to_blob(counts: np.ndarray) -> bytes:
@@ -48,29 +51,30 @@ def write_tile_cache(
     included_activity_ids: set[int],
     min_activities: int,
 ) -> None:
-    num_activities = len(included_activity_ids)
-    cache_entry = get_tile_cache(zoom, tile_x, tile_y, search_query_id)
-    if num_activities < min_activities:
-        if cache_entry is not None:
-            DB.session.delete(cache_entry)
-            DB.session.commit()
-        return
+    with _write_lock:
+        num_activities = len(included_activity_ids)
+        cache_entry = get_tile_cache(zoom, tile_x, tile_y, search_query_id)
+        if num_activities < min_activities:
+            if cache_entry is not None:
+                DB.session.delete(cache_entry)
+                DB.session.commit()
+            return
 
-    if cache_entry is None:
-        cache_entry = HeatmapTileCache()
-        cache_entry.zoom = zoom
-        cache_entry.tile_x = tile_x
-        cache_entry.tile_y = tile_y
-        cache_entry.search_query_id = search_query_id
-        cache_entry.counts = b""
-        cache_entry.included_activity_ids = []
-        cache_entry.num_activities = 0
-        DB.session.add(cache_entry)
-    cache_entry.counts = counts_to_blob(counts)
-    cache_entry.included_activity_ids = sorted(included_activity_ids)
-    cache_entry.num_activities = num_activities
-    cache_entry.last_used = datetime.datetime.now()
-    DB.session.commit()
+        if cache_entry is None:
+            cache_entry = HeatmapTileCache()
+            cache_entry.zoom = zoom
+            cache_entry.tile_x = tile_x
+            cache_entry.tile_y = tile_y
+            cache_entry.search_query_id = search_query_id
+            cache_entry.counts = b""
+            cache_entry.included_activity_ids = []
+            cache_entry.num_activities = 0
+            DB.session.add(cache_entry)
+        cache_entry.counts = counts_to_blob(counts)
+        cache_entry.included_activity_ids = sorted(included_activity_ids)
+        cache_entry.num_activities = num_activities
+        cache_entry.last_used = datetime.datetime.now()
+        DB.session.commit()
 
 
 def touch_tile_cache(cache_entry: HeatmapTileCache) -> None:
