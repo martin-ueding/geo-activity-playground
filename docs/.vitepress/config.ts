@@ -78,6 +78,7 @@ export default {
         items: [
           { text: 'Acknowledgments', link: '/acknowledgments' },
           { text: 'Similar Projects', link: '/similar-projects' },
+          { text: 'License', link: '/license' },
         ],
       },
       { text: 'Get Help', link: '/get-help' },
