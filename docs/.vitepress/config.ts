@@ -86,6 +86,9 @@ export default {
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/martin-ueding/geo-activity-playground' },
+      { icon: 'python', link: 'https://pypi.org/project/geo-activity-playground/' },
+      { icon: 'mastodon', link: 'https://bonn.social/tags/GeoActivityPlayground' },
+      { icon: 'email', link: 'mailto:mu@martin-ueding.de' },
     ],
     outline: {
       level: [2, 3],
