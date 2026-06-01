@@ -23,7 +23,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 from ...core.activities import (
     ActivityRepository,
@@ -713,6 +713,29 @@ def name_minutes_plot(meta: pd.DataFrame) -> str:
     )
 
 
+_SHAREPIC_FOOTER_HEIGHT = 115
+_SHAREPIC_HEADER_HEIGHT = 50
+_FONT_CANDIDATES = [
+    "/usr/share/fonts/open-sans/OpenSans-Regular.ttf",
+    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/adwaita-sans-fonts/AdwaitaSans-Regular.ttf",
+]
+_FONT_BOLD_CANDIDATES = [
+    "/usr/share/fonts/open-sans/OpenSans-Bold.ttf",
+    "/usr/share/fonts/liberation-sans-fonts/LiberationSans-Bold.ttf",
+]
+
+
+def _get_font(
+    size: int, bold: bool = False
+) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    candidates = _FONT_BOLD_CANDIDATES if bold else _FONT_CANDIDATES
+    for path in candidates:
+        if pathlib.Path(path).exists():
+            return ImageFont.truetype(path, size)
+    return ImageFont.load_default(size=size)
+
+
 def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
     all_time_series = pd.concat(time_series_list)
     finite_mask = np.isfinite(all_time_series["x"]) & np.isfinite(all_time_series["y"])
@@ -720,8 +743,9 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
 
     target_width = 600
     target_height = 600
-    footer_height = 100
-    target_map_height = target_height - footer_height
+    footer_height = _SHAREPIC_FOOTER_HEIGHT
+    header_height = _SHAREPIC_HEADER_HEIGHT
+    target_map_height = target_height - footer_height - header_height
 
     if len(all_time_series) == 0:
         return Image.new("RGB", (target_width, target_height), "black")
@@ -748,13 +772,16 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
     )
 
     tile_bounds = tile_bounds_around_center(
-        tile_xz_center, (target_width, target_height - footer_height), zoom
+        tile_xz_center, (target_width, target_map_height), zoom
     )
+    tile_bounds.y1 -= header_height / OSM_TILE_SIZE
     tile_bounds.y2 += footer_height / OSM_TILE_SIZE
     background = map_image_from_tile_bounds(tile_bounds, config)
 
     img = Image.fromarray((background * 255).astype("uint8"), "RGB")
     draw = ImageDraw.Draw(img, mode="RGBA")
+
+    map_center_y = header_height + target_map_height / 2
 
     for time_series in time_series_list:
         time_series = time_series.loc[
@@ -765,17 +792,45 @@ def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
         for _index, group in time_series.groupby("segment_id"):
             tile_xz = group["x"] * 2**zoom
             tile_yz = group["y"] * 2**zoom
-            yx = list(
+            xy = list(
                 zip(
                     (tile_xz - tile_xz_center[0]) * OSM_TILE_SIZE + target_width / 2,
-                    (tile_yz - tile_xz_center[1]) * OSM_TILE_SIZE
-                    + target_map_height / 2,
+                    (tile_yz - tile_xz_center[1]) * OSM_TILE_SIZE + map_center_y,
                 )
             )
-
-            draw.line(yx, fill="red", width=4)
+            draw.line(xy, fill=(255, 255, 255, 120), width=7)
+            draw.line(xy, fill=(220, 50, 30), width=4)
 
     return img
+
+
+def _draw_sharepic_stats(
+    draw: ImageDraw.ImageDraw,
+    img_width: int,
+    footer_y: int,
+    stat_items: list[tuple[str, str]],
+) -> None:
+    if not stat_items:
+        return
+    n = len(stat_items)
+    col_w = img_width // n
+    stat_y = footer_y + 42
+    for i, (value, label) in enumerate(stat_items):
+        x_center = i * col_w + col_w // 2
+        draw.text(
+            (x_center, stat_y),
+            value,
+            fill="white",
+            font=_get_font(22, bold=True),
+            anchor="mt",
+        )
+        draw.text(
+            (x_center, stat_y + 28),
+            label,
+            fill=(140, 140, 140),
+            font=_get_font(11),
+            anchor="mt",
+        )
 
 
 def make_sharepic(
@@ -784,48 +839,57 @@ def make_sharepic(
     sharepic_suppressed_fields: list[str],
     config: Config,
 ) -> bytes:
-    footer_height = 100
-
     img = make_sharepic_base([time_series], config)
-
     draw = ImageDraw.Draw(img, mode="RGBA")
-    draw.rectangle(
-        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
+
+    # Header overlay: activity name
+    draw.rectangle([0, 0, img.width, _SHAREPIC_HEADER_HEIGHT], fill=(10, 10, 10, 210))
+    name = activity.name or ""
+    draw.text(
+        (16, (_SHAREPIC_HEADER_HEIGHT - 26) // 2),
+        name,
+        fill="white",
+        font=_get_font(24, bold=True),
     )
 
-    facts = {
-        "distance_km": f"\n{activity.distance_km:.1f} km",
-    }
-    if activity.start_local_tz:
-        facts["start"] = f"{activity.start_local_tz.date()}"
-    if activity.elapsed_time:
-        facts["elapsed_time"] = _format_elapsed_time(activity.elapsed_time)
-    if activity.kind:
-        facts["kind"] = f"{activity.kind.name}"
-    if activity.equipment:
-        facts["equipment"] = f"{activity.equipment.name}"
+    # Footer overlay
+    footer_y = img.height - _SHAREPIC_FOOTER_HEIGHT
+    draw.rectangle([0, footer_y, img.width, img.height], fill=(10, 10, 10, 215))
 
-    if activity.calories:
-        facts["calories"] = f"{activity.calories} kcal"
-    if activity.steps:
-        facts["steps"] = f"{activity.steps} steps"
+    # Secondary meta line: date · kind · equipment
+    meta_parts = []
+    if activity.start_local_tz and "start" not in sharepic_suppressed_fields:
+        meta_parts.append(str(activity.start_local_tz.date()))
+    if activity.kind and "kind" not in sharepic_suppressed_fields:
+        meta_parts.append(activity.kind.name)
+    if activity.equipment and "equipment" not in sharepic_suppressed_fields:
+        meta_parts.append(activity.equipment.name)
+    if meta_parts:
+        draw.text(
+            (16, footer_y + 12),
+            "  ·  ".join(meta_parts),
+            fill=(170, 170, 170),
+            font=_get_font(14),
+        )
 
-    facts = {
-        key: value
-        for key, value in facts.items()
-        if key not in sharepic_suppressed_fields
-    }
+    # Stats columns
+    stat_items = []
+    if "distance_km" not in sharepic_suppressed_fields:
+        stat_items.append((f"{activity.distance_km:.1f} km", "DISTANCE"))
+    if activity.elapsed_time and "elapsed_time" not in sharepic_suppressed_fields:
+        stat_items.append((_format_elapsed_time(activity.elapsed_time), "DURATION"))
+    if activity.calories and "calories" not in sharepic_suppressed_fields:
+        stat_items.append((f"{activity.calories}", "KCAL"))
+    if activity.steps and "steps" not in sharepic_suppressed_fields:
+        stat_items.append((f"{activity.steps}", "STEPS"))
+    _draw_sharepic_stats(draw, img.width, footer_y, stat_items)
 
     draw.text(
-        (35, img.height - footer_height + 10),
-        "      ".join(facts.values()),
-        font_size=20,
-    )
-
-    draw.text(
-        (img.width - 250, img.height - 20),
-        "Map: © Open Street Map Contributors",
-        font_size=14,
+        (img.width - 8, img.height - 6),
+        "Map: © OpenStreetMap Contributors",
+        fill=(90, 90, 90),
+        font=_get_font(11),
+        anchor="rs",
     )
 
     f = io.BytesIO()
@@ -838,35 +902,46 @@ def make_day_sharepic(
     time_series_list: list[pd.DataFrame],
     config: Config,
 ) -> bytes:
-    footer_height = 100
-
     img = make_sharepic_base(time_series_list, config)
-
     draw = ImageDraw.Draw(img, mode="RGBA")
-    draw.rectangle(
-        [0, img.height - footer_height, img.width, img.height], fill=(0, 0, 0, 180)
-    )
 
     date = activities.iloc[0]["start_local"].date()
     distance_km = activities["distance_km"].sum()
     elapsed_time: pd.Timedelta = activities["elapsed_time"].sum()
 
-    facts = {
-        "date": f"{date}",
-        "distance_km": f"{distance_km:.1f} km",
-        "elapsed_time": _format_elapsed_time(elapsed_time),
-    }
-
+    # Header: date
+    draw.rectangle([0, 0, img.width, _SHAREPIC_HEADER_HEIGHT], fill=(10, 10, 10, 210))
     draw.text(
-        (35, img.height - footer_height + 10),
-        "      ".join(facts.values()),
-        font_size=20,
+        (16, (_SHAREPIC_HEADER_HEIGHT - 26) // 2),
+        str(date),
+        fill="white",
+        font=_get_font(24, bold=True),
     )
 
+    # Footer overlay
+    footer_y = img.height - _SHAREPIC_FOOTER_HEIGHT
+    draw.rectangle([0, footer_y, img.width, img.height], fill=(10, 10, 10, 215))
+
+    n_activities = len(activities)
+    activity_label = (
+        f"{n_activities} {'activity' if n_activities == 1 else 'activities'}"
+    )
     draw.text(
-        (img.width - 250, img.height - 20),
-        "Map: © Open Street Map Contributors",
-        font_size=14,
+        (16, footer_y + 12), activity_label, fill=(170, 170, 170), font=_get_font(14)
+    )
+
+    stat_items = [
+        (f"{distance_km:.1f} km", "DISTANCE"),
+        (_format_elapsed_time(elapsed_time), "DURATION"),
+    ]
+    _draw_sharepic_stats(draw, img.width, footer_y, stat_items)
+
+    draw.text(
+        (img.width - 8, img.height - 6),
+        "Map: © OpenStreetMap Contributors",
+        fill=(90, 90, 90),
+        font=_get_font(11),
+        anchor="rs",
     )
 
     f = io.BytesIO()
