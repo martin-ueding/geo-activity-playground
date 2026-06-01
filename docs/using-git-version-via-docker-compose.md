@@ -43,7 +43,7 @@ docker compose build
 docker compose up -d
 ```
 
-This will start the webserver on <http://localhost:5000/> or at the port you chose to expose.
+This will start the webserver on `http://localhost:5000/` or at the port you chose to expose.
 
 Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another port.
 

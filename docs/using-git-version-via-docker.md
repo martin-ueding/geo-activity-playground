@@ -24,7 +24,7 @@ Once you have your playground directory, you can launch the Docker image with th
 sudo docker run -p 5000:5000 -v path/to/playground:/data -it geo-activity-playground
 ```
 
-This will start the webserver on <http://localhost:5000/>.
+This will start the webserver on `http://localhost:5000/`.
 
-Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another port by replacing the port specifier from above with `-p 8000:5000`. Then you can open <http://localhost:8000/> in your browser.
+Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another port by replacing the port specifier from above with `-p 8000:5000`. Then you can open `http://localhost:8000/` in your browser.
 

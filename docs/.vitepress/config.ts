@@ -2,7 +2,6 @@ export default {
   title: 'Geo Activity Playground',
   description: 'View recorded outdoor activities and derive insights from your data.',
   base: '/geo-activity-playground/',
-  ignoreDeadLinks: [/^https?:\/\/localhost/],
   themeConfig: {
     logo: '/logo-2.png',
     nav: [
