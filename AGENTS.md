@@ -30,6 +30,8 @@ For this particular project, you can create new commits on `main`.
 
 When writing a commit message, use "Refs: GH-123" to mention the ticket. Do not use "fixes" or anything that would close the ticket on upload.
 
+Do not just commit code that I haven't reviewed.
+
 ## Ticket status commands (resolved IDs)
 
 You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there. I let the users know about the status when I make changes. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
