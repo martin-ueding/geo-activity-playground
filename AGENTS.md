@@ -34,7 +34,7 @@ Do not just commit code that I haven't reviewed.
 
 ## Ticket status commands (resolved IDs)
 
-You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there. I let the users know about the status when I make changes. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
+You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there.
 
 Use these exact constants for this repository/project:
 
@@ -66,3 +66,5 @@ You can access GitHub via the `gh` CLI. When interacting with users, start issue
 ```markdown
 _The following content is AI generated ({marketing name of model and version})._
 ```
+
+Only post updates to the GitHub tickets when I tell you to. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
