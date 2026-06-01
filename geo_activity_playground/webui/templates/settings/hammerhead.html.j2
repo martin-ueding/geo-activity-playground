@@ -11,7 +11,12 @@
     <div class="col-lg-6">
         <p>{{ _('You can connect to the Hammerhead Karoo API so that rides recorded on your Karoo head unit are downloaded automatically.') }}</p>
 
-        <p>{{ _('Hammerhead does not offer a shared OAuth application, so you need to register your own. Visit the') }} <a href="https://api.hammerhead.io/v1/docs" target="_blank">{{ _('Hammerhead API documentation') }}</a> {{ _('to request OAuth credentials, then paste the client ID and client secret below.') }}</p>
+        <p>{{ _('Hammerhead does not offer a shared OAuth application, so you need to register your own developer account:') }}</p>
+        <ol>
+            <li>{{ _('Create a developer account at') }} <a href="https://dashboard.hammerhead.io/create" target="_blank">dashboard.hammerhead.io/create</a>.</li>
+            <li>{{ _('Enable developer settings for your account, fill in the app name and description, and accept the API Licensing agreement.') }}</li>
+            <li>{{ _('Open the API settings tab that appears after accepting the agreement — your client ID and client secret are listed there.') }}</li>
+        </ol>
 
         <p>{{ _('Make sure to set the redirect URI of your Hammerhead OAuth app to this callback URL:') }}</p>
         <p><code>{{ url_for('settings.hammerhead_callback', _external=True) }}</code></p>
