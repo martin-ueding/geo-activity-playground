@@ -19,6 +19,7 @@ Types of changes
 
 Changed:
 
+- The share picture now uses a proper sans-serif font (Open Sans), displays the activity name in a header overlay at the top, and arranges stats (distance, duration, calories, steps) as labeled columns in the footer. The route line has a white halo for better visibility against light and dark map tiles.
 - The Hammerhead settings page now shows step-by-step instructions for registering a developer account at `dashboard.hammerhead.io/create` to obtain OAuth credentials, replacing the previous vague wording. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 Fixed:
