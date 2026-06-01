@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- The Hammerhead settings page now shows step-by-step instructions for registering a developer account at `dashboard.hammerhead.io/create` to obtain OAuth credentials, replacing the previous vague wording. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
+
 Fixed:
 
 - Backward segment matches now correctly compute average power. Previously the time-series slice used `[i_entry : i_exit + 1]`, which is empty when `i_entry > i_exit` (backward traversal), causing power to show as 0. ([GH-438](https://github.com/martin-ueding/geo-activity-playground/issues/438))
