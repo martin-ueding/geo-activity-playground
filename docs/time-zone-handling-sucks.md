@@ -4,7 +4,7 @@ With an unnerving frequency, the topic of time zones comes up. Let me take you i
 
 ## Time zone specifications
 
-The problem with time zones is that they inconsistently recorded. A second problem is that there are two ways of specifying them. These two ways seem equivalent until there is the daylight savings time switchover.
+The problem with time zones is that they are inconsistently recorded. A second problem is that there are two ways of specifying them. These two ways seem equivalent until there is the daylight savings time switchover.
 
 I live in Germany, hence I am always in the “Europe/Berlin” time zone. That doesn't change. But the meaning of that changes twice a year. During winter, we “Europe/Berlin” means “Central European Time” (“CET” in English, “MEZ” in German). The offset to UTC (Coordinated Universal Time) is +0100 then. During summer, Germany switches to “Central European Summer Time”, “CEST” (or “Central European Daylight Time”, “CEDT” in American English; “MESZ” in German). Then the UTC offset is +0200.
 
