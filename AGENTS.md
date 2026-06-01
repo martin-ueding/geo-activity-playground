@@ -20,6 +20,8 @@ If similar functionality already exist, please asks me to generalize it before c
 
 Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious. New changelog entries always go into a `## Unreleased` section, not to existing released versions.
 
+Changelog entries shall go into separate commits because if I need to revert a feature, I don't want to revert the changelog entry.
+
 I have used Material for MkDocs in the past, at the moment I use VitePress but haven't finally decided against Zensical. Hence there is a `mkdocs.yml` and also a `docs/.vitepress/config.ts`. When changing the structure of the documentation, make sure that it is updated in both configs.
 
 ## Git
