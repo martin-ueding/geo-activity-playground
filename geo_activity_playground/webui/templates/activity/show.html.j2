@@ -92,7 +92,6 @@
 
         <a href="{{ url_for('.edit', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Edit') }}</a>
         <a href="{{ url_for('.trim', id=activity['id']) }}" class="btn btn-secondary btn-small">{{ _('Trim') }}</a>
-        <a href="{{ url_for('filter_playground.show', id=activity.id) }}" class="btn btn-secondary btn-small">{{ _('Filter Playground') }}</a>
         <form method="POST" action="{{ url_for('.reenrich', id=activity.id) }}" class="d-inline">
             <button type="submit" class="btn btn-warning btn-small">{{ _('Re-enrich') }}</button>
         </form>
