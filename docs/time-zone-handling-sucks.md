@@ -99,7 +99,7 @@ If we supply time zone aware data to Altair, it will pass that onto Vega and the
 
 On top of this, databases like SQLite have their own time zone and [will convert dates back and forth](https://www.reddit.com/r/flask/comments/1im57ij/sqlalchemy_is_driving_me_nuts/). This doesn't make so much sense because I don't want to convert to the time zone of the database. The database should just store the times in the time zone of that time stamp. Likely that doesn't work, I would have to store the offset myself.
 
-# In this project
+## In this project
 
 After all these considations, here is how it is done in this project:
 
