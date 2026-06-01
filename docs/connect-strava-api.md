@@ -1,8 +1,8 @@
 # Connect Strava API
 
-You might have all your data on the Strava service and would like to use this for additional analytics without moving your data. That is fine.
+You might have all your data on the Strava service and would like to use this for additional analytics without moving your data. That is fine and a supported mode of operation.
 
-If you don't mind a bit of rate-limiting, you can just directly go ahead and start the webserver. It will offer to connect with Strava.
+From 2026-07-01, Strava requires API developers to have a Strava subscription. As I don't use Strava myself, I am not paying for a subscription. Therefore, if you want to use the Strava API, you will need a subscription and register your own API app as described in the next section.
 
 ## Your own Strava App
 
@@ -30,12 +30,7 @@ The easiest way to import it is via **Settings → Strava → Upload Strava Arch
 
 Alternatively, you can extract the ZIP manually and place its contents into `Playground/Strava Export`. Either way, activities from Strava will only be downloaded after importing all these local files, and only the ones after the last one in the export will be downloaded. This way you can get started much quicker.
 
-**⚠️ This is NOT the same as moving from Strava**
-
-This `Strava Export/` folder is specifically for **speeding up the initial Strava API sync**. It does not convert or process your files — it's just a cache to avoid rate limiting.
-
-- Do **not** put these files in your `Activities/` folder.
-- If you want to **leave Strava entirely**, see [Moving from Strava](moving-from-strava.md) instead.
+⚠️ This `Strava Export/` folder is specifically for **speeding up the initial Strava API sync**. It does not convert or process your files — it's just a cache to avoid rate limiting. Do **not** put these files in your `Activities/` folder. If you want to **leave Strava entirely**, see [Moving from Strava](moving-from-strava.md) instead.
 
 ## Skip Strava download
 
