@@ -199,7 +199,8 @@ def try_match_segment_activity(
             )
             power_avg = None
             if "power" in ts.columns:
-                power_slice = ts["power"].iloc[i_entry : i_exit + 1]
+                i_start, i_end = sorted([i_entry, i_exit])
+                power_slice = ts["power"].iloc[i_start : i_end + 1]
                 if not power_slice.empty:
                     mean_power = float(power_slice.mean())
                     if not pd.isna(mean_power):
