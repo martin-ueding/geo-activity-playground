@@ -87,6 +87,9 @@ export default {
     socialLinks: [
       { icon: 'github', link: 'https://github.com/martin-ueding/geo-activity-playground' },
     ],
+    outline: {
+      level: [2, 3],
+    },
     search: {
       provider: 'local',
     },
