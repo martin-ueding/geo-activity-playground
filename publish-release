@@ -122,15 +122,9 @@ def publish_to_pypi(version: str) -> None:
         )
 
 
-def deploy_documentation(version: str) -> None:
+def deploy_documentation() -> None:
     step("Deploy documentation")
-    run("npm", "run", "build")
-    dist = REPO_ROOT / "docs/.vitepress/dist"
-    run("git", "-C", str(dist), "init")
-    run("git", "-C", str(dist), "add", "-A")
-    run("git", "-C", str(dist), "commit", "-m", f"docs: deploy {version}")
-    origin = capture("git", "remote", "get-url", "origin")
-    run("git", "-C", str(dist), "push", "-f", origin, "HEAD:gh-pages")
+    run("./publish-docs", "vitepress")
 
 
 def create_github_release(version: str) -> None:
@@ -183,7 +177,7 @@ def main() -> None:
     push_commits_and_tags()
     build_wheel()
     publish_to_pypi(version)
-    deploy_documentation(version)
+    deploy_documentation()
     create_github_release(version)
     restore_unreleased_section()
     commit_and_push_changelog_restore()

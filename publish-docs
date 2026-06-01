@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -eu
+
+case "$1" in
+    vitepress)
+        npm run build
+        dist="docs/.vitepress/dist"
+        ;;
+    zensical)
+        uv run zensical build
+        dist="site"
+        ;;
+    *)
+        echo "Unsupported documentation generator!"
+        exit 1
+esac
+
+version=$(uv version --short)
+
+git -C "$dist" init
+git -C "$dist" add -A
+git -C "$dist" commit -m "docs: deploy documentation for $version"
+origin="$(git remote get-url origin)"
+git -C "$dist" push -f "$origin" HEAD:gh-pages
