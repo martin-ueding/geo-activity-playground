@@ -4,6 +4,7 @@ site_url: 'https://martin-ueding.github.io/geo-activity-playground/'
 theme:
   features:
     - navigation.sections
+  logo: public/logo-2.png
   name: material
   palette:
     - scheme: default

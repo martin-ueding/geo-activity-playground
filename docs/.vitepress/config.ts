@@ -4,6 +4,7 @@ export default {
   base: '/geo-activity-playground/',
   ignoreDeadLinks: [/^https?:\/\/localhost/],
   themeConfig: {
+    logo: '/logo-2.png',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Get Help', link: '/get-help' },
