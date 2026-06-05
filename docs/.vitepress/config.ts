@@ -8,6 +8,7 @@ export default {
       { text: 'Home', link: '/' },
       { text: 'Get Help', link: '/get-help' },
       { text: 'Changelog', link: '/changelog' },
+      { text: "Martin Ueding", link: "https://martin-ueding.de/" },
     ],
     sidebar: [
       { text: 'Home', link: '/' },
