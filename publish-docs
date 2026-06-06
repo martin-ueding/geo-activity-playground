@@ -2,21 +2,10 @@
 
 set -eu
 
-case "$1" in
-    vitepress)
-        npm run build
-        dist="docs/.vitepress/dist"
-        ;;
-    zensical)
-        uv run zensical build
-        dist="site"
-        ;;
-    *)
-        echo "Unsupported documentation generator!"
-        exit 1
-esac
-
 version=$(uv version --short)
+
+npm run docs:build
+dist="docs/.vitepress/dist"
 
 git -C "$dist" init
 git -C "$dist" add -A
