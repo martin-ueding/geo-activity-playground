@@ -1,47 +1,99 @@
-# Home
+---
+layout: home
 
-Geo Activity Playground is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.
+hero:
+  name: Geo Activity Playground
+  text: Nerd Out on Your Outdoor Data
+  tagline: A self-hosted playground for GPS tracks, heatmaps, and stats.
+  image:
+    src: images/screenshot-heatmap.png
+    alt: Interactive Heatmap
 
-It caters to serve a similar purpose as other systems like [Strava](https://strava.com/), [Statshunters](https://statshunters.com/) or [VeloViewer](https://veloviewer.com/), though the focus here is on self-hosting and using local files.
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /getting-started
+    - theme: brand
+      text: See Screenshots
+      link: /screenshot-tour
+    - theme: alt
+      text: See What's New
+      link: /changelog
 
-One can use this program with a local collection of activity files (GPX, FIT, TCX, KML, CSV) or via the Strava API. The latter is appealing to people who want to keep their data with Strava primarily. In case that one wants to move, this might provide a noncommittal way of testing out this project.
+features:
+  - icon: 📍
+    title: Activity Import
+    details: "Use your GPX, FIT, TCX, KML, or CSV files. Heart rate, cadence, speed and elevation are parsed automatically. Your data stays with you."
 
-The main user interface is web-based, you can run this on your Linux, Mac or Windows laptop. If you want, it can also run on a home server or your personal cloud instance.
+  - icon: 🔥
+    title: Heatmap View
+    details: "Dwell on a beautiful interactive heatmap of all your activities."
 
-## Screenshot tour
+  - icon: 🧩
+    title: Explorer Tiles
+    details: "Break the world into tiles and see which ones you've visited. Track your largest connected cluster, bookmark clusters across locations, and use the Square Planner to plan which tiles to ride next."
 
-This is the view of a single activity:
+  - icon: 📈
+    title: Summary Dashboard
+    details: "Totals and trends for distance, elevation, time, and steps — broken down by activity kind."
 
-![](images/screenshot-activity.png)
+  - icon: 📊
+    title: Activity Detail View
+    details: "View an interactive map and plots for each activity, compare to other activities though the same segments."
 
-You also get a beautiful interactive heatmap of all your activities:
+  - icon: 📸
+    title: Photo Integration
+    details: "Upload geotagged photos and they are matched to the nearest activity and shown on the map."
 
-![](images/screenshot-heatmap.png)
+  - icon: 🏆
+    title: Hall of Fame
+    details: "Your personal records: longest ride, fastest run, biggest climbing day, and more."
 
-Also there are plenty of summary statistics that lets you track how many rides, walks or hikes you have done:
+  - icon: 🗓️
+    title: Year & Month Wrap
+    details: "Strava-style annual and monthly summaries with progress highlights and new tile counts."
 
-![t](images/screenshot-summary.png)
+  - icon: ✂️
+    title: Activity Trimming
+    details: Crop the start or end of a track to remove warm-up noise or accidental recording.
+    
+  - icon: 🔁
+    title: Strava API Integration (Optional)
+    details: Sync activities directly from your Strava account. No data is uploaded — it's all stored locally.
 
-If you're into _explorer tiles_ or _squadratinhos_, this got you covered:
+  - icon: 📈
+    title: Eddington Number
+    details: Track your Eddington number for both distance and elevation gain.
 
-![](images/screenshot-explorer.png)
+  - icon: 🛣️
+    title: Segments
+    details: Define route segments via a routing service. The app automatically matches your activities to segments and tracks your times — including forward vs. backward direction comparison.
 
-The configuration options are available within the interface such that you do not have to work with configuration files (like in earlier versions):
+  - icon: 🫧
+    title: Bubble Charts
+    details: Scatter every activity as a bubble by distance vs. elevation gain, with per-day aggregates too.
 
-![](images/screenshot-settings.png)
+  - icon: 🎨
+    title: Custom Plot Builder
+    details: Build your own Vega-Lite charts from activity data and share them as JSON snippets.
 
-## Get started
+  - icon: 📹
+    title: Explorer Video Export
+    details: Generate a time-lapse MP4 of how your explored tile area grew over time.
 
-If you're new, just follow these steps:
+  - icon: 🛡️
+    title: Privacy Zones
+    details: Exclude sensitive areas like your home or workplace on all maps and heatmaps.
 
-1. Install the software on [Linux](install-on-linux.md), [Windows](install-on-windows.md) or [macOS](install-on-macos.md).
-2. [Create a base directory](create-a-base-directory.md).
-3. [Start the webserver](starting-the-webserver.md).
-4. Choose a method to [record activities](record-activities.md).
-5. Import your activities by [Choosing an Activity Source](activity-sources.md)
+  - icon: ⚙️
+    title: Equipment Tracking
+    details: Manage your gear, log offset distances (for bikes with prior mileage), and see per-equipment stats.
 
-Have fun. If you're stuck, [get help](get-help.md).
+  - icon: 🌍
+    title: Internationalization
+    details: Interface available in English, German, and Dutch.
 
-## Free software
-
-You can [find the code on GitHub](https://github.com/martin-ueding/geo-activity-playground) where you can also file issues. If you would like to use this yourself or contribute, feel free to reach out via the contact options [from my website](https://martin-ueding.de/). I would especially appreciate improvements to the documentation. If you're familiar with Markdown and GitHub, you can also directly create a pull request. The code is licensed under the very permissive MIT license.
+  - icon: 🧑‍💻
+    title: Free Software
+    details: This is free software that doesn't try to steal your data and always lets you move on if you want.
+---

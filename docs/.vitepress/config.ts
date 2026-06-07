@@ -12,6 +12,8 @@ export default {
     ],
     sidebar: [
       { text: 'Home', link: '/' },
+      { text: 'Getting Started', link: '/getting-started' },
+      { text: 'Screenshot Tour', link: '/screenshot-tour' },
       {
         text: 'Installation',
         items: [
@@ -74,14 +76,9 @@ export default {
           { text: 'Segment Matching', link: '/segment-matching' },
         ],
       },
-      {
-        text: 'Other',
-        items: [
-          { text: 'Acknowledgments', link: '/acknowledgments' },
-          { text: 'Similar Projects', link: '/similar-projects' },
-          { text: 'License', link: '/license' },
-        ],
-      },
+      { text: 'Acknowledgments', link: '/acknowledgments' },
+      { text: 'Similar Projects', link: '/similar-projects' },
+      { text: 'License', link: '/license' },
       { text: 'Get Help', link: '/get-help' },
       { text: 'Changelog', link: '/changelog' },
     ],
