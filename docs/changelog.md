@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a "hero" style home page to the docs to make this project look more polished and attractive.
+
 Changed:
 
 - Explain the Strava API changes in the documentation.
