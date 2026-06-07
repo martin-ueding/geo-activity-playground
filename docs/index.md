@@ -6,7 +6,7 @@ hero:
   text: Nerd Out on Your Outdoor Data
   tagline: A self-hosted playground for GPS tracks, heatmaps, and stats.
   image:
-    src: images/screenshot-heatmap.png
+    src: /screenshot-heatmap.png
     alt: Interactive Heatmap
 
   actions:
