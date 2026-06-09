@@ -555,6 +555,7 @@ class TileVisit(DB.Model):
     last_activity_id: Mapped[int] = mapped_column(
         ForeignKey("activities.id", name="tile_visit_last_activity_id"),
         nullable=False,
+        index=True,
     )
     last_activity: Mapped["Activity"] = relationship(foreign_keys=[last_activity_id])
     last_time: Mapped[datetime.datetime | None] = mapped_column(

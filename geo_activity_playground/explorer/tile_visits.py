@@ -746,7 +746,6 @@ def _process_activity(
 
         if activity.kind.consider_for_achievements:
             DB.session.commit()
-            invalidate_tile_visits_cache()
 
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
@@ -1079,31 +1078,26 @@ def _compute_cluster_evolution(
 
 @functools.lru_cache(maxsize=64)
 def get_tile_visits(zoom: int) -> dict[tuple[int, int], TileInfo]:
-    visits = DB.session.scalars(
-        sa.select(TileVisit)
-        .where(TileVisit.zoom == zoom)
-        .options(
-            sa.orm.joinedload(TileVisit.first_activity),
-            sa.orm.joinedload(TileVisit.last_activity),
-        )
+    rows = DB.session.execute(
+        sa.select(
+            TileVisit.tile_x,
+            TileVisit.tile_y,
+            TileVisit.visit_count,
+            TileVisit.first_activity_id,
+            TileVisit.first_time,
+            TileVisit.last_activity_id,
+            TileVisit.last_time,
+        ).where(TileVisit.zoom == zoom)
     ).all()
     return {
-        (visit.tile_x, visit.tile_y): {
-            "visit_count": visit.visit_count,
-            "first_time": (
-                pd.Timestamp(visit.first_time or visit.first_activity.start)
-                if (visit.first_time or visit.first_activity.start)
-                else pd.NaT
-            ),
-            "first_id": visit.first_activity_id,
-            "last_time": (
-                pd.Timestamp(visit.last_time or visit.last_activity.start)
-                if (visit.last_time or visit.last_activity.start)
-                else pd.NaT
-            ),
-            "last_id": visit.last_activity_id,
+        (row.tile_x, row.tile_y): {
+            "visit_count": row.visit_count,
+            "first_time": pd.Timestamp(row.first_time) if row.first_time else pd.NaT,
+            "first_id": row.first_activity_id,
+            "last_time": pd.Timestamp(row.last_time) if row.last_time else pd.NaT,
+            "last_id": row.last_activity_id,
         }
-        for visit in visits
+        for row in rows
     }
 
 
