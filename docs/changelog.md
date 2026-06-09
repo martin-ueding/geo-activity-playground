@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add a "hero" style home page to the docs to make this project look more polished and attractive.
+- Announce new releases on Mastodon.
 
 Fixed:
 
