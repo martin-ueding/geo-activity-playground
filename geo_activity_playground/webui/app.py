@@ -375,6 +375,9 @@ def create_app(
         )
         return variables
 
+    app.tile_visit_accessor = tile_visit_accessor
+    app.activity_repository = repository
+
     return app
 
 
@@ -430,8 +433,8 @@ def web_ui_main(
                 DB.session.commit()
 
     if not skip_reload:
-        repository = ActivityRepository()
-        tile_visit_accessor = TileVisitAccessor()
+        repository = app.activity_repository
+        tile_visit_accessor = app.tile_visit_accessor
         with app.app_context():
             scan_for_activities(
                 repository,
