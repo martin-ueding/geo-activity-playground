@@ -1202,8 +1202,9 @@ class HammerheadLoginHelper:
         }
 
     def save_hammerhead(self, client_id: str, client_secret: str) -> str:
-        self._hammerhead_client_id = client_id
-        self._hammerhead_client_secret = client_secret
+        self._config_accessor().hammerhead_client_id = client_id
+        self._config_accessor().hammerhead_client_secret = client_secret
+        self._config_accessor.save()
 
         payload = {
             "client_id": client_id,
@@ -1218,10 +1219,6 @@ class HammerheadLoginHelper:
         return f"https://api.hammerhead.io/v1/auth/oauth/authorize?{arg_string}"
 
     def save_hammerhead_code(self, code: str) -> None:
-        self._config_accessor().hammerhead_client_id = self._hammerhead_client_id
-        self._config_accessor().hammerhead_client_secret = (
-            self._hammerhead_client_secret
-        )
         self._config_accessor().hammerhead_client_code = code
         self._config_accessor.save()
         flash("Connected to Hammerhead API", category="success")
