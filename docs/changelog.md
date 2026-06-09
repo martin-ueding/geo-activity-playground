@@ -24,6 +24,7 @@ Added:
 Changed:
 
 - Explain the Strava API changes in the documentation.
+- Make tile visit retrieval faster. ([GH-436](https://github.com/martin-ueding/geo-activity-playground/issues/436))
 
 Removed:
 
