@@ -21,6 +21,10 @@ Added:
 
 - Add a "hero" style home page to the docs to make this project look more polished and attractive.
 
+Fixed:
+
+- Explorer tile view (zoom level 17 map and tile counter) now updates immediately after a new activity is imported, without requiring a server restart. ([GH-444](https://github.com/martin-ueding/geo-activity-playground/issues/444))
+
 Changed:
 
 - Explain the Strava API changes in the documentation.
