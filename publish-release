@@ -148,6 +148,32 @@ def create_github_release(version: str) -> None:
         print(f"[skip] GitHub release {version} already exists")
 
 
+def post_to_mastodon(version: str) -> None:
+    step("Post to Mastodon")
+    access_token = os.environ.get("MASTODON_ACCESS_TOKEN")
+    if not access_token:
+        print("[skip] MASTODON_ACCESS_TOKEN not set")
+        return
+
+    import mastodon
+
+    today = date.today().isoformat()
+    anchor = f"version-{version.replace('.', '-')}-%E2%80%94-{today}"
+    changelog_url = f"https://martin-ueding.github.io/geo-activity-playground/changelog.html#{anchor}"
+
+    text = (
+        f"Version {version} von #GeoActivityPlayground ist nun verfügbar!\n\n"
+        f"Alle Änderungen im Changelog:\n{changelog_url}"
+    )
+
+    client = mastodon.Mastodon(
+        access_token=access_token,
+        api_base_url="https://mastodon.social",
+    )
+    result = client.status_post(text, visibility="public")
+    print(f"Posted: {result['url']}")
+
+
 def restore_unreleased_section() -> None:
     step("Restore Unreleased section in changelog")
     changelog_text = CHANGELOG.read_text()
@@ -185,6 +211,7 @@ def main() -> None:
     upload_documentation_to_martin_ueding()
     deploy_documentation()
     create_github_release(version)
+    post_to_mastodon(version)
     restore_unreleased_section()
     commit_and_push_changelog_restore()
     print("\nRelease complete.")
