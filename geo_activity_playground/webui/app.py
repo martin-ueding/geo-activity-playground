@@ -493,7 +493,7 @@ def web_ui_main(
         except webbrowser.Error as e:
             logger.debug("Could not open browser: %s", e)
 
-    threading.Timer(1.0, open_browser).start()
+    threading.Timer(3.0, open_browser).start()
 
     if http_server == "waitress":
         logger.info(
