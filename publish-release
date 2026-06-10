@@ -122,16 +122,6 @@ def publish_to_pypi(version: str) -> None:
         )
 
 
-def upload_documentation_to_martin_ueding() -> None:
-    step("Deploy documentation to docs.martin-ueding.de")
-    run("upload-docs-page")
-
-
-def deploy_documentation() -> None:
-    step("Deploy documentation to GitHub Pages")
-    run("./publish-docs", "vitepress")
-
-
 def create_github_release(version: str) -> None:
     step("Create GitHub release")
     gh_check = subprocess.run(
@@ -215,8 +205,6 @@ def main() -> None:
     push_commits_and_tags()
     build_wheel()
     publish_to_pypi(version)
-    upload_documentation_to_martin_ueding()
-    deploy_documentation()
     create_github_release(version)
     post_to_mastodon(version)
     restore_unreleased_section()
