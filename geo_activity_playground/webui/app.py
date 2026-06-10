@@ -9,9 +9,11 @@ import pathlib
 import secrets
 import shutil
 import sys
+import threading
 import urllib.parse
 import uuid
 import warnings
+import webbrowser
 from collections.abc import Iterable
 from typing import Any, Literal
 from wsgiref.types import StartResponse, WSGIApplication, WSGIEnvironment
@@ -481,6 +483,17 @@ def web_ui_main(
             DB.engine.dispose()
 
     atexit.register(cleanup)
+
+    browser_host = "127.0.0.1" if host in ("0.0.0.0", "::") else host
+    url = f"http://{browser_host}:{port}"
+
+    def open_browser() -> None:
+        try:
+            webbrowser.open(url)
+        except webbrowser.Error as e:
+            logger.debug("Could not open browser: %s", e)
+
+    threading.Timer(1.0, open_browser).start()
 
     if http_server == "waitress":
         logger.info(
