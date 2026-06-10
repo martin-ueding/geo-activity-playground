@@ -2,69 +2,49 @@
 
 These are the instructions for an LLM coding agent.
 
-## Project description
+Project context:
 
-This project is a Flask application that uses SQLAlchemy for persistence.
+- This is a hobby project that analyzes outdoor activity tracks.
+- This project is a Flask application that uses SQLAlchemy for persistence.
+- Documentation is done with Markdown and VitePress.
 
-## Python coding guidelines
+## Coding
 
-Use modern Python syntax with type annotations.
+Rule: Use modern Python syntax with type annotations.
 
-When you change the SQLAlchemy model, generate the Alembic migration yourself by running `uv run alembic revision --autogenerate -m 'MESSAGE'`. The `database.sqlite` file checked into the repository serves as the schema anchor that Alembic compares against. Add both the model change and the generated migration file in `geo_activity_playground/alembic/versions/` to git. Do not hand-write migrations — always use autogenerate.
+Rule: Generate Alembic migrations with `uv run alembic revision --autogenerate -m 'MESSAGE'` using the `database.sqlite` checked into the repository as a schema anchor.
+Reason: Writing migrations oneself is error-prone, Alembic does valuable checks.
 
-This project is i18n'ed. Use `_(…)` for user facing strings.
+Rule: Use `_(…)` for user facing strings.
 
-If similar functionality already exist, please asks me to generalize it before creating duplicated code.
+Rule: If similar functionality already exist, please asks me to generalize it before creating duplicated code.
+Reason: Duplicated code has a cognitive burden.
 
 ## Documentation
 
-Changes are documented in `docs/changelog.md`, the format is documented within and should be obvious. New changelog entries always go into a `## Unreleased` section, not to existing released versions.
+Rule: Document changes in the `docs/changelog.md` in the `## Unreleased` section.
 
-Changelog entries shall go into separate commits because if I need to revert a feature, I don't want to revert the changelog entry.
+Rule: Changelog entries go into separate `docs:` commits.
+Reason: Reverting a feature doesn't undo the past.
 
-I have used Material for MkDocs in the past, at the moment I use VitePress but haven't finally decided against Zensical. Hence there is a `mkdocs.yml` and also a `docs/.vitepress/config.ts`. When changing the structure of the documentation, make sure that it is updated in both configs.
+Rule: When adding a new documentation file, it needs to be added to `docs/.vitepress/config.ts`.
 
 ## Git
 
-For this particular project, you can create new commits on `main`.
+Rule: Work on `main` in this particular project.
 
-When writing a commit message, use "Refs: GH-123" to mention the ticket. Do not use "fixes" or anything that would close the ticket on upload.
+Rule: Add references like `Refs: GH-123` to the trailer of the commit message.
 
-Do not just commit code that I haven't reviewed.
+Rule: Never use magic terms like "fixes" that would close a GitHub ticket on push.
 
-## Ticket status commands (resolved IDs)
+Rule: Don't commit code that I haven't reviewed.
 
-You can likely use the `gh` command line utility to make use of GitHub. The tickets are part of a project and are moved along the statuses there.
+## Communication
 
-Use these exact constants for this repository/project:
+Rule: Let users know that you are AI.
+Example: Prepend issue comments with `_The following content is AI generated ({marketing name of model and version})._`.
 
-- Owner: `martin-ueding`
-- Repo: `martin-ueding/geo-activity-playground`
-- Project: `GAP Kanban` (`number 4`, `id PVT_kwHOAA7oHM4A9xal`)
-- Status field id: `PVTSSF_lAHOAA7oHM4A9xalzgxX-6Q`
-- Status options:
-  - Backlog: `f75ad846`
-  - Ready: `61e4505c`
-  - In Progress: `47fc9ee4`
-  - Ready for Release: `df73e18b`
-  - Waiting for User Feedback: `98236657`
-  - Done: `6c55a62d`
+Rule: Only post updates to the GitHub tickets when I tell you to.
 
-Copy/paste flow for an issue number:
-
-```bash
-ISSUE_NUMBER=418
-ITEM_ID=$(gh project item-list 4 --owner martin-ueding --format json | jq -r ".items[] | select(.content.type==\"Issue\" and .content.number==${ISSUE_NUMBER}) | .id")
-gh project item-edit --id "$ITEM_ID" --project-id "PVT_kwHOAA7oHM4A9xal" --field-id "PVTSSF_lAHOAA7oHM4A9xalzgxX-6Q" --single-select-option-id "df73e18b"
-gh issue view "$ISSUE_NUMBER" --repo "martin-ueding/geo-activity-playground" --json number,title,projectItems
-```
-
-## Interaction with users
-
-You can access GitHub via the `gh` CLI. When interacting with users, start issue comments by the following:
-
-```markdown
-_The following content is AI generated ({marketing name of model and version})._
-```
-
-Only post updates to the GitHub tickets when I tell you to. Be careful of newline handling. If one is not careful, literal `\n` end up in the GitHub text.
+Rule: When posting content to GitHub using the `gh` CLI, be aware of newlines.
+Reason: When one isn't careful, literal `\n` end up in the GitHub text.
