@@ -45,9 +45,6 @@ Example: See git log.
 
 ## Communication
 
-Rule: Let users know that you are AI.
-Example: Prepend issue comments with `_The following content is AI generated ({marketing name of model and version})._`.
-
 Rule: Only post updates to the GitHub tickets when I tell you to.
 
 Rule: When posting content to GitHub using the `gh` CLI, be aware of newlines.
