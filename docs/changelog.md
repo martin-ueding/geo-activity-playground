@@ -17,6 +17,15 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Photos can now be imported automatically from the `Photos/` directory, mirroring how `Activities/` works. Drop photo files there (and sync that directory via OneDrive or similar) and they will be picked up on the next scan. Each machine builds its own database independently from the shared files.
+
+Changed:
+
+- Thumbnail caches for photos moved from `Photos/size-*/` to `Cache/Photos/size-*/`, keeping `Photos/` a clean inbox for source files only. Existing installations are migrated automatically on startup.
+- Photo files uploaded via the web form are now stored under their original filename instead of a UUID.
+
 Fixed:
 
 - Store Hammerhead code in config between requests. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/issues/440))
