@@ -446,6 +446,26 @@ def web_ui_main(
                 hammerhead_end=hammerhead_end,
             )
 
+    # Migrate Photos/original/ → Photos/ (flatten inbox structure)
+    photos_original = pathlib.Path("Photos/original")
+    if photos_original.exists():
+        for f in photos_original.iterdir():
+            dest = pathlib.Path("Photos") / f.name
+            if not dest.exists():
+                f.rename(dest)
+        try:
+            photos_original.rmdir()
+        except OSError:
+            pass
+        logger.info("Migrated Photos/original/ to Photos/")
+
+    # Migrate Photos/size-*/ thumbnail caches to Cache/Photos/
+    for old_cache in pathlib.Path("Photos").glob("size-*"):
+        if old_cache.is_dir():
+            dest = pathlib.Path("Cache") / "Photos" / old_cache.name
+            dest.parent.mkdir(exist_ok=True, parents=True)
+            old_cache.rename(dest)
+
     # Migrate tile cache directory structure
     base_dir = pathlib.Path("Open Street Map Tiles")
     dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)

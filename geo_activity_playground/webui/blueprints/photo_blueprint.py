@@ -1,16 +1,15 @@
 import datetime
-import pathlib
-import uuid
 
 import geojson
 import sqlalchemy
 from flask import Blueprint, Response, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from PIL import Image, ImageOps
+from werkzeug.utils import secure_filename
 
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, Photo
-from ...core.paths import PHOTOS_DIR
+from ...core.paths import PHOTOS_DIR, cache_dir
 from ...core.photos import get_metadata_from_image
 from ..authenticator import Authenticator, needs_authentication
 from ..flasher import Flasher, FlashTypes
@@ -26,8 +25,10 @@ def make_photo_blueprint(
         assert size < 5000
         photo = DB.session.get_one(Photo, id)
 
-        original_path = PHOTOS_DIR() / "original" / photo.path
-        small_path = PHOTOS_DIR() / f"size-{size}" / photo.path.with_suffix(".webp")
+        original_path = PHOTOS_DIR() / photo.path
+        small_path = (
+            cache_dir() / "Photos" / f"size-{size}" / photo.path.with_suffix(".webp")
+        )
 
         if not small_path.exists():
             with Image.open(original_path) as im:
@@ -110,9 +111,18 @@ def make_photo_blueprint(
                     flasher.flash_message("Empty file uploaded.", FlashTypes.WARNING)
                     return redirect(url_for(".new"))
 
-                filename = str(uuid.uuid4()) + pathlib.Path(file.filename).suffix
-                path = PHOTOS_DIR() / "original" / filename
-                path.parent.mkdir(exist_ok=True)
+                filename = secure_filename(file.filename)
+                if not filename:
+                    flasher.flash_message("Invalid filename.", FlashTypes.DANGER)
+                    continue
+                if DB.session.scalar(
+                    sqlalchemy.select(Photo).where(Photo.filename == filename)
+                ):
+                    flasher.flash_message(
+                        f"Photo '{filename}' is already imported.", FlashTypes.WARNING
+                    )
+                    continue
+                path = PHOTOS_DIR() / filename
                 file.save(path)
                 metadata = get_metadata_from_image(path)
 

@@ -23,6 +23,7 @@ from ...explorer.tile_visits import (
 )
 from ...importers.directory import import_from_directory
 from ...importers.hammerhead_api import import_from_hammerhead_api
+from ...importers.photo_directory import import_photos_from_directory
 from ...importers.strava_api import import_from_strava_api
 from ...importers.strava_checkout import import_from_strava_checkout
 from ..authenticator import Authenticator, needs_authentication
@@ -125,6 +126,7 @@ def scan_for_activities(
 ) -> None:
     if pathlib.Path("Activities").exists():
         import_from_directory(repository, tile_visit_accessor, config)
+    import_photos_from_directory()
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
