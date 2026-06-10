@@ -39,6 +39,10 @@ Rule: Never use magic terms like "fixes" that would close a GitHub ticket on pus
 
 Rule: Don't commit code that I haven't reviewed.
 
+Rule: Use conventional commits without scope.
+Reason: Version bumps are done based on conventional commits. The project is too small for scopes.
+Example: See git log.
+
 ## Communication
 
 Rule: Let users know that you are AI.
