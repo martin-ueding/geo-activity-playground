@@ -29,7 +29,6 @@ Changed:
 Fixed:
 
 - Store Hammerhead code in config between requests. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/issues/440))
-- Photo map popup image no longer overflows the popup container.
 
 ## Version 1.31.1 — 2026-06-09
 
