@@ -30,7 +30,7 @@
                     });
                 },
                 onEachFeature: function (feature, layer) {
-                    layer.bindPopup(`<a href="${feature.properties.url_full}" target="_blank"><img src="${feature.properties.url_popup}" style="max-width: 100%; display: block;" /></a>`)
+                    layer.bindPopup(`<a href="${feature.properties.url_full}" target="_blank"><img src="${feature.properties.url_popup}" style="max-width: 512px; display: block;" /></a>`, {maxWidth: 520})
                 }
             })
 
