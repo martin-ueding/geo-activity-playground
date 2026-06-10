@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Photos can now be imported automatically from the `Photos/` directory, mirroring how `Activities/` works. Drop photo files there (and sync that directory via OneDrive or similar) and they will be picked up on the next scan. Each machine builds its own database independently from the shared files.
+- The `serve` command now opens the web interface in the default browser shortly after startup. On headless systems where no browser is available this fails silently.
 
 Changed:
 
