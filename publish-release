@@ -150,12 +150,6 @@ def create_github_release(version: str) -> None:
 
 def post_to_mastodon(version: str) -> None:
     step("Post to Mastodon")
-    access_token = os.environ.get("MASTODON_ACCESS_TOKEN")
-    if not access_token:
-        print("[skip] MASTODON_ACCESS_TOKEN not set")
-        return
-
-    import mastodon
 
     today = date.today().isoformat()
     anchor = f"version-{version.replace('.', '-')}-%E2%80%94-{today}"
@@ -166,12 +160,25 @@ def post_to_mastodon(version: str) -> None:
         f"Alle Änderungen im Changelog:\n{changelog_url}"
     )
 
-    client = mastodon.Mastodon(
-        access_token=access_token,
-        api_base_url="https://mastodon.social",
-    )
-    result = client.status_post(text, visibility="public")
-    print(f"Posted: {result['url']}")
+    ctl_toml = Path.home() / "Projekte/eigene-webseite/ctl.toml"
+    if ctl_toml.exists():
+        with open(ctl_toml, "rb") as f:
+            config = tomllib.load(f)
+        mastodon_config = config["mastodon"]
+
+        import mastodon
+
+        client = mastodon.Mastodon(
+            api_base_url=mastodon_config["url"],
+            client_id=mastodon_config["client_id"],
+            client_secret=mastodon_config["client_secret"],
+            access_token=mastodon_config["access_token"],
+        )
+        result = client.status_post(text, visibility="public")
+        print(f"Posted: {result['url']}")
+    else:
+        print("[skip] ctl.toml not found; post this manually:")
+        print(text)
 
 
 def restore_unreleased_section() -> None:
