@@ -35,7 +35,7 @@ def make_photo_blueprint(
                 target_size = (size, size)
                 im = ImageOps.exif_transpose(im)
                 im = ImageOps.contain(im, target_size)
-                small_path.parent.mkdir(exist_ok=True)
+                small_path.parent.mkdir(parents=True, exist_ok=True)
                 im.save(small_path)
 
         with open(small_path, "rb") as f:
