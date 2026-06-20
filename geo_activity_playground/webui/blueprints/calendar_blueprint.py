@@ -191,17 +191,28 @@ def _plot_monthly_progress(monthly: pd.DataFrame) -> str:
             alt.Tooltip("max_square_size:Q", title=_("Square size")),
         ],
     )
-    new_tiles = base.mark_line(point=True, color="#ffc107").encode(
-        alt.X("month:O", title=_("Month")),
-        alt.Y("new_tiles:Q", title=_("New tiles")),
-    )
-    new_cluster_tiles = base.mark_line(point=True, color="#6f42c1").encode(
-        alt.X("month:O", title=_("Month")),
-        alt.Y("new_cluster_tiles:Q", title=_("New cluster tiles")),
+    tiles = (
+        base.transform_fold(
+            ["new_tiles", "new_cluster_tiles"],
+            as_=["tile_type", "tiles"],
+        )
+        .mark_line(point=True)
+        .encode(
+            alt.X("month:O", title=_("Month")),
+            alt.Y("tiles:Q", title=_("New tiles")),
+            alt.Color(
+                "tile_type:N",
+                scale=alt.Scale(
+                    domain=["new_tiles", "new_cluster_tiles"],
+                    range=["#ffc107", "#6f42c1"],
+                ),
+                legend=alt.Legend(title=_("Tile type")),
+            ),
+        )
     )
     return (
-        alt.layer(distance, new_tiles, new_cluster_tiles)
-        .resolve_scale(y="independent")
+        alt.layer(distance, tiles)
+        .resolve_scale(y="independent", color="independent")
         .to_json(format="vega")
     )
 
@@ -246,17 +257,28 @@ def _plot_daily_progress(daily: pd.DataFrame) -> str:
             alt.Tooltip("max_square_size:Q", title=_("Square size")),
         ],
     )
-    new_tiles = base.mark_line(point=True, color="#dc3545").encode(
-        alt.X("day:O", title=_("Day")),
-        alt.Y("new_tiles:Q", title=_("New tiles")),
-    )
-    new_cluster_tiles = base.mark_line(point=True, color="#6f42c1").encode(
-        alt.X("day:O", title=_("Day")),
-        alt.Y("new_cluster_tiles:Q", title=_("New cluster tiles")),
+    tiles = (
+        base.transform_fold(
+            ["new_tiles", "new_cluster_tiles"],
+            as_=["tile_type", "tiles"],
+        )
+        .mark_line(point=True)
+        .encode(
+            alt.X("day:O", title=_("Day")),
+            alt.Y("tiles:Q", title=_("New tiles")),
+            alt.Color(
+                "tile_type:N",
+                scale=alt.Scale(
+                    domain=["new_tiles", "new_cluster_tiles"],
+                    range=["#dc3545", "#6f42c1"],
+                ),
+                legend=alt.Legend(title=_("Tile type")),
+            ),
+        )
     )
     return (
-        alt.layer(distance, new_tiles, new_cluster_tiles)
-        .resolve_scale(y="independent")
+        alt.layer(distance, tiles)
+        .resolve_scale(y="independent", color="independent")
         .to_json(format="vega")
     )
 
