@@ -17,8 +17,8 @@ Types of changes
 
 ## Unreleased
 
-- *Added*: Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that are 8 km or longer. These are rendered smaller than the quarter markers to visually distinguish them.
-- *Added*: Distance / Time toggle in the activity map view. Switching to Time repositions the progress markers at equal fractions of elapsed duration. Eighth markers appear when the activity lasts ≥ 30 minutes.
+- *Added*: Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that exceed the configured thresholds. They are rendered smaller than the quarter markers to visually distinguish them. Thresholds are `eighth_marker_min_distance_km` (default 30) and `eighth_marker_min_duration_hours` (default 3) in `config.json`.
+- *Added*: Distance / Time toggle in the activity map view. Switching to Time repositions the progress markers at equal fractions of elapsed duration.
 
 
 ## Version 1.33.0 — 2026-06-20
