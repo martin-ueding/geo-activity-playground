@@ -6,7 +6,6 @@ import io
 import itertools
 import logging
 import pathlib
-from collections.abc import Iterable
 from typing import Any
 
 import altair as alt
@@ -41,13 +40,18 @@ from ...explorer.grid_file import (
     make_grid_points,
 )
 from ...explorer.tile_visits import (
-    TileEvolutionState,
     TileVisitAccessor,
     compute_tile_evolution,
+    get_biggest_cluster_members,
     get_cluster_history_latest_event_index,
+    get_cluster_id_for_tile,
+    get_cluster_members,
+    get_cluster_membership_in_bounds,
     get_cluster_state_at_cutoff,
+    get_cluster_tile_count,
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
+    get_max_cluster,
     get_tile_count,
     get_tile_history_df,
     get_tile_medians,
@@ -84,23 +88,22 @@ class ColorStrategy(abc.ABC):
 
 class MaxClusterColorStrategy(ColorStrategy):
     def __init__(
-        self, evolution_state: TileEvolutionState, tile_visits, config: Config
+        self,
+        membership: dict[tuple[int, int], tuple[int, int]],
+        max_cluster_id: tuple[int, int] | None,
+        tile_visits,
+        config: Config,
     ):
-        self.evolution_state = evolution_state
+        self.membership = membership
+        self.max_cluster_id = max_cluster_id
         self.tile_visits = tile_visits
-        self.max_cluster_members = set(
-            max(
-                evolution_state.clusters.values(),
-                key=len,
-                default=(),
-            )
-        )
         self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.max_cluster_members:
-            return hex_color_to_float(self._config.color_strategy_max_cluster_color)
-        elif tile_xy in self.evolution_state.memberships:
+        cluster_id = self.membership.get(tile_xy)
+        if cluster_id is not None:
+            if cluster_id == self.max_cluster_id:
+                return hex_color_to_float(self._config.color_strategy_max_cluster_color)
             return hex_color_to_float(
                 self._config.color_strategy_max_cluster_other_color
             )
@@ -112,16 +115,19 @@ class MaxClusterColorStrategy(ColorStrategy):
 
 class ColorfulClusterColorStrategy(ColorStrategy):
     def __init__(
-        self, evolution_state: TileEvolutionState, tile_visits, config: Config
+        self,
+        membership: dict[tuple[int, int], tuple[int, int]],
+        tile_visits,
+        config: Config,
     ):
-        self.evolution_state = evolution_state
+        self.membership = membership
         self.tile_visits = tile_visits
         self._cmap = matplotlib.colormaps["hsv"]
         self._config = config
 
     def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.evolution_state.memberships:
-            cluster_id = self.evolution_state.memberships[tile_xy]
+        cluster_id = self.membership.get(tile_xy)
+        if cluster_id is not None:
             m = hashlib.sha256()
             m.update(str(cluster_id).encode())
             d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
@@ -392,10 +398,10 @@ def make_explorer_blueprint(
             )
         ).all():
             tile = (bookmark.tile_x, bookmark.tile_y)
-            representative = tile_evolution_state.memberships.get(tile, None)
-            if not representative:
+            representative = get_cluster_id_for_tile(zoom, tile[0], tile[1])
+            if representative is None:
                 continue
-            cluster = tile_evolution_state.clusters.get(representative, None)
+            cluster = get_cluster_members(zoom, representative[0], representative[1])
             if not cluster:
                 continue
             bookmarks.append(
@@ -407,15 +413,18 @@ def make_explorer_blueprint(
                 }
             )
 
+        biggest_cluster_members = get_biggest_cluster_members(zoom)
+        _max_cluster_representative, max_cluster_size = get_max_cluster(zoom)
+
         context = {
             "center": {
                 "latitude": median_lat,
                 "longitude": median_lon,
                 "bbox": (
-                    bounding_box_for_biggest_cluster(
-                        tile_evolution_state.clusters.values(), zoom
+                    geojson_bounding_box_for_tile_collection(
+                        biggest_cluster_members, zoom
                     )
-                    if len(tile_evolution_state.memberships) > 0
+                    if biggest_cluster_members
                     else {}
                 ),
             },
@@ -428,13 +437,11 @@ def make_explorer_blueprint(
             ),
             "zoom": zoom,
             "num_tiles": num_tiles,
-            "num_cluster_tiles": len(tile_evolution_state.memberships),
+            "num_cluster_tiles": get_cluster_tile_count(zoom),
             "square_x": tile_evolution_state.square_x,
             "square_y": tile_evolution_state.square_y,
             "square_size": tile_evolution_state.max_square_size,
-            "max_cluster_size": max(
-                map(len, tile_evolution_state.clusters.values()), default=0
-            ),
+            "max_cluster_size": max_cluster_size,
             "bookmarks": bookmarks,
         }
         return render_template("explorer/server-side.html.j2", **context)
@@ -520,6 +527,17 @@ def make_explorer_blueprint(
             )
             historical_state = get_cluster_state_at_cutoff(zoom, history_event_index)
 
+        # Bounding box of explorer tiles covered by this map tile, used to fetch
+        # only the cluster membership in view from the database.
+        if z >= zoom:
+            cover_factor = 2 ** (z - zoom)
+            tx_min = tx_max = x // cover_factor
+            ty_min = ty_max = y // cover_factor
+        else:
+            cover_factor = 2 ** (zoom - z)
+            tx_min, tx_max = x * cover_factor, x * cover_factor + cover_factor - 1
+            ty_min, ty_max = y * cover_factor, y * cover_factor + cover_factor - 1
+
         # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         # grayscale = image_transforms["grayscale"].transform_image(map_tile)
         grayscale = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
@@ -532,8 +550,12 @@ def make_explorer_blueprint(
         match color_strategy_name:
             case "max_cluster":
                 if historical_state is None:
+                    membership = get_cluster_membership_in_bounds(
+                        zoom, tx_min, tx_max, ty_min, ty_max
+                    )
+                    max_cluster_id, _ = get_max_cluster(zoom)
                     color_strategy = MaxClusterColorStrategy(
-                        evolution_state, tile_visits, config
+                        membership, max_cluster_id, tile_visits, config
                     )
                 else:
                     color_strategy = HistoricalMaxClusterColorStrategy(
@@ -541,8 +563,11 @@ def make_explorer_blueprint(
                     )
             case "colorful_cluster":
                 if historical_state is None:
+                    membership = get_cluster_membership_in_bounds(
+                        zoom, tx_min, tx_max, ty_min, ty_max
+                    )
                     color_strategy = ColorfulClusterColorStrategy(
-                        evolution_state, tile_visits, config
+                        membership, tile_visits, config
                     )
                 else:
                     color_strategy = HistoricalColorfulClusterColorStrategy(
@@ -709,6 +734,7 @@ def make_explorer_blueprint(
     def info(zoom: int, latitude: float, longitude: float) -> str:
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         tile_xy = compute_tile(latitude, longitude, zoom)
+        cluster_id = get_cluster_id_for_tile(zoom, tile_xy[0], tile_xy[1])
         context: dict[str, Any] = {
             "tile_x": tile_xy[0],
             "tile_y": tile_xy[1],
@@ -745,11 +771,11 @@ def make_explorer_blueprint(
                         if tile_visit.last_time
                         else None
                     ),
-                    "is_cluster": tile_xy in evolution_state.memberships,
-                    "this_cluster_size": len(
-                        evolution_state.clusters.get(
-                            evolution_state.memberships.get(tile_xy, None), []
-                        )
+                    "is_cluster": cluster_id is not None,
+                    "this_cluster_size": (
+                        len(get_cluster_members(zoom, cluster_id[0], cluster_id[1]))
+                        if cluster_id is not None
+                        else 0
                     ),
                     "new_bookmark_url": url_for(
                         "settings.cluster_bookmark_new",
@@ -859,13 +885,6 @@ def make_explorer_blueprint(
         )
 
     return blueprint
-
-
-def bounding_box_for_biggest_cluster(
-    clusters: Iterable[list[tuple[int, int]]], zoom: int
-) -> str:
-    biggest_cluster = max(clusters, key=lambda members: len(members))
-    return geojson_bounding_box_for_tile_collection(biggest_cluster, zoom)
 
 
 def geojson_bounding_box_for_tile_collection(

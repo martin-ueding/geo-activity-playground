@@ -617,6 +617,35 @@ class ClusterHistoryCheckpoint(DB.Model):
     )
 
 
+class ClusterMembership(DB.Model):
+    """Materialized current cluster membership per tile.
+
+    Holds, for every cluster tile at a zoom level, the representative tile of
+    its cluster (``cluster_x``/``cluster_y``). This is the source of truth for
+    the live explorer cluster coloring and counters, queried by viewport so no
+    per-process in-memory state is needed.
+    """
+
+    __tablename__ = "cluster_membership"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    cluster_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    cluster_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    __table_args__ = (
+        sa.Index("idx_cluster_membership_zoom_tile", "zoom", "tile_x", "tile_y"),
+        sa.Index(
+            "idx_cluster_membership_zoom_cluster", "zoom", "cluster_x", "cluster_y"
+        ),
+        sa.UniqueConstraint(
+            "zoom", "tile_x", "tile_y", name="uq_cluster_membership_per_zoom"
+        ),
+    )
+
+
 class StoredSearchQuery(DB.Model):
     __tablename__ = "stored_search_queries"
 

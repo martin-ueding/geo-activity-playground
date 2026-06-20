@@ -30,9 +30,13 @@ from ...core.raster_map import (
     get_sensible_zoom_level,
 )
 from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.tile_visits import TileVisitAccessor, get_tile_medians
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    get_biggest_cluster_members,
+    get_tile_medians,
+)
 from ..authenticator import Authenticator
-from .explorer_blueprint import bounding_box_for_biggest_cluster
+from .explorer_blueprint import geojson_bounding_box_for_tile_collection
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +70,7 @@ def make_heatmap_blueprint(
         median_lat, median_lon = get_tile_upper_left_lat_lon(
             medians[0], medians[1], zoom
         )
-        cluster_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        biggest_cluster_members = get_biggest_cluster_members(zoom)
 
         stored_queries = get_stored_queries()
         search_query_favorites = [
@@ -81,10 +85,10 @@ def make_heatmap_blueprint(
                 "latitude": median_lat,
                 "longitude": median_lon,
                 "bbox": (
-                    bounding_box_for_biggest_cluster(
-                        cluster_state.clusters.values(), zoom
+                    geojson_bounding_box_for_tile_collection(
+                        biggest_cluster_members, zoom
                     )
-                    if len(cluster_state.memberships) > 0
+                    if biggest_cluster_members
                     else {}
                 ),
             },

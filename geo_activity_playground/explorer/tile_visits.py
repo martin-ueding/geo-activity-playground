@@ -21,6 +21,7 @@ from ..core.datamodel import (
     Activity,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
+    ClusterMembership,
     TileVisit,
 )
 from ..core.paths import atomic_open
@@ -819,6 +820,7 @@ def rebuild_cluster_history_for_zoom(zoom: int, tile_history: pd.DataFrame) -> N
     DB.session.query(ClusterHistoryCheckpoint).filter(
         ClusterHistoryCheckpoint.zoom == zoom
     ).delete()
+    DB.session.query(ClusterMembership).filter(ClusterMembership.zoom == zoom).delete()
 
     state = ClusterReplayState()
     event_batch: list[ClusterHistoryEvent] = []
@@ -873,7 +875,116 @@ def rebuild_cluster_history_for_zoom(zoom: int, tile_history: pd.DataFrame) -> N
     if checkpoint_batch:
         DB.session.add_all(checkpoint_batch)
 
+    _materialize_cluster_membership(zoom, state)
+
     DB.session.commit()
+
+
+def _materialize_cluster_membership(zoom: int, state: ClusterReplayState) -> None:
+    """Persist the final cluster membership of a replay state for a zoom level."""
+    batch: list[ClusterMembership] = []
+    for tile in state.cluster_tiles:
+        root = _find_root(state.parents, tile)
+        batch.append(
+            ClusterMembership(
+                zoom=zoom,
+                tile_x=tile[0],
+                tile_y=tile[1],
+                cluster_x=root[0],
+                cluster_y=root[1],
+            )
+        )
+        if len(batch) >= 1_000:
+            DB.session.add_all(batch)
+            batch = []
+    if batch:
+        DB.session.add_all(batch)
+
+
+def get_cluster_membership_in_bounds(
+    zoom: int, x_min: int, x_max: int, y_min: int, y_max: int
+) -> dict[tuple[int, int], tuple[int, int]]:
+    """Return ``tile -> representative tile`` for cluster tiles within a viewport."""
+    rows = DB.session.execute(
+        sa.select(
+            ClusterMembership.tile_x,
+            ClusterMembership.tile_y,
+            ClusterMembership.cluster_x,
+            ClusterMembership.cluster_y,
+        ).where(
+            ClusterMembership.zoom == zoom,
+            ClusterMembership.tile_x >= x_min,
+            ClusterMembership.tile_x <= x_max,
+            ClusterMembership.tile_y >= y_min,
+            ClusterMembership.tile_y <= y_max,
+        )
+    ).all()
+    return {(row.tile_x, row.tile_y): (row.cluster_x, row.cluster_y) for row in rows}
+
+
+def get_cluster_tile_count(zoom: int) -> int:
+    """Number of tiles that belong to any cluster at a zoom level."""
+    return (
+        DB.session.query(ClusterMembership)
+        .filter(ClusterMembership.zoom == zoom)
+        .count()
+    )
+
+
+def get_max_cluster(zoom: int) -> tuple[tuple[int, int] | None, int]:
+    """Return the representative and size of the largest cluster at a zoom level."""
+    row = DB.session.execute(
+        sa.select(
+            ClusterMembership.cluster_x,
+            ClusterMembership.cluster_y,
+            sa.func.count().label("size"),
+        )
+        .where(ClusterMembership.zoom == zoom)
+        .group_by(ClusterMembership.cluster_x, ClusterMembership.cluster_y)
+        .order_by(sa.desc("size"))
+        .limit(1)
+    ).first()
+    if row is None:
+        return None, 0
+    return (row.cluster_x, row.cluster_y), int(row.size)
+
+
+def get_cluster_id_for_tile(
+    zoom: int, tile_x: int, tile_y: int
+) -> tuple[int, int] | None:
+    """Return the representative tile of the cluster a tile belongs to, if any."""
+    row = DB.session.execute(
+        sa.select(ClusterMembership.cluster_x, ClusterMembership.cluster_y).where(
+            ClusterMembership.zoom == zoom,
+            ClusterMembership.tile_x == tile_x,
+            ClusterMembership.tile_y == tile_y,
+        )
+    ).first()
+    if row is None:
+        return None
+    return (row.cluster_x, row.cluster_y)
+
+
+def get_cluster_members(
+    zoom: int, cluster_x: int, cluster_y: int
+) -> list[tuple[int, int]]:
+    """Return all member tiles of a cluster identified by its representative."""
+    rows = DB.session.execute(
+        sa.select(ClusterMembership.tile_x, ClusterMembership.tile_y).where(
+            ClusterMembership.zoom == zoom,
+            ClusterMembership.cluster_x == cluster_x,
+            ClusterMembership.cluster_y == cluster_y,
+        )
+    ).all()
+    return [(row.tile_x, row.tile_y) for row in rows]
+
+
+def get_biggest_cluster_members(zoom: int) -> list[tuple[int, int]]:
+    """Return the member tiles of the largest cluster at a zoom level."""
+    representative, _size = get_max_cluster(zoom)
+    if representative is None:
+        return []
+    return get_cluster_members(zoom, representative[0], representative[1])
 
 
 def get_cluster_history_cutoff_for_activity(
