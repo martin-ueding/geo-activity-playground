@@ -17,6 +17,8 @@ Types of changes
 
 ## Unreleased
 
+- *Added*: Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that are 8 km or longer. These are rendered smaller than the quarter markers to visually distinguish them.
+
 
 ## Version 1.33.0 — 2026-06-20
 
