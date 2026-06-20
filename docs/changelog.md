@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Explorer and square-planner tiles now read tile visits scoped to the visible area from the database on each request, instead of caching the full per-zoom set in process memory. Zoomed-out tiles render faster because only the tiles in view are read, and the explored-tile layer stays correct across multiple worker processes. ([GH-444](https://github.com/martin-ueding/geo-activity-playground/issues/444))
+
 Fixed:
 
 - Fixed overlapping right-side axis labels in the "Monthly Distance and New Tiles" and "Daily Distance and New Tiles" plots by merging the two tile series into a single layer with color encoding. Refs: [GH-445](https://github.com/martin-ueding/geo-activity-playground/issues/445)
