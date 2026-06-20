@@ -17,8 +17,10 @@ Types of changes
 
 ## Unreleased
 
-- Fixed overlapping right-side axis labels in the "Monthly Distance and New Tiles" and "Daily Distance and New Tiles" plots by merging the two tile series into a single layer with color encoding. Refs: [GH-445](https://github.com/martin-ueding/geo-activity-playground/issues/445)
+Fixed:
 
+- Fixed overlapping right-side axis labels in the "Monthly Distance and New Tiles" and "Daily Distance and New Tiles" plots by merging the two tile series into a single layer with color encoding. Refs: [GH-445](https://github.com/martin-ueding/geo-activity-playground/issues/445)
+- Photo thumbnails now render correctly even when the photo cache directory does not exist yet. ([GH-446](https://github.com/martin-ueding/geo-activity-playground/issues/446))
 
 ## Version 1.32.0 — 2026-06-10
 
