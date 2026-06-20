@@ -1,5 +1,4 @@
 import datetime as dt
-import pickle
 import time
 from types import SimpleNamespace
 
@@ -19,7 +18,6 @@ from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
 from geo_activity_playground.explorer.tile_visits import (
     CLUSTER_CHECKPOINT_INTERVAL,
     TileEvolutionState,
-    TileVisitAccessor,
     _compute_cluster_evolution,
     _process_activity,
     _tiles_from_points,
@@ -33,28 +31,6 @@ from geo_activity_playground.explorer.tile_visits import (
     remove_activity_from_tile_state,
 )
 from geo_activity_playground.webui.blueprints.heatmap_blueprint import _get_counts
-
-
-def test_accessor_removes_persisted_tile_visits_key(app) -> None:
-    with app.app_context():
-        state_path = TileVisitAccessor.PATH
-        state_path.parent.mkdir(parents=True, exist_ok=True)
-        state_path.write_bytes(
-            pickle.dumps(
-                {
-                    "tile_visits": {14: {(1, 2): {"visit_count": 1}}},
-                    "activities_per_tile": {},
-                    "evolution_state": {},
-                    "version": 3,
-                }
-            )
-        )
-
-        accessor = TileVisitAccessor()
-        assert "tile_visits" not in accessor.tile_state
-
-        persisted = pickle.loads(state_path.read_bytes())
-        assert "tile_visits" not in persisted
 
 
 def test_get_tile_visits_uses_db_only(app) -> None:

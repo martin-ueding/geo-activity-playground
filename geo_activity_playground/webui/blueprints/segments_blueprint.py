@@ -15,14 +15,12 @@ from ...core.segments import (
     rematch_segment,
     segment_track_distance,
 )
-from ...explorer.tile_visits import TileVisitAccessor
 from ..authenticator import Authenticator, needs_authentication
 from ..flasher import Flasher, FlashTypes
 
 
 def make_segments_blueprint(
     authenticator: Authenticator,
-    tile_visit_accessor: TileVisitAccessor,
     flasher: Flasher,
     config: Config,
 ) -> Blueprint:

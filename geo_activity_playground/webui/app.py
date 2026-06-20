@@ -55,7 +55,6 @@ from ..core.raster_map import (
     PastelImageTransform,
     TileGetter,
 )
-from ..explorer.tile_visits import TileVisitAccessor
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
@@ -244,10 +243,6 @@ def create_app(
 
     # Set up dependencies
     repository = ActivityRepository()
-    tile_visit_accessor = TileVisitAccessor()
-    # Complete any pending migration from old pickle format (requires app context)
-    with app.app_context():
-        tile_visit_accessor.complete_migration()
     config_accessor = ConfigAccessor()
     config = config_accessor()
     with app.app_context():
@@ -306,19 +301,17 @@ def create_app(
         "/activity": make_activity_blueprint(
             repository,
             authenticator,
-            tile_visit_accessor,
             config,
             heart_rate_zone_computer,
         ),
         "/admin": make_admin_blueprint(authenticator),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
-        "/calendar": make_calendar_blueprint(repository, tile_visit_accessor, config),
+        "/calendar": make_calendar_blueprint(repository, config),
         "/eddington": register_eddington_blueprint(repository, authenticator),
         "/equipment": make_equipment_blueprint(repository, config),
         "/explorer": make_explorer_blueprint(
             authenticator,
-            tile_visit_accessor,
             config_accessor,
             tile_getter,
             image_transforms,
@@ -326,26 +319,20 @@ def create_app(
         ),
         "/export": make_export_blueprint(authenticator),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator),
-        "/heatmap": make_heatmap_blueprint(
-            repository, tile_visit_accessor, config, authenticator
-        ),
+        "/heatmap": make_heatmap_blueprint(repository, config, authenticator),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
             repository, flasher, authenticator
         ),
         "/settings": make_settings_blueprint(
-            config_accessor, authenticator, flasher, repository, tile_visit_accessor
+            config_accessor, authenticator, flasher, repository
         ),
-        "/segments": make_segments_blueprint(
-            authenticator, tile_visit_accessor, flasher, config
-        ),
-        "/square-planner": make_square_planner_blueprint(tile_visit_accessor),
+        "/segments": make_segments_blueprint(authenticator, flasher, config),
+        "/square-planner": make_square_planner_blueprint(),
         "/search": make_search_blueprint(authenticator, config),
         "/summary": make_summary_blueprint(repository, config, authenticator),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
-        "/upload": make_upload_blueprint(
-            repository, tile_visit_accessor, config, authenticator, flasher
-        ),
+        "/upload": make_upload_blueprint(repository, config, authenticator, flasher),
     }
 
     for url_prefix, blueprint in blueprints.items():
@@ -377,7 +364,6 @@ def create_app(
         )
         return variables
 
-    app.tile_visit_accessor = tile_visit_accessor
     app.activity_repository = repository
 
     return app
@@ -436,11 +422,9 @@ def web_ui_main(
 
     if not skip_reload:
         repository = app.activity_repository
-        tile_visit_accessor = app.tile_visit_accessor
         with app.app_context():
             scan_for_activities(
                 repository,
-                tile_visit_accessor,
                 config_accessor(),
                 strava_begin=strava_begin,
                 strava_end=strava_end,

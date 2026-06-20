@@ -420,7 +420,6 @@ def test_try_import_strava_does_not_recompute_tiles_per_activity(app, monkeypatc
         limit_exceeded = strava_api.try_import_strava(
             config=strava_api.Config(),
             repository=None,
-            tile_visit_accessor=None,
             strava_begin="2020-01-01",
         )
 

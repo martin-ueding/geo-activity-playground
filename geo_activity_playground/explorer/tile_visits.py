@@ -3,8 +3,6 @@ import datetime
 import itertools
 import json
 import logging
-import pathlib
-import pickle
 import zoneinfo
 from collections.abc import Iterator
 from typing import TypedDict
@@ -27,8 +25,6 @@ from ..core.datamodel import (
     SquareHistory,
     TileVisit,
 )
-from ..core.paths import atomic_open
-from ..core.tasks import try_load_pickle
 from ..core.tiles import adjacent_to, interpolate_missing_tile
 
 logger = logging.getLogger(__name__)
@@ -265,86 +261,6 @@ def _state_from_payload(payload_json: str) -> ClusterReplayState:
     return state
 
 
-class TileState(TypedDict):
-    evolution_state: dict[int, TileEvolutionState]
-    version: int
-
-
-# Version 4: Removed duplicate tile_visits from pickle
-# Version 5: Moved activities_per_tile into the activity_tile database table
-TILE_STATE_VERSION = 5
-
-
-class TileVisitAccessor:
-    PATH = pathlib.Path("Cache/tile-state-3.pickle")
-    OLD_PATH = pathlib.Path("Cache/tile-state-2.pickle")
-
-    def __init__(self) -> None:
-        loaded_state: dict | None = try_load_pickle(self.PATH)
-        self.tile_state: TileState | None = None
-        self._pending_migration: dict | None = None
-
-        if loaded_state is None:
-            # Try loading old pickle - defer DB migration until we have app context
-            old_state = try_load_pickle(self.OLD_PATH)
-            if old_state is not None:
-                logger.info("Found old tile-state-2.pickle, will migrate to v3...")
-                self.tile_state = _normalize_tile_state(old_state)
-                # Store old state for DB migration later (needs app context)
-                self._pending_migration = old_state
-                self.save()
-            else:
-                self.tile_state = make_tile_state()
-        else:
-            self.tile_state = _normalize_tile_state(loaded_state)
-            if (
-                loaded_state.get("version", None) != TILE_STATE_VERSION
-                or "tile_visits" in loaded_state
-            ):
-                self.save()
-
-    def complete_migration(self) -> None:
-        """Complete pending migration to database. Must be called with app context."""
-        if self._pending_migration is not None:
-            logger.info("Completing tile_history migration to database...")
-            _migrate_from_pickle_to_db(self._pending_migration)
-            self._pending_migration = None
-            logger.info("Migration complete.")
-
-    def reset(self) -> None:
-        self.tile_state = make_tile_state()
-
-    def save(self) -> None:
-        with atomic_open(self.PATH, "wb") as f:
-            pickle.dump(self.tile_state, f)
-
-
-# Retained so that legacy (version <= 4) pickles, whose activities_per_tile was
-# stored as a defaultdict with these factories, can still be unpickled. The data
-# itself is dropped on load; activity-tile membership now lives in the database.
-def make_defaultdict_dict():
-    return collections.defaultdict(dict)
-
-
-def make_defaultdict_set():
-    return collections.defaultdict(set)
-
-
-def make_tile_state() -> TileState:
-    tile_state: TileState = {
-        "evolution_state": collections.defaultdict(TileEvolutionState),
-        "version": TILE_STATE_VERSION,
-    }
-    return tile_state
-
-
-def _normalize_tile_state(raw_state: dict) -> TileState:
-    tile_state = make_tile_state()
-    if "evolution_state" in raw_state:
-        tile_state["evolution_state"] = raw_state["evolution_state"]
-    return tile_state
-
-
 def remove_activity_from_tile_state(activity_id: int) -> int:
     removed_references = (
         DB.session.query(ActivityTile)
@@ -355,9 +271,7 @@ def remove_activity_from_tile_state(activity_id: int) -> int:
     return removed_references
 
 
-def _consistency_check(
-    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
-) -> bool:
+def _consistency_check(repository: ActivityRepository) -> bool:
     present_activity_ids = set(repository.get_activity_ids())
 
     activity_tile_count = DB.session.query(ActivityTile).limit(1).count()
@@ -430,118 +344,7 @@ def _reset_tile_visits_db() -> None:
     logger.info("Cleared tile_visits and activity_tile tables in database.")
 
 
-def _migrate_from_pickle_to_db(old_tile_state: dict) -> None:
-    """Migrate existing pickle data to the TileVisit database table.
-
-    This migrates from older pickle formats (v2/v3) that had tile_history
-    or tile_visits with activity_ids sets.
-    """
-    # Check if DB already has data
-    existing_count = DB.session.query(TileVisit).limit(1).count()
-    if existing_count > 0:
-        return  # Already migrated
-
-    # Try to migrate from tile_visits in pickle (has first/last info)
-    tile_visits = old_tile_state.get("tile_visits", {})
-    if tile_visits:
-        total_tiles = sum(len(visits) for visits in tile_visits.values())
-        if total_tiles > 0:
-            logger.info(f"Migrating {total_tiles} tiles from pickle to database...")
-            for zoom, visits_at_zoom in tile_visits.items():
-                batch: list[TileVisit] = []
-                for (tile_x, tile_y), info in visits_at_zoom.items():
-                    first_time = info.get("first_time")
-                    last_time = info.get("last_time")
-                    db_first_time = (
-                        first_time.to_pydatetime() if pd.notna(first_time) else None
-                    )
-                    db_last_time = (
-                        last_time.to_pydatetime() if pd.notna(last_time) else None
-                    )
-
-                    # Get visit count from activity_ids if present, otherwise from visit_count
-                    if "activity_ids" in info:
-                        visit_count = len(info["activity_ids"])
-                    else:
-                        visit_count = info.get("visit_count", 1)
-
-                    batch.append(
-                        TileVisit(
-                            zoom=zoom,
-                            tile_x=tile_x,
-                            tile_y=tile_y,
-                            first_activity_id=info["first_id"],
-                            first_time=db_first_time,
-                            last_activity_id=info["last_id"],
-                            last_time=db_last_time,
-                            visit_count=visit_count,
-                        )
-                    )
-
-                    if len(batch) >= 1000:
-                        DB.session.add_all(batch)
-                        DB.session.commit()
-                        batch = []
-
-                if batch:
-                    DB.session.add_all(batch)
-                    DB.session.commit()
-
-            logger.info("Migration complete.")
-            return
-
-    # Fallback: migrate from tile_history (older format)
-    tile_history = old_tile_state.get("tile_history", {})
-    if not tile_history:
-        return
-
-    total_records = sum(
-        len(df) for df in tile_history.values() if isinstance(df, pd.DataFrame)
-    )
-    if total_records == 0:
-        return
-
-    logger.info(
-        f"Migrating {total_records} tile first visits from pickle to database..."
-    )
-
-    for zoom, tile_history_df in tile_history.items():
-        if not isinstance(tile_history_df, pd.DataFrame) or tile_history_df.empty:
-            continue
-
-        history_batch: list[TileVisit] = []
-        for _, row in tile_history_df.iterrows():
-            time = row["time"]
-            db_time = time.to_pydatetime() if pd.notna(time) else None
-            activity_id = int(row["activity_id"])
-            history_batch.append(
-                TileVisit(
-                    zoom=zoom,
-                    tile_x=int(row["tile_x"]),
-                    tile_y=int(row["tile_y"]),
-                    first_activity_id=activity_id,
-                    first_time=db_time,
-                    last_activity_id=activity_id,
-                    last_time=db_time,
-                    visit_count=1,
-                )
-            )
-
-            if len(history_batch) >= 1000:
-                DB.session.add_all(history_batch)
-                DB.session.commit()
-                history_batch = []
-
-        if history_batch:
-            DB.session.add_all(history_batch)
-            DB.session.commit()
-
-    logger.info("Migration complete.")
-
-
-def refresh_tile_visits_for_activity(
-    activity_id: int, tile_visit_accessor: TileVisitAccessor
-) -> None:
+def refresh_tile_visits_for_activity(activity_id: int) -> None:
     """Incrementally repair tile visits after an activity's start time changed.
 
     Recomputes first/last visitor metadata for every tile the activity touches
@@ -650,23 +453,15 @@ def refresh_tile_visits_for_activity(
     for zoom in affected_zooms:
         rebuild_cluster_history_for_zoom(zoom, get_tile_history_df(zoom))
 
-    tile_visit_accessor.save()
-
 
 def _processed_activity_ids() -> set[int]:
     """Activity ids that already have tile membership in the database."""
     return {row[0] for row in DB.session.query(ActivityTile.activity_id).distinct()}
 
 
-def compute_tile_visits_new(
-    repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
-) -> None:
-    # Complete any pending migration from old pickle format (requires app context)
-    tile_visit_accessor.complete_migration()
-
-    if not _consistency_check(repository, tile_visit_accessor):
+def compute_tile_visits_new(repository: ActivityRepository) -> None:
+    if not _consistency_check(repository):
         logger.warning("Need to recompute Explorer Tiles.")
-        tile_visit_accessor.reset()
         _reset_tile_visits_db()
 
     processed_ids = _processed_activity_ids()
@@ -677,8 +472,6 @@ def compute_tile_visits_new(
     ]
     for activity_id in tqdm(unprocessed_ids, desc="Tile visits", delay=1):
         _process_activity(repository, activity_id)
-
-    tile_visit_accessor.save()
 
 
 def _process_activity(repository: ActivityRepository, activity_id: int) -> None:
@@ -836,12 +629,13 @@ def _tiles_from_points(
                 yield (t1,) + interpolated
 
 
-def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
+def compute_tile_evolution(config: Config) -> None:
     for zoom in config.explorer_zoom_levels:
         # Get tile history from database
         tile_history = get_tile_history_df(zoom)
         rebuild_cluster_history_for_zoom(zoom, tile_history)
-        state = tile_state["evolution_state"][zoom]
+        # Recompute from the full history each time and persist to the database.
+        state = TileEvolutionState()
         _compute_cluster_evolution(tile_history, state, zoom)
         _compute_square_history(tile_history, state, zoom)
         _persist_evolution_to_db(zoom, state)

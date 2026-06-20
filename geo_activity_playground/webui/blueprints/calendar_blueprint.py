@@ -14,7 +14,6 @@ from ...core.activities import ActivityRepository
 from ...core.config import Config
 from ...core.datamodel import DB, Activity, TileVisit
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     get_cluster_tile_activations_df,
     get_square_history_df,
 )
@@ -159,9 +158,7 @@ def _cluster_tile_activations(zoom: int) -> pd.DataFrame:
     return frame
 
 
-def _square_evolution_frame(
-    tile_visit_accessor: TileVisitAccessor, zoom: int
-) -> pd.DataFrame:
+def _square_evolution_frame(zoom: int) -> pd.DataFrame:
     frame = get_square_history_df(zoom)
     if len(frame) == 0:
         frame["year"] = pd.Series(dtype="int64")
@@ -347,7 +344,6 @@ def _square_size_at(square_history: pd.DataFrame, checkpoints: pd.Series) -> pd.
 
 def make_calendar_blueprint(
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("calendar", __name__, template_folder="templates")
@@ -477,7 +473,7 @@ def make_calendar_blueprint(
             if 14 in selected_zooms
             else (selected_zooms[0] if selected_zooms else 14)
         )
-        square = _square_evolution_frame(tile_visit_accessor, primary_zoom)
+        square = _square_evolution_frame(primary_zoom)
 
         monthly_activity = (
             period.groupby("month", dropna=False)
@@ -500,7 +496,7 @@ def make_calendar_blueprint(
             cluster_year = cluster_activations.loc[
                 cluster_activations["year"] == year
             ].copy()
-            square_zoom = _square_evolution_frame(tile_visit_accessor, zoom)
+            square_zoom = _square_evolution_frame(zoom)
             year_end = pd.Series([pd.Timestamp(year=year, month=12, day=31)])
             square_size = int(_square_size_at(square_zoom, year_end).iloc[0])
             zoom_stats.append(
@@ -614,7 +610,7 @@ def make_calendar_blueprint(
             if 14 in selected_zooms
             else (selected_zooms[0] if selected_zooms else 14)
         )
-        square = _square_evolution_frame(tile_visit_accessor, primary_zoom)
+        square = _square_evolution_frame(primary_zoom)
 
         max_day = calendar.monthrange(year, month)[1]
         daily_activity = (
@@ -640,7 +636,7 @@ def make_calendar_blueprint(
                 (cluster_activations["year"] == year)
                 & (cluster_activations["month"] == month)
             ].copy()
-            square_zoom = _square_evolution_frame(tile_visit_accessor, zoom)
+            square_zoom = _square_evolution_frame(zoom)
             month_end = pd.Series([pd.Timestamp(year=year, month=month, day=max_day)])
             square_size = int(_square_size_at(square_zoom, month_end).iloc[0])
             zoom_stats.append(

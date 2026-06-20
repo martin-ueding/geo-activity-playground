@@ -51,7 +51,6 @@ from ...core.heart_rate import HeartRateZoneComputer
 from ...core.heatmap_cache import delete_all_heatmap_cache, delete_stale_heatmap_cache
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     _reset_tile_visits_db,
     compute_tile_evolution,
     compute_tile_visits_new,
@@ -272,7 +271,6 @@ def make_settings_blueprint(
     authenticator: Authenticator,
     flasher: Flasher,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
 ) -> Blueprint:
     strava_login_helper = StravaLoginHelper(config_accessor)
     hammerhead_login_helper = HammerheadLoginHelper(config_accessor)
@@ -290,13 +288,9 @@ def make_settings_blueprint(
             action = request.form.get("action")
             if action == "reset_tile_visit_state":
                 logger.info("User requested reset of tile visit state.")
-                tile_visit_accessor.reset()
                 _reset_tile_visits_db()
-                compute_tile_visits_new(repository, tile_visit_accessor)
-                compute_tile_evolution(
-                    tile_visit_accessor.tile_state, config_accessor()
-                )
-                tile_visit_accessor.save()
+                compute_tile_visits_new(repository)
+                compute_tile_evolution(config_accessor())
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
                     FlashTypes.SUCCESS,

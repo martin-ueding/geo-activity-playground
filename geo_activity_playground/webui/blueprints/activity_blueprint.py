@@ -54,7 +54,6 @@ from ...core.raster_map import (
 )
 from ...explorer.grid_file import make_grid_file_geojson, make_grid_points
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
 )
@@ -67,7 +66,6 @@ logger = logging.getLogger(__name__)
 def make_activity_blueprint(
     repository: ActivityRepository,
     authenticator: Authenticator,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
     heart_rate_zone_computer: HeartRateZoneComputer,
 ) -> Blueprint:
@@ -407,7 +405,7 @@ def make_activity_blueprint(
 
             DB.session.commit()
             if start_changed:
-                refresh_tile_visits_for_activity(activity.id, tile_visit_accessor)
+                refresh_tile_visits_for_activity(activity.id)
             return redirect(url_for(".show", id=activity.id))
 
         return render_template(

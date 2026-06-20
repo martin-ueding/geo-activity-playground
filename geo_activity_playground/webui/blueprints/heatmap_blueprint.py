@@ -31,7 +31,6 @@ from ...core.raster_map import (
 )
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     get_activity_ids_in_tile,
     get_biggest_cluster_members,
     get_tile_medians,
@@ -53,7 +52,6 @@ def _handle_db_lock(message: str) -> Generator[None, None, None]:
 
 def make_heatmap_blueprint(
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
     authenticator: Authenticator,
 ) -> Blueprint:

@@ -18,7 +18,6 @@ from ..core.datamodel import (
     get_or_make_kind,
 )
 from ..core.enrichment import update_and_commit
-from ..explorer.tile_visits import TileVisitAccessor
 from .activity_parsers import ActivityParseError, read_fit_activity
 
 logger = logging.getLogger(__name__)
@@ -102,13 +101,12 @@ def _apply_token_response(auth: HammerheadAuth, payload: dict) -> None:
 def import_from_hammerhead_api(
     config: Config,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     hammerhead_begin: str | None = None,
     hammerhead_end: str | None = None,
 ) -> None:
     try:
         while _try_import_hammerhead(
-            config, repository, tile_visit_accessor, hammerhead_begin, hammerhead_end
+            config, repository, hammerhead_begin, hammerhead_end
         ):
             logger.warning("Hammerhead rate limit hit; sleeping for 60 seconds.")
             time.sleep(60)
@@ -123,7 +121,6 @@ def import_from_hammerhead_api(
 def _try_import_hammerhead(
     config: Config,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     hammerhead_begin: str | None,
     hammerhead_end: str | None,
 ) -> bool:

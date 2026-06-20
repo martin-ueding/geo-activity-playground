@@ -16,7 +16,6 @@ from ...core.config import Config
 from ...core.datamodel import DB, Activity, Segment
 from ...core.segments import find_matches
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     compute_tile_evolution,
     compute_tile_visits_new,
 )
@@ -31,7 +30,6 @@ from ..flasher import Flasher, FlashTypes
 
 def make_upload_blueprint(
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
     authenticator: Authenticator,
     flasher: Flasher,
@@ -85,7 +83,6 @@ def make_upload_blueprint(
             file.save(target_path)
         scan_for_activities(
             repository,
-            tile_visit_accessor,
             config,
             skip_strava=True,
             skip_hammerhead=True,
@@ -105,7 +102,7 @@ def make_upload_blueprint(
     @blueprint.route("/execute-reload")
     @needs_authentication(authenticator)
     def execute_reload():
-        scan_for_activities(repository, tile_visit_accessor, config)
+        scan_for_activities(repository, config)
         flash("Scanned for new activities.", category="success")
         return redirect(url_for("index"))
 
@@ -114,7 +111,6 @@ def make_upload_blueprint(
 
 def scan_for_activities(
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
     strava_begin: str | None = None,
     strava_end: str | None = None,
@@ -124,27 +120,23 @@ def scan_for_activities(
     skip_hammerhead: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
-        import_from_directory(repository, tile_visit_accessor, config)
+        import_from_directory(repository, config)
     import_photos_from_directory()
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
-        import_from_strava_api(
-            config, repository, tile_visit_accessor, strava_begin, strava_end
-        )
+        import_from_strava_api(config, repository, strava_begin, strava_end)
     if config.hammerhead_client_code and not skip_hammerhead:
         import_from_hammerhead_api(
             config,
             repository,
-            tile_visit_accessor,
             hammerhead_begin,
             hammerhead_end,
         )
 
     if len(repository) > 0:
-        compute_tile_visits_new(repository, tile_visit_accessor)
-        compute_tile_evolution(tile_visit_accessor.tile_state, config)
-        tile_visit_accessor.save()
+        compute_tile_visits_new(repository)
+        compute_tile_evolution(config)
 
     for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
         find_matches(segment, config)

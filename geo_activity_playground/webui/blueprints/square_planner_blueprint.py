@@ -12,14 +12,13 @@ from ...explorer.grid_file import (
     make_grid_points,
 )
 from ...explorer.tile_visits import (
-    TileVisitAccessor,
     get_explorer_square,
     get_tile_medians,
     get_tile_visits_in_bounds,
 )
 
 
-def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blueprint:
+def make_square_planner_blueprint() -> Blueprint:
     blueprint = Blueprint("square_planner", __name__, template_folder="templates")
 
     @blueprint.route("/<int:zoom>")

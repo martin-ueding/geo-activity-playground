@@ -18,7 +18,6 @@ from ..core.datamodel import (
 )
 from ..core.enrichment import update_and_commit
 from ..explorer.tile_visits import (
-    TileVisitAccessor,
     compute_tile_evolution,
     compute_tile_visits_new,
 )
@@ -31,7 +30,6 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 
 def import_from_directory(
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
 ) -> None:
     activity_paths = [
@@ -90,13 +88,12 @@ def import_from_directory(
                         + ", ".join(str(activity.id) for activity in with_same_hash)
                     )
 
-            import_from_file(activity_path, repository, tile_visit_accessor, config, i)
+            import_from_file(activity_path, repository, config, i)
 
 
 def import_from_file(
     path: pathlib.Path,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     config: Config,
     i: int,
 ) -> None:
@@ -143,9 +140,8 @@ def import_from_file(
     update_and_commit(activity, time_series, config)
 
     if len(repository) > 0 and i % 50 == 0:
-        compute_tile_visits_new(repository, tile_visit_accessor)
-        compute_tile_evolution(tile_visit_accessor.tile_state, config)
-        tile_visit_accessor.save()
+        compute_tile_visits_new(repository)
+        compute_tile_evolution(config)
 
 
 def _get_metadata_from_path(

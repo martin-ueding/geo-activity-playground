@@ -21,7 +21,6 @@ from ..core.paths import (
     strava_last_activity_date_path,
 )
 from ..core.tasks import get_state, set_state
-from ..explorer.tile_visits import TileVisitAccessor
 
 logger = logging.getLogger(__name__)
 
@@ -134,14 +133,11 @@ def _refresh_activity_names_from_strava_once(config: Config) -> int:
 def import_from_strava_api(
     config: Config,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     strava_begin: str | None = None,
     strava_end: str | None = None,
 ) -> None:
     try:
-        while try_import_strava(
-            config, repository, tile_visit_accessor, strava_begin, strava_end
-        ):
+        while try_import_strava(config, repository, strava_begin, strava_end):
             now = datetime.datetime.now()
             next_quarter = round_to_next_quarter_hour(now)
             seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -161,7 +157,6 @@ def import_from_strava_api(
 def try_import_strava(
     config: Config,
     repository: ActivityRepository,
-    tile_visit_accessor: TileVisitAccessor,
     strava_begin: str | None = None,
     strava_end: str | None = None,
 ) -> bool:
