@@ -19,7 +19,6 @@ from ...explorer.tile_visits import (
     TileVisitAccessor,
     compute_tile_evolution,
     compute_tile_visits_new,
-    get_tile_visits,
 )
 from ...importers.directory import import_from_directory
 from ...importers.hammerhead_api import import_from_hammerhead_api
@@ -146,8 +145,6 @@ def scan_for_activities(
         compute_tile_visits_new(repository, tile_visit_accessor)
         compute_tile_evolution(tile_visit_accessor.tile_state, config)
         tile_visit_accessor.save()
-        for zoom in config.explorer_zoom_levels:
-            get_tile_visits(zoom)
 
     for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
         find_matches(

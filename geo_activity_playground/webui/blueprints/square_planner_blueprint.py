@@ -11,7 +11,11 @@ from ...explorer.grid_file import (
     make_grid_file_gpx,
     make_grid_points,
 )
-from ...explorer.tile_visits import TileVisitAccessor, get_tile_medians, get_tile_visits
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    get_tile_medians,
+    get_tile_visits_in_bounds,
+)
 
 
 def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blueprint:
@@ -74,13 +78,13 @@ def make_square_planner_blueprint(tile_visit_accessor: TileVisitAccessor) -> Blu
 
     @blueprint.route("/<int:zoom>/<int:x>/<int:y>/<int:size>/missing.<suffix>")
     def square_planner_missing(zoom: int, x: int, y: int, size: int, suffix: str):
-        tile_visits = get_tile_visits(zoom)
+        tile_visits = get_tile_visits_in_bounds(zoom, x, x + size - 1, y, y + size - 1)
         points = make_grid_points(
             (
                 (tile_x, tile_y)
                 for tile_x in range(x, x + size)
                 for tile_y in range(y, y + size)
-                if (tile_x, tile_y) not in set(tile_visits.keys())
+                if (tile_x, tile_y) not in tile_visits
             ),
             zoom,
         )

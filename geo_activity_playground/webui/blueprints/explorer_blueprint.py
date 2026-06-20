@@ -55,7 +55,7 @@ from ...explorer.tile_visits import (
     get_tile_count,
     get_tile_history_df,
     get_tile_medians,
-    get_tile_visits,
+    get_tile_visits_in_bounds,
 )
 from ...explorer.video import ExplorerVideoOptions, generate_explorer_video
 from ..authenticator import Authenticator, needs_authentication
@@ -358,7 +358,7 @@ def make_explorer_blueprint(
         x2, y2 = compute_tile(south, east, zoom)
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
-        tiles = get_tile_visits(zoom)
+        tiles = get_tile_visits_in_bounds(zoom, x1, x2 + 2, y1, y2 + 2)
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
         )
@@ -516,7 +516,6 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
-        tile_visits = get_tile_visits(zoom)
         evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
         history_event_index = request.args.get("event_index", type=int)
         historical_state = None
@@ -528,7 +527,7 @@ def make_explorer_blueprint(
             historical_state = get_cluster_state_at_cutoff(zoom, history_event_index)
 
         # Bounding box of explorer tiles covered by this map tile, used to fetch
-        # only the cluster membership in view from the database.
+        # only the tile visits and cluster membership in view from the database.
         if z >= zoom:
             cover_factor = 2 ** (z - zoom)
             tx_min = tx_max = x // cover_factor
@@ -537,6 +536,8 @@ def make_explorer_blueprint(
             cover_factor = 2 ** (zoom - z)
             tx_min, tx_max = x * cover_factor, x * cover_factor + cover_factor - 1
             ty_min, ty_max = y * cover_factor, y * cover_factor + cover_factor - 1
+
+        tile_visits = get_tile_visits_in_bounds(zoom, tx_min, tx_max, ty_min, ty_max)
 
         # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
         # grayscale = image_transforms["grayscale"].transform_image(map_tile)

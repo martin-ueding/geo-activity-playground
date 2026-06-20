@@ -25,8 +25,7 @@ from geo_activity_playground.explorer.tile_visits import (
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
     get_tile_history_df,
-    get_tile_visits,
-    invalidate_tile_visits_cache,
+    get_tile_visits_in_bounds,
     make_tile_state,
     rebuild_cluster_history_for_zoom,
     remove_activity_from_tile_state,
@@ -74,8 +73,7 @@ def test_get_tile_visits_uses_db_only(app) -> None:
         )
         DB.session.commit()
 
-        invalidate_tile_visits_cache()
-        visits = get_tile_visits(14)
+        visits = get_tile_visits_in_bounds(14, 3, 3, 4, 4)
         assert (3, 4) in visits
         assert visits[(3, 4)]["visit_count"] == 1
 
@@ -98,8 +96,7 @@ def test_get_tile_visits_falls_back_to_activity_start_when_time_missing(app) -> 
         )
         DB.session.commit()
 
-        invalidate_tile_visits_cache()
-        visits = get_tile_visits(14)
+        visits = get_tile_visits_in_bounds(14, 8, 8, 9, 9)
         assert visits[(8, 9)]["first_time"] == pd.Timestamp("2026-01-01T10:00:00")
         assert visits[(8, 9)]["last_time"] == pd.Timestamp("2026-01-01T10:00:00")
 

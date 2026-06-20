@@ -1,6 +1,5 @@
 import collections
 import datetime
-import functools
 import itertools
 import json
 import logging
@@ -421,7 +420,6 @@ def _reset_tile_visits_db() -> None:
     """Clear all TileVisit records from the database."""
     DB.session.query(TileVisit).delete()
     DB.session.commit()
-    invalidate_tile_visits_cache()
     logger.info("Cleared tile_visits table in database.")
 
 
@@ -620,7 +618,6 @@ def refresh_tile_visits_for_activity(
     for zoom in affected_zooms:
         rebuild_cluster_history_for_zoom(zoom, get_tile_history_df(zoom))
 
-    invalidate_tile_visits_cache()
     tile_visit_accessor.save()
 
 
@@ -644,7 +641,6 @@ def compute_tile_visits_new(
         _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
         work_tracker.mark_done(activity_id)
 
-    invalidate_tile_visits_cache()
     tile_visit_accessor.save()
     work_tracker.close()
 
@@ -1187,8 +1183,10 @@ def _compute_cluster_evolution(
     s.cluster_start = len(tiles)
 
 
-@functools.lru_cache(maxsize=64)
-def get_tile_visits(zoom: int) -> dict[tuple[int, int], TileInfo]:
+def get_tile_visits_in_bounds(
+    zoom: int, x_min: int, x_max: int, y_min: int, y_max: int
+) -> dict[tuple[int, int], TileInfo]:
+    """Return tile visit info for tiles within a viewport, read from the database."""
     rows = DB.session.execute(
         sa.select(
             TileVisit.tile_x,
@@ -1198,7 +1196,13 @@ def get_tile_visits(zoom: int) -> dict[tuple[int, int], TileInfo]:
             TileVisit.first_time,
             TileVisit.last_activity_id,
             TileVisit.last_time,
-        ).where(TileVisit.zoom == zoom)
+        ).where(
+            TileVisit.zoom == zoom,
+            TileVisit.tile_x >= x_min,
+            TileVisit.tile_x <= x_max,
+            TileVisit.tile_y >= y_min,
+            TileVisit.tile_y <= y_max,
+        )
     ).all()
     return {
         (row.tile_x, row.tile_y): {
@@ -1210,10 +1214,6 @@ def get_tile_visits(zoom: int) -> dict[tuple[int, int], TileInfo]:
         }
         for row in rows
     }
-
-
-def invalidate_tile_visits_cache() -> None:
-    get_tile_visits.cache_clear()
 
 
 def _compute_square_history(
