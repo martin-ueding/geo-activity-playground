@@ -5,9 +5,9 @@ export default {
   themeConfig: {
     logo: '/logo-2.png',
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Get Help', link: '/get-help' },
+      { text: 'Docs', link: '/getting-started' },
       { text: 'Changelog', link: '/changelog' },
+      { text: 'Get Help', link: '/get-help' },
       { text: "Martin Ueding", link: "https://martin-ueding.de/" },
     ],
     sidebar: [
