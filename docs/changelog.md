@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Photo thumbnails now render correctly even when the photo cache directory does not exist yet. ([GH-446](https://github.com/martin-ueding/geo-activity-playground/issues/446))
 
 ## Version 1.32.0 — 2026-06-10
 
