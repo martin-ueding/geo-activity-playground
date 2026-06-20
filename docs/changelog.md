@@ -23,6 +23,7 @@ Added:
 
 Changed:
 
+- The documentation navbar now has a "Docs" entry that leads directly into the documentation, replacing the redundant "Home" link that duplicated the logo.
 - Explorer and square-planner tiles now read tile visits scoped to the visible area from the database on each request, instead of caching the full per-zoom set in process memory. Zoomed-out tiles render faster because only the tiles in view are read, and the explored-tile layer stays correct across multiple worker processes. ([GH-444](https://github.com/martin-ueding/geo-activity-playground/issues/444))
 - The `Cache/tile-state` pickle and its work-tracker file are gone. Activity-per-tile membership, the explorer square, and the cluster/square evolution plots are now stored in the database, so all tile state is consistent across worker processes and survives without a separate cache file. On the first launch after upgrading, the explorer tiles are recomputed once to populate the new tables. ([GH-444](https://github.com/martin-ueding/geo-activity-playground/issues/444))
 
