@@ -642,6 +642,41 @@ class ActivityTile(DB.Model):
     )
 
 
+class ExplorerSquare(DB.Model):
+    """Current biggest explorer square per zoom level."""
+
+    __tablename__ = "explorer_square"
+
+    zoom: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+    square_x: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    square_y: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    max_square_size: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+
+
+class SquareHistory(DB.Model):
+    """Time series of the biggest explorer square, for the evolution plot."""
+
+    __tablename__ = "square_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False, index=True)
+    time: Mapped[datetime.datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    max_square_size: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    square_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    square_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+
+class ClusterSizeHistory(DB.Model):
+    """Time series of the biggest cluster size, for the evolution plot."""
+
+    __tablename__ = "cluster_size_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False, index=True)
+    time: Mapped[datetime.datetime | None] = mapped_column(sa.DateTime, nullable=True)
+    max_cluster_size: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+
 class ClusterMembership(DB.Model):
     """Materialized current cluster membership per tile.
 

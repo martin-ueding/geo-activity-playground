@@ -13,7 +13,11 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import Config
 from ...core.datamodel import DB, Activity, TileVisit
-from ...explorer.tile_visits import TileVisitAccessor, get_cluster_tile_activations_df
+from ...explorer.tile_visits import (
+    TileVisitAccessor,
+    get_cluster_tile_activations_df,
+    get_square_history_df,
+)
 
 
 def _meta_with_local_start(repository: ActivityRepository) -> pd.DataFrame:
@@ -158,9 +162,7 @@ def _cluster_tile_activations(zoom: int) -> pd.DataFrame:
 def _square_evolution_frame(
     tile_visit_accessor: TileVisitAccessor, zoom: int
 ) -> pd.DataFrame:
-    frame = tile_visit_accessor.tile_state["evolution_state"][
-        zoom
-    ].square_evolution.copy()
+    frame = get_square_history_df(zoom)
     if len(frame) == 0:
         frame["year"] = pd.Series(dtype="int64")
         frame["month"] = pd.Series(dtype="int64")

@@ -22,6 +22,9 @@ from ..core.datamodel import (
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
     ClusterMembership,
+    ClusterSizeHistory,
+    ExplorerSquare,
+    SquareHistory,
     TileVisit,
 )
 from ..core.paths import atomic_open
@@ -838,16 +841,95 @@ def compute_tile_evolution(tile_state: TileState, config: Config) -> None:
         # Get tile history from database
         tile_history = get_tile_history_df(zoom)
         rebuild_cluster_history_for_zoom(zoom, tile_history)
-        _compute_cluster_evolution(
-            tile_history,
-            tile_state["evolution_state"][zoom],
-            zoom,
+        state = tile_state["evolution_state"][zoom]
+        _compute_cluster_evolution(tile_history, state, zoom)
+        _compute_square_history(tile_history, state, zoom)
+        _persist_evolution_to_db(zoom, state)
+
+
+def _persist_evolution_to_db(zoom: int, state: "TileEvolutionState") -> None:
+    """Write the square state and evolution plot series of a zoom to the database."""
+    DB.session.query(ExplorerSquare).filter(ExplorerSquare.zoom == zoom).delete()
+    DB.session.query(SquareHistory).filter(SquareHistory.zoom == zoom).delete()
+    DB.session.query(ClusterSizeHistory).filter(
+        ClusterSizeHistory.zoom == zoom
+    ).delete()
+
+    DB.session.add(
+        ExplorerSquare(
+            zoom=zoom,
+            square_x=state.square_x,
+            square_y=state.square_y,
+            max_square_size=state.max_square_size,
         )
-        _compute_square_history(
-            tile_history,
-            tile_state["evolution_state"][zoom],
-            zoom,
+    )
+
+    for row in state.square_evolution.itertuples(index=False):
+        DB.session.add(
+            SquareHistory(
+                zoom=zoom,
+                time=(row.time.to_pydatetime() if pd.notna(row.time) else None),
+                max_square_size=int(row.max_square_size),
+                square_x=int(row.square_x),
+                square_y=int(row.square_y),
+            )
         )
+
+    for row in state.cluster_evolution.itertuples(index=False):
+        DB.session.add(
+            ClusterSizeHistory(
+                zoom=zoom,
+                time=(row.time.to_pydatetime() if pd.notna(row.time) else None),
+                max_cluster_size=int(row.max_cluster_size),
+            )
+        )
+
+    DB.session.commit()
+
+
+def get_explorer_square(zoom: int) -> tuple[int | None, int | None, int]:
+    """Return ``(square_x, square_y, max_square_size)`` for a zoom level."""
+    row = DB.session.get(ExplorerSquare, zoom)
+    if row is None:
+        return None, None, 0
+    return row.square_x, row.square_y, row.max_square_size
+
+
+def get_square_history_df(zoom: int) -> pd.DataFrame:
+    """Square evolution series for the plot: time, max_square_size, square_x/y."""
+    rows = DB.session.execute(
+        sa.select(
+            SquareHistory.time,
+            SquareHistory.max_square_size,
+            SquareHistory.square_x,
+            SquareHistory.square_y,
+        )
+        .where(SquareHistory.zoom == zoom)
+        .order_by(SquareHistory.id)
+    ).all()
+    return pd.DataFrame(
+        {
+            "time": [pd.Timestamp(r.time) if r.time else pd.NaT for r in rows],
+            "max_square_size": [r.max_square_size for r in rows],
+            "square_x": [r.square_x for r in rows],
+            "square_y": [r.square_y for r in rows],
+        }
+    )
+
+
+def get_cluster_size_history_df(zoom: int) -> pd.DataFrame:
+    """Cluster size evolution series for the plot: time, max_cluster_size."""
+    rows = DB.session.execute(
+        sa.select(ClusterSizeHistory.time, ClusterSizeHistory.max_cluster_size)
+        .where(ClusterSizeHistory.zoom == zoom)
+        .order_by(ClusterSizeHistory.id)
+    ).all()
+    return pd.DataFrame(
+        {
+            "time": [pd.Timestamp(r.time) if r.time else pd.NaT for r in rows],
+            "max_cluster_size": [r.max_cluster_size for r in rows],
+        }
+    )
 
 
 def rebuild_cluster_history_for_zoom(zoom: int, tile_history: pd.DataFrame) -> None:

@@ -6,6 +6,7 @@ import io
 import itertools
 import logging
 import pathlib
+from types import SimpleNamespace
 from typing import Any
 
 import altair as alt
@@ -48,11 +49,14 @@ from ...explorer.tile_visits import (
     get_cluster_id_for_tile,
     get_cluster_members,
     get_cluster_membership_in_bounds,
+    get_cluster_size_history_df,
     get_cluster_state_at_cutoff,
     get_cluster_tile_count,
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
+    get_explorer_square,
     get_max_cluster,
+    get_square_history_df,
     get_tile_count,
     get_tile_history_df,
     get_tile_medians,
@@ -382,7 +386,7 @@ def make_explorer_blueprint(
         if zoom not in config_accessor().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
-        tile_evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        square_x, square_y, square_size = get_explorer_square(zoom)
 
         # Get data from database
         medians = get_tile_medians(zoom)
@@ -431,17 +435,15 @@ def make_explorer_blueprint(
             },
             "plot_tile_evolution": plot_tile_evolution(tile_history),
             "plot_cluster_evolution": plot_cluster_evolution(
-                tile_evolution_state.cluster_evolution
+                get_cluster_size_history_df(zoom)
             ),
-            "plot_square_evolution": plot_square_evolution(
-                tile_evolution_state.square_evolution
-            ),
+            "plot_square_evolution": plot_square_evolution(get_square_history_df(zoom)),
             "zoom": zoom,
             "num_tiles": num_tiles,
             "num_cluster_tiles": get_cluster_tile_count(zoom),
-            "square_x": tile_evolution_state.square_x,
-            "square_y": tile_evolution_state.square_y,
-            "square_size": tile_evolution_state.max_square_size,
+            "square_x": square_x,
+            "square_y": square_y,
+            "square_size": square_size,
             "max_cluster_size": max_cluster_size,
             "bookmarks": bookmarks,
         }
@@ -517,7 +519,10 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
-        evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        square_x, square_y, square_size = get_explorer_square(zoom)
+        evolution_state = SimpleNamespace(
+            square_x=square_x, square_y=square_y, max_square_size=square_size
+        )
         history_event_index = request.args.get("event_index", type=int)
         historical_state = None
         if history_event_index is not None:
@@ -734,14 +739,14 @@ def make_explorer_blueprint(
         "/<int:zoom>/info/<float(signed=True):latitude>/<float(signed=True):longitude>"
     )
     def info(zoom: int, latitude: float, longitude: float) -> str:
-        evolution_state = tile_visit_accessor.tile_state["evolution_state"][zoom]
+        _square_x, _square_y, square_size = get_explorer_square(zoom)
         tile_xy = compute_tile(latitude, longitude, zoom)
         cluster_id = get_cluster_id_for_tile(zoom, tile_xy[0], tile_xy[1])
         context: dict[str, Any] = {
             "tile_x": tile_xy[0],
             "tile_y": tile_xy[1],
             "zoom": zoom,
-            "square_size": evolution_state.max_square_size,
+            "square_size": square_size,
         }
 
         # Query tile info from database
