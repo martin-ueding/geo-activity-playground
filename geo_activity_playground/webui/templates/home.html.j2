@@ -13,8 +13,8 @@
 </div>
 
 <script>
-    function getProgressMarkerIcon(progress) {
-        return window.progressMarkerIcon(progress);
+    function getProgressMarkerIcon(progress, isEighth) {
+        return window.progressMarkerIcon(progress, isEighth);
     }
 
     function add_map(id, geojson) {
@@ -36,7 +36,7 @@
             pointToLayer: function (feature, latlng) {
                 const progress = feature?.properties?.marker_progress;
                 if (Number.isFinite(progress)) {
-                    return L.marker(latlng, { icon: getProgressMarkerIcon(progress) });
+                    return L.marker(latlng, { icon: getProgressMarkerIcon(progress, feature?.properties?.marker_is_eighth) });
                 }
                 return L.circleMarker(latlng);
             }

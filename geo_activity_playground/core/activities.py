@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
+EIGHTH_MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.125, 0.375, 0.625, 0.875)
+EIGHTH_MARKER_MIN_DISTANCE_KM: float = 8.0
 
 
 class ActivityRepository:
@@ -180,18 +182,45 @@ def _make_value_clamp(values: pd.Series) -> tuple[float, float, Callable]:
 def _make_progress_marker_features(time_series: pd.DataFrame) -> list[geojson.Feature]:
     if time_series.empty:
         return []
-    marker_points = _progress_marker_points(time_series)
+    all_stops, total_distance_km = _progress_marker_stops_and_distance(time_series)
+    marker_points = _progress_marker_points(time_series, all_stops)
+    eighth_stops = set(EIGHTH_MARKER_PROGRESS_STOPS)
     return [
         geojson.Feature(
             geometry=geojson.Point((point["longitude"], point["latitude"])),
-            properties={"marker_progress": progress},
+            properties={
+                "marker_progress": progress,
+                "marker_is_eighth": progress in eighth_stops,
+            },
         )
-        for progress in MARKER_PROGRESS_STOPS
+        for progress in all_stops
         for point in [marker_points[progress]]
     ]
 
 
-def _progress_marker_points(time_series: pd.DataFrame) -> dict[float, pd.Series]:
+def _progress_marker_stops_and_distance(
+    time_series: pd.DataFrame,
+) -> tuple[tuple[float, ...], float]:
+    if (
+        "distance_km" not in time_series
+        or (distance := pd.to_numeric(time_series["distance_km"], errors="coerce"))
+        .isna()
+        .all()
+    ):
+        return MARKER_PROGRESS_STOPS, 0.0
+    valid_distance = distance.loc[distance.notna()]
+    total_distance_km = float(valid_distance.iloc[-1] - valid_distance.iloc[0])
+    if total_distance_km >= EIGHTH_MARKER_MIN_DISTANCE_KM:
+        stops = tuple(
+            sorted(set(MARKER_PROGRESS_STOPS) | set(EIGHTH_MARKER_PROGRESS_STOPS))
+        )
+        return stops, total_distance_km
+    return MARKER_PROGRESS_STOPS, total_distance_km
+
+
+def _progress_marker_points(
+    time_series: pd.DataFrame, stops: tuple[float, ...]
+) -> dict[float, pd.Series]:
     if (
         "distance_km" not in time_series
         or (distance := pd.to_numeric(time_series["distance_km"], errors="coerce"))
@@ -201,7 +230,7 @@ def _progress_marker_points(time_series: pd.DataFrame) -> dict[float, pd.Series]
         final_index = len(time_series) - 1
         return {
             progress: time_series.iloc[int(round(final_index * progress))]
-            for progress in MARKER_PROGRESS_STOPS
+            for progress in stops
         }
 
     valid_rows = time_series.loc[distance.notna()]
@@ -210,10 +239,10 @@ def _progress_marker_points(time_series: pd.DataFrame) -> dict[float, pd.Series]
     total_distance = float(valid_distance.iloc[-1] - start_distance)
     if total_distance <= 0:
         point = valid_rows.iloc[0]
-        return {progress: point for progress in MARKER_PROGRESS_STOPS}
+        return {progress: point for progress in stops}
 
     result: dict[float, pd.Series] = {}
-    for progress in MARKER_PROGRESS_STOPS:
+    for progress in stops:
         target_distance = start_distance + progress * total_distance
         nearest_index = (valid_distance - target_distance).abs().idxmin()
         result[progress] = time_series.loc[nearest_index]

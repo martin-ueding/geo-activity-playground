@@ -239,7 +239,7 @@
             L.geoJSON(progressMarkerGeojson, {
                 pointToLayer: function (feature, latlng) {
                     return L.marker(latlng, {
-                        icon: window.progressMarkerIcon(feature?.properties?.marker_progress)
+                        icon: window.progressMarkerIcon(feature?.properties?.marker_progress, feature?.properties?.marker_is_eighth)
                     });
                 }
             }).addTo(map);

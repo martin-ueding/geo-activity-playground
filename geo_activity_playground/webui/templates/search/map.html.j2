@@ -84,7 +84,7 @@
                 const progress = feature?.properties?.marker_progress;
                 if (Number.isFinite(progress)) {
                     return L.marker(latlng, {
-                        icon: window.progressMarkerIcon(progress)
+                        icon: window.progressMarkerIcon(progress, feature?.properties?.marker_is_eighth)
                     });
                 }
                 return L.circleMarker(latlng);

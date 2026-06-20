@@ -1,8 +1,9 @@
-function makeProgressMarkerSvg(progress) {
+function makeProgressMarkerSvg(progress, small) {
     const clamped = Math.min(Math.max(progress ?? 0, 0), 1);
-    const cx = 12;
-    const cy = 12;
-    const r = 8;
+    const size = small ? 16 : 24;
+    const cx = size / 2;
+    const cy = size / 2;
+    const r = small ? 5 : 8;
     const fillColor = "#00aaff";
     let fillMarkup = "";
     if (clamped >= 1) {
@@ -16,7 +17,7 @@ function makeProgressMarkerSvg(progress) {
             `<path d="M ${cx} ${cy} L ${cx} ${cy - r} A ${r} ${r} 0 ${largeArc} 1 ${endX} ${endY} Z" fill="${fillColor}"/>`;
     }
     return `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
             <circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff"/>
             ${fillMarkup}
             <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#111111" stroke-width="2"/>
@@ -24,12 +25,14 @@ function makeProgressMarkerSvg(progress) {
     `;
 }
 
-function progressMarkerIcon(progress) {
+function progressMarkerIcon(progress, isEighth) {
+    const small = !!isEighth;
+    const size = small ? 16 : 24;
     return L.divIcon({
         className: "",
-        html: makeProgressMarkerSvg(progress),
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: makeProgressMarkerSvg(progress, small),
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2]
     });
 }
 
