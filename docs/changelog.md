@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- The metadata-extraction settings page now has an "Apply to existing activities" button. Clicking it re-runs the configured path regexes against all already-imported activities and updates `kind`, `equipment`, and `name` for every activity whose path matches. Activities that do not match any regex are left untouched. This avoids a full re-import when regexes are added after the initial import. ([GH-447](https://github.com/martin-ueding/geo-activity-playground/issues/447))
+
 Changed:
 
 - Explorer and square-planner tiles now read tile visits scoped to the visible area from the database on each request, instead of caching the full per-zoom set in process memory. Zoomed-out tiles render faster because only the tiles in view are read, and the explored-tile layer stays correct across multiple worker processes. ([GH-444](https://github.com/martin-ueding/geo-activity-playground/issues/444))
