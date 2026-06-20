@@ -13,7 +13,6 @@ from geo_activity_playground.core.datamodel import (
 )
 from geo_activity_playground.core.segments import (
     rematch_segment,
-    tiles_for_segment,
     try_match_segment_activity,
 )
 
@@ -41,11 +40,7 @@ def test_rematch_segment_deletes_checks_and_matches_before_matching(app) -> None
         )
         DB.session.commit()
 
-        segment_tiles = tiles_for_segment(segment, 17)
-        empty_candidates = {tile: set() for tile in segment_tiles}
-        deleted_matches, deleted_checks = rematch_segment(
-            segment, empty_candidates, Config()
-        )
+        deleted_matches, deleted_checks = rematch_segment(segment, Config())
 
         assert deleted_matches == 1
         assert deleted_checks == 1

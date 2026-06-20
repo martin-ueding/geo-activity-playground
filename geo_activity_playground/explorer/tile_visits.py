@@ -18,13 +18,14 @@ from ..core.config import Config
 from ..core.datamodel import (
     DB,
     Activity,
+    ActivityTile,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
     ClusterMembership,
     TileVisit,
 )
 from ..core.paths import atomic_open
-from ..core.tasks import WorkTracker, try_load_pickle, work_tracker_path
+from ..core.tasks import try_load_pickle
 from ..core.tiles import adjacent_to, interpolate_missing_tile
 
 logger = logging.getLogger(__name__)
@@ -262,13 +263,13 @@ def _state_from_payload(payload_json: str) -> ClusterReplayState:
 
 
 class TileState(TypedDict):
-    activities_per_tile: dict[int, dict[tuple[int, int], set[int]]]
     evolution_state: dict[int, TileEvolutionState]
     version: int
 
 
 # Version 4: Removed duplicate tile_visits from pickle
-TILE_STATE_VERSION = 4
+# Version 5: Moved activities_per_tile into the activity_tile database table
+TILE_STATE_VERSION = 5
 
 
 class TileVisitAccessor:
@@ -315,6 +316,9 @@ class TileVisitAccessor:
             pickle.dump(self.tile_state, f)
 
 
+# Retained so that legacy (version <= 4) pickles, whose activities_per_tile was
+# stored as a defaultdict with these factories, can still be unpickled. The data
+# itself is dropped on load; activity-tile membership now lives in the database.
 def make_defaultdict_dict():
     return collections.defaultdict(dict)
 
@@ -325,7 +329,6 @@ def make_defaultdict_set():
 
 def make_tile_state() -> TileState:
     tile_state: TileState = {
-        "activities_per_tile": collections.defaultdict(make_defaultdict_set),
         "evolution_state": collections.defaultdict(TileEvolutionState),
         "version": TILE_STATE_VERSION,
     }
@@ -334,26 +337,18 @@ def make_tile_state() -> TileState:
 
 def _normalize_tile_state(raw_state: dict) -> TileState:
     tile_state = make_tile_state()
-    if "activities_per_tile" in raw_state:
-        tile_state["activities_per_tile"] = raw_state["activities_per_tile"]
     if "evolution_state" in raw_state:
         tile_state["evolution_state"] = raw_state["evolution_state"]
     return tile_state
 
 
-def remove_activity_from_tile_state(tile_state: TileState, activity_id: int) -> int:
-    removed_references = 0
-    for activities_per_tile in tile_state["activities_per_tile"].values():
-        empty_tiles: list[tuple[int, int]] = []
-        for tile, tile_activity_ids in activities_per_tile.items():
-            if activity_id not in tile_activity_ids:
-                continue
-            tile_activity_ids.discard(activity_id)
-            removed_references += 1
-            if not tile_activity_ids:
-                empty_tiles.append(tile)
-        for tile in empty_tiles:
-            del activities_per_tile[tile]
+def remove_activity_from_tile_state(activity_id: int) -> int:
+    removed_references = (
+        DB.session.query(ActivityTile)
+        .filter(ActivityTile.activity_id == activity_id)
+        .delete()
+    )
+    DB.session.commit()
     return removed_references
 
 
@@ -362,14 +357,22 @@ def _consistency_check(
 ) -> bool:
     present_activity_ids = set(repository.get_activity_ids())
 
-    for _zoom, activities_per_tile in tile_visit_accessor.tile_state[
-        "activities_per_tile"
-    ].items():
-        for _tile, tile_activity_ids in activities_per_tile.items():
-            deleted_activity_ids = tile_activity_ids - present_activity_ids
-            if deleted_activity_ids:
-                logger.info(f"Activities {deleted_activity_ids} have been deleted.")
-                return False
+    activity_tile_count = DB.session.query(ActivityTile).limit(1).count()
+    tile_visit_count = DB.session.query(TileVisit).limit(1).count()
+    if activity_tile_count == 0 and tile_visit_count > 0:
+        logger.info(
+            "activity_tile table is empty while tile visits exist; "
+            "recomputing to populate it."
+        )
+        return False
+
+    activity_tile_ids = {
+        row[0] for row in DB.session.query(ActivityTile.activity_id).distinct()
+    }
+    deleted_activity_ids = activity_tile_ids - present_activity_ids
+    if deleted_activity_ids:
+        logger.info(f"Activities {deleted_activity_ids} have been deleted.")
+        return False
 
     for first_activity_id, last_activity_id in DB.session.query(
         TileVisit.first_activity_id, TileVisit.last_activity_id
@@ -417,10 +420,11 @@ def _consistency_check(
 
 
 def _reset_tile_visits_db() -> None:
-    """Clear all TileVisit records from the database."""
+    """Clear all TileVisit and ActivityTile records from the database."""
     DB.session.query(TileVisit).delete()
+    DB.session.query(ActivityTile).delete()
     DB.session.commit()
-    logger.info("Cleared tile_visits table in database.")
+    logger.info("Cleared tile_visits and activity_tile tables in database.")
 
 
 def _migrate_from_pickle_to_db(old_tile_state: dict) -> None:
@@ -541,33 +545,58 @@ def refresh_tile_visits_for_activity(
     and rebuilds the cluster history for zoom levels whose first-visit ordering
     shifted.
     """
-    activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
     affected_zooms: set[int] = set()
 
-    for zoom, tiles_for_zoom in activities_per_tile.items():
+    zooms = [
+        row[0]
+        for row in DB.session.execute(
+            sa.select(ActivityTile.zoom)
+            .where(ActivityTile.activity_id == activity_id)
+            .distinct()
+        )
+    ]
+
+    for zoom in zooms:
         affected_tiles = [
-            tile
-            for tile, activity_ids in tiles_for_zoom.items()
-            if activity_id in activity_ids
+            (row.tile_x, row.tile_y)
+            for row in DB.session.execute(
+                sa.select(ActivityTile.tile_x, ActivityTile.tile_y).where(
+                    ActivityTile.zoom == zoom,
+                    ActivityTile.activity_id == activity_id,
+                )
+            )
         ]
         if not affected_tiles:
             continue
 
-        relevant_activity_ids: set[int] = set()
-        for tile in affected_tiles:
-            relevant_activity_ids.update(tiles_for_zoom[tile])
-
-        starts_by_id = {
-            row.id: row.start
-            for row in DB.session.execute(
-                sa.select(Activity.id, Activity.start).where(
-                    Activity.id.in_(relevant_activity_ids)
-                )
-            )
-        }
-
         for chunk_start in range(0, len(affected_tiles), 400):
             chunk = affected_tiles[chunk_start : chunk_start + 400]
+
+            visiting_by_tile: dict[tuple[int, int], set[int]] = collections.defaultdict(
+                set
+            )
+            for row in DB.session.execute(
+                sa.select(
+                    ActivityTile.tile_x, ActivityTile.tile_y, ActivityTile.activity_id
+                ).where(
+                    ActivityTile.zoom == zoom,
+                    sa.tuple_(ActivityTile.tile_x, ActivityTile.tile_y).in_(chunk),
+                )
+            ):
+                visiting_by_tile[(row.tile_x, row.tile_y)].add(row.activity_id)
+
+            relevant_activity_ids: set[int] = set()
+            for ids in visiting_by_tile.values():
+                relevant_activity_ids.update(ids)
+            starts_by_id = {
+                row.id: row.start
+                for row in DB.session.execute(
+                    sa.select(Activity.id, Activity.start).where(
+                        Activity.id.in_(relevant_activity_ids)
+                    )
+                )
+            }
+
             visits = {
                 (visit.tile_x, visit.tile_y): visit
                 for visit in DB.session.scalars(
@@ -582,7 +611,7 @@ def refresh_tile_visits_for_activity(
                 visit = visits.get(tile)
                 if visit is None:
                     continue
-                visiting_ids = tiles_for_zoom[tile]
+                visiting_ids = visiting_by_tile.get(tile, set())
                 earliest_id: int | None = None
                 earliest_time: datetime.datetime | None = None
                 latest_id: int | None = None
@@ -621,42 +650,44 @@ def refresh_tile_visits_for_activity(
     tile_visit_accessor.save()
 
 
+def _processed_activity_ids() -> set[int]:
+    """Activity ids that already have tile membership in the database."""
+    return {row[0] for row in DB.session.query(ActivityTile.activity_id).distinct()}
+
+
 def compute_tile_visits_new(
     repository: ActivityRepository, tile_visit_accessor: TileVisitAccessor
 ) -> None:
-    work_tracker = WorkTracker(work_tracker_path("tile-state"))
-
     # Complete any pending migration from old pickle format (requires app context)
     tile_visit_accessor.complete_migration()
 
     if not _consistency_check(repository, tile_visit_accessor):
-        logger.warning("Need to recompute Explorer Tiles due to deleted activities.")
+        logger.warning("Need to recompute Explorer Tiles.")
         tile_visit_accessor.reset()
         _reset_tile_visits_db()
-        work_tracker.reset()
 
-    for activity_id in tqdm(
-        work_tracker.filter(repository.get_activity_ids()), desc="Tile visits", delay=1
-    ):
-        _process_activity(repository, tile_visit_accessor.tile_state, activity_id)
-        work_tracker.mark_done(activity_id)
+    processed_ids = _processed_activity_ids()
+    unprocessed_ids = [
+        activity_id
+        for activity_id in repository.get_activity_ids()
+        if activity_id not in processed_ids
+    ]
+    for activity_id in tqdm(unprocessed_ids, desc="Tile visits", delay=1):
+        _process_activity(repository, activity_id)
 
     tile_visit_accessor.save()
-    work_tracker.close()
 
 
-def _process_activity(
-    repository: ActivityRepository, tile_state: TileState, activity_id: int
-) -> None:
+def _process_activity(repository: ActivityRepository, activity_id: int) -> None:
     activity = repository.get_activity_by_id(activity_id)
     time_series = repository.get_time_series(activity_id)
     fallback_time = _fallback_timestamp_for_activity(activity)
 
+    activity_tile_rows: list[ActivityTile] = []
     activity_tiles = pd.DataFrame(
         _tiles_from_points(time_series, 19), columns=["time", "tile_x", "tile_y"]
     )
     for zoom in reversed(range(20)):
-        activities_per_tile = tile_state["activities_per_tile"][zoom]
         # Keep one row per tile while preferring entries with real timestamps.
         # This avoids freezing a tile's first/last time at NaT when the same
         # activity has a later point on the same tile with valid time data.
@@ -739,7 +770,14 @@ def _process_activity(
                             f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"
                         ) from e
 
-            activities_per_tile[tile].add(activity_id)
+            activity_tile_rows.append(
+                ActivityTile(
+                    zoom=zoom,
+                    tile_x=tile[0],
+                    tile_y=tile[1],
+                    activity_id=activity_id,
+                )
+            )
 
         if activity.kind.consider_for_achievements:
             DB.session.commit()
@@ -747,6 +785,9 @@ def _process_activity(
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
         activity_tiles["tile_y"] //= 2
+
+    DB.session.add_all(activity_tile_rows)
+    DB.session.commit()
 
 
 def _fallback_timestamp_for_activity(activity: object) -> pd.Timestamp | None:
@@ -1181,6 +1222,54 @@ def _compute_cluster_evolution(
     new_cluster_evolution = pd.DataFrame(rows)
     s.cluster_evolution = pd.concat([s.cluster_evolution, new_cluster_evolution])
     s.cluster_start = len(tiles)
+
+
+def get_activity_ids_in_tile(zoom: int, tile_x: int, tile_y: int) -> set[int]:
+    """Activity ids passing through a single tile."""
+    return {
+        row[0]
+        for row in DB.session.execute(
+            sa.select(ActivityTile.activity_id).where(
+                ActivityTile.zoom == zoom,
+                ActivityTile.tile_x == tile_x,
+                ActivityTile.tile_y == tile_y,
+            )
+        )
+    }
+
+
+def get_activity_ids_in_bounds(
+    zoom: int, x_min: int, x_max: int, y_min: int, y_max: int
+) -> set[int]:
+    """Activity ids passing through any tile within a viewport."""
+    return {
+        row[0]
+        for row in DB.session.execute(
+            sa.select(ActivityTile.activity_id).where(
+                ActivityTile.zoom == zoom,
+                ActivityTile.tile_x >= x_min,
+                ActivityTile.tile_x <= x_max,
+                ActivityTile.tile_y >= y_min,
+                ActivityTile.tile_y <= y_max,
+            )
+        )
+    }
+
+
+def get_activity_ids_in_tiles(zoom: int, tiles: Iterator[tuple[int, int]]) -> set[int]:
+    """Activity ids passing through any of the given tiles."""
+    tile_list = list(tiles)
+    result: set[int] = set()
+    for chunk_start in range(0, len(tile_list), 400):
+        chunk = tile_list[chunk_start : chunk_start + 400]
+        for row in DB.session.execute(
+            sa.select(ActivityTile.activity_id).where(
+                ActivityTile.zoom == zoom,
+                sa.tuple_(ActivityTile.tile_x, ActivityTile.tile_y).in_(chunk),
+            )
+        ):
+            result.add(row[0])
+    return result
 
 
 def get_tile_visits_in_bounds(

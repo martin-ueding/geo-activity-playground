@@ -507,11 +507,7 @@ def make_activity_blueprint(
         activity.delete_data()
         DB.session.delete(activity)
         DB.session.commit()
-        removed_references = remove_activity_from_tile_state(
-            tile_visit_accessor.tile_state, id
-        )
-        if removed_references:
-            tile_visit_accessor.save()
+        remove_activity_from_tile_state(id)
         return redirect(url_for("index"))
 
     @blueprint.route("/download-original/<id>")

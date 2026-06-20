@@ -42,6 +42,7 @@ from ...explorer.grid_file import (
 from ...explorer.tile_visits import (
     TileVisitAccessor,
     compute_tile_evolution,
+    get_activity_ids_in_bounds,
     get_biggest_cluster_members,
     get_cluster_history_latest_event_index,
     get_cluster_id_for_tile,
@@ -807,17 +808,14 @@ def make_explorer_blueprint(
             tile_y: The tile Y coordinate.
             radius: The radius of neighboring tiles to include (0 = just this tile).
         """
-        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"][
-            zoom
-        ]
-
         # Collect all activity IDs from the tile and its neighbors within the radius
-        activity_ids: set[int] = set()
-        for dx in range(-radius, radius + 1):
-            for dy in range(-radius, radius + 1):
-                tile = (tile_x + dx, tile_y + dy)
-                if tile in activities_per_tile:
-                    activity_ids.update(activities_per_tile[tile])
+        activity_ids = get_activity_ids_in_bounds(
+            zoom,
+            tile_x - radius,
+            tile_x + radius,
+            tile_y - radius,
+            tile_y + radius,
+        )
 
         # Fetch activities from database
         activities = []

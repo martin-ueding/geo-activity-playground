@@ -57,11 +57,7 @@ def make_segments_blueprint(
 
             flasher.flash_message(f"Created segment “{name}”.", FlashTypes.SUCCESS)
 
-            find_matches(
-                segment,
-                tile_visit_accessor.tile_state["activities_per_tile"][17],
-                config,
-            )
+            find_matches(segment, config)
         return redirect(url_for(".index"))
 
     @blueprint.route("/line/<int:id>/line.geojson")
@@ -113,11 +109,7 @@ def make_segments_blueprint(
     @needs_authentication(authenticator)
     def rematch(id: int) -> ResponseReturnValue:
         segment = DB.session.get_one(Segment, id)
-        deleted_matches, _ = rematch_segment(
-            segment,
-            tile_visit_accessor.tile_state["activities_per_tile"][17],
-            config,
-        )
+        deleted_matches, _ = rematch_segment(segment, config)
         flasher.flash_message(
             f"Re-matched segment “{segment.name}” after deleting {deleted_matches} previous matches.",
             FlashTypes.SUCCESS,

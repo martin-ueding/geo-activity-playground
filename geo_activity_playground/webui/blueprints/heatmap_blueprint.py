@@ -32,6 +32,7 @@ from ...core.raster_map import (
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.tile_visits import (
     TileVisitAccessor,
+    get_activity_ids_in_tile,
     get_biggest_cluster_members,
     get_tile_medians,
 )
@@ -113,7 +114,6 @@ def make_heatmap_blueprint(
                 primitives,
                 config,
                 repository,
-                tile_visit_accessor.tile_state["activities_per_tile"],
             ),
             format="png",
         )
@@ -132,7 +132,6 @@ def make_heatmap_blueprint(
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
         pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
 
-        activities_per_tile = tile_visit_accessor.tile_state["activities_per_tile"]
         background = np.zeros((*pixel_bounds.shape, 3))
         for x in range(tile_bounds.x1, tile_bounds.x2):
             for y in range(tile_bounds.y1, tile_bounds.y2):
@@ -150,7 +149,6 @@ def make_heatmap_blueprint(
                     primitives,
                     config,
                     repository,
-                    activities_per_tile,
                 )
 
         f = io.BytesIO()
@@ -174,11 +172,10 @@ def _get_counts(
     primitives: dict,
     config: Config,
     repository: ActivityRepository,
-    activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels, dtype=np.int32)
-    activity_ids = activities_per_tile[z].get((x, y), set())
+    activity_ids = get_activity_ids_in_tile(z, x, y)
 
     search_query_id: int | None = None
     should_use_cache = True
@@ -296,13 +293,10 @@ def _render_tile_image(
     primitives: dict,
     config: Config,
     repository: ActivityRepository,
-    activities_per_tile: dict[int, dict[tuple[int, int], set[int]]],
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
     tile_counts = np.zeros(tile_pixels)
-    tile_counts += _get_counts(
-        x, y, z, primitives, config, repository, activities_per_tile
-    )
+    tile_counts += _get_counts(x, y, z, primitives, config, repository)
 
     tile_counts = np.sqrt(tile_counts) / 5
     tile_counts[tile_counts > 1.0] = 1.0

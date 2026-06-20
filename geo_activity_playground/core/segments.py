@@ -10,6 +10,8 @@ from .coordinates import get_distance
 from .datamodel import DB, Activity, Segment, SegmentCheck, SegmentMatch
 from .tiles import compute_tile_float
 
+SEGMENT_ZOOM = 17
+
 
 def extract_segment_from_geojson(geojson_str: str) -> list[list[float]]:
     gj = geojson.loads(geojson_str)
@@ -119,24 +121,15 @@ def tiles_for_segment(segment: Segment, level: int) -> set[tuple[int, int]]:
     return {(int(a), int(b)) for a, b in zip(x, y)}
 
 
-def activity_candidates_for_tiles(
-    tiles: set[tuple[int, int]], activities_per_tile: dict[tuple[int, int], set[int]]
-) -> set[int]:
-    result: set[int] = set()
-    for tile in tiles:
-        result.update(activities_per_tile[tile])
-    return result
-
-
 def find_matches(
     segment: Segment,
-    activities_per_tile: dict[tuple[int, int], set[int]],
     config: Config,
 ) -> None:
-    segment_tiles = tiles_for_segment(segment, 17)
-    activity_candidates = activity_candidates_for_tiles(
-        segment_tiles, activities_per_tile
-    )
+    # Imported here to avoid a core -> explorer import at module load time.
+    from ..explorer.tile_visits import get_activity_ids_in_tiles
+
+    segment_tiles = tiles_for_segment(segment, SEGMENT_ZOOM)
+    activity_candidates = get_activity_ids_in_tiles(SEGMENT_ZOOM, iter(segment_tiles))
     for activity_id in activity_candidates:
         activity = DB.session.get_one(Activity, activity_id)
         try_match_segment_activity(segment, activity, config)
@@ -144,7 +137,6 @@ def find_matches(
 
 def rematch_segment(
     segment: Segment,
-    activities_per_tile: dict[tuple[int, int], set[int]],
     config: Config,
 ) -> tuple[int, int]:
     deleted_matches = DB.session.scalar(
@@ -166,7 +158,7 @@ def rematch_segment(
     )
     DB.session.commit()
 
-    find_matches(segment, activities_per_tile, config)
+    find_matches(segment, config)
 
     return int(deleted_matches or 0), int(deleted_checks or 0)
 

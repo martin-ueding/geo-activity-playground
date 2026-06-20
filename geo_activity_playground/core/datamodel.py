@@ -617,6 +617,31 @@ class ClusterHistoryCheckpoint(DB.Model):
     )
 
 
+class ActivityTile(DB.Model):
+    """Which activities pass through which tile, per zoom level.
+
+    Replaces the in-memory ``activities_per_tile`` structure. Queried by
+    viewport/tile for the heatmap, the "activities through tile" view, and
+    segment matching.
+    """
+
+    __tablename__ = "activity_tile"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    activity_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id", name="activity_tile_activity_id"),
+        nullable=False,
+        index=True,
+    )
+
+    __table_args__ = (
+        sa.Index("idx_activity_tile_zoom_tile", "zoom", "tile_x", "tile_y"),
+    )
+
+
 class ClusterMembership(DB.Model):
     """Materialized current cluster membership per tile.
 

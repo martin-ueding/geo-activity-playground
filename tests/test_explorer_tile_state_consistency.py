@@ -10,10 +10,12 @@ from geo_activity_playground.core.activities import ActivityRepository
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
+    ActivityTile,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
     TileVisit,
 )
+from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
 from geo_activity_playground.explorer.tile_visits import (
     CLUSTER_CHECKPOINT_INTERVAL,
     TileEvolutionState,
@@ -21,12 +23,12 @@ from geo_activity_playground.explorer.tile_visits import (
     _compute_cluster_evolution,
     _process_activity,
     _tiles_from_points,
+    get_activity_ids_in_tile,
     get_cluster_tile_activations_df,
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
     get_tile_history_df,
     get_tile_visits_in_bounds,
-    make_tile_state,
     rebuild_cluster_history_for_zoom,
     remove_activity_from_tile_state,
 )
@@ -101,18 +103,25 @@ def test_get_tile_visits_falls_back_to_activity_start_when_time_missing(app) -> 
         assert visits[(8, 9)]["last_time"] == pd.Timestamp("2026-01-01T10:00:00")
 
 
-def test_remove_activity_from_tile_state_removes_all_references() -> None:
-    tile_state = make_tile_state()
-    tile_state["activities_per_tile"][17][(1, 2)] = {1, 2}
-    tile_state["activities_per_tile"][17][(2, 3)] = {2}
-    tile_state["activities_per_tile"][18][(4, 5)] = {2, 3}
+def test_remove_activity_from_tile_state_removes_all_references(app) -> None:
+    with app.app_context():
+        DB.session.add_all([Activity(id=1, name="A1"), Activity(id=2, name="A2")])
+        DB.session.add_all(
+            [
+                ActivityTile(zoom=17, tile_x=1, tile_y=2, activity_id=1),
+                ActivityTile(zoom=17, tile_x=1, tile_y=2, activity_id=2),
+                ActivityTile(zoom=17, tile_x=2, tile_y=3, activity_id=2),
+                ActivityTile(zoom=18, tile_x=4, tile_y=5, activity_id=2),
+            ]
+        )
+        DB.session.commit()
 
-    removed = remove_activity_from_tile_state(tile_state, 2)
+        removed = remove_activity_from_tile_state(2)
 
-    assert removed == 3
-    assert tile_state["activities_per_tile"][17][(1, 2)] == {1}
-    assert (2, 3) not in tile_state["activities_per_tile"][17]
-    assert tile_state["activities_per_tile"][18][(4, 5)] == {3}
+        assert removed == 3
+        assert get_activity_ids_in_tile(17, 1, 2) == {1}
+        assert get_activity_ids_in_tile(17, 2, 3) == set()
+        assert get_activity_ids_in_tile(18, 4, 5) == set()
 
 
 def test_heatmap_counts_skip_deleted_activity_ids(app) -> None:
@@ -122,9 +131,20 @@ def test_heatmap_counts_skip_deleted_activity_ids(app) -> None:
                 raise ValueError("Cannot find activity 2 in DB.session.")
             return pd.DataFrame({"x": [0.5], "y": [0.5], "segment_id": [0]})
 
-    activities_per_tile = {17: {(1, 2): {1, 2}}}
-    _ = _get_counts(1, 2, 17, {}, Repository(), activities_per_tile)
-    assert activities_per_tile[17][(1, 2)] == {1, 2}
+    with app.app_context():
+        DB.session.add_all(
+            [
+                ActivityTile(zoom=17, tile_x=1, tile_y=2, activity_id=1),
+                ActivityTile(zoom=17, tile_x=1, tile_y=2, activity_id=2),
+            ]
+        )
+        DB.session.commit()
+
+        config = SimpleNamespace(heatmap_cache_min_activities=0)
+        # Activity 2 raises (simulating deletion); _get_counts must skip it and
+        # still return counts without error.
+        counts = _get_counts(1, 2, 17, {}, config, Repository())
+        assert counts.shape == (OSM_TILE_SIZE, OSM_TILE_SIZE)
 
 
 def test_process_activity_updates_first_and_last_fields_in_db(app) -> None:
@@ -170,9 +190,8 @@ def test_process_activity_updates_first_and_last_fields_in_db(app) -> None:
                 return self.series[activity_id]
 
         repository = Repository()
-        state = make_tile_state()
-        _process_activity(repository, state, 2)
-        _process_activity(repository, state, 1)
+        _process_activity(repository, 2)
+        _process_activity(repository, 1)
 
         visit = DB.session.scalar(
             sa.select(TileVisit).where(
@@ -229,8 +248,7 @@ def test_process_activity_prefers_non_missing_time_for_same_tile(app) -> None:
                 assert activity_id == 1
                 return self.series
 
-        state = make_tile_state()
-        _process_activity(Repository(), state, 1)
+        _process_activity(Repository(), 1)
 
         visit = DB.session.scalar(
             sa.select(TileVisit).where(
@@ -300,9 +318,8 @@ def test_process_activity_uses_activity_start_when_track_times_missing(app) -> N
                 return self.series[activity_id]
 
         repository = Repository()
-        state = make_tile_state()
-        _process_activity(repository, state, 1)
-        _process_activity(repository, state, 2)
+        _process_activity(repository, 1)
+        _process_activity(repository, 2)
 
         visit = DB.session.scalar(
             sa.select(TileVisit).where(

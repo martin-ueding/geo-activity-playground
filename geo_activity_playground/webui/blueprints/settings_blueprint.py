@@ -27,8 +27,10 @@ from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import (
     DB,
     Activity,
+    ActivityTile,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
+    ClusterMembership,
     Equipment,
     ExplorerTileBookmark,
     HeatmapTileCache,
@@ -48,7 +50,6 @@ from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.heatmap_cache import delete_all_heatmap_cache, delete_stale_heatmap_cache
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
-from ...core.tasks import WorkTracker, work_tracker_path
 from ...explorer.tile_visits import (
     TileVisitAccessor,
     _reset_tile_visits_db,
@@ -174,9 +175,11 @@ def _truncate_user_content_tables() -> None:
     DB.session.execute(sqlalchemy.delete(activity_tag_association_table))
     DB.session.execute(sqlalchemy.delete(SegmentMatch))
     DB.session.execute(sqlalchemy.delete(SegmentCheck))
+    DB.session.execute(sqlalchemy.delete(ActivityTile))
     DB.session.execute(sqlalchemy.delete(TileVisit))
     DB.session.execute(sqlalchemy.delete(ClusterHistoryEvent))
     DB.session.execute(sqlalchemy.delete(ClusterHistoryCheckpoint))
+    DB.session.execute(sqlalchemy.delete(ClusterMembership))
     DB.session.execute(sqlalchemy.delete(Photo))
     DB.session.execute(sqlalchemy.delete(Activity))
     DB.session.execute(sqlalchemy.delete(Segment))
@@ -289,9 +292,6 @@ def make_settings_blueprint(
                 logger.info("User requested reset of tile visit state.")
                 tile_visit_accessor.reset()
                 _reset_tile_visits_db()
-                work_tracker = WorkTracker(work_tracker_path("tile-state"))
-                work_tracker.reset()
-                work_tracker.close()
                 compute_tile_visits_new(repository, tile_visit_accessor)
                 compute_tile_evolution(
                     tile_visit_accessor.tile_state, config_accessor()
