@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+
+## Version 1.33.0 — 2026-06-20
+
 Added:
 
 - The metadata-extraction settings page now has an "Apply to existing activities" button. Clicking it re-runs the configured path regexes against all already-imported activities and updates `kind`, `equipment`, and `name` for every activity whose path matches. Activities that do not match any regex are left untouched. This avoids a full re-import when regexes are added after the initial import. ([GH-447](https://github.com/martin-ueding/geo-activity-playground/issues/447))
