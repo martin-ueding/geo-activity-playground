@@ -16,7 +16,8 @@
 </ul>
 
 <p>By default these fields are extracted from files that contain this data. Otherwise the filename is set as <tt>name</tt>.
-    You can overwrite this by setting up a directory structure with corresponding regular expressions using named capture groups.</p>
+    You can overwrite this by setting up a directory structure with corresponding regular expressions using named capture groups.
+    Regexes apply to newly imported activities; to update activities that were already imported, save your regexes first and then use the <a href="#apply-existing">Apply to Existing Activities</a> button below.</p>
 
 
 <form method="POST">
@@ -55,7 +56,7 @@
 
 <hr class="my-4">
 
-<h2 class="mb-3">Apply to Existing Activities</h2>
+<h2 id="apply-existing" class="mb-3">Apply to Existing Activities</h2>
 
 <p>After saving your regexes, you can retroactively apply them to all activities that were imported before the regexes were configured. Only activities whose path matches at least one regex will be updated; unmatched activities are left untouched.</p>
 
