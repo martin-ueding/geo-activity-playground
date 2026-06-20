@@ -99,6 +99,12 @@
             onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
     </div>
     <div class="col-sm-12 col-md-8">
+        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="{{ _('Progress marker mode') }}">
+            <input type="radio" class="btn-check" name="marker-mode" id="marker-mode-distance" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="marker-mode-distance">{{ _('Distance') }}</label>
+            <input type="radio" class="btn-check" name="marker-mode" id="marker-mode-time" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="marker-mode-time">{{ _('Time') }}</label>
+        </div>
         <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
         <script>
             var map = L.map('activity-show-map', {
@@ -111,6 +117,7 @@
 
             const trackGeojson = {{ color_line_geojson|safe }};
             const progressMarkerGeojson = {{ progress_marker_geojson|safe }};
+            const progressMarkerTimeGeojson = {{ progress_marker_time_geojson|safe }};
             const viridisStops = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
             let selectedLineColorColumn = '{{ line_color_column|default("", true) }}';
             const statsByColumn = {};
@@ -236,14 +243,27 @@
                     return feature.geometry.type !== 'Point';
                 }
             }).addTo(map);
-            L.geoJSON(progressMarkerGeojson, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {
-                        icon: window.progressMarkerIcon(feature?.properties?.marker_progress, feature?.properties?.marker_is_eighth)
-                    });
-                }
-            }).addTo(map);
+            function makeMarkerLayer(geojson) {
+                return L.geoJSON(geojson, {
+                    pointToLayer: function (feature, latlng) {
+                        return L.marker(latlng, {
+                            icon: window.progressMarkerIcon(feature?.properties?.marker_progress, feature?.properties?.marker_is_eighth)
+                        });
+                    }
+                });
+            }
+
+            let currentMarkerLayer = makeMarkerLayer(progressMarkerGeojson).addTo(map);
             map.fitBounds(trackLayer.getBounds());
+
+            document.getElementById('marker-mode-distance').addEventListener('change', function () {
+                map.removeLayer(currentMarkerLayer);
+                currentMarkerLayer = makeMarkerLayer(progressMarkerGeojson).addTo(map);
+            });
+            document.getElementById('marker-mode-time').addEventListener('change', function () {
+                map.removeLayer(currentMarkerLayer);
+                currentMarkerLayer = makeMarkerLayer(progressMarkerTimeGeojson).addTo(map);
+            });
 
             document.addEventListener('DOMContentLoaded', function () {
                 const lineColorColumnSelect = document.getElementById('line-color-column-select');

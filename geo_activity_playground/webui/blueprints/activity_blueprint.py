@@ -30,6 +30,7 @@ from ...core.activities import (
     make_geojson_from_time_series,
     make_geojson_line_segments_with_columns,
     make_geojson_progress_markers_from_time_series,
+    make_geojson_progress_markers_time_based,
 )
 from ...core.config import Config
 from ...core.datamodel import (
@@ -153,6 +154,9 @@ def make_activity_blueprint(
             "activity": activity,
             "color_line_geojson": line_json,
             "progress_marker_geojson": make_geojson_progress_markers_from_time_series(
+                time_series
+            ),
+            "progress_marker_time_geojson": make_geojson_progress_markers_time_based(
                 time_series
             ),
             "similar_activites": similar_activities,
