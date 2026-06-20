@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
 EIGHTH_MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.125, 0.375, 0.625, 0.875)
-EIGHTH_MARKER_MIN_DISTANCE_KM: float = 8.0
-EIGHTH_MARKER_MIN_DURATION_S: float = 30 * 60
+EIGHTH_MARKER_DEFAULT_MIN_DISTANCE_KM: float = 30.0
+EIGHTH_MARKER_DEFAULT_MIN_DURATION_S: float = 3 * 3600
 
 
 class ActivityRepository:
@@ -80,16 +80,22 @@ class ActivityRepository:
         return df
 
 
-def make_geojson_progress_markers_from_time_series(time_series: pd.DataFrame) -> str:
+def make_geojson_progress_markers_from_time_series(
+    time_series: pd.DataFrame,
+    eighth_marker_min_distance_km: float = EIGHTH_MARKER_DEFAULT_MIN_DISTANCE_KM,
+) -> str:
     feature_collection = geojson.FeatureCollection(
-        _make_progress_marker_features(time_series)
+        _make_progress_marker_features(time_series, eighth_marker_min_distance_km)
     )
     return geojson.dumps(feature_collection)
 
 
-def make_geojson_progress_markers_time_based(time_series: pd.DataFrame) -> str:
+def make_geojson_progress_markers_time_based(
+    time_series: pd.DataFrame,
+    eighth_marker_min_duration_s: float = EIGHTH_MARKER_DEFAULT_MIN_DURATION_S,
+) -> str:
     feature_collection = geojson.FeatureCollection(
-        _make_progress_marker_features_time(time_series)
+        _make_progress_marker_features_time(time_series, eighth_marker_min_duration_s)
     )
     return geojson.dumps(feature_collection)
 
@@ -204,10 +210,15 @@ def _make_features_from_stops_and_points(
     ]
 
 
-def _make_progress_marker_features(time_series: pd.DataFrame) -> list[geojson.Feature]:
+def _make_progress_marker_features(
+    time_series: pd.DataFrame,
+    eighth_marker_min_distance_km: float,
+) -> list[geojson.Feature]:
     if time_series.empty:
         return []
-    all_stops, _ = _progress_marker_stops_and_distance(time_series)
+    all_stops, _ = _progress_marker_stops_and_distance(
+        time_series, eighth_marker_min_distance_km
+    )
     marker_points = _progress_marker_points_from_metric(
         time_series,
         all_stops,
@@ -220,10 +231,13 @@ def _make_progress_marker_features(time_series: pd.DataFrame) -> list[geojson.Fe
 
 def _make_progress_marker_features_time(
     time_series: pd.DataFrame,
+    eighth_marker_min_duration_s: float,
 ) -> list[geojson.Feature]:
     if time_series.empty:
         return []
-    all_stops, _ = _progress_marker_stops_and_duration(time_series)
+    all_stops, _ = _progress_marker_stops_and_duration(
+        time_series, eighth_marker_min_duration_s
+    )
     if "time" not in time_series.columns:
         final_index = len(time_series) - 1
         marker_points = {
@@ -240,6 +254,7 @@ def _make_progress_marker_features_time(
 
 def _progress_marker_stops_and_distance(
     time_series: pd.DataFrame,
+    eighth_marker_min_distance_km: float,
 ) -> tuple[tuple[float, ...], float]:
     if (
         "distance_km" not in time_series
@@ -250,7 +265,7 @@ def _progress_marker_stops_and_distance(
         return MARKER_PROGRESS_STOPS, 0.0
     valid_distance = distance.loc[distance.notna()]
     total_distance_km = float(valid_distance.iloc[-1] - valid_distance.iloc[0])
-    if total_distance_km >= EIGHTH_MARKER_MIN_DISTANCE_KM:
+    if total_distance_km >= eighth_marker_min_distance_km:
         stops = tuple(
             sorted(set(MARKER_PROGRESS_STOPS) | set(EIGHTH_MARKER_PROGRESS_STOPS))
         )
@@ -260,6 +275,7 @@ def _progress_marker_stops_and_distance(
 
 def _progress_marker_stops_and_duration(
     time_series: pd.DataFrame,
+    eighth_marker_min_duration_s: float,
 ) -> tuple[tuple[float, ...], float]:
     if "time" not in time_series.columns:
         return MARKER_PROGRESS_STOPS, 0.0
@@ -267,7 +283,7 @@ def _progress_marker_stops_and_duration(
     if len(time_col) < 2:
         return MARKER_PROGRESS_STOPS, 0.0
     duration_s = float((time_col.iloc[-1] - time_col.iloc[0]).total_seconds())
-    if duration_s >= EIGHTH_MARKER_MIN_DURATION_S:
+    if duration_s >= eighth_marker_min_duration_s:
         stops = tuple(
             sorted(set(MARKER_PROGRESS_STOPS) | set(EIGHTH_MARKER_PROGRESS_STOPS))
         )

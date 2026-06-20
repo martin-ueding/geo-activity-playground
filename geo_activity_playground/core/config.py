@@ -26,6 +26,8 @@ class Config:
     color_strategy_max_cluster_other_color: str = "#4daf4a4d"
     color_strategy_visited_color: str = "#0000004d"
     color_strategy_cmap_opacity: float = 0.5
+    eighth_marker_min_distance_km: float = 30.0
+    eighth_marker_min_duration_hours: float = 3.0
     equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
     explorer_zoom_levels: list[int] = dataclasses.field(
         default_factory=lambda: [14, 17]

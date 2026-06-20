@@ -154,10 +154,13 @@ def make_activity_blueprint(
             "activity": activity,
             "color_line_geojson": line_json,
             "progress_marker_geojson": make_geojson_progress_markers_from_time_series(
-                time_series
+                time_series,
+                eighth_marker_min_distance_km=config.eighth_marker_min_distance_km,
             ),
             "progress_marker_time_geojson": make_geojson_progress_markers_time_based(
-                time_series
+                time_series,
+                eighth_marker_min_duration_s=config.eighth_marker_min_duration_hours
+                * 3600,
             ),
             "similar_activites": similar_activities,
             "new_tiles": new_tiles_per_zoom,
