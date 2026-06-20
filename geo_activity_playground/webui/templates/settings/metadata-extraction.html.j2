@@ -52,4 +52,14 @@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
+
+<hr class="my-4">
+
+<h2 class="mb-3">Apply to Existing Activities</h2>
+
+<p>After saving your regexes, you can retroactively apply them to all activities that were imported before the regexes were configured. Only activities whose path matches at least one regex will be updated; unmatched activities are left untouched.</p>
+
+<form method="POST" action="{{ url_for('settings.metadata_extraction_apply_to_existing') }}">
+    <button type="submit" class="btn btn-warning">Apply regexes to existing activities</button>
+</form>
 {% endblock %}

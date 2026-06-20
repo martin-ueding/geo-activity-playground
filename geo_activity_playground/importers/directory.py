@@ -122,7 +122,7 @@ def import_from_file(
     if activity.name is None:
         activity.name = path.name.removesuffix("".join(path.suffixes))
 
-    meta_from_path = _get_metadata_from_path(path, config.metadata_extraction_regexes)
+    meta_from_path = get_metadata_from_path(path, config.metadata_extraction_regexes)
     activity.name = meta_from_path.get("name", activity.name)
     if "equipment" in meta_from_path:
         activity.equipment = get_or_make_equipment(meta_from_path["equipment"], config)
@@ -144,7 +144,7 @@ def import_from_file(
         compute_tile_evolution(config)
 
 
-def _get_metadata_from_path(
+def get_metadata_from_path(
     path: pathlib.Path, metadata_extraction_regexes: list[str]
 ) -> dict[str, str]:
     for regex in metadata_extraction_regexes:

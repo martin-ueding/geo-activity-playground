@@ -1,6 +1,6 @@
 import pathlib
 
-from .directory import _get_metadata_from_path
+from .directory import get_metadata_from_path
 
 
 def test_get_metadata_from_path() -> None:
@@ -9,7 +9,7 @@ def test_get_metadata_from_path() -> None:
         "equipment": "Bike 2019",
         "name": "Foo-Bar to Baz24",
     }
-    actual = _get_metadata_from_path(
+    actual = get_metadata_from_path(
         pathlib.Path(
             "Activities/Radfahrt/Bike 2019/Foo-Bar to Baz24/2024-03-03-17-42-10 Something something.fit"
         ),
