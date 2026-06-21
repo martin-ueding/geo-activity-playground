@@ -17,6 +17,8 @@ Types of changes
 
 ## Unreleased
 
+- *Fixed*: Viewing activities failing with HTTP 500 due to `make_geojson_from_time_series` not passing the configured eighth-marker distance threshold to the progress marker renderer.
+
 - *Fixed*: Vega console warning about v6 specs being loaded with a v5 runtime. Updated vendored JS from Vega 5 / Vega-Lite 4 / vega-embed 6 to Vega 6.2.0 / Vega-Lite 6.4.3 / vega-embed 7.1.0, matching what vegafusion 2.x generates.
 
 - *Added*: Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that exceed the configured thresholds. They are rendered smaller than the quarter markers to visually distinguish them. Thresholds are `eighth_marker_min_distance_km` (default 30) and `eighth_marker_min_duration_hours` (default 3) in `config.json`.
