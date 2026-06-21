@@ -17,6 +17,8 @@ Types of changes
 
 ## Unreleased
 
+- *Changed*: Gunicorn now starts with `preload_app = True`, so the application is fully loaded before workers are forked. Worker processes share read-only code pages copy-on-write, reducing total physical RAM usage.
+
 - *Fixed*: Viewing activities failing with HTTP 500 due to `make_geojson_from_time_series` not passing the configured eighth-marker distance threshold to the progress marker renderer.
 
 - *Fixed*: Vega console warning about v6 specs being loaded with a v5 runtime. Updated vendored JS from Vega 5 / Vega-Lite 4 / vega-embed 6 to Vega 6.2.0 / Vega-Lite 6.4.3 / vega-embed 7.1.0, matching what vegafusion 2.x generates.
