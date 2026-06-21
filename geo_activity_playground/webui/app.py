@@ -68,7 +68,6 @@ from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.export_blueprint import make_export_blueprint
 from .blueprints.hall_of_fame_blueprint import make_hall_of_fame_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
-from .blueprints.memory_blueprint import make_memory_blueprint
 from .blueprints.photo_blueprint import make_photo_blueprint
 from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
@@ -319,7 +318,6 @@ def create_app(
             config,
         ),
         "/export": make_export_blueprint(authenticator),
-        "/memory": make_memory_blueprint(),
         "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator, config),
         "/heatmap": make_heatmap_blueprint(repository, config, authenticator),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
