@@ -505,6 +505,7 @@ def web_ui_main(
                 self.cfg.set("workers", workers)
                 self.cfg.set("worker_class", "gthread")
                 self.cfg.set("threads", threads)
+                self.cfg.set("preload_app", True)
 
             def load(self) -> Any:
                 return app
