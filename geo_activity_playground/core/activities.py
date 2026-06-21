@@ -21,8 +21,6 @@ logger = logging.getLogger(__name__)
 
 MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
 EIGHTH_MARKER_PROGRESS_STOPS: tuple[float, ...] = (0.125, 0.375, 0.625, 0.875)
-EIGHTH_MARKER_DEFAULT_MIN_DISTANCE_KM: float = 30.0
-EIGHTH_MARKER_DEFAULT_MIN_DURATION_S: float = 3 * 3600
 
 
 class ActivityRepository:
@@ -82,7 +80,7 @@ class ActivityRepository:
 
 def make_geojson_progress_markers_from_time_series(
     time_series: pd.DataFrame,
-    eighth_marker_min_distance_km: float = EIGHTH_MARKER_DEFAULT_MIN_DISTANCE_KM,
+    eighth_marker_min_distance_km: float,
 ) -> str:
     feature_collection = geojson.FeatureCollection(
         _make_progress_marker_features(time_series, eighth_marker_min_distance_km)
@@ -92,7 +90,7 @@ def make_geojson_progress_markers_from_time_series(
 
 def make_geojson_progress_markers_time_based(
     time_series: pd.DataFrame,
-    eighth_marker_min_duration_s: float = EIGHTH_MARKER_DEFAULT_MIN_DURATION_S,
+    eighth_marker_min_duration_s: float,
 ) -> str:
     feature_collection = geojson.FeatureCollection(
         _make_progress_marker_features_time(time_series, eighth_marker_min_duration_s)
@@ -100,7 +98,10 @@ def make_geojson_progress_markers_time_based(
     return geojson.dumps(feature_collection)
 
 
-def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
+def make_geojson_from_time_series(
+    time_series: pd.DataFrame,
+    eighth_marker_min_distance_km: float,
+) -> str:
     features = []
     for _, group in time_series.groupby("segment_id"):
         features.append(
@@ -109,7 +110,9 @@ def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
             )
         )
 
-    features.extend(_make_progress_marker_features(time_series))
+    features.extend(
+        _make_progress_marker_features(time_series, eighth_marker_min_distance_km)
+    )
 
     fc = geojson.FeatureCollection(features=features)
     return geojson.dumps(fc)

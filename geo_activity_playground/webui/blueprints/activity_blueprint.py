@@ -111,7 +111,9 @@ def make_activity_blueprint(
         activity = repository.get_activity_by_id(id)
 
         time_series = repository.get_time_series(id)
-        line_json = make_geojson_from_time_series(time_series)
+        line_json = make_geojson_from_time_series(
+            time_series, config.eighth_marker_min_distance_km
+        )
 
         meta = repository.meta
         similar_activities = meta.loc[
@@ -227,7 +229,8 @@ def make_activity_blueprint(
     @blueprint.route("/<int:id>/line.geojson")
     def geojson_line(id: int) -> ResponseReturnValue:
         return make_geojson_from_time_series(
-            DB.session.get_one(Activity, id).time_series
+            DB.session.get_one(Activity, id).time_series,
+            config.eighth_marker_min_distance_km,
         )
 
     @blueprint.route("/<int:id>/sharepic.png")

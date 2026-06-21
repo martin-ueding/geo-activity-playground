@@ -318,7 +318,7 @@ def create_app(
             config,
         ),
         "/export": make_export_blueprint(authenticator),
-        "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator),
+        "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator, config),
         "/heatmap": make_heatmap_blueprint(repository, config, authenticator),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
