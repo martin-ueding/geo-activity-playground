@@ -224,7 +224,11 @@ def make_activity_blueprint(
         if "power" in time_series.columns:
             context["power_time_plot"] = power_time_plot(display_time_series)
 
-        return render_template("activity/show.html.j2", **context)
+        return render_template(
+            "activity/show.html.j2",
+            **context,
+            is_authenticated=authenticator.is_authenticated(),
+        )
 
     @blueprint.route("/<int:id>/line.geojson")
     def geojson_line(id: int) -> ResponseReturnValue:
