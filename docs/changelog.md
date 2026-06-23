@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Security:
+
+- Activity action buttons (Edit, Trim, Re-enrich, Delete) are now hidden unless the user is logged in. This reduces unnecessary attack surface for public instances ([GH-450](https://github.com/martin-ueding/geo-activity-playground/issues/450)).
+
 ## Version 1.34.0 — 2026-06-23
 
 Added:
