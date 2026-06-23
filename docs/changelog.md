@@ -17,15 +17,21 @@ Types of changes
 
 ## Unreleased
 
-- *Changed*: Gunicorn now starts with `preload_app = True`, so the application is fully loaded before workers are forked. Worker processes share read-only code pages copy-on-write, reducing total physical RAM usage.
+## Version 1.34.0 — 2026-06-23
 
-- *Fixed*: Viewing activities failing with HTTP 500 due to `make_geojson_from_time_series` not passing the configured eighth-marker distance threshold to the progress marker renderer.
+Added:
 
-- *Fixed*: Vega console warning about v6 specs being loaded with a v5 runtime. Updated vendored JS from Vega 5 / Vega-Lite 4 / vega-embed 6 to Vega 6.2.0 / Vega-Lite 6.4.3 / vega-embed 7.1.0, matching what vegafusion 2.x generates.
+- Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that exceed the configured thresholds. They are rendered smaller than the quarter markers to visually distinguish them. Thresholds are `eighth_marker_min_distance_km` (default 30) and `eighth_marker_min_duration_hours` (default 3) in `config.json`.
+- Distance / Time toggle in the activity map view. Switching to Time repositions the progress markers at equal fractions of elapsed duration.
 
-- *Added*: Eighth-progress markers (1/8, 3/8, 5/8, 7/8) on activity tracks that exceed the configured thresholds. They are rendered smaller than the quarter markers to visually distinguish them. Thresholds are `eighth_marker_min_distance_km` (default 30) and `eighth_marker_min_duration_hours` (default 3) in `config.json`.
-- *Added*: Distance / Time toggle in the activity map view. Switching to Time repositions the progress markers at equal fractions of elapsed duration.
+Changed:
 
+- Gunicorn now starts with `preload_app = True`, so the application is fully loaded before workers are forked. Worker processes share read-only code pages copy-on-write, reducing total physical RAM usage.
+
+Fixed:
+
+- Viewing activities failing with HTTP 500 due to `make_geojson_from_time_series` not passing the configured eighth-marker distance threshold to the progress marker renderer.
+- Vega console warning about v6 specs being loaded with a v5 runtime. Updated vendored JS from Vega 5 / Vega-Lite 4 / vega-embed 6 to Vega 6.2.0 / Vega-Lite 6.4.3 / vega-embed 7.1.0, matching what vegafusion 2.x generates.
 
 ## Version 1.33.0 — 2026-06-20
 
