@@ -24,10 +24,15 @@ Reason: Duplicated code has a cognitive burden.
 
 Rule: Document changes in the `docs/changelog.md` in the `## Unreleased` section.
 
+Rule: Changelog entries use the sections defined at the beginning of the file.
+
 Rule: Changelog entries go into separate `docs:` commits.
 Reason: Reverting a feature doesn't undo the past.
 
 Rule: When adding a new documentation file, it needs to be added to `docs/.vitepress/config.ts`.
+
+Rule: If you were prompted to work on a GitHub Issue, refer to the issue in the changelog.
+Example: `- Added new feature. (GH-123)`
 
 ## Git
 
