@@ -10,6 +10,8 @@ import urllib.request
 from datetime import date
 from pathlib import Path
 
+import mastodon
+
 REPO_ROOT = Path(__file__).parent
 CHANGELOG = REPO_ROOT / "docs/changelog.md"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
@@ -155,8 +157,6 @@ def post_to_mastodon(version: str) -> None:
         with open(ctl_toml, "rb") as f:
             config = tomllib.load(f)
         mastodon_config = config["mastodon"]
-
-        import mastodon
 
         client = mastodon.Mastodon(
             api_base_url=mastodon_config["url"],
