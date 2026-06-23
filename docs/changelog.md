@@ -15,7 +15,7 @@ Types of changes
 
 <!-- next version below this line -->
 
-## Unreleased
+## Version 1.34.0 — 2026-06-23
 
 - *Fixed*: Viewing activities failing with HTTP 500 due to `make_geojson_from_time_series` not passing the configured eighth-marker distance threshold to the progress marker renderer.
 
