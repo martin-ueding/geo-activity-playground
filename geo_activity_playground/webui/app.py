@@ -167,6 +167,7 @@ def create_app(
     database_uri: str = "sqlite:///database.sqlite",
     secret_key: str | None = None,
     run_migrations: bool = True,
+    http_server: Literal["waitress", "werkzeug", "gunicorn"] | None = None,
 ) -> Flask:
     """
     Create and configure the Flask application.
@@ -304,7 +305,9 @@ def create_app(
             config,
             heart_rate_zone_computer,
         ),
-        "/admin": make_admin_blueprint(authenticator),
+        "/admin": make_admin_blueprint(
+            authenticator, multi_process=http_server == "gunicorn"
+        ),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
         "/calendar": make_calendar_blueprint(repository, config),
@@ -397,6 +400,7 @@ def web_ui_main(
     app = create_app(
         database_uri=f"sqlite:///{database_path.absolute()}",
         run_migrations=True,
+        http_server=http_server,
     )
 
     # Import old config formats

@@ -1,5 +1,6 @@
 import logging
 import os
+import signal
 
 from flask import Blueprint
 from flask.typing import ResponseReturnValue
@@ -9,16 +10,21 @@ from ..authenticator import Authenticator, needs_authentication
 logger = logging.getLogger(__name__)
 
 
-def make_admin_blueprint(authenticator: Authenticator) -> Blueprint:
+def make_admin_blueprint(
+    authenticator: Authenticator, multi_process: bool = False
+) -> Blueprint:
     blueprint = Blueprint("admin", __name__, template_folder="templates")
 
     @blueprint.route("/shutdown", methods=["POST"])
     @needs_authentication(authenticator)
     def shutdown() -> ResponseReturnValue:
         logger.info("Shutdown requested via web interface.")
-        # Use os._exit to immediately terminate the process
-        # This is appropriate here since we want a clean shutdown
-        os._exit(0)
+        if multi_process:
+            # We are a Gunicorn worker; os._exit(0) here would only kill this
+            # worker and the master would respawn a replacement. Signal the
+            # master (our parent process) instead, which stops all workers.
+            os.kill(os.getppid(), signal.SIGTERM)
+        else:
+            os._exit(0)
 
     return blueprint
-
