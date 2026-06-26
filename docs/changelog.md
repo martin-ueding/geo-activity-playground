@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- The admin shutdown route now stops all Gunicorn workers, not just the one handling the request.
 
 ## Version 1.35.0 — 2026-06-26
 
