@@ -15,7 +15,7 @@ Types of changes
 
 <!-- next version below this line -->
 
-## Unreleased
+## Version 1.35.0 — 2026-06-26
 
 Security:
 
