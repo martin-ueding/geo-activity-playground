@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Updated the screenshots in the screenshot tour and refreshed the heatmap hero image on the landing page to reflect the current interface.
+
 Fixed:
 
 - The admin shutdown route now stops all Gunicorn workers, not just the one handling the request.
