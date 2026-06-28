@@ -1,0 +1,18 @@
+services:
+  # Defines the geo-activity service
+  geo-activity:
+    # Specifies the Docker image to be used for this service
+    image: geo-activity-playground
+    # Sets a custom name for the running container
+    container_name: geo-activity-container
+    # Maps port 5000 on the host to port 5000 in the container
+    # You may change the values to your needs
+    ports:
+      - "5000:5000"
+    # Mounts a host directory to a directory within the container
+    # You may change the mountpoint to your needs	
+    volumes:
+      - /srv/playground_data:/data
+    # Ensures the container automatically restarts if it stops
+    # other options are: no ; unless-stopped ; on-failure
+    restart: always
