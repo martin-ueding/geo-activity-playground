@@ -28,7 +28,7 @@ CONTINUOUS_VARIABLES = {
     "sum(elevation_gain)": _("Total elevation gain / m"),
     "mean(elevation_gain)": _("Average elevation gain / m"),
     "num_new_tiles_14": _("New tiles 14"),
-    "num_new_tiles_14": _("New tiles 17"),
+    "num_new_tiles_17": _("New tiles 17"),
     "average_speed_moving_kmh": _("Average moving speed / km/h"),
     "average_speed_elapsed_kmh": _("Average elapsed speed / km/h"),
     "start_latitude": _("Start latitude / °"),
