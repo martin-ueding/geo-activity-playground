@@ -47,6 +47,8 @@ export default {
           { text: 'Using Maps as Overlays', link: '/using-maps-as-overlays' },
           { text: 'Build Custom Plots', link: '/build-custom-plots' },
           { text: 'Plan Missing Tile Rides', link: '/plan-missing-tile-rides' },
+          { text: 'Explorer Tiles on the Go', link: '/explorer-tiles-on-the-go' },
+          { text: 'Cluster History', link: '/cluster-history' },
           { text: 'Create a Privacy Zone', link: '/create-a-privacy-zone' },
           { text: 'Set Up a Development Environment', link: '/set-up-a-development-environment' },
           { text: 'Rename Activity Kinds', link: '/rename-activity-kinds' },

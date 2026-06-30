@@ -75,39 +75,7 @@ As you can see in this picture, there is a tile missing right at the top edge. I
 
 You can click on each tile and get some information about that particular tile. You can see when you first explored that and with which activity. Also it shows the last activity there as well as the number of activities. If it is a local cluster, it will also show the cluster size.
 
-## Cluster history overlay
-
-The Explorer page can show how your cluster grew over time. Click **Load Cluster History** on the explorer zoom-level page to fetch the history. A time-cutoff slider then lets you scrub backwards and forwards to replay cluster growth activity by activity. Each activity also shows its own cluster delta: which tiles became cluster tiles for the first time because of it.
-
-The history is loaded on demand (not on page load) to keep the initial map fast for large histories.
-
-## Explorer video export
-
-You can export a time-lapse MP4 of your explorer tile history directly from the Explorer page. Open a zoom-level view and use the **Generate explorer MP4** form to configure width, height, FPS, interpolation, and fade, then start rendering. Once done the file is available for download.
-
-The same export is also available via the CLI:
-
-```bash
-geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30
-```
-
-## Downloading tiles for a Garmin device
-
-Below the explorer map you can download the tiles in the visible area. The explored and missing tiles are each available as GeoJSON, GPX, and KML. The KML export is convenient if you want to turn the missing tiles into a map overlay for a Garmin cycling computer.
-
-To get a tile-grid overlay onto a Garmin Edge you need a Garmin map file (`.img`). There is no pure-Python way to write that format, so the conversion is done with [`mkgmap`](https://www.mkgmap.org.uk/), a Java command-line tool. The general workflow is described in [this tutorial](https://peatfaerie.medium.com/how-to-create-a-tile-grid-overlay-for-the-garmin-edge-based-on-veloviewer-unexplored-tiles-5b36e7c401bd): download the missing tiles as KML, convert them, and build the Garmin map.
-
-If `mkgmap` is installed on the machine running this application, the download row additionally offers **Missing as Garmin map** and **Explored as Garmin map**. These run `mkgmap` for you and hand back a ready `gmapsupp.img`. Copy that file into the `Garmin` folder on your device, and the tile grid shows up as a map overlay. The Garmin links are hidden when `mkgmap` is not found, so a default installation is not affected.
-
-## Exporting to the Explorer Tile Helper app
-
-Below the visible-area downloads there is a link to export _all_ explored tiles as a Squadrats-compatible KML. Unlike the per-area downloads, this covers your whole history. The file follows the structure that [Squadrats](https://squadrats.com/) uses and contains four placemarks: the explored tiles at zoom 14 (_squadrats_) and zoom 17 (_squadratinhos_), plus the largest square at each zoom level (_ubersquadrat_ and _ubersquadratinho_).
-
-You can import this file into the [Explorer Tile Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv) app. Layers without data are omitted, so if zoom 17 is not enabled, only the zoom 14 placemarks are written.
-
-This is how that looks in the app:
-
-![](images/explorer-helper.jpg)
+Once you are hooked on filling the gaps, two how-to guides take over from here: [Plan Missing Tile Rides](/plan-missing-tile-rides) shows how to plan a route through the missing tiles, and [Explorer Tiles on the Go](/explorer-tiles-on-the-go) shows how to carry the explored and missing tiles into navigation apps and onto a Garmin device. To watch how your cluster grew over time, see [Cluster History](/cluster-history).
 
 ## Squadratinhos
 
