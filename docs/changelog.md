@@ -28,6 +28,7 @@ Changed:
 
 - Split the explorer tile documentation along Diátaxis lines: the _Explorer Tiles_ page now only explains the concept, while the new _Explorer Tiles on the Go_ guide covers getting tiles into navigation apps and onto a Garmin device, and the new _Cluster History_ guide covers the history overlay and video export.
 - Updated the screenshots in the screenshot tour and refreshed the heatmap hero image on the landing page to reflect the current interface.
+- Reorder the documentation navigation by themes and topics, not by Diataxis types.
 
 Fixed:
 
