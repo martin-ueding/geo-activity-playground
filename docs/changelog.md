@@ -17,6 +17,11 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a contributors page to the documentation that credits everyone who has contributed code, documentation, and fixes.
+- Add a ready-to-use `docker-compose.yml` so the app can be started with `docker compose up` (image, port 5000, a `/data` volume, and auto-restart) instead of crafting a `docker run` command by hand. ([GH-452](https://github.com/martin-ueding/geo-activity-playground/issues/452))
+
 Changed:
 
 - Updated the screenshots in the screenshot tour and refreshed the heatmap hero image on the landing page to reflect the current interface.
@@ -24,6 +29,7 @@ Changed:
 Fixed:
 
 - The admin shutdown route now stops all Gunicorn workers, not just the one handling the request.
+- Fix `num_new_tiles_14` in plot builder. ([GH-453](https://github.com/martin-ueding/geo-activity-playground/issues/453))
 
 ## Version 1.35.0 — 2026-06-26
 
