@@ -34,6 +34,9 @@ Rule: When adding a new documentation file, it needs to be added to `docs/.vitep
 Rule: If you were prompted to work on a GitHub Issue, refer to the issue in the changelog.
 Example: `- Added new feature. (GH-123)`
 
+Rule: Don't hard-wrap Markdown content.
+Reason: Editors have soft-wrap that is more flexible.
+
 ## Git
 
 Rule: Work on `main` in this particular project.
