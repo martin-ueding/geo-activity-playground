@@ -105,6 +105,10 @@ Below the visible-area downloads there is a link to export _all_ explored tiles 
 
 You can import this file into the [Explorer Tile Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv) app. Layers without data are omitted, so if zoom 17 is not enabled, only the zoom 14 placemarks are written.
 
+This is how that looks in the app:
+
+![](images/explorer-helper.jpg)
+
 ## Squadratinhos
 
 The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the _squadratinhos_ which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.
