@@ -93,36 +93,17 @@ geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-
 
 ## Downloading tiles for a Garmin device
 
-Below the explorer map you can download the tiles in the visible area. The
-explored and missing tiles are each available as GeoJSON, GPX, and KML. The KML
-export is convenient if you want to turn the missing tiles into a map overlay for
-a Garmin cycling computer.
+Below the explorer map you can download the tiles in the visible area. The explored and missing tiles are each available as GeoJSON, GPX, and KML. The KML export is convenient if you want to turn the missing tiles into a map overlay for a Garmin cycling computer.
 
-To get a tile-grid overlay onto a Garmin Edge you need a Garmin map file
-(`.img`). There is no pure-Python way to write that format, so the conversion is
-done with [`mkgmap`](https://www.mkgmap.org.uk/), a Java command-line tool. The
-general workflow is described in [this tutorial](https://peatfaerie.medium.com/how-to-create-a-tile-grid-overlay-for-the-garmin-edge-based-on-veloviewer-unexplored-tiles-5b36e7c401bd):
-download the missing tiles as KML, convert them, and build the Garmin map.
+To get a tile-grid overlay onto a Garmin Edge you need a Garmin map file (`.img`). There is no pure-Python way to write that format, so the conversion is done with [`mkgmap`](https://www.mkgmap.org.uk/), a Java command-line tool. The general workflow is described in [this tutorial](https://peatfaerie.medium.com/how-to-create-a-tile-grid-overlay-for-the-garmin-edge-based-on-veloviewer-unexplored-tiles-5b36e7c401bd): download the missing tiles as KML, convert them, and build the Garmin map.
 
-If `mkgmap` is installed on the machine running this application, the download row
-additionally offers **Missing as Garmin map** and **Explored as Garmin map**.
-These run `mkgmap` for you and hand back a ready `gmapsupp.img`. Copy that file
-into the `Garmin` folder on your device, and the tile grid shows up as a map
-overlay. The Garmin links are hidden when `mkgmap` is not found, so a default
-installation is not affected.
+If `mkgmap` is installed on the machine running this application, the download row additionally offers **Missing as Garmin map** and **Explored as Garmin map**. These run `mkgmap` for you and hand back a ready `gmapsupp.img`. Copy that file into the `Garmin` folder on your device, and the tile grid shows up as a map overlay. The Garmin links are hidden when `mkgmap` is not found, so a default installation is not affected.
 
 ## Exporting to the Explorer Tile Helper app
 
-Below the visible-area downloads there is a link to export _all_ explored tiles
-as a Squadrats-compatible KML. Unlike the per-area downloads, this covers your
-whole history. The file follows the structure that
-[Squadrats](https://squadrats.com/) uses and contains four placemarks: the
-explored tiles at zoom 14 (_squadrats_) and zoom 17 (_squadratinhos_), plus the
-largest square at each zoom level (_ubersquadrat_ and _ubersquadratinho_).
+Below the visible-area downloads there is a link to export _all_ explored tiles as a Squadrats-compatible KML. Unlike the per-area downloads, this covers your whole history. The file follows the structure that [Squadrats](https://squadrats.com/) uses and contains four placemarks: the explored tiles at zoom 14 (_squadrats_) and zoom 17 (_squadratinhos_), plus the largest square at each zoom level (_ubersquadrat_ and _ubersquadratinho_).
 
-You can import this file into the [Explorer Tile Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv) app. Layers without data
-are omitted, so if zoom 17 is not enabled, only the zoom 14 placemarks are
-written.
+You can import this file into the [Explorer Tile Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv) app. Layers without data are omitted, so if zoom 17 is not enabled, only the zoom 14 placemarks are written.
 
 ## Squadratinhos
 
