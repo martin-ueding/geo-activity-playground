@@ -1,10 +1,12 @@
 import json
 import logging
 from collections.abc import Iterable
+from xml.etree import ElementTree as ET
 
 import geojson
 import gpxpy
 import pandas as pd
+import simplekml
 
 from ..core.coordinates import Bounds
 from ..core.tiles import get_tile_upper_left_lat_lon
@@ -104,3 +106,31 @@ def make_grid_file_geojson(grid_points: list[list[tuple[float, float]]]) -> str:
     )
     result = geojson.dumps(fc, sort_keys=True, indent=4, ensure_ascii=False)
     return result
+
+
+def make_grid_file_kml(grid_points: list[list[tuple[float, float]]]) -> str:
+    kml = simplekml.Kml()
+    for points in grid_points:
+        kml.newpolygon().outerboundaryis = [(lon, lat) for lat, lon in points]
+    return kml.kml()
+
+
+def make_grid_file_osm(grid_points: list[list[tuple[float, float]]]) -> str:
+    osm = ET.Element("osm", version="0.6", generator="geo-activity-playground")
+    node_id = -1
+    way_id = -1
+    for points in grid_points:
+        way_node_ids = []
+        # The rings from make_grid_points repeat the first point as the last one;
+        # mkgmap closes ways by repeating the node reference, so drop the duplicate.
+        for lat, lon in points[:-1]:
+            ET.SubElement(osm, "node", id=str(node_id), lat=repr(lat), lon=repr(lon))
+            way_node_ids.append(node_id)
+            node_id -= 1
+        way = ET.SubElement(osm, "way", id=str(way_id))
+        for ref in [*way_node_ids, way_node_ids[0]]:
+            ET.SubElement(way, "nd", ref=str(ref))
+        ET.SubElement(way, "tag", k="boundary", v="administrative")
+        ET.SubElement(way, "tag", k="admin_level", v="2")
+        way_id -= 1
+    return ET.tostring(osm, encoding="unicode")

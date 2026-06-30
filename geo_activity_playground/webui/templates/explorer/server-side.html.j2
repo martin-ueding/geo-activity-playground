@@ -52,8 +52,12 @@
         <p>{{ _('Download tiles in visible area:') }}
             <a href="#" data-download-suffix="explored.geojson">{{ _('Explored as GeoJSON') }}</a>,
             <a href="#" data-download-suffix="explored.gpx">{{ _('Explored as GPX') }}</a>,
-            <a href="#" data-download-suffix="missing.geojson">{{ _('Missing as GeoJSON') }}</a> {{ _('or') }}
-            <a href="#" data-download-suffix="missing.gpx">{{ _('Missing as GPX') }}</a>.
+            <a href="#" data-download-suffix="explored.kml">{{ _('Explored as KML') }}</a>,
+            {% if mkgmap_available %}<a href="#" data-download-suffix="explored.img">{{ _('Explored as Garmin map') }}</a>,{% endif %}
+            <a href="#" data-download-suffix="missing.geojson">{{ _('Missing as GeoJSON') }}</a>,
+            <a href="#" data-download-suffix="missing.gpx">{{ _('Missing as GPX') }}</a> {{ _('or') }}
+            <a href="#" data-download-suffix="missing.kml">{{ _('Missing as KML') }}</a>{% if mkgmap_available %} {{ _('or') }}
+            <a href="#" data-download-suffix="missing.img">{{ _('Missing as Garmin map') }}</a>{% endif %}.
         </p>
         <script type="module">
             import { initExplorerMap } from '/static/server-side-explorer.js';

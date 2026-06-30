@@ -19,6 +19,7 @@ import sqlalchemy
 from flask import (
     Blueprint,
     Response,
+    abort,
     flash,
     redirect,
     render_template,
@@ -33,11 +34,14 @@ from ...core.coordinates import Bounds
 from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit
 from ...core.raster_map import OSM_TILE_SIZE, ImageTransform, TileGetter
 from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
+from ...explorer.garmin_img import build_garmin_img, mkgmap_available
 from ...explorer.grid_file import (
     get_border_tiles,
     make_explorer_tile,
     make_grid_file_geojson,
     make_grid_file_gpx,
+    make_grid_file_kml,
+    make_grid_file_osm,
     make_grid_points,
 )
 from ...explorer.tile_visits import (
@@ -67,6 +71,41 @@ from ..authenticator import Authenticator, needs_authentication
 alt.data_transformers.enable("vegafusion")
 
 logger = logging.getLogger(__name__)
+
+
+def _grid_points_response(
+    points: list[list[tuple[float, float]]], suffix: str, name: str
+) -> ResponseReturnValue:
+    if suffix == "geojson":
+        return Response(
+            make_grid_file_geojson(points),
+            mimetype="application/json",
+            headers={"Content-disposition": "attachment"},
+        )
+    elif suffix == "gpx":
+        return Response(
+            make_grid_file_gpx(points),
+            mimetype="application/xml",
+            headers={"Content-disposition": "attachment"},
+        )
+    elif suffix == "kml":
+        return Response(
+            make_grid_file_kml(points),
+            mimetype="application/vnd.google-earth.kml+xml",
+            headers={"Content-disposition": "attachment"},
+        )
+    elif suffix == "img":
+        if not mkgmap_available():
+            abort(404)
+        return Response(
+            build_garmin_img(make_grid_file_osm(points), name),
+            mimetype="application/octet-stream",
+            headers={
+                "Content-disposition": f"attachment; filename={name}-gmapsupp.img"
+            },
+        )
+    else:
+        abort(404)
 
 
 def blend_color(
@@ -336,19 +375,7 @@ def make_explorer_blueprint(
 
         tiles = get_tile_history_df(zoom)
         points = get_border_tiles(tiles, zoom, tile_bounds)
-        if suffix == "geojson":
-            result = make_grid_file_geojson(points)
-        elif suffix == "gpx":
-            result = make_grid_file_gpx(points)
-        else:
-            raise ValueError(f"Unsupported suffix: {suffix}")
-
-        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
-        return Response(
-            result,
-            mimetype=mimetypes[suffix],
-            headers={"Content-disposition": "attachment"},
-        )
+        return _grid_points_response(points, suffix, "missing")
 
     @blueprint.route(
         "/<int:zoom>/<float(signed=True):north>/<float(signed=True):east>/<float(signed=True):south>/<float(signed=True):west>/explored.<suffix>"
@@ -364,19 +391,7 @@ def make_explorer_blueprint(
         points = make_grid_points(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
         )
-        if suffix == "geojson":
-            result = make_grid_file_geojson(points)
-        elif suffix == "gpx":
-            result = make_grid_file_gpx(points)
-        else:
-            raise ValueError(f"Unsupported suffix: {suffix}")
-
-        mimetypes = {"geojson": "application/json", "gpx": "application/xml"}
-        return Response(
-            result,
-            mimetype=mimetypes[suffix],
-            headers={"Content-disposition": "attachment"},
-        )
+        return _grid_points_response(points, suffix, "explored")
 
     @blueprint.route("/<int:zoom>/server-side")
     def server_side(zoom: int) -> ResponseReturnValue:
@@ -443,6 +458,7 @@ def make_explorer_blueprint(
             "square_size": square_size,
             "max_cluster_size": max_cluster_size,
             "bookmarks": bookmarks,
+            "mkgmap_available": mkgmap_available(),
         }
         return render_template("explorer/server-side.html.j2", **context)
 
