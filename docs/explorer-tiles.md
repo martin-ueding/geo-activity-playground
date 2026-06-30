@@ -91,6 +91,26 @@ The same export is also available via the CLI:
 geo-activity-playground --basedir YOUR_BASEDIR explorer-video --zoom 14 --video-width 1920 --video-height 1080 --fps 30
 ```
 
+## Downloading tiles for a Garmin device
+
+Below the explorer map you can download the tiles in the visible area. The
+explored and missing tiles are each available as GeoJSON, GPX, and KML. The KML
+export is convenient if you want to turn the missing tiles into a map overlay for
+a Garmin cycling computer.
+
+To get a tile-grid overlay onto a Garmin Edge you need a Garmin map file
+(`.img`). There is no pure-Python way to write that format, so the conversion is
+done with [`mkgmap`](https://www.mkgmap.org.uk/), a Java command-line tool. The
+general workflow is described in [this tutorial](https://peatfaerie.medium.com/how-to-create-a-tile-grid-overlay-for-the-garmin-edge-based-on-veloviewer-unexplored-tiles-5b36e7c401bd):
+download the missing tiles as KML, convert them, and build the Garmin map.
+
+If `mkgmap` is installed on the machine running this application, the download row
+additionally offers **Missing as Garmin map** and **Explored as Garmin map**.
+These run `mkgmap` for you and hand back a ready `gmapsupp.img`. Copy that file
+into the `Garmin` folder on your device, and the tile grid shows up as a map
+overlay. The Garmin links are hidden when `mkgmap` is not found, so a default
+installation is not affected.
+
 ## Squadratinhos
 
 The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the _squadratinhos_ which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.

@@ -19,6 +19,7 @@ Types of changes
 
 Added:
 
+- Add KML export for explored and missing explorer tiles, and a one-click Garmin map (`.img`) download that is offered when `mkgmap` is installed on the host. This makes it easier to show missing tiles as a map overlay on a Garmin device. ([GH-455](https://github.com/martin-ueding/geo-activity-playground/issues/455))
 - Add a contributors page to the documentation that credits everyone who has contributed code, documentation, and fixes.
 - Add a ready-to-use `docker-compose.yml` so the app can be started with `docker compose up` (image, port 5000, a `/data` volume, and auto-restart) instead of crafting a `docker run` command by hand. ([GH-452](https://github.com/martin-ueding/geo-activity-playground/issues/452))
 
