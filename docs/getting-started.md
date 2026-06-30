@@ -1,4 +1,4 @@
-# Getting started
+# Getting Started
 
 Geo Activity Playground is a software to view recorded outdoor activities and derive various insights from your data collection. All data is kept on your machine, hence it is suitable for people who have an affinity for data analysis and privacy.
 
