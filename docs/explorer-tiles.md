@@ -111,6 +111,19 @@ into the `Garmin` folder on your device, and the tile grid shows up as a map
 overlay. The Garmin links are hidden when `mkgmap` is not found, so a default
 installation is not affected.
 
+## Exporting to the Explorer Tile Helper app
+
+Below the visible-area downloads there is a link to export _all_ explored tiles
+as a Squadrats-compatible KML. Unlike the per-area downloads, this covers your
+whole history. The file follows the structure that
+[Squadrats](https://squadrats.com/) uses and contains four placemarks: the
+explored tiles at zoom 14 (_squadrats_) and zoom 17 (_squadratinhos_), plus the
+largest square at each zoom level (_ubersquadrat_ and _ubersquadratinho_).
+
+You can import this file into the [Explorer Tile Helper](https://play.google.com/store/apps/details?id=ru.anisart.vv) app. Layers without data
+are omitted, so if zoom 17 is not enabled, only the zoom 14 placemarks are
+written.
+
 ## Squadratinhos
 
 The explorer tiles at zoom level 14 are best suited for cycling and to discover the area around the city. There is a derived definition, the _squadratinhos_ which are defined at zoom level 17 and therefore a factor 8 smaller in each direction. Each explorer tile is therefore divided into 256 squadratinhos.
