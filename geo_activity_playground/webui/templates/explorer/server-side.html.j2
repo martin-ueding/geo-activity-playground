@@ -59,6 +59,10 @@
             <a href="#" data-download-suffix="missing.kml">{{ _('Missing as KML') }}</a>{% if mkgmap_available %} {{ _('or') }}
             <a href="#" data-download-suffix="missing.img">{{ _('Missing as Garmin map') }}</a>{% endif %}.
         </p>
+        <p>{{ _('Export all explored tiles as a') }}
+            <a href="{{ url_for('.download_squadrats') }}">{{ _('Squadrats-compatible KML') }}</a>
+            {{ _('(zoom 14 and 17) for import into the Explorer Tile Helper app.') }}
+        </p>
         <script type="module">
             import { initExplorerMap } from '/static/server-side-explorer.js';
             initExplorerMap({

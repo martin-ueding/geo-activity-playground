@@ -115,6 +115,97 @@ def make_grid_file_kml(grid_points: list[list[tuple[float, float]]]) -> str:
     return kml.kml()
 
 
+# The Squadrats KML uses four named placemarks: explored tiles at zoom 14
+# (squadrats) and 17 (squadratinhos), plus the largest square at each zoom level
+# (ubersquadrat, ubersquadratinho). Colors are KML's aabbggrr hex strings.
+_SQUADRATS_TILE_LAYERS = {
+    14: {
+        "name": "squadrats",
+        "poly_color": "40FFFFFF",
+        "line_color": "FF808080",
+        "line_width": "1",
+    },
+    17: {
+        "name": "squadratinhos",
+        "poly_color": "400085FF",
+        "line_color": "FF000000",
+        "line_width": "0.25",
+    },
+}
+_SQUADRATS_SQUARE_LAYERS = {
+    14: {"name": "ubersquadrat", "line_color": "FF0000FF", "line_width": "2"},
+    17: {"name": "ubersquadratinho", "line_color": "FF00477A", "line_width": "1"},
+}
+
+
+def _add_squadrats_extended_data(placemark: ET.Element, name: str, size: int) -> None:
+    extended_data = ET.SubElement(placemark, "ExtendedData")
+    name_data = ET.SubElement(extended_data, "Data", name="name")
+    ET.SubElement(name_data, "value").text = name
+    size_data = ET.SubElement(extended_data, "Data", name="size")
+    ET.SubElement(size_data, "value").text = str(size)
+
+
+def _add_squadrats_polygon(parent: ET.Element, ring: list[tuple[float, float]]) -> None:
+    polygon = ET.SubElement(parent, "Polygon")
+    outer = ET.SubElement(polygon, "outerBoundaryIs")
+    linear_ring = ET.SubElement(outer, "LinearRing")
+    ET.SubElement(linear_ring, "coordinates").text = " ".join(
+        f"{lon},{lat}" for lat, lon in ring
+    )
+
+
+def make_grid_file_kml_squadrats(
+    explored: dict[int, Iterable[tuple[int, int]]],
+    squares: dict[int, tuple[int, int, int]],
+) -> str:
+    """Build a Squadrats-compatible KML for the Explorer Tile Helper app.
+
+    Args:
+        explored: Explored tiles per zoom level, keyed by 14 and/or 17.
+        squares: Largest square as ``(x, y, size)`` per zoom level.
+    """
+    kml = ET.Element("kml", xmlns="http://www.opengis.net/kml/2.2")
+    document = ET.SubElement(kml, "Document")
+
+    for zoom, spec in _SQUADRATS_TILE_LAYERS.items():
+        tiles = list(explored.get(zoom, []))
+        if not tiles:
+            continue
+        placemark = ET.SubElement(document, "Placemark")
+        ET.SubElement(placemark, "name").text = spec["name"]
+        style = ET.SubElement(placemark, "Style")
+        ET.SubElement(ET.SubElement(style, "PolyStyle"), "color").text = spec[
+            "poly_color"
+        ]
+        line_style = ET.SubElement(style, "LineStyle")
+        ET.SubElement(line_style, "color").text = spec["line_color"]
+        ET.SubElement(line_style, "width").text = spec["line_width"]
+        _add_squadrats_extended_data(placemark, spec["name"], len(tiles))
+        multi_geometry = ET.SubElement(placemark, "MultiGeometry")
+        for ring in make_grid_points(tiles, zoom):
+            _add_squadrats_polygon(multi_geometry, ring)
+
+    for zoom, spec in _SQUADRATS_SQUARE_LAYERS.items():
+        square = squares.get(zoom)
+        if square is None or square[2] == 0:
+            continue
+        x, y, size = square
+        placemark = ET.SubElement(document, "Placemark")
+        ET.SubElement(placemark, "name").text = spec["name"]
+        style = ET.SubElement(placemark, "Style")
+        ET.SubElement(ET.SubElement(style, "PolyStyle"), "fill").text = "0"
+        line_style = ET.SubElement(style, "LineStyle")
+        ET.SubElement(line_style, "color").text = spec["line_color"]
+        ET.SubElement(line_style, "width").text = spec["line_width"]
+        _add_squadrats_extended_data(placemark, spec["name"], size)
+        corners = [(x, y), (x + size, y), (x + size, y + size), (x, y + size), (x, y)]
+        ring = [get_tile_upper_left_lat_lon(cx, cy, zoom) for cx, cy in corners]
+        _add_squadrats_polygon(placemark, ring)
+
+    return ET.tostring(kml, encoding="unicode")
+
+
 def make_grid_file_osm(grid_points: list[list[tuple[float, float]]]) -> str:
     osm = ET.Element("osm", version="0.6", generator="geo-activity-playground")
     node_id = -1

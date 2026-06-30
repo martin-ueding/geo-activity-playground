@@ -41,6 +41,7 @@ from ...explorer.grid_file import (
     make_grid_file_geojson,
     make_grid_file_gpx,
     make_grid_file_kml,
+    make_grid_file_kml_squadrats,
     make_grid_file_osm,
     make_grid_points,
 )
@@ -392,6 +393,25 @@ def make_explorer_blueprint(
             (tile for tile in tiles.keys() if tile_bounds.contains(*tile)), zoom
         )
         return _grid_points_response(points, suffix, "explored")
+
+    @blueprint.route("/squadrats.kml")
+    def download_squadrats() -> ResponseReturnValue:
+        explored: dict[int, list[tuple[int, int]]] = {}
+        squares: dict[int, tuple[int, int, int]] = {}
+        for zoom in (14, 17):
+            tiles = get_tile_history_df(zoom)
+            if len(tiles):
+                explored[zoom] = list(zip(tiles["tile_x"], tiles["tile_y"]))
+            square_x, square_y, square_size = get_explorer_square(zoom)
+            if square_x is not None and square_size:
+                squares[zoom] = (square_x, square_y, square_size)
+        if not explored:
+            abort(404)
+        return Response(
+            make_grid_file_kml_squadrats(explored, squares),
+            mimetype="application/vnd.google-earth.kml+xml",
+            headers={"Content-disposition": "attachment; filename=squadrats.kml"},
+        )
 
     @blueprint.route("/<int:zoom>/server-side")
     def server_side(zoom: int) -> ResponseReturnValue:
