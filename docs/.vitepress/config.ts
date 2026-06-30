@@ -76,6 +76,7 @@ export default {
           { text: 'Segment Matching', link: '/segment-matching' },
         ],
       },
+      { text: 'Contributors', link: '/contributors' },
       { text: 'Acknowledgments', link: '/acknowledgments' },
       { text: 'Similar Projects', link: '/similar-projects' },
       { text: 'License', link: '/license' },
