@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add an `annotate-photos` CLI command that reads the capture time from JPEG EXIF, matches it against recorded activity time series, and writes the interpolated GPS coordinates back into the image file.
 
 ## Version 1.36.0 — 2026-06-30
 
