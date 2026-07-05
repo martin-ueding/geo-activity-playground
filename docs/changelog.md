@@ -21,6 +21,10 @@ Added:
 
 - Add an `annotate-photos` CLI command that reads the capture time from JPEG EXIF, matches it against recorded activity time series, and writes the interpolated GPS coordinates back into the image file.
 
+Fixed:
+
+- Remove the `simplekml` dependency, which only ships as a source distribution and fails to install on Python 3.14. KML generation now uses the stdlib `xml.etree.ElementTree` module instead. ([GH-456](https://github.com/martin-ueding/geo-activity-playground/issues/456))
+
 ## Version 1.36.0 — 2026-06-30
 
 Added:
