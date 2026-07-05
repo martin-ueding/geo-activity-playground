@@ -50,6 +50,7 @@ export default {
           { text: 'Record Activities', link: '/record-activities' },
           { text: 'Rename Activity Kinds', link: '/rename-activity-kinds' },
           { text: 'Advanced Metadata Extraction', link: '/advanced-metadata-extraction' },
+          { text: 'Sync Between Computers', link: '/sync-between-computers' },
         ],
       },
       {
