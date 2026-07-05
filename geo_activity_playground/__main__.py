@@ -5,7 +5,7 @@ import sys
 
 import coloredlogs
 
-from .core.photos import main_inspect_photo
+from .core.photos import main_annotate_photos, main_inspect_photo
 from .explorer.video import explorer_video_main
 from .heatmap_video import main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
@@ -209,6 +209,19 @@ def main() -> None:
     )
     subparser.add_argument("path", type=pathlib.Path)
     subparser.set_defaults(func=main_inspect_photo)
+
+    subparser = subparsers.add_parser(
+        "annotate-photos",
+        help="Write GPS coordinates into EXIF of photos that lack location data",
+    )
+    subparser.add_argument(
+        "paths",
+        type=pathlib.Path,
+        nargs="+",
+        metavar="PHOTO",
+        help="JPEG photo files to annotate",
+    )
+    subparser.set_defaults(func=main_annotate_photos)
 
     options = parser.parse_args()
     coloredlogs.install(
