@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add an `annotate-photos` CLI command that reads the capture time from JPEG EXIF, matches it against recorded activity time series, and writes the interpolated GPS coordinates back into the image file.
+- Add an `export-kml` CLI command that exports explorer tiles as a KML file without starting the web server. Supports three formats: `squadrats` (Garmin/Squadrats-compatible KML for zoom 14 and 17, the default), `missing` (unvisited tiles in the bounding box around explored tiles), and `explored` (all visited tiles). ([GH-455](https://github.com/martin-ueding/geo-activity-playground/issues/455))
 
 Fixed:
 
