@@ -6,7 +6,6 @@ from xml.etree import ElementTree as ET
 import geojson
 import gpxpy
 import pandas as pd
-import simplekml
 
 from ..core.coordinates import Bounds
 from ..core.tiles import get_tile_upper_left_lat_lon
@@ -109,10 +108,12 @@ def make_grid_file_geojson(grid_points: list[list[tuple[float, float]]]) -> str:
 
 
 def make_grid_file_kml(grid_points: list[list[tuple[float, float]]]) -> str:
-    kml = simplekml.Kml()
+    kml = ET.Element("kml", xmlns="http://www.opengis.net/kml/2.2")
+    document = ET.SubElement(kml, "Document")
     for points in grid_points:
-        kml.newpolygon().outerboundaryis = [(lon, lat) for lat, lon in points]
-    return kml.kml()
+        placemark = ET.SubElement(document, "Placemark")
+        _add_squadrats_polygon(placemark, points)
+    return ET.tostring(kml, encoding="unicode")
 
 
 # The Squadrats KML uses four named placemarks: explored tiles at zoom 14
