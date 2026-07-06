@@ -65,6 +65,7 @@ class Config:
     heatmap_cache_min_activities: int = 5
     map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
     map_tile_attribution: str = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
+    map_style_url: str | None = None
 
 
 # Field names that are valid for Config, used to filter out obsolete fields when loading

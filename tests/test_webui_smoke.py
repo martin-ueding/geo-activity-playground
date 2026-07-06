@@ -75,6 +75,24 @@ def test_wrap_month_page_loads_with_data(client, app):
     assert b'id="wrap-month-selector"' in response.data
 
 
+def test_explorer_style_json_loads(client):
+    response = client.get("/explorer/14/style.json")
+    assert response.status_code == 200
+    assert response.is_json
+    data = response.get_json()
+    assert "sources" in data
+    assert "layers" in data
+    assert "gap-explorer-14-colorful_cluster" in data["sources"]
+    assert response.headers["Access-Control-Allow-Origin"] == "*"
+
+
+def test_explorer_style_json_with_color_strategy(client):
+    response = client.get("/explorer/14/style.json?color_strategy=max_cluster")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "gap-explorer-14-max_cluster" in data["sources"]
+
+
 def test_cluster_history_endpoints_load(client, app):
     with app.app_context():
         activity = Activity(id=1, name="Ride")
