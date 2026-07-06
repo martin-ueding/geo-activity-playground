@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a `/explorer/{zoom}/style.json?color_strategy={strategy}` endpoint that returns a MapLibre GL-compatible style document with the GAP explorer tiles injected as a raster source and layer. If `map_style_url` is set in `config.json`, the referenced style is fetched and extended; otherwise a minimal raster style using the configured `map_tile_url` is generated. The explorer tile and style endpoints now include `Access-Control-Allow-Origin: *` headers so that browser-based external map applications (e.g. Wanderer) can consume them directly. ([GH-459](https://github.com/martin-ueding/geo-activity-playground/issues/459))
+
 Fixed:
 
 - Fix Hammerhead client ID and secret being silently lost when the OAuth callback was handled by a different gunicorn worker than the settings form POST. Credentials are now stored in the database (shared across all workers) instead of `config.json`. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
