@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Fix Hammerhead client ID and secret being silently lost when the OAuth callback was handled by a different gunicorn worker than the settings form POST. Credentials are now stored in the database (shared across all workers) instead of `config.json`. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 ## Version 1.37.0 — 2026-07-05
 
