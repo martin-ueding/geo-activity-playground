@@ -965,7 +965,7 @@ class SegmentCheck(DB.Model):
 
 
 class HammerheadAuth(DB.Model):
-    """Persistent OAuth tokens and import cursor for the Hammerhead Karoo API.
+    """Persistent OAuth credentials, tokens, and import cursor for the Hammerhead Karoo API.
 
     Single-row table.
     """
@@ -973,6 +973,9 @@ class HammerheadAuth(DB.Model):
     __tablename__ = "hammerhead_auth"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    client_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    client_secret: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    client_code: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     access_token: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     refresh_token: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     expires_at: Mapped[datetime.datetime | None] = mapped_column(

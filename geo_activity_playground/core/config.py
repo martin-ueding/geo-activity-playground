@@ -48,9 +48,6 @@ class Config:
     strava_client_id: int = 0
     strava_client_secret: str = ""
     strava_client_code: str | None = None
-    hammerhead_client_id: str | None = None
-    hammerhead_client_secret: str | None = None
-    hammerhead_client_code: str | None = None
     time_diff_threshold_seconds: int | None = 30
     upload_password: str | None = None
     visible_table_columns: list[str] = dataclasses.field(

@@ -30,36 +30,36 @@ class HammerheadAuthError(RuntimeError):
     pass
 
 
-def get_current_access_token(config: Config) -> str:
-    if not (config.hammerhead_client_id and config.hammerhead_client_secret):
-        raise HammerheadAuthError("Hammerhead client_id/client_secret not configured.")
-
+def get_current_access_token() -> str:
     auth = get_hammerhead_auth()
 
+    if not (auth.client_id and auth.client_secret):
+        raise HammerheadAuthError("Hammerhead client_id/client_secret not configured.")
+
     if not auth.access_token or not auth.refresh_token or auth.expires_at is None:
-        if not config.hammerhead_client_code:
+        if not auth.client_code:
             raise HammerheadAuthError(
                 "Missing Hammerhead authorization code; reconnect on the settings page."
             )
         logger.info("Exchange Hammerhead authorization code for access token …")
-        _exchange_code_for_token(config, auth)
+        _exchange_code_for_token(auth)
 
     if auth.expires_at is None or auth.expires_at < datetime.datetime.now(datetime.UTC):
         logger.info("Refresh Hammerhead access token …")
-        _refresh_token(config, auth)
+        _refresh_token(auth)
 
     assert auth.access_token is not None
     return auth.access_token
 
 
-def _exchange_code_for_token(config: Config, auth: HammerheadAuth) -> None:
+def _exchange_code_for_token(auth: HammerheadAuth) -> None:
     response = requests.post(
         f"{HAMMERHEAD_API_BASE}/auth/oauth/token",
         data={
             "grant_type": "authorization_code",
-            "code": config.hammerhead_client_code,
-            "client_id": config.hammerhead_client_id,
-            "client_secret": config.hammerhead_client_secret,
+            "code": auth.client_code,
+            "client_id": auth.client_id,
+            "client_secret": auth.client_secret,
         },
         timeout=30,
     )
@@ -70,14 +70,14 @@ def _exchange_code_for_token(config: Config, auth: HammerheadAuth) -> None:
     _apply_token_response(auth, response.json())
 
 
-def _refresh_token(config: Config, auth: HammerheadAuth) -> None:
+def _refresh_token(auth: HammerheadAuth) -> None:
     response = requests.post(
         f"{HAMMERHEAD_API_BASE}/auth/oauth/token",
         data={
             "grant_type": "refresh_token",
             "refresh_token": auth.refresh_token,
-            "client_id": config.hammerhead_client_id,
-            "client_secret": config.hammerhead_client_secret,
+            "client_id": auth.client_id,
+            "client_secret": auth.client_secret,
         },
         timeout=30,
     )
@@ -124,7 +124,7 @@ def _try_import_hammerhead(
     hammerhead_begin: str | None,
     hammerhead_end: str | None,
 ) -> bool:
-    access_token = get_current_access_token(config)
+    access_token = get_current_access_token()
     auth = get_hammerhead_auth()
     session = requests.Session()
     session.headers.update({"Authorization": f"Bearer {access_token}"})

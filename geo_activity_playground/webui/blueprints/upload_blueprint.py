@@ -13,7 +13,7 @@ from flask import (
 
 from ...core.activities import ActivityRepository
 from ...core.config import Config
-from ...core.datamodel import DB, Activity, Segment
+from ...core.datamodel import DB, Activity, HammerheadAuth, Segment
 from ...core.segments import find_matches
 from ...explorer.tile_visits import (
     compute_tile_evolution,
@@ -126,7 +126,8 @@ def scan_for_activities(
         import_from_strava_checkout(config)
     if config.strava_client_code and not skip_strava:
         import_from_strava_api(config, repository, strava_begin, strava_end)
-    if config.hammerhead_client_code and not skip_hammerhead:
+    hammerhead_auth = DB.session.scalar(sqlalchemy.select(HammerheadAuth).limit(1))
+    if hammerhead_auth and hammerhead_auth.client_code and not skip_hammerhead:
         import_from_hammerhead_api(
             config,
             repository,

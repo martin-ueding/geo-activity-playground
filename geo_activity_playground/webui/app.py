@@ -40,6 +40,7 @@ from ..core.datamodel import (
     Kind,
     Photo,
     Tag,
+    get_hammerhead_auth,
 )
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.heatmap_cache import (
@@ -148,6 +149,37 @@ def _migrate_null_activity_fields_to_unknown(config: Config) -> None:
             DEFAULT_UNKNOWN_NAME,
         )
     DB.session.commit()
+
+
+def _migrate_hammerhead_credentials_to_db() -> None:
+    config_path = pathlib.Path("config.json")
+    if not config_path.exists():
+        return
+    with open(config_path) as f:
+        raw = json.load(f)
+    old_fields = {
+        "hammerhead_client_id",
+        "hammerhead_client_secret",
+        "hammerhead_client_code",
+    }
+    if not any(k in raw for k in old_fields):
+        return
+    client_id: str | None = raw.get("hammerhead_client_id")
+    client_secret: str | None = raw.get("hammerhead_client_secret")
+    client_code: str | None = raw.get("hammerhead_client_code")
+    auth = get_hammerhead_auth()
+    if client_id and not auth.client_id:
+        auth.client_id = client_id
+    if client_secret and not auth.client_secret:
+        auth.client_secret = client_secret
+    if client_code and not auth.client_code:
+        auth.client_code = client_code
+    DB.session.commit()
+    for key in old_fields:
+        raw.pop(key, None)
+    with open(config_path, "w") as f:
+        json.dump(raw, f, ensure_ascii=False, indent=2, sort_keys=True)
+    logger.info("Migrated Hammerhead credentials from config.json to database.")
 
 
 def get_secret_key():
@@ -407,6 +439,10 @@ def web_ui_main(
     config_accessor = ConfigAccessor()
     import_old_config(config_accessor)
     import_old_strava_config(config_accessor)
+
+    # Migrate Hammerhead credentials from config.json to database
+    with app.app_context():
+        _migrate_hammerhead_credentials_to_db()
 
     # Migrate time series files to new UUID-based naming
     with app.app_context():

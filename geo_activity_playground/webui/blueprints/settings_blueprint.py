@@ -33,6 +33,7 @@ from ...core.datamodel import (
     ClusterMembership,
     Equipment,
     ExplorerTileBookmark,
+    HammerheadAuth,
     HeatmapTileCache,
     Kind,
     Photo,
@@ -45,6 +46,7 @@ from ...core.datamodel import (
     Tag,
     TileVisit,
     activity_tag_association_table,
+    get_hammerhead_auth,
     get_or_make_equipment,
     get_or_make_kind,
 )
@@ -299,7 +301,7 @@ def make_settings_blueprint(
     repository: ActivityRepository,
 ) -> Blueprint:
     strava_login_helper = StravaLoginHelper(config_accessor)
-    hammerhead_login_helper = HammerheadLoginHelper(config_accessor)
+    hammerhead_login_helper = HammerheadLoginHelper()
     blueprint = Blueprint("settings", __name__, template_folder="templates")
 
     @blueprint.route("/")
@@ -1224,20 +1226,19 @@ class StravaLoginHelper:
 
 
 class HammerheadLoginHelper:
-    def __init__(self, config_accessor: ConfigAccessor) -> None:
-        self._config_accessor = config_accessor
-
     def render_hammerhead(self) -> dict:
+        auth = DB.session.scalar(sqlalchemy.select(HammerheadAuth).limit(1))
         return {
-            "hammerhead_client_id": self._config_accessor().hammerhead_client_id,
-            "hammerhead_client_secret": self._config_accessor().hammerhead_client_secret,
-            "hammerhead_client_code": self._config_accessor().hammerhead_client_code,
+            "hammerhead_client_id": auth.client_id if auth else None,
+            "hammerhead_client_secret": auth.client_secret if auth else None,
+            "hammerhead_client_code": auth.client_code if auth else None,
         }
 
     def save_hammerhead(self, client_id: str, client_secret: str) -> str:
-        self._config_accessor().hammerhead_client_id = client_id
-        self._config_accessor().hammerhead_client_secret = client_secret
-        self._config_accessor.save()
+        auth = get_hammerhead_auth()
+        auth.client_id = client_id
+        auth.client_secret = client_secret
+        DB.session.commit()
 
         payload = {
             "client_id": client_id,
@@ -1252,8 +1253,9 @@ class HammerheadLoginHelper:
         return f"https://api.hammerhead.io/v1/auth/oauth/authorize?{arg_string}"
 
     def save_hammerhead_code(self, code: str) -> None:
-        self._config_accessor().hammerhead_client_code = code
-        self._config_accessor.save()
+        auth = get_hammerhead_auth()
+        auth.client_code = code
+        DB.session.commit()
         flash("Connected to Hammerhead API", category="success")
 
 
