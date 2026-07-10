@@ -21,6 +21,10 @@ Added:
 
 - Add a Markdown `description` field to activities, editable on the edit activity page and rendered on the activity detail page. ([GH-463](https://github.com/martin-ueding/geo-activity-playground/discussions/463))
 
+Changed:
+
+- Document the `/explorer/{zoom}/style.json` endpoint on the explorer server-side page and in "Using Maps as Overlays". ([GH-459](https://github.com/martin-ueding/geo-activity-playground/issues/459))
+
 Fixed:
 
 - Require `vl-convert-python>=1.9.0`. ([GH-460](https://github.com/martin-ueding/geo-activity-playground/issues/460))

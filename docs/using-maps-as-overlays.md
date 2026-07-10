@@ -48,3 +48,13 @@ Go to [Bikerouter](https://bikerouter.de) and then you can add these as overlay 
 ![](images/bikerouter-overlay-5.png)
 
 And now you can plan routes with your explorer tiles overlaid. Or add the heatmap. Or both.
+
+## Style JSON endpoint for MapLibre GL clients
+
+For applications that consume a [MapLibre GL style document](https://maplibre.org/maplibre-style-spec/) rather than a plain tile URL (e.g. [Wanderer](https://wanderer.to/)), GAP can generate one on the fly:
+
+```
+http://localhost:5000/explorer/{zoom}/style.json?color_strategy={strategy}
+```
+
+If `map_style_url` is set in `config.json`, that style is fetched and extended with a `gap-explorer-{zoom}-{strategy}` source and matching raster layer. Otherwise a minimal raster style is generated using the configured `map_tile_url` as the base layer. Both the style and the underlying explorer tile endpoints send `Access-Control-Allow-Origin: *`, so external browser-based map applications can fetch them directly.

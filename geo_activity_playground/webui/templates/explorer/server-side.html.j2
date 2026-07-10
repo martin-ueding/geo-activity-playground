@@ -163,6 +163,14 @@
 
 <code><pre class="tile-urls">/heatmap/tile/{z}/{x}/{y}.png</pre></code>
 
+<h2 class="mb-3">{{ _('Style JSON for MapLibre GL clients') }}</h2>
+
+<p>{{ _('Applications that consume a MapLibre GL style document rather than a plain tile URL (for example') }} <a href="https://wanderer.to/" target="_blank">Wanderer</a>) {{ _('can use this endpoint, which returns the explorer tiles injected as a raster source and layer:') }}</p>
+
+<code><pre class="tile-urls">/explorer/{{ zoom }}/style.json?color_strategy=colorful_cluster</pre></code>
+
+<p>{{ _('If') }} <code>map_style_url</code> {{ _('is set in') }} <code>config.json</code>, {{ _('that style is fetched and extended with the explorer tiles source and layer. Otherwise a minimal raster style is generated from the configured map tile URL. Both this endpoint and the explorer tile endpoints send an') }} <code>Access-Control-Allow-Origin: *</code> {{ _('header, so external browser-based map applications can fetch them directly.') }}</p>
+
 <script>
 // Prepend the current origin (protocol + host) to tile URLs
 // This ensures correct https:// when behind a reverse proxy
