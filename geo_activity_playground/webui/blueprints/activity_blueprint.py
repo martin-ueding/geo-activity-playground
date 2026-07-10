@@ -383,6 +383,7 @@ def make_activity_blueprint(
 
         if request.method == "POST":
             activity.name = request.form.get("name")
+            activity.description = request.form.get("description") or None
 
             previous_start = activity.start
             start_changed = False

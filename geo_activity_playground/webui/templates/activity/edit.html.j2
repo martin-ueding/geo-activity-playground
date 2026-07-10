@@ -11,6 +11,12 @@
     </div>
 
     <div class="mb-3">
+        <label for="description" class="form-label">{{ _('Description') }}</label>
+        <textarea class="form-control" id="description" name="description" rows="4">{{ activity.description or '' }}</textarea>
+        <div class="form-text">{{ _('Markdown is supported.') }}</div>
+    </div>
+
+    <div class="mb-3">
         <label for="start" class="form-label">{{ _('Start time') }}</label>
         <input type="datetime-local" step="1" class="form-control" id="start" name="start"
             value="{{ activity.start_local_tz.strftime('%Y-%m-%dT%H:%M:%S') if activity.start_local_tz else '' }}" />

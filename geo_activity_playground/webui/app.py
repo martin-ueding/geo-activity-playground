@@ -1,5 +1,6 @@
 import atexit
 import datetime
+import html
 import importlib
 import importlib.metadata
 import json
@@ -18,12 +19,14 @@ from collections.abc import Iterable
 from typing import Any, Literal
 from wsgiref.types import StartResponse, WSGIApplication, WSGIEnvironment
 
+import markdown
 import pandas as pd
 import sqlalchemy
 import waitress
 from flask import Flask, request
 from flask_alembic import Alembic
 from flask_babel import Babel
+from markupsafe import Markup
 
 from ..core.activities import ActivityRepository
 from ..core.config import (
@@ -326,6 +329,13 @@ def create_app(
     @app.template_filter()
     def isna(value):
         return pd.isna(value)
+
+    @app.template_filter()
+    def render_markdown(text: str | None) -> Markup:
+        if not text:
+            return Markup("")
+        escaped = html.escape(text, quote=False)
+        return Markup(markdown.markdown(escaped, extensions=["nl2br"]))
 
     # Register routes and blueprints
     register_entry_views(app, repository, config)

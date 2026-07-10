@@ -4,6 +4,9 @@
 <div class="row mb-3">
     <div class="col">
         <h1>{{ activity["name"] }}</h1>
+        {% if activity.description %}
+        <div class="text-body-secondary">{{ activity.description | render_markdown }}</div>
+        {% endif %}
     </div>
 </div>
 

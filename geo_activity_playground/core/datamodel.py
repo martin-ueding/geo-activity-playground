@@ -82,6 +82,7 @@ class Activity(DB.Model):
     # Housekeeping data:
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     distance_km: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
     time_series_uuid: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
