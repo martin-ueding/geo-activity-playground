@@ -931,7 +931,7 @@ requires-dist = [
     { name = "timezonefinder", specifier = ">=6.5.9" },
     { name = "tqdm", specifier = ">=4.64.0" },
     { name = "vegafusion", specifier = ">=2.0.3" },
-    { name = "vl-convert-python", specifier = ">=1.0.1" },
+    { name = "vl-convert-python", specifier = ">=1.9.0" },
     { name = "waitress", specifier = ">=3.0.2" },
     { name = "xmltodict", specifier = ">=0.13.0" },
 ]
