@@ -70,7 +70,34 @@ column_elevation = ColumnDescription(
     format=".0f",
 )
 
-TIME_SERIES_COLUMNS = [column_speed, column_elevation]
+column_heartrate = ColumnDescription(
+    name="heartrate",
+    display_name=_("Heart Rate"),
+    unit="bpm",
+    format=".0f",
+)
+
+column_cadence = ColumnDescription(
+    name="cadence",
+    display_name=_("Cadence"),
+    unit="",
+    format=".0f",
+)
+
+column_power = ColumnDescription(
+    name="power",
+    display_name=_("Power"),
+    unit="W",
+    format=".0f",
+)
+
+TIME_SERIES_COLUMNS = [
+    column_speed,
+    column_elevation,
+    column_heartrate,
+    column_cadence,
+    column_power,
+]
 
 column_duration = ColumnDescription(
     name="duration",

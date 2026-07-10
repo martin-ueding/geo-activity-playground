@@ -334,6 +334,7 @@
                     <option {% if name==line_color_column %} selected {% endif %} value="{{ name }}"
                         data-unit="{{ column.unit }}" data-format="{{ column.format }}">{{ column.display_name }}</option>
                     {% endfor %}
+                    <option value="">{{ _('None (solid color)') }}</option>
             </select>
         </div>
         {% endif %}

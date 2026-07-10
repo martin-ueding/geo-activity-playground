@@ -149,7 +149,9 @@ def make_activity_blueprint(
             )
 
         line_color_columns_avail = {
-            column.name: column for column in TIME_SERIES_COLUMNS
+            column.name: column
+            for column in TIME_SERIES_COLUMNS
+            if column.name in time_series.columns
         }
 
         context = {
