@@ -31,6 +31,7 @@ Changed:
 Fixed:
 
 - Require `vl-convert-python>=1.9.0`. ([GH-460](https://github.com/martin-ueding/geo-activity-playground/issues/460))
+- Fix `mkgmap` invocation for the Garmin IMG download so `--description` is passed as `--description=…` instead of a separate argument, which `mkgmap` was misinterpreting as an input file. ([GH-461](https://github.com/martin-ueding/geo-activity-playground/issues/461))
 
 ## Version 1.38.0 — 2026-07-06
 
