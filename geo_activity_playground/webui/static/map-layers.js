@@ -6,7 +6,7 @@
  * @param {number} config.zoom - Explorer tile zoom level
  * @param {string} config.attribution - Map tile attribution text
  * @param {string} [config.baseLayer='Grayscale'] - Default base layer name
- * @param {string} [config.overlay='Colorful Cluster'] - Default overlay name
+ * @param {string|null} [config.overlay='Colorful Cluster'] - Default overlay name, or null for no overlay
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
  * @param {number} config.squarePlanner.x - Square X coordinate
  * @param {number} config.squarePlanner.y - Square Y coordinate
@@ -150,15 +150,16 @@ export function add_layers_to_map(map, config) {
 
     // In square planner mode the active overlay must be deterministic and tied to URL
     // parameters; saved overlays can otherwise hide the planner layer.
+    const defaultOverlays = selectedOverlay ? [selectedOverlay] : [];
     let selectedOverlays;
     if (squarePlanner) {
         selectedOverlays = [selectedOverlay];
     } else if (saved.overlays && Array.isArray(saved.overlays)) {
         const savedOverlays = saved.overlays.filter(name => overlay_maps[name]);
-        selectedOverlays = savedOverlays.length > 0 ? savedOverlays : [selectedOverlay];
+        selectedOverlays = savedOverlays.length > 0 ? savedOverlays : defaultOverlays;
     } else {
-        // Fall back to default (single overlay as array)
-        selectedOverlays = [selectedOverlay];
+        // Fall back to default (single overlay as array, or none)
+        selectedOverlays = defaultOverlays;
     }
 
     base_maps[selectedBase].addTo(map);

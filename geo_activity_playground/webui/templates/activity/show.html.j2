@@ -113,14 +113,18 @@
         </div>
         {% endif %}
         <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
-        <script>
+        <script type="module">
+            import { add_layers_to_map } from '/static/map-layers.js';
+
             var map = L.map('activity-show-map', {
                 fullscreenControl: true
             });
-            L.tileLayer('/tile/pastel/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '{{ map_tile_attribution|safe }}'
-            }).addTo(map);
+            add_layers_to_map(map, {
+                zoom: {{ explorer_zoom_levels[0] }},
+                attribution: '{{ map_tile_attribution|safe }}',
+                baseLayer: 'Pastel',
+                overlay: null
+            });
 
             const trackGeojson = {{ color_line_geojson|safe }};
             const progressMarkerGeojson = {{ progress_marker_geojson|safe }};
