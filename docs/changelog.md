@@ -20,10 +20,13 @@ Types of changes
 Added:
 
 - Add a Markdown `description` field to activities, editable on the edit activity page and rendered on the activity detail page. ([GH-463](https://github.com/martin-ueding/geo-activity-playground/discussions/463))
+- Allow coloring the activity map line by heart rate, cadence or power (when available), plus a "None" option for a single solid color. ([GH-462](https://github.com/martin-ueding/geo-activity-playground/issues/462))
+- Add a "Map Display" setting to hide the progress marker pie charts on the activity map. ([GH-462](https://github.com/martin-ueding/geo-activity-playground/issues/462))
 
 Changed:
 
 - Document the `/explorer/{zoom}/style.json` endpoint on the explorer server-side page and in "Using Maps as Overlays". ([GH-459](https://github.com/martin-ueding/geo-activity-playground/issues/459))
+- Offer the same background map layer choices (Grayscale, Pastel, Color, Inverse Grayscale, Blank, hillshade, …) on the activity detail map as on the explorer and heatmap views. ([GH-462](https://github.com/martin-ueding/geo-activity-playground/issues/462))
 
 Fixed:
 
