@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a Markdown `description` field to activities, editable on the edit activity page and rendered on the activity detail page. ([GH-463](https://github.com/martin-ueding/geo-activity-playground/discussions/463))
+
 Fixed:
 
 - Require `vl-convert-python>=1.9.0`. ([GH-460](https://github.com/martin-ueding/geo-activity-playground/issues/460))
