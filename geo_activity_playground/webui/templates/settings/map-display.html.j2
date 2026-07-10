@@ -1,0 +1,18 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Map Display') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Map Display') }}</h1>
+
+<form method="POST">
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="show_progress_markers"
+            name="show_progress_markers" {{ 'checked' if show_progress_markers else '' }} />
+        <label class="form-check-label" for="show_progress_markers">{{ _('Show progress markers on the activity map') }}</label>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+</form>
+{% endblock %}

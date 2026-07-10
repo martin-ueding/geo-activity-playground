@@ -104,12 +104,14 @@
         {% endif %}
     </div>
     <div class="col-sm-12 col-md-8">
+        {% if show_progress_markers %}
         <div class="btn-group btn-group-sm mb-2" role="group" aria-label="{{ _('Progress marker mode') }}">
             <input type="radio" class="btn-check" name="marker-mode" id="marker-mode-distance" autocomplete="off" checked>
             <label class="btn btn-outline-secondary" for="marker-mode-distance">{{ _('Distance') }}</label>
             <input type="radio" class="btn-check" name="marker-mode" id="marker-mode-time" autocomplete="off">
             <label class="btn btn-outline-secondary" for="marker-mode-time">{{ _('Time') }}</label>
         </div>
+        {% endif %}
         <div id="activity-show-map" style="height: 500px;" class="mb-3"></div>
         <script>
             var map = L.map('activity-show-map', {
@@ -258,9 +260,12 @@
                 });
             }
 
+            {% if show_progress_markers %}
             let currentMarkerLayer = makeMarkerLayer(progressMarkerGeojson).addTo(map);
+            {% endif %}
             map.fitBounds(trackLayer.getBounds());
 
+            {% if show_progress_markers %}
             document.getElementById('marker-mode-distance').addEventListener('change', function () {
                 map.removeLayer(currentMarkerLayer);
                 currentMarkerLayer = makeMarkerLayer(progressMarkerGeojson).addTo(map);
@@ -269,6 +274,7 @@
                 map.removeLayer(currentMarkerLayer);
                 currentMarkerLayer = makeMarkerLayer(progressMarkerTimeGeojson).addTo(map);
             });
+            {% endif %}
 
             document.addEventListener('DOMContentLoaded', function () {
                 const lineColorColumnSelect = document.getElementById('line-color-column-select');

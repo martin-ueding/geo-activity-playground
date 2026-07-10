@@ -954,6 +954,22 @@ def make_settings_blueprint(
             ],
         )
 
+    @blueprint.route("/map-display", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def map_display():
+        if request.method == "POST":
+            config_accessor().show_progress_markers = (
+                request.form.get("show_progress_markers") == "on"
+            )
+            config_accessor.save()
+            flasher.flash_message(
+                _("Updated map display preferences."), FlashTypes.SUCCESS
+            )
+        return render_template(
+            "settings/map-display.html.j2",
+            show_progress_markers=config_accessor().show_progress_markers,
+        )
+
     @blueprint.route("/sharepic", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def sharepic():

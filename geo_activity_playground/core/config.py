@@ -45,6 +45,7 @@ class Config:
     )
     reliable_elevation_measurements: bool = True
     sharepic_suppressed_fields: list[str] = dataclasses.field(default_factory=list)
+    show_progress_markers: bool = True
     strava_client_id: int = 0
     strava_client_secret: str = ""
     strava_client_code: str | None = None

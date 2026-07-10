@@ -170,6 +170,7 @@ def make_activity_blueprint(
             "new_tiles": new_tiles_per_zoom,
             "new_tiles_geojson": new_tiles_geojson,
             "cluster_diff_geojson_urls": cluster_diff_geojson_urls,
+            "show_progress_markers": config.show_progress_markers,
         }
 
         display_time_series = time_series.copy()
