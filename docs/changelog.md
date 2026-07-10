@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Require `vl-convert-python>=1.9.0`. ([GH-460](https://github.com/martin-ueding/geo-activity-playground/issues/460))
 
 ## Version 1.38.0 — 2026-07-06
 
