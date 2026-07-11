@@ -1254,11 +1254,12 @@ class HammerheadLoginHelper:
         auth = get_hammerhead_auth()
         auth.client_id = client_id
         auth.client_secret = client_secret
+        auth.redirect_uri = url_for(".hammerhead_callback", _external=True)
         DB.session.commit()
 
         payload = {
             "client_id": client_id,
-            "redirect_uri": url_for(".hammerhead_callback", _external=True),
+            "redirect_uri": auth.redirect_uri,
             "response_type": "code",
             "scope": "activity:read",
         }

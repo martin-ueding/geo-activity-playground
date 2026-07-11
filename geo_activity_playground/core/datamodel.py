@@ -977,6 +977,7 @@ class HammerheadAuth(DB.Model):
     client_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     client_secret: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     client_code: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    redirect_uri: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     access_token: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     refresh_token: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     expires_at: Mapped[datetime.datetime | None] = mapped_column(

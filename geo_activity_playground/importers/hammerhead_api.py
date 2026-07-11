@@ -60,6 +60,7 @@ def _exchange_code_for_token(auth: HammerheadAuth) -> None:
             "code": auth.client_code,
             "client_id": auth.client_id,
             "client_secret": auth.client_secret,
+            "redirect_uri": auth.redirect_uri,
         },
         timeout=30,
     )
