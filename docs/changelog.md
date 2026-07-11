@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Send `redirect_uri` in the Hammerhead OAuth token exchange, matching the value used in the authorization request; the Hammerhead API rejected the exchange without it. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 ## Version 1.39.0 — 2026-07-10
 
