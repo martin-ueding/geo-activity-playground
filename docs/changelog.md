@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Exchange the Hammerhead OAuth authorization code for an access token immediately after the callback, instead of waiting for the next activity scan; the code expires quickly, so deferring the exchange caused a persistent `invalid_auth_request` error. Also add the `state` parameter to the authorization request for CSRF protection, as required by the Hammerhead API. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 ## Version 1.39.2 — 2026-07-11
 
