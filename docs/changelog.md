@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Pass `--transparent` to `mkgmap` so the explorer tile overlay in the generated Garmin map no longer hides the underlying base map on the device. ([GH-461](https://github.com/martin-ueding/geo-activity-playground/issues/461))
 
 ## Version 1.39.1 — 2026-07-11
 
