@@ -20,7 +20,13 @@ def build_garmin_img(osm_xml: str, name: str) -> bytes:
         osm_path.write_text(osm_xml, encoding="utf-8")
         try:
             subprocess.run(
-                ["mkgmap", "--gmapsupp", f"--description={name}", str(osm_path)],
+                [
+                    "mkgmap",
+                    "--gmapsupp",
+                    "--transparent",
+                    f"--description={name}",
+                    str(osm_path),
+                ],
                 cwd=tmp_path,
                 check=True,
                 capture_output=True,
