@@ -3,6 +3,7 @@ import json
 import logging
 import pathlib
 import re
+import secrets
 import shutil
 import tempfile
 import urllib.parse
@@ -17,6 +18,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask_babel import gettext as _
@@ -65,6 +67,11 @@ from ...importers.activity_parsers import (
     read_activity,
 )
 from ...importers.directory import get_metadata_from_path
+from ...importers.hammerhead_api import (
+    HAMMERHEAD_OAUTH_SCOPE,
+    HammerheadAuthError,
+    exchange_code_for_token,
+)
 from ...importers.strava_api import refresh_activity_names_from_strava
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TOGGLEABLE_TABLE_COLUMNS
@@ -1065,6 +1072,14 @@ def make_settings_blueprint(
     def hammerhead_callback():
         code = request.args.get("code", type=str)
         assert code
+        state = request.args.get("state", type=str)
+        expected_state = session.pop("hammerhead_oauth_state", None)
+        if not expected_state or state != expected_state:
+            flash(
+                _("Hammerhead authorization failed: invalid or missing state."),
+                category="danger",
+            )
+            return redirect(url_for(".hammerhead"))
         hammerhead_login_helper.save_hammerhead_code(code)
         return redirect(url_for(".hammerhead"))
 
@@ -1257,11 +1272,15 @@ class HammerheadLoginHelper:
         auth.redirect_uri = url_for(".hammerhead_callback", _external=True)
         DB.session.commit()
 
+        state = secrets.token_urlsafe(32)
+        session["hammerhead_oauth_state"] = state
+
         payload = {
             "client_id": client_id,
             "redirect_uri": auth.redirect_uri,
             "response_type": "code",
-            "scope": "activity:read",
+            "scope": HAMMERHEAD_OAUTH_SCOPE,
+            "state": state,
         }
 
         arg_string = "&".join(
@@ -1273,7 +1292,15 @@ class HammerheadLoginHelper:
         auth = get_hammerhead_auth()
         auth.client_code = code
         DB.session.commit()
-        flash("Connected to Hammerhead API", category="success")
+        try:
+            exchange_code_for_token(auth)
+        except HammerheadAuthError as e:
+            flash(
+                _("Could not connect to Hammerhead API: %(error)s", error=str(e)),
+                category="danger",
+            )
+            return
+        flash(_("Connected to Hammerhead API"), category="success")
 
 
 def save_privacy_zones(

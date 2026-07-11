@@ -42,7 +42,7 @@ def get_current_access_token() -> str:
                 "Missing Hammerhead authorization code; reconnect on the settings page."
             )
         logger.info("Exchange Hammerhead authorization code for access token …")
-        _exchange_code_for_token(auth)
+        exchange_code_for_token(auth)
 
     if auth.expires_at is None or auth.expires_at < datetime.datetime.now(datetime.UTC):
         logger.info("Refresh Hammerhead access token …")
@@ -52,7 +52,7 @@ def get_current_access_token() -> str:
     return auth.access_token
 
 
-def _exchange_code_for_token(auth: HammerheadAuth) -> None:
+def exchange_code_for_token(auth: HammerheadAuth) -> None:
     response = requests.post(
         f"{HAMMERHEAD_API_BASE}/auth/oauth/token",
         data={
