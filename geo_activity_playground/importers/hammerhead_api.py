@@ -44,7 +44,9 @@ def get_current_access_token() -> str:
         logger.info("Exchange Hammerhead authorization code for access token …")
         exchange_code_for_token(auth)
 
-    if auth.expires_at is None or auth.expires_at < datetime.datetime.now(datetime.UTC):
+    if auth.expires_at is None or auth.expires_at < datetime.datetime.now(
+        datetime.UTC
+    ).replace(tzinfo=None):
         logger.info("Refresh Hammerhead access token …")
         _refresh_token(auth)
 
@@ -93,9 +95,9 @@ def _apply_token_response(auth: HammerheadAuth, payload: dict) -> None:
     expires_in = int(payload.get("expires_in", 3600))
     auth.access_token = payload["access_token"]
     auth.refresh_token = payload["refresh_token"]
-    auth.expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
-        seconds=expires_in - 60
-    )
+    auth.expires_at = datetime.datetime.now(datetime.UTC).replace(
+        tzinfo=None
+    ) + datetime.timedelta(seconds=expires_in - 60)
     DB.session.commit()
 
 
