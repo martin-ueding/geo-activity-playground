@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Fix timezone mismatch when checking whether the Hammerhead access token has expired: SQLite strips timezone info from stored datetimes, so comparing a naive `expires_at` read from the database with a timezone-aware `datetime.now(UTC)` raised a `TypeError`. Both the stored value and the comparison now use naive UTC. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 ## Version 1.39.3 — 2026-07-11
 
