@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Return a proper response from the shutdown endpoint when running with multiple worker processes, instead of falling off the end of the view function and raising a `TypeError`. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
 
 ## Version 1.39.4 — 2026-07-13
 
