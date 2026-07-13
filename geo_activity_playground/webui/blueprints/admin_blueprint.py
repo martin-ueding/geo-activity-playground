@@ -24,6 +24,7 @@ def make_admin_blueprint(
             # worker and the master would respawn a replacement. Signal the
             # master (our parent process) instead, which stops all workers.
             os.kill(os.getppid(), signal.SIGTERM)
+            return "", 204
         else:
             os._exit(0)
 
