@@ -24,6 +24,13 @@
             <span class="badge text-bg-secondary">Not connected</span>
             {% endif %}
         </p>
+
+        {% if strava_client_code %}
+        <form action="{{ url_for('settings.strava_disconnect') }}" method="POST"
+            onsubmit="return confirm('Are you sure you want to disconnect from Strava? You will need to re-authorize to sync activities again.');">
+            <button type="submit" class="btn btn-outline-danger">Disconnect from Strava</button>
+        </form>
+        {% endif %}
     </div>
 
     <div class="col-lg-6">

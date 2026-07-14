@@ -55,6 +55,7 @@ from ...core.datamodel import (
 from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.heatmap_cache import delete_all_heatmap_cache, delete_stale_heatmap_cache
+from ...core.paths import strava_api_dir
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
 from ...explorer.tile_visits import (
     _reset_tile_visits_db,
@@ -1054,6 +1055,12 @@ def make_settings_blueprint(
         strava_login_helper.save_strava_code(code)
         return redirect(url_for(".strava"))
 
+    @blueprint.route("/strava-disconnect", methods=["POST"])
+    @needs_authentication(authenticator)
+    def strava_disconnect():
+        strava_login_helper.disconnect_strava()
+        return redirect(url_for(".strava"))
+
     @blueprint.route("/hammerhead", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def hammerhead():
@@ -1081,6 +1088,12 @@ def make_settings_blueprint(
             )
             return redirect(url_for(".hammerhead"))
         hammerhead_login_helper.save_hammerhead_code(code)
+        return redirect(url_for(".hammerhead"))
+
+    @blueprint.route("/hammerhead-disconnect", methods=["POST"])
+    @needs_authentication(authenticator)
+    def hammerhead_disconnect():
+        hammerhead_login_helper.disconnect_hammerhead()
         return redirect(url_for(".hammerhead"))
 
     @blueprint.route("/tags")
@@ -1255,6 +1268,12 @@ class StravaLoginHelper:
         self._config_accessor.save()
         flash("Connected to Strava API", category="success")
 
+    def disconnect_strava(self) -> None:
+        self._config_accessor().strava_client_code = None
+        self._config_accessor.save()
+        (strava_api_dir() / "strava_tokens.json").unlink(missing_ok=True)
+        flash(_("Disconnected from Strava API"), category="success")
+
 
 class HammerheadLoginHelper:
     def render_hammerhead(self) -> dict:
@@ -1301,6 +1320,15 @@ class HammerheadLoginHelper:
             )
             return
         flash(_("Connected to Hammerhead API"), category="success")
+
+    def disconnect_hammerhead(self) -> None:
+        auth = get_hammerhead_auth()
+        auth.client_code = None
+        auth.access_token = None
+        auth.refresh_token = None
+        auth.expires_at = None
+        DB.session.commit()
+        flash(_("Disconnected from Hammerhead API"), category="success")
 
 
 def save_privacy_zones(

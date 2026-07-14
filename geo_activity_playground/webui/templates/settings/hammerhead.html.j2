@@ -29,6 +29,13 @@
             <span class="badge text-bg-secondary">{{ _('Not connected') }}</span>
             {% endif %}
         </p>
+
+        {% if hammerhead_client_code %}
+        <form action="{{ url_for('settings.hammerhead_disconnect') }}" method="POST"
+            onsubmit="return confirm('{{ _('Are you sure you want to disconnect from Hammerhead? You will need to re-authorize to sync activities again.') }}');">
+            <button type="submit" class="btn btn-outline-danger">{{ _('Disconnect from Hammerhead') }}</button>
+        </form>
+        {% endif %}
     </div>
 
     <div class="col-lg-6">
