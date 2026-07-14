@@ -19,7 +19,7 @@ Types of changes
 
 Added:
 
-- Add a "Disconnect" button to the Strava and Hammerhead settings pages. Disconnecting clears the stored authorization code and access/refresh tokens (Strava's cached token file, respectively the Hammerhead auth row's token fields), while keeping the client ID/secret so reconnecting doesn't require re-entering the developer app credentials.
+- Add a "Disconnect" button to the Strava and Hammerhead settings pages. Disconnecting clears the stored authorization code and access/refresh tokens (Strava's cached token file, respectively the Hammerhead auth row's token fields), while keeping the client ID/secret so reconnecting doesn't require re-entering the developer app credentials. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/issues/440))
 
 Fixed:
 
