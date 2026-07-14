@@ -4,14 +4,18 @@
 <h1>{{ _('Photo Map') }}</h1>
 
 <div id="photo-map" style="height: 800px;" class="mb-3"></div>
-<script>
+<script type="module">
+    import { add_layers_to_map } from '/static/map-layers.js';
+
     var map = L.map('photo-map', {
         fullscreenControl: true
     });
-    L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '{{ map_tile_attribution|safe }}'
-    }).addTo(map);
+    add_layers_to_map(map, {
+        zoom: {{ explorer_zoom_levels[0] }},
+        attribution: '{{ map_tile_attribution|safe }}',
+        baseLayer: 'Color',
+        overlay: null
+    });
 
     fetch("{{ url_for('photo.map_for_all') }}")
         .then(function (response) {
