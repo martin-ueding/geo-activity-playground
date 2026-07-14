@@ -21,6 +21,10 @@ Added:
 
 - Add a "Disconnect" button to the Strava and Hammerhead settings pages. Disconnecting clears the stored authorization code and access/refresh tokens (Strava's cached token file, respectively the Hammerhead auth row's token fields), while keeping the client ID/secret so reconnecting doesn't require re-entering the developer app credentials. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/issues/440))
 
+Changed:
+
+- Reload the configuration from `config.json` when the file changes on disk, based on its modification time. In multi-process mode each worker now picks up settings changes made by another worker without a restart. The web UI blueprints and the `Authenticator` and `HeartRateZoneComputer` services now resolve the configuration through the accessor on each use instead of capturing a snapshot at startup.
+
 Fixed:
 
 - Return a proper response from the shutdown endpoint when running with multiple worker processes, instead of falling off the end of the view function and raising a `TypeError`. ([GH-440](https://github.com/martin-ueding/geo-activity-playground/discussions/440))
