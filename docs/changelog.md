@@ -24,6 +24,7 @@ Added:
 Changed:
 
 - Reload the configuration from `config.json` when the file changes on disk, based on its modification time. In multi-process mode each worker now picks up settings changes made by another worker without a restart. The web UI blueprints and the `Authenticator` and `HeartRateZoneComputer` services now resolve the configuration through the accessor on each use instead of capturing a snapshot at startup.
+- Align all maps (home, day, activity name, activity lines, photo, search, segments, hall of fame, privacy zones) with the explorer and heatmap views so they offer the same selectable base and overlay layers instead of a single hardcoded background. ([GH-464](https://github.com/martin-ueding/geo-activity-playground/issues/464))
 
 Fixed:
 

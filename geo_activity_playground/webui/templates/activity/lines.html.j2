@@ -11,7 +11,9 @@
 <div class="row mb-3">
     <div class="col-md-12">
         <div id="activity-lines-map" style="height: 500px;"></div>
-        <script>
+        <script type="module">
+            import { add_layers_to_map } from '/static/map-layers.js';
+
             function onEachFeature(feature, layer) {
                 layer.bindPopup(`<a href=/activity/${feature.properties.activity_id}>${feature.properties.activity_name}</a>`)
             }
@@ -19,10 +21,12 @@
             var map = L.map('activity-lines-map', {
                 fullscreenControl: true
             });
-            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '{{ map_tile_attribution|safe }}'
-            }).addTo(map);
+            add_layers_to_map(map, {
+                zoom: {{ explorer_zoom_levels[0] }},
+                attribution: '{{ map_tile_attribution|safe }}',
+                baseLayer: 'Grayscale',
+                overlay: null
+            });
 
             let geojson = L.geoJSON({{ geojson| safe }}, {
                 style: function (feature) { return { color: feature.properties.color } },

@@ -501,11 +501,6 @@
 
         const map = L.map(container, { fullscreenControl: true });
 
-        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution
-        }).addTo(map);
-
         // Add new tiles layer (orange outline)
         const tilesLayer = L.geoJSON(tilesGeojson, {
             style: { color: "#ff7700", fillOpacity: 0.0 }

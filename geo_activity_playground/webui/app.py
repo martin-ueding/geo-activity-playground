@@ -394,6 +394,8 @@ def create_app(
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor().map_tile_attribution,
             "request_url": urllib.parse.quote_plus(request.url),
+            "explorer_zoom_levels": sorted(config_accessor().explorer_zoom_levels)
+            or [14],
         }
         variables["equipments_avail"] = DB.session.scalars(
             sqlalchemy.select(Equipment).order_by(Equipment.name)

@@ -4,20 +4,26 @@
 <h1>{{ _('Segments') }}</h1>
 
 
-<script>
+<script type="module">
+    import { add_layers_to_map } from '/static/map-layers.js';
+
     function add_map(id, geojson) {
         let map = L.map(id, {
             fullscreenControl: true
         })
-        L.tileLayer('/tile/color/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '{{ map_tile_attribution|safe }}'
-        }).addTo(map)
+        add_layers_to_map(map, {
+            zoom: {{ explorer_zoom_levels[0] }},
+            attribution: '{{ map_tile_attribution|safe }}',
+            baseLayer: 'Color',
+            overlay: null
+        })
 
         let geojson_layer = L.geoJSON(geojson).addTo(map)
         map.fitBounds(geojson_layer.getBounds())
         return map
     }
+
+    window.add_map = add_map;
 </script>
 
 <div class="row row-cols-1 row-cols-lg-3 g-4 mb-3">
