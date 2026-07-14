@@ -10,7 +10,7 @@ from flask.typing import ResponseReturnValue
 from matplotlib import colormaps
 from matplotlib.colors import to_hex
 
-from ...core.config import Config
+from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, StoredSearchQuery
 from ...core.heatmap_cache import delete_heatmap_cache_for_query
 from ...core.meta_search import (
@@ -25,9 +25,10 @@ from ...core.meta_search import (
 from ..authenticator import Authenticator, needs_authentication
 
 
-def make_search_blueprint(authenticator: Authenticator, config: Config) -> Blueprint:
+def make_search_blueprint(
+    authenticator: Authenticator, config_accessor: ConfigAccessor
+) -> Blueprint:
     blueprint = Blueprint("search", __name__, template_folder="templates")
-    per_page = config.search_map_tiles_per_page
     aggregate_map_activity_cap = 100
     aggregate_map_max_lines = 100
 
@@ -77,6 +78,7 @@ def make_search_blueprint(authenticator: Authenticator, config: Config) -> Bluep
     @blueprint.route("/map")
     def map_view():
         primitives = parse_search_params(request.args)
+        per_page = config_accessor().search_map_tiles_per_page
         page = max(1, int(request.args.get("page", 1)))
 
         if authenticator.is_authenticated():

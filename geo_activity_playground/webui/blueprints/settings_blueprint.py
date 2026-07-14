@@ -799,7 +799,7 @@ def make_settings_blueprint(
             "heart_rate_maximum": config_accessor().heart_rate_maximum,
         }
 
-        heart_rate_computer = HeartRateZoneComputer(config_accessor())
+        heart_rate_computer = HeartRateZoneComputer(config_accessor)
         try:
             context["zone_boundaries"] = heart_rate_computer.zone_boundaries()
         except RuntimeError:

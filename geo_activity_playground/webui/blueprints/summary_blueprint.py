@@ -7,7 +7,7 @@ from flask import Blueprint, render_template, request
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config
+from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, PlotSpec
 from ...core.meta_search import (
     apply_search_filter,
@@ -174,7 +174,7 @@ def _filter_past_year(df: pd.DataFrame) -> pd.DataFrame:
 
 def make_summary_blueprint(
     repository: ActivityRepository,
-    config: Config,
+    config_accessor: ConfigAccessor,
     authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("summary", __name__, template_folder="templates")

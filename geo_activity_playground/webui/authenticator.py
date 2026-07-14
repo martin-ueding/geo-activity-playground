@@ -4,20 +4,20 @@ from collections.abc import Callable
 from flask import flash, redirect, request, session, url_for
 from flask.typing import RouteCallable
 
-from ..core.config import Config
+from ..core.config import ConfigAccessor
 
 
 class Authenticator:
-    def __init__(self, config: Config) -> None:
-        self._config = config
+    def __init__(self, config_accessor: ConfigAccessor) -> None:
+        self._config_accessor = config_accessor
 
     def is_authenticated(self) -> bool:
-        return not self._config.upload_password or session.get(
+        return not self._config_accessor().upload_password or session.get(
             "is_authenticated", False
         )
 
     def authenticate(self, password: str) -> None:
-        if password == self._config.upload_password:
+        if password == self._config_accessor().upload_password:
             session["is_authenticated"] = True
             session.permanent = True
             flash("Login successful.", category="success")

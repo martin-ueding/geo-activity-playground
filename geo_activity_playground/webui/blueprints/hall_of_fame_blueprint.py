@@ -5,7 +5,7 @@ import pandas as pd
 from flask import Blueprint, render_template, request
 
 from ...core.activities import ActivityRepository, make_geojson_from_time_series
-from ...core.config import Config
+from ...core.config import ConfigAccessor
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -21,12 +21,13 @@ logger = logging.getLogger(__name__)
 def make_hall_of_fame_blueprint(
     repository: ActivityRepository,
     authenticator: Authenticator,
-    config: Config,
+    config_accessor: ConfigAccessor,
 ) -> Blueprint:
     blueprint = Blueprint("hall_of_fame", __name__, template_folder="templates")
 
     @blueprint.route("/")
     def index() -> str:
+        config = config_accessor()
         primitives = parse_search_params(request.args)
 
         if authenticator.is_authenticated():

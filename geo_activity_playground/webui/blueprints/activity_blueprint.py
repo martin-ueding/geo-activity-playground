@@ -32,7 +32,7 @@ from ...core.activities import (
     make_geojson_progress_markers_from_time_series,
     make_geojson_progress_markers_time_based,
 )
-from ...core.config import Config
+from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
@@ -67,7 +67,7 @@ logger = logging.getLogger(__name__)
 def make_activity_blueprint(
     repository: ActivityRepository,
     authenticator: Authenticator,
-    config: Config,
+    config_accessor: ConfigAccessor,
     heart_rate_zone_computer: HeartRateZoneComputer,
 ) -> Blueprint:
     blueprint = Blueprint("activity", __name__, template_folder="templates")
@@ -108,6 +108,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/<int:id>")
     def show(id: str) -> ResponseReturnValue:
+        config = config_accessor()
         activity = repository.get_activity_by_id(id)
 
         time_series = repository.get_time_series(id)
@@ -238,11 +239,12 @@ def make_activity_blueprint(
     def geojson_line(id: int) -> ResponseReturnValue:
         return make_geojson_from_time_series(
             DB.session.get_one(Activity, id).time_series,
-            config.eighth_marker_min_distance_km,
+            config_accessor().eighth_marker_min_distance_km,
         )
 
     @blueprint.route("/<int:id>/sharepic.png")
     def sharepic(id: int) -> ResponseReturnValue:
+        config = config_accessor()
         activity = repository.get_activity_by_id(id)
         time_series = repository.get_time_series(id)
         for coordinates in config.privacy_zones.values():
@@ -310,6 +312,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/day-sharepic/<int:year>/<int:month>/<int:day>/sharepic.png")
     def day_sharepic(year: int, month: int, day: int) -> ResponseReturnValue:
+        config = config_accessor()
         meta = repository.meta
         selection = meta["start_local"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
@@ -378,6 +381,7 @@ def make_activity_blueprint(
     @blueprint.route("/edit/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def edit(id: str) -> ResponseReturnValue:
+        config = config_accessor()
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -438,6 +442,7 @@ def make_activity_blueprint(
     @blueprint.route("/trim/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def trim(id: str) -> ResponseReturnValue:
+        config = config_accessor()
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -510,6 +515,7 @@ def make_activity_blueprint(
     @blueprint.route("/<int:id>/reenrich", methods=["POST"])
     @needs_authentication(authenticator)
     def reenrich(id: int) -> ResponseReturnValue:
+        config = config_accessor()
         activity = DB.session.get(Activity, id)
         if activity is None:
             abort(404)

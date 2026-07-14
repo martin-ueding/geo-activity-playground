@@ -10,7 +10,7 @@ from flask import Blueprint, Response, render_template, request
 from PIL import Image, ImageDraw
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config
+from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import DB, StoredSearchQuery
 from ...core.heatmap_cache import blob_to_counts, get_tile_cache, write_tile_cache
 from ...core.meta_search import (
@@ -52,7 +52,7 @@ def _handle_db_lock(message: str) -> Generator[None, None, None]:
 
 def make_heatmap_blueprint(
     repository: ActivityRepository,
-    config: Config,
+    config_accessor: ConfigAccessor,
     authenticator: Authenticator,
 ) -> Blueprint:
     blueprint = Blueprint("heatmap", __name__, template_folder="templates")
@@ -110,7 +110,7 @@ def make_heatmap_blueprint(
                 y,
                 z,
                 primitives,
-                config,
+                config_accessor(),
                 repository,
             ),
             format="png",
@@ -145,7 +145,7 @@ def make_heatmap_blueprint(
                     y,
                     tile_bounds.zoom,
                     primitives,
-                    config,
+                    config_accessor(),
                     repository,
                 )
 

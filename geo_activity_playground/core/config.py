@@ -75,20 +75,33 @@ _CONFIG_FIELDS = {f.name for f in dataclasses.fields(Config)}
 
 class ConfigAccessor:
     def __init__(self) -> None:
-        if new_config_file().exists():
-            with open(new_config_file()) as f:
-                data = json.load(f)
-            # Filter out unknown fields to handle old config files with obsolete fields
-            filtered_data = {k: v for k, v in data.items() if k in _CONFIG_FIELDS}
-            self._config = Config(**filtered_data)
-        else:
-            self._config = Config()
+        self._config = Config()
+        self._mtime_ns: int | None = None
+        self._reload_if_changed()
+
+    def _reload_if_changed(self) -> None:
+        path = new_config_file()
+        if not path.exists():
+            return
+        mtime_ns = path.stat().st_mtime_ns
+        if self._mtime_ns is not None and mtime_ns <= self._mtime_ns:
+            return
+        with open(path) as f:
+            data = json.load(f)
+        # Filter out unknown fields to handle old config files with obsolete fields
+        filtered_data = {k: v for k, v in data.items() if k in _CONFIG_FIELDS}
+        # Reassign (atomic under the GIL) so an in-flight request keeps a
+        # consistent view while other processes' writes are picked up here.
+        self._config = Config(**filtered_data)
+        self._mtime_ns = mtime_ns
 
     def __call__(self) -> Config:
+        self._reload_if_changed()
         return self._config
 
     def save(self) -> None:
-        with open(new_config_file(), "w") as f:
+        path = new_config_file()
+        with open(path, "w") as f:
             json.dump(
                 dataclasses.asdict(self._config),
                 f,
@@ -96,6 +109,8 @@ class ConfigAccessor:
                 indent=2,
                 sort_keys=True,
             )
+        # Record our own write so we don't immediately reload it.
+        self._mtime_ns = path.stat().st_mtime_ns
 
 
 @functools.cache

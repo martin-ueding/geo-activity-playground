@@ -11,7 +11,7 @@ from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config
+from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, TileVisit
 from ...explorer.tile_visits import (
     get_cluster_tile_activations_df,
@@ -344,7 +344,7 @@ def _square_size_at(square_history: pd.DataFrame, checkpoints: pd.Series) -> pd.
 
 def make_calendar_blueprint(
     repository: ActivityRepository,
-    config: Config,
+    config_accessor: ConfigAccessor,
 ) -> Blueprint:
     blueprint = Blueprint("calendar", __name__, template_folder="templates")
 
@@ -467,7 +467,7 @@ def make_calendar_blueprint(
             return redirect(url_for(".wrap_year", year=years[-1]))
 
         period = meta.loc[meta["year"] == year].copy()
-        selected_zooms = sorted(set(config.explorer_zoom_levels))
+        selected_zooms = sorted(set(config_accessor().explorer_zoom_levels))
         primary_zoom = (
             14
             if 14 in selected_zooms
@@ -604,7 +604,7 @@ def make_calendar_blueprint(
                 zoom_stats=[],
             )
 
-        selected_zooms = sorted(set(config.explorer_zoom_levels))
+        selected_zooms = sorted(set(config_accessor().explorer_zoom_levels))
         primary_zoom = (
             14
             if 14 in selected_zooms

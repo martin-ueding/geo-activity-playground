@@ -349,7 +349,6 @@ def make_explorer_blueprint(
     config_accessor: ConfigAccessor,
     tile_getter: TileGetter,
     image_transforms: dict[str, ImageTransform],
-    config: Config,
 ) -> Blueprint:
     blueprint = Blueprint("explorer", __name__, template_folder="templates")
 
@@ -605,6 +604,7 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
+        config = config_accessor()
         square_x, square_y, square_size = get_explorer_square(zoom)
         evolution_state = SimpleNamespace(
             square_x=square_x, square_y=square_y, max_square_size=square_size

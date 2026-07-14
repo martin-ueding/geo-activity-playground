@@ -12,7 +12,7 @@ from flask import (
 )
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config
+from ...core.config import Config, ConfigAccessor
 from ...core.datamodel import DB, Activity, HammerheadAuth, Segment
 from ...core.segments import find_matches
 from ...explorer.tile_visits import (
@@ -30,7 +30,7 @@ from ..flasher import Flasher, FlashTypes
 
 def make_upload_blueprint(
     repository: ActivityRepository,
-    config: Config,
+    config_accessor: ConfigAccessor,
     authenticator: Authenticator,
     flasher: Flasher,
 ) -> Blueprint:
@@ -83,7 +83,7 @@ def make_upload_blueprint(
             file.save(target_path)
         scan_for_activities(
             repository,
-            config,
+            config_accessor(),
             skip_strava=True,
             skip_hammerhead=True,
         )
@@ -102,7 +102,7 @@ def make_upload_blueprint(
     @blueprint.route("/execute-reload")
     @needs_authentication(authenticator)
     def execute_reload():
-        scan_for_activities(repository, config)
+        scan_for_activities(repository, config_accessor())
         flash("Scanned for new activities.", category="success")
         return redirect(url_for("index"))
 

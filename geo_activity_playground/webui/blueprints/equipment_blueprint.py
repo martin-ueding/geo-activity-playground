@@ -5,18 +5,19 @@ from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config
+from ...core.config import ConfigAccessor
 from ...core.summary_stats import get_equipment_use_table
 from ..plot_util import make_kind_scale
 
 
 def make_equipment_blueprint(
-    repository: ActivityRepository, config: Config
+    repository: ActivityRepository, config_accessor: ConfigAccessor
 ) -> Blueprint:
     blueprint = Blueprint("equipment", __name__, template_folder="templates")
 
     @blueprint.route("/")
     def index() -> ResponseReturnValue:
+        config = config_accessor()
         equipment_summary = get_equipment_use_table(
             repository.meta, config.equipment_offsets
         )

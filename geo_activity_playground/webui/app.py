@@ -286,7 +286,7 @@ def create_app(
         import_legacy_heatmap_cache_from_filesystem()
         delete_small_heatmap_cache_entries(config.heatmap_cache_min_activities)
 
-    authenticator = Authenticator(config)
+    authenticator = Authenticator(config_accessor)
     tile_getter = TileGetter(config.map_tile_url)
     image_transforms = {
         "color": IdentityImageTransform(),
@@ -296,7 +296,7 @@ def create_app(
         "blank": BlankImageTransform(),
     }
     flasher = FlaskFlasher()
-    heart_rate_zone_computer = HeartRateZoneComputer(config)
+    heart_rate_zone_computer = HeartRateZoneComputer(config_accessor)
 
     # Register template filters
     @app.template_filter()
@@ -338,13 +338,13 @@ def create_app(
         return Markup(markdown.markdown(escaped, extensions=["nl2br"]))
 
     # Register routes and blueprints
-    register_entry_views(app, repository, config)
+    register_entry_views(app, repository, config_accessor)
 
     blueprints = {
         "/activity": make_activity_blueprint(
             repository,
             authenticator,
-            config,
+            config_accessor,
             heart_rate_zone_computer,
         ),
         "/admin": make_admin_blueprint(
@@ -352,19 +352,20 @@ def create_app(
         ),
         "/auth": make_auth_blueprint(authenticator),
         "/bubble-chart": make_bubble_chart_blueprint(repository),
-        "/calendar": make_calendar_blueprint(repository, config),
+        "/calendar": make_calendar_blueprint(repository, config_accessor),
         "/eddington": register_eddington_blueprint(repository, authenticator),
-        "/equipment": make_equipment_blueprint(repository, config),
+        "/equipment": make_equipment_blueprint(repository, config_accessor),
         "/explorer": make_explorer_blueprint(
             authenticator,
             config_accessor,
             tile_getter,
             image_transforms,
-            config,
         ),
         "/export": make_export_blueprint(authenticator),
-        "/hall-of-fame": make_hall_of_fame_blueprint(repository, authenticator, config),
-        "/heatmap": make_heatmap_blueprint(repository, config, authenticator),
+        "/hall-of-fame": make_hall_of_fame_blueprint(
+            repository, authenticator, config_accessor
+        ),
+        "/heatmap": make_heatmap_blueprint(repository, config_accessor, authenticator),
         "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
         "/plot-builder": make_plot_builder_blueprint(
             repository, flasher, authenticator
@@ -372,12 +373,14 @@ def create_app(
         "/settings": make_settings_blueprint(
             config_accessor, authenticator, flasher, repository
         ),
-        "/segments": make_segments_blueprint(authenticator, flasher, config),
+        "/segments": make_segments_blueprint(authenticator, flasher, config_accessor),
         "/square-planner": make_square_planner_blueprint(),
-        "/search": make_search_blueprint(authenticator, config),
-        "/summary": make_summary_blueprint(repository, config, authenticator),
+        "/search": make_search_blueprint(authenticator, config_accessor),
+        "/summary": make_summary_blueprint(repository, config_accessor, authenticator),
         "/tile": make_tile_blueprint(image_transforms, tile_getter),
-        "/upload": make_upload_blueprint(repository, config, authenticator, flasher),
+        "/upload": make_upload_blueprint(
+            repository, config_accessor, authenticator, flasher
+        ),
     }
 
     for url_prefix, blueprint in blueprints.items():
