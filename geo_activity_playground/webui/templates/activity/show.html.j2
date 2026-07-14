@@ -121,6 +121,7 @@
             });
             add_layers_to_map(map, {
                 zoom: {{ explorer_zoom_levels[0] }},
+                zoomLevels: {{ explorer_zoom_levels | tojson }},
                 attribution: '{{ map_tile_attribution|safe }}',
                 baseLayer: 'Pastel',
                 overlay: null

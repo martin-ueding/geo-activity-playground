@@ -23,6 +23,7 @@
 
             add_layers_to_map(map, {
                 zoom: 14,
+                zoomLevels: {{ explorer_zoom_levels | tojson }},
                 attribution: '{{ map_tile_attribution|safe }}',
                 baseLayer: 'Inverse Grayscale',
                 overlay: 'Heatmap',

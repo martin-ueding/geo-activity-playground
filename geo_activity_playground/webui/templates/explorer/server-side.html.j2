@@ -69,6 +69,7 @@
                 centerLatitude: {{ center.latitude }},
                 centerLongitude: {{ center.longitude }},
                 zoom: {{ zoom }},
+                zoomLevels: {{ explorer_zoom_levels | tojson }},
                 attribution: '{{ map_tile_attribution|safe }}',
                 bbox: {{ center.bbox | safe }}
             });

@@ -7,7 +7,8 @@ import { add_layers_to_map } from '/static/map-layers.js';
  * @param {string} config.elementId - ID of the map container element
  * @param {number} config.centerLatitude - Initial center latitude
  * @param {number} config.centerLongitude - Initial center longitude
- * @param {number} config.zoom - Explorer tile zoom level
+ * @param {number} config.zoom - Explorer tile zoom level of this page
+ * @param {number[]} [config.zoomLevels] - All enabled explorer zoom levels to offer in the layer control
  * @param {string} config.attribution - Map tile attribution
  * @param {Object} [config.bbox] - Initial bounding box as GeoJSON (optional)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
@@ -18,6 +19,7 @@ export function initExplorerMap(config) {
         centerLatitude,
         centerLongitude,
         zoom,
+        zoomLevels = [zoom],
         attribution,
         bbox = null,
         squarePlanner = null
@@ -31,6 +33,7 @@ export function initExplorerMap(config) {
 
     add_layers_to_map(map, {
         zoom,
+        zoomLevels,
         attribution,
         squarePlanner
     });
