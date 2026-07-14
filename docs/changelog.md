@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Align all maps (home, day, activity name, activity lines, photo, search, segments, hall of fame, privacy zones) with the explorer and heatmap views so they offer the same selectable base and overlay layers instead of a single hardcoded background. ([GH-464](https://github.com/martin-ueding/geo-activity-playground/issues/464))
+
 
 ## Version 1.39.4 — 2026-07-13
 
