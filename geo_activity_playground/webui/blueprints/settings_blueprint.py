@@ -931,7 +931,7 @@ def make_settings_blueprint(
             _reprocess_all_activities(
                 config_accessor(),
                 force=False,
-                use_raw_time_series=False,
+                use_raw_time_series=True,
                 desc="Recomputing segments",
             )
         return render_template(
