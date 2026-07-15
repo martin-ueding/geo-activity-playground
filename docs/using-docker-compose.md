@@ -42,7 +42,7 @@ docker compose up -d
 This will start the webserver on your local host: `http://127.0.0.1:5000/`.  
 If you want ot open GAP to your local network, use `"5000:5000"` in the `ports` section.  
 
-Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another host port e.g. `"127.0.0.1:8000:5000"`in the `ports` section.  
+Note that port 5000 may not be available on macOS because of AirPlay, so you can map to another host port e.g. `"127.0.0.1:8000:5000"` in the `ports` section.  
 Then you can open `http://127.0.0.1:8000/` in your browser.  
 
 ## Stopping the container
