@@ -20,7 +20,7 @@ On Android you can use the [OsmAnd](https://osmand.net/) app to display tracks a
 
 ![](images/explorer-osmand.jpg)
 
-Alternatively you can import the missing tiles map layer as online overlay map. For on-the-go you might want a VPN connection or use the map tile caching function of OsmAnd in your local network. You need to activate the 'Online maps' plugin. Add a new map online source under `Maps & Resources > Local > Map sources`. Use one of the [Explorer Tiles Tile URLs](using-maps-as-overlays.md) as URL and choose an expiry time, so OsmAnd pulls the newest state after a while. You can `Clear all tiles` to force an update of the map. To add the overlay to your map, `Configure map > Overlay map` and choose your new map source.
+Alternatively you can import the missing tiles map layer as online overlay map. For on-the-go you might want a VPN connection like [Using Docker Compose with Tailscale VPN](using-docker-compose-and-tailscale-vpn.md) or use the map tile caching function of OsmAnd in your local network. You need to activate the 'Online maps' plugin. Add a new map online source under `Maps & Resources > Local > Map sources`. Use one of the [Explorer Tiles Tile URLs](using-maps-as-overlays.md) as URL and choose an expiry time, so OsmAnd pulls the newest state after a while. You can `Clear all tiles` to force an update of the map. To add the overlay to your map, `Configure map > Overlay map` and choose your new map source.
 
 ![](images/OsmAnd_Explorer_Tile_Overlay.png)
 

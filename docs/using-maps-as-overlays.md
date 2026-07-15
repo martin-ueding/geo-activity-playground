@@ -58,3 +58,7 @@ http://localhost:5000/explorer/{zoom}/style.json?color_strategy={strategy}
 ```
 
 If `map_style_url` is set in `config.json`, that style is fetched and extended with a `gap-explorer-{zoom}-{strategy}` source and matching raster layer. Otherwise a minimal raster style is generated using the configured `map_tile_url` as the base layer. Both the style and the underlying explorer tile endpoints send `Access-Control-Allow-Origin: *`, so external browser-based map applications can fetch them directly.
+
+## Maps and Layers on-the-go
+
+You might concider using a VPN to get the latest version of your missing explorer tiles when you are on-the-go. One example is [Using Docker Compose with Tailscale VPN](using-docker-compose-and-tailscale-vpn.md).  
