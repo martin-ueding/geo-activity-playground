@@ -19,6 +19,7 @@ Types of changes
 
 Changed:
 
+- Document the OsmAnd online overlay map. ([GH-467](https://github.com/martin-ueding/geo-activity-playground/issues/467))
 - Offer the explorer overlays (cluster, visits, missing, …) for every enabled explorer zoom level in the map layer control, named `Explorer {zoom} {strategy}` so they cluster by zoom level, instead of only a single fixed zoom. On the explorer tile pages the overlay for the page's own zoom level stays selected by default, and the chosen overlay strategy is remembered across pages while following each page's zoom.
 
 
