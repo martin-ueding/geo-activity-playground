@@ -17,18 +17,17 @@ Types of changes
 
 ## Unreleased
 
-Fixed:
-
-- Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
-
 Changed:
 
 - Move all application settings from the `config.json` file into the database, split across domain-grouped tables (heart rate, Strava, activity import, UI, and map). Settings are seeded once from an existing `config.json` on the next start, after which the database is authoritative and the file can be deleted. Privacy zones now live in their own database table instead of the config file.
 
+Fixed:
+
+- Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
+
 Removed:
 
 - Drop the unused `num_processes` setting and the redundant `equipment_offsets` config seed (equipment offsets are edited directly on the equipment).
-
 
 ## Version 1.41.0 — 2026-07-15
 
