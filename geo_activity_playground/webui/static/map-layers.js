@@ -96,8 +96,9 @@ export function add_layers_to_map(map, config) {
     ];
     const explorerNames = new Set(explorerStrategies.map(s => s.name));
 
-    // Only suffix with the zoom level when there is more than one to disambiguate.
-    const labelFor = (name, z) => zoomLevels.length > 1 ? `${name} (z${z})` : name;
+    // Prefix with "Explorer {zoom}" when there is more than one zoom level, so that
+    // the entries cluster by zoom level in the layer control.
+    const labelFor = (name, z) => zoomLevels.length > 1 ? `Explorer ${z} ${name}` : name;
 
     const overlay_maps = {
         "Mapterhorn Hillshade": (L.gridLayer && L.gridLayer.relief)
@@ -152,7 +153,7 @@ export function add_layers_to_map(map, config) {
     // navigating between explorer pages always shows the strategy at the page's own
     // zoom rather than whichever zoom happened to be active when it was saved.
     const overlayBaseName = (label) => {
-        const m = label.match(/^(.*) \(z\d+\)$/);
+        const m = label.match(/^Explorer \d+ (.*)$/);
         return m ? m[1] : label;
     };
     const resolveSavedOverlay = (base) => explorerNames.has(base) ? labelFor(base, zoom) : base;
