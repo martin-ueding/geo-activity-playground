@@ -38,7 +38,7 @@ When you apply a [tag](https://tailscale.com/kb/1068/tags#generate-an-auth-key-w
 
 ## Compose stack with Tailscale configuration
 
-Like in the default [docker compose install](using-docker-compose.md) the compose project needs a directory, which includes the defining `compose.yaml` file. Additionaly a config directory is created for tailscale.  
+Like in the default [docker compose install](using-docker-compose.md) the compose project requires a directory, which includes the defining `compose.yaml` file. Additionaly a config directory is created for tailscale.  
 The [base directory](create-a-base-directory.md) can also be in this directory e.g., `/docker/geo-activity-playground/playground`. The location can be changed in the `compose.yaml`.  
 
 The geo-activity-playground service will be made available by using the [Tailscale Serve](https://tailscale.com/kb/1312/serve) functionality.
