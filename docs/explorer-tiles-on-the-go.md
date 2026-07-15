@@ -16,9 +16,7 @@ This is how that looks in the app:
 
 ## OsmAnd
 
-On Android you can use the [OsmAnd](https://osmand.net/) app to display tracks and visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/), so the missing tiles are also exported as a GPX file with one track per missing tile. This looks strange, but it works with OsmAnd. In GPXSee the file looks like this:
-
-![](images/explorer-sint-annaland-missing-gpx.png)
+On Android you can use the [OsmAnd](https://osmand.net/) app to display tracks and visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/), so the missing tiles are also exported as a GPX file with one track per missing tile. This looks strange, but it works with OsmAnd.
 
 And on OsmAnd such files look like this:
 
