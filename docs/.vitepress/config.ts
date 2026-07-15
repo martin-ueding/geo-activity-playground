@@ -36,7 +36,7 @@ export default {
         items: [
           { text: 'Start with Docker Run', link: '/docker-run' },
           { text: 'Using Docker Compose', link: '/using-docker-compose' },
-          { text: 'Docker Compose + Tailscale VPN', link: '/using-git-version-via-docker-compose-and-tailscale-vpn' },
+          { text: 'Docker Compose + Tailscale VPN', link: '/using-docker-compose-and-tailscale-vpn' },
         ],
       },
       {
