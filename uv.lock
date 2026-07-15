@@ -830,7 +830,7 @@ wheels = [
 
 [[package]]
 name = "geo-activity-playground"
-version = "1.40.0"
+version = "1.41.0"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
