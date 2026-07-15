@@ -35,7 +35,7 @@ export default {
         text: 'Docker Installation',
         items: [
           { text: 'Using Git Version via Docker', link: '/using-git-version-via-docker' },
-          { text: 'Using Git Version via Docker Compose', link: '/using-git-version-via-docker-compose' },
+          { text: 'Using Docker Compose', link: '/using-docker-compose' },
           { text: 'Docker Compose + Tailscale VPN', link: '/using-git-version-via-docker-compose-and-tailscale-vpn' },
         ],
       },
