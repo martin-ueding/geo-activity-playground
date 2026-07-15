@@ -17,6 +17,13 @@ from .time_conversion import get_timezone
 logger = logging.getLogger(__name__)
 
 
+def _clamp_index(index: int, length: int) -> int:
+    """Keep a positional index within a series of the given length."""
+    if index < 0:
+        return index
+    return min(index, length - 1)
+
+
 def enrichment_set_timezone(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -75,14 +82,22 @@ def enrichment_normalize_time(
         time_series["time"].iloc[0],
     )
 
-    new_start = some(time_series["time"].iloc[activity.index_begin or 0])
+    new_start = some(
+        time_series["time"].iloc[
+            _clamp_index(activity.index_begin or 0, len(time_series))
+        ]
+    )
     if new_start != activity.start:
         activity.start = new_start
         changed = True
 
     new_elapsed_time = some(
-        time_series["time"].iloc[activity.index_end or -1]
-        - time_series["time"].iloc[activity.index_begin or 0]
+        time_series["time"].iloc[
+            _clamp_index(activity.index_end or -1, len(time_series))
+        ]
+        - time_series["time"].iloc[
+            _clamp_index(activity.index_begin or 0, len(time_series))
+        ]
     )
     if new_elapsed_time != activity.elapsed_time:
         activity.elapsed_time = new_elapsed_time
@@ -168,8 +183,12 @@ def enrichment_elevation_gain(
         time_series["elevation_gain_cum"] = elevation_diff.cumsum().fillna(0)
 
         activity.elevation_gain = (
-            time_series["elevation_gain_cum"].iloc[activity.index_end or -1]
-            - time_series["elevation_gain_cum"].iloc[activity.index_begin or 0]
+            time_series["elevation_gain_cum"].iloc[
+                _clamp_index(activity.index_end or -1, len(time_series))
+            ]
+            - time_series["elevation_gain_cum"].iloc[
+                _clamp_index(activity.index_begin or 0, len(time_series))
+            ]
         )
         return True
     else:
@@ -184,8 +203,12 @@ def enrichment_add_calories(
 ) -> bool:
     if "calories" in time_series.columns and (activity.calories is None or force):
         activity.calories = (
-            time_series["calories"].iloc[activity.index_end or -1]
-            - time_series["calories"].iloc[activity.index_begin or 0]
+            time_series["calories"].iloc[
+                _clamp_index(activity.index_end or -1, len(time_series))
+            ]
+            - time_series["calories"].iloc[
+                _clamp_index(activity.index_begin or 0, len(time_series))
+            ]
         )
         return True
     else:
@@ -257,8 +280,12 @@ def enrichment_distance(
         changed = True
 
     new_distance_km = (
-        time_series["distance_km"].iloc[activity.index_end or -1]
-        - time_series["distance_km"].iloc[activity.index_begin or 0]
+        time_series["distance_km"].iloc[
+            _clamp_index(activity.index_end or -1, len(time_series))
+        ]
+        - time_series["distance_km"].iloc[
+            _clamp_index(activity.index_begin or 0, len(time_series))
+        ]
     )
     if new_distance_km != activity.distance_km:
         activity.distance_km = new_distance_km
@@ -299,13 +326,17 @@ def enrichment_copy_latlon(
 ) -> bool:
     if activity.start_latitude is None or force:
         activity.start_latitude = time_series["latitude"].iloc[
-            activity.index_begin or 0
+            _clamp_index(activity.index_begin or 0, len(time_series))
         ]
-        activity.end_latitude = time_series["latitude"].iloc[activity.index_end or -1]
+        activity.end_latitude = time_series["latitude"].iloc[
+            _clamp_index(activity.index_end or -1, len(time_series))
+        ]
         activity.start_longitude = time_series["longitude"].iloc[
-            activity.index_begin or 0
+            _clamp_index(activity.index_begin or 0, len(time_series))
         ]
-        activity.end_longitude = time_series["longitude"].iloc[activity.index_end or -1]
+        activity.end_longitude = time_series["longitude"].iloc[
+            _clamp_index(activity.index_end or -1, len(time_series))
+        ]
         return True
     else:
         return False
