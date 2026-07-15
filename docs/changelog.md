@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
+
 
 ## Version 1.41.0 — 2026-07-15
 
