@@ -99,7 +99,7 @@ volumes:
     driver: local
 ```
 
-# Downloading the image and running the container
+## Downloading the image and running the container
 
 ```bash
 cd /docker/geo-activity-playground
