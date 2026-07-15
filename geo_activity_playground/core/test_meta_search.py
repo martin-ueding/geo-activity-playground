@@ -1,4 +1,3 @@
-
 from werkzeug.datastructures import MultiDict
 
 from .meta_search import (
@@ -83,7 +82,7 @@ def test_primitives_to_jinja() -> None:
     assert jinja_dict["name"] == "Test"
     assert jinja_dict["kind"] == []  # Default value
     assert jinja_dict["tag_exclude"] == []  # Default value
-    assert jinja_dict["active"] == True
+    assert jinja_dict["active"]
 
 
 def test_primitives_to_jinja_tag_exclude() -> None:
@@ -97,4 +96,4 @@ def test_primitives_to_jinja_empty() -> None:
     jinja_dict = primitives_to_jinja(primitives)
     assert jinja_dict["equipment"] == []
     assert jinja_dict["name"] == ""
-    assert jinja_dict["active"] == False
+    assert not jinja_dict["active"]

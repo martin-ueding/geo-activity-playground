@@ -20,11 +20,23 @@ from .core.tiles import compute_tile_float
 
 
 def main_heatmap_video(options) -> None:
+    from .webui.app import create_app
+
     zoom: int = options.zoom
     print(options)
     video_size = options.video_width, options.video_height
     os.chdir(options.basedir)
 
+    database_path = pathlib.Path("database.sqlite")
+    app = create_app(
+        database_uri=f"sqlite:///{database_path.absolute()}",
+        run_migrations=False,
+    )
+    with app.app_context():
+        _render_heatmap_video(options, zoom, video_size)
+
+
+def _render_heatmap_video(options, zoom: int, video_size) -> None:
     repository = ActivityRepository()
     assert len(repository) > 0
     config_accessor = ConfigAccessor()
@@ -32,7 +44,7 @@ def main_heatmap_video(options) -> None:
     center_xy = compute_tile_float(options.latitude, options.longitude, zoom)
 
     tile_bounds = tile_bounds_around_center(center_xy, video_size, zoom)
-    background = map_image_from_tile_bounds(tile_bounds, config_accessor())
+    background = map_image_from_tile_bounds(tile_bounds, config_accessor.map())
 
     background = convert_to_grayscale(background)
     background = 1.0 - background  # invert colors
@@ -77,7 +89,7 @@ def main_heatmap_video(options) -> None:
         tile_counts = np.sqrt(running_counts) / 5
         tile_counts[tile_counts > 1.0] = 1.0
 
-        cmap = pl.get_cmap(config_accessor().color_scheme_for_heatmap)
+        cmap = pl.get_cmap(config_accessor.ui().color_scheme_for_heatmap)
         data_color = cmap(tile_counts)
         data_color[data_color == cmap(0.0)] = 0.0  # remove background color
 

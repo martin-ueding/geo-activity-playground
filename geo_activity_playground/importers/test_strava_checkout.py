@@ -1,4 +1,4 @@
-from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import ActivityImportConfig
 
 from .activity_parsers import ActivityParseError, NoGeoDataError
 from .strava_checkout import import_from_strava_checkout
@@ -26,8 +26,8 @@ def test_no_geo_data_errors_are_marked_done(monkeypatch, tmp_path) -> None:
         fake_read_activity,
     )
 
-    import_from_strava_checkout(Config())
-    import_from_strava_checkout(Config())
+    import_from_strava_checkout(ActivityImportConfig())
+    import_from_strava_checkout(ActivityImportConfig())
 
     assert calls == 1
 
@@ -54,7 +54,7 @@ def test_other_parse_errors_are_retried(monkeypatch, tmp_path) -> None:
         fake_read_activity,
     )
 
-    import_from_strava_checkout(Config())
-    import_from_strava_checkout(Config())
+    import_from_strava_checkout(ActivityImportConfig())
+    import_from_strava_checkout(ActivityImportConfig())
 
     assert calls == 2

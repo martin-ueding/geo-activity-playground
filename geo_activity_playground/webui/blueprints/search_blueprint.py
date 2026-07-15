@@ -78,7 +78,7 @@ def make_search_blueprint(
     @blueprint.route("/map")
     def map_view():
         primitives = parse_search_params(request.args)
-        per_page = config_accessor().search_map_tiles_per_page
+        per_page = config_accessor.ui().search_map_tiles_per_page
         page = max(1, int(request.args.get("page", 1)))
 
         if authenticator.is_authenticated():

@@ -8,11 +8,11 @@ import sqlalchemy
 from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
 from ..core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
     Activity,
+    ActivityImportConfig,
     get_or_make_equipment,
     get_or_make_kind,
 )
@@ -30,7 +30,7 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 
 def import_from_directory(
     repository: ActivityRepository,
-    config: Config,
+    config: ActivityImportConfig,
 ) -> None:
     activity_paths = [
         path
@@ -94,7 +94,7 @@ def import_from_directory(
 def import_from_file(
     path: pathlib.Path,
     repository: ActivityRepository,
-    config: Config,
+    config: ActivityImportConfig,
     i: int,
 ) -> None:
     logger.info(f"Importing {path} …")
@@ -125,12 +125,12 @@ def import_from_file(
     meta_from_path = get_metadata_from_path(path, config.metadata_extraction_regexes)
     activity.name = meta_from_path.get("name", activity.name)
     if "equipment" in meta_from_path:
-        activity.equipment = get_or_make_equipment(meta_from_path["equipment"], config)
+        activity.equipment = get_or_make_equipment(meta_from_path["equipment"])
     if "kind" in meta_from_path:
         activity.kind = get_or_make_kind(meta_from_path["kind"])
     if activity.equipment is None:
         activity.equipment = get_or_make_equipment(
-            meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME), config
+            meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME)
         )
     if activity.kind is None:
         activity.kind = get_or_make_kind(

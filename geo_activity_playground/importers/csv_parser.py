@@ -27,9 +27,9 @@ def parse_csv(text: str) -> list[list]:
         if line[0].startswith("#"):
             continue
         result.append(line)
-        assert len(line) == len(
-            result[0]
-        ), f"Expected {len(result[0])} columns at {index=}, got {len(line)} columns"
+        assert len(line) == len(result[0]), (
+            f"Expected {len(result[0])} columns at {index=}, got {len(line)} columns"
+        )
 
     return result
 

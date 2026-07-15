@@ -27,7 +27,7 @@ def make_hall_of_fame_blueprint(
 
     @blueprint.route("/")
     def index() -> str:
-        config = config_accessor()
+        config = config_accessor.ui()
         primitives = parse_search_params(request.args)
 
         if authenticator.is_authenticated():

@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 
 from . import enrichment
-from .config import Config
-from .datamodel import Activity
+from .datamodel import Activity, ActivityImportConfig
 
 
 def test_update_and_commit_skips_single_track_point(monkeypatch) -> None:
@@ -40,7 +39,7 @@ def test_update_and_commit_skips_single_track_point(monkeypatch) -> None:
         ]
     )
 
-    enrichment.update_and_commit(activity, time_series, Config())
+    enrichment.update_and_commit(activity, time_series, ActivityImportConfig())
 
     assert calls == []
 
@@ -65,7 +64,12 @@ def test_gps_spike_filtered_by_acceleration() -> None:
             "distance_km": [0.0, 0.004, 0.025, 0.046, 0.050],
         }
     )
-    enrichment.enrichment_distance(activity, time_series, Config(), force=False)
+    enrichment.enrichment_distance(
+        activity,
+        time_series,
+        ActivityImportConfig(time_diff_threshold_seconds=30),
+        force=False,
+    )
     assert not np.isnan(time_series.loc[2, "speed"]), (
         "Spike should be interpolated, not left as NaN"
     )
@@ -89,7 +93,12 @@ def test_sustained_high_speed_not_filtered() -> None:
             "distance_km": [0.0, 0.014, 0.036, 0.058, 0.080],
         }
     )
-    enrichment.enrichment_distance(activity, time_series, Config(), force=False)
+    enrichment.enrichment_distance(
+        activity,
+        time_series,
+        ActivityImportConfig(time_diff_threshold_seconds=30),
+        force=False,
+    )
     assert time_series.loc[4, "speed"] > 70.0, (
         "Sustained high speed should not be filtered"
     )

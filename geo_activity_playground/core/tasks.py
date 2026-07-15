@@ -88,9 +88,9 @@ class TransformVersion:
         with open(path) as f:
             self._actual_version = json.load(f)
 
-        assert (
-            self._actual_version <= self._code_version
-        ), "You attempt to use a more modern playground with an older code version, that is not supported."
+        assert self._actual_version <= self._code_version, (
+            "You attempt to use a more modern playground with an older code version, that is not supported."
+        )
 
     def outdated(self) -> bool:
         return self._actual_version < self._code_version

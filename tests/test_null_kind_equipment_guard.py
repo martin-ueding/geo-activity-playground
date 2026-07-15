@@ -1,6 +1,5 @@
 import sqlalchemy
 
-from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
@@ -17,7 +16,7 @@ def test_migration_replaces_null_kind_and_equipment(app):
         DB.session.add(activity)
         DB.session.commit()
 
-        _migrate_null_activity_fields_to_unknown(Config())
+        _migrate_null_activity_fields_to_unknown()
 
         reloaded = DB.session.get_one(Activity, 1)
         assert reloaded.kind is not None

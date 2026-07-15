@@ -32,13 +32,15 @@ from ...core.activities import (
     make_geojson_progress_markers_from_time_series,
     make_geojson_progress_markers_time_based,
 )
-from ...core.config import Config, ConfigAccessor
+from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
     Activity,
     Equipment,
     Kind,
+    MapConfig,
+    PrivacyZone,
     Tag,
     TileVisit,
     get_or_make_equipment,
@@ -46,7 +48,6 @@ from ...core.datamodel import (
 )
 from ...core.enrichment import update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
-from ...core.privacy_zones import PrivacyZone
 from ...core.raster_map import (
     OSM_MAX_ZOOM,
     OSM_TILE_SIZE,
@@ -108,7 +109,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/<int:id>")
     def show(id: str) -> ResponseReturnValue:
-        config = config_accessor()
+        config = config_accessor.ui()
         activity = repository.get_activity_by_id(id)
 
         time_series = repository.get_time_series(id)
@@ -238,22 +239,23 @@ def make_activity_blueprint(
     def geojson_line(id: int) -> ResponseReturnValue:
         return make_geojson_from_time_series(
             DB.session.get_one(Activity, id).time_series,
-            config_accessor().eighth_marker_min_distance_km,
+            config_accessor.ui().eighth_marker_min_distance_km,
         )
 
     @blueprint.route("/<int:id>/sharepic.png")
     def sharepic(id: int) -> ResponseReturnValue:
-        config = config_accessor()
         activity = repository.get_activity_by_id(id)
         time_series = repository.get_time_series(id)
-        for coordinates in config.privacy_zones.values():
-            privacy_zone = PrivacyZone(coordinates)
+        for privacy_zone in DB.session.scalars(sqlalchemy.select(PrivacyZone)).all():
             time_series = privacy_zone.filter_time_series(time_series)
         if len(time_series) == 0:
             time_series = repository.get_time_series(id)
         return Response(
             make_sharepic(
-                activity, time_series, config.sharepic_suppressed_fields, config
+                activity,
+                time_series,
+                config_accessor.ui().sharepic_suppressed_fields,
+                config_accessor.map(),
             ),
             mimetype="image/png",
         )
@@ -311,7 +313,7 @@ def make_activity_blueprint(
 
     @blueprint.route("/day-sharepic/<int:year>/<int:month>/<int:day>/sharepic.png")
     def day_sharepic(year: int, month: int, day: int) -> ResponseReturnValue:
-        config = config_accessor()
+        config = config_accessor.map()
         meta = repository.meta
         selection = meta["start_local"].dt.date == datetime.date(year, month, day)
         activities_that_day = meta.loc[selection]
@@ -380,7 +382,6 @@ def make_activity_blueprint(
     @blueprint.route("/edit/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def edit(id: str) -> ResponseReturnValue:
-        config = config_accessor()
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -412,7 +413,7 @@ def make_activity_blueprint(
             if form_equipment and form_equipment != "null":
                 activity.equipment = DB.session.get_one(Equipment, int(form_equipment))
             else:
-                activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME, config)
+                activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME)
 
             form_kind = request.form.get("kind")
             if form_kind and form_kind != "null":
@@ -441,7 +442,7 @@ def make_activity_blueprint(
     @blueprint.route("/trim/<id>", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def trim(id: str) -> ResponseReturnValue:
-        config = config_accessor()
+        config = config_accessor.activity_import()
         activity = DB.session.get(Activity, int(id))
         if activity is None:
             abort(404)
@@ -514,7 +515,7 @@ def make_activity_blueprint(
     @blueprint.route("/<int:id>/reenrich", methods=["POST"])
     @needs_authentication(authenticator)
     def reenrich(id: int) -> ResponseReturnValue:
-        config = config_accessor()
+        config = config_accessor.activity_import()
         activity = DB.session.get(Activity, id)
         if activity is None:
             abort(404)
@@ -754,7 +755,7 @@ def _get_font(
     return ImageFont.load_default(size=size)
 
 
-def make_sharepic_base(time_series_list: list[pd.DataFrame], config: Config):
+def make_sharepic_base(time_series_list: list[pd.DataFrame], config: MapConfig):
     all_time_series = pd.concat(time_series_list)
     finite_mask = np.isfinite(all_time_series["x"]) & np.isfinite(all_time_series["y"])
     all_time_series = all_time_series.loc[finite_mask]
@@ -855,7 +856,7 @@ def make_sharepic(
     activity: Activity,
     time_series: pd.DataFrame,
     sharepic_suppressed_fields: list[str],
-    config: Config,
+    config: MapConfig,
 ) -> bytes:
     img = make_sharepic_base([time_series], config)
     draw = ImageDraw.Draw(img, mode="RGBA")
@@ -918,7 +919,7 @@ def make_sharepic(
 def make_day_sharepic(
     activities: pd.DataFrame,
     time_series_list: list[pd.DataFrame],
-    config: Config,
+    config: MapConfig,
 ) -> bytes:
     img = make_sharepic_base(time_series_list, config)
     draw = ImageDraw.Draw(img, mode="RGBA")

@@ -23,4 +23,3 @@ SUPPORTED_LANGUAGE_CODES = [lang.code for lang in SUPPORTED_LANGUAGES]
 
 # Default language
 DEFAULT_LANGUAGE = "en"
-

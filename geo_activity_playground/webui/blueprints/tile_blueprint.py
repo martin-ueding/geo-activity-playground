@@ -11,7 +11,6 @@ def make_tile_blueprint(
     image_transforms: dict[str, ImageTransform],
     tile_getter: TileGetter,
 ) -> Blueprint:
-
     blueprint = Blueprint("tile", __name__, template_folder="templates")
 
     @blueprint.route("/<scheme>/<int:z>/<int:x>/<int:y>.png")

@@ -467,7 +467,7 @@ def make_calendar_blueprint(
             return redirect(url_for(".wrap_year", year=years[-1]))
 
         period = meta.loc[meta["year"] == year].copy()
-        selected_zooms = sorted(set(config_accessor().explorer_zoom_levels))
+        selected_zooms = sorted(set(config_accessor.ui().explorer_zoom_levels))
         primary_zoom = (
             14
             if 14 in selected_zooms
@@ -604,7 +604,7 @@ def make_calendar_blueprint(
                 zoom_stats=[],
             )
 
-        selected_zooms = sorted(set(config_accessor().explorer_zoom_levels))
+        selected_zooms = sorted(set(config_accessor.ui().explorer_zoom_levels))
         primary_zoom = (
             14
             if 14 in selected_zooms

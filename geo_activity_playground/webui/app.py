@@ -29,12 +29,7 @@ from flask_babel import Babel
 from markupsafe import Markup
 
 from ..core.activities import ActivityRepository
-from ..core.config import (
-    Config,
-    ConfigAccessor,
-    import_old_config,
-    import_old_strava_config,
-)
+from ..core.config import ConfigAccessor, import_config_json
 from ..core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
@@ -110,7 +105,7 @@ def _without_response_header(
     return wrapped_application
 
 
-def _migrate_null_activity_fields_to_unknown(config: Config) -> None:
+def _migrate_null_activity_fields_to_unknown() -> None:
     activities = DB.session.scalars(
         sqlalchemy.select(Activity).where(
             sqlalchemy.or_(
@@ -133,10 +128,7 @@ def _migrate_null_activity_fields_to_unknown(config: Config) -> None:
         sqlalchemy.select(Equipment).where(Equipment.name == DEFAULT_UNKNOWN_NAME)
     )
     if unknown_equipment is None:
-        unknown_equipment = Equipment(
-            name=DEFAULT_UNKNOWN_NAME,
-            offset_km=config.equipment_offsets.get(DEFAULT_UNKNOWN_NAME, 0),
-        )
+        unknown_equipment = Equipment(name=DEFAULT_UNKNOWN_NAME)
         DB.session.add(unknown_equipment)
 
     for activity in activities:
@@ -241,10 +233,11 @@ def create_app(
             if lang in app.config["BABEL_SUPPORTED_LOCALES"]:
                 return lang
 
-        # Check config file for user preference
-        if config.preferred_language:
-            if config.preferred_language in app.config["BABEL_SUPPORTED_LOCALES"]:
-                return config.preferred_language
+        # Check stored user preference.
+        preferred_language = config_accessor.ui().preferred_language
+        if preferred_language:
+            if preferred_language in app.config["BABEL_SUPPORTED_LOCALES"]:
+                return preferred_language
 
         # Fall back to browser's preferred language
         return request.accept_languages.best_match(
@@ -280,14 +273,20 @@ def create_app(
     # Set up dependencies
     repository = ActivityRepository()
     config_accessor = ConfigAccessor()
-    config = config_accessor()
     with app.app_context():
-        _migrate_null_activity_fields_to_unknown(config)
+        # Seed a fresh database from a legacy config.json before filling in any
+        # remaining defaults; import_config_json is a no-op once rows exist.
+        import_config_json(config_accessor)
+        config_accessor.ensure_exists()
+        _migrate_null_activity_fields_to_unknown()
         import_legacy_heatmap_cache_from_filesystem()
-        delete_small_heatmap_cache_entries(config.heatmap_cache_min_activities)
+        delete_small_heatmap_cache_entries(
+            config_accessor.ui().heatmap_cache_min_activities
+        )
+        map_tile_url = config_accessor.map().map_tile_url
 
     authenticator = Authenticator(config_accessor)
-    tile_getter = TileGetter(config.map_tile_url)
+    tile_getter = TileGetter(map_tile_url)
     image_transforms = {
         "color": IdentityImageTransform(),
         "grayscale": GrayscaleImageTransform(),
@@ -392,9 +391,9 @@ def create_app(
         variables = {
             "version": _try_get_version(),
             "num_activities": len(repository),
-            "map_tile_attribution": config_accessor().map_tile_attribution,
+            "map_tile_attribution": config_accessor.map().map_tile_attribution,
             "request_url": urllib.parse.quote_plus(request.url),
-            "explorer_zoom_levels": sorted(config_accessor().explorer_zoom_levels)
+            "explorer_zoom_levels": sorted(config_accessor.ui().explorer_zoom_levels)
             or [14],
         }
         variables["equipments_avail"] = DB.session.scalars(
@@ -450,10 +449,8 @@ def web_ui_main(
         http_server=http_server,
     )
 
-    # Import old config formats
+    # Settings are seeded from any legacy config.json inside create_app().
     config_accessor = ConfigAccessor()
-    import_old_config(config_accessor)
-    import_old_strava_config(config_accessor)
 
     # Migrate Hammerhead credentials from config.json to database
     with app.app_context():
@@ -480,7 +477,7 @@ def web_ui_main(
         with app.app_context():
             scan_for_activities(
                 repository,
-                config_accessor(),
+                config_accessor,
                 strava_begin=strava_begin,
                 strava_end=strava_end,
                 hammerhead_begin=hammerhead_begin,
@@ -509,7 +506,9 @@ def web_ui_main(
 
     # Migrate tile cache directory structure
     base_dir = pathlib.Path("Open Street Map Tiles")
-    dir_for_source = base_dir / urllib.parse.quote_plus(config_accessor().map_tile_url)
+    with app.app_context():
+        map_tile_url = config_accessor.map().map_tile_url
+    dir_for_source = base_dir / urllib.parse.quote_plus(map_tile_url)
     if base_dir.exists() and not dir_for_source.exists():
         subdirs = base_dir.glob("*")
         dir_for_source.mkdir()

@@ -58,7 +58,6 @@ def _render_eddington_template(
     column: ColumnDescription,
     divisor_values_avail: list[int],
 ) -> str:
-
     column_name = column.name
     display_name = str(column.display_name)
     print(repr(display_name))
@@ -75,9 +74,9 @@ def _render_eddington_template(
         .copy()
     )
 
-    assert (
-        len(activities) > 0
-    ), "The filter has selected zero elements, that cannot work here."
+    assert len(activities) > 0, (
+        "The filter has selected zero elements, that cannot work here."
+    )
 
     en_per_day, eddington_df_per_day = _get_values_per_group(
         activities.groupby("date"), column_name, divisor
@@ -216,8 +215,6 @@ def _get_eddington_number(elevation_gains: pd.Series, divisor: int) -> int:
     if len(elevation_gains) == 1:
         if elevation_gains.iloc[0] >= 1:
             return 1
-        else:
-            0
 
     sorted_elevation_gains = sorted(elevation_gains, reverse=True)
 
@@ -246,7 +243,6 @@ def _get_yearly_eddington(
 def _get_eddington_number_history(
     meta: pd.DataFrame, columnName: str, divisor: int
 ) -> str:
-
     daily_elevation_gains = meta.groupby("date").apply(
         lambda group2: int(group2[columnName].sum()), include_groups=False
     )

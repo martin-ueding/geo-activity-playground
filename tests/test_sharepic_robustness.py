@@ -1,6 +1,6 @@
 import pandas as pd
 
-from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import MapConfig
 from geo_activity_playground.webui.blueprints.activity_blueprint import (
     _format_elapsed_time,
     make_sharepic_base,
@@ -16,7 +16,7 @@ def test_make_sharepic_base_handles_missing_tile_coordinates() -> None:
         }
     )
 
-    image = make_sharepic_base([time_series], Config())
+    image = make_sharepic_base([time_series], MapConfig())
     assert image.size == (600, 600)
 
 

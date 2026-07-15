@@ -31,9 +31,9 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
-from ...core.config import Config, ConfigAccessor
+from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
-from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit
+from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit, UiConfig
 from ...core.raster_map import OSM_TILE_SIZE, ImageTransform, TileGetter
 from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
 from ...explorer.garmin_img import build_garmin_img, mkgmap_available
@@ -138,7 +138,7 @@ class MaxClusterColorStrategy(ColorStrategy):
         membership: dict[tuple[int, int], tuple[int, int]],
         max_cluster_id: tuple[int, int] | None,
         tile_visits,
-        config: Config,
+        config: UiConfig,
     ):
         self.membership = membership
         self.max_cluster_id = max_cluster_id
@@ -164,7 +164,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         self,
         membership: dict[tuple[int, int], tuple[int, int]],
         tile_visits,
-        config: Config,
+        config: UiConfig,
     ):
         self.membership = membership
         self.tile_visits = tile_visits
@@ -196,7 +196,7 @@ def _replay_root(
 
 
 class HistoricalColorfulClusterColorStrategy(ColorStrategy):
-    def __init__(self, state, config: Config):
+    def __init__(self, state, config: UiConfig):
         self._config = config
         self._cmap = matplotlib.colormaps["hsv"]
         self._color_by_tile: dict[tuple[int, int], np.ndarray] = {}
@@ -220,7 +220,7 @@ class HistoricalColorfulClusterColorStrategy(ColorStrategy):
 
 
 class HistoricalMaxClusterColorStrategy(ColorStrategy):
-    def __init__(self, state, config: Config):
+    def __init__(self, state, config: UiConfig):
         self._config = config
         max_root = max(
             state.component_sizes, key=state.component_sizes.get, default=None
@@ -248,7 +248,7 @@ class HistoricalMaxClusterColorStrategy(ColorStrategy):
 
 
 class VisitTimeColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: Config, use_first=True):
+    def __init__(self, tile_visits, config: UiConfig, use_first=True):
         self.tile_visits = tile_visits
         self.use_first = use_first
         self._config = config
@@ -275,7 +275,7 @@ class VisitTimeColorStrategy(ColorStrategy):
 
 
 class NumVisitsColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: Config):
+    def __init__(self, tile_visits, config: UiConfig):
         self.tile_visits = tile_visits
         self._config = config
 
@@ -290,7 +290,7 @@ class NumVisitsColorStrategy(ColorStrategy):
 
 
 class MissingColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: Config):
+    def __init__(self, tile_visits, config: UiConfig):
         self.tile_visits = tile_visits
         self._config = config
 
@@ -302,7 +302,7 @@ class MissingColorStrategy(ColorStrategy):
 
 
 class VisitedColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: Config):
+    def __init__(self, tile_visits, config: UiConfig):
         self.tile_visits = tile_visits
         self._config = config
 
@@ -317,7 +317,7 @@ class SquarePlannerColorStrategy(ColorStrategy):
     def __init__(
         self,
         tile_visits,
-        config: Config,
+        config: UiConfig,
         square_x: int,
         square_y: int,
         square_size: int,
@@ -356,10 +356,11 @@ def make_explorer_blueprint(
     @needs_authentication(authenticator)
     def enable_zoom_level(zoom: int) -> ResponseReturnValue:
         if 0 <= zoom <= 19:
-            config_accessor().explorer_zoom_levels.append(zoom)
-            config_accessor().explorer_zoom_levels.sort()
+            ui_config = config_accessor.ui()
+            ui_config.explorer_zoom_levels.append(zoom)
+            ui_config.explorer_zoom_levels.sort()
             config_accessor.save()
-            compute_tile_evolution(config_accessor())
+            compute_tile_evolution(ui_config)
             flash(f"Enabled {zoom=} for explorer tiles.", category="success")
         else:
             flash(f"{zoom=} is not valid, must be between 0 and 19.", category="danger")
@@ -416,7 +417,7 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/server-side")
     def server_side(zoom: int) -> ResponseReturnValue:
-        if zoom not in config_accessor().explorer_zoom_levels:
+        if zoom not in config_accessor.ui().explorer_zoom_levels:
             return {"zoom_level_not_generated": zoom}
 
         square_x, square_y, square_size = get_explorer_square(zoom)
@@ -486,7 +487,7 @@ def make_explorer_blueprint(
     @blueprint.route("/video")
     @needs_authentication(authenticator)
     def video() -> ResponseReturnValue:
-        zoom_levels = sorted(set(config_accessor().explorer_zoom_levels))
+        zoom_levels = sorted(set(config_accessor.ui().explorer_zoom_levels))
         selected_zoom = request.args.get("zoom", type=int)
         if selected_zoom not in zoom_levels:
             selected_zoom = zoom_levels[0] if zoom_levels else 14
@@ -500,7 +501,7 @@ def make_explorer_blueprint(
     @needs_authentication(authenticator)
     def generate_video() -> ResponseReturnValue:
         zoom = request.form.get("zoom", type=int, default=14)
-        if zoom not in config_accessor().explorer_zoom_levels:
+        if zoom not in config_accessor.ui().explorer_zoom_levels:
             flash(_("The selected zoom level is not enabled."), category="danger")
             return redirect(url_for(".video"))
         video_width = request.form.get("video_width", type=int, default=1920)
@@ -577,13 +578,15 @@ def make_explorer_blueprint(
             "paint": {"raster-opacity": 0.8},
         }
 
-        map_style_url = config_accessor().map_style_url
+        map_style_url = config_accessor.map().map_style_url
         if map_style_url:
             style = requests.get(map_style_url, timeout=10).json()
             style["sources"][gap_source_id] = gap_source
             style["layers"].append(gap_layer)
         else:
-            raster_tile_url = config_accessor().map_tile_url.replace("{zoom}", "{z}")
+            raster_tile_url = config_accessor.map().map_tile_url.replace(
+                "{zoom}", "{z}"
+            )
             style = {
                 "version": 8,
                 "sources": {
@@ -604,7 +607,7 @@ def make_explorer_blueprint(
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")
     def tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
-        config = config_accessor()
+        config = config_accessor.ui()
         square_x, square_y, square_size = get_explorer_square(zoom)
         evolution_state = SimpleNamespace(
             square_x=square_x, square_y=square_y, max_square_size=square_size
@@ -639,7 +642,7 @@ def make_explorer_blueprint(
 
         color_strategy_name = request.args.get("color_strategy", "colorful_cluster")
         if color_strategy_name == "default":
-            color_strategy_name = config_accessor().cluster_color_strategy
+            color_strategy_name = config_accessor.ui().cluster_color_strategy
         match color_strategy_name:
             case "max_cluster":
                 if historical_state is None:

@@ -14,7 +14,7 @@ class HeartRateZoneComputer:
         self._config_accessor = config_accessor
 
     def compute_zones(self, frequencies: pd.Series, year: int) -> pd.Series:
-        config = self._config_accessor()
+        config = self._config_accessor.heart_rate()
         maximum = self._get_maximum(year)
         zones: pd.Series = (frequencies - config.heart_rate_resting) * 10 // (
             maximum - config.heart_rate_resting
@@ -24,7 +24,7 @@ class HeartRateZoneComputer:
         return zones
 
     def zone_boundaries(self) -> list[tuple[int, int]]:
-        config = self._config_accessor()
+        config = self._config_accessor.heart_rate()
         maximum = self._get_maximum(datetime.date.today().year)
         result = []
         for zone in [1, 2, 3, 4, 5]:
@@ -40,7 +40,7 @@ class HeartRateZoneComputer:
         return result
 
     def _get_maximum(self, year: int) -> int:
-        config = self._config_accessor()
+        config = self._config_accessor.heart_rate()
         if config.heart_rate_maximum:
             return config.heart_rate_maximum
         elif config.birth_year:

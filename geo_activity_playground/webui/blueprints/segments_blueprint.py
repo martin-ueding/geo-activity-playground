@@ -55,7 +55,7 @@ def make_segments_blueprint(
 
             flasher.flash_message(f"Created segment “{name}”.", FlashTypes.SUCCESS)
 
-            find_matches(segment, config_accessor())
+            find_matches(segment, config_accessor.activity_import())
         return redirect(url_for(".index"))
 
     @blueprint.route("/line/<int:id>/line.geojson")
@@ -73,7 +73,7 @@ def make_segments_blueprint(
         segment = DB.session.get_one(Segment, id)
         df = segment_df(segment)
         visible = {
-            name: name in config_accessor().visible_table_columns
+            name: name in config_accessor.ui().visible_table_columns
             for name in (
                 "distance",
                 "duration",
@@ -107,7 +107,7 @@ def make_segments_blueprint(
     @needs_authentication(authenticator)
     def rematch(id: int) -> ResponseReturnValue:
         segment = DB.session.get_one(Segment, id)
-        deleted_matches, _ = rematch_segment(segment, config_accessor())
+        deleted_matches, _ = rematch_segment(segment, config_accessor.activity_import())
         flasher.flash_message(
             f"Re-matched segment “{segment.name}” after deleting {deleted_matches} previous matches.",
             FlashTypes.SUCCESS,
@@ -119,7 +119,7 @@ def make_segments_blueprint(
         activity = DB.session.get_one(Activity, activity_id)
         segment = DB.session.get_one(Segment, segment_id)
         distance_m, index, distance_matrix = segment_track_distance(
-            segment, activity, config_accessor()
+            segment, activity, config_accessor.activity_import()
         )
         np.save(f"distance-{activity.id}-{segment.id}.npy", distance_matrix)
 

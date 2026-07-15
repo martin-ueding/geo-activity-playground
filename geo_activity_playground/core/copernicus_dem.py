@@ -39,7 +39,6 @@ def _ensure_copernicus_file(p: pathlib.Path) -> None:
 
 @functools.lru_cache(9)
 def _get_elevation_arrays(p: pathlib.Path) -> np.ndarray | None:
-
     _ensure_copernicus_file(p)
     if not p.exists():
         return None

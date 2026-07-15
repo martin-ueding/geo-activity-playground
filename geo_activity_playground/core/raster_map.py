@@ -10,7 +10,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-from .config import Config
+from .datamodel import MapConfig
 from .tiles import compute_tile_float
 
 logger = logging.getLogger(__name__)
@@ -189,7 +189,9 @@ def _paste_array(
     ]
 
 
-def map_image_from_tile_bounds(tile_bounds: TileBounds, config: Config) -> np.ndarray:
+def map_image_from_tile_bounds(
+    tile_bounds: TileBounds, config: MapConfig
+) -> np.ndarray:
     pixel_bounds = pixel_bounds_from_tile_bounds(tile_bounds)
     background = np.zeros((pixel_bounds.height, pixel_bounds.width, 3))
 

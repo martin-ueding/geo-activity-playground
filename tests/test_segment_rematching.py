@@ -2,11 +2,11 @@ import datetime as dt
 
 import sqlalchemy
 
-from geo_activity_playground.core.config import Config
 from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
+    ActivityImportConfig,
     Segment,
     SegmentCheck,
     SegmentMatch,
@@ -40,7 +40,10 @@ def test_rematch_segment_deletes_checks_and_matches_before_matching(app) -> None
         )
         DB.session.commit()
 
-        deleted_matches, deleted_checks = rematch_segment(segment, Config())
+        deleted_matches, deleted_checks = rematch_segment(
+            segment,
+            ActivityImportConfig(segment_split_distance=100, segment_max_distance=20),
+        )
 
         assert deleted_matches == 1
         assert deleted_checks == 1
@@ -85,7 +88,11 @@ def test_try_match_segment_activity_skips_activities_without_start_time(
             fail_if_called,
         )
 
-        try_match_segment_activity(segment, activity, Config())
+        try_match_segment_activity(
+            segment,
+            activity,
+            ActivityImportConfig(segment_split_distance=100, segment_max_distance=20),
+        )
 
         assert (
             DB.session.scalar(sqlalchemy.select(sqlalchemy.func.count(SegmentCheck.id)))

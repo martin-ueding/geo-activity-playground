@@ -214,12 +214,19 @@ def prefetch_tiles(
 def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
     import imageio.v2 as imageio
 
+    from ..webui.app import create_app
+
     os.chdir(options.basedir)
-    config = ConfigAccessor()()
-    map_tile_url = options.map_tile_url or config.map_tile_url
     database_path = pathlib.Path("database.sqlite")
     if not database_path.exists():
         raise FileNotFoundError(f"Database does not exist: {database_path.absolute()}")
+
+    app = create_app(
+        database_uri=f"sqlite:///{database_path.absolute()}",
+        run_migrations=False,
+    )
+    with app.app_context():
+        map_tile_url = options.map_tile_url or ConfigAccessor().map().map_tile_url
 
     tile_df = load_tile_history(database_path=database_path, zoom=options.zoom)
     if len(tile_df) == 0:

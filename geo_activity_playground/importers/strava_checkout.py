@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ..core.config import Config
 from ..core.datamodel import (
     DEFAULT_UNKNOWN_NAME,
+    ActivityImportConfig,
     get_or_make_equipment,
     get_or_make_kind,
 )
@@ -53,7 +53,7 @@ def normalize_header(header: Sequence[str]) -> list[str]:
     return [mapping.get(h, h) for h in header]
 
 
-def import_from_strava_checkout(config: Config) -> None:
+def import_from_strava_checkout(config: ActivityImportConfig) -> None:
     checkout_path = pathlib.Path("Strava Export")
     with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
@@ -149,7 +149,6 @@ def import_from_strava_checkout(config: Config) -> None:
             or nan_as_none(row["Bike"])
             or nan_as_none(row["Gear"])
             or DEFAULT_UNKNOWN_NAME,
-            config,
         )
         activity.kind = get_or_make_kind(row["Activity Type"])
         activity.name = row["Activity Name"]

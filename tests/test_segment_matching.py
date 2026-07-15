@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import pandas as pd
 import pytest
 
-from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import ActivityImportConfig
 from geo_activity_playground.core.segments import segment_track_distance
 
 
@@ -22,7 +22,7 @@ def make_segment(coordinates: list[list[float]]) -> SimpleNamespace:
     return SimpleNamespace(coordinates=coordinates)
 
 
-def first_distance(segment, activity, config: Config) -> float:
+def first_distance(segment, activity, config: ActivityImportConfig) -> float:
     matches = list(segment_track_distance(segment, activity, config))
     assert len(matches) == 1
     distance_m, _ = matches[0]
@@ -30,7 +30,7 @@ def first_distance(segment, activity, config: Config) -> float:
 
 
 def test_segment_distance_zero_when_segment_is_contained() -> None:
-    config = Config(segment_split_distance=150)
+    config = ActivityImportConfig(segment_split_distance=150)
     segment = make_segment([[0.0, 0.0], [0.0, 0.001]])
     activity = make_activity(
         [
@@ -47,7 +47,7 @@ def test_segment_distance_zero_when_segment_is_contained() -> None:
 
 
 def test_segment_distance_positive_for_crossing_line() -> None:
-    config = Config(segment_split_distance=300)
+    config = ActivityImportConfig(segment_split_distance=300)
     segment = make_segment([[0.0, 0.0], [0.0, 0.001], [0.0, 0.002]])
     activity = make_activity(
         [
@@ -64,7 +64,7 @@ def test_segment_distance_positive_for_crossing_line() -> None:
 
 
 def test_sparse_collinear_overlap_has_zero_distance() -> None:
-    config = Config(segment_split_distance=100)
+    config = ActivityImportConfig(segment_split_distance=100)
     segment = make_segment([[0.0, 0.0005], [0.0, 0.0015]])
     activity = make_activity(
         [

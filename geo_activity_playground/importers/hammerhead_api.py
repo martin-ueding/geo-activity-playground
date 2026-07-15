@@ -9,10 +9,10 @@ import sqlalchemy
 from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
 from ..core.datamodel import (
     DB,
     Activity,
+    ActivityImportConfig,
     HammerheadAuth,
     get_hammerhead_auth,
     get_or_make_kind,
@@ -102,7 +102,7 @@ def _apply_token_response(auth: HammerheadAuth, payload: dict) -> None:
 
 
 def import_from_hammerhead_api(
-    config: Config,
+    config: ActivityImportConfig,
     repository: ActivityRepository,
     hammerhead_begin: str | None = None,
     hammerhead_end: str | None = None,
@@ -122,7 +122,7 @@ def import_from_hammerhead_api(
 
 
 def _try_import_hammerhead(
-    config: Config,
+    config: ActivityImportConfig,
     repository: ActivityRepository,
     hammerhead_begin: str | None,
     hammerhead_end: str | None,
@@ -225,7 +225,7 @@ def _max_date(current: str | None, candidate: str) -> str:
 
 
 def _import_one_activity(
-    config: Config, session: requests.Session, summary: dict
+    config: ActivityImportConfig, session: requests.Session, summary: dict
 ) -> None:
     activity_id = summary["id"]
     logger.info(

@@ -12,12 +12,13 @@ class Authenticator:
         self._config_accessor = config_accessor
 
     def is_authenticated(self) -> bool:
-        return not self._config_accessor().upload_password or session.get(
-            "is_authenticated", False
+        return (
+            not self._config_accessor.activity_import().upload_password
+            or session.get("is_authenticated", False)
         )
 
     def authenticate(self, password: str) -> None:
-        if password == self._config_accessor().upload_password:
+        if password == self._config_accessor.activity_import().upload_password:
             session["is_authenticated"] = True
             session.permanent = True
             flash("Login successful.", category="success")

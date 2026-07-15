@@ -5,9 +5,15 @@ import numpy as np
 import pandas as pd
 import sqlalchemy
 
-from .config import Config
 from .coordinates import get_distance
-from .datamodel import DB, Activity, Segment, SegmentCheck, SegmentMatch
+from .datamodel import (
+    DB,
+    Activity,
+    ActivityImportConfig,
+    Segment,
+    SegmentCheck,
+    SegmentMatch,
+)
 from .tiles import compute_tile_float
 
 SEGMENT_ZOOM = 17
@@ -20,7 +26,7 @@ def extract_segment_from_geojson(geojson_str: str) -> list[list[float]]:
 
 
 def segment_track_distance(
-    segment: Segment, activity: Activity, config: Config
+    segment: Segment, activity: Activity, config: ActivityImportConfig
 ) -> Iterator[tuple[float, np.ndarray]]:
     """
     Computes asymmetric distance between a segment and a track in meters.
@@ -123,7 +129,7 @@ def tiles_for_segment(segment: Segment, level: int) -> set[tuple[int, int]]:
 
 def find_matches(
     segment: Segment,
-    config: Config,
+    config: ActivityImportConfig,
 ) -> None:
     # Imported here to avoid a core -> explorer import at module load time.
     from ..explorer.tile_visits import get_activity_ids_in_tiles
@@ -137,7 +143,7 @@ def find_matches(
 
 def rematch_segment(
     segment: Segment,
-    config: Config,
+    config: ActivityImportConfig,
 ) -> tuple[int, int]:
     deleted_matches = DB.session.scalar(
         sqlalchemy.select(sqlalchemy.func.count(SegmentMatch.id)).where(
@@ -164,7 +170,7 @@ def rematch_segment(
 
 
 def try_match_segment_activity(
-    segment: Segment, activity: Activity, config: Config
+    segment: Segment, activity: Activity, config: ActivityImportConfig
 ) -> None:
     if activity.start is None:
         return

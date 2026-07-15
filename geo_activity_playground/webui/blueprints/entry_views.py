@@ -29,7 +29,7 @@ def register_entry_views(
         df = repository.meta
 
         if len(repository):
-            kind_scale = make_kind_scale(df, config_accessor())
+            kind_scale = make_kind_scale(df, config_accessor.ui())
             context["last_30_days_plot"] = {
                 column.display_name: _last_30_days_meta_plot(df, kind_scale, column)
                 for column in META_COLUMNS

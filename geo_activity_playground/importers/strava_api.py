@@ -12,8 +12,14 @@ from stravalib.exc import Fault, ObjectNotFound, RateLimitExceeded
 from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
-from ..core.datamodel import DB, Activity, get_or_make_equipment, get_or_make_kind
+from ..core.config import ConfigAccessor
+from ..core.datamodel import (
+    DB,
+    Activity,
+    StravaConfig,
+    get_or_make_equipment,
+    get_or_make_kind,
+)
 from ..core.enrichment import update_and_commit
 from ..core.paths import (
     activity_extracted_time_series_dir,
@@ -25,7 +31,7 @@ from ..core.tasks import get_state, set_state
 logger = logging.getLogger(__name__)
 
 
-def get_current_access_token(config: Config) -> str:
+def get_current_access_token(config: StravaConfig) -> str:
     tokens = get_state(strava_api_dir() / "strava_tokens.json", None)
     if not tokens:
         logger.info("Create Strava access token …")
@@ -68,7 +74,7 @@ def round_to_next_quarter_hour(date: datetime.datetime) -> datetime.datetime:
     return next_quarter
 
 
-def refresh_activity_names_from_strava(config: Config) -> int:
+def refresh_activity_names_from_strava(config: StravaConfig) -> int:
     updated_names = 0
     while True:
         try:
@@ -89,7 +95,7 @@ def refresh_activity_names_from_strava(config: Config) -> int:
         time.sleep(seconds_to_wait)
 
 
-def _refresh_activity_names_from_strava_once(config: Config) -> int:
+def _refresh_activity_names_from_strava_once(config: StravaConfig) -> int:
     client = Client(access_token=get_current_access_token(config))
     updated_names = 0
     page = 1
@@ -131,13 +137,13 @@ def _refresh_activity_names_from_strava_once(config: Config) -> int:
 
 
 def import_from_strava_api(
-    config: Config,
+    config_accessor: ConfigAccessor,
     repository: ActivityRepository,
     strava_begin: str | None = None,
     strava_end: str | None = None,
 ) -> None:
     try:
-        while try_import_strava(config, repository, strava_begin, strava_end):
+        while try_import_strava(config_accessor, repository, strava_begin, strava_end):
             now = datetime.datetime.now()
             next_quarter = round_to_next_quarter_hour(now)
             seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -155,7 +161,7 @@ def import_from_strava_api(
 
 
 def try_import_strava(
-    config: Config,
+    config_accessor: ConfigAccessor,
     repository: ActivityRepository,
     strava_begin: str | None = None,
     strava_end: str | None = None,
@@ -167,7 +173,7 @@ def try_import_strava(
 
     gear_names = {None: "None"}
 
-    client = Client(access_token=get_current_access_token(config))
+    client = Client(access_token=get_current_access_token(config_accessor.strava()))
 
     try:
         for strava_activity in tqdm(
@@ -248,12 +254,14 @@ def try_import_strava(
                 )
                 activity.elapsed_time = strava_activity.elapsed_time
                 activity.equipment = get_or_make_equipment(
-                    gear_names[strava_activity.gear_id], config
+                    gear_names[strava_activity.gear_id]
                 )
                 activity.calories = detailed_activity.calories
                 activity.moving_time = detailed_activity.moving_time
 
-                update_and_commit(activity, time_series, config)
+                update_and_commit(
+                    activity, time_series, config_accessor.activity_import()
+                )
                 logger.info(f"Added activity '{activity.name}' from Strava.")
 
             if strava_begin is None and strava_end is None:

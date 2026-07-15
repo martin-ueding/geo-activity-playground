@@ -12,7 +12,6 @@ import sqlalchemy as sa
 from tqdm import tqdm
 
 from ..core.activities import ActivityRepository
-from ..core.config import Config
 from ..core.datamodel import (
     DB,
     Activity,
@@ -24,6 +23,7 @@ from ..core.datamodel import (
     ExplorerSquare,
     SquareHistory,
     TileVisit,
+    UiConfig,
 )
 from ..core.tiles import adjacent_to, interpolate_missing_tile
 
@@ -629,7 +629,7 @@ def _tiles_from_points(
                 yield (t1,) + interpolated
 
 
-def compute_tile_evolution(config: Config) -> None:
+def compute_tile_evolution(config: UiConfig) -> None:
     for zoom in config.explorer_zoom_levels:
         # Get tile history from database
         tile_history = get_tile_history_df(zoom)

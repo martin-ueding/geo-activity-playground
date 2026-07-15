@@ -25,10 +25,11 @@ from flask_babel import gettext as _
 from tqdm import tqdm
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config, ConfigAccessor
+from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     DB,
     Activity,
+    ActivityImportConfig,
     ActivityTile,
     ClusterHistoryCheckpoint,
     ClusterHistoryEvent,
@@ -40,6 +41,7 @@ from ...core.datamodel import (
     Kind,
     Photo,
     PlotSpec,
+    PrivacyZone,
     Segment,
     SegmentCheck,
     SegmentMatch,
@@ -47,6 +49,7 @@ from ...core.datamodel import (
     StoredSearchQuery,
     Tag,
     TileVisit,
+    UiConfig,
     activity_tag_association_table,
     get_hammerhead_auth,
     get_or_make_equipment,
@@ -139,8 +142,13 @@ def int_or_none(s: str) -> int | None:
     return None
 
 
+def _ui_config_default(field: str):
+    """Return the column default declared on ``UiConfig`` for display placeholders."""
+    return UiConfig.__table__.c[field].default.arg
+
+
 def _reprocess_all_activities(
-    config: Config,
+    config: ActivityImportConfig,
     *,
     force: bool,
     use_raw_time_series: bool,
@@ -156,7 +164,9 @@ def _reprocess_all_activities(
         update_and_commit(activity, time_series, config, force=force)
 
 
-def _reimport_time_series_from_files(config: Config) -> tuple[int, int, int]:
+def _reimport_time_series_from_files(
+    config: ActivityImportConfig,
+) -> tuple[int, int, int]:
     activities = DB.session.scalars(
         sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
     ).all()
@@ -279,7 +289,7 @@ def _heatmap_cache_stats() -> tuple[int, list[dict[str, Any]]]:
     return total_tiles, stats
 
 
-def _apply_metadata_extraction_to_existing(config: Config) -> int:
+def _apply_metadata_extraction_to_existing(config: ActivityImportConfig) -> int:
     activities = DB.session.scalars(
         sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
     ).all()
@@ -326,7 +336,7 @@ def make_settings_blueprint(
                 logger.info("User requested reset of tile visit state.")
                 _reset_tile_visits_db()
                 compute_tile_visits_new(repository)
-                compute_tile_evolution(config_accessor())
+                compute_tile_evolution(config_accessor.ui())
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
                     FlashTypes.SUCCESS,
@@ -356,7 +366,7 @@ def make_settings_blueprint(
             elif action == "reenrich_all_activities":
                 logger.info("User requested re-enrichment of all activities.")
                 _reprocess_all_activities(
-                    config_accessor(),
+                    config_accessor.activity_import(),
                     force=True,
                     use_raw_time_series=True,
                     desc="Re-enriching activities",
@@ -368,7 +378,7 @@ def make_settings_blueprint(
             elif action == "repair_activities":
                 logger.info("User requested repair of activities.")
                 _reprocess_all_activities(
-                    config_accessor(),
+                    config_accessor.activity_import(),
                     force=True,
                     use_raw_time_series=True,
                     desc="Repairing activities",
@@ -388,7 +398,9 @@ def make_settings_blueprint(
                 )
             elif action == "refresh_strava_activity_names":
                 logger.info("User requested Strava activity name refresh.")
-                updated_names = refresh_activity_names_from_strava(config_accessor())
+                updated_names = refresh_activity_names_from_strava(
+                    config_accessor.strava()
+                )
                 flasher.flash_message(
                     _(
                         "Refreshed activity names from Strava. Updated %(updated_names)s activities."
@@ -401,7 +413,7 @@ def make_settings_blueprint(
                     "User requested re-import of time series from activity files."
                 )
                 reimported, skipped, errors = _reimport_time_series_from_files(
-                    config_accessor()
+                    config_accessor.activity_import()
                 )
                 flasher.flash_message(
                     _(
@@ -417,7 +429,7 @@ def make_settings_blueprint(
             elif action in ("fix_timezone_local_to_utc", "fix_timezone_utc_to_utc"):
                 from_iana = action == "fix_timezone_local_to_utc"
                 logger.info("User requested timezone fix (from_iana=%s).", from_iana)
-                config = config_accessor()
+                config = config_accessor.activity_import()
                 for activity in DB.session.scalars(sqlalchemy.select(Activity)).all():
                     if activity.start is None:
                         continue
@@ -447,13 +459,13 @@ def make_settings_blueprint(
         if request.method == "POST":
             lang = request.form.get("language", "")
             if lang:
-                config_accessor().preferred_language = lang
+                config_accessor.ui().preferred_language = lang
                 flasher.flash_message(
                     "Language preference updated.", FlashTypes.SUCCESS
                 )
             else:
                 # Empty string means "Auto"
-                config_accessor().preferred_language = None
+                config_accessor.ui().preferred_language = None
                 flasher.flash_message(
                     "Language preference cleared. Using browser language.",
                     FlashTypes.SUCCESS,
@@ -462,7 +474,7 @@ def make_settings_blueprint(
             # Redirect to refresh the page with new language
             return redirect(url_for("settings.language"))
 
-        current_language = config_accessor().preferred_language or ""
+        current_language = config_accessor.ui().preferred_language or ""
         return render_template(
             "settings/language.html.j2",
             available_languages=SUPPORTED_LANGUAGES,
@@ -473,13 +485,13 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def admin_password() -> Response:
         if request.method == "POST":
-            config_accessor().upload_password = request.form["password"]
+            config_accessor.activity_import().upload_password = request.form["password"]
             config_accessor.save()
             flasher.flash_message("Updated admin password.", FlashTypes.SUCCESS)
         return Response(
             render_template(
                 "settings/admin-password.html.j2",
-                password=config_accessor().upload_password,
+                password=config_accessor.activity_import().upload_password,
             )
         )
 
@@ -519,13 +531,13 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def color_schemes():
         if request.method == "POST":
-            config_accessor().color_scheme_for_counts = request.form[
+            config_accessor.ui().color_scheme_for_counts = request.form[
                 "color_scheme_for_counts"
             ]
-            config_accessor().color_scheme_for_kind = request.form[
+            config_accessor.ui().color_scheme_for_kind = request.form[
                 "color_scheme_for_kind"
             ]
-            config_accessor().color_scheme_for_heatmap = request.form[
+            config_accessor.ui().color_scheme_for_heatmap = request.form[
                 "color_scheme_for_heatmap"
             ]
             config_accessor.save()
@@ -533,9 +545,9 @@ def make_settings_blueprint(
 
         return render_template(
             "settings/color-schemes.html.j2",
-            color_scheme_for_counts=config_accessor().color_scheme_for_counts,
+            color_scheme_for_counts=config_accessor.ui().color_scheme_for_counts,
             color_scheme_for_counts_avail=VEGA_COLOR_SCHEMES_CONTINUOUS,
-            color_scheme_for_kind=config_accessor().color_scheme_for_kind,
+            color_scheme_for_kind=config_accessor.ui().color_scheme_for_kind,
             color_scheme_for_kind_avail=[
                 "accent",
                 "category10",
@@ -552,7 +564,7 @@ def make_settings_blueprint(
                 "tableau10",
                 "tableau20",
             ],
-            color_scheme_for_heatmap=config_accessor().color_scheme_for_heatmap,
+            color_scheme_for_heatmap=config_accessor.ui().color_scheme_for_heatmap,
             color_scheme_for_heatmap_avail=MATPLOTLIB_COLOR_SCHEMES_CONTINUOUS,
         )
 
@@ -561,47 +573,52 @@ def make_settings_blueprint(
     def color_strategy():
         if request.method == "POST":
             print(request.form)
-            config_accessor().color_strategy_max_cluster_color = _combine_color(
+            config_accessor.ui().color_strategy_max_cluster_color = _combine_color(
                 request.form["max_cluster_color"],
                 int(request.form["max_cluster_color_alpha"]),
             )
-            config_accessor().color_strategy_max_cluster_other_color = _combine_color(
-                request.form["max_cluster_other_color"],
-                int(request.form["max_cluster_other_color_alpha"]),
+            config_accessor.ui().color_strategy_max_cluster_other_color = (
+                _combine_color(
+                    request.form["max_cluster_other_color"],
+                    int(request.form["max_cluster_other_color_alpha"]),
+                )
             )
-            config_accessor().color_strategy_visited_color = _combine_color(
+            config_accessor.ui().color_strategy_visited_color = _combine_color(
                 request.form["visited_color"], int(request.form["visited_color_alpha"])
             )
-            config_accessor().color_strategy_cmap_opacity = float(
+            config_accessor.ui().color_strategy_cmap_opacity = float(
                 request.form["cmap_opacity"]
             )
             config_accessor.save()
             flash("Updated color strategy values.", category="success")
 
-        new_config = Config()
         max_cluster_color, max_cluster_color_alpha = _split_hex_into_color_alpha(
-            config_accessor().color_strategy_max_cluster_color
+            config_accessor.ui().color_strategy_max_cluster_color
         )
         max_cluster_color_default, max_cluster_color_alpha_default = (
-            _split_hex_into_color_alpha(new_config.color_strategy_max_cluster_color)
+            _split_hex_into_color_alpha(
+                _ui_config_default("color_strategy_max_cluster_color")
+            )
         )
 
         max_cluster_other_color, max_cluster_other_color_alpha = (
             _split_hex_into_color_alpha(
-                config_accessor().color_strategy_max_cluster_other_color
+                config_accessor.ui().color_strategy_max_cluster_other_color
             )
         )
         max_cluster_other_color_default, max_cluster_other_color_alpha_default = (
             _split_hex_into_color_alpha(
-                new_config.color_strategy_max_cluster_other_color
+                _ui_config_default("color_strategy_max_cluster_other_color")
             )
         )
 
         visited_color, visited_color_alpha = _split_hex_into_color_alpha(
-            config_accessor().color_strategy_visited_color
+            config_accessor.ui().color_strategy_visited_color
         )
         visited_color_default, visited_color_alpha_default = (
-            _split_hex_into_color_alpha(new_config.color_strategy_visited_color)
+            _split_hex_into_color_alpha(
+                _ui_config_default("color_strategy_visited_color")
+            )
         )
 
         return render_template(
@@ -618,7 +635,7 @@ def make_settings_blueprint(
             visited_color_default=visited_color_default,
             visited_color_alpha=visited_color_alpha,
             visited_color_alpha_default=visited_color_alpha_default,
-            cmap_opacity=config_accessor().color_strategy_cmap_opacity,
+            cmap_opacity=config_accessor.ui().color_strategy_cmap_opacity,
         )
 
     @blueprint.route("/manage-equipments", methods=["GET", "POST"])
@@ -787,16 +804,16 @@ def make_settings_blueprint(
             if heart_rate_resting is None:
                 heart_rate_resting = 0
             heart_rate_maximum = int_or_none(request.form["heart_rate_maximum"])
-            config_accessor().birth_year = birth_year
-            config_accessor().heart_rate_resting = heart_rate_resting or 0
-            config_accessor().heart_rate_maximum = heart_rate_maximum
+            config_accessor.heart_rate().birth_year = birth_year
+            config_accessor.heart_rate().heart_rate_resting = heart_rate_resting or 0
+            config_accessor.heart_rate().heart_rate_maximum = heart_rate_maximum
             config_accessor.save()
             flash("Updated heart rate data.", category="success")
 
         context: dict[str, Any] = {
-            "birth_year": config_accessor().birth_year,
-            "heart_rate_resting": config_accessor().heart_rate_resting,
-            "heart_rate_maximum": config_accessor().heart_rate_maximum,
+            "birth_year": config_accessor.heart_rate().birth_year,
+            "heart_rate_resting": config_accessor.heart_rate().heart_rate_resting,
+            "heart_rate_maximum": config_accessor.heart_rate().heart_rate_maximum,
         }
 
         heart_rate_computer = HeartRateZoneComputer(config_accessor)
@@ -823,20 +840,22 @@ def make_settings_blueprint(
                 else:
                     new_metadata_extraction_regexes.append(regex)
 
-            config_accessor().metadata_extraction_regexes = (
+            config_accessor.activity_import().metadata_extraction_regexes = (
                 new_metadata_extraction_regexes
             )
             config_accessor.save()
             flash("Updated metadata extraction settings.", category="success")
         context = {
-            "metadata_extraction_regexes": config_accessor().metadata_extraction_regexes,
+            "metadata_extraction_regexes": config_accessor.activity_import().metadata_extraction_regexes,
         }
         return render_template("settings/metadata-extraction.html.j2", **context)
 
     @blueprint.route("/metadata-extraction/apply-to-existing", methods=["POST"])
     @needs_authentication(authenticator)
     def metadata_extraction_apply_to_existing():
-        changed = _apply_metadata_extraction_to_existing(config_accessor())
+        changed = _apply_metadata_extraction_to_existing(
+            config_accessor.activity_import()
+        )
         flasher.flash_message(
             _(
                 "Applied metadata extraction regexes to existing activities: %(changed)s updated."
@@ -852,70 +871,15 @@ def make_settings_blueprint(
         if request.method == "POST":
             zone_names = request.form.getlist("zone_name")
             zone_geojsons = request.form.getlist("zone_geojson")
-            save_privacy_zones(zone_names, zone_geojsons, config_accessor)
-
-            assert len(zone_names) == len(zone_geojsons)
-            new_zone_config = {}
-
-            for zone_name, zone_geojson_str in zip(zone_names, zone_geojsons):
-                if not zone_name or not zone_geojson_str:
-                    continue
-
-                try:
-                    zone_geojson = json.loads(zone_geojson_str)
-                except json.decoder.JSONDecodeError as e:
-                    flash(
-                        f"Could not parse GeoJSON for {zone_name} due to the following error: {e}"
-                    )
-                    continue
-
-                if not zone_geojson["type"] == "FeatureCollection":
-                    flash(
-                        f"Pasted GeoJSON for {zone_name} must be of type 'FeatureCollection'.",
-                        category="danger",
-                    )
-                    continue
-
-                features = zone_geojson["features"]
-
-                if not len(features) == 1:
-                    flash(
-                        f"Pasted GeoJSON for {zone_name} must contain exactly one feature. You cannot have multiple shapes for one privacy zone",
-                        category="danger",
-                    )
-                    continue
-
-                feature = features[0]
-                geometry = feature["geometry"]
-
-                if not geometry["type"] == "Polygon":
-                    flash(
-                        f"Geometry for {zone_name} is not a polygon. You need to create a polygon (or circle or rectangle).",
-                        category="danger",
-                    )
-                    continue
-
-                coordinates = geometry["coordinates"]
-
-                if not len(coordinates) == 1:
-                    flash(
-                        f"Polygon for {zone_name} consists of multiple polygons. Please supply a simple one.",
-                        category="danger",
-                    )
-                    continue
-
-                points = coordinates[0]
-
-                new_zone_config[zone_name] = points
-
-            config_accessor().privacy_zones = new_zone_config
-            config_accessor.save()
+            save_privacy_zones(zone_names, zone_geojsons)
             flash("Updated privacy zones.", category="success")
 
         context = {
             "privacy_zones": {
-                name: _wrap_coordinates(coordinates)
-                for name, coordinates in config_accessor().privacy_zones.items()
+                zone.name: _wrap_coordinates(zone.points)
+                for zone in DB.session.scalars(
+                    sqlalchemy.select(PrivacyZone).order_by(PrivacyZone.name)
+                ).all()
             }
         }
         return render_template("settings/privacy-zones.html.j2", **context)
@@ -925,18 +889,18 @@ def make_settings_blueprint(
     def segmentation():
         if request.method == "POST":
             threshold = int(request.form.get("threshold", 0))
-            config_accessor().time_diff_threshold_seconds = threshold
+            config_accessor.activity_import().time_diff_threshold_seconds = threshold
             config_accessor.save()
             flash(f"Threshold set to {threshold}.", category="success")
             _reprocess_all_activities(
-                config_accessor(),
+                config_accessor.activity_import(),
                 force=False,
                 use_raw_time_series=True,
                 desc="Recomputing segments",
             )
         return render_template(
             "settings/segmentation.html.j2",
-            threshold=config_accessor().time_diff_threshold_seconds,
+            threshold=config_accessor.activity_import().time_diff_threshold_seconds,
         )
 
     @blueprint.route("/table-columns", methods=["GET", "POST"])
@@ -945,7 +909,9 @@ def make_settings_blueprint(
         if request.method == "POST":
             names = request.form.getlist("name")
             known = {col.name for col in TOGGLEABLE_TABLE_COLUMNS}
-            config_accessor().visible_table_columns = [n for n in names if n in known]
+            config_accessor.ui().visible_table_columns = [
+                n for n in names if n in known
+            ]
             config_accessor.save()
             flasher.flash_message(
                 _("Updated summary table columns."), FlashTypes.SUCCESS
@@ -956,7 +922,7 @@ def make_settings_blueprint(
                 (
                     col.name,
                     col.display_name,
-                    col.name in config_accessor().visible_table_columns,
+                    col.name in config_accessor.ui().visible_table_columns,
                 )
                 for col in TOGGLEABLE_TABLE_COLUMNS
             ],
@@ -966,7 +932,7 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def map_display():
         if request.method == "POST":
-            config_accessor().show_progress_markers = (
+            config_accessor.ui().show_progress_markers = (
                 request.form.get("show_progress_markers") == "on"
             )
             config_accessor.save()
@@ -975,7 +941,7 @@ def make_settings_blueprint(
             )
         return render_template(
             "settings/map-display.html.j2",
-            show_progress_markers=config_accessor().show_progress_markers,
+            show_progress_markers=config_accessor.ui().show_progress_markers,
         )
 
     @blueprint.route("/sharepic", methods=["GET", "POST"])
@@ -983,7 +949,7 @@ def make_settings_blueprint(
     def sharepic():
         if request.method == "POST":
             names = request.form.getlist("name")
-            config_accessor().sharepic_suppressed_fields = list(
+            config_accessor.ui().sharepic_suppressed_fields = list(
                 set(SHAREPIC_FIELDS) - set(names)
             )
             config_accessor.save()
@@ -994,7 +960,7 @@ def make_settings_blueprint(
                 (
                     name,
                     label,
-                    name not in config_accessor().sharepic_suppressed_fields,
+                    name not in config_accessor.ui().sharepic_suppressed_fields,
                 )
                 for name, label in SHAREPIC_FIELDS.items()
             ],
@@ -1205,17 +1171,17 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def tile_source() -> str:
         if request.method == "POST":
-            config_accessor().map_tile_url = request.form["map_tile_url"]
-            config_accessor().map_tile_attribution = request.form[
+            config_accessor.map().map_tile_url = request.form["map_tile_url"]
+            config_accessor.map().map_tile_attribution = request.form[
                 "map_tile_attribution"
             ]
             config_accessor.save()
             flasher.flash_message("Tile source updated.", FlashTypes.SUCCESS)
         return render_template(
             "settings/tile-source.html.j2",
-            map_tile_url=config_accessor().map_tile_url,
-            map_tile_attribution=config_accessor().map_tile_attribution,
-            test_url=config_accessor().map_tile_url.format(zoom=14, x=8514, y=5504),
+            map_tile_url=config_accessor.map().map_tile_url,
+            map_tile_attribution=config_accessor.map().map_tile_attribution,
+            test_url=config_accessor.map().map_tile_url.format(zoom=14, x=8514, y=5504),
         )
 
     return blueprint
@@ -1240,9 +1206,9 @@ class StravaLoginHelper:
 
     def render_strava(self) -> dict:
         return {
-            "strava_client_id": self._config_accessor().strava_client_id,
-            "strava_client_secret": self._config_accessor().strava_client_secret,
-            "strava_client_code": self._config_accessor().strava_client_code,
+            "strava_client_id": self._config_accessor.strava().strava_client_id,
+            "strava_client_secret": self._config_accessor.strava().strava_client_secret,
+            "strava_client_code": self._config_accessor.strava().strava_client_code,
         }
 
     def save_strava(self, client_id: str, client_secret: str) -> str:
@@ -1262,14 +1228,14 @@ class StravaLoginHelper:
         return f"https://www.strava.com/oauth/authorize?{arg_string}"
 
     def save_strava_code(self, code: str) -> None:
-        self._config_accessor().strava_client_id = int(self._strava_client_id)
-        self._config_accessor().strava_client_secret = self._strava_client_secret
-        self._config_accessor().strava_client_code = code
+        self._config_accessor.strava().strava_client_id = int(self._strava_client_id)
+        self._config_accessor.strava().strava_client_secret = self._strava_client_secret
+        self._config_accessor.strava().strava_client_code = code
         self._config_accessor.save()
         flash("Connected to Strava API", category="success")
 
     def disconnect_strava(self) -> None:
-        self._config_accessor().strava_client_code = None
+        self._config_accessor.strava().strava_client_code = None
         self._config_accessor.save()
         (strava_api_dir() / "strava_tokens.json").unlink(missing_ok=True)
         flash(_("Disconnected from Strava API"), category="success")
@@ -1331,9 +1297,7 @@ class HammerheadLoginHelper:
         flash(_("Disconnected from Hammerhead API"), category="success")
 
 
-def save_privacy_zones(
-    zone_names: list[str], zone_geojsons: list[str], config_accessor: ConfigAccessor
-) -> None:
+def save_privacy_zones(zone_names: list[str], zone_geojsons: list[str]) -> None:
     assert len(zone_names) == len(zone_geojsons)
     new_zone_config = {}
 
@@ -1388,9 +1352,10 @@ def save_privacy_zones(
 
         new_zone_config[zone_name] = points
 
-    config_accessor().privacy_zones = new_zone_config
-    config_accessor.save()
-    flash("Updated privacy zones.", category="success")
+    DB.session.execute(sqlalchemy.delete(PrivacyZone))
+    for name, points in new_zone_config.items():
+        DB.session.add(PrivacyZone(name=name, points=points))
+    DB.session.commit()
 
 
 def _add_alpha_if_needed(color_str: str) -> str:

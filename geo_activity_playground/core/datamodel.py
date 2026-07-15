@@ -12,9 +12,9 @@ import sqlalchemy
 import sqlalchemy as sa
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, String, Table
+from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from .config import Config
 from .paths import (
     TIME_SERIES_DIR,
     activity_extracted_meta_dir,
@@ -376,7 +376,7 @@ class Equipment(DB.Model):
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
 
 
-def get_or_make_equipment(name: str, config: Config) -> Equipment:
+def get_or_make_equipment(name: str) -> Equipment:
     equipments = DB.session.scalars(
         sqlalchemy.select(Equipment).where(Equipment.name == name)
     ).all()
@@ -386,9 +386,7 @@ def get_or_make_equipment(name: str, config: Config) -> Equipment:
         )
         return equipments[0]
     else:
-        equipment = Equipment(
-            name=name, offset_km=config.equipment_offsets.get(name, 0)
-        )
+        equipment = Equipment(name=name)
         return equipment
 
 
@@ -993,3 +991,167 @@ def get_hammerhead_auth() -> HammerheadAuth:
         DB.session.add(row)
         DB.session.commit()
     return row
+
+
+class HeartRateConfig(DB.Model):
+    """Single-row settings for heart-rate zone computation."""
+
+    __tablename__ = "config_heart_rate"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    birth_year: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    heart_rate_resting: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=0
+    )
+    heart_rate_maximum: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+
+
+class StravaConfig(DB.Model):
+    """Single-row Strava API credentials."""
+
+    __tablename__ = "config_strava"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    strava_client_id: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+    strava_client_secret: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default=""
+    )
+    strava_client_code: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
+
+class ActivityImportConfig(DB.Model):
+    """Single-row settings governing how activities are imported and enriched."""
+
+    __tablename__ = "config_activity_import"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    metadata_extraction_regexes: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(sa.JSON), nullable=False, default=list
+    )
+    ignore_suffixes: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(sa.JSON), nullable=False, default=list
+    )
+    time_diff_threshold_seconds: Mapped[int | None] = mapped_column(
+        sa.Integer, nullable=True, default=30
+    )
+    reliable_elevation_measurements: Mapped[bool] = mapped_column(
+        sa.Boolean, nullable=False, default=True
+    )
+    kind_renames: Mapped[dict[str, str]] = mapped_column(
+        MutableDict.as_mutable(sa.JSON), nullable=False, default=dict
+    )
+    segment_max_distance: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=20
+    )
+    segment_split_distance: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=100
+    )
+    upload_password: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
+
+class UiConfig(DB.Model):
+    """Single-row settings for display, colors, and interface preferences."""
+
+    __tablename__ = "config_ui"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    cluster_color_strategy: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="colorful_cluster"
+    )
+    color_scheme_for_counts: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="teals"
+    )
+    color_scheme_for_kind: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="category10"
+    )
+    color_scheme_for_heatmap: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="hot"
+    )
+    color_strategy_max_cluster_color: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="#377eb84d"
+    )
+    color_strategy_max_cluster_other_color: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="#4daf4a4d"
+    )
+    color_strategy_visited_color: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="#0000004d"
+    )
+    color_strategy_cmap_opacity: Mapped[float] = mapped_column(
+        sa.Float, nullable=False, default=0.5
+    )
+    eighth_marker_min_distance_km: Mapped[float] = mapped_column(
+        sa.Float, nullable=False, default=30.0
+    )
+    eighth_marker_min_duration_hours: Mapped[float] = mapped_column(
+        sa.Float, nullable=False, default=3.0
+    )
+    explorer_zoom_levels: Mapped[list[int]] = mapped_column(
+        MutableList.as_mutable(sa.JSON), nullable=False, default=lambda: [14, 17]
+    )
+    show_progress_markers: Mapped[bool] = mapped_column(
+        sa.Boolean, nullable=False, default=True
+    )
+    visible_table_columns: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(sa.JSON),
+        nullable=False,
+        default=lambda: ["distance", "duration", "direction", "equipment", "kind"],
+    )
+    search_map_tiles_per_page: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=50
+    )
+    heatmap_cache_min_activities: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=5
+    )
+    sharepic_suppressed_fields: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(sa.JSON), nullable=False, default=list
+    )
+    kinds_without_achievements: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(sa.JSON), nullable=False, default=list
+    )
+    preferred_language: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
+
+class MapConfig(DB.Model):
+    """Single-row settings for the base map tiles."""
+
+    __tablename__ = "config_map"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    map_tile_url: Mapped[str] = mapped_column(
+        sa.String,
+        nullable=False,
+        default="https://tile.openstreetmap.org/{zoom}/{x}/{y}.png",
+    )
+    map_tile_attribution: Mapped[str] = mapped_column(
+        sa.String,
+        nullable=False,
+        default=(
+            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            ' | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
+        ),
+    )
+    map_style_url: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
+
+class PrivacyZone(DB.Model):
+    """A named polygon whose interior is stripped from shared time series."""
+
+    __tablename__ = "privacy_zones"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(sa.String, nullable=False, unique=True)
+    # Polygon ring as a list of ``[longitude, latitude]`` points.
+    points: Mapped[list[list[float]]] = mapped_column(sa.JSON, nullable=False)
+
+    def filter_time_series(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        import shapely
+
+        polygon = shapely.Polygon(self.points)
+        shapely.prepare(polygon)
+        mask = [
+            not shapely.contains_xy(polygon, longitude, latitude)
+            for longitude, latitude in zip(
+                time_series["longitude"], time_series["latitude"]
+            )
+        ]
+        return time_series.loc[mask]

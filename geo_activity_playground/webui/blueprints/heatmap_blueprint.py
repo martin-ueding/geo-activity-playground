@@ -10,8 +10,8 @@ from flask import Blueprint, Response, render_template, request
 from PIL import Image, ImageDraw
 
 from ...core.activities import ActivityRepository
-from ...core.config import Config, ConfigAccessor
-from ...core.datamodel import DB, StoredSearchQuery
+from ...core.config import ConfigAccessor
+from ...core.datamodel import DB, StoredSearchQuery, UiConfig
 from ...core.heatmap_cache import blob_to_counts, get_tile_cache, write_tile_cache
 from ...core.meta_search import (
     apply_search_filter,
@@ -110,7 +110,7 @@ def make_heatmap_blueprint(
                 y,
                 z,
                 primitives,
-                config_accessor(),
+                config_accessor.ui(),
                 repository,
             ),
             format="png",
@@ -145,7 +145,7 @@ def make_heatmap_blueprint(
                     y,
                     tile_bounds.zoom,
                     primitives,
-                    config_accessor(),
+                    config_accessor.ui(),
                     repository,
                 )
 
@@ -168,7 +168,7 @@ def _get_counts(
     y: int,
     z: int,
     primitives: dict,
-    config: Config,
+    config: UiConfig,
     repository: ActivityRepository,
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
@@ -289,7 +289,7 @@ def _render_tile_image(
     y: int,
     z: int,
     primitives: dict,
-    config: Config,
+    config: UiConfig,
     repository: ActivityRepository,
 ) -> np.ndarray:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)

@@ -1,11 +1,13 @@
 import altair as alt
 import pandas as pd
+import sqlalchemy
 from flask import Blueprint, render_template
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
+from ...core.datamodel import DB, Equipment
 from ...core.summary_stats import get_equipment_use_table
 from ..plot_util import make_kind_scale
 
@@ -17,10 +19,11 @@ def make_equipment_blueprint(
 
     @blueprint.route("/")
     def index() -> ResponseReturnValue:
-        config = config_accessor()
-        equipment_summary = get_equipment_use_table(
-            repository.meta, config.equipment_offsets
-        )
+        offsets = {
+            equipment.name: equipment.offset_km
+            for equipment in DB.session.scalars(sqlalchemy.select(Equipment)).all()
+        }
+        equipment_summary = get_equipment_use_table(repository.meta, offsets)
 
         # Prepare data for the stacked area chart
         activities = repository.meta.dropna(subset=["start_local"])
@@ -100,7 +103,7 @@ def make_equipment_blueprint(
                     alt.Y("sum(distance_km)", title=_("Distance / km")),
                     alt.Color(
                         "kind",
-                        scale=make_kind_scale(repository.meta, config),
+                        scale=make_kind_scale(repository.meta, config_accessor.ui()),
                         title=_("Kind"),
                     ),
                     tooltip=[
@@ -151,7 +154,7 @@ def make_equipment_blueprint(
             "equipment_summary": equipment_summary.to_dict(orient="records"),
             "stacked_area_chart": stacked_area_chart,
             "visible": {
-                "distance": "distance" in config.visible_table_columns,
+                "distance": "distance" in config_accessor.ui().visible_table_columns,
             },
         }
 

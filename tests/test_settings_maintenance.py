@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pandas as pd
 import sqlalchemy
 
+from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
@@ -418,7 +419,7 @@ def test_try_import_strava_does_not_recompute_tiles_per_activity(app, monkeypatc
 
     with app.app_context():
         limit_exceeded = strava_api.try_import_strava(
-            config=strava_api.Config(),
+            config_accessor=ConfigAccessor(),
             repository=None,
             strava_begin="2020-01-01",
         )

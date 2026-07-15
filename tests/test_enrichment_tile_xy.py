@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 
-from geo_activity_playground.core.config import Config
+from geo_activity_playground.core.datamodel import ActivityImportConfig
 from geo_activity_playground.core.enrichment import enrichment_compute_tile_xy
 
 
@@ -18,7 +18,7 @@ def test_enrichment_compute_tile_xy_recomputes_invalid_coordinates() -> None:
     )
 
     changed = enrichment_compute_tile_xy(
-        SimpleNamespace(), time_series, Config(), force=False
+        SimpleNamespace(), time_series, ActivityImportConfig(), force=False
     )
 
     assert changed

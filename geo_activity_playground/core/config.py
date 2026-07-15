@@ -1,187 +1,144 @@
-import dataclasses
-import functools
 import json
 import logging
-import pathlib
 
-from .paths import new_config_file, strava_dynamic_config_path
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib  # type: ignore
-
+from .datamodel import (
+    DB,
+    ActivityImportConfig,
+    HeartRateConfig,
+    MapConfig,
+    PrivacyZone,
+    StravaConfig,
+    UiConfig,
+    get_or_make_equipment,
+)
+from .paths import new_config_file
 
 logger = logging.getLogger(__name__)
 
-
-@dataclasses.dataclass
-class Config:
-    birth_year: int | None = None
-    cluster_color_strategy: str = "colorful_cluster"
-    color_scheme_for_counts: str = "teals"
-    color_scheme_for_kind: str = "category10"
-    color_scheme_for_heatmap: str = "hot"
-    color_strategy_max_cluster_color: str = "#377eb84d"
-    color_strategy_max_cluster_other_color: str = "#4daf4a4d"
-    color_strategy_visited_color: str = "#0000004d"
-    color_strategy_cmap_opacity: float = 0.5
-    eighth_marker_min_distance_km: float = 30.0
-    eighth_marker_min_duration_hours: float = 3.0
-    equipment_offsets: dict[str, float] = dataclasses.field(default_factory=dict)
-    explorer_zoom_levels: list[int] = dataclasses.field(
-        default_factory=lambda: [14, 17]
-    )
-    heart_rate_resting: int = 0
-    heart_rate_maximum: int | None = None
-    ignore_suffixes: list[str] = dataclasses.field(default_factory=list)
-    kind_renames: dict[str, str] = dataclasses.field(default_factory=dict)
-    kinds_without_achievements: list[str] = dataclasses.field(default_factory=list)
-    metadata_extraction_regexes: list[str] = dataclasses.field(default_factory=list)
-    num_processes: int | None = 1
-    preferred_language: str | None = None
-    privacy_zones: dict[str, list[list[float]]] = dataclasses.field(
-        default_factory=dict
-    )
-    reliable_elevation_measurements: bool = True
-    sharepic_suppressed_fields: list[str] = dataclasses.field(default_factory=list)
-    show_progress_markers: bool = True
-    strava_client_id: int = 0
-    strava_client_secret: str = ""
-    strava_client_code: str | None = None
-    time_diff_threshold_seconds: int | None = 30
-    upload_password: str | None = None
-    visible_table_columns: list[str] = dataclasses.field(
-        default_factory=lambda: [
-            "distance",
-            "duration",
-            "direction",
-            "equipment",
-            "kind",
-        ]
-    )
-    segment_max_distance: int = 20
-    segment_split_distance: int = 100
-    search_map_tiles_per_page: int = 50
-    heatmap_cache_min_activities: int = 5
-    map_tile_url: str = "https://tile.openstreetmap.org/{zoom}/{x}/{y}.png"
-    map_tile_attribution: str = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.openstreetmap.org/fixthemap">Correct Map</a>'
-    map_style_url: str | None = None
+_SINGLETONS = (
+    HeartRateConfig,
+    StravaConfig,
+    ActivityImportConfig,
+    UiConfig,
+    MapConfig,
+)
 
 
-# Field names that are valid for Config, used to filter out obsolete fields when loading
-_CONFIG_FIELDS = {f.name for f in dataclasses.fields(Config)}
+def _singleton(model):
+    row = DB.session.get(model, 1)
+    if row is None:
+        row = model(id=1)
+        DB.session.add(row)
+        DB.session.commit()
+    return row
 
 
 class ConfigAccessor:
-    def __init__(self) -> None:
-        self._config = Config()
-        self._mtime_ns: int | None = None
-        self._reload_if_changed()
+    """Provides the domain-grouped settings singletons stored in the database.
 
-    def _reload_if_changed(self) -> None:
-        path = new_config_file()
-        if not path.exists():
-            return
-        mtime_ns = path.stat().st_mtime_ns
-        if self._mtime_ns is not None and mtime_ns <= self._mtime_ns:
-            return
-        with open(path) as f:
-            data = json.load(f)
-        # Filter out unknown fields to handle old config files with obsolete fields
-        filtered_data = {k: v for k, v in data.items() if k in _CONFIG_FIELDS}
-        # Reassign (atomic under the GIL) so an in-flight request keeps a
-        # consistent view while other processes' writes are picked up here.
-        self._config = Config(**filtered_data)
-        self._mtime_ns = mtime_ns
+    Each accessor re-fetches its row from the current session, so every request
+    and worker process observes the latest committed values.
+    """
 
-    def __call__(self) -> Config:
-        self._reload_if_changed()
-        return self._config
+    def heart_rate(self) -> HeartRateConfig:
+        return _singleton(HeartRateConfig)
+
+    def strava(self) -> StravaConfig:
+        return _singleton(StravaConfig)
+
+    def activity_import(self) -> ActivityImportConfig:
+        return _singleton(ActivityImportConfig)
+
+    def ui(self) -> UiConfig:
+        return _singleton(UiConfig)
+
+    def map(self) -> MapConfig:
+        return _singleton(MapConfig)
 
     def save(self) -> None:
-        path = new_config_file()
-        with open(path, "w") as f:
-            json.dump(
-                dataclasses.asdict(self._config),
-                f,
-                ensure_ascii=False,
-                indent=2,
-                sort_keys=True,
-            )
-        # Record our own write so we don't immediately reload it.
-        self._mtime_ns = path.stat().st_mtime_ns
+        DB.session.commit()
+
+    def ensure_exists(self) -> None:
+        for model in _SINGLETONS:
+            _singleton(model)
 
 
-@functools.cache
-def get_config() -> dict:
-    config_path = pathlib.Path("config.toml")
-    if not config_path.exists():
-        logger.warning("Missing a config, some features might be missing.")
-        return {}
-    with open(config_path, "rb") as f:
-        config = tomllib.load(f)
+_HEART_RATE_KEYS = ("birth_year", "heart_rate_resting", "heart_rate_maximum")
+_STRAVA_KEYS = ("strava_client_id", "strava_client_secret", "strava_client_code")
+_ACTIVITY_IMPORT_KEYS = (
+    "metadata_extraction_regexes",
+    "ignore_suffixes",
+    "time_diff_threshold_seconds",
+    "reliable_elevation_measurements",
+    "kind_renames",
+    "segment_max_distance",
+    "segment_split_distance",
+    "upload_password",
+)
+_UI_KEYS = (
+    "cluster_color_strategy",
+    "color_scheme_for_counts",
+    "color_scheme_for_kind",
+    "color_scheme_for_heatmap",
+    "color_strategy_max_cluster_color",
+    "color_strategy_max_cluster_other_color",
+    "color_strategy_visited_color",
+    "color_strategy_cmap_opacity",
+    "eighth_marker_min_distance_km",
+    "eighth_marker_min_duration_hours",
+    "explorer_zoom_levels",
+    "show_progress_markers",
+    "visible_table_columns",
+    "search_map_tiles_per_page",
+    "heatmap_cache_min_activities",
+    "sharepic_suppressed_fields",
+    "kinds_without_achievements",
+    "preferred_language",
+)
+_MAP_KEYS = ("map_tile_url", "map_tile_attribution", "map_style_url")
 
-    return config
+
+def _seed(model, data: dict, keys: tuple[str, ...]):
+    row = model(id=1)
+    for key in keys:
+        if key in data:
+            setattr(row, key, data[key])
+    DB.session.add(row)
+    return row
 
 
-def import_old_config(config_accessor: ConfigAccessor) -> None:
-    old_config_path = pathlib.Path("config.toml")
-    if not old_config_path.exists():
+def import_config_json(config_accessor: ConfigAccessor) -> None:
+    """One-time migration of a legacy ``config.json`` into the database.
+
+    Only seeds a fresh database; once the settings rows exist the database is
+    authoritative and the file is ignored.
+    """
+    path = new_config_file()
+    if not path.exists():
+        return
+    if DB.session.get(HeartRateConfig, 1) is not None:
         return
 
-    if new_config_file().exists():
-        logger.warning(
-            "You have an old 'config.toml' which is now superseded by the 'config.json'. You can check the contents of the new 'config.json' and then delete the old 'config.toml'."
-        )
-        return
+    with open(path) as f:
+        data = json.load(f)
 
-    old_config = get_config()
-    config = config_accessor()
+    _seed(HeartRateConfig, data, _HEART_RATE_KEYS)
+    _seed(StravaConfig, data, _STRAVA_KEYS)
+    _seed(ActivityImportConfig, data, _ACTIVITY_IMPORT_KEYS)
+    _seed(UiConfig, data, _UI_KEYS)
+    _seed(MapConfig, data, _MAP_KEYS)
 
-    if "metadata_extraction_regexes" in old_config:
-        config.metadata_extraction_regexes = old_config["metadata_extraction_regexes"]
+    for name, points in data.get("privacy_zones", {}).items():
+        DB.session.add(PrivacyZone(name=name, points=points))
 
-    if "heart" in old_config:
-        if "birthyear" in old_config["heart"]:
-            config.birth_year = old_config["heart"]["birthyear"]
-        if "resting" in old_config["heart"]:
-            config.heart_rate_resting = old_config["heart"]["resting"]
-        if "maximum" in old_config["heart"]:
-            config.heart_rate_maximum = old_config["heart"]["maximum"]
+    for name, offset in data.get("equipment_offsets", {}).items():
+        equipment = get_or_make_equipment(name)
+        if not equipment.offset_km:
+            equipment.offset_km = int(offset)
+        DB.session.add(equipment)
 
-    if "strava" in old_config:
-        if "client_id" in old_config["strava"]:
-            config.strava_client_id = old_config["strava"]["client_id"]
-        if "client_secret" in old_config["strava"]:
-            config.strava_client_secret = old_config["strava"]["client_secret"]
-        if "code" in old_config["strava"]:
-            config.strava_client_code = old_config["strava"]["code"]
-
-    if "offsets" in old_config:
-        config.equipment_offsets = old_config["offsets"]
-
-    if "upload" in old_config:
-        if "password" in old_config["upload"]:
-            config.upload_password = old_config["upload"]["password"]
-
-    if "privacy_zones" in old_config:
-        config.privacy_zones = old_config["privacy_zones"]
-
-    config_accessor.save()
-
-
-def import_old_strava_config(config_accessor: ConfigAccessor) -> None:
-    if not strava_dynamic_config_path().exists():
-        return
-
-    with open(strava_dynamic_config_path()) as f:
-        strava_dynamic_config = json.load(f)
-
-    config = config_accessor()
-    config.strava_client_id = strava_dynamic_config["client_id"]
-    config.strava_client_secret = strava_dynamic_config["client_secret"]
-    config.strava_client_code = strava_dynamic_config["code"]
-
-    config_accessor.save()
-    strava_dynamic_config_path().unlink()
+    DB.session.commit()
+    logger.info(
+        "Imported settings from 'config.json' into the database. "
+        "You can review the settings in the GUI and then delete 'config.json'."
+    )
