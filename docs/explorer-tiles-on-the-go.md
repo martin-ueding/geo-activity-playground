@@ -16,13 +16,14 @@ This is how that looks in the app:
 
 ## OsmAnd
 
-On Android you can use the [OsmAnd](https://osmand.net/) app to display tracks and visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/), so the missing tiles are also exported as a GPX file with one track per missing tile. This looks strange, but it works with OsmAnd.
-
-And on OsmAnd such files look like this:
+On Android you can use the [OsmAnd](https://osmand.net/) app to display tracks and visualize the missing tiles. Unfortunately [GeoJSON is not supported](https://osmand.net/docs/technical/osmand-file-formats/). But you can export the missing tiles as a GPX file with contains one track per missing tile. Then you can import the GPX file in OsmAnd. This looks strange, but it works for a small region. For bigger regions OsmAnd becomes very sluggish.
 
 ![](images/explorer-osmand.jpg)
 
-OsmAnd becomes very sluggish with such a huge track imported, so only export it from rather small regions.
+Alternatively you can import the missing tiles map layer as online overlay map from GAP. For on-the-go you might want a VPN connection or use the map tile caching function of OsmAnd in your local network. You need to activcate the 'Online maps' plugin. Add a new map online source under `Maps & Resources > Local > Map sources`. Use one of the [Explorer Tiles Tile URLs](using-maps-as-overlays.md) as URL and choose an expiry time, so OsmAnd pulls the newest state after a while. You can `Clear all tiles` to force a update of the map. To add the overlay to your map, `Configure map > Overlay map` and choose your new map source.
+
+![](images/OsmAnd_Explorer_Tile_Overlay.png)
+
 
 ## Organic Maps and CoMaps
 
