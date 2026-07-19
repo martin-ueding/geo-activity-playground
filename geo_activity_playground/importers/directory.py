@@ -13,6 +13,7 @@ from ..core.datamodel import (
     DEFAULT_UNKNOWN_NAME,
     Activity,
     ActivityImportConfig,
+    UiConfig,
     get_or_make_equipment,
     get_or_make_kind,
 )
@@ -31,6 +32,7 @@ ACTIVITY_DIR = pathlib.Path("Activities")
 def import_from_directory(
     repository: ActivityRepository,
     config: ActivityImportConfig,
+    ui_config: UiConfig,
 ) -> None:
     activity_paths = [
         path
@@ -88,13 +90,14 @@ def import_from_directory(
                         + ", ".join(str(activity.id) for activity in with_same_hash)
                     )
 
-            import_from_file(activity_path, repository, config, i)
+            import_from_file(activity_path, repository, config, ui_config, i)
 
 
 def import_from_file(
     path: pathlib.Path,
     repository: ActivityRepository,
     config: ActivityImportConfig,
+    ui_config: UiConfig,
     i: int,
 ) -> None:
     logger.info(f"Importing {path} …")
@@ -141,7 +144,7 @@ def import_from_file(
 
     if len(repository) > 0 and i % 50 == 0:
         compute_tile_visits_new(repository)
-        compute_tile_evolution(config)
+        compute_tile_evolution(ui_config)
 
 
 def get_metadata_from_path(

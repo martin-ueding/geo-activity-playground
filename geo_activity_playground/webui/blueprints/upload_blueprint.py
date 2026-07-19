@@ -120,7 +120,9 @@ def scan_for_activities(
     skip_hammerhead: bool = False,
 ) -> None:
     if pathlib.Path("Activities").exists():
-        import_from_directory(repository, config_accessor.activity_import())
+        import_from_directory(
+            repository, config_accessor.activity_import(), config_accessor.ui()
+        )
     import_photos_from_directory()
     if pathlib.Path("Strava Export").exists():
         import_from_strava_checkout(config_accessor.activity_import())
