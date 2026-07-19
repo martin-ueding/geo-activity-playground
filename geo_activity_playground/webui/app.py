@@ -55,6 +55,7 @@ from ..core.raster_map import (
 )
 from ..features.activity_photos.model import Photo
 from ..features.activity_photos.photo_blueprint import make_photo_blueprint
+from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
@@ -339,50 +340,75 @@ def create_app(
     # Register routes and blueprints
     register_entry_views(app, repository, config_accessor)
 
-    blueprints = {
-        "/activity": make_activity_blueprint(
-            repository,
-            authenticator,
-            config_accessor,
-            heart_rate_zone_computer,
+    blueprints = [
+        (
+            "/activity",
+            make_activity_blueprint(
+                repository,
+                authenticator,
+                config_accessor,
+                heart_rate_zone_computer,
+            ),
         ),
-        "/admin": make_admin_blueprint(
-            authenticator, multi_process=http_server == "gunicorn"
+        (
+            "/admin",
+            make_admin_blueprint(
+                authenticator, multi_process=http_server == "gunicorn"
+            ),
         ),
-        "/auth": make_auth_blueprint(authenticator),
-        "/bubble-chart": make_bubble_chart_blueprint(repository),
-        "/calendar": make_calendar_blueprint(repository, config_accessor),
-        "/eddington": register_eddington_blueprint(repository, authenticator),
-        "/equipment": make_equipment_blueprint(repository, config_accessor),
-        "/explorer": make_explorer_blueprint(
-            authenticator,
-            config_accessor,
-            tile_getter,
-            image_transforms,
+        ("/auth", make_auth_blueprint(authenticator)),
+        ("/bubble-chart", make_bubble_chart_blueprint(repository)),
+        ("/calendar", make_calendar_blueprint(repository, config_accessor)),
+        ("/eddington", register_eddington_blueprint(repository, authenticator)),
+        ("/equipment", make_equipment_blueprint(repository, config_accessor)),
+        (
+            "/explorer",
+            make_explorer_blueprint(
+                authenticator,
+                config_accessor,
+                tile_getter,
+                image_transforms,
+            ),
         ),
-        "/export": make_export_blueprint(authenticator),
-        "/hall-of-fame": make_hall_of_fame_blueprint(
-            repository, authenticator, config_accessor
+        ("/explorer", make_explorer_video_blueprint(authenticator, config_accessor)),
+        ("/export", make_export_blueprint(authenticator)),
+        (
+            "/hall-of-fame",
+            make_hall_of_fame_blueprint(repository, authenticator, config_accessor),
         ),
-        "/heatmap": make_heatmap_blueprint(repository, config_accessor, authenticator),
-        "/photo": make_photo_blueprint(config_accessor, authenticator, flasher),
-        "/plot-builder": make_plot_builder_blueprint(
-            repository, flasher, authenticator
+        (
+            "/heatmap",
+            make_heatmap_blueprint(repository, config_accessor, authenticator),
         ),
-        "/settings": make_settings_blueprint(
-            config_accessor, authenticator, flasher, repository
+        ("/photo", make_photo_blueprint(config_accessor, authenticator, flasher)),
+        (
+            "/plot-builder",
+            make_plot_builder_blueprint(repository, flasher, authenticator),
         ),
-        "/segments": make_segments_blueprint(authenticator, flasher, config_accessor),
-        "/square-planner": make_square_planner_blueprint(),
-        "/search": make_search_blueprint(authenticator, config_accessor),
-        "/summary": make_summary_blueprint(repository, config_accessor, authenticator),
-        "/tile": make_tile_blueprint(image_transforms, tile_getter),
-        "/upload": make_upload_blueprint(
-            repository, config_accessor, authenticator, flasher
+        (
+            "/settings",
+            make_settings_blueprint(
+                config_accessor, authenticator, flasher, repository
+            ),
         ),
-    }
+        (
+            "/segments",
+            make_segments_blueprint(authenticator, flasher, config_accessor),
+        ),
+        ("/square-planner", make_square_planner_blueprint()),
+        ("/search", make_search_blueprint(authenticator, config_accessor)),
+        (
+            "/summary",
+            make_summary_blueprint(repository, config_accessor, authenticator),
+        ),
+        ("/tile", make_tile_blueprint(image_transforms, tile_getter)),
+        (
+            "/upload",
+            make_upload_blueprint(repository, config_accessor, authenticator, flasher),
+        ),
+    ]
 
-    for url_prefix, blueprint in blueprints.items():
+    for url_prefix, blueprint in blueprints:
         app.register_blueprint(blueprint, url_prefix=url_prefix)
 
     # Register context processor for global template variables

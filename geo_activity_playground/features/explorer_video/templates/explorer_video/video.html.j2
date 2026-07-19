@@ -7,7 +7,7 @@
 <p>{{ _('No explorer zoom levels are enabled yet.') }}</p>
 {% else %}
 <p>{{ _('Configure the render options and generate an MP4.') }}</p>
-<p><a href="{{ url_for('.server_side', zoom=selected_zoom) }}">{{ _('Back to Explorer Tiles') }}</a></p>
+<p><a href="{{ url_for('explorer.server_side', zoom=selected_zoom) }}">{{ _('Back to Explorer Tiles') }}</a></p>
 
 <form action="{{ url_for('.generate_video') }}" method="post" class="row g-2 align-items-end mt-2">
     <div class="col-md-2">
