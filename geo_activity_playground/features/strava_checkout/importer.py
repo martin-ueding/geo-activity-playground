@@ -14,16 +14,20 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ..core.datamodel import (
+from ...core.datamodel import (
     DEFAULT_UNKNOWN_NAME,
     ActivityImportConfig,
     get_or_make_equipment,
     get_or_make_kind,
 )
-from ..core.enrichment import update_and_commit
-from ..core.paths import activity_extracted_meta_dir
-from ..core.tasks import WorkTracker, work_tracker_path
-from .activity_parsers import ActivityParseError, NoGeoDataError, read_activity
+from ...core.enrichment import update_and_commit
+from ...core.paths import activity_extracted_meta_dir
+from ...core.tasks import WorkTracker, work_tracker_path
+from ...importers.activity_parsers import (
+    ActivityParseError,
+    NoGeoDataError,
+    read_activity,
+)
 from .csv_parser import parse_csv
 
 logger = logging.getLogger(__name__)

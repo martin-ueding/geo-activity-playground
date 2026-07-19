@@ -779,19 +779,6 @@ class HeartRateConfig(DB.Model):
     heart_rate_maximum: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
 
 
-class StravaConfig(DB.Model):
-    """Single-row Strava API credentials."""
-
-    __tablename__ = "config_strava"
-
-    id: Mapped[int] = mapped_column(primary_key=True, default=1)
-    strava_client_id: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
-    strava_client_secret: Mapped[str] = mapped_column(
-        sa.String, nullable=False, default=""
-    )
-    strava_client_code: Mapped[str | None] = mapped_column(sa.String, nullable=True)
-
-
 class ActivityImportConfig(DB.Model):
     """Single-row settings governing how activities are imported and enriched."""
 

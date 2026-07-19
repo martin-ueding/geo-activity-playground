@@ -11,22 +11,17 @@ from stravalib import Client
 from stravalib.exc import Fault, ObjectNotFound, RateLimitExceeded
 from tqdm import tqdm
 
-from ..core.activities import ActivityRepository
-from ..core.config import ConfigAccessor
-from ..core.datamodel import (
-    DB,
-    Activity,
-    StravaConfig,
-    get_or_make_equipment,
-    get_or_make_kind,
-)
-from ..core.enrichment import update_and_commit
-from ..core.paths import (
+from ...core.activities import ActivityRepository
+from ...core.config import ConfigAccessor
+from ...core.datamodel import DB, Activity, get_or_make_equipment, get_or_make_kind
+from ...core.enrichment import update_and_commit
+from ...core.paths import (
     activity_extracted_time_series_dir,
     strava_api_dir,
     strava_last_activity_date_path,
 )
-from ..core.tasks import get_state, set_state
+from ...core.tasks import get_state, set_state
+from .model import StravaConfig
 
 logger = logging.getLogger(__name__)
 

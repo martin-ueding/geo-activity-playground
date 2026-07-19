@@ -30,7 +30,7 @@ from geo_activity_playground.features.segments.model import (
     SegmentCheck,
     SegmentMatch,
 )
-from geo_activity_playground.importers import strava_api
+from geo_activity_playground.features.strava_api import importer as strava_api
 
 
 def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path):

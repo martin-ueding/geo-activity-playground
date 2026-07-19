@@ -23,9 +23,9 @@ from ...features.hammerhead.importer import import_from_hammerhead_api
 from ...features.hammerhead.model import HammerheadAuth
 from ...features.segments.matching import find_matches
 from ...features.segments.model import Segment
+from ...features.strava_api.importer import import_from_strava_api
+from ...features.strava_checkout.importer import import_from_strava_checkout
 from ...importers.directory import import_from_directory
-from ...importers.strava_api import import_from_strava_api
-from ...importers.strava_checkout import import_from_strava_checkout
 from ..authenticator import Authenticator, needs_authentication
 from ..flasher import Flasher, FlashTypes
 

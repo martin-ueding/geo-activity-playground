@@ -13,7 +13,7 @@ from .features.explorer_video.cli import (
     register_main_explorer_video,
 )
 from .features.heatmap_video.cli import register_main_heatmap_video
-from .importers.strava_checkout import convert_strava_checkout
+from .features.strava_checkout.importer import convert_strava_checkout
 from .webui.app import create_app, web_ui_main
 
 logger = logging.getLogger(__name__)

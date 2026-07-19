@@ -1,13 +1,13 @@
 import json
 import logging
 
+from ..features.strava_api.model import StravaConfig
 from .datamodel import (
     DB,
     ActivityImportConfig,
     HeartRateConfig,
     MapConfig,
     PrivacyZone,
-    StravaConfig,
     UiConfig,
     get_or_make_equipment,
 )
