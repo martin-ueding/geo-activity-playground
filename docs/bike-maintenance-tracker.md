@@ -16,44 +16,43 @@ In the current state, we have these entities:
 - **Task Execution**: When a _task_ is executed, it is logged with the date and the mileage of the _equipment_ when it was executed.
 
 ```mermaid
-classDiagram
-    class Equipment {
-        id: int
-        name: str
-        mileage_offset: float
+erDiagram
+    EQUIPMENT {
+        int id
+        str name
+        float mileage_offset
     }
-    class MaintenanceAction {
-        id: int
-        title: str
-        description: str
-        equipment_id: id
-        date: datetime
-        mileage_km: int
+    MAINTENANCE_ACTION {
+        int id
+        str title
+        str description
+        int equipment_id
+        datetime date
+        int mileage_km
     }
-    class MaintenanceActionPhoto {
-        id: int
-        title: str
-        maintenance_action_id: int
+    MAINTENANCE_ACTION_PHOTO {
+        int id
+        str title
+        int maintenance_action_id
     }
-    class RecurringTask {
-        id: int
-        title: int
-        interval_days: int
-        interval_km: int
+    RECURRING_TASK {
+        int id
+        str title
+        int interval_days
+        int interval_km
     }
-    class TaskExecution {
-        id: int
-        task_id: id
-        comment: str
-        date: datetime
-        mileage_km: int
+    TASK_EXECUTION {
+        int id
+        int task_id
+        str comment
+        datetime date
+        int mileage_km
     }
 
-    Equipment <-- MaintenanceAction
-    MaintenanceAction <-- MaintenanceActionPhoto
-    Equipment <-- RecurringTask
-    RecurringTask <-- TaskExecution
-
+    EQUIPMENT ||--o{ MAINTENANCE_ACTION : has
+    MAINTENANCE_ACTION ||--o{ MAINTENANCE_ACTION_PHOTO : has
+    EQUIPMENT ||--o{ RECURRING_TASK : has
+    RECURRING_TASK ||--o{ TASK_EXECUTION : has
 ```
 
 ## Analysis features
