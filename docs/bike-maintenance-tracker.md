@@ -15,6 +15,47 @@ In the current state, we have these entities:
 - **Recurring Task**: A task is something that needs to be checked or done on a specific _equipment_, but isn't a _maintenance action_ in itself. These are things like “apply chain lube”, “check tire pressure”. Each _task_ has a title, an interval in days and/or an interval in kilometers.
 - **Task Execution**: When a _task_ is executed, it is logged with the date and the mileage of the _equipment_ when it was executed.
 
+```mermaid
+classDiagram
+    class Equipment {
+        id: int
+        name: str
+        mileage_offset: float
+    }
+    class MaintenanceAction {
+        id: int
+        title: str
+        description: str
+        equipment_id: id
+        date: datetime
+        mileage_km: int
+    }
+    class MaintenanceActionPhoto {
+        id: int
+        title: str
+        maintenance_action_id: int
+    }
+    class RecurringTask {
+        id: int
+        title: int
+        interval_days: int
+        interval_km: int
+    }
+    class TaskExecution {
+        id: int
+        task_id: id
+        comment: str
+        date: datetime
+        mileage_km: int
+    }
+
+    Equipment <-- MaintenanceAction
+    MaintenanceAction <-- MaintenanceActionPhoto
+    Equipment <-- RecurringTask
+    RecurringTask <-- TaskExecution
+
+```
+
 ## Analysis features
 
 For each equipment, you can see the maintenance actions and task executions as well as the pending task executions.
