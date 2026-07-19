@@ -1,4 +1,6 @@
-export default {
+import { withMermaid } from 'vitepress-plugin-mermaid'
+
+export default withMermaid({
   title: 'Geo Activity Playground',
   description: 'View recorded outdoor activities and derive insights from your data.',
   base: '/geo-activity-playground/',
@@ -115,4 +117,4 @@ export default {
       provider: 'local',
     },
   },
-}
+})
