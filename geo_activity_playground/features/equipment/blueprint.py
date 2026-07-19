@@ -8,8 +8,8 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Equipment
-from ...core.summary_stats import get_equipment_use_table
-from ..plot_util import make_kind_scale
+from ...webui.plot_util import make_kind_scale
+from .stats import get_equipment_use_table
 
 
 def make_equipment_blueprint(

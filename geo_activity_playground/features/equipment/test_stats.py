@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import pytest
 
-from .summary_stats import get_equipment_use_table
+from .stats import get_equipment_use_table
 
 
 @pytest.fixture

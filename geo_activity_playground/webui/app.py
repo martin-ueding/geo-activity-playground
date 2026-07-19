@@ -56,6 +56,7 @@ from ..features.bubble_chart.blueprint import make_bubble_chart_blueprint
 from ..features.calendar.blueprint import make_calendar_blueprint
 from ..features.data_export.blueprint import make_export_blueprint
 from ..features.eddington.blueprint import register_eddington_blueprint
+from ..features.equipment.blueprint import make_equipment_blueprint
 from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
 from ..features.hall_of_fame.blueprint import make_hall_of_fame_blueprint
 from ..features.hammerhead.model import get_hammerhead_auth
@@ -74,15 +75,14 @@ from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from ..features.summary.blueprint import make_summary_blueprint
+from ..features.tile.blueprint import make_tile_blueprint
 from ..features.upload.blueprint import make_upload_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.entry_views import register_entry_views
-from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
-from .blueprints.tile_blueprint import make_tile_blueprint
 from .flasher import FlaskFlasher
 from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
 
