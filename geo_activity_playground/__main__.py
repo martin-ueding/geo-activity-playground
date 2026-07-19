@@ -10,7 +10,7 @@ from .features.activity_photos.cli import (
     register_main_annotate_photos,
     register_main_inspect_photo,
 )
-from .heatmap_video import main_heatmap_video
+from .features.heatmap_video.cli import register_main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
 from .webui.app import create_app, web_ui_main
 
@@ -106,6 +106,7 @@ def main() -> None:
 
     register_main_inspect_photo(subparsers)
     register_main_annotate_photos(subparsers)
+    register_main_heatmap_video(subparsers)
 
     subparser = subparsers.add_parser(
         "explorer-video", help="Generate video with explorer timeline."
@@ -247,32 +248,6 @@ def main() -> None:
         "--hammerhead-end",
         help="End date to limit Hammerhead sync, format YYYY-MM-DD",
     )
-
-    subparser = subparsers.add_parser(
-        "heatmap-video", help="Create a video with the evolution of the heatmap"
-    )
-    subparser.add_argument("latitude", type=float)
-    subparser.add_argument("longitude", type=float)
-    subparser.add_argument("zoom", type=int)
-    subparser.add_argument(
-        "--decay",
-        type=float,
-        default=0.05,
-        help="Decay factor per frame (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--video-width",
-        type=int,
-        default=1920,
-        help="Output video width in pixels (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--video-height",
-        type=int,
-        default=1080,
-        help="Output video height in pixels (default: %(default)s)",
-    )
-    subparser.set_defaults(func=main_heatmap_video)
 
     subparser = subparsers.add_parser(
         "export-kml",

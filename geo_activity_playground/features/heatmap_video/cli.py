@@ -1,3 +1,4 @@
+import argparse
 import collections
 import os
 import pathlib
@@ -8,19 +9,19 @@ import pandas as pd
 from PIL import Image, ImageDraw
 from tqdm import tqdm
 
-from .core.activities import ActivityRepository
-from .core.config import ConfigAccessor
-from .core.raster_map import (
+from ...core.activities import ActivityRepository
+from ...core.config import ConfigAccessor
+from ...core.raster_map import (
     OSM_TILE_SIZE,
     convert_to_grayscale,
     map_image_from_tile_bounds,
     tile_bounds_around_center,
 )
-from .core.tiles import compute_tile_float
+from ...core.tiles import compute_tile_float
 
 
 def main_heatmap_video(options) -> None:
-    from .webui.app import create_app
+    from ...webui.app import create_app
 
     zoom: int = options.zoom
     print(options)
@@ -34,6 +35,34 @@ def main_heatmap_video(options) -> None:
     )
     with app.app_context():
         _render_heatmap_video(options, zoom, video_size)
+
+
+def register_main_heatmap_video(subparsers: argparse._SubParsersAction) -> None:
+    subparser = subparsers.add_parser(
+        "heatmap-video", help="Create a video with the evolution of the heatmap"
+    )
+    subparser.add_argument("latitude", type=float)
+    subparser.add_argument("longitude", type=float)
+    subparser.add_argument("zoom", type=int)
+    subparser.add_argument(
+        "--decay",
+        type=float,
+        default=0.05,
+        help="Decay factor per frame (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-width",
+        type=int,
+        default=1920,
+        help="Output video width in pixels (default: %(default)s)",
+    )
+    subparser.add_argument(
+        "--video-height",
+        type=int,
+        default=1080,
+        help="Output video height in pixels (default: %(default)s)",
+    )
+    subparser.set_defaults(func=main_heatmap_video)
 
 
 def _render_heatmap_video(options, zoom: int, video_size) -> None:
