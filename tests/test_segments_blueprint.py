@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from geo_activity_playground.webui.blueprints.segments_blueprint import segment_df
+from geo_activity_playground.features.segments.analysis import segment_df
 
 
 def test_segment_df_handles_empty_matches() -> None:

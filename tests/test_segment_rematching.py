@@ -3,17 +3,15 @@ import datetime as dt
 import sqlalchemy
 
 from geo_activity_playground.core.coordinates import get_distance
-from geo_activity_playground.core.datamodel import (
-    DB,
-    Activity,
-    ActivityImportConfig,
+from geo_activity_playground.core.datamodel import DB, Activity, ActivityImportConfig
+from geo_activity_playground.features.segments.matching import (
+    rematch_segment,
+    try_match_segment_activity,
+)
+from geo_activity_playground.features.segments.model import (
     Segment,
     SegmentCheck,
     SegmentMatch,
-)
-from geo_activity_playground.core.segments import (
-    rematch_segment,
-    try_match_segment_activity,
 )
 
 
@@ -84,7 +82,7 @@ def test_try_match_segment_activity_skips_activities_without_start_time(
             )
 
         monkeypatch.setattr(
-            "geo_activity_playground.core.segments.segment_track_distance",
+            "geo_activity_playground.features.segments.matching.segment_track_distance",
             fail_if_called,
         )
 

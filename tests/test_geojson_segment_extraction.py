@@ -1,6 +1,8 @@
 import pathlib
 
-from geo_activity_playground.core.segments import extract_segment_from_geojson
+from geo_activity_playground.features.segments.matching import (
+    extract_segment_from_geojson,
+)
 
 
 def test_extract_segment_from_geojson() -> None:

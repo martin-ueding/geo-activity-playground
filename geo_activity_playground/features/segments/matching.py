@@ -5,16 +5,10 @@ import numpy as np
 import pandas as pd
 import sqlalchemy
 
-from .coordinates import get_distance
-from .datamodel import (
-    DB,
-    Activity,
-    ActivityImportConfig,
-    Segment,
-    SegmentCheck,
-    SegmentMatch,
-)
-from .tiles import compute_tile_float
+from ...core.coordinates import get_distance
+from ...core.datamodel import DB, Activity, ActivityImportConfig
+from ...core.tiles import compute_tile_float
+from .model import Segment, SegmentCheck, SegmentMatch
 
 SEGMENT_ZOOM = 17
 
@@ -132,7 +126,7 @@ def find_matches(
     config: ActivityImportConfig,
 ) -> None:
     # Imported here to avoid a core -> explorer import at module load time.
-    from ..explorer.tile_visits import get_activity_ids_in_tiles
+    from ...explorer.tile_visits import get_activity_ids_in_tiles
 
     segment_tiles = tiles_for_segment(segment, SEGMENT_ZOOM)
     activity_candidates = get_activity_ids_in_tiles(SEGMENT_ZOOM, iter(segment_tiles))

@@ -17,16 +17,18 @@ from geo_activity_playground.core.datamodel import (
     ExplorerTileBookmark,
     HeatmapTileCache,
     Kind,
-    Photo,
     PlotSpec,
-    Segment,
-    SegmentCheck,
-    SegmentMatch,
     SquarePlannerBookmark,
     StoredSearchQuery,
     Tag,
     TileVisit,
     activity_tag_association_table,
+)
+from geo_activity_playground.features.activity_photos.model import Photo
+from geo_activity_playground.features.segments.model import (
+    Segment,
+    SegmentCheck,
+    SegmentMatch,
 )
 from geo_activity_playground.importers import strava_api
 

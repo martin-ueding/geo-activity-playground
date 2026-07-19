@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from geo_activity_playground.core.datamodel import ActivityImportConfig
-from geo_activity_playground.core.segments import segment_track_distance
+from geo_activity_playground.features.segments.matching import segment_track_distance
 
 
 def make_activity(coordinates: list[list[float]]) -> SimpleNamespace:

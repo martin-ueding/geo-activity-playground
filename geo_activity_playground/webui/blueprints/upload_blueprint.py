@@ -13,13 +13,14 @@ from flask import (
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, Activity, HammerheadAuth, Segment
-from ...core.segments import find_matches
+from ...core.datamodel import DB, Activity, HammerheadAuth
 from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
 from ...features.activity_photos.importer import import_photos_from_directory
+from ...features.segments.matching import find_matches
+from ...features.segments.model import Segment
 from ...importers.directory import import_from_directory
 from ...importers.hammerhead_api import import_from_hammerhead_api
 from ...importers.strava_api import import_from_strava_api

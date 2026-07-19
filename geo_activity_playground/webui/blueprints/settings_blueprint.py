@@ -41,9 +41,6 @@ from ...core.datamodel import (
     Kind,
     PlotSpec,
     PrivacyZone,
-    Segment,
-    SegmentCheck,
-    SegmentMatch,
     SquarePlannerBookmark,
     StoredSearchQuery,
     Tag,
@@ -65,6 +62,7 @@ from ...explorer.tile_visits import (
     compute_tile_visits_new,
 )
 from ...features.activity_photos.model import Photo
+from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
