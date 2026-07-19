@@ -66,11 +66,11 @@ from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
 from ..features.segments.model import Segment  # noqa: F401
+from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
-from .blueprints.admin_blueprint import make_admin_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
@@ -354,12 +354,6 @@ def create_app(
             ),
         ),
         (
-            "/admin",
-            make_admin_blueprint(
-                authenticator, multi_process=http_server == "gunicorn"
-            ),
-        ),
-        (
             "/authentication",
             make_authentication_blueprint(authenticator, config_accessor, flasher),
         ),
@@ -400,6 +394,12 @@ def create_app(
         (
             "/segments",
             make_segments_blueprint(authenticator, flasher, config_accessor),
+        ),
+        (
+            "/shutdown",
+            make_shutdown_blueprint(
+                authenticator, multi_process=http_server == "gunicorn"
+            ),
         ),
         ("/square-planner", make_square_planner_blueprint()),
         ("/search", make_search_blueprint(authenticator, config_accessor)),

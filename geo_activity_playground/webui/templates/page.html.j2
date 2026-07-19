@@ -179,7 +179,7 @@
                                 </li>
 
                                 <li>
-                                    <form action="{{ url_for('admin.shutdown') }}" method="POST" style="margin: 0;"
+                                    <form action="{{ url_for('shutdown.shutdown') }}" method="POST" style="margin: 0;"
                                         onsubmit="return confirm('{{ _('Are you sure you want to shut down the server? This will terminate the application.') }}');">
                                         <button type="submit" class="dropdown-item text-danger">{{ _('Shutdown Server')
                                             }}</button>

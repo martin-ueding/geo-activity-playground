@@ -5,17 +5,17 @@ import signal
 from flask import Blueprint
 from flask.typing import ResponseReturnValue
 
-from ..authenticator import Authenticator, needs_authentication
+from ...webui.authenticator import Authenticator, needs_authentication
 
 logger = logging.getLogger(__name__)
 
 
-def make_admin_blueprint(
+def make_shutdown_blueprint(
     authenticator: Authenticator, multi_process: bool = False
 ) -> Blueprint:
-    blueprint = Blueprint("admin", __name__, template_folder="templates")
+    blueprint = Blueprint("shutdown", __name__, template_folder="templates")
 
-    @blueprint.route("/shutdown", methods=["POST"])
+    @blueprint.route("/", methods=["POST"])
     @needs_authentication(authenticator)
     def shutdown() -> ResponseReturnValue:
         logger.info("Shutdown requested via web interface.")
