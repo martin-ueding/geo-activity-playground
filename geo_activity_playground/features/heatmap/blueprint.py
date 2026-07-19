@@ -35,8 +35,10 @@ from ...explorer.tile_visits import (
     get_biggest_cluster_members,
     get_tile_medians,
 )
-from ..authenticator import Authenticator
-from .explorer_blueprint import geojson_bounding_box_for_tile_collection
+from ...webui.authenticator import Authenticator
+from ...webui.blueprints.explorer_blueprint import (
+    geojson_bounding_box_for_tile_collection,
+)
 
 logger = logging.getLogger(__name__)
 

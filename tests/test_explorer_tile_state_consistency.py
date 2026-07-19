@@ -30,7 +30,7 @@ from geo_activity_playground.explorer.tile_visits import (
     rebuild_cluster_history_for_zoom,
     remove_activity_from_tile_state,
 )
-from geo_activity_playground.webui.blueprints.heatmap_blueprint import _get_counts
+from geo_activity_playground.features.heatmap.blueprint import _get_counts
 
 
 def test_get_tile_visits_uses_db_only(app) -> None:
