@@ -18,4 +18,4 @@ def test_interpolate() -> None:
     assert interpolate_missing_tile(1.25, 2.25, 2.5, 1.5) == (1, 1)
     assert interpolate_missing_tile(2.5, 1.5, 1.25, 2.25) == (1, 1)
     assert interpolate_missing_tile(2.25, 2.5, 1.75, 1.25) == (2, 1)
-    assert interpolate_missing_tile(1.25, 2.25, 2.25, 2.5) == None
+    assert interpolate_missing_tile(1.25, 2.25, 2.25, 2.5) is None

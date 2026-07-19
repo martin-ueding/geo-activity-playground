@@ -59,8 +59,8 @@ def interpolate_missing_tile(
         return None
 
     x_hat = int(max(x1, x2))
-    l = (x_hat - x1) / (x2 - x1)
-    y_hat = int(y1 + l * (y2 - y1))
+    frac = (x_hat - x1) / (x2 - x1)
+    y_hat = int(y1 + frac * (y2 - y1))
     if y_hat == int(y1):
         return (int(x2), y_hat)
     else:

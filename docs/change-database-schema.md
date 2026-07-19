@@ -12,7 +12,7 @@ Whenever there is a change to the model, existing databases have to be upgraded 
 
 ## Concrete example
 
-Somebody wanted to be able to change the colors for the tags. We need to add a *color* field to the database table of the tags. In the file `geo_activity_playground/core/datamodel.py` we find the following model for the tags:
+Somebody wanted to be able to change the colors for the tags. We need to add a *color* field to the database table of the tags. In the file `src/geo_activity_playground/core/datamodel.py` we find the following model for the tags:
 
 ```python
 class Tag(DB.Model):
@@ -50,7 +50,7 @@ This changes the model, but it doesn't upgrade the database. We need to run the 
 uv run alembic revision --autogenerate -m 'Add Tag.color'
 ```
 
-This then created the file `geo_activity_playground/alembic/versions/0f02b92c4f94_add_tag_color.py`. This contains a bit of metadata:
+This then created the file `src/geo_activity_playground/alembic/versions/0f02b92c4f94_add_tag_color.py`. This contains a bit of metadata:
 
 ```python
 revision: str = "0f02b92c4f94"
@@ -101,6 +101,6 @@ A `database.sqlite` file is checked into the repository at the project root. Ale
 If you want to change the data model, do the following:
 
 1. Get in touch, let's discuss your plans.
-2. Add the necessary fields in `geo_activity_playground/core/datamodel.py` or potentially other files if your model has more cohesion with your code.
+2. Add the necessary fields in `src/geo_activity_playground/core/datamodel.py` or potentially other files if your model has more cohesion with your code.
 3. Run `uv run alembic revision --autogenerate -m 'MESSAGE'` with an appropriate message.
 4. Add your changes and the generated migration file to git.

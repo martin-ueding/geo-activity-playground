@@ -146,7 +146,7 @@ def get_stored_queries(limit_recent: int = 10) -> list[StoredSearchQuery]:
     favorites = list(
         DB.session.scalars(
             sqlalchemy.select(StoredSearchQuery)
-            .where(StoredSearchQuery.is_favorite == True)
+            .where(StoredSearchQuery.is_favorite)
             .order_by(StoredSearchQuery.last_used.desc())
         ).all()
     )
@@ -154,7 +154,7 @@ def get_stored_queries(limit_recent: int = 10) -> list[StoredSearchQuery]:
     recent = list(
         DB.session.scalars(
             sqlalchemy.select(StoredSearchQuery)
-            .where(StoredSearchQuery.is_favorite == False)
+            .where(~StoredSearchQuery.is_favorite)
             .order_by(StoredSearchQuery.last_used.desc())
             .limit(limit_recent)
         ).all()

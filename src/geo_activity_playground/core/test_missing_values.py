@@ -5,11 +5,11 @@ from .missing_values import some
 
 
 def test_none() -> None:
-    assert some(None) == None
+    assert some(None) is None
 
 
 def test_nan() -> None:
-    assert some(np.nan) == None
+    assert some(np.nan) is None
 
 
 def test_float() -> None:
@@ -21,4 +21,4 @@ def test_integer() -> None:
 
 
 def test_nat() -> None:
-    assert some(pd.NaT) == None
+    assert some(pd.NaT) is None

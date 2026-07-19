@@ -9,7 +9,7 @@ This guide explains how to work with the internationalization (i18n) system in G
 The translation files are located in:
 
 ```
-geo_activity_playground/webui/translations/
+src/geo_activity_playground/webui/translations/
 ├── messages.pot                    # Template with all extracted strings
 └── de/                             # German translations
     └── LC_MESSAGES/
@@ -41,7 +41,7 @@ flash(_('Activity saved successfully.'), 'success')
 After adding new translatable strings, extract them to update the `.pot` template:
 
 ```bash
-uv run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .
+uv run pybabel extract -F babel.cfg -o src/geo_activity_playground/webui/translations/messages.pot .
 ```
 
 This scans all Python files and Jinja2 templates for `_()` calls and updates the template file.
@@ -51,7 +51,7 @@ This scans all Python files and Jinja2 templates for `_()` calls and updates the
 After extracting new strings, update all existing language catalogs:
 
 ```bash
-uv run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations
+uv run pybabel update --no-fuzzy-matching -i src/geo_activity_playground/webui/translations/messages.pot -d src/geo_activity_playground/webui/translations
 ```
 
 This merges new strings into each language's `.po` file, marking them as untranslated (with empty `msgstr`).
@@ -63,7 +63,7 @@ To add support for a new language (e.g., French):
 1. Initialize the language catalog:
 
     ```bash
-    uv run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l fr
+    uv run pybabel init -i src/geo_activity_playground/webui/translations/messages.pot -d src/geo_activity_playground/webui/translations -l fr
     ```
 
 2. Add the language code to the supported locales in `app.py`:
@@ -72,14 +72,14 @@ To add support for a new language (e.g., French):
     app.config["BABEL_SUPPORTED_LOCALES"] = ["en", "de", "fr"]
     ```
 
-3. Edit the generated `.po` file at `geo_activity_playground/webui/translations/fr/LC_MESSAGES/messages.po` to add translations.
+3. Edit the generated `.po` file at `src/geo_activity_playground/webui/translations/fr/LC_MESSAGES/messages.po` to add translations.
 
 ## Editing Translations
 
 The `.po` files are plain text and can be edited with any text editor. Each entry looks like:
 
 ```po
-#: geo_activity_playground/webui/templates/page.html.j2:64
+#: src/geo_activity_playground/webui/templates/page.html.j2:64
 msgid "Activities"
 msgstr "Aktivitäten"
 ```
@@ -95,7 +95,7 @@ For a better editing experience, consider using a dedicated PO editor like [Poed
 After editing `.po` files, compile them into binary `.mo` files:
 
 ```bash
-uv run pybabel compile -d geo_activity_playground/webui/translations
+uv run pybabel compile -d src/geo_activity_playground/webui/translations
 ```
 
 This must be done before the translations take effect. The `.mo` files are what Flask-Babel reads at runtime.
@@ -112,10 +112,10 @@ You can test translations by:
 
 | Task | Command |
 |------|---------|
-| Extract strings | `uv run pybabel extract -F babel.cfg -o geo_activity_playground/webui/translations/messages.pot .` |
-| Update existing languages | `uv run pybabel update --no-fuzzy-matching -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations` |
-| Add new language | `uv run pybabel init -i geo_activity_playground/webui/translations/messages.pot -d geo_activity_playground/webui/translations -l LANG` |
-| Compile translations | `uv run pybabel compile -d geo_activity_playground/webui/translations` |
+| Extract strings | `uv run pybabel extract -F babel.cfg -o src/geo_activity_playground/webui/translations/messages.pot .` |
+| Update existing languages | `uv run pybabel update --no-fuzzy-matching -i src/geo_activity_playground/webui/translations/messages.pot -d src/geo_activity_playground/webui/translations` |
+| Add new language | `uv run pybabel init -i src/geo_activity_playground/webui/translations/messages.pot -d src/geo_activity_playground/webui/translations -l LANG` |
+| Compile translations | `uv run pybabel compile -d src/geo_activity_playground/webui/translations` |
 
 ## Typical Workflow
 
