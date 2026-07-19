@@ -39,7 +39,6 @@ from ...core.datamodel import (
     HammerheadAuth,
     HeatmapTileCache,
     Kind,
-    PlotSpec,
     PrivacyZone,
     SquarePlannerBookmark,
     StoredSearchQuery,
@@ -62,6 +61,7 @@ from ...explorer.tile_visits import (
     compute_tile_visits_new,
 )
 from ...features.activity_photos.model import Photo
+from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...importers.activity_parsers import (
     ActivityParseError,

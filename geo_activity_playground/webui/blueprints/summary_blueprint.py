@@ -8,7 +8,7 @@ from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, PlotSpec
+from ...core.datamodel import DB
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -16,7 +16,8 @@ from ...core.meta_search import (
     primitives_to_jinja,
     register_search_query,
 )
-from ...core.parametric_plot import make_parametric_plot
+from ...features.plot_builder.analysis import make_parametric_plot
+from ...features.plot_builder.model import PlotSpec
 from ..authenticator import Authenticator
 from ..columns import META_COLUMNS, ColumnDescription
 

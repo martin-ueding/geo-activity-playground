@@ -6,16 +6,16 @@ from flask.typing import ResponseReturnValue
 
 from ...core.activities import ActivityRepository
 from ...core.datamodel import DB
-from ...core.parametric_plot import (
+from ...webui.authenticator import Authenticator, needs_authentication
+from ...webui.flasher import Flasher, FlashTypes
+from .analysis import (
     GROUP_BY_VARIABLES,
     MARKS,
     VARIABLES_1,
     VARIABLES_2,
-    PlotSpec,
     make_parametric_plot,
 )
-from ..authenticator import Authenticator, needs_authentication
-from ..flasher import Flasher, FlashTypes
+from .model import PlotSpec
 
 
 def make_plot_builder_blueprint(

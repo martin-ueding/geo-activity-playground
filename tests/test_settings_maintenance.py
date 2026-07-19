@@ -17,7 +17,6 @@ from geo_activity_playground.core.datamodel import (
     ExplorerTileBookmark,
     HeatmapTileCache,
     Kind,
-    PlotSpec,
     SquarePlannerBookmark,
     StoredSearchQuery,
     Tag,
@@ -25,6 +24,7 @@ from geo_activity_playground.core.datamodel import (
     activity_tag_association_table,
 )
 from geo_activity_playground.features.activity_photos.model import Photo
+from geo_activity_playground.features.plot_builder.model import PlotSpec
 from geo_activity_playground.features.segments.model import (
     Segment,
     SegmentCheck,

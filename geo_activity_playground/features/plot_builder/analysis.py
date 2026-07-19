@@ -2,7 +2,7 @@ import altair as alt
 import pandas as pd
 from flask_babel import lazy_gettext as _
 
-from .datamodel import PlotSpec
+from .model import PlotSpec
 
 MARKS = {
     "point": _("Point"),
