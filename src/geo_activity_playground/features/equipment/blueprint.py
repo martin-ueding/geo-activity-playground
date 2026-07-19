@@ -177,7 +177,7 @@ def make_equipment_blueprint(
                     ),
                 ],
             )
-            .interactive()
+            .interactive(bind_y=False)
             .to_json(format="vega")
         )
 
