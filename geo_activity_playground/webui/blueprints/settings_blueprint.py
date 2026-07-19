@@ -39,7 +39,6 @@ from ...core.datamodel import (
     HammerheadAuth,
     HeatmapTileCache,
     Kind,
-    Photo,
     PlotSpec,
     PrivacyZone,
     Segment,
@@ -65,6 +64,7 @@ from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
+from ...features.activity_photos.model import Photo
 from ...importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,

@@ -8,11 +8,12 @@ from PIL import Image, ImageOps
 from werkzeug.utils import secure_filename
 
 from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, Activity, Photo
+from ...core.datamodel import DB, Activity
 from ...core.paths import PHOTOS_DIR, cache_dir
 from ...core.photos import get_metadata_from_image
-from ..authenticator import Authenticator, needs_authentication
-from ..flasher import Flasher, FlashTypes
+from ...webui.authenticator import Authenticator, needs_authentication
+from ...webui.flasher import Flasher, FlashTypes
+from .model import Photo
 
 
 def make_photo_blueprint(

@@ -36,7 +36,6 @@ from ..core.datamodel import (
     Activity,
     Equipment,
     Kind,
-    Photo,
     Tag,
     get_hammerhead_auth,
 )
@@ -54,6 +53,8 @@ from ..core.raster_map import (
     PastelImageTransform,
     TileGetter,
 )
+from ..features.activity_photos.model import Photo
+from ..features.activity_photos.photo_blueprint import make_photo_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
@@ -67,7 +68,6 @@ from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.export_blueprint import make_export_blueprint
 from .blueprints.hall_of_fame_blueprint import make_hall_of_fame_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
-from .blueprints.photo_blueprint import make_photo_blueprint
 from .blueprints.plot_builder_blueprint import make_plot_builder_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.segments_blueprint import make_segments_blueprint

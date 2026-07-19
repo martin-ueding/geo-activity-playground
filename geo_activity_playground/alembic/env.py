@@ -3,6 +3,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+# Import feature models such that Alembic has seen all the table definitions.
+import geo_activity_playground.features.activity_photos.model  # noqa: F401
 from geo_activity_playground.core.datamodel import Base
 
 # this is the Alembic Config object, which provides
