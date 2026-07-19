@@ -7,6 +7,7 @@ from sqlalchemy import engine_from_config, pool
 import geo_activity_playground.features.activity_photos.model  # noqa: F401
 import geo_activity_playground.features.hammerhead.model  # noqa: F401
 import geo_activity_playground.features.heatmap.model  # noqa: F401
+import geo_activity_playground.features.maintenance.model  # noqa: F401
 import geo_activity_playground.features.plot_builder.model  # noqa: F401
 import geo_activity_playground.features.segments.model  # noqa: F401
 import geo_activity_playground.features.square_planner.model  # noqa: F401

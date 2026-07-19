@@ -370,6 +370,12 @@ class Equipment(DB.Model):
     default_for_kinds: Mapped[list["Kind"]] = relationship(
         back_populates="default_equipment", cascade="all, delete-orphan"
     )
+    maintenance_actions: Mapped[list["MaintenanceAction"]] = relationship(  # noqa: F821
+        back_populates="equipment", cascade="all, delete-orphan"
+    )
+    recurring_tasks: Mapped[list["RecurringTask"]] = relationship(  # noqa: F821
+        back_populates="equipment", cascade="all, delete-orphan"
+    )
 
     def __str__(self) -> str:
         return f"{self.name} ({self.offset_km} km)"
