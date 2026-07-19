@@ -68,6 +68,7 @@ from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
 from ..features.segments.model import Segment  # noqa: F401
+from ..features.sharepic.blueprint import make_sharepic_blueprint
 from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
@@ -396,6 +397,10 @@ def create_app(
         (
             "/segments",
             make_segments_blueprint(authenticator, flasher, config_accessor),
+        ),
+        (
+            "/sharepic",
+            make_sharepic_blueprint(repository, config_accessor),
         ),
         (
             "/shutdown",

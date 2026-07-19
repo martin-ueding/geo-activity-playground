@@ -1,7 +1,7 @@
 import pandas as pd
 
 from geo_activity_playground.core.datamodel import MapConfig
-from geo_activity_playground.webui.blueprints.activity_blueprint import (
+from geo_activity_playground.features.sharepic.render import (
     _format_elapsed_time,
     make_sharepic_base,
 )

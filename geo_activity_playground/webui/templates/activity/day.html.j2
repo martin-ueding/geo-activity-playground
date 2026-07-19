@@ -82,6 +82,6 @@
 
 <h2>{{ _('Share picture') }}</h2>
 
-<p><img class="img-fluid sharepic-preview" src="{{ url_for('.day_sharepic', year=year, month=month, day=day) }}" /></p>
+<p><img class="img-fluid sharepic-preview" src="{{ url_for('sharepic.day', year=year, month=month, day=day) }}" /></p>
 
 {% endblock %}
