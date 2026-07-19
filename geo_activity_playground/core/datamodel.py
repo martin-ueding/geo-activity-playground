@@ -435,20 +435,6 @@ def get_or_make_kind(name: str) -> Kind:
         return kind
 
 
-class SquarePlannerBookmark(DB.Model):
-    __tablename__ = "square_planner_bookmarks"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    size: Mapped[int] = mapped_column(sa.Integer, nullable=False)
-    name: Mapped[str] = mapped_column(sa.String, nullable=False)
-
-    __table_args__ = (sa.UniqueConstraint("zoom", "x", "y", "size", name="kinds_name"),)
-
-
 class ExplorerTileBookmark(DB.Model):
     __tablename__ = "explorer_tile_bookmarks"
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -17,7 +17,6 @@ from geo_activity_playground.core.datamodel import (
     ExplorerTileBookmark,
     HeatmapTileCache,
     Kind,
-    SquarePlannerBookmark,
     StoredSearchQuery,
     Tag,
     TileVisit,
@@ -30,6 +29,7 @@ from geo_activity_playground.features.segments.model import (
     SegmentCheck,
     SegmentMatch,
 )
+from geo_activity_playground.features.square_planner.model import SquarePlannerBookmark
 from geo_activity_playground.features.strava_api import importer as strava_api
 
 

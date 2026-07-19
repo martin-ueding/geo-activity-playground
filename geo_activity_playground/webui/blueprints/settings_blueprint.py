@@ -34,7 +34,6 @@ from ...core.datamodel import (
     HeatmapTileCache,
     Kind,
     PrivacyZone,
-    SquarePlannerBookmark,
     StoredSearchQuery,
     Tag,
     TileVisit,
@@ -56,6 +55,7 @@ from ...features.activity_photos.model import Photo
 from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
+from ...features.square_planner.model import SquarePlannerBookmark
 from ...features.strava_api.blueprint import register_strava_api_settings
 from ...features.strava_api.importer import refresh_activity_names_from_strava
 from ...features.strava_checkout.blueprint import register_strava_checkout_settings

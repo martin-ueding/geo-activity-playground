@@ -64,6 +64,8 @@ from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
 from ..features.segments.model import Segment  # noqa: F401
+from ..features.square_planner.blueprint import make_square_planner_blueprint
+from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
@@ -75,7 +77,6 @@ from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.heatmap_blueprint import make_heatmap_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
-from .blueprints.square_planner_blueprint import make_square_planner_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .blueprints.upload_blueprint import make_upload_blueprint, scan_for_activities

@@ -2,11 +2,10 @@ import geojson
 import sqlalchemy
 from flask import Blueprint, Response, redirect, render_template, request, url_for
 
-from ...core.datamodel import DB, SquarePlannerBookmark
+from ...core.datamodel import DB
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ...explorer.grid_file import (
     make_explorer_rectangle,
-    make_explorer_tile,
     make_grid_file_geojson,
     make_grid_file_gpx,
     make_grid_points,
@@ -16,6 +15,7 @@ from ...explorer.tile_visits import (
     get_tile_medians,
     get_tile_visits_in_bounds,
 )
+from .model import SquarePlannerBookmark
 
 
 def make_square_planner_blueprint() -> Blueprint:
@@ -119,19 +119,3 @@ def make_square_planner_blueprint() -> Blueprint:
         return redirect(request.referrer)
 
     return blueprint
-
-
-def _get_explored_geojson(tile_visits: list[tuple[int, int]], zoom: int) -> str:
-    return geojson.dumps(
-        geojson.FeatureCollection(
-            features=[
-                make_explorer_tile(
-                    tile_x,
-                    tile_y,
-                    {},
-                    zoom,
-                )
-                for tile_x, tile_y in tile_visits
-            ]
-        )
-    )
