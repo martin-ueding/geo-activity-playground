@@ -53,8 +53,8 @@ from ..core.raster_map import (
     PastelImageTransform,
     TileGetter,
 )
+from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
-from ..features.activity_photos.photo_blueprint import make_photo_blueprint
 from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint

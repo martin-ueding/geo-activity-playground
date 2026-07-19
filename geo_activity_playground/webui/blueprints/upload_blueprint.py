@@ -19,9 +19,9 @@ from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
+from ...features.activity_photos.importer import import_photos_from_directory
 from ...importers.directory import import_from_directory
 from ...importers.hammerhead_api import import_from_hammerhead_api
-from ...importers.photo_directory import import_photos_from_directory
 from ...importers.strava_api import import_from_strava_api
 from ...importers.strava_checkout import import_from_strava_checkout
 from ..authenticator import Authenticator, needs_authentication
