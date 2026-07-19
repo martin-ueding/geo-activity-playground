@@ -5,10 +5,12 @@ import sys
 
 import coloredlogs
 
-from .explorer.video import explorer_video_main
 from .features.activity_photos.cli import (
     register_main_annotate_photos,
     register_main_inspect_photo,
+)
+from .features.explorer_video.cli import (
+    register_main_explorer_video,
 )
 from .features.heatmap_video.cli import register_main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
@@ -107,70 +109,7 @@ def main() -> None:
     register_main_inspect_photo(subparsers)
     register_main_annotate_photos(subparsers)
     register_main_heatmap_video(subparsers)
-
-    subparser = subparsers.add_parser(
-        "explorer-video", help="Generate video with explorer timeline."
-    )
-    subparser.add_argument(
-        "--zoom",
-        type=int,
-        default=14,
-        help="Explorer zoom level (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--video-width",
-        type=int,
-        default=1920,
-        help="Output video width in pixels (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--video-height",
-        type=int,
-        default=1080,
-        help="Output video height in pixels (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--fps",
-        type=int,
-        default=30,
-        help="Frames per second for output video (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--steps-per-tile",
-        type=int,
-        default=12,
-        help="Interpolation frames between consecutive tiles (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--fade-frames",
-        type=int,
-        default=12,
-        help="Fade-in and fade-out frames per chunk (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--pause-frames",
-        type=int,
-        default=12,
-        help="Hold frames before fade-out per chunk (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--download-workers",
-        type=int,
-        default=16,
-        help="Parallel workers for OSM tile downloads (default: %(default)s)",
-    )
-    subparser.add_argument(
-        "--output-path",
-        type=pathlib.Path,
-        default=None,
-        help="Optional output path for MP4 file",
-    )
-    subparser.add_argument(
-        "--map-tile-url",
-        default=None,
-        help="Optional map tile URL template override",
-    )
-    subparser.set_defaults(func=explorer_video_main)
+    register_main_explorer_video(subparsers)
 
     subparser = subparsers.add_parser(
         "convert-strava-checkout",

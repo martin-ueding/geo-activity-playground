@@ -68,7 +68,10 @@ from ...explorer.tile_visits import (
     get_tile_medians,
     get_tile_visits_in_bounds,
 )
-from ...explorer.video import ExplorerVideoOptions, generate_explorer_video
+from ...features.explorer_video.video import (
+    ExplorerVideoOptions,
+    generate_explorer_video,
+)
 from ..authenticator import Authenticator, needs_authentication
 
 alt.data_transformers.enable("vegafusion")

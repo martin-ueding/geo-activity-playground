@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from PIL import Image, ImageEnhance
 from tqdm import tqdm
 
-from ..core.config import ConfigAccessor
-from ..core.raster_map import get_tile, osm_tile_path
+from ...core.config import ConfigAccessor
+from ...core.raster_map import get_tile, osm_tile_path
 
 
 @dataclasses.dataclass
@@ -214,7 +214,7 @@ def prefetch_tiles(
 def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
     import imageio.v2 as imageio
 
-    from ..webui.app import create_app
+    from ...webui.app import create_app
 
     os.chdir(options.basedir)
     database_path = pathlib.Path("database.sqlite")
@@ -280,22 +280,3 @@ def generate_explorer_video(options: ExplorerVideoOptions) -> pathlib.Path:
                     cast(Any, writer).append_data(data)
                     chunk_progress.update()
     return output_path
-
-
-def explorer_video_main(options) -> None:
-    output_path = generate_explorer_video(
-        ExplorerVideoOptions(
-            basedir=options.basedir,
-            zoom=options.zoom,
-            width=options.video_width,
-            height=options.video_height,
-            fps=options.fps,
-            output_path=options.output_path,
-            steps_per_tile=options.steps_per_tile,
-            fade_frames=options.fade_frames,
-            pause_frames=options.pause_frames,
-            download_workers=options.download_workers,
-            map_tile_url=options.map_tile_url,
-        )
-    )
-    print(f"Wrote explorer video to {output_path}")
