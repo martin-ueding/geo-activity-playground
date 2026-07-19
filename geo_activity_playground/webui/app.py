@@ -52,6 +52,7 @@ from ..core.raster_map import (
     PastelImageTransform,
     TileGetter,
 )
+from ..core.scan import scan_for_activities
 from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
 from ..features.authentication.blueprint import make_authentication_blueprint
@@ -69,6 +70,7 @@ from ..features.segments.model import Segment  # noqa: F401
 from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
+from ..features.upload.blueprint import make_upload_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
@@ -79,7 +81,6 @@ from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
 from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
-from .blueprints.upload_blueprint import make_upload_blueprint, scan_for_activities
 from .flasher import FlaskFlasher
 from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
 
