@@ -15,8 +15,8 @@ from ...core.meta_search import (
     primitives_to_jinja,
     register_search_query,
 )
-from ..authenticator import Authenticator
-from ..columns import ColumnDescription, column_distance, column_elevation_gain
+from ...webui.authenticator import Authenticator
+from ...webui.columns import ColumnDescription, column_distance, column_elevation_gain
 
 
 def register_eddington_blueprint(
@@ -31,7 +31,6 @@ def register_eddington_blueprint(
             repository,
             request,
             authenticator,
-            "distance",
             column_distance,
             [1],
         )
@@ -42,7 +41,6 @@ def register_eddington_blueprint(
             repository,
             request,
             authenticator,
-            "elevation_gain",
             column_elevation_gain,
             [20, 10, 1],
         )
@@ -54,13 +52,11 @@ def _render_eddington_template(
     repository: ActivityRepository,
     request: Request,
     authenticator: Authenticator,
-    template_name,
     column: ColumnDescription,
     divisor_values_avail: list[int],
 ) -> str:
     column_name = column.name
     display_name = str(column.display_name)
-    print(repr(display_name))
     divisor = int(request.args.get("eddington_divisor") or divisor_values_avail[0])
 
     primitives = parse_search_params(request.args)
@@ -94,7 +90,10 @@ def _render_eddington_template(
     ]
 
     return render_template(
-        f"eddington/{template_name}.html.j2",
+        "eddington/index.html.j2",
+        column_name=column_name,
+        display_name=display_name,
+        unit=column.unit,
         eddington_number=en_per_day,
         logarithmic_plot=_make_eddington_plot(
             eddington_df_per_day, en_per_day, "Days", column_name, display_name, divisor

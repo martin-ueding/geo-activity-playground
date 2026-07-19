@@ -56,6 +56,7 @@ from ..core.raster_map import (
 from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
 from ..features.bubble_chart.blueprint import make_bubble_chart_blueprint
+from ..features.eddington.blueprint import register_eddington_blueprint
 from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
 from ..features.hall_of_fame.blueprint import make_hall_of_fame_blueprint
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
@@ -67,7 +68,6 @@ from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
 from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
-from .blueprints.eddington_blueprints import register_eddington_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
