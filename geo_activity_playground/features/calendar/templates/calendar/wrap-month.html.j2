@@ -191,7 +191,7 @@
                 <tbody>
                     {% for row in daily_table %}
                     <tr>
-                        <td><a href="{{ url_for('activity.day', year=year, month=month, day=row.day|int) }}">{{ row.day|int }}</a></td>
+                        <td><a href="{{ url_for('calendar.day', year=year, month=month, day=row.day|int) }}">{{ row.day|int }}</a></td>
                         <td class="text-end">{{ row.activities|int }}</td>
                         <td class="text-end">{{ '%.1f'|format(row.distance_km) }}</td>
                         <td class="text-end">{{ row.elevation_gain|int }}</td>

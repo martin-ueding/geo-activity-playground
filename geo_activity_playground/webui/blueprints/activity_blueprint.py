@@ -230,57 +230,6 @@ def make_activity_blueprint(
             config_accessor.ui().eighth_marker_min_distance_km,
         )
 
-    @blueprint.route("/day/<int:year>/<int:month>/<int:day>")
-    def day(year: int, month: int, day: int) -> ResponseReturnValue:
-        meta = repository.meta
-        selection = meta["start_local"].dt.date == datetime.date(year, month, day)
-        activities_that_day = meta.loc[selection]
-
-        time_series = [
-            repository.get_time_series(activity_id)
-            for activity_id in activities_that_day["id"]
-        ]
-
-        cmap = matplotlib.colormaps["Dark2"]
-        fc = geojson.FeatureCollection(
-            features=[
-                geojson.Feature(
-                    geometry=geojson.MultiLineString(
-                        coordinates=[
-                            [
-                                [lon, lat]
-                                for lat, lon in zip(
-                                    group["latitude"], group["longitude"]
-                                )
-                            ]
-                            for _, group in ts.groupby("segment_id")
-                        ]
-                    ),
-                    properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
-                )
-                for i, ts in enumerate(time_series)
-            ]
-        )
-
-        activities_list = activities_that_day.to_dict(orient="records")
-        for i, activity_record in enumerate(activities_list):
-            activity_record["color"] = matplotlib.colors.to_hex(cmap(i % 8))
-
-        context = {
-            "activities": activities_list,
-            "geojson": geojson.dumps(fc),
-            "date": datetime.date(year, month, day).isoformat(),
-            "total_distance": activities_that_day["distance_km"].sum(),
-            "total_elapsed_time": activities_that_day["elapsed_time"].sum(),
-            "day": day,
-            "month": month,
-            "year": year,
-        }
-        return render_template(
-            "activity/day.html.j2",
-            **context,
-        )
-
     @blueprint.route("/name/<name>")
     def name(name: str) -> ResponseReturnValue:
         meta = repository.meta

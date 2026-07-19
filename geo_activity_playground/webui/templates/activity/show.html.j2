@@ -53,7 +53,7 @@
             {% endif %}
             {% if date is defined %}
             <dt>{{ _('Start time') }}</dt>
-            <dd><a href="{{ url_for('activity.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
+            <dd><a href="{{ url_for('calendar.day', year=date.year, month=date.month, day=date.day) }}">{{ date }}</a>
                 {{ time }} {{ activity.iana_timezone }}
             </dd>
             {% endif %}

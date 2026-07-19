@@ -53,6 +53,7 @@ from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
 from ..features.authentication.blueprint import make_authentication_blueprint
 from ..features.bubble_chart.blueprint import make_bubble_chart_blueprint
+from ..features.calendar.blueprint import make_calendar_blueprint
 from ..features.data_export.blueprint import make_export_blueprint
 from ..features.eddington.blueprint import register_eddington_blueprint
 from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
@@ -75,7 +76,6 @@ from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from ..features.upload.blueprint import make_upload_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
-from .blueprints.calendar_blueprint import make_calendar_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint

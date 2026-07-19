@@ -48,7 +48,7 @@ def make_bubble_chart_blueprint(repository) -> Blueprint:
         )
         day_bubble_data["day_url"] = day_bubble_data["date"].apply(
             lambda date: url_for(
-                "activity.day", year=date.year, month=date.month, day=date.day
+                "calendar.day", year=date.year, month=date.month, day=date.day
             )
         )
 
