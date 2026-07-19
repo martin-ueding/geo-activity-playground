@@ -78,7 +78,7 @@ def test_equipment_use_table(activity_meta) -> None:
         {
             "distance_km": pd.Series([9.8, 4.4, 4.3]),
             "equipment": pd.Series(["A", "B", "B"]),
-            "start": pd.Series(
+            "start_local": pd.Series(
                 [
                     datetime.datetime(2024, 12, 24, 10),
                     datetime.datetime(2025, 1, 1, 10),
@@ -105,4 +105,4 @@ def test_equipment_use_table(activity_meta) -> None:
         },
     ]
     actual = get_equipment_use_table(activity_meta, offsets)
-    assert actual == expected
+    assert actual.to_dict("records") == expected

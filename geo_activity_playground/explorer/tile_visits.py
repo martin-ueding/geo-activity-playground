@@ -1169,12 +1169,34 @@ def get_tile_visits_in_bounds(
             TileVisit.tile_y <= y_max,
         )
     ).all()
+
+    # Older rows may have NULL first_time/last_time; fall back to the
+    # relevant activity's start time, matching _process_activity's behavior.
+    fallback_activity_ids = {
+        row.first_activity_id for row in rows if row.first_time is None
+    } | {row.last_activity_id for row in rows if row.last_time is None}
+    fallback_starts: dict[int, datetime.datetime] = {}
+    if fallback_activity_ids:
+        fallback_starts = dict(
+            DB.session.execute(
+                sa.select(Activity.id, Activity.start).where(
+                    Activity.id.in_(fallback_activity_ids)
+                )
+            ).all()
+        )
+
+    def _timestamp(time: datetime.datetime | None, activity_id: int) -> pd.Timestamp:
+        if time is not None:
+            return pd.Timestamp(time)
+        fallback = fallback_starts.get(activity_id)
+        return pd.Timestamp(fallback) if fallback is not None else pd.NaT
+
     return {
         (row.tile_x, row.tile_y): {
             "visit_count": row.visit_count,
-            "first_time": pd.Timestamp(row.first_time) if row.first_time else pd.NaT,
+            "first_time": _timestamp(row.first_time, row.first_activity_id),
             "first_id": row.first_activity_id,
-            "last_time": pd.Timestamp(row.last_time) if row.last_time else pd.NaT,
+            "last_time": _timestamp(row.last_time, row.last_activity_id),
             "last_id": row.last_activity_id,
         }
         for row in rows

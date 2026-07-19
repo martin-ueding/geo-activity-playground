@@ -2,7 +2,10 @@ import datetime
 import pathlib
 import zoneinfo
 
+from ..core.datamodel import Kind
+from ..importers import activity_parsers
 from ..importers.activity_parsers import read_activity
+from ..webui import app as _app  # noqa: F401  (registers all feature models)
 from .time_conversion import sanitize_datetime
 
 
@@ -68,7 +71,7 @@ def test_naive_helsinki_to_helsinki() -> None:
     )
 
 
-def test_time_zone_from_abvio() -> None:
+def test_time_zone_from_abvio(monkeypatch) -> None:
     """
     Apply local time zone from Abvio generated files.
 
@@ -85,6 +88,9 @@ def test_time_zone_from_abvio() -> None:
     """
     path = pathlib.Path(
         "/home/mu/Dokumente/Geo Activity Playground/Test-Suite/b1b9ec9b-016a-4223-9218-12b97d7019f2.gpx"
+    )
+    monkeypatch.setattr(
+        activity_parsers, "get_or_make_kind", lambda name: Kind(name=name)
     )
     meta, ts = read_activity(path)
 
