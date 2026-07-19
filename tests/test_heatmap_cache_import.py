@@ -5,7 +5,8 @@ import pathlib
 import numpy as np
 import sqlalchemy
 
-from geo_activity_playground.core.datamodel import DB, HeatmapTileCache
+from geo_activity_playground.core.datamodel import DB
+from geo_activity_playground.features.heatmap.model import HeatmapTileCache
 from geo_activity_playground.webui.app import create_app
 
 

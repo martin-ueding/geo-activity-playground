@@ -12,7 +12,6 @@ from matplotlib.colors import to_hex
 
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, StoredSearchQuery
-from ...core.heatmap_cache import delete_heatmap_cache_for_query
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -22,6 +21,7 @@ from ...core.meta_search import (
     primitives_to_url_str,
     register_search_query,
 )
+from ...features.heatmap.cache import delete_heatmap_cache_for_query
 from ..authenticator import Authenticator, needs_authentication
 
 
@@ -225,6 +225,8 @@ def make_search_blueprint(
         if stored:
             stored.is_favorite = False
             DB.session.commit()
+            # Only favorited queries are heatmap-cacheable, so un-favoriting
+            # orphans any cached tiles for this query; clean them up here.
             delete_heatmap_cache_for_query(stored.id)
 
         return redirect(urllib.parse.unquote_plus(request.args["redirect"]))

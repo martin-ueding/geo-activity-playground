@@ -10,7 +10,8 @@ import numpy as np
 import sqlalchemy
 from tqdm import tqdm
 
-from .datamodel import DB, HeatmapTileCache
+from ...core.datamodel import DB
+from .model import HeatmapTileCache
 
 logger = logging.getLogger(__name__)
 

@@ -6,9 +6,9 @@ import sqlalchemy
 
 from geo_activity_playground.core.datamodel import (
     DB,
-    HeatmapTileCache,
     StoredSearchQuery,
 )
+from geo_activity_playground.features.heatmap.model import HeatmapTileCache
 
 
 def test_delete_search_query_removes_favorite_cache(client, app):

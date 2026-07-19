@@ -1,18 +1,22 @@
+import datetime
 import io
 import logging
+import pathlib
+import shutil
 from collections.abc import Generator
 from contextlib import contextmanager
+from typing import Any
 
 import matplotlib.pylab as pl
 import numpy as np
 import sqlalchemy
-from flask import Blueprint, Response, render_template, request
+from flask import Blueprint, Response, redirect, render_template, request, url_for
+from flask_babel import gettext as _
 from PIL import Image, ImageDraw
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, StoredSearchQuery, UiConfig
-from ...core.heatmap_cache import blob_to_counts, get_tile_cache, write_tile_cache
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -35,10 +39,19 @@ from ...explorer.tile_visits import (
     get_biggest_cluster_members,
     get_tile_medians,
 )
-from ...webui.authenticator import Authenticator
+from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.blueprints.explorer_blueprint import (
     geojson_bounding_box_for_tile_collection,
 )
+from ...webui.flasher import Flasher, FlashTypes
+from .cache import (
+    blob_to_counts,
+    delete_all_heatmap_cache,
+    delete_stale_heatmap_cache,
+    get_tile_cache,
+    write_tile_cache,
+)
+from .model import HeatmapTileCache
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +178,110 @@ def make_heatmap_blueprint(
     return blueprint
 
 
+def register_heatmap_settings(
+    blueprint: Blueprint, authenticator: Authenticator, flasher: Flasher
+) -> None:
+    """Register the heatmap cache maintenance route onto the settings blueprint."""
+
+    @blueprint.route("/heatmap-cache", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def heatmap_cache():
+        if request.method == "POST":
+            action = request.form.get("action")
+            if action == "reset_heatmap_cache":
+                logger.info("User requested reset of heatmap cache.")
+                dropped = delete_all_heatmap_cache()
+                heatmap_cache_dir = pathlib.Path("Cache/Heatmap")
+                if heatmap_cache_dir.exists():
+                    shutil.rmtree(heatmap_cache_dir)
+                flasher.flash_message(
+                    _("Heatmap cache has been cleared (%(dropped)s tiles).")
+                    % {"dropped": dropped},
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "cleanup_heatmap_cache_stale":
+                logger.info("User requested cleanup of stale heatmap cache.")
+                cutoff = datetime.datetime.now() - datetime.timedelta(days=182)
+                dropped = delete_stale_heatmap_cache(cutoff)
+                flasher.flash_message(
+                    _(
+                        "Dropped %(dropped)s stale heatmap cache tiles (unused for six months)."
+                    )
+                    % {"dropped": dropped},
+                    FlashTypes.SUCCESS,
+                )
+            return redirect(url_for(".heatmap_cache"))
+
+        total_tiles, stats = _heatmap_cache_stats()
+        return render_template(
+            "settings/heatmap-cache.html.j2",
+            heatmap_cache_total_tiles=total_tiles,
+            heatmap_cache_stats=stats,
+        )
+
+
+def _heatmap_cache_stats() -> tuple[int, list[dict[str, Any]]]:
+    grouped_rows = DB.session.execute(
+        sqlalchemy.select(
+            HeatmapTileCache.search_query_id,
+            sqlalchemy.func.count(HeatmapTileCache.id).label("num_tiles"),
+            sqlalchemy.func.sum(HeatmapTileCache.num_activities).label(
+                "num_activities"
+            ),
+            sqlalchemy.func.max(HeatmapTileCache.last_used).label("last_used"),
+        )
+        .group_by(HeatmapTileCache.search_query_id)
+        .order_by(
+            HeatmapTileCache.search_query_id.is_not(None),
+            HeatmapTileCache.search_query_id,
+        )
+    ).all()
+
+    query_ids = [
+        row.search_query_id for row in grouped_rows if row.search_query_id is not None
+    ]
+    query_by_id = {
+        query.id: query
+        for query in DB.session.scalars(
+            sqlalchemy.select(StoredSearchQuery).where(
+                StoredSearchQuery.id.in_(query_ids)
+            )
+        ).all()
+    }
+
+    stats: list[dict[str, Any]] = []
+    total_tiles = 0
+    for row in grouped_rows:
+        search_query_id = row.search_query_id
+        num_tiles = int(row.num_tiles or 0)
+        num_activities = int(row.num_activities or 0)
+        total_tiles += num_tiles
+
+        if search_query_id is None:
+            description = _("No search query")
+            is_favorite = None
+        else:
+            query = query_by_id.get(search_query_id)
+            if query:
+                description = str(query)
+                is_favorite = query.is_favorite
+            else:
+                description = _("Deleted search query #%d") % search_query_id
+                is_favorite = False
+
+        stats.append(
+            {
+                "search_query_id": search_query_id,
+                "description": description,
+                "num_tiles": num_tiles,
+                "num_activities": num_activities,
+                "last_used": row.last_used,
+                "is_favorite": is_favorite,
+            }
+        )
+    return total_tiles, stats
+
+
 def _get_counts(
     x: int,
     y: int,
@@ -274,7 +391,7 @@ def _paint_activity(
     tile_counts: np.ndarray, time_series, *, x: int, y: int, z: int
 ) -> None:
     tile_pixels = (OSM_TILE_SIZE, OSM_TILE_SIZE)
-    for _, group in time_series.groupby("segment_id"):
+    for _segment_id, group in time_series.groupby("segment_id"):
         xy_pixels = (
             np.array([group["x"] * 2**z - x, group["y"] * 2**z - y]).T * OSM_TILE_SIZE
         )

@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import pathlib
@@ -30,7 +29,6 @@ from ...core.datamodel import (
     ClusterMembership,
     Equipment,
     ExplorerTileBookmark,
-    HeatmapTileCache,
     Kind,
     PrivacyZone,
     StoredSearchQuery,
@@ -43,7 +41,6 @@ from ...core.datamodel import (
 )
 from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
-from ...core.heatmap_cache import delete_all_heatmap_cache, delete_stale_heatmap_cache
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
 from ...explorer.tile_visits import (
     _reset_tile_visits_db,
@@ -52,6 +49,8 @@ from ...explorer.tile_visits import (
 )
 from ...features.activity_photos.model import Photo
 from ...features.hammerhead.blueprint import register_hammerhead_settings
+from ...features.heatmap.blueprint import register_heatmap_settings
+from ...features.heatmap.model import HeatmapTileCache
 from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...features.square_planner.model import SquarePlannerBookmark
@@ -214,68 +213,6 @@ def _wipe_local_state() -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
 
-def _heatmap_cache_stats() -> tuple[int, list[dict[str, Any]]]:
-    grouped_rows = DB.session.execute(
-        sqlalchemy.select(
-            HeatmapTileCache.search_query_id,
-            sqlalchemy.func.count(HeatmapTileCache.id).label("num_tiles"),
-            sqlalchemy.func.sum(HeatmapTileCache.num_activities).label(
-                "num_activities"
-            ),
-            sqlalchemy.func.max(HeatmapTileCache.last_used).label("last_used"),
-        )
-        .group_by(HeatmapTileCache.search_query_id)
-        .order_by(
-            HeatmapTileCache.search_query_id.is_not(None),
-            HeatmapTileCache.search_query_id,
-        )
-    ).all()
-
-    query_ids = [
-        row.search_query_id for row in grouped_rows if row.search_query_id is not None
-    ]
-    query_by_id = {
-        query.id: query
-        for query in DB.session.scalars(
-            sqlalchemy.select(StoredSearchQuery).where(
-                StoredSearchQuery.id.in_(query_ids)
-            )
-        ).all()
-    }
-
-    stats: list[dict[str, Any]] = []
-    total_tiles = 0
-    for row in grouped_rows:
-        search_query_id = row.search_query_id
-        num_tiles = int(row.num_tiles or 0)
-        num_activities = int(row.num_activities or 0)
-        total_tiles += num_tiles
-
-        if search_query_id is None:
-            description = _("No search query")
-            is_favorite = None
-        else:
-            query = query_by_id.get(search_query_id)
-            if query:
-                description = str(query)
-                is_favorite = query.is_favorite
-            else:
-                description = _("Deleted search query #%d") % search_query_id
-                is_favorite = False
-
-        stats.append(
-            {
-                "search_query_id": search_query_id,
-                "description": description,
-                "num_tiles": num_tiles,
-                "num_activities": num_activities,
-                "last_used": row.last_used,
-                "is_favorite": is_favorite,
-            }
-        )
-    return total_tiles, stats
-
-
 def _apply_metadata_extraction_to_existing(config: ActivityImportConfig) -> int:
     activities = DB.session.scalars(
         sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
@@ -307,6 +244,7 @@ def make_settings_blueprint(
 ) -> Blueprint:
     blueprint = Blueprint("settings", __name__, template_folder="templates")
     register_hammerhead_settings(blueprint, authenticator)
+    register_heatmap_settings(blueprint, authenticator, flasher)
     register_strava_api_settings(blueprint, authenticator, config_accessor)
     register_strava_checkout_settings(blueprint, authenticator, flasher)
 
@@ -327,28 +265,6 @@ def make_settings_blueprint(
                 compute_tile_evolution(config_accessor.ui())
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
-                    FlashTypes.SUCCESS,
-                )
-            elif action == "reset_heatmap_cache":
-                logger.info("User requested reset of heatmap cache.")
-                dropped = delete_all_heatmap_cache()
-                heatmap_cache_dir = pathlib.Path("Cache/Heatmap")
-                if heatmap_cache_dir.exists():
-                    shutil.rmtree(heatmap_cache_dir)
-                flasher.flash_message(
-                    _("Heatmap cache has been cleared (%(dropped)s tiles).")
-                    % {"dropped": dropped},
-                    FlashTypes.SUCCESS,
-                )
-            elif action == "cleanup_heatmap_cache_stale":
-                logger.info("User requested cleanup of stale heatmap cache.")
-                cutoff = datetime.datetime.now() - datetime.timedelta(days=182)
-                dropped = delete_stale_heatmap_cache(cutoff)
-                flasher.flash_message(
-                    _(
-                        "Dropped %(dropped)s stale heatmap cache tiles (unused for six months)."
-                    )
-                    % {"dropped": dropped},
                     FlashTypes.SUCCESS,
                 )
             elif action == "reenrich_all_activities":
@@ -434,12 +350,7 @@ def make_settings_blueprint(
                     FlashTypes.SUCCESS,
                 )
             return redirect(url_for(".maintenance"))
-        heatmap_cache_total_tiles, heatmap_cache_stats = _heatmap_cache_stats()
-        return render_template(
-            "settings/maintenance.html.j2",
-            heatmap_cache_total_tiles=heatmap_cache_total_tiles,
-            heatmap_cache_stats=heatmap_cache_stats,
-        )
+        return render_template("settings/maintenance.html.j2")
 
     @blueprint.route("/language", methods=["GET", "POST"])
     @needs_authentication(authenticator)

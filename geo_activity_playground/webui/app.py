@@ -39,10 +39,6 @@ from ..core.datamodel import (
     Tag,
 )
 from ..core.heart_rate import HeartRateZoneComputer
-from ..core.heatmap_cache import (
-    delete_small_heatmap_cache_entries,
-    import_legacy_heatmap_cache_from_filesystem,
-)
 from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import (
     BlankImageTransform,
@@ -63,6 +59,11 @@ from ..features.explorer_video.video_blueprint import make_explorer_video_bluepr
 from ..features.hall_of_fame.blueprint import make_hall_of_fame_blueprint
 from ..features.hammerhead.model import get_hammerhead_auth
 from ..features.heatmap.blueprint import make_heatmap_blueprint
+from ..features.heatmap.cache import (
+    delete_small_heatmap_cache_entries,
+    import_legacy_heatmap_cache_from_filesystem,
+)
+from ..features.heatmap.model import HeatmapTileCache  # noqa: F401
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
