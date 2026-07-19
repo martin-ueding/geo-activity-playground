@@ -18,8 +18,8 @@ from ...core.meta_search import (
 )
 from ...features.plot_builder.analysis import make_parametric_plot
 from ...features.plot_builder.model import PlotSpec
-from ..authenticator import Authenticator
-from ..columns import META_COLUMNS, ColumnDescription
+from ...webui.authenticator import Authenticator
+from ...webui.columns import META_COLUMNS, ColumnDescription
 
 
 def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:

@@ -73,6 +73,7 @@ from ..features.sharepic.blueprint import make_sharepic_blueprint
 from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
+from ..features.summary.blueprint import make_summary_blueprint
 from ..features.upload.blueprint import make_upload_blueprint
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
@@ -81,7 +82,6 @@ from .blueprints.equipment_blueprint import make_equipment_blueprint
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.search_blueprint import make_search_blueprint
 from .blueprints.settings_blueprint import make_settings_blueprint
-from .blueprints.summary_blueprint import make_summary_blueprint
 from .blueprints.tile_blueprint import make_tile_blueprint
 from .flasher import FlaskFlasher
 from .i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE_CODES
