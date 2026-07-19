@@ -132,9 +132,22 @@ def make_equipment_blueprint(
     def index() -> ResponseReturnValue:
         equipments = DB.session.scalars(sqlalchemy.select(Equipment)).all()
         equipment_ids = {equipment.name: equipment.id for equipment in equipments}
+        equipment_picture_filenames = {
+            equipment.name: equipment.picture_filename for equipment in equipments
+        }
         offsets = {equipment.name: equipment.offset_km for equipment in equipments}
         equipment_summary = get_equipment_use_table(repository.meta, offsets)
         equipment_summary["id"] = equipment_summary["equipment"].map(equipment_ids)
+        # dtype=object avoids pandas coercing missing filenames to float NaN
+        # (truthy in Jinja) instead of None, which .map() would otherwise do.
+        equipment_summary["picture_filename"] = pd.Series(
+            [
+                equipment_picture_filenames.get(name)
+                for name in equipment_summary["equipment"]
+            ],
+            dtype=object,
+            index=equipment_summary.index,
+        )
 
         # Prepare data for the stacked area chart
         activities = repository.meta.dropna(subset=["start_local"])

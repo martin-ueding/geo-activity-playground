@@ -16,6 +16,9 @@
     {% for equipment in equipment_summary %}
     <div class="col-md-4 mb-3">
         <div class="card h-100">
+            {% if equipment.picture_filename %}
+            <img src="{{ url_for('pictures.get', kind='internal', filename=equipment.picture_filename, size=512) }}" class="card-img-top" />
+            {% endif %}
             <div class="card-body">
                 <h5 class="card-title">
                     <a href="{{ url_for('.show', id=equipment.id) }}">{{ equipment.equipment }}</a>
