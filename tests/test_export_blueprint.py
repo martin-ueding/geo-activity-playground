@@ -32,7 +32,7 @@ def password_client(tmp_path: pathlib.Path):
 def test_export_index_requires_authentication(password_client):
     response = password_client.get("/export/")
     assert response.status_code == 302
-    assert response.headers["Location"].startswith("/auth/?redirect=")
+    assert response.headers["Location"].startswith("/authentication/login?redirect=")
 
 
 def test_export_download_requires_authentication(password_client):
@@ -40,7 +40,7 @@ def test_export_download_requires_authentication(password_client):
         "/export/export?meta_format=json&activity_format=geojson"
     )
     assert response.status_code == 302
-    assert response.headers["Location"].startswith("/auth/?redirect=")
+    assert response.headers["Location"].startswith("/authentication/login?redirect=")
 
 
 def test_export_download_works_when_authenticated(password_client):

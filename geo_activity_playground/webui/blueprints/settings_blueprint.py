@@ -9,7 +9,6 @@ from typing import Any
 import sqlalchemy
 from flask import (
     Blueprint,
-    Response,
     flash,
     redirect,
     render_template,
@@ -468,20 +467,6 @@ def make_settings_blueprint(
             "settings/language.html.j2",
             available_languages=SUPPORTED_LANGUAGES,
             current_language=current_language,
-        )
-
-    @blueprint.route("/admin-password", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def admin_password() -> Response:
-        if request.method == "POST":
-            config_accessor.activity_import().upload_password = request.form["password"]
-            config_accessor.save()
-            flasher.flash_message("Updated admin password.", FlashTypes.SUCCESS)
-        return Response(
-            render_template(
-                "settings/admin-password.html.j2",
-                password=config_accessor.activity_import().upload_password,
-            )
         )
 
     @blueprint.route("/cluster-bookmarks/new", methods=["GET", "POST"])

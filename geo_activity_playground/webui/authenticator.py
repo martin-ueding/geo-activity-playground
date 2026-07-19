@@ -38,7 +38,7 @@ def needs_authentication(authenticator: Authenticator) -> Callable:
                 return route(*args, **kwargs)
             else:
                 flash("You need to be logged in to view that site.", category="Warning")
-                return redirect(url_for("auth.index", redirect=request.url))
+                return redirect(url_for("authentication.login", redirect=request.url))
 
         return wrapped_route
 

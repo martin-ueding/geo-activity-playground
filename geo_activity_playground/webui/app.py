@@ -54,6 +54,7 @@ from ..core.raster_map import (
 )
 from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
+from ..features.authentication.blueprint import make_authentication_blueprint
 from ..features.bubble_chart.blueprint import make_bubble_chart_blueprint
 from ..features.data_export.blueprint import make_export_blueprint
 from ..features.eddington.blueprint import register_eddington_blueprint
@@ -70,7 +71,6 @@ from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from .authenticator import Authenticator
 from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.admin_blueprint import make_admin_blueprint
-from .blueprints.auth_blueprint import make_auth_blueprint
 from .blueprints.calendar_blueprint import make_calendar_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.equipment_blueprint import make_equipment_blueprint
@@ -359,7 +359,10 @@ def create_app(
                 authenticator, multi_process=http_server == "gunicorn"
             ),
         ),
-        ("/auth", make_auth_blueprint(authenticator)),
+        (
+            "/authentication",
+            make_authentication_blueprint(authenticator, config_accessor, flasher),
+        ),
         ("/bubble-chart", make_bubble_chart_blueprint(repository)),
         ("/calendar", make_calendar_blueprint(repository, config_accessor)),
         ("/eddington", register_eddington_blueprint(repository, authenticator)),
