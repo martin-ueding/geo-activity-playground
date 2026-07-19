@@ -8,17 +8,11 @@ import requests
 import sqlalchemy
 from tqdm import tqdm
 
-from ..core.activities import ActivityRepository
-from ..core.datamodel import (
-    DB,
-    Activity,
-    ActivityImportConfig,
-    HammerheadAuth,
-    get_hammerhead_auth,
-    get_or_make_kind,
-)
-from ..core.enrichment import update_and_commit
-from .activity_parsers import ActivityParseError, read_fit_activity
+from ...core.activities import ActivityRepository
+from ...core.datamodel import DB, Activity, ActivityImportConfig, get_or_make_kind
+from ...core.enrichment import update_and_commit
+from ...importers.activity_parsers import ActivityParseError, read_fit_activity
+from .model import HammerheadAuth, get_hammerhead_auth
 
 logger = logging.getLogger(__name__)
 

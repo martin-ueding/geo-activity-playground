@@ -3,7 +3,6 @@ import json
 import logging
 import pathlib
 import re
-import secrets
 import shutil
 import tempfile
 import urllib.parse
@@ -18,7 +17,6 @@ from flask import (
     redirect,
     render_template,
     request,
-    session,
     url_for,
 )
 from flask_babel import gettext as _
@@ -36,7 +34,6 @@ from ...core.datamodel import (
     ClusterMembership,
     Equipment,
     ExplorerTileBookmark,
-    HammerheadAuth,
     HeatmapTileCache,
     Kind,
     PrivacyZone,
@@ -46,7 +43,6 @@ from ...core.datamodel import (
     TileVisit,
     UiConfig,
     activity_tag_association_table,
-    get_hammerhead_auth,
     get_or_make_equipment,
     get_or_make_kind,
 )
@@ -61,6 +57,7 @@ from ...explorer.tile_visits import (
     compute_tile_visits_new,
 )
 from ...features.activity_photos.model import Photo
+from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...importers.activity_parsers import (
@@ -69,11 +66,6 @@ from ...importers.activity_parsers import (
     read_activity,
 )
 from ...importers.directory import get_metadata_from_path
-from ...importers.hammerhead_api import (
-    HAMMERHEAD_OAUTH_SCOPE,
-    HammerheadAuthError,
-    exchange_code_for_token,
-)
 from ...importers.strava_api import refresh_activity_names_from_strava
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TOGGLEABLE_TABLE_COLUMNS
@@ -317,8 +309,8 @@ def make_settings_blueprint(
     repository: ActivityRepository,
 ) -> Blueprint:
     strava_login_helper = StravaLoginHelper(config_accessor)
-    hammerhead_login_helper = HammerheadLoginHelper()
     blueprint = Blueprint("settings", __name__, template_folder="templates")
+    register_hammerhead_settings(blueprint, authenticator)
 
     @blueprint.route("/")
     @needs_authentication(authenticator)
@@ -1025,41 +1017,6 @@ def make_settings_blueprint(
         strava_login_helper.disconnect_strava()
         return redirect(url_for(".strava"))
 
-    @blueprint.route("/hammerhead", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def hammerhead():
-        if request.method == "POST":
-            client_id = request.form["hammerhead_client_id"].strip()
-            client_secret = request.form["hammerhead_client_secret"].strip()
-            url = hammerhead_login_helper.save_hammerhead(client_id, client_secret)
-            return redirect(url)
-        return render_template(
-            "settings/hammerhead.html.j2",
-            **hammerhead_login_helper.render_hammerhead(),
-        )
-
-    @blueprint.route("/hammerhead-callback")
-    @needs_authentication(authenticator)
-    def hammerhead_callback():
-        code = request.args.get("code", type=str)
-        assert code
-        state = request.args.get("state", type=str)
-        expected_state = session.pop("hammerhead_oauth_state", None)
-        if not expected_state or state != expected_state:
-            flash(
-                _("Hammerhead authorization failed: invalid or missing state."),
-                category="danger",
-            )
-            return redirect(url_for(".hammerhead"))
-        hammerhead_login_helper.save_hammerhead_code(code)
-        return redirect(url_for(".hammerhead"))
-
-    @blueprint.route("/hammerhead-disconnect", methods=["POST"])
-    @needs_authentication(authenticator)
-    def hammerhead_disconnect():
-        hammerhead_login_helper.disconnect_hammerhead()
-        return redirect(url_for(".hammerhead"))
-
     @blueprint.route("/tags")
     @needs_authentication(authenticator)
     def tags_list():
@@ -1237,62 +1194,6 @@ class StravaLoginHelper:
         self._config_accessor.save()
         (strava_api_dir() / "strava_tokens.json").unlink(missing_ok=True)
         flash(_("Disconnected from Strava API"), category="success")
-
-
-class HammerheadLoginHelper:
-    def render_hammerhead(self) -> dict:
-        auth = DB.session.scalar(sqlalchemy.select(HammerheadAuth).limit(1))
-        return {
-            "hammerhead_client_id": auth.client_id if auth else None,
-            "hammerhead_client_secret": auth.client_secret if auth else None,
-            "hammerhead_client_code": auth.client_code if auth else None,
-        }
-
-    def save_hammerhead(self, client_id: str, client_secret: str) -> str:
-        auth = get_hammerhead_auth()
-        auth.client_id = client_id
-        auth.client_secret = client_secret
-        auth.redirect_uri = url_for(".hammerhead_callback", _external=True)
-        DB.session.commit()
-
-        state = secrets.token_urlsafe(32)
-        session["hammerhead_oauth_state"] = state
-
-        payload = {
-            "client_id": client_id,
-            "redirect_uri": auth.redirect_uri,
-            "response_type": "code",
-            "scope": HAMMERHEAD_OAUTH_SCOPE,
-            "state": state,
-        }
-
-        arg_string = "&".join(
-            f"{key}={urllib.parse.quote(value)}" for key, value in payload.items()
-        )
-        return f"https://api.hammerhead.io/v1/auth/oauth/authorize?{arg_string}"
-
-    def save_hammerhead_code(self, code: str) -> None:
-        auth = get_hammerhead_auth()
-        auth.client_code = code
-        DB.session.commit()
-        try:
-            exchange_code_for_token(auth)
-        except HammerheadAuthError as e:
-            flash(
-                _("Could not connect to Hammerhead API: %(error)s", error=str(e)),
-                category="danger",
-            )
-            return
-        flash(_("Connected to Hammerhead API"), category="success")
-
-    def disconnect_hammerhead(self) -> None:
-        auth = get_hammerhead_auth()
-        auth.client_code = None
-        auth.access_token = None
-        auth.refresh_token = None
-        auth.expires_at = None
-        DB.session.commit()
-        flash(_("Disconnected from Hammerhead API"), category="success")
 
 
 def save_privacy_zones(zone_names: list[str], zone_geojsons: list[str]) -> None:

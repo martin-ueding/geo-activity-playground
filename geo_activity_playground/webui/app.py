@@ -37,7 +37,6 @@ from ..core.datamodel import (
     Equipment,
     Kind,
     Tag,
-    get_hammerhead_auth,
 )
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.heatmap_cache import (
@@ -60,6 +59,7 @@ from ..features.data_export.blueprint import make_export_blueprint
 from ..features.eddington.blueprint import register_eddington_blueprint
 from ..features.explorer_video.video_blueprint import make_explorer_video_blueprint
 from ..features.hall_of_fame.blueprint import make_hall_of_fame_blueprint
+from ..features.hammerhead.model import get_hammerhead_auth
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint

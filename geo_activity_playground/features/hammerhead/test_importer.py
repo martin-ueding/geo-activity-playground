@@ -1,4 +1,4 @@
-from .hammerhead_api import _max_date
+from .importer import _max_date
 
 
 def test_max_date_picks_newer() -> None:
