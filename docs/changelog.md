@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
+- Add pictures per equipment.
 
 Changed:
 
