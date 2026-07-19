@@ -82,6 +82,7 @@ export default {
           { text: 'Time Zone Handling Sucks', link: '/time-zone-handling-sucks' },
         ],
       },
+      { text: 'Bike Maintenance Tracker', link: '/bike-maintenance-tracker' },
       {
         text: 'Contributing',
         items: [
