@@ -49,6 +49,7 @@ from ..core.raster_map import (
     TileGetter,
 )
 from ..core.scan import scan_for_activities
+from ..features.activity.blueprint import make_activity_blueprint
 from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
 from ..features.authentication.blueprint import make_authentication_blueprint
@@ -78,7 +79,6 @@ from ..features.summary.blueprint import make_summary_blueprint
 from ..features.tile.blueprint import make_tile_blueprint
 from ..features.upload.blueprint import make_upload_blueprint
 from .authenticator import Authenticator
-from .blueprints.activity_blueprint import make_activity_blueprint
 from .blueprints.entry_views import register_entry_views
 from .blueprints.explorer_blueprint import make_explorer_blueprint
 from .blueprints.search_blueprint import make_search_blueprint

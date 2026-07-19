@@ -47,8 +47,8 @@ from ...explorer.tile_visits import (
     refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
 )
-from ..authenticator import Authenticator, needs_authentication
-from ..columns import TIME_SERIES_COLUMNS
+from ...webui.authenticator import Authenticator, needs_authentication
+from ...webui.columns import TIME_SERIES_COLUMNS
 
 logger = logging.getLogger(__name__)
 
