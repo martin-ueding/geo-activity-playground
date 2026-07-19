@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, url_for
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
-from ..columns import ColumnDescription, column_distance, column_elevation_gain
+from ...webui.columns import ColumnDescription, column_distance, column_elevation_gain
 
 
 def make_bubble_chart_blueprint(repository) -> Blueprint:
