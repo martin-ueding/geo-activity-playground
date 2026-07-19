@@ -8,7 +8,7 @@ import pandas as pd
 import sqlalchemy
 from tqdm import tqdm
 
-from .datamodel import DB, Activity, query_activity_meta
+from ...core.datamodel import DB, Activity, query_activity_meta
 
 
 def export_all(meta_format: str, activity_format: str) -> bytes:
@@ -102,11 +102,11 @@ def export_activity_as_gpx(activity: Activity, target: IO[bytes]) -> None:
     g.tracks.append(gpx_track)
 
     ts = activity.time_series
-    for segment_id, group in ts.groupby("segment_id"):
+    for _segment_id, group in ts.groupby("segment_id"):
         gpx_segment = gpxpy.gpx.GPXTrackSegment()
         gpx_track.segments.append(gpx_segment)
 
-        for index, row in group.iterrows():
+        for _index, row in group.iterrows():
             gpx_segment.points.append(
                 gpxpy.gpx.GPXTrackPoint(
                     row["latitude"],

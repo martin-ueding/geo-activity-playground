@@ -2,8 +2,8 @@ from datetime import date
 
 from flask import Blueprint, Response, render_template, request
 
-from ...core.export import export_all
-from ..authenticator import Authenticator, needs_authentication
+from ...webui.authenticator import Authenticator, needs_authentication
+from .export import export_all
 
 
 def make_export_blueprint(authenticator: Authenticator) -> Blueprint:
