@@ -1,0 +1,37 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ equipment.name }}</h1>
+    </div>
+    {% if is_authenticated %}
+    <div class="col-auto">
+        <a href="{{ url_for('.edit', id=equipment.id) }}" class="btn btn-secondary">{{ _('Edit') }}</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <dl class="row">
+            <dt class="col-sm-3">{{ _('Usage') }}</dt>
+            <dd class="col-sm-9">{{ usage_km }} km</dd>
+            <dt class="col-sm-3">{{ _('Usage offset') }}</dt>
+            <dd class="col-sm-9">{{ equipment.offset_km }} km</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct(plots.total_distances_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(plots.yearly_distance_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(plots.usages_plot) }}
+    </div>
+</div>
+{% endblock %}

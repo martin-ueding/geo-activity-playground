@@ -17,9 +17,18 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
+
 Changed:
 
 - Move all application settings from the `config.json` file into the database, split across domain-grouped tables (heart rate, Strava, activity import, UI, and map). Settings are seeded once from an existing `config.json` on the next start, after which the database is authoritative and the file can be deleted. Privacy zones now live in their own database table instead of the config file.
+- Replace the equipment overview table with Bootstrap cards showing each equipment's usage, first use and last use, linking to its new detail page.
+
+Removed:
+
+- Remove the `/settings/manage-equipments` bulk-edit page; editing and creating equipment now happens on the equipment pages instead.
 
 Fixed:
 

@@ -5,31 +5,30 @@
     <div class="col">
         <h1>{{ _('Equipment') }}</h1>
     </div>
+    {% if is_authenticated %}
+    <div class="col-auto">
+        <a href="{{ url_for('.new') }}" class="btn btn-secondary">{{ _('New equipment') }}</a>
+    </div>
+    {% endif %}
 </div>
 
 <div class="row mb-3">
-    <div class="col">
-        <table class="table table-sort table-arrows">
-            <thead>
-                <tr>
-                    <th>{{ _('Equipment') }}</th>
-                    {% if visible['distance'] %}<th style="text-align: right;">{{ _('Distance / km') }}</th>{% endif %}
-                    <th style="text-align: right;">{{ _('First use') }}</th>
-                    <th style="text-align: right;">{{ _('Last use') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for equipment in equipment_summary %}
-                <tr>
-                    <td>{{ equipment.equipment }}</td>
-                    {% if visible['distance'] %}<td style="text-align: right;">{{ equipment.total_distance_km }}</td>{% endif %}
-                    <td style="text-align: right;">{{ equipment.first_use }}</td>
-                    <td style="text-align: right;">{{ equipment.last_use }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {% for equipment in equipment_summary %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{{ url_for('.show', id=equipment.id) }}">{{ equipment.equipment }}</a>
+                </h5>
+                <p class="card-text">
+                    {{ _('Usage') }}: {{ equipment.total_distance_km }} km<br>
+                    {{ _('First use') }}: {{ equipment.first_use }}<br>
+                    {{ _('Last use') }}: {{ equipment.last_use }}
+                </p>
+            </div>
+        </div>
     </div>
+    {% endfor %}
 </div>
 
 <div class="row mb-3">
@@ -38,25 +37,4 @@
         {{ vega_direct(stacked_area_chart) }}
     </div>
 </div>
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _('Details for each equipment') }}</h2>
-    </div>
-</div>
-
-{% for equipment, data in equipment_variables.items() %}
-<h3>{{ equipment }}</h3>
-<div class="row mb-3">
-    <div class="col-md-4">
-        {{ vega_direct(data.total_distances_plot) }}
-    </div>
-    <div class="col-md-4">
-        {{ vega_direct(data.yearly_distance_plot) }}
-    </div>
-    <div class="col-md-4">
-        {{ vega_direct(data.usages_plot) }}
-    </div>
-</div>
-{% endfor %}
 {% endblock %}

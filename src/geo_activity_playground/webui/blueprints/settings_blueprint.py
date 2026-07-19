@@ -523,36 +523,6 @@ def make_settings_blueprint(
             cmap_opacity=config_accessor.ui().color_strategy_cmap_opacity,
         )
 
-    @blueprint.route("/manage-equipments", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def manage_equipments():
-        if request.method == "POST":
-            ids = request.form.getlist("id")
-            names = request.form.getlist("name")
-            offsets = request.form.getlist("offset_km")
-            assert len(ids) == len(names) == len(offsets)
-            for id, name, offset in zip(ids, names, offsets):
-                if id:
-                    equipment = DB.session.get_one(Equipment, int(id))
-                    equipment.name = name
-                    equipment.offset_km = int(float(offset))
-                if not id and name:
-                    equipment = Equipment(name=name)
-                    if offset:
-                        equipment.offset_km = int(float(offset))
-                    DB.session.add(equipment)
-                    flasher.flash_message(
-                        f"Equipment '{name}' added.", FlashTypes.SUCCESS
-                    )
-            DB.session.commit()
-        equipments = DB.session.scalars(
-            sqlalchemy.select(Equipment).order_by(Equipment.name)
-        ).all()
-        return render_template(
-            "settings/manage-equipments.html.j2",
-            equipments=equipments,
-        )
-
     @blueprint.route("/manage-kinds")
     @needs_authentication(authenticator)
     def manage_kinds():

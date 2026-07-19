@@ -363,7 +363,12 @@ def create_app(
         ("/bubble-chart", make_bubble_chart_blueprint(repository)),
         ("/calendar", make_calendar_blueprint(repository, config_accessor)),
         ("/eddington", register_eddington_blueprint(repository, authenticator)),
-        ("/equipment", make_equipment_blueprint(repository, config_accessor)),
+        (
+            "/equipment",
+            make_equipment_blueprint(
+                repository, config_accessor, authenticator, flasher
+            ),
+        ),
         (
             "/explorer",
             make_explorer_blueprint(
