@@ -13,7 +13,7 @@ from ...core.meta_search import (
     primitives_to_jinja,
     register_search_query,
 )
-from ..authenticator import Authenticator
+from ...webui.authenticator import Authenticator
 
 logger = logging.getLogger(__name__)
 
