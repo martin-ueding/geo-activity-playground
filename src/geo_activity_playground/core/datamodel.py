@@ -380,6 +380,15 @@ class Equipment(DB.Model):
     def __str__(self) -> str:
         return f"{self.name} ({self.offset_km} km)"
 
+    @property
+    def total_distance_km(self) -> float:
+        tracked = DB.session.execute(
+            sqlalchemy.select(sqlalchemy.func.sum(Activity.distance_km)).where(
+                Activity.equipment_id == self.id
+            )
+        ).scalar()
+        return (tracked or 0.0) + self.offset_km
+
     __table_args__ = (sa.UniqueConstraint("name", name="equipments_name"),)
 
 

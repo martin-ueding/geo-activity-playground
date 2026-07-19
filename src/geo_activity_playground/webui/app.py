@@ -67,6 +67,12 @@ from ..features.heatmap.cache import (
     import_legacy_heatmap_cache_from_filesystem,
 )
 from ..features.heatmap.model import HeatmapTileCache  # noqa: F401
+from ..features.maintenance.model import (  # noqa: F401
+    MaintenanceAction,
+    MaintenanceActionPhoto,
+    RecurringTask,
+    TaskExecution,
+)
 from ..features.pictures.blueprint import make_pictures_blueprint
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
