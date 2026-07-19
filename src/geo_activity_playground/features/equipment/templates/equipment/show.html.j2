@@ -2,6 +2,11 @@
 
 {% block container %}
 <div class="row mb-3">
+    {% if equipment.picture_filename %}
+    <div class="col-auto">
+        <img src="{{ url_for('pictures.get', kind='internal', filename=equipment.picture_filename, size=128) }}" />
+    </div>
+    {% endif %}
     <div class="col">
         <h1>{{ equipment.name }}</h1>
     </div>

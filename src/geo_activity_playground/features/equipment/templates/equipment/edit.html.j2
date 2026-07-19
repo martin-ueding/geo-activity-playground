@@ -9,7 +9,7 @@
 
 <div class="row mb-3">
     <div class="col-md-6">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="name" class="form-label">{{ _('Name') }}</label>
                 <input type="text" class="form-control" id="name" name="name" value="{{ equipment.name if equipment else '' }}" required />
@@ -18,6 +18,16 @@
             <div class="mb-3">
                 <label for="offset_km" class="form-label">{{ _('Usage offset / km') }}</label>
                 <input type="number" class="form-control" id="offset_km" name="offset_km" value="{{ equipment.offset_km if equipment else 0 }}" />
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">{{ _('Image') }}</label>
+                {% if equipment and equipment.picture_filename %}
+                <div class="mb-2">
+                    <img src="{{ url_for('pictures.get', kind='internal', filename=equipment.picture_filename, size=128) }}" />
+                </div>
+                {% endif %}
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" />
             </div>
 
             <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>

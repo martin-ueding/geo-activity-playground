@@ -4,12 +4,11 @@ import geojson
 import sqlalchemy
 from flask import Blueprint, Response, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from PIL import Image, ImageOps
 from werkzeug.utils import secure_filename
 
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity
-from ...core.paths import PHOTOS_DIR, cache_dir
+from ...core.paths import PHOTOS_DIR
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
 from .exif_handling import get_metadata_from_image
@@ -20,27 +19,6 @@ def make_photo_blueprint(
     config_accessor: ConfigAccessor, authenticator: Authenticator, flasher: Flasher
 ) -> Blueprint:
     blueprint = Blueprint("photo", __name__, template_folder="templates")
-
-    @blueprint.route("/get/<int:id>/<int:size>.webp")
-    def get(id: int, size: int) -> Response:
-        assert size < 5000
-        photo = DB.session.get_one(Photo, id)
-
-        original_path = PHOTOS_DIR() / photo.path
-        small_path = (
-            cache_dir() / "Photos" / f"size-{size}" / photo.path.with_suffix(".webp")
-        )
-
-        if not small_path.exists():
-            with Image.open(original_path) as im:
-                target_size = (size, size)
-                im = ImageOps.exif_transpose(im)
-                im = ImageOps.contain(im, target_size)
-                small_path.parent.mkdir(parents=True, exist_ok=True)
-                im.save(small_path)
-
-        with open(small_path, "rb") as f:
-            return Response(f.read(), mimetype="image/webp")
 
     @blueprint.route("/map")
     def map() -> str:
@@ -55,9 +33,24 @@ def make_photo_blueprint(
                     geometry=geojson.Point((photo.longitude, photo.latitude)),
                     properties={
                         "photo_id": photo.id,
-                        "url_marker": url_for(".get", id=photo.id, size=128),
-                        "url_popup": url_for(".get", id=photo.id, size=512),
-                        "url_full": url_for(".get", id=photo.id, size=4096),
+                        "url_marker": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=128,
+                        ),
+                        "url_popup": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=512,
+                        ),
+                        "url_full": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=4096,
+                        ),
                     },
                 )
                 for photo in photos
@@ -77,9 +70,24 @@ def make_photo_blueprint(
                     geometry=geojson.Point((photo.longitude, photo.latitude)),
                     properties={
                         "photo_id": photo.id,
-                        "url_marker": url_for(".get", id=photo.id, size=128),
-                        "url_popup": url_for(".get", id=photo.id, size=512),
-                        "url_full": url_for(".get", id=photo.id, size=4096),
+                        "url_marker": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=128,
+                        ),
+                        "url_popup": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=512,
+                        ),
+                        "url_full": url_for(
+                            "pictures.get",
+                            kind="activity",
+                            filename=photo.filename,
+                            size=4096,
+                        ),
                     },
                 )
                 for photo in activity.photos

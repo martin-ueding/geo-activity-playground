@@ -8,6 +8,7 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Equipment
+from ...core.internal_pictures import delete_internal_picture, save_internal_picture
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
 from ...webui.plot_util import make_kind_scale
@@ -105,6 +106,20 @@ def _equipment_plots(
     }
 
 
+def _apply_uploaded_picture(equipment: Equipment, flasher: Flasher) -> None:
+    image_file = request.files.get("image")
+    if not image_file or not image_file.filename:
+        return
+    try:
+        new_filename = save_internal_picture(image_file)
+    except ValueError as e:
+        flasher.flash_message(str(e), FlashTypes.WARNING)
+        return
+    if equipment.picture_filename:
+        delete_internal_picture(equipment.picture_filename)
+    equipment.picture_filename = new_filename
+
+
 def make_equipment_blueprint(
     repository: ActivityRepository,
     config_accessor: ConfigAccessor,
@@ -186,6 +201,7 @@ def make_equipment_blueprint(
         if request.method == "POST":
             equipment.name = request.form["name"]
             equipment.offset_km = int(float(request.form["offset_km"]))
+            _apply_uploaded_picture(equipment, flasher)
             DB.session.commit()
             flasher.flash_message(
                 _("Equipment '%(name)s' updated.", name=equipment.name),
@@ -202,6 +218,7 @@ def make_equipment_blueprint(
             offset_km = request.form.get("offset_km", "")
             if offset_km:
                 equipment.offset_km = int(float(offset_km))
+            _apply_uploaded_picture(equipment, flasher)
             DB.session.add(equipment)
             DB.session.commit()
             flasher.flash_message(

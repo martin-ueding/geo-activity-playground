@@ -357,7 +357,7 @@
 <div class="row mb-3">
     {% for photo in activity.photos %}
     <div class="col-md-3">
-        <img src="{{ url_for('photo.get', id=photo.id, size=512) }}" width="100%" />
+        <img src="{{ url_for('pictures.get', kind='activity', filename=photo.filename, size=512) }}" width="100%" />
     </div>
     {% endfor %}
 </div>

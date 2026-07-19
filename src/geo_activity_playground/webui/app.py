@@ -67,6 +67,7 @@ from ..features.heatmap.cache import (
     import_legacy_heatmap_cache_from_filesystem,
 )
 from ..features.heatmap.model import HeatmapTileCache  # noqa: F401
+from ..features.pictures.blueprint import make_pictures_blueprint
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
@@ -389,6 +390,7 @@ def create_app(
             make_heatmap_blueprint(repository, config_accessor, authenticator),
         ),
         ("/photo", make_photo_blueprint(config_accessor, authenticator, flasher)),
+        ("/picture", make_pictures_blueprint()),
         (
             "/plot-builder",
             make_plot_builder_blueprint(repository, flasher, authenticator),

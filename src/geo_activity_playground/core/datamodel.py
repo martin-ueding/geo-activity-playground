@@ -362,6 +362,7 @@ class Equipment(DB.Model):
 
     name: Mapped[str] = mapped_column(String)
     offset_km: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+    picture_filename: Mapped[str | None] = mapped_column(String, nullable=True)
 
     activities: Mapped[list["Activity"]] = relationship(
         back_populates="equipment", cascade="all, delete-orphan"

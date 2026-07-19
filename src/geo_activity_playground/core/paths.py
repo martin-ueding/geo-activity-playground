@@ -61,6 +61,7 @@ _new_config_file = pathlib.Path("config.json")
 _activity_meta_override_dir = pathlib.Path("Metadata Override")
 _time_series_dir = pathlib.Path("Time Series")
 _photos_dir = pathlib.Path("Photos")
+_internal_pictures_dir = pathlib.Path("Internal") / "Pictures"
 
 
 cache_dir = dir_wrapper(_cache_dir)
@@ -74,6 +75,7 @@ strava_api_dir = dir_wrapper(_strava_api_dir)
 activity_meta_override_dir = dir_wrapper(_activity_meta_override_dir)
 TIME_SERIES_DIR = dir_wrapper(_time_series_dir)
 PHOTOS_DIR = dir_wrapper(_photos_dir)
+INTERNAL_PICTURES_DIR = dir_wrapper(_internal_pictures_dir)
 
 activities_file = file_wrapper(_activities_file)
 strava_dynamic_config_path = file_wrapper(_strava_dynamic_config_path)
