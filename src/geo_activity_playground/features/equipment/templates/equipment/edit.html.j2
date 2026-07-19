@@ -1,6 +1,17 @@
 {% extends "page.html.j2" %}
 
 {% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">{{ _('Equipment') }}</a></li>
+        {% if equipment %}
+        <li class="breadcrumb-item"><a href="{{ url_for('.show', id=equipment.id) }}">{{ equipment.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _('Edit') }}</li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">{{ _('New') }}</li>
+        {% endif %}
+    </ol>
+</nav>
 <div class="row mb-3">
     <div class="col">
         <h1>{{ _('Edit equipment') if equipment else _('New equipment') }}</h1>
