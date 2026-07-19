@@ -1,4 +1,7 @@
-from .photos import apply_ref_sign, get_metadata_from_image
+from ..features.activity_photos.exif_handling import (
+    apply_ref_sign,
+    get_metadata_from_image,
+)
 
 
 class _Ratio:

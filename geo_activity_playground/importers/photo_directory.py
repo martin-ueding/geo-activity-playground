@@ -4,7 +4,7 @@ import pathlib
 import sqlalchemy
 
 from ..core.datamodel import DB, Activity
-from ..core.photos import get_metadata_from_image
+from ..features.activity_photos.exif_handling import get_metadata_from_image
 from ..features.activity_photos.model import Photo
 
 logger = logging.getLogger(__name__)

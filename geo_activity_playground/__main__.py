@@ -5,8 +5,11 @@ import sys
 
 import coloredlogs
 
-from .core.photos import main_annotate_photos, main_inspect_photo
 from .explorer.video import explorer_video_main
+from .features.activity_photos.cli import (
+    register_main_annotate_photos,
+    register_main_inspect_photo,
+)
 from .heatmap_video import main_heatmap_video
 from .importers.strava_checkout import convert_strava_checkout
 from .webui.app import create_app, web_ui_main
@@ -100,6 +103,9 @@ def main() -> None:
     subparsers = parser.add_subparsers(
         description="The tools are organized in subcommands.", metavar="Command"
     )
+
+    register_main_inspect_photo(subparsers)
+    register_main_annotate_photos(subparsers)
 
     subparser = subparsers.add_parser(
         "explorer-video", help="Generate video with explorer timeline."
@@ -267,26 +273,6 @@ def main() -> None:
         help="Output video height in pixels (default: %(default)s)",
     )
     subparser.set_defaults(func=main_heatmap_video)
-
-    subparser = subparsers.add_parser(
-        "inspect-photo",
-        help="Extract EXIF data from the image to see how it would be imported",
-    )
-    subparser.add_argument("path", type=pathlib.Path)
-    subparser.set_defaults(func=main_inspect_photo)
-
-    subparser = subparsers.add_parser(
-        "annotate-photos",
-        help="Write GPS coordinates into EXIF of photos that lack location data",
-    )
-    subparser.add_argument(
-        "paths",
-        type=pathlib.Path,
-        nargs="+",
-        metavar="PHOTO",
-        help="JPEG photo files to annotate",
-    )
-    subparser.set_defaults(func=main_annotate_photos)
 
     subparser = subparsers.add_parser(
         "export-kml",

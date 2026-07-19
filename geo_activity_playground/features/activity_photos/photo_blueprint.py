@@ -10,9 +10,9 @@ from werkzeug.utils import secure_filename
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity
 from ...core.paths import PHOTOS_DIR, cache_dir
-from ...core.photos import get_metadata_from_image
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
+from .exif_handling import get_metadata_from_image
 from .model import Photo
 
 
