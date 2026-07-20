@@ -1,8 +1,6 @@
 # Bike Maintenance Tracker
 
-(This feature doesn't exist yet, we're [working backwards](https://workingbackwards.com/concepts/working-backwards-pr-faq-process/) from the documentation to the implementation.)
-
-Besides tracking your activities, you can also track maintenance on your bikes.
+Besides tracking your activities, you can also track maintenance actions on your bikes.
 
 ## Data model
 
