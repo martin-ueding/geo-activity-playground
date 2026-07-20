@@ -39,6 +39,14 @@
     </div>
 </div>
 
+{% if flow_plot %}
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct(flow_plot) }}
+    </div>
+</div>
+{% endif %}
+
 {% if has_cost_data %}
 <div class="row mb-3">
     <div class="col-md-4">

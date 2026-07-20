@@ -33,3 +33,7 @@ def get_cost_by_equipment(actions: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
         .sort_values("total_cost", ascending=False)
     )
+
+
+def get_maintenance_flow_by_title(actions: pd.DataFrame) -> pd.DataFrame:
+    return actions.groupby(["equipment", "title"]).size().reset_index(name="count")
