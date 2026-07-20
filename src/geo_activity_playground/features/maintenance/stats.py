@@ -36,4 +36,6 @@ def get_cost_by_equipment(actions: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_maintenance_flow_by_title(actions: pd.DataFrame) -> pd.DataFrame:
-    return actions.groupby(["equipment", "title"]).size().reset_index(name="count")
+    return (
+        actions.groupby(["equipment", "title"])["cost"].sum().reset_index(name="cost")
+    )

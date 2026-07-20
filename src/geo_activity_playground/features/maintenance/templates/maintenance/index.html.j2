@@ -49,13 +49,15 @@
 
 {% if has_cost_data %}
 <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col">
         {{ vega_direct(plots.cost_by_equipment_plot) }}
     </div>
-    <div class="col-md-4">
+</div>
+<div class="row mb-3">
+    <div class="col-md-6">
         {{ vega_direct(plots.cost_by_year_plot) }}
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         {{ vega_direct(plots.cost_vs_usage_plot) }}
     </div>
 </div>
