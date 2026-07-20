@@ -45,4 +45,13 @@
         {{ vega_direct(plots.usages_plot) }}
     </div>
 </div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {% include "maintenance/_actions_list.html.j2" %}
+    </div>
+    <div class="col-md-6">
+        {% include "maintenance/_tasks_list.html.j2" %}
+    </div>
+</div>
 {% endblock %}

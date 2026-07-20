@@ -192,12 +192,7 @@ def make_equipment_blueprint(
     @blueprint.route("/<int:id>")
     def show(id: int) -> ResponseReturnValue:
         equipment = DB.session.get_one(Equipment, id)
-        offsets = {equipment.name: equipment.offset_km}
-        equipment_summary = get_equipment_use_table(repository.meta, offsets)
-        row = equipment_summary.loc[equipment_summary["equipment"] == equipment.name]
-        usage_km = (
-            int(row["total_distance_km"].iloc[0]) if len(row) else equipment.offset_km
-        )
+        usage_km = round(equipment.total_distance_km)
 
         variables = {
             "equipment": equipment,

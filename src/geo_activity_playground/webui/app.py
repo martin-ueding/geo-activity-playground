@@ -67,12 +67,7 @@ from ..features.heatmap.cache import (
     import_legacy_heatmap_cache_from_filesystem,
 )
 from ..features.heatmap.model import HeatmapTileCache  # noqa: F401
-from ..features.maintenance.model import (  # noqa: F401
-    MaintenanceAction,
-    MaintenanceActionPhoto,
-    RecurringTask,
-    TaskExecution,
-)
+from ..features.maintenance.blueprint import make_maintenance_blueprint
 from ..features.pictures.blueprint import make_pictures_blueprint
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
@@ -394,6 +389,10 @@ def create_app(
         (
             "/heatmap",
             make_heatmap_blueprint(repository, config_accessor, authenticator),
+        ),
+        (
+            "/maintenance",
+            make_maintenance_blueprint(authenticator, flasher),
         ),
         ("/photo", make_photo_blueprint(config_accessor, authenticator, flasher)),
         ("/picture", make_pictures_blueprint()),

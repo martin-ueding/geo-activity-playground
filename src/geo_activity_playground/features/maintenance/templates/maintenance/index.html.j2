@@ -1,0 +1,59 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1 class="mb-3">{{ _('Maintenance') }}</h1>
+
+{% if not has_actions %}
+<p class="text-body-secondary">{{ _('No maintenance actions logged yet.') }}</p>
+{% else %}
+
+<div class="row mb-3">
+    <div class="col">
+        <dl class="row">
+            <dt class="col-sm-3">{{ _('Total cost') }}</dt>
+            <dd class="col-sm-9">{{ '%.2f' | format(total_cost) }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <table class="table table-sort table-arrows">
+            <thead>
+                <tr>
+                    <th>{{ _('Equipment') }}</th>
+                    <th>{{ _('Number of actions') }}</th>
+                    <th>{{ _('Total cost') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in summary %}
+                <tr>
+                    <td>{{ row.equipment }}</td>
+                    <td>{{ row.num_actions }}</td>
+                    <td>{{ '%.2f' | format(row.total_cost) if row.total_cost is not none else '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if has_cost_data %}
+<div class="row mb-3">
+    <div class="col-md-4">
+        {{ vega_direct(plots.cost_by_equipment_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(plots.cost_by_year_plot) }}
+    </div>
+    <div class="col-md-4">
+        {{ vega_direct(plots.cost_vs_usage_plot) }}
+    </div>
+</div>
+{% else %}
+<p class="text-body-secondary">{{ _('No cost data recorded yet.') }}</p>
+{% endif %}
+
+{% endif %}
+{% endblock %}

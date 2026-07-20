@@ -64,6 +64,36 @@ class RecurringTask(DB.Model):
         back_populates="task", cascade="all, delete-orphan"
     )
 
+    @property
+    def last_execution(self) -> "TaskExecution | None":
+        if not self.executions:
+            return None
+        return max(self.executions, key=lambda execution: execution.date)
+
+    @property
+    def next_due_date(self) -> datetime.datetime | None:
+        last = self.last_execution
+        if self.interval_days is None or last is None:
+            return None
+        return last.date + datetime.timedelta(days=self.interval_days)
+
+    @property
+    def next_due_km(self) -> int | None:
+        last = self.last_execution
+        if self.interval_km is None or last is None or last.usage_km is None:
+            return None
+        return last.usage_km + self.interval_km
+
+    def is_overdue(
+        self, current_km: float, now: datetime.datetime | None = None
+    ) -> bool:
+        if self.last_execution is None:
+            return True
+        now = now or datetime.datetime.now()
+        due_by_date = self.next_due_date is not None and now >= self.next_due_date
+        due_by_km = self.next_due_km is not None and current_km >= self.next_due_km
+        return due_by_date or due_by_km
+
 
 class TaskExecution(DB.Model):
     __tablename__ = "task_executions"

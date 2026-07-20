@@ -1,0 +1,67 @@
+{% set tasks = equipment.recurring_tasks | sort(attribute="title") %}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h4 mb-0">{{ _('Recurring tasks') }}</h2>
+    {% if is_authenticated %}
+    <a class="btn btn-primary btn-sm" href="{{ url_for('maintenance.new_task', equipment_id=equipment.id) }}">{{ _('Add task') }}</a>
+    {% endif %}
+</div>
+
+{% if tasks %}
+<div class="list-group mb-3">
+    {% for task in tasks %}
+    {% set overdue = task.is_overdue(usage_km) %}
+    <div class="list-group-item {{ 'list-group-item-danger' if overdue else '' }}">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-bold">{{ task.title }}</div>
+                <div class="text-body-secondary">
+                    {% if task.interval_days %}{{ _('every %(n)s days', n=task.interval_days) }}{% endif %}
+                    {% if task.interval_days and task.interval_km %} &middot; {% endif %}
+                    {% if task.interval_km %}{{ _('every %(n)s km', n=task.interval_km) }}{% endif %}
+                </div>
+                {% if task.description %}
+                <div class="text-body-secondary">{{ task.description | render_markdown }}</div>
+                {% endif %}
+                {% if task.last_execution %}
+                <div class="text-body-secondary">
+                    {{ _('Last done: %(date)s', date=task.last_execution.date.date().isoformat()) }}
+                    {% if task.last_execution.usage_km is not none %} ({{ task.last_execution.usage_km }} km){% endif %}
+                </div>
+                {% else %}
+                <div class="text-body-secondary">{{ _('Never done yet.') }}</div>
+                {% endif %}
+                {% if task.executions %}
+                <details class="mt-1">
+                    <summary>{{ _('History (%(n)s)', n=task.executions | length) }}</summary>
+                    <ul class="list-unstyled mb-0">
+                        {% for execution in task.executions | sort(attribute="date", reverse=True) %}
+                        <li>
+                            {{ execution.date.date().isoformat() }}
+                            {% if execution.usage_km is not none %} &middot; {{ execution.usage_km }} km{% endif %}
+                            {% if execution.comment %} &middot; {{ execution.comment }}{% endif %}
+                            {% if is_authenticated %}
+                            <a href="{{ url_for('maintenance.delete_execution', id=execution.id) }}"
+                                onclick="if(!confirm('{{ _('Delete this task execution?') }}')){ event.preventDefault() }">{{ _('Delete') }}</a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+                {% endif %}
+            </div>
+            {% if is_authenticated %}
+            <div class="text-nowrap">
+                <a class="btn btn-sm btn-success" href="{{ url_for('maintenance.execute_task', id=task.id) }}">{{ _('Mark done') }}</a>
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('maintenance.edit_task', id=task.id) }}">{{ _('Edit') }}</a>
+                <a class="btn btn-sm btn-danger" href="{{ url_for('maintenance.delete_task', id=task.id) }}"
+                    onclick="if(!confirm('{{ _('Delete this recurring task?') }}')){ event.preventDefault() }">{{ _('Delete') }}</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-body-secondary">{{ _('No recurring tasks defined yet.') }}</p>
+{% endif %}

@@ -1,0 +1,46 @@
+{% set actions = equipment.maintenance_actions | sort(attribute="date", reverse=True) %}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h4 mb-0">{{ _('Maintenance actions') }}</h2>
+    {% if is_authenticated %}
+    <a class="btn btn-primary btn-sm" href="{{ url_for('maintenance.new_action', equipment_id=equipment.id) }}">{{ _('Add action') }}</a>
+    {% endif %}
+</div>
+
+{% if actions %}
+<div class="list-group mb-3">
+    {% for action in actions %}
+    <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-bold">{{ action.title }}</div>
+                <div class="text-body-secondary">
+                    {{ action.date.date().isoformat() }}
+                    {% if action.usage_km is not none %} &middot; {{ action.usage_km }} km{% endif %}
+                    {% if action.cost is not none %} &middot; {{ action.cost }}{% endif %}
+                </div>
+                {% if action.description %}
+                <div class="text-body-secondary">{{ action.description | render_markdown }}</div>
+                {% endif %}
+                {% if action.photos %}
+                <div class="mt-2 d-flex flex-wrap gap-2">
+                    {% for photo in action.photos %}
+                    <img src="{{ url_for('pictures.get', kind='internal', filename=photo.filename, size=128) }}" />
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% if is_authenticated %}
+            <div class="text-nowrap">
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('maintenance.edit_action', id=action.id) }}">{{ _('Edit') }}</a>
+                <a class="btn btn-sm btn-danger" href="{{ url_for('maintenance.delete_action', id=action.id) }}"
+                    onclick="if(!confirm('{{ _('Delete this maintenance action?') }}')){ event.preventDefault() }">{{ _('Delete') }}</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-body-secondary">{{ _('No maintenance actions logged yet.') }}</p>
+{% endif %}

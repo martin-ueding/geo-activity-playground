@@ -1,0 +1,67 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('equipment.index') }}">{{ _('Equipment') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('equipment.show', id=equipment.id) }}">{{ equipment.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ _('Edit maintenance action') if action else _('New maintenance action') }}
+        </li>
+    </ol>
+</nav>
+
+<h1 class="mb-3">{{ _('Edit maintenance action') if action else _('New maintenance action') }}</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="title" class="form-label">{{ _('Title') }}</label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ action.title if action else '' }}" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">{{ _('Description') }}</label>
+        <textarea class="form-control" id="description" name="description" rows="4">{{ action.description or '' if action else '' }}</textarea>
+        <div class="form-text">{{ _('Markdown is supported.') }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">{{ _('Date') }}</label>
+        <input type="datetime-local" step="1" class="form-control" id="date" name="date"
+            value="{{ (action.date if action else defaults.date).strftime('%Y-%m-%dT%H:%M:%S') }}" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="usage_km" class="form-label">{{ _('Usage / km') }}</label>
+        <input type="number" class="form-control" id="usage_km" name="usage_km"
+            value="{{ action.usage_km if action else defaults.usage_km }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="cost" class="form-label">{{ _('Cost') }}</label>
+        <input type="number" step="0.01" class="form-control" id="cost" name="cost"
+            value="{{ action.cost if action and action.cost is not none else '' }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="photos" class="form-label">{{ _('Photos') }}</label>
+        {% if action and action.photos %}
+        <div class="mb-2 d-flex flex-wrap gap-2">
+            {% for photo in action.photos %}
+            <div>
+                <img src="{{ url_for('pictures.get', kind='internal', filename=photo.filename, size=128) }}" />
+                <div>
+                    <a class="btn btn-sm btn-danger" href="{{ url_for('maintenance.delete_action_photo', id=photo.id) }}"
+                        onclick="if(!confirm('{{ _('Delete this photo?') }}')){ event.preventDefault() }">{{ _('Delete') }}</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <input type="file" class="form-control" id="photos" name="photos" accept="image/*" multiple />
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+    <a href="{{ url_for('equipment.show', id=equipment.id) }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+</form>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('equipment.index') }}">{{ _('Equipment') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('equipment.show', id=equipment.id) }}">{{ equipment.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ _('Edit recurring task') if task else _('New recurring task') }}
+        </li>
+    </ol>
+</nav>
+
+<h1 class="mb-3">{{ _('Edit recurring task') if task else _('New recurring task') }}</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="title" class="form-label">{{ _('Title') }}</label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ task.title if task else '' }}" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">{{ _('Description') }}</label>
+        <textarea class="form-control" id="description" name="description" rows="4">{{ task.description or '' if task else '' }}</textarea>
+        <div class="form-text">{{ _('Markdown is supported.') }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="interval_days" class="form-label">{{ _('Interval / days') }}</label>
+        <input type="number" class="form-control" id="interval_days" name="interval_days"
+            value="{{ task.interval_days if task and task.interval_days is not none else '' }}" />
+    </div>
+
+    <div class="mb-3">
+        <label for="interval_km" class="form-label">{{ _('Interval / km') }}</label>
+        <input type="number" class="form-control" id="interval_km" name="interval_km"
+            value="{{ task.interval_km if task and task.interval_km is not none else '' }}" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+    <a href="{{ url_for('equipment.show', id=equipment.id) }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+</form>
+{% endblock %}
