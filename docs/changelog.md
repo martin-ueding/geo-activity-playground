@@ -23,6 +23,7 @@ Added:
 - Add pictures per equipment.
 - Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
 - Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
+- Record activity files that fail to import (parse errors, no geospatial data, empty time series) in a new "Broken Activity Files" settings page instead of just logging a warning on every import scan. Files are only retried once their content changes, or after being retried manually from that page. ([GH-472](https://github.com/martin-ueding/geo-activity-playground/issues/472))
 
 Changed:
 
