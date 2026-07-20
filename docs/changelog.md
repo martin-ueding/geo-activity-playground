@@ -36,6 +36,7 @@ Removed:
 Fixed:
 
 - Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
+- Fix the maintenance "Cost vs. usage" plot to show one point per equipment (total cost against total distance) instead of one point per maintenance action against the odometer reading at the time, which made it hard to interpret.
 
 Removed:
 

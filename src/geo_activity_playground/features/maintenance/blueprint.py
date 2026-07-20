@@ -42,7 +42,7 @@ def _apply_uploaded_photos(action: MaintenanceAction) -> None:
         )
 
 
-def _maintenance_plots(actions: pd.DataFrame) -> dict[str, str]:
+def _maintenance_plots(actions: pd.DataFrame, summary: pd.DataFrame) -> dict[str, str]:
     cost_by_equipment_plot = (
         alt.Chart(actions, height=300, title=_("Cost by equipment"))
         .mark_bar()
@@ -74,17 +74,16 @@ def _maintenance_plots(actions: pd.DataFrame) -> dict[str, str]:
     )
 
     cost_vs_usage_plot = (
-        alt.Chart(actions, height=300, title=_("Cost vs. usage"))
+        alt.Chart(summary, height=300, title=_("Cost vs. usage"))
         .mark_point()
         .encode(
-            alt.X("usage_km", title=_("Usage / km")),
-            alt.Y("cost", title=_("Cost")),
+            alt.X("total_distance_km", title=_("Total usage / km")),
+            alt.Y("total_cost", title=_("Total cost")),
             alt.Color("equipment", title=_("Equipment")),
             tooltip=[
-                alt.Tooltip("title:N", title=_("Title")),
                 alt.Tooltip("equipment:N", title=_("Equipment")),
-                alt.Tooltip("usage_km:Q", title=_("Usage / km")),
-                alt.Tooltip("cost:Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("total_distance_km:Q", title=_("Total usage / km")),
+                alt.Tooltip("total_cost:Q", title=_("Total cost"), format=".2f"),
             ],
         )
         .interactive()
@@ -117,7 +116,7 @@ def make_maintenance_blueprint(
             variables["summary"] = summary.to_dict(orient="records")
             variables["total_cost"] = float(actions["cost"].sum(skipna=True))
         if has_cost_data:
-            variables["plots"] = _maintenance_plots(actions)
+            variables["plots"] = _maintenance_plots(actions, summary)
         return render_template("maintenance/index.html.j2", **variables)
 
     @blueprint.route(

@@ -27,12 +27,21 @@ def get_maintenance_actions_table() -> pd.DataFrame:
 
 
 def get_cost_by_equipment(actions: pd.DataFrame) -> pd.DataFrame:
-    return (
+    summary = (
         actions.groupby("equipment")
         .agg(total_cost=("cost", "sum"), num_actions=("id", "count"))
         .reset_index()
         .sort_values("total_cost", ascending=False)
     )
+    equipments = DB.session.scalars(sa.select(Equipment)).all()
+    usage = pd.DataFrame(
+        {
+            "equipment": equipment.name,
+            "total_distance_km": equipment.total_distance_km,
+        }
+        for equipment in equipments
+    )
+    return summary.merge(usage, on="equipment", how="left")
 
 
 def get_maintenance_flow_by_title(actions: pd.DataFrame) -> pd.DataFrame:
