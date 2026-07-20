@@ -36,8 +36,6 @@ from ...core.datamodel import (
     TileVisit,
     UiConfig,
     activity_tag_association_table,
-    get_or_make_equipment,
-    get_or_make_kind,
 )
 from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
@@ -48,6 +46,7 @@ from ...explorer.tile_visits import (
     compute_tile_visits_new,
 )
 from ...features.activity_photos.model import Photo
+from ...features.directory_import.blueprint import register_directory_import_settings
 from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.heatmap.blueprint import register_heatmap_settings
 from ...features.heatmap.model import HeatmapTileCache
@@ -62,7 +61,6 @@ from ...importers.activity_parsers import (
     NoGeoDataError,
     read_activity,
 )
-from ...importers.directory import get_metadata_from_path
 from ..authenticator import Authenticator, needs_authentication
 from ..columns import TOGGLEABLE_TABLE_COLUMNS
 from ..flasher import Flasher, FlashTypes
@@ -213,29 +211,6 @@ def _wipe_local_state() -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
 
-def _apply_metadata_extraction_to_existing(config: ActivityImportConfig) -> int:
-    activities = DB.session.scalars(
-        sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
-    ).all()
-    changed = 0
-    for activity in activities:
-        assert activity.path is not None
-        meta = get_metadata_from_path(
-            pathlib.Path(activity.path), config.metadata_extraction_regexes
-        )
-        if not meta:
-            continue
-        if "name" in meta:
-            activity.name = meta["name"]
-        if "kind" in meta:
-            activity.kind = get_or_make_kind(meta["kind"])
-        if "equipment" in meta:
-            activity.equipment = get_or_make_equipment(meta["equipment"], config)
-        changed += 1
-    DB.session.commit()
-    return changed
-
-
 def make_settings_blueprint(
     config_accessor: ConfigAccessor,
     authenticator: Authenticator,
@@ -243,6 +218,9 @@ def make_settings_blueprint(
     repository: ActivityRepository,
 ) -> Blueprint:
     blueprint = Blueprint("settings", __name__, template_folder="templates")
+    register_directory_import_settings(
+        blueprint, authenticator, flasher, config_accessor
+    )
     register_hammerhead_settings(blueprint, authenticator)
     register_heatmap_settings(blueprint, authenticator, flasher)
     register_strava_api_settings(blueprint, authenticator, config_accessor)
@@ -677,48 +655,6 @@ def make_settings_blueprint(
         except RuntimeError:
             pass
         return render_template("settings/heart-rate.html.j2", **context)
-
-    @blueprint.route("/metadata-extraction", methods=["GET", "POST"])
-    @needs_authentication(authenticator)
-    def metadata_extraction():
-        if request.method == "POST":
-            metadata_extraction_regexes = request.form.getlist("regex")
-            new_metadata_extraction_regexes = []
-            for regex in metadata_extraction_regexes:
-                try:
-                    re.compile(regex)
-                except re.error as e:
-                    flash(
-                        f"Cannot parse regex {regex} due to error: {e}",
-                        category="danger",
-                    )
-                else:
-                    new_metadata_extraction_regexes.append(regex)
-
-            config_accessor.activity_import().metadata_extraction_regexes = (
-                new_metadata_extraction_regexes
-            )
-            config_accessor.save()
-            flash("Updated metadata extraction settings.", category="success")
-        context = {
-            "metadata_extraction_regexes": config_accessor.activity_import().metadata_extraction_regexes,
-        }
-        return render_template("settings/metadata-extraction.html.j2", **context)
-
-    @blueprint.route("/metadata-extraction/apply-to-existing", methods=["POST"])
-    @needs_authentication(authenticator)
-    def metadata_extraction_apply_to_existing():
-        changed = _apply_metadata_extraction_to_existing(
-            config_accessor.activity_import()
-        )
-        flasher.flash_message(
-            _(
-                "Applied metadata extraction regexes to existing activities: %(changed)s updated."
-            )
-            % {"changed": changed},
-            FlashTypes.SUCCESS,
-        )
-        return redirect(url_for(".metadata_extraction"))
 
     @blueprint.route("/privacy-zones", methods=["GET", "POST"])
     @needs_authentication(authenticator)

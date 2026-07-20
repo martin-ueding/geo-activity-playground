@@ -1,6 +1,6 @@
 import pathlib
 
-from .directory import get_metadata_from_path
+from .importer import get_metadata_from_path
 
 
 def test_get_metadata_from_path() -> None:

@@ -7,8 +7,8 @@ import traceback
 import sqlalchemy
 from tqdm import tqdm
 
-from ..core.activities import ActivityRepository
-from ..core.datamodel import (
+from ...core.activities import ActivityRepository
+from ...core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
     Activity,
@@ -17,12 +17,16 @@ from ..core.datamodel import (
     get_or_make_equipment,
     get_or_make_kind,
 )
-from ..core.enrichment import update_and_commit
-from ..explorer.tile_visits import (
+from ...core.enrichment import update_and_commit
+from ...explorer.tile_visits import (
     compute_tile_evolution,
     compute_tile_visits_new,
 )
-from .activity_parsers import ActivityParseError, NoGeoDataError, read_activity
+from ...importers.activity_parsers import (
+    ActivityParseError,
+    NoGeoDataError,
+    read_activity,
+)
 
 logger = logging.getLogger(__name__)
 
