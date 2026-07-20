@@ -46,6 +46,14 @@
     </div>
 </div>
 
+{% if flow_plot %}
+<div class="row mb-3">
+    <div class="col">
+        {{ vega_direct(flow_plot) }}
+    </div>
+</div>
+{% endif %}
+
 <div class="row mb-3">
     <div class="col-md-6">
         {% include "maintenance/_actions_list.html.j2" %}

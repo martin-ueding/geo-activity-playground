@@ -2,7 +2,6 @@ import datetime
 import decimal
 
 import altair as alt
-import numpy as np
 import pandas as pd
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
@@ -18,11 +17,7 @@ from .model import (
     RecurringTask,
     TaskExecution,
 )
-from .stats import (
-    get_cost_by_equipment,
-    get_maintenance_actions_table,
-    get_maintenance_flow_by_title,
-)
+from .stats import get_cost_by_equipment, get_maintenance_actions_table
 
 
 def _parse_int(value: str | None) -> int | None:
@@ -103,191 +98,6 @@ def _maintenance_plots(actions: pd.DataFrame) -> dict[str, str]:
     }
 
 
-def _stack_nodes(
-    order: list[str], totals: pd.Series, gap: float
-) -> dict[str, tuple[float, float]]:
-    positions = {}
-    y = 0.0
-    for name in order:
-        positions[name] = (y, y + totals[name])
-        y += totals[name] + gap
-    return positions
-
-
-def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
-    if links.empty:
-        return None
-
-    equipment_totals = links.groupby("equipment")["cost"].sum()
-    title_totals = links.groupby("title")["cost"].sum()
-    equipment_order = list(equipment_totals.sort_values(ascending=False).index)
-    title_order = list(title_totals.sort_values(ascending=False).index)
-
-    gap = links["cost"].sum() * 0.02
-    equipment_pos = _stack_nodes(equipment_order, equipment_totals, gap)
-    title_pos = _stack_nodes(title_order, title_totals, gap)
-
-    links_sorted = links.copy()
-    links_sorted["equipment"] = pd.Categorical(
-        links_sorted["equipment"], categories=equipment_order, ordered=True
-    )
-    links_sorted["title"] = pd.Categorical(
-        links_sorted["title"], categories=title_order, ordered=True
-    )
-    links_sorted = links_sorted.sort_values(["equipment", "title"])
-
-    left_cursor = {name: pos[0] for name, pos in equipment_pos.items()}
-    right_cursor = {name: pos[0] for name, pos in title_pos.items()}
-
-    num_steps = 20
-    t = np.linspace(0.0, 1.0, num_steps)
-    smoothstep = 3 * t**2 - 2 * t**3
-
-    curve_rows = []
-    for link_id, (equipment, title, cost) in enumerate(
-        zip(
-            links_sorted["equipment"].astype(str),
-            links_sorted["title"].astype(str),
-            links_sorted["cost"],
-        )
-    ):
-        y0_left = left_cursor[equipment]
-        y1_left = y0_left + cost
-        left_cursor[equipment] = y1_left
-        y0_right = right_cursor[title]
-        y1_right = y0_right + cost
-        right_cursor[title] = y1_right
-
-        top = y0_left + (y0_right - y0_left) * smoothstep
-        bottom = y1_left + (y1_right - y1_left) * smoothstep
-        for x, y, y2 in zip(t, top, bottom):
-            curve_rows.append(
-                {
-                    "link_id": link_id,
-                    "x": x,
-                    "y": y,
-                    "y2": y2,
-                    "equipment": equipment,
-                    "title": title,
-                    "cost": cost,
-                }
-            )
-    curve_df = pd.DataFrame(curve_rows)
-
-    node_width = 0.02
-    node_rows = []
-    for name in equipment_order:
-        y0, y1 = equipment_pos[name]
-        node_rows.append(
-            {
-                "x0": -node_width,
-                "x1": 0.0,
-                "y0": y0,
-                "y1": y1,
-                "label": name,
-                "total": equipment_totals[name],
-                "side": "equipment",
-            }
-        )
-    for name in title_order:
-        y0, y1 = title_pos[name]
-        node_rows.append(
-            {
-                "x0": 1.0,
-                "x1": 1.0 + node_width,
-                "y0": y0,
-                "y1": y1,
-                "label": name,
-                "total": title_totals[name],
-                "side": "title",
-            }
-        )
-    node_df = pd.DataFrame(node_rows)
-    equipment_nodes = node_df[node_df["side"] == "equipment"]
-    title_nodes = node_df[node_df["side"] == "title"]
-
-    x_scale = alt.Scale(domain=[-0.5, 1.5])
-    y_scale = alt.Scale(domain=[curve_df[["y", "y2"]].values.max(), 0])
-
-    links_chart = (
-        alt.Chart(curve_df)
-        .mark_area(opacity=0.4, interpolate="monotone")
-        .encode(
-            x=alt.X("x:Q", axis=None, scale=x_scale),
-            y=alt.Y("y:Q", axis=None, scale=y_scale),
-            y2="y2:Q",
-            color=alt.Color("equipment:N", legend=None),
-            detail="link_id:N",
-            tooltip=[
-                alt.Tooltip("equipment:N", title=_("Equipment")),
-                alt.Tooltip("title:N", title=_("Title")),
-                alt.Tooltip("cost:Q", title=_("Cost"), format=".2f"),
-            ],
-        )
-    )
-    equipment_rects = (
-        alt.Chart(equipment_nodes)
-        .mark_rect()
-        .encode(
-            x=alt.X("x0:Q", axis=None, scale=x_scale),
-            x2="x1:Q",
-            y=alt.Y("y0:Q", axis=None, scale=y_scale),
-            y2="y1:Q",
-            color=alt.Color("label:N", legend=None),
-            tooltip=[
-                alt.Tooltip("label:N", title=_("Equipment")),
-                alt.Tooltip("total:Q", title=_("Cost"), format=".2f"),
-            ],
-        )
-    )
-    title_rects = (
-        alt.Chart(title_nodes)
-        .mark_rect(color="#888888")
-        .encode(
-            x=alt.X("x0:Q", axis=None, scale=x_scale),
-            x2="x1:Q",
-            y=alt.Y("y0:Q", axis=None, scale=y_scale),
-            y2="y1:Q",
-            tooltip=[
-                alt.Tooltip("label:N", title=_("Title")),
-                alt.Tooltip("total:Q", title=_("Cost"), format=".2f"),
-            ],
-        )
-    )
-    equipment_text = (
-        alt.Chart(equipment_nodes)
-        .mark_text(align="right", dx=-6)
-        .encode(
-            x=alt.X("x0:Q", scale=x_scale),
-            y=alt.Y("y_mid:Q", scale=y_scale),
-            text="label:N",
-        )
-        .transform_calculate(y_mid="(datum.y0 + datum.y1) / 2")
-    )
-    title_text = (
-        alt.Chart(title_nodes)
-        .mark_text(align="left", dx=6)
-        .encode(
-            x=alt.X("x1:Q", scale=x_scale),
-            y=alt.Y("y_mid:Q", scale=y_scale),
-            text="label:N",
-        )
-        .transform_calculate(y_mid="(datum.y0 + datum.y1) / 2")
-    )
-
-    chart = (
-        alt.layer(links_chart, equipment_rects, title_rects, equipment_text, title_text)
-        .properties(
-            width=700,
-            height=max(300, 24 * max(len(equipment_order), len(title_order))),
-            title=_("Bike to maintenance flow"),
-        )
-        .configure_view(strokeWidth=0)
-        .configure_axis(grid=False, domain=False, ticks=False, labels=False)
-    )
-    return chart.to_json(format="vega")
-
-
 def make_maintenance_blueprint(
     authenticator: Authenticator, flasher: Flasher
 ) -> Blueprint:
@@ -306,9 +116,6 @@ def make_maintenance_blueprint(
             summary = get_cost_by_equipment(actions)
             variables["summary"] = summary.to_dict(orient="records")
             variables["total_cost"] = float(actions["cost"].sum(skipna=True))
-            variables["flow_plot"] = _maintenance_flow_plot(
-                get_maintenance_flow_by_title(actions)
-            )
         if has_cost_data:
             variables["plots"] = _maintenance_plots(actions)
         return render_template("maintenance/index.html.j2", **variables)
