@@ -13,6 +13,7 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity
+from ...features.maintenance.stats import get_due_tasks
 from ..columns import (
     META_COLUMNS,
     ColumnDescription,
@@ -25,7 +26,10 @@ def register_entry_views(
 ) -> None:
     @app.route("/")
     def index() -> ResponseReturnValue:
-        context: dict[str, Any] = {"latest_activities": []}
+        context: dict[str, Any] = {
+            "latest_activities": [],
+            "due_tasks": get_due_tasks(),
+        }
         df = repository.meta
 
         if len(repository):

@@ -22,6 +22,7 @@ Added:
 - Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
 - Add pictures per equipment.
 - Add a bike-to-maintenance-title flow chart to the Maintenance page, showing the cost of each maintenance action title per piece of equipment.
+- Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
 
 Changed:
 

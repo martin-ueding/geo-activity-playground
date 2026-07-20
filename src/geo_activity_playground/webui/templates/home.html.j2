@@ -4,6 +4,26 @@
 <div class="row mb-3">
 </div>
 
+{% if due_tasks %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="card border-danger">
+            <div class="card-body">
+                <h2 class="h4 card-title">{{ _('Due maintenance tasks') }}</h2>
+                <ul class="list-unstyled mb-0">
+                    {% for task in due_tasks %}
+                    <li>
+                        <a href="{{ url_for('equipment.show', id=task.equipment.id) }}">{{ task.equipment.name }}</a>
+                        &middot; {{ task.title }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if latest_activities %}
 <div class="row mb-3">
     <div class="col">

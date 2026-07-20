@@ -2,7 +2,7 @@ import pandas as pd
 import sqlalchemy as sa
 
 from ...core.datamodel import DB, Equipment
-from .model import MaintenanceAction
+from .model import MaintenanceAction, RecurringTask
 
 
 def get_maintenance_actions_table() -> pd.DataFrame:
@@ -39,3 +39,9 @@ def get_maintenance_flow_by_title(actions: pd.DataFrame) -> pd.DataFrame:
     return (
         actions.groupby(["equipment", "title"])["cost"].sum().reset_index(name="cost")
     )
+
+
+def get_due_tasks() -> list[RecurringTask]:
+    tasks = DB.session.scalars(sa.select(RecurringTask)).all()
+    due = [task for task in tasks if task.is_overdue(task.equipment.total_distance_km)]
+    return sorted(due, key=lambda task: (task.equipment.name, task.title))
