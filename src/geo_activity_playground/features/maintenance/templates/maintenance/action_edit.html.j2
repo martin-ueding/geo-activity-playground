@@ -27,8 +27,8 @@
 
     <div class="mb-3">
         <label for="date" class="form-label">{{ _('Date') }}</label>
-        <input type="datetime-local" step="1" class="form-control" id="date" name="date"
-            value="{{ (action.date if action else defaults.date).strftime('%Y-%m-%dT%H:%M:%S') }}" required />
+        <input type="date" class="form-control" id="date" name="date"
+            value="{{ (action.date if action else defaults.date).strftime('%Y-%m-%d') }}" required />
     </div>
 
     <div class="mb-3">

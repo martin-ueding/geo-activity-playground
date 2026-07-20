@@ -33,8 +33,8 @@ def _parse_decimal(value: str | None) -> decimal.Decimal | None:
     return decimal.Decimal(value) if value else None
 
 
-def _parse_date(value: str) -> datetime.datetime:
-    return datetime.datetime.fromisoformat(value)
+def _parse_date(value: str) -> datetime.date:
+    return datetime.date.fromisoformat(value)
 
 
 def _apply_uploaded_photos(action: MaintenanceAction) -> None:
@@ -338,7 +338,7 @@ def make_maintenance_blueprint(
             )
             return redirect(url_for("equipment.show", id=equipment_id))
         defaults = {
-            "date": datetime.datetime.now(),
+            "date": datetime.date.today(),
             "usage_km": round(equipment.total_distance_km),
         }
         return render_template(
@@ -465,7 +465,7 @@ def make_maintenance_blueprint(
             )
             return redirect(url_for("equipment.show", id=task.equipment_id))
         defaults = {
-            "date": datetime.datetime.now(),
+            "date": datetime.date.today(),
             "usage_km": round(task.equipment.total_distance_km),
         }
         return render_template(

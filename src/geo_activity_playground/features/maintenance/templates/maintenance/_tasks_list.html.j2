@@ -25,7 +25,7 @@
                 {% endif %}
                 {% if task.last_execution %}
                 <div class="text-body-secondary">
-                    {{ _('Last done: %(date)s', date=task.last_execution.date.date().isoformat()) }}
+                    {{ _('Last done: %(date)s', date=task.last_execution.date.isoformat()) }}
                     {% if task.last_execution.usage_km is not none %} ({{ task.last_execution.usage_km }} km){% endif %}
                 </div>
                 {% else %}
@@ -37,7 +37,7 @@
                     <ul class="list-unstyled mb-0">
                         {% for execution in task.executions | sort(attribute="date", reverse=True) %}
                         <li>
-                            {{ execution.date.date().isoformat() }}
+                            {{ execution.date.isoformat() }}
                             {% if execution.usage_km is not none %} &middot; {{ execution.usage_km }} km{% endif %}
                             {% if execution.comment %} &middot; {{ execution.comment }}{% endif %}
                             {% if is_authenticated %}

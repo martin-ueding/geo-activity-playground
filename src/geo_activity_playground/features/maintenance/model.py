@@ -14,7 +14,7 @@ class MaintenanceAction(DB.Model):
 
     title: Mapped[str] = mapped_column(sa.String, nullable=False)
     description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
-    date: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=False)
+    date: Mapped[datetime.date] = mapped_column(sa.Date, nullable=False)
     usage_km: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
     cost: Mapped[decimal.Decimal | None] = mapped_column(
         sa.Numeric(10, 2), nullable=True
@@ -71,7 +71,7 @@ class RecurringTask(DB.Model):
         return max(self.executions, key=lambda execution: execution.date)
 
     @property
-    def next_due_date(self) -> datetime.datetime | None:
+    def next_due_date(self) -> datetime.date | None:
         last = self.last_execution
         if self.interval_days is None or last is None:
             return None
@@ -84,12 +84,10 @@ class RecurringTask(DB.Model):
             return None
         return last.usage_km + self.interval_km
 
-    def is_overdue(
-        self, current_km: float, now: datetime.datetime | None = None
-    ) -> bool:
+    def is_overdue(self, current_km: float, now: datetime.date | None = None) -> bool:
         if self.last_execution is None:
             return True
-        now = now or datetime.datetime.now()
+        now = now or datetime.date.today()
         due_by_date = self.next_due_date is not None and now >= self.next_due_date
         due_by_km = self.next_due_km is not None and current_km >= self.next_due_km
         return due_by_date or due_by_km
@@ -100,7 +98,7 @@ class TaskExecution(DB.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     comment: Mapped[str | None] = mapped_column(sa.String, nullable=True)
-    date: Mapped[datetime.datetime] = mapped_column(sa.DateTime, nullable=False)
+    date: Mapped[datetime.date] = mapped_column(sa.Date, nullable=False)
     usage_km: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
 
     task_id: Mapped[int] = mapped_column(

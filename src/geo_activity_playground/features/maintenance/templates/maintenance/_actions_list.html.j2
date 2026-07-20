@@ -15,7 +15,7 @@
             <div>
                 <div class="fw-bold">{{ action.title }}</div>
                 <div class="text-body-secondary">
-                    {{ action.date.date().isoformat() }}
+                    {{ action.date.isoformat() }}
                     {% if action.usage_km is not none %} &middot; {{ action.usage_km }} km{% endif %}
                     {% if action.cost is not none %} &middot; {{ action.cost }}{% endif %}
                 </div>
