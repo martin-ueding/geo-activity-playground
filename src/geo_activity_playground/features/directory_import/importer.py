@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import logging
 import pathlib
@@ -27,6 +28,7 @@ from ...importers.activity_parsers import (
     NoGeoDataError,
     read_activity,
 )
+from .model import BrokenActivityFile
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +82,18 @@ def import_from_directory(
             if activity is not None:
                 continue
 
-            with_same_hash = DB.session.scalars(
-                sqlalchemy.select(Activity).filter(
-                    Activity.upstream_id == file_sha256(activity_path)
+            current_hash = file_sha256(activity_path)
+
+            broken = DB.session.scalar(
+                sqlalchemy.select(BrokenActivityFile).filter(
+                    BrokenActivityFile.path == str(activity_path)
                 )
+            )
+            if broken is not None and broken.file_hash == current_hash:
+                continue
+
+            with_same_hash = DB.session.scalars(
+                sqlalchemy.select(Activity).filter(Activity.upstream_id == current_hash)
             ).all()
             if with_same_hash:
                 if len(with_same_hash) == 1:
@@ -94,7 +104,9 @@ def import_from_directory(
                         + ", ".join(str(activity.id) for activity in with_same_hash)
                     )
 
-            import_from_file(activity_path, repository, config, ui_config, i)
+            import_from_file(
+                activity_path, repository, config, ui_config, i, current_hash
+            )
 
 
 def import_from_file(
@@ -103,18 +115,21 @@ def import_from_file(
     config: ActivityImportConfig,
     ui_config: UiConfig,
     i: int,
+    file_hash: str,
 ) -> None:
     logger.info(f"Importing {path} …")
     try:
         activity, time_series = read_activity(path)
-    except NoGeoDataError:
+    except NoGeoDataError as e:
         logger.warning(
             f"Activity with {path=} has no geospatial series data, skipping."
         )
+        _record_broken(path, file_hash, "no_geo_data", str(e))
         return
-    except ActivityParseError:
+    except ActivityParseError as e:
         logger.error(f"Error while parsing file {path}:")
         traceback.print_exc()
+        _record_broken(path, file_hash, "parse_error", str(e))
         return
     except:
         logger.error(f"Encountered a problem with {path=}, see details below.")
@@ -122,10 +137,13 @@ def import_from_file(
 
     if len(time_series) == 0:
         logger.warning(f"Activity with {path=} has no time series data, skipping.")
+        _record_broken(path, file_hash, "empty_time_series", None)
         return
 
+    _clear_broken(path)
+
     activity.path = str(path)
-    activity.upstream_id = file_sha256(path)
+    activity.upstream_id = file_hash
     if activity.name is None:
         activity.name = path.name.removesuffix("".join(path.suffixes))
 
@@ -149,6 +167,32 @@ def import_from_file(
     if len(repository) > 0 and i % 50 == 0:
         compute_tile_visits_new(repository)
         compute_tile_evolution(ui_config)
+
+
+def _record_broken(
+    path: pathlib.Path, file_hash: str, reason: str, error_message: str | None
+) -> None:
+    broken = DB.session.scalar(
+        sqlalchemy.select(BrokenActivityFile).filter(
+            BrokenActivityFile.path == str(path)
+        )
+    )
+    if broken is None:
+        broken = BrokenActivityFile(path=str(path))
+        DB.session.add(broken)
+    broken.file_hash = file_hash
+    broken.reason = reason
+    broken.error_message = error_message
+    broken.last_attempt = datetime.datetime.now(datetime.UTC)
+    DB.session.commit()
+
+
+def _clear_broken(path: pathlib.Path) -> None:
+    DB.session.execute(
+        sqlalchemy.delete(BrokenActivityFile).where(
+            BrokenActivityFile.path == str(path)
+        )
+    )
 
 
 def get_metadata_from_path(

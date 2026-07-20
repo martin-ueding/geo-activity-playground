@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 # Import feature models such that Alembic has seen all the table definitions.
 import geo_activity_playground.features.activity_photos.model  # noqa: F401
+import geo_activity_playground.features.directory_import.model  # noqa: F401
 import geo_activity_playground.features.hammerhead.model  # noqa: F401
 import geo_activity_playground.features.heatmap.model  # noqa: F401
 import geo_activity_playground.features.maintenance.model  # noqa: F401

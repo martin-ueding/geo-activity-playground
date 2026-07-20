@@ -1,0 +1,48 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Broken Activity Files') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Broken Activity Files') }}</h1>
+
+<p>{{ _('These activity files could not be imported. They are remembered so that they are not retried and re-logged on every import scan. Once you have fixed a file (or decided that a warning was a false alarm), retry it here — it will be picked up on the next import scan.') }}</p>
+
+{% if broken_files %}
+<form method="POST" action="{{ url_for('.broken_activity_files_retry_all') }}" class="mb-3" onsubmit="return confirm('{{ _('Are you sure you want to retry all broken activity files on the next import scan?') }}');">
+    <button type="submit" class="btn btn-outline-secondary">{{ _('Retry all') }}</button>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>{{ _('Path') }}</th>
+                <th>{{ _('Reason') }}</th>
+                <th>{{ _('Details') }}</th>
+                <th>{{ _('Last attempt') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for broken in broken_files %}
+            <tr>
+                <td><code>{{ broken.path }}</code></td>
+                <td>{{ reasons.get(broken.reason, broken.reason) }}</td>
+                <td class="text-muted small">{{ broken.error_message or '' }}</td>
+                <td>{{ broken.last_attempt }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('.broken_activity_file_retry', id=broken.id) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">{{ _('Retry') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">{{ _('No broken activity files recorded.') }}</p>
+{% endif %}
+{% endblock %}

@@ -17,8 +17,17 @@ from ...core.datamodel import (
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
 from .importer import get_metadata_from_path
+from .model import BrokenActivityFile
 
 logger = logging.getLogger(__name__)
+
+
+def _broken_activity_file_reasons() -> dict[str, str]:
+    return {
+        "no_geo_data": _("No geospatial data"),
+        "parse_error": _("Parse error"),
+        "empty_time_series": _("Empty time series"),
+    }
 
 
 def _apply_metadata_extraction_to_existing(config: ActivityImportConfig) -> int:
@@ -93,3 +102,44 @@ def register_directory_import_settings(
             FlashTypes.SUCCESS,
         )
         return redirect(url_for(".metadata_extraction"))
+
+    @blueprint.route("/broken-activity-files")
+    @needs_authentication(authenticator)
+    def broken_activity_files():
+        broken_files = DB.session.scalars(
+            sqlalchemy.select(BrokenActivityFile).order_by(
+                BrokenActivityFile.last_attempt.desc()
+            )
+        ).all()
+        reasons = _broken_activity_file_reasons()
+        return render_template(
+            "settings/broken-activity-files.html.j2",
+            broken_files=broken_files,
+            reasons=reasons,
+        )
+
+    @blueprint.route("/broken-activity-files/retry/<int:id>", methods=["POST"])
+    @needs_authentication(authenticator)
+    def broken_activity_file_retry(id: int):
+        broken = DB.session.get_one(BrokenActivityFile, id)
+        DB.session.delete(broken)
+        DB.session.commit()
+        flasher.flash_message(
+            _("The file will be retried on the next import scan."),
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".broken_activity_files"))
+
+    @blueprint.route("/broken-activity-files/retry-all", methods=["POST"])
+    @needs_authentication(authenticator)
+    def broken_activity_files_retry_all():
+        count = DB.session.execute(sqlalchemy.delete(BrokenActivityFile)).rowcount
+        DB.session.commit()
+        flasher.flash_message(
+            _(
+                "Cleared %(count)s broken activity files. They will be retried on the next import scan."
+            )
+            % {"count": count},
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".broken_activity_files"))
