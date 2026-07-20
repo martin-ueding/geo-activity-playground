@@ -38,6 +38,7 @@ Fixed:
 
 - Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
 - Fix the maintenance "Cost vs. usage" plot to show one point per equipment (total cost against total distance) instead of one point per maintenance action against the odometer reading at the time, which made it hard to interpret.
+- Use a root-relative tile URL in the explorer's `style.json` instead of one built from `request.url_root`, which produced `http://` URLs behind an SSL-terminating reverse proxy and made browsers block the tiles as mixed content. ([GH-470](https://github.com/martin-ueding/geo-activity-playground/issues/470))
 
 Removed:
 
