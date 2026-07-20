@@ -487,9 +487,8 @@ def make_explorer_blueprint(
     @blueprint.route("/<int:zoom>/style.json")
     def style_json(zoom: int) -> ResponseReturnValue:
         color_strategy = request.args.get("color_strategy", "colorful_cluster")
-        base_url = request.url_root.rstrip("/")
         tile_url = (
-            f"{base_url}/explorer/{zoom}/tile/{{z}}/{{x}}/{{y}}.png"
+            f"/explorer/{zoom}/tile/{{z}}/{{x}}/{{y}}.png"
             f"?color_strategy={color_strategy}"
         )
         gap_source_id = f"gap-explorer-{zoom}-{color_strategy}"
