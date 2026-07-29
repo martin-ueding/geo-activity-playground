@@ -123,3 +123,20 @@ class ClusterMembership(DB.Model):
             "zoom", "tile_x", "tile_y", name="uq_cluster_membership_per_zoom"
         ),
     )
+
+
+class InaccessibleTile(DB.Model):
+    """A tile that the user has marked as inaccessible for a given zoom level."""
+
+    __tablename__ = "inaccessible_tiles"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zoom: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_x: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    tile_y: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "zoom", "tile_x", "tile_y", name="uq_inaccessible_tile_per_zoom"
+        ),
+    )

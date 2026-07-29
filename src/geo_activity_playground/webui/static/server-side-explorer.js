@@ -39,6 +39,7 @@ export function initExplorerMap(config) {
     });
 
     initClusterHistoryLayer(map, zoom);
+    setupInaccessibleLinks(map, zoom);
 
     // Fit to bounding box if provided
     if (bbox) {
@@ -47,6 +48,9 @@ export function initExplorerMap(config) {
 
     // Click handler to show tile info popup
     map.on('click', e => {
+        if (e.originalEvent?.target?.closest('a[data-inaccessible-action]')) {
+            return;
+        }
         fetch(`/explorer/${zoom}/info/${e.latlng.lat}/${e.latlng.lng}`)
             .then(response => response.text())
             .then(text => {
@@ -191,5 +195,37 @@ function setupDownloadLinks(map, zoom) {
             const bounds = map.getBounds();
             window.location.href = `/explorer/${zoom}/${bounds.getNorth()}/${bounds.getEast()}/${bounds.getSouth()}/${bounds.getWest()}/${suffix}`;
         });
+    });
+}
+
+/**
+ * Handle clicks on the mark/unmark inaccessible links inside the tile popup.
+ *
+ * The request is sent in the background, the popup is refreshed, and the
+ * active explorer overlay tiles are reloaded so the new stripes appear.
+ */
+function setupInaccessibleLinks(map, zoom) {
+    map.getContainer().addEventListener('click', async (e) => {
+        const link = e.target.closest('a[data-inaccessible-action]');
+        if (!link) {
+            return;
+        }
+        e.preventDefault();
+
+        try {
+            await fetch(link.href);
+
+            const popup = map._popup;
+            if (popup) {
+                const latlng = popup.getLatLng();
+                const text = await fetch(
+                    `/explorer/${zoom}/info/${latlng.lat}/${latlng.lng}`
+                ).then(response => response.text());
+                popup.setContent(text);
+            }
+
+        } catch (error) {
+            console.error('Failed to toggle inaccessible mark:', error);
+        }
     });
 }

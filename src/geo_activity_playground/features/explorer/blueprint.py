@@ -63,7 +63,7 @@ from .clustering import (
     get_square_history_df,
 )
 from .garmin_img import build_garmin_img, mkgmap_available
-from .model import ExplorerTileBookmark
+from .model import ExplorerTileBookmark, InaccessibleTile
 from .tile_rendering import (
     _render_tile_image,
     _resolve_color_strategy,
@@ -324,6 +324,18 @@ def make_explorer_blueprint(
             tile_bounds.y_min,
             tile_bounds.y_max,
         )
+        inaccessible_tiles = {
+            (tile.tile_x, tile.tile_y)
+            for tile in DB.session.scalars(
+                sqlalchemy.select(InaccessibleTile).where(
+                    InaccessibleTile.zoom == zoom,
+                    InaccessibleTile.tile_x >= tile_bounds.x_min,
+                    InaccessibleTile.tile_x <= tile_bounds.x_max,
+                    InaccessibleTile.tile_y >= tile_bounds.y_min,
+                    InaccessibleTile.tile_y <= tile_bounds.y_max,
+                )
+            )
+        }
 
         color_strategy = _resolve_color_strategy(
             request,
@@ -337,7 +349,15 @@ def make_explorer_blueprint(
             config,
         )
 
-        result = _render_tile_image(zoom, z, x, y, color_strategy, evolution_state)
+        result = _render_tile_image(
+            zoom,
+            z,
+            x,
+            y,
+            color_strategy,
+            evolution_state,
+            frozenset(inaccessible_tiles),
+        )
 
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
@@ -354,11 +374,22 @@ def make_explorer_blueprint(
         _square_x, _square_y, square_size = get_explorer_square(zoom)
         tile_xy = compute_tile(latitude, longitude, zoom)
         cluster_id = get_cluster_id_for_tile(zoom, tile_xy[0], tile_xy[1])
+        is_inaccessible = (
+            DB.session.query(InaccessibleTile)
+            .filter_by(
+                zoom=zoom,
+                tile_x=tile_xy[0],
+                tile_y=tile_xy[1],
+            )
+            .first()
+            is not None
+        )
         context: dict[str, Any] = {
             "tile_x": tile_xy[0],
             "tile_y": tile_xy[1],
             "zoom": zoom,
             "square_size": square_size,
+            "is_inaccessible": is_inaccessible,
         }
 
         # Query tile info from database
@@ -410,6 +441,20 @@ def make_explorer_blueprint(
                         radius=0,
                     ),
                 }
+            )
+        if is_inaccessible:
+            context["unmark_url"] = url_for(
+                ".remove_inaccessible",
+                zoom=zoom,
+                tile_x=tile_xy[0],
+                tile_y=tile_xy[1],
+            )
+        elif tile_visit is None:
+            context["mark_url"] = url_for(
+                ".mark_inaccessible",
+                zoom=zoom,
+                tile_x=tile_xy[0],
+                tile_y=tile_xy[1],
             )
         return render_template("explorer/tooltip.html.j2", **context)
 
@@ -499,6 +544,51 @@ def make_explorer_blueprint(
             geojson.dumps(geojson.FeatureCollection(features)),
             mimetype="application/json",
         )
+
+    @blueprint.route("/<int:zoom>/inaccessible/<int:tile_x>/<int:tile_y>")
+    @needs_authentication(authenticator)
+    def mark_inaccessible(zoom: int, tile_x: int, tile_y: int) -> ResponseReturnValue:
+        tile_visit = (
+            DB.session.query(TileVisit)
+            .filter_by(zoom=zoom, tile_x=tile_x, tile_y=tile_y)
+            .first()
+        )
+        if tile_visit is not None:
+            flash(
+                _("Only missing tiles can be marked as inaccessible."),
+                category="danger",
+            )
+            return redirect(url_for(".server_side", zoom=zoom))
+        existing = (
+            DB.session.query(InaccessibleTile)
+            .filter_by(zoom=zoom, tile_x=tile_x, tile_y=tile_y)
+            .first()
+        )
+        if existing is not None:
+            flash(_("Tile is already marked as inaccessible."), category="warning")
+        else:
+            DB.session.add(
+                InaccessibleTile(zoom=zoom, tile_x=tile_x, tile_y=tile_y)  # pyright: ignore
+            )
+            DB.session.commit()
+            flash(_("Tile marked as inaccessible."), category="success")
+        return redirect(url_for(".server_side", zoom=zoom))
+
+    @blueprint.route("/<int:zoom>/inaccessible/<int:tile_x>/<int:tile_y>/remove")
+    @needs_authentication(authenticator)
+    def remove_inaccessible(zoom: int, tile_x: int, tile_y: int) -> ResponseReturnValue:
+        existing = (
+            DB.session.query(InaccessibleTile)
+            .filter_by(zoom=zoom, tile_x=tile_x, tile_y=tile_y)
+            .first()
+        )
+        if existing is not None:
+            DB.session.delete(existing)
+            DB.session.commit()
+            flash(_("Tile unmarked as inaccessible."), category="success")
+        else:
+            flash(_("Tile was not marked as inaccessible."), category="warning")
+        return redirect(url_for(".server_side", zoom=zoom))
 
     return blueprint
 

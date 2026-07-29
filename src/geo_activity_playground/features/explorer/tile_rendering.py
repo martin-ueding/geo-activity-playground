@@ -22,6 +22,10 @@ SQUARE_LINE_WIDTH = 3
 SQUARE_COLOR = np.array([228, 26, 28, 255], dtype=np.float32) / 256.0
 GRID_COLOR = np.array([0.5, 0.5, 0.5, 0.5], dtype=np.float32)
 
+INACCESSIBLE_STRIPE_COLOR = np.array([0.5, 0.5, 0.5, 0.6], dtype=np.float32)
+INACCESSIBLE_STRIPE_PERIOD = 16
+INACCESSIBLE_STRIPE_THICKNESS = 8
+
 
 def blend_color(
     base: np.ndarray, addition: np.ndarray | float, opacity: float
@@ -51,6 +55,42 @@ class SolidColor(TilePattern):
     def rasterize(self, shape: tuple[int, int]) -> np.ndarray:
         height, width = shape
         return np.broadcast_to(self._color, (height, width, 4)).copy()
+
+
+class HatchedPattern(TilePattern):
+    def __init__(self, color: np.ndarray, period: int, thickness: int) -> None:
+        self._color = np.asarray(color, dtype=np.float32)
+        self._period = period
+        self._thickness = thickness
+
+    def rasterize(self, shape: tuple[int, int]) -> np.ndarray:
+        height, width = shape
+        rgba = np.zeros((height, width, 4), dtype=np.float32)
+        mask = np.fromfunction(
+            lambda i, j: (i + j) % self._period < self._thickness,
+            (height, width),
+            dtype=int,
+        )
+        rgba[mask] = self._color
+        return rgba
+
+
+def alpha_composite(base: np.ndarray, overlay: np.ndarray) -> np.ndarray:
+    """Composite a RGBA overlay onto a RGBA base image."""
+    a = overlay[..., 3]
+    out = np.copy(base)
+    out[..., :3] = (1 - a[..., np.newaxis]) * base[..., :3] + a[
+        ..., np.newaxis
+    ] * overlay[..., :3]
+    out[..., 3] = base[..., 3] + (1 - base[..., 3]) * a
+    return out
+
+
+HATCHED_PATTERN = HatchedPattern(
+    INACCESSIBLE_STRIPE_COLOR,
+    INACCESSIBLE_STRIPE_PERIOD,
+    INACCESSIBLE_STRIPE_THICKNESS,
+)
 
 
 class ColorStrategy(abc.ABC):
@@ -417,7 +457,10 @@ def _render_tile_image(
     y: int,
     color_strategy: ColorStrategy,
     evolution_state: SimpleNamespace,
+    inaccessible_tiles: frozenset[tuple[int, int]] | None = None,
 ) -> np.ndarray:
+    if inaccessible_tiles is None:
+        inaccessible_tiles = frozenset()
     result = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
 
     if z >= zoom:
@@ -474,6 +517,16 @@ def _render_tile_image(
                 y_start : y_start + width,
                 x_start : x_start + width,
             ] = pattern.rasterize((width, width))
+
+        if tile_xy in inaccessible_tiles:
+            hatch = HATCHED_PATTERN.rasterize((width, width))
+            result[
+                y_start : y_start + width,
+                x_start : x_start + width,
+            ] = alpha_composite(
+                result[y_start : y_start + width, x_start : x_start + width],
+                hatch,
+            )
 
         _draw_grid_lines(result, x_start, y_start, width, draw_left, draw_top)
         _draw_explorer_square_edges(

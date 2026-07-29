@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
+- Add the ability to mark missing explorer tiles as inaccessible; marked tiles are shown with diagonal gray stripes on every explorer overlay.
 - Add pictures per equipment.
 - Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
 - Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
