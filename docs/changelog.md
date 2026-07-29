@@ -25,10 +25,12 @@ Added:
 - Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
 - Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
 - Record activity files that fail to import (parse errors, no geospatial data, empty time series) in a new "Broken Activity Files" settings page instead of just logging a warning on every import scan. Files are only retried once their content changes, or after being retried manually from that page. ([GH-472](https://github.com/martin-ueding/geo-activity-playground/issues/472))
+- Add a `source` column to `Activity` that records which importer created the record.
 
 Changed:
 
 - Move all application settings from the `config.json` file into the database, split across domain-grouped tables (heart rate, Strava, activity import, UI, and map). Settings are seeded once from an existing `config.json` on the next start, after which the database is authoritative and the file can be deleted. Privacy zones now live in their own database table instead of the config file.
+- Unify the Strava API and checkout importers into a single `features/strava/` package, a single settings page, and a compound `StravaActivitySource` that runs the checkout import before the API import.
 - Replace the equipment overview table with Bootstrap cards showing each equipment's usage, first use and last use, linking to its new detail page.
 
 Removed:

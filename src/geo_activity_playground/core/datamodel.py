@@ -89,6 +89,7 @@ class Activity(DB.Model):
     # Where it comes from:
     path: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    source: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)

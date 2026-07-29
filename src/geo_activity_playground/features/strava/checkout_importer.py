@@ -57,7 +57,10 @@ def normalize_header(header: Sequence[str]) -> list[str]:
     return [mapping.get(h, h) for h in header]
 
 
-def import_from_strava_checkout(config: ActivityImportConfig) -> None:
+def import_from_strava_checkout(
+    config: ActivityImportConfig,
+    source: str | None = None,
+) -> None:
     checkout_path = pathlib.Path("Strava Export")
     with open(checkout_path / "activities.csv", encoding="utf-8") as f:
         rows = parse_csv(f.read())
@@ -159,6 +162,7 @@ def import_from_strava_checkout(config: ActivityImportConfig) -> None:
         activity.path = str(activity_file)
         activity.start = start_datetime
         activity.steps = float_with_comma_or_period(row["Total Steps"])
+        activity.source = source
 
         update_and_commit(activity, time_series, config)
 

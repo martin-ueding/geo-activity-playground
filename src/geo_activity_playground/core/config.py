@@ -1,7 +1,7 @@
 import json
 import logging
 
-from ..features.strava_api.model import StravaConfig
+from ..features.strava.model import StravaConfig
 from .datamodel import (
     DB,
     ActivityImportConfig,

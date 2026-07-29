@@ -27,7 +27,9 @@ def test_broken_file_is_recorded_and_skipped_until_changed(app_context) -> None:
     accessor = ConfigAccessor()
     repository = ActivityRepository()
 
-    import_from_directory(repository, accessor.activity_import(), accessor.ui())
+    import_from_directory(
+        repository, accessor.activity_import(), accessor.ui(), source="directory"
+    )
 
     broken = DB.session.scalar(sqlalchemy.select(BrokenActivityFile))
     assert broken is not None
@@ -36,7 +38,9 @@ def test_broken_file_is_recorded_and_skipped_until_changed(app_context) -> None:
     first_attempt = broken.last_attempt
 
     # A second scan of the unchanged file must not touch the record.
-    import_from_directory(repository, accessor.activity_import(), accessor.ui())
+    import_from_directory(
+        repository, accessor.activity_import(), accessor.ui(), source="directory"
+    )
     DB.session.expire_all()
     broken_again = DB.session.scalar(sqlalchemy.select(BrokenActivityFile))
     assert broken_again is not None
@@ -44,7 +48,9 @@ def test_broken_file_is_recorded_and_skipped_until_changed(app_context) -> None:
 
     # Once the file's content changes, it is retried and the record refreshed.
     path.write_text("still broken, but different content this time")
-    import_from_directory(repository, accessor.activity_import(), accessor.ui())
+    import_from_directory(
+        repository, accessor.activity_import(), accessor.ui(), source="directory"
+    )
     DB.session.expire_all()
     broken_third = DB.session.scalar(sqlalchemy.select(BrokenActivityFile))
     assert broken_third is not None

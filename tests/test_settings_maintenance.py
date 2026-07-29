@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pandas as pd
 import sqlalchemy
 
+import geo_activity_playground.features.strava.api_importer as strava_api
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import (
     DB,
@@ -32,7 +33,6 @@ from geo_activity_playground.features.segments.model import (
     SegmentMatch,
 )
 from geo_activity_playground.features.square_planner.model import SquarePlannerBookmark
-from geo_activity_playground.features.strava_api import importer as strava_api
 
 
 def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path):

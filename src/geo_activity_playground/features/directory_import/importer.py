@@ -37,6 +37,7 @@ def import_from_directory(
     repository: ActivityRepository,
     config: ActivityImportConfig,
     ui_config: UiConfig,
+    source: str | None = None,
 ) -> None:
     activity_paths = [
         path
@@ -103,7 +104,13 @@ def import_from_directory(
                     )
 
             import_from_file(
-                activity_path, repository, config, ui_config, i, current_hash
+                activity_path,
+                repository,
+                config,
+                ui_config,
+                i,
+                current_hash,
+                source,
             )
 
 
@@ -114,6 +121,7 @@ def import_from_file(
     ui_config: UiConfig,
     i: int,
     file_hash: str,
+    source: str | None = None,
 ) -> None:
     logger.info(f"Importing {path} …")
     try:
@@ -159,6 +167,7 @@ def import_from_file(
         activity.kind = get_or_make_kind(
             meta_from_path.get("kind", DEFAULT_UNKNOWN_NAME)
         )
+    activity.source = source
 
     update_and_commit(activity, time_series, config)
 

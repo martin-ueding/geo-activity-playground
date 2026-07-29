@@ -55,9 +55,8 @@ from ...features.heatmap.model import HeatmapTileCache
 from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...features.square_planner.model import SquarePlannerBookmark
-from ...features.strava_api.blueprint import register_strava_api_settings
-from ...features.strava_api.importer import refresh_activity_names_from_strava
-from ...features.strava_checkout.blueprint import register_strava_checkout_settings
+from ...features.strava.api_importer import refresh_activity_names_from_strava
+from ...features.strava.blueprint import register_strava_settings
 from ...importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
@@ -225,8 +224,7 @@ def make_settings_blueprint(
     )
     register_hammerhead_settings(blueprint, authenticator)
     register_heatmap_settings(blueprint, authenticator, flasher)
-    register_strava_api_settings(blueprint, authenticator, config_accessor)
-    register_strava_checkout_settings(blueprint, authenticator, flasher)
+    register_strava_settings(blueprint, authenticator, config_accessor, flasher)
 
     @blueprint.route("/")
     @needs_authentication(authenticator)

@@ -1,20 +1,22 @@
-import pathlib
-
 import sqlalchemy
 
 from ..features.activity_photos.importer import import_photos_from_directory
-from ..features.directory_import.importer import import_from_directory
 from ..features.explorer.clustering import compute_tile_evolution
-from ..features.hammerhead.importer import import_from_hammerhead_api
-from ..features.hammerhead.model import HammerheadAuth
+from ..features.hammerhead.source import HammerheadActivitySource
 from ..features.segments.matching import find_matches
 from ..features.segments.model import Segment
-from ..features.strava_api.importer import import_from_strava_api
-from ..features.strava_checkout.importer import import_from_strava_checkout
+from ..features.strava.source import StravaActivitySource
 from .activities import ActivityRepository
 from .config import ConfigAccessor
 from .datamodel import DB
+from .sources import ActivitySource, DirectoryImportSource
 from .tile_visits import compute_tile_visits_new
+
+_ACTIVITY_SOURCES: list[ActivitySource] = [
+    DirectoryImportSource(),
+    StravaActivitySource(),
+    HammerheadActivitySource(),
+]
 
 
 def scan_for_activities(
@@ -27,23 +29,27 @@ def scan_for_activities(
     hammerhead_end: str | None = None,
     skip_hammerhead: bool = False,
 ) -> None:
-    if pathlib.Path("Activities").exists():
-        import_from_directory(
-            repository, config_accessor.activity_import(), config_accessor.ui()
-        )
+    for activity_source in _ACTIVITY_SOURCES:
+        if not activity_source.is_enabled(config_accessor):
+            continue
+        if activity_source.source == "strava" and skip_strava:
+            continue
+        if activity_source.source == "hammerhead" and skip_hammerhead:
+            continue
+
+        if activity_source.source == "strava":
+            begin = strava_begin
+            end = strava_end
+        elif activity_source.source == "hammerhead":
+            begin = hammerhead_begin
+            end = hammerhead_end
+        else:
+            begin = None
+            end = None
+
+        activity_source.import_activities(config_accessor, repository, begin, end)
+
     import_photos_from_directory()
-    if pathlib.Path("Strava Export").exists():
-        import_from_strava_checkout(config_accessor.activity_import())
-    if config_accessor.strava().strava_client_code and not skip_strava:
-        import_from_strava_api(config_accessor, repository, strava_begin, strava_end)
-    hammerhead_auth = DB.session.scalar(sqlalchemy.select(HammerheadAuth).limit(1))
-    if hammerhead_auth and hammerhead_auth.client_code and not skip_hammerhead:
-        import_from_hammerhead_api(
-            config_accessor.activity_import(),
-            repository,
-            hammerhead_begin,
-            hammerhead_end,
-        )
 
     if len(repository) > 0:
         compute_tile_visits_new(repository)

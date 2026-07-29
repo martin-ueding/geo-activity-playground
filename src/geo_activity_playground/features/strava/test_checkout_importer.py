@@ -4,7 +4,7 @@ from geo_activity_playground.importers.activity_parsers import (
     NoGeoDataError,
 )
 
-from .importer import import_from_strava_checkout
+from .checkout_importer import import_from_strava_checkout
 
 
 def test_no_geo_data_errors_are_marked_done(monkeypatch, tmp_path) -> None:
@@ -25,12 +25,12 @@ def test_no_geo_data_errors_are_marked_done(monkeypatch, tmp_path) -> None:
         raise NoGeoDataError("latitude is mandatory in None (got None)")
 
     monkeypatch.setattr(
-        "geo_activity_playground.features.strava_checkout.importer.read_activity",
+        "geo_activity_playground.features.strava.checkout_importer.read_activity",
         fake_read_activity,
     )
 
-    import_from_strava_checkout(ActivityImportConfig())
-    import_from_strava_checkout(ActivityImportConfig())
+    import_from_strava_checkout(ActivityImportConfig(), source="strava")
+    import_from_strava_checkout(ActivityImportConfig(), source="strava")
 
     assert calls == 1
 
@@ -53,11 +53,11 @@ def test_other_parse_errors_are_retried(monkeypatch, tmp_path) -> None:
         raise ActivityParseError("invalid input")
 
     monkeypatch.setattr(
-        "geo_activity_playground.features.strava_checkout.importer.read_activity",
+        "geo_activity_playground.features.strava.checkout_importer.read_activity",
         fake_read_activity,
     )
 
-    import_from_strava_checkout(ActivityImportConfig())
-    import_from_strava_checkout(ActivityImportConfig())
+    import_from_strava_checkout(ActivityImportConfig(), source="strava")
+    import_from_strava_checkout(ActivityImportConfig(), source="strava")
 
     assert calls == 2

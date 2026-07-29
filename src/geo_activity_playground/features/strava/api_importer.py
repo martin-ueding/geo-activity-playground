@@ -136,9 +136,12 @@ def import_from_strava_api(
     repository: ActivityRepository,
     strava_begin: str | None = None,
     strava_end: str | None = None,
+    source: str | None = None,
 ) -> None:
     try:
-        while try_import_strava(config_accessor, repository, strava_begin, strava_end):
+        while try_import_strava(
+            config_accessor, repository, strava_begin, strava_end, source
+        ):
             now = datetime.datetime.now()
             next_quarter = round_to_next_quarter_hour(now)
             seconds_to_wait = (next_quarter - now).total_seconds() + 10
@@ -160,6 +163,7 @@ def try_import_strava(
     repository: ActivityRepository,
     strava_begin: str | None = None,
     strava_end: str | None = None,
+    source: str | None = None,
 ) -> bool:
     if strava_begin:
         get_after = f"{strava_begin}T00:00:00Z"
@@ -253,6 +257,7 @@ def try_import_strava(
                 )
                 activity.calories = detailed_activity.calories
                 activity.moving_time = detailed_activity.moving_time
+                activity.source = source
 
                 update_and_commit(
                     activity, time_series, config_accessor.activity_import()
