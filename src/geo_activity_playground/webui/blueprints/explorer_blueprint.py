@@ -1,16 +1,10 @@
-import abc
-import datetime
-import functools
-import hashlib
 import io
-import itertools
 import json
 from types import SimpleNamespace
 from typing import Any
 
 import altair as alt
 import geojson
-import matplotlib
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
@@ -31,8 +25,8 @@ from flask_babel import gettext as _
 
 from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
-from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit, UiConfig
-from ...core.raster_map import OSM_TILE_SIZE, ImageTransform, TileGetter
+from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit
+from ...core.raster_map import ImageTransform, TileGetter
 from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
 from ...explorer.garmin_img import build_garmin_img, mkgmap_available
 from ...explorer.grid_file import (
@@ -45,6 +39,11 @@ from ...explorer.grid_file import (
     make_grid_file_osm,
     make_grid_points,
 )
+from ...explorer.tile_rendering import (
+    _render_tile_image,
+    _resolve_color_strategy,
+    _tile_bounds,
+)
 from ...explorer.tile_visits import (
     compute_tile_evolution,
     get_activity_ids_in_bounds,
@@ -52,7 +51,6 @@ from ...explorer.tile_visits import (
     get_cluster_history_latest_event_index,
     get_cluster_id_for_tile,
     get_cluster_members,
-    get_cluster_membership_in_bounds,
     get_cluster_size_history_df,
     get_cluster_state_at_cutoff,
     get_cluster_tile_count,
@@ -104,239 +102,6 @@ def _grid_points_response(
         )
     else:
         abort(404)
-
-
-def blend_color(
-    base: np.ndarray, addition: np.ndarray | float, opacity: float
-) -> np.ndarray:
-    return (1 - opacity) * base + opacity * addition
-
-
-@functools.cache
-def hex_color_to_float(color: str) -> np.ndarray:
-    values = [int("".join(x), base=16) / 255 for x in itertools.batched(color[1:], 2)]
-    assert min(values) >= 0.0 and max(values) <= 1.0, (
-        f"All {values=} must be within 0.0 and 1.0."
-    )
-    return np.array([[values]])
-
-
-class ColorStrategy(abc.ABC):
-    @abc.abstractmethod
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        pass
-
-
-class MaxClusterColorStrategy(ColorStrategy):
-    def __init__(
-        self,
-        membership: dict[tuple[int, int], tuple[int, int]],
-        max_cluster_id: tuple[int, int] | None,
-        tile_visits,
-        config: UiConfig,
-    ):
-        self.membership = membership
-        self.max_cluster_id = max_cluster_id
-        self.tile_visits = tile_visits
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        cluster_id = self.membership.get(tile_xy)
-        if cluster_id is not None:
-            if cluster_id == self.max_cluster_id:
-                return hex_color_to_float(self._config.color_strategy_max_cluster_color)
-            return hex_color_to_float(
-                self._config.color_strategy_max_cluster_other_color
-            )
-        elif tile_xy in self.tile_visits:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        else:
-            return None
-
-
-class ColorfulClusterColorStrategy(ColorStrategy):
-    def __init__(
-        self,
-        membership: dict[tuple[int, int], tuple[int, int]],
-        tile_visits,
-        config: UiConfig,
-    ):
-        self.membership = membership
-        self.tile_visits = tile_visits
-        self._cmap = matplotlib.colormaps["hsv"]
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        cluster_id = self.membership.get(tile_xy)
-        if cluster_id is not None:
-            m = hashlib.sha256()
-            m.update(str(cluster_id).encode())
-            d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
-            return np.array(
-                [[self._cmap(d)[:3] + (self._config.color_strategy_cmap_opacity,)]]
-            )
-        elif tile_xy in self.tile_visits:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        else:
-            return None
-
-
-def _replay_root(
-    parents: dict[tuple[int, int], tuple[int, int]], tile: tuple[int, int]
-) -> tuple[int, int]:
-    root = tile
-    while parents[root] != root:
-        root = parents[root]
-    return root
-
-
-class HistoricalColorfulClusterColorStrategy(ColorStrategy):
-    def __init__(self, state, config: UiConfig):
-        self._config = config
-        self._cmap = matplotlib.colormaps["hsv"]
-        self._color_by_tile: dict[tuple[int, int], np.ndarray] = {}
-        self._visited_tiles = set(state.visited_tiles)
-        for tile in state.cluster_tiles:
-            cluster_id = _replay_root(state.parents, tile)
-            m = hashlib.sha256()
-            m.update(str(cluster_id).encode())
-            d = int(m.hexdigest(), base=16) / (256.0**m.digest_size)
-            self._color_by_tile[tile] = np.array(
-                [[self._cmap(d)[:3] + (self._config.color_strategy_cmap_opacity,)]]
-            )
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        color = self._color_by_tile.get(tile_xy)
-        if color is not None:
-            return color
-        if tile_xy in self._visited_tiles:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        return None
-
-
-class HistoricalMaxClusterColorStrategy(ColorStrategy):
-    def __init__(self, state, config: UiConfig):
-        self._config = config
-        max_root = max(
-            state.component_sizes, key=state.component_sizes.get, default=None
-        )
-        self._max_members: set[tuple[int, int]] = set()
-        if max_root is not None:
-            self._max_members = {
-                tile
-                for tile in state.cluster_tiles
-                if _replay_root(state.parents, tile) == max_root
-            }
-        self._cluster_tiles = set(state.cluster_tiles)
-        self._visited_tiles = set(state.visited_tiles)
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self._max_members:
-            return hex_color_to_float(self._config.color_strategy_max_cluster_color)
-        if tile_xy in self._cluster_tiles:
-            return hex_color_to_float(
-                self._config.color_strategy_max_cluster_other_color
-            )
-        if tile_xy in self._visited_tiles:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        return None
-
-
-class VisitTimeColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: UiConfig, use_first=True):
-        self.tile_visits = tile_visits
-        self.use_first = use_first
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.tile_visits:
-            today = datetime.date.today()
-            cmap = matplotlib.colormaps["plasma"]
-            tile_info = self.tile_visits[tile_xy]
-            relevant_time = (
-                tile_info["first_time"] if self.use_first else tile_info["last_time"]
-            )
-            if pd.isna(relevant_time):
-                color = hex_color_to_float(self._config.color_strategy_visited_color)
-            else:
-                last_age_days = (today - relevant_time.date()).days
-                color = cmap(max(1 - last_age_days / (2 * 365), 0.0))
-                color = np.array(
-                    [[color[:3] + (self._config.color_strategy_cmap_opacity,)]]
-                )
-            return color
-        else:
-            return None
-
-
-class NumVisitsColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: UiConfig):
-        self.tile_visits = tile_visits
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.tile_visits:
-            cmap = matplotlib.colormaps["viridis"]
-            tile_info = self.tile_visits[tile_xy]
-            color = cmap(min(tile_info["visit_count"] / 50, 1.0))
-            return np.array([[color[:3] + (self._config.color_strategy_cmap_opacity,)]])
-        else:
-            return None
-
-
-class MissingColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: UiConfig):
-        self.tile_visits = tile_visits
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.tile_visits:
-            return None
-        else:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-
-
-class VisitedColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: UiConfig):
-        self.tile_visits = tile_visits
-        self._config = config
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        if tile_xy in self.tile_visits:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        else:
-            return None
-
-
-class SquarePlannerColorStrategy(ColorStrategy):
-    def __init__(
-        self,
-        tile_visits,
-        config: UiConfig,
-        square_x: int,
-        square_y: int,
-        square_size: int,
-    ):
-        self.tile_visits = tile_visits
-        self._config = config
-        self.square_x = square_x
-        self.square_y = square_y
-        self.square_size = square_size
-
-    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
-        x, y = tile_xy
-        if (
-            self.square_x <= x < self.square_x + self.square_size
-            and self.square_y <= y < self.square_y + self.square_size
-        ):
-            if tile_xy in self.tile_visits:
-                return hex_color_to_float("#00aa004d")
-            else:
-                return hex_color_to_float("#aa00004d")
-        elif tile_xy in self.tile_visits:
-            return hex_color_to_float(self._config.color_strategy_visited_color)
-        else:
-            return None
 
 
 def make_explorer_blueprint(
@@ -547,201 +312,29 @@ def make_explorer_blueprint(
             )
             historical_state = get_cluster_state_at_cutoff(zoom, history_event_index)
 
-        # Bounding box of explorer tiles covered by this map tile, used to fetch
-        # only the tile visits and cluster membership in view from the database.
-        if z >= zoom:
-            cover_factor = 2 ** (z - zoom)
-            tx_min = tx_max = x // cover_factor
-            ty_min = ty_max = y // cover_factor
-        else:
-            cover_factor = 2 ** (zoom - z)
-            tx_min, tx_max = x * cover_factor, x * cover_factor + cover_factor - 1
-            ty_min, ty_max = y * cover_factor, y * cover_factor + cover_factor - 1
+        tile_bounds = _tile_bounds(zoom, z, x, y)
+        tile_visits = get_tile_visits_in_bounds(
+            zoom,
+            tile_bounds.x_min,
+            tile_bounds.x_max,
+            tile_bounds.y_min,
+            tile_bounds.y_max,
+        )
 
-        tile_visits = get_tile_visits_in_bounds(zoom, tx_min, tx_max, ty_min, ty_max)
+        color_strategy = _resolve_color_strategy(
+            request,
+            zoom,
+            tile_visits,
+            tile_bounds.x_min,
+            tile_bounds.x_max,
+            tile_bounds.y_min,
+            tile_bounds.y_max,
+            historical_state,
+            config,
+        )
 
-        # map_tile = np.array(tile_getter.get_tile(z, x, y)) / 255
-        # grayscale = image_transforms["grayscale"].transform_image(map_tile)
-        grayscale = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
-        square_line_width = 3
-        square_color = np.array([[[228, 26, 28, 255]]]) / 256
+        result = _render_tile_image(zoom, z, x, y, color_strategy, evolution_state)
 
-        color_strategy_name = request.args.get("color_strategy", "colorful_cluster")
-        if color_strategy_name == "default":
-            color_strategy_name = config_accessor.ui().cluster_color_strategy
-        match color_strategy_name:
-            case "max_cluster":
-                if historical_state is None:
-                    membership = get_cluster_membership_in_bounds(
-                        zoom, tx_min, tx_max, ty_min, ty_max
-                    )
-                    max_cluster_id, _ = get_max_cluster(zoom)
-                    color_strategy = MaxClusterColorStrategy(
-                        membership, max_cluster_id, tile_visits, config
-                    )
-                else:
-                    color_strategy = HistoricalMaxClusterColorStrategy(
-                        historical_state, config
-                    )
-            case "colorful_cluster":
-                if historical_state is None:
-                    membership = get_cluster_membership_in_bounds(
-                        zoom, tx_min, tx_max, ty_min, ty_max
-                    )
-                    color_strategy = ColorfulClusterColorStrategy(
-                        membership, tile_visits, config
-                    )
-                else:
-                    color_strategy = HistoricalColorfulClusterColorStrategy(
-                        historical_state, config
-                    )
-            case "first":
-                color_strategy = VisitTimeColorStrategy(
-                    tile_visits, config, use_first=True
-                )
-            case "last":
-                color_strategy = VisitTimeColorStrategy(
-                    tile_visits, config, use_first=False
-                )
-            case "visits":
-                color_strategy = NumVisitsColorStrategy(tile_visits, config)
-            case "missing":
-                color_strategy = MissingColorStrategy(tile_visits, config)
-            case "visited":
-                color_strategy = VisitedColorStrategy(tile_visits, config)
-            case "square_planner":
-                color_strategy = SquarePlannerColorStrategy(
-                    tile_visits,
-                    config,
-                    int(request.args["x"]),
-                    int(request.args["y"]),
-                    int(request.args["size"]),
-                )
-            case _:
-                raise ValueError("Unsupported color strategy.")
-
-        if z >= zoom:
-            factor = 2 ** (z - zoom)
-            tile_x = x // factor
-            tile_y = y // factor
-            tile_xy = (tile_x, tile_y)
-            color = color_strategy.color(tile_xy)
-            if color is None:
-                result = grayscale
-            else:
-                result = np.broadcast_to(color, grayscale.shape).copy()
-
-            if x % factor == 0:
-                result[:, 0, :] = 0.5
-            if y % factor == 0:
-                result[0, :, :] = 0.5
-
-            if (
-                evolution_state.square_x is not None
-                and evolution_state.square_y is not None
-            ):
-                if (
-                    x % factor == 0
-                    and tile_x == evolution_state.square_x
-                    and evolution_state.square_y
-                    <= tile_y
-                    < evolution_state.square_y + evolution_state.max_square_size
-                ):
-                    result[:, 0:square_line_width] = square_color
-                if (
-                    y % factor == 0
-                    and tile_y == evolution_state.square_y
-                    and evolution_state.square_x
-                    <= tile_x
-                    < evolution_state.square_x + evolution_state.max_square_size
-                ):
-                    result[0:square_line_width, :] = square_color
-                if (
-                    (x + 1) % factor == 0
-                    and (x + 1) // factor
-                    == evolution_state.square_x + evolution_state.max_square_size
-                    and evolution_state.square_y
-                    <= tile_y
-                    < evolution_state.square_y + evolution_state.max_square_size
-                ):
-                    result[:, -square_line_width:] = square_color
-                if (
-                    (y + 1) % factor == 0
-                    and (y + 1) // factor
-                    == evolution_state.square_y + evolution_state.max_square_size
-                    and evolution_state.square_x
-                    <= tile_x
-                    < evolution_state.square_x + evolution_state.max_square_size
-                ):
-                    result[-square_line_width:, :] = square_color
-        else:
-            result = grayscale
-            factor = 2 ** (zoom - z)
-            width = 256 // factor
-            for xo in range(factor):
-                for yo in range(factor):
-                    tile_x = x * factor + xo
-                    tile_y = y * factor + yo
-                    tile_xy = (tile_x, tile_y)
-                    color = color_strategy.color(tile_xy)
-                    if color is not None:
-                        result[
-                            yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
-                        ] = color
-
-                    if (
-                        evolution_state.square_x is not None
-                        and evolution_state.square_y is not None
-                    ):
-                        if (
-                            tile_x == evolution_state.square_x
-                            and evolution_state.square_y
-                            <= tile_y
-                            < evolution_state.square_y + evolution_state.max_square_size
-                        ):
-                            result[
-                                yo * width : (yo + 1) * width,
-                                xo * width : xo * width + square_line_width,
-                            ] = square_color
-                        if (
-                            tile_y == evolution_state.square_y
-                            and evolution_state.square_x
-                            <= tile_x
-                            < evolution_state.square_x + evolution_state.max_square_size
-                        ):
-                            result[
-                                yo * width : yo * width + square_line_width,
-                                xo * width : (xo + 1) * width,
-                            ] = square_color
-
-                        if (
-                            tile_x + 1
-                            == evolution_state.square_x
-                            + evolution_state.max_square_size
-                            and evolution_state.square_y
-                            <= tile_y
-                            < evolution_state.square_y + evolution_state.max_square_size
-                        ):
-                            result[
-                                yo * width : (yo + 1) * width,
-                                (xo + 1) * width - square_line_width : (xo + 1) * width,
-                            ] = square_color
-
-                        if (
-                            tile_y + 1
-                            == evolution_state.square_y
-                            + evolution_state.max_square_size
-                            and evolution_state.square_x
-                            <= tile_x
-                            < evolution_state.square_x + evolution_state.max_square_size
-                        ):
-                            result[
-                                (yo + 1) * width - square_line_width : (yo + 1) * width,
-                                xo * width : (xo + 1) * width,
-                            ] = square_color
-                    if width >= 64:
-                        result[yo * width, :, :] = 0.5
-                        result[:, xo * width, :] = 0.5
         f = io.BytesIO()
         pl.imsave(f, result, format="png")
         return Response(
