@@ -123,7 +123,7 @@ def hex_color_to_float(color: str) -> np.ndarray:
 
 class ColorStrategy(abc.ABC):
     @abc.abstractmethod
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         pass
 
 
@@ -140,7 +140,7 @@ class MaxClusterColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         cluster_id = self.membership.get(tile_xy)
         if cluster_id is not None:
             if cluster_id == self.max_cluster_id:
@@ -166,7 +166,7 @@ class ColorfulClusterColorStrategy(ColorStrategy):
         self._cmap = matplotlib.colormaps["hsv"]
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         cluster_id = self.membership.get(tile_xy)
         if cluster_id is not None:
             m = hashlib.sha256()
@@ -205,7 +205,7 @@ class HistoricalColorfulClusterColorStrategy(ColorStrategy):
                 [[self._cmap(d)[:3] + (self._config.color_strategy_cmap_opacity,)]]
             )
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         color = self._color_by_tile.get(tile_xy)
         if color is not None:
             return color
@@ -230,7 +230,7 @@ class HistoricalMaxClusterColorStrategy(ColorStrategy):
         self._cluster_tiles = set(state.cluster_tiles)
         self._visited_tiles = set(state.visited_tiles)
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self._max_members:
             return hex_color_to_float(self._config.color_strategy_max_cluster_color)
         if tile_xy in self._cluster_tiles:
@@ -248,7 +248,7 @@ class VisitTimeColorStrategy(ColorStrategy):
         self.use_first = use_first
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             today = datetime.date.today()
             cmap = matplotlib.colormaps["plasma"]
@@ -274,7 +274,7 @@ class NumVisitsColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             cmap = matplotlib.colormaps["viridis"]
             tile_info = self.tile_visits[tile_xy]
@@ -289,7 +289,7 @@ class MissingColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             return None
         else:
@@ -301,7 +301,7 @@ class VisitedColorStrategy(ColorStrategy):
         self.tile_visits = tile_visits
         self._config = config
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         if tile_xy in self.tile_visits:
             return hex_color_to_float(self._config.color_strategy_visited_color)
         else:
@@ -323,7 +323,7 @@ class SquarePlannerColorStrategy(ColorStrategy):
         self.square_y = square_y
         self.square_size = square_size
 
-    def _color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
+    def color(self, tile_xy: tuple[int, int]) -> np.ndarray | None:
         x, y = tile_xy
         if (
             self.square_x <= x < self.square_x + self.square_size
@@ -625,7 +625,7 @@ def make_explorer_blueprint(
             tile_x = x // factor
             tile_y = y // factor
             tile_xy = (tile_x, tile_y)
-            color = color_strategy._color(tile_xy)
+            color = color_strategy.color(tile_xy)
             if color is None:
                 result = grayscale
             else:
@@ -683,7 +683,7 @@ def make_explorer_blueprint(
                     tile_x = x * factor + xo
                     tile_y = y * factor + yo
                     tile_xy = (tile_x, tile_y)
-                    color = color_strategy._color(tile_xy)
+                    color = color_strategy.color(tile_xy)
                     if color is not None:
                         result[
                             yo * width : (yo + 1) * width, xo * width : (xo + 1) * width
