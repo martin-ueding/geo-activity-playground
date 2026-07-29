@@ -312,7 +312,7 @@ def _progress_marker_points_from_metric(
     total = float(valid_metric.iloc[-1] - start)
     if total <= 0:
         point = valid_rows.iloc[0]
-        return {progress: point for progress in stops}
+        return dict.fromkeys(stops, point)
     result: dict[float, pd.Series] = {}
     for progress in stops:
         target = start + progress * total

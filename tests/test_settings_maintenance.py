@@ -11,10 +11,7 @@ from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
-    ClusterHistoryCheckpoint,
-    ClusterHistoryEvent,
     Equipment,
-    ExplorerTileBookmark,
     Kind,
     StoredSearchQuery,
     Tag,
@@ -22,6 +19,11 @@ from geo_activity_playground.core.datamodel import (
     activity_tag_association_table,
 )
 from geo_activity_playground.features.activity_photos.model import Photo
+from geo_activity_playground.features.explorer.model import (
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
+    ExplorerTileBookmark,
+)
 from geo_activity_playground.features.heatmap.model import HeatmapTileCache
 from geo_activity_playground.features.plot_builder.model import PlotSpec
 from geo_activity_playground.features.segments.model import (

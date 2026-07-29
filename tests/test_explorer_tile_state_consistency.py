@@ -10,25 +10,29 @@ from geo_activity_playground.core.datamodel import (
     DB,
     Activity,
     ActivityTile,
-    ClusterHistoryCheckpoint,
-    ClusterHistoryEvent,
     TileVisit,
 )
 from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
-from geo_activity_playground.explorer.tile_visits import (
-    CLUSTER_CHECKPOINT_INTERVAL,
-    TileEvolutionState,
-    _compute_cluster_evolution,
+from geo_activity_playground.core.tile_visits import (
     _process_activity,
     _tiles_from_points,
     get_activity_ids_in_tile,
+    get_tile_history_df,
+    get_tile_visits_in_bounds,
+    remove_activity_from_tile_state,
+)
+from geo_activity_playground.features.explorer.clustering import (
+    CLUSTER_CHECKPOINT_INTERVAL,
+    TileEvolutionState,
+    _compute_cluster_evolution,
     get_cluster_tile_activations_df,
     get_cluster_tile_diff_for_activity,
     get_cluster_tiles_at_cutoff,
-    get_tile_history_df,
-    get_tile_visits_in_bounds,
     rebuild_cluster_history_for_zoom,
-    remove_activity_from_tile_state,
+)
+from geo_activity_playground.features.explorer.model import (
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
 )
 from geo_activity_playground.features.heatmap.blueprint import _get_counts
 

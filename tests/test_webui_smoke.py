@@ -15,8 +15,8 @@ from geo_activity_playground.core.datamodel import (
     Kind,
     TileVisit,
 )
-from geo_activity_playground.explorer.tile_visits import (
-    get_tile_history_df,
+from geo_activity_playground.core.tile_visits import get_tile_history_df
+from geo_activity_playground.features.explorer.clustering import (
     rebuild_cluster_history_for_zoom,
 )
 

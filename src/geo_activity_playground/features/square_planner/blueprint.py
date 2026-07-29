@@ -3,18 +3,18 @@ import sqlalchemy
 from flask import Blueprint, Response, redirect, render_template, request, url_for
 
 from ...core.datamodel import DB
-from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.grid_file import (
+from ...core.grid import (
     make_explorer_rectangle,
     make_grid_file_geojson,
     make_grid_file_gpx,
     make_grid_points,
 )
-from ...explorer.tile_visits import (
-    get_explorer_square,
+from ...core.tile_visits import (
     get_tile_medians,
     get_tile_visits_in_bounds,
 )
+from ...core.tiles import get_tile_upper_left_lat_lon
+from ..explorer.clustering import get_explorer_square
 from .model import SquarePlannerBookmark
 
 

@@ -25,11 +25,9 @@ from flask_babel import gettext as _
 
 from ...core.config import ConfigAccessor
 from ...core.coordinates import Bounds
-from ...core.datamodel import DB, Activity, ExplorerTileBookmark, TileVisit
-from ...core.raster_map import ImageTransform, TileGetter
-from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
-from ...explorer.garmin_img import build_garmin_img, mkgmap_available
-from ...explorer.grid_file import (
+from ...core.datamodel import DB, Activity, TileVisit
+from ...core.grid import (
+    geojson_bounding_box_for_tile_collection,
     get_border_tiles,
     make_explorer_tile,
     make_grid_file_geojson,
@@ -39,14 +37,18 @@ from ...explorer.grid_file import (
     make_grid_file_osm,
     make_grid_points,
 )
-from ...explorer.tile_rendering import (
-    _render_tile_image,
-    _resolve_color_strategy,
-    _tile_bounds,
-)
-from ...explorer.tile_visits import (
-    compute_tile_evolution,
+from ...core.raster_map import ImageTransform, TileGetter
+from ...core.tile_visits import (
     get_activity_ids_in_bounds,
+    get_tile_count,
+    get_tile_history_df,
+    get_tile_medians,
+    get_tile_visits_in_bounds,
+)
+from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
+from ...webui.authenticator import Authenticator, needs_authentication
+from .clustering import (
+    compute_tile_evolution,
     get_biggest_cluster_members,
     get_cluster_history_latest_event_index,
     get_cluster_id_for_tile,
@@ -59,12 +61,14 @@ from ...explorer.tile_visits import (
     get_explorer_square,
     get_max_cluster,
     get_square_history_df,
-    get_tile_count,
-    get_tile_history_df,
-    get_tile_medians,
-    get_tile_visits_in_bounds,
 )
-from ..authenticator import Authenticator, needs_authentication
+from .garmin_img import build_garmin_img, mkgmap_available
+from .model import ExplorerTileBookmark
+from .tile_rendering import (
+    _render_tile_image,
+    _resolve_color_strategy,
+    _tile_bounds,
+)
 
 alt.data_transformers.enable("vegafusion")
 
@@ -497,32 +501,6 @@ def make_explorer_blueprint(
         )
 
     return blueprint
-
-
-def geojson_bounding_box_for_tile_collection(
-    tiles: list[tuple[int, int]], zoom: int
-) -> str:
-    min_x = min(x for x, y in tiles)
-    max_x = max(x for x, y in tiles)
-    min_y = min(y for x, y in tiles)
-    max_y = max(y for x, y in tiles)
-    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
-    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
-    return geojson.dumps(
-        geojson.Feature(
-            geometry=geojson.Polygon(
-                [
-                    [
-                        (lon_min, lat_max),
-                        (lon_max, lat_max),
-                        (lon_max, lat_min),
-                        (lon_min, lat_min),
-                        (lon_min, lat_max),
-                    ]
-                ]
-            ),
-        )
-    )
 
 
 def plot_tile_evolution(tiles: pd.DataFrame) -> str:

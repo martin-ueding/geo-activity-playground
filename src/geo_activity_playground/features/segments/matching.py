@@ -125,8 +125,7 @@ def find_matches(
     segment: Segment,
     config: ActivityImportConfig,
 ) -> None:
-    # Imported here to avoid a core -> explorer import at module load time.
-    from ...explorer.tile_visits import get_activity_ids_in_tiles
+    from ...core.tile_visits import get_activity_ids_in_tiles
 
     segment_tiles = tiles_for_segment(segment, SEGMENT_ZOOM)
     activity_candidates = get_activity_ids_in_tiles(SEGMENT_ZOOM, iter(segment_tiles))

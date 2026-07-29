@@ -41,9 +41,9 @@ from ...core.datamodel import (
     get_or_make_kind,
 )
 from ...core.enrichment import update_and_commit
+from ...core.grid import make_grid_file_geojson, make_grid_points
 from ...core.heart_rate import HeartRateZoneComputer
-from ...explorer.grid_file import make_grid_file_geojson, make_grid_points
-from ...explorer.tile_visits import (
+from ...core.tile_visits import (
     refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
 )

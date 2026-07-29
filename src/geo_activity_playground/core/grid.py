@@ -7,8 +7,8 @@ import geojson
 import gpxpy
 import pandas as pd
 
-from ..core.coordinates import Bounds
-from ..core.tiles import get_tile_upper_left_lat_lon
+from .coordinates import Bounds
+from .tiles import get_tile_upper_left_lat_lon
 
 logger = logging.getLogger(__name__)
 
@@ -226,3 +226,29 @@ def make_grid_file_osm(grid_points: list[list[tuple[float, float]]]) -> str:
         ET.SubElement(way, "tag", k="admin_level", v="2")
         way_id -= 1
     return ET.tostring(osm, encoding="unicode")
+
+
+def geojson_bounding_box_for_tile_collection(
+    tiles: list[tuple[int, int]], zoom: int
+) -> str:
+    min_x = min(x for x, y in tiles)
+    max_x = max(x for x, y in tiles)
+    min_y = min(y for x, y in tiles)
+    max_y = max(y for x, y in tiles)
+    lat_max, lon_min = get_tile_upper_left_lat_lon(min_x, min_y, zoom)
+    lat_min, lon_max = get_tile_upper_left_lat_lon(max_x, max_y, zoom)
+    return geojson.dumps(
+        geojson.Feature(
+            geometry=geojson.Polygon(
+                [
+                    [
+                        (lon_min, lat_max),
+                        (lon_max, lat_max),
+                        (lon_max, lat_min),
+                        (lon_min, lat_min),
+                        (lon_min, lat_max),
+                    ]
+                ]
+            ),
+        )
+    )

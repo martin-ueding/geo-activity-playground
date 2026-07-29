@@ -19,15 +19,13 @@ from ...core.datamodel import (
     get_or_make_kind,
 )
 from ...core.enrichment import update_and_commit
-from ...explorer.tile_visits import (
-    compute_tile_evolution,
-    compute_tile_visits_new,
-)
+from ...core.tile_visits import compute_tile_visits_new
 from ...importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
     read_activity,
 )
+from ..explorer.clustering import compute_tile_evolution
 from .model import BrokenActivityFile
 
 logger = logging.getLogger(__name__)

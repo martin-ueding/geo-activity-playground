@@ -24,11 +24,7 @@ from ...core.datamodel import (
     Activity,
     ActivityImportConfig,
     ActivityTile,
-    ClusterHistoryCheckpoint,
-    ClusterHistoryEvent,
-    ClusterMembership,
     Equipment,
-    ExplorerTileBookmark,
     Kind,
     PrivacyZone,
     StoredSearchQuery,
@@ -40,13 +36,19 @@ from ...core.datamodel import (
 from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
-from ...explorer.tile_visits import (
+from ...core.tile_visits import (
     _reset_tile_visits_db,
-    compute_tile_evolution,
     compute_tile_visits_new,
 )
 from ...features.activity_photos.model import Photo
 from ...features.directory_import.blueprint import register_directory_import_settings
+from ...features.explorer.clustering import compute_tile_evolution
+from ...features.explorer.model import (
+    ClusterHistoryCheckpoint,
+    ClusterHistoryEvent,
+    ClusterMembership,
+    ExplorerTileBookmark,
+)
 from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.heatmap.blueprint import register_heatmap_settings
 from ...features.heatmap.model import HeatmapTileCache

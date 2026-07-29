@@ -10,10 +10,10 @@ import matplotlib
 import numpy as np
 import pandas as pd
 
-from ..core.coordinates import Bounds
-from ..core.datamodel import UiConfig
-from ..core.raster_map import OSM_TILE_SIZE
-from .tile_visits import (
+from ...core.coordinates import Bounds
+from ...core.datamodel import UiConfig
+from ...core.raster_map import OSM_TILE_SIZE
+from .clustering import (
     get_cluster_membership_in_bounds,
     get_max_cluster,
 )

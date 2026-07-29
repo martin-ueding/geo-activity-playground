@@ -23,14 +23,15 @@ def main_export_kml(options: argparse.Namespace) -> None:
     import os
 
     from .core.coordinates import Bounds
-    from .core.tiles import compute_tile
-    from .explorer.grid_file import (
+    from .core.grid import (
         get_border_tiles,
         make_grid_file_kml,
         make_grid_file_kml_squadrats,
         make_grid_points,
     )
-    from .explorer.tile_visits import get_explorer_square, get_tile_history_df
+    from .core.tile_visits import get_tile_history_df
+    from .core.tiles import compute_tile
+    from .features.explorer.clustering import get_explorer_square
 
     os.chdir(options.basedir)
     database_path = pathlib.Path("database.sqlite")

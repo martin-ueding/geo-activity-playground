@@ -15,7 +15,7 @@ from flask_babel import gettext as _
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, TileVisit
-from ...explorer.tile_visits import (
+from ..explorer.clustering import (
     get_cluster_tile_activations_df,
     get_square_history_df,
 )

@@ -1,6 +1,6 @@
 from xml.etree import ElementTree as ET
 
-from geo_activity_playground.explorer.grid_file import (
+from geo_activity_playground.core.grid import (
     make_grid_file_kml,
     make_grid_file_osm,
     make_grid_points,

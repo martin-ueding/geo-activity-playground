@@ -17,6 +17,7 @@ from PIL import Image, ImageDraw
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, StoredSearchQuery, UiConfig
+from ...core.grid import geojson_bounding_box_for_tile_collection
 from ...core.meta_search import (
     apply_search_filter,
     get_stored_queries,
@@ -33,17 +34,14 @@ from ...core.raster_map import (
     PixelBounds,
     get_sensible_zoom_level,
 )
-from ...core.tiles import get_tile_upper_left_lat_lon
-from ...explorer.tile_visits import (
+from ...core.tile_visits import (
     get_activity_ids_in_tile,
-    get_biggest_cluster_members,
     get_tile_medians,
 )
+from ...core.tiles import get_tile_upper_left_lat_lon
 from ...webui.authenticator import Authenticator, needs_authentication
-from ...webui.blueprints.explorer_blueprint import (
-    geojson_bounding_box_for_tile_collection,
-)
 from ...webui.flasher import Flasher, FlashTypes
+from ..explorer.clustering import get_biggest_cluster_members
 from .cache import (
     blob_to_counts,
     delete_all_heatmap_cache,
