@@ -34,6 +34,11 @@ def step(label: str) -> None:
     print(f"\n=== {label} ===")
 
 
+def run_tests() -> None:
+    step("Run test suite")
+    run("uv", "run", "pytest")
+
+
 def determine_next_version() -> str:
     step("Determine next version")
     try:
@@ -197,6 +202,7 @@ def commit_and_push_changelog_restore() -> None:
 
 
 def main() -> None:
+    run_tests()
     version = determine_next_version()
     set_pyproject_version(version)
     update_changelog_header(version)
