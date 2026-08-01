@@ -214,7 +214,7 @@ class Activity(DB.Model):
 
     def delete_data(self) -> None:
         for path in [
-            TIME_SERIES_DIR() / f"{self.id}.parquet",
+            self.time_series_path,
             activity_extracted_meta_dir() / f"{self.upstream_id}.pickle",
             activity_extracted_time_series_dir() / f"{self.upstream_id}.pickle",
         ]:
