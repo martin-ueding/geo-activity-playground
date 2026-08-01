@@ -89,6 +89,7 @@ export default withMermaid({
         text: 'Contributing',
         items: [
           { text: 'Set Up a Development Environment', link: '/set-up-a-development-environment' },
+          { text: 'Run the Tests', link: '/run-the-tests' },
           { text: 'Change Database Schema', link: '/change-database-schema' },
           { text: 'Update and Extend Translations', link: '/update-and-extend-translations' },
         ],

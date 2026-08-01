@@ -58,7 +58,10 @@ And then set it up in the project directory:
 
 ```bash
 pre-commit install
+pre-commit install --hook-type pre-push
 ```
+
+The pre-commit hook takes care of formatting, the pre-push hook runs the test suite. See [Run the Tests](run-the-tests.md) for details.
 
 ## Open your editor or IDE
 
