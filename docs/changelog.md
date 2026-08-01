@@ -19,13 +19,15 @@ Types of changes
 
 Added:
 
-- Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
+- New equipment maintenance tracker:
+  - Add a per-equipment detail page with its usage plots and an edit form for the name and usage offset, linked from the equipment overview. Creating equipment also moved here from the settings page.
+  - Add pictures per equipment.
+  - Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
+  - Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
 - Add the ability to mark missing explorer tiles as inaccessible; marked tiles are shown with diagonal gray stripes on every explorer overlay.
-- Add pictures per equipment.
-- Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
-- Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
 - Record activities that fail to import (parse errors, no geospatial data, empty time series) in a new "Excluded Activities" settings page instead of just logging a warning on every import scan. Files are only retried once their content changes, or after being retried manually from that page. ([GH-472](https://github.com/martin-ueding/geo-activity-playground/issues/472))
 - Add a `source` column to `Activity` that records which importer created the record.
+- Consolidate all tests in the `tests/` directory with shared fixtures, add a smoke test that fetches every `GET` route against a database seeded from real activity files, render templates with `jinja2.StrictUndefined` in tests, and check the Alembic migrations against the models. The test suite runs as a pre-push hook; see the new [Run the Tests](run-the-tests.md) documentation.
 
 Changed:
 
@@ -45,8 +47,8 @@ Fixed:
 - Fix deleting an activity leaving its time series file behind in `Time Series/`. The wrong file name was used, so the parquet file was never removed.
 - Fix the Strava API importer's duplicate check, which compared a number against the text `upstream_id` column and therefore never matched. The Strava checkout importer now stores `upstream_id` as text as well, matching every other importer.
 - Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
-- Fix the maintenance "Cost vs. usage" plot to show one point per equipment (total cost against total distance) instead of one point per maintenance action against the odometer reading at the time, which made it hard to interpret.
 - Use a root-relative tile URL in the explorer's `style.json` instead of one built from `request.url_root`, which produced `http://` URLs behind an SSL-terminating reverse proxy and made browsers block the tiles as mixed content. ([GH-470](https://github.com/martin-ueding/geo-activity-playground/issues/470))
+- Fix downloading the heatmap as a PNG image, which failed with an error because the image was allocated without an alpha channel.
 
 Removed:
 
