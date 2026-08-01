@@ -24,6 +24,7 @@ Changed:
 Fixed:
 
 - Treat an interval of zero on a recurring maintenance task as “no interval” instead of “due immediately”. Tasks that only have a kilometer interval no longer stay overdue right after being marked as done.
+- Draw maintenance actions without a cost with a symbolic minimum thickness in the maintenance cost flow chart. They were previously invisible, and an equipment whose actions were all free produced an empty chart. Tooltips still show the actual cost.
 
 ## Version 1.42.0 — 2026-08-01
 
