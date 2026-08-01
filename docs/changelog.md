@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add a currency setting under Settings → Display → Currency. Maintenance costs were previously shown as bare numbers with no indication of their unit. Setting an ISO 4217 code formats all amounts in your locale's convention and labels the cost axes and tooltips in the maintenance and equipment plots. There is a single currency for all entries and no conversion; leaving the setting empty keeps the previous bare numbers.
+
 Changed:
 
 - Update the German and Dutch translations, adding the 172 and 174 strings that were still untranslated after the recent maintenance tracker, excluded activities, Hammerhead and technical maintenance features.
