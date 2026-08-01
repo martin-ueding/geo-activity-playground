@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-01 14:02+0200\n"
+"POT-Creation-Date: 2026-08-01 14:44+0200\n"
 "PO-Revision-Date: 2025-12-06 21:30+0100\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -94,10 +94,10 @@ msgstr "Distanz"
 #: src/geo_activity_playground/features/calendar/blueprint.py:237
 #: src/geo_activity_playground/features/calendar/blueprint.py:250
 #: src/geo_activity_playground/features/calendar/blueprint.py:254
-#: src/geo_activity_playground/features/equipment/blueprint.py:252
-#: src/geo_activity_playground/features/equipment/blueprint.py:261
-#: src/geo_activity_playground/features/equipment/blueprint.py:281
-#: src/geo_activity_playground/features/equipment/blueprint.py:285
+#: src/geo_activity_playground/features/equipment/blueprint.py:263
+#: src/geo_activity_playground/features/equipment/blueprint.py:272
+#: src/geo_activity_playground/features/equipment/blueprint.py:292
+#: src/geo_activity_playground/features/equipment/blueprint.py:296
 #: src/geo_activity_playground/features/plot_builder/analysis.py:16
 msgid "Distance / km"
 msgstr "Distanz / km"
@@ -123,7 +123,7 @@ msgstr "Höhenmeter / m"
 
 #: src/geo_activity_playground/features/activity/blueprint.py:553
 #: src/geo_activity_playground/webui/columns.py:75
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:35
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:36
 msgid "Heart Rate"
 msgstr "Herzfrequenz"
 
@@ -165,9 +165,9 @@ msgstr "Wiederholungen"
 #: src/geo_activity_playground/features/bubble_chart/blueprint.py:118
 #: src/geo_activity_playground/features/bubble_chart/blueprint.py:130
 #: src/geo_activity_playground/features/eddington/blueprint.py:271
-#: src/geo_activity_playground/features/equipment/blueprint.py:228
-#: src/geo_activity_playground/features/equipment/blueprint.py:231
-#: src/geo_activity_playground/features/equipment/blueprint.py:363
+#: src/geo_activity_playground/features/equipment/blueprint.py:239
+#: src/geo_activity_playground/features/equipment/blueprint.py:242
+#: src/geo_activity_playground/features/equipment/blueprint.py:374
 #: src/geo_activity_playground/features/plot_builder/analysis.py:20
 #: src/geo_activity_playground/webui/blueprints/entry_views.py:71
 #: src/geo_activity_playground/webui/blueprints/entry_views.py:75
@@ -177,23 +177,23 @@ msgstr "Datum"
 
 #: src/geo_activity_playground/features/activity/blueprint.py:619
 #: src/geo_activity_playground/features/activity/blueprint.py:622
-#: src/geo_activity_playground/features/equipment/blueprint.py:139
-#: src/geo_activity_playground/features/equipment/blueprint.py:155
-#: src/geo_activity_playground/features/equipment/blueprint.py:361
-#: src/geo_activity_playground/features/equipment/blueprint.py:364
-#: src/geo_activity_playground/features/maintenance/blueprint.py:51
-#: src/geo_activity_playground/features/maintenance/blueprint.py:53
-#: src/geo_activity_playground/features/maintenance/blueprint.py:66
-#: src/geo_activity_playground/features/maintenance/blueprint.py:69
-#: src/geo_activity_playground/features/maintenance/blueprint.py:82
-#: src/geo_activity_playground/features/maintenance/blueprint.py:84
+#: src/geo_activity_playground/features/equipment/blueprint.py:150
+#: src/geo_activity_playground/features/equipment/blueprint.py:166
+#: src/geo_activity_playground/features/equipment/blueprint.py:372
+#: src/geo_activity_playground/features/equipment/blueprint.py:375
+#: src/geo_activity_playground/features/maintenance/blueprint.py:58
+#: src/geo_activity_playground/features/maintenance/blueprint.py:60
+#: src/geo_activity_playground/features/maintenance/blueprint.py:73
+#: src/geo_activity_playground/features/maintenance/blueprint.py:76
+#: src/geo_activity_playground/features/maintenance/blueprint.py:89
+#: src/geo_activity_playground/features/maintenance/blueprint.py:91
 #: src/geo_activity_playground/features/plot_builder/analysis.py:40
 #: src/geo_activity_playground/features/plot_builder/analysis.py:58
 #: src/geo_activity_playground/webui/columns.py:116
 #: src/geo_activity_playground/webui/templates/page.html.j2:106
 #: src/geo_activity_playground/webui/templates/search/index.html.j2:58
 #: src/geo_activity_playground/webui/templates/search_form.html.j2:82
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:41
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:42
 msgid "Equipment"
 msgstr "Ausrüstung"
 
@@ -253,7 +253,7 @@ msgstr "Monatliche Distanz und neue Kacheln"
 #: src/geo_activity_playground/features/calendar/blueprint.py:183
 #: src/geo_activity_playground/features/calendar/blueprint.py:187
 #: src/geo_activity_playground/features/calendar/blueprint.py:202
-#: src/geo_activity_playground/features/equipment/blueprint.py:359
+#: src/geo_activity_playground/features/equipment/blueprint.py:370
 #: src/geo_activity_playground/features/plot_builder/analysis.py:50
 msgid "Month"
 msgstr "Monat"
@@ -350,42 +350,37 @@ msgstr "%(interval)s fehlen für nächste"
 msgid "Eddington number"
 msgstr "Eddington-Zahl"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:140
-#: src/geo_activity_playground/features/equipment/blueprint.py:169
-msgid "Title"
-msgstr "Titel"
-
-#: src/geo_activity_playground/features/equipment/blueprint.py:141
-#: src/geo_activity_playground/features/equipment/blueprint.py:156
-#: src/geo_activity_playground/features/equipment/blueprint.py:170
+#: src/geo_activity_playground/features/equipment/blueprint.py:42
 #: src/geo_activity_playground/features/maintenance/blueprint.py:50
-#: src/geo_activity_playground/features/maintenance/blueprint.py:54
-#: src/geo_activity_playground/features/maintenance/blueprint.py:65
-#: src/geo_activity_playground/features/maintenance/blueprint.py:70
 msgid "Cost"
 msgstr "Kosten"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:200
+#: src/geo_activity_playground/features/equipment/blueprint.py:151
+#: src/geo_activity_playground/features/equipment/blueprint.py:180
+msgid "Title"
+msgstr "Titel"
+
+#: src/geo_activity_playground/features/equipment/blueprint.py:211
 msgid "Maintenance cost flow"
 msgstr "Wartungskostenfluss"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:224
+#: src/geo_activity_playground/features/equipment/blueprint.py:235
 msgid "Usage over Time"
 msgstr "Nutzung über Zeit"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:229
-#: src/geo_activity_playground/features/equipment/blueprint.py:234
+#: src/geo_activity_playground/features/equipment/blueprint.py:240
+#: src/geo_activity_playground/features/equipment/blueprint.py:245
 msgid "Cumulative distance / km"
 msgstr "Kumulative Distanz / km"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:247
+#: src/geo_activity_playground/features/equipment/blueprint.py:258
 msgid "Yearly distance"
 msgstr "Jährliche Distanz"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:251
-#: src/geo_activity_playground/features/equipment/blueprint.py:259
-#: src/geo_activity_playground/features/maintenance/blueprint.py:64
-#: src/geo_activity_playground/features/maintenance/blueprint.py:68
+#: src/geo_activity_playground/features/equipment/blueprint.py:262
+#: src/geo_activity_playground/features/equipment/blueprint.py:270
+#: src/geo_activity_playground/features/maintenance/blueprint.py:71
+#: src/geo_activity_playground/features/maintenance/blueprint.py:75
 #: src/geo_activity_playground/features/plot_builder/analysis.py:43
 #: src/geo_activity_playground/features/plot_builder/analysis.py:61
 #: src/geo_activity_playground/features/summary/blueprint.py:34
@@ -395,10 +390,10 @@ msgstr "Jährliche Distanz"
 msgid "Year"
 msgstr "Jahr"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:256
-#: src/geo_activity_playground/features/equipment/blueprint.py:263
-#: src/geo_activity_playground/features/equipment/blueprint.py:279
-#: src/geo_activity_playground/features/equipment/blueprint.py:283
+#: src/geo_activity_playground/features/equipment/blueprint.py:267
+#: src/geo_activity_playground/features/equipment/blueprint.py:274
+#: src/geo_activity_playground/features/equipment/blueprint.py:290
+#: src/geo_activity_playground/features/equipment/blueprint.py:294
 #: src/geo_activity_playground/features/summary/blueprint.py:39
 #: src/geo_activity_playground/features/summary/blueprint.py:42
 #: src/geo_activity_playground/webui/blueprints/entry_views.py:73
@@ -409,28 +404,28 @@ msgstr "Jahr"
 msgid "Kind"
 msgstr "Art"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:273
+#: src/geo_activity_playground/features/equipment/blueprint.py:284
 msgid "Kinds"
 msgstr "Arten"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:355
+#: src/geo_activity_playground/features/equipment/blueprint.py:366
 msgid "Monthly Equipment Usage"
 msgstr "Monatliche Ausrüstungsnutzung"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:360
+#: src/geo_activity_playground/features/equipment/blueprint.py:371
 msgid "Total Kilometers per Month"
 msgstr "Gesamtkilometer pro Monat"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:366
+#: src/geo_activity_playground/features/equipment/blueprint.py:377
 msgid "Total Distance"
 msgstr "Gesamtdistanz"
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:414
+#: src/geo_activity_playground/features/equipment/blueprint.py:428
 #, python-format
 msgid "Equipment '%(name)s' updated."
 msgstr "Ausrüstung „%(name)s“ aktualisiert."
 
-#: src/geo_activity_playground/features/equipment/blueprint.py:432
+#: src/geo_activity_playground/features/equipment/blueprint.py:446
 #, python-format
 msgid "Equipment '%(name)s' added."
 msgstr "Ausrüstung „%(name)s“ hinzugefügt."
@@ -545,62 +540,61 @@ msgstr "Keine Suchanfrage"
 msgid "Deleted search query #%d"
 msgstr "Suchanfrage #%d gelöscht"
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:47
-msgid "Cost by equipment"
-msgstr "Kosten nach Ausrüstung"
-
-#: src/geo_activity_playground/features/maintenance/blueprint.py:61
-msgid "Cost by year"
-msgstr "Kosten nach Jahr"
-
-#: src/geo_activity_playground/features/maintenance/blueprint.py:77
-msgid "Cost vs. usage"
-msgstr "Kosten im Verhältnis zur Nutzung"
-
-#: src/geo_activity_playground/features/maintenance/blueprint.py:80
-#: src/geo_activity_playground/features/maintenance/blueprint.py:85
-msgid "Total usage / km"
-msgstr "Gesamtnutzung / km"
-
-#: src/geo_activity_playground/features/maintenance/blueprint.py:81
-#: src/geo_activity_playground/features/maintenance/blueprint.py:86
+#: src/geo_activity_playground/features/maintenance/blueprint.py:51
 msgid "Total cost"
 msgstr "Gesamtkosten"
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:142
+#: src/geo_activity_playground/features/maintenance/blueprint.py:54
+msgid "Cost by equipment"
+msgstr "Kosten nach Ausrüstung"
+
+#: src/geo_activity_playground/features/maintenance/blueprint.py:68
+msgid "Cost by year"
+msgstr "Kosten nach Jahr"
+
+#: src/geo_activity_playground/features/maintenance/blueprint.py:84
+msgid "Cost vs. usage"
+msgstr "Kosten im Verhältnis zur Nutzung"
+
+#: src/geo_activity_playground/features/maintenance/blueprint.py:87
+#: src/geo_activity_playground/features/maintenance/blueprint.py:92
+msgid "Total usage / km"
+msgstr "Gesamtnutzung / km"
+
+#: src/geo_activity_playground/features/maintenance/blueprint.py:151
 #, python-format
 msgid "Maintenance action '%(title)s' added."
 msgstr "Wartungsmaßnahme „%(title)s“ hinzugefügt."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:170
+#: src/geo_activity_playground/features/maintenance/blueprint.py:179
 #, python-format
 msgid "Maintenance action '%(title)s' updated."
 msgstr "Wartungsmaßnahme „%(title)s“ aktualisiert."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:190
+#: src/geo_activity_playground/features/maintenance/blueprint.py:199
 msgid "Maintenance action deleted."
 msgstr "Wartungsmaßnahme gelöscht."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:218
+#: src/geo_activity_playground/features/maintenance/blueprint.py:227
 #, python-format
 msgid "Recurring task '%(title)s' added."
 msgstr "Wiederkehrende Aufgabe „%(title)s“ hinzugefügt."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:237
+#: src/geo_activity_playground/features/maintenance/blueprint.py:246
 #, python-format
 msgid "Recurring task '%(title)s' updated."
 msgstr "Wiederkehrende Aufgabe „%(title)s“ aktualisiert."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:252
+#: src/geo_activity_playground/features/maintenance/blueprint.py:261
 msgid "Recurring task deleted."
 msgstr "Wiederkehrende Aufgabe gelöscht."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:269
+#: src/geo_activity_playground/features/maintenance/blueprint.py:278
 #, python-format
 msgid "Task '%(title)s' marked as done."
 msgstr "Aufgabe „%(title)s“ als erledigt markiert."
 
-#: src/geo_activity_playground/features/maintenance/blueprint.py:288
+#: src/geo_activity_playground/features/maintenance/blueprint.py:297
 msgid "Task execution deleted."
 msgstr "Aufgabenausführung gelöscht."
 
@@ -877,27 +871,27 @@ msgstr "Durchschnittsgeschwindigkeit"
 msgid "Average Power"
 msgstr "Durchschnittsleistung"
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:76
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:79
 msgid "No geospatial data"
 msgstr "Keine Geodaten"
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:77
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:80
 msgid "Parse error"
 msgstr "Lesefehler"
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:78
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:81
 msgid "Empty time series"
 msgstr "Leere Zeitreihe"
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:79
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:82
 msgid "Deleted by user"
 msgstr "Vom Benutzer gelöscht"
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:267
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:270
 msgid "The activity will be imported again on the next import scan."
 msgstr "Die Aktivität wird beim nächsten Import-Scan erneut importiert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:283
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:286
 #, python-format
 msgid ""
 "Cleared %(count)s failed imports. They will be retried on the next import"
@@ -906,19 +900,19 @@ msgstr ""
 "%(count)s fehlgeschlagene Importe zurückgesetzt. Sie werden beim nächsten"
 " Import-Scan erneut versucht."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:301
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:304
 msgid "Tile visit state has been reset and re-indexed."
 msgstr "Kachelbesuchs-Status wurde zurückgesetzt und neu indiziert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:313
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:316
 msgid "All activities have been re-enriched."
 msgstr "Alle Aktivitäten wurden neu angereichert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:325
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:328
 msgid "Activities have been repaired and reprocessed."
 msgstr "Aktivitäten wurden repariert und neu verarbeitet."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:333
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:336
 msgid ""
 "Local activity state has been wiped. Equipment, kinds, and Strava API "
 "credentials were preserved."
@@ -926,7 +920,7 @@ msgstr ""
 "Lokaler Aktivitätsbestand wurde gelöscht. Ausrüstung, Arten und Strava-"
 "API-Zugangsdaten blieben erhalten."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:344
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:347
 #, python-format
 msgid ""
 "Refreshed activity names from Strava. Updated %(updated_names)s "
@@ -935,7 +929,7 @@ msgstr ""
 "Aktivitätsnamen von Strava aktualisiert. %(updated_names)s Aktivitäten "
 "aktualisiert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:358
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:361
 #, python-format
 msgid ""
 "Re-imported time series from activity files: %(reimported)s re-imported, "
@@ -944,15 +938,24 @@ msgstr ""
 "Zeitreihen aus Aktivitätsdateien neu importiert: %(reimported)s neu "
 "importiert, %(skipped)s übersprungen (Datei fehlt), %(errors)s Fehler."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:383
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:386
 msgid "Activity timezones have been fixed."
 msgstr "Zeitzonen der Aktivitäten wurden korrigiert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:765
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:427
+#, python-format
+msgid "'%(code)s' is not a known ISO 4217 currency code."
+msgstr "„%(code)s“ ist kein bekannter ISO-4217-Währungscode."
+
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:433
+msgid "Currency updated."
+msgstr "Währung aktualisiert."
+
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:792
 msgid "Updated summary table columns."
 msgstr "Spalten der Übersichtstabellen aktualisiert."
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:788
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:815
 msgid "Updated map display preferences."
 msgstr "Kartendarstellungs-Einstellungen aktualisiert."
 
@@ -1130,7 +1133,7 @@ msgstr ""
 "                                        Editor"
 
 #: src/geo_activity_playground/webui/templates/page.html.j2:175
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:83
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:84
 #: src/geo_activity_playground/webui/templates/settings/index.html.j2:8
 msgid "Settings"
 msgstr "Einstellungen"
@@ -1209,7 +1212,7 @@ msgid "Distance maximum"
 msgstr "Maximaldistanz"
 
 #: src/geo_activity_playground/webui/templates/search_form.html.j2:98
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:43
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:44
 msgid "Tags"
 msgstr "Tags"
 
@@ -1344,78 +1347,134 @@ msgid "Language"
 msgstr "Sprache"
 
 #: src/geo_activity_playground/webui/templates/settings/base.html.j2:21
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:4
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:8
+msgid "Currency"
+msgstr "Währung"
+
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:22
 #: src/geo_activity_playground/webui/templates/settings/table-columns.html.j2:4
 msgid "Table Columns"
 msgstr "Tabellenspalten"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:22
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:23
 #: src/geo_activity_playground/webui/templates/settings/map-display.html.j2:4
 #: src/geo_activity_playground/webui/templates/settings/map-display.html.j2:8
 msgid "Map Display"
 msgstr "Kartendarstellung"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:26
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:27
 msgid "Analysis"
 msgstr "Analyse"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:28
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:29
 msgid "Track Segmentation"
 msgstr "Streckensegmentierung"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:29
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:30
 msgid "Plot Builder"
 msgstr "Diagramm-Editor"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:33
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:34
 #: src/geo_activity_playground/webui/templates/settings/index.html.j2:29
 msgid "Personal"
 msgstr "Persönlich"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:39
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:40
 #: src/geo_activity_playground/webui/templates/settings/index.html.j2:35
 msgid "Management"
 msgstr "Verwaltung"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:42
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:43
 msgid "Activity Kinds"
 msgstr "Aktivitätsarten"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:47
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:48
 msgid "Privacy & Security"
 msgstr "Datenschutz & Sicherheit"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:49
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:50
 msgid "Privacy Zones"
 msgstr "Privatsphärezonen"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:50
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:51
 #: src/geo_activity_playground/webui/templates/settings/sharepic.html.j2:4
 #: src/geo_activity_playground/webui/templates/settings/sharepic.html.j2:8
 msgid "Share Picture"
 msgstr "Teilbild"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:51
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:52
 msgid "Admin Password"
 msgstr "Admin-Passwort"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:55
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:56
 #: src/geo_activity_playground/webui/templates/settings/index.html.j2:53
 msgid "System"
 msgstr "System"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:57
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:58
 #: src/geo_activity_playground/webui/templates/settings/maintenance.html.j2:4
 #: src/geo_activity_playground/webui/templates/settings/maintenance.html.j2:8
 msgid "Technical Maintenance"
 msgstr "Technische Wartung"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:58
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:59
 msgid "Heatmap Cache"
 msgstr "Intensitätskarten-Cache"
 
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:96
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:97
 msgid "Settings Menu"
 msgstr "Einstellungsmenü"
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:10
+msgid ""
+"Maintenance costs are stored as plain numbers. This setting says which "
+"currency those numbers are in and how they are formatted."
+msgstr ""
+"Wartungskosten werden als reine Zahlen gespeichert. Diese Einstellung "
+"legt fest, in welcher Währung diese Zahlen angegeben sind und wie sie "
+"formatiert werden."
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:14
+msgid "Currency code"
+msgstr "Währungscode"
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:18
+msgid ""
+"ISO 4217 code, for instance EUR, USD, CHF, or GBP. Leave empty to show "
+"bare numbers without a currency."
+msgstr ""
+"ISO-4217-Code, zum Beispiel EUR, USD, CHF oder GBP. Leer lassen, um reine"
+" Zahlen ohne Währung anzuzeigen."
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:22
+#: src/geo_activity_playground/webui/templates/settings/language.html.j2:28
+#: src/geo_activity_playground/webui/templates/settings/map-display.html.j2:16
+#: src/geo_activity_playground/webui/templates/settings/sharepic.html.j2:21
+#: src/geo_activity_playground/webui/templates/settings/table-columns.html.j2:21
+#: src/geo_activity_playground/webui/templates/settings/tile-source.html.j2:25
+msgid "Save"
+msgstr "Speichern"
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:26
+msgid "Preview"
+msgstr "Vorschau"
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:31
+#: src/geo_activity_playground/webui/templates/settings/language.html.j2:32
+msgid "Note"
+msgstr "Hinweis"
+
+#: src/geo_activity_playground/webui/templates/settings/currency.html.j2:32
+msgid ""
+"There is a single currency for all entries and no conversion. Changing "
+"the code relabels existing amounts, it does not convert them. If you buy "
+"equipment abroad, convert the amount yourself before entering it."
+msgstr ""
+"Es gibt eine einzige Währung für alle Einträge und keine Umrechnung. Ein "
+"geänderter Code beschriftet vorhandene Beträge nur neu, er rechnet sie "
+"nicht um. Wenn du Ausrüstung im Ausland kaufst, rechne den Betrag vor der"
+" Eingabe selbst um."
 
 #: src/geo_activity_playground/webui/templates/settings/excluded-activities.html.j2:10
 msgid ""
@@ -1634,18 +1693,6 @@ msgid "Leave as \"Auto\" to automatically detect from your browser settings."
 msgstr ""
 "Auf \"Automatisch\" belassen, um automatisch aus den Browser-"
 "Einstellungen zu erkennen."
-
-#: src/geo_activity_playground/webui/templates/settings/language.html.j2:28
-#: src/geo_activity_playground/webui/templates/settings/map-display.html.j2:16
-#: src/geo_activity_playground/webui/templates/settings/sharepic.html.j2:21
-#: src/geo_activity_playground/webui/templates/settings/table-columns.html.j2:21
-#: src/geo_activity_playground/webui/templates/settings/tile-source.html.j2:25
-msgid "Save"
-msgstr "Speichern"
-
-#: src/geo_activity_playground/webui/templates/settings/language.html.j2:32
-msgid "Note"
-msgstr "Hinweis"
 
 #: src/geo_activity_playground/webui/templates/settings/language.html.j2:33
 msgid ""
