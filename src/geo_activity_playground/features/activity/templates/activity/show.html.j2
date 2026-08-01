@@ -99,8 +99,10 @@
         <form method="POST" action="{{ url_for('.reenrich', id=activity.id) }}" class="d-inline">
             <button type="submit" class="btn btn-warning btn-small">{{ _('Re-enrich') }}</button>
         </form>
-        <a class="btn btn-small btn-danger" href="{{ url_for('.delete', id=activity.id) }}"
-            onclick="if(!confirm('{{ _('Are you sure to delete this?') }}')){event.preventDefault()}">{{ _('Delete') }}</a>
+        <form method="POST" action="{{ url_for('.delete', id=activity.id) }}" class="d-inline"
+            onsubmit="return confirm('{{ _('Are you sure to delete this? The source data is left untouched, but the activity will not be imported again.') }}');">
+            <button type="submit" class="btn btn-small btn-danger">{{ _('Delete') }}</button>
+        </form>
         {% endif %}
     </div>
     <div class="col-sm-12 col-md-8">

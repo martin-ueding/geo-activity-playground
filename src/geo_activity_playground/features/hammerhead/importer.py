@@ -11,6 +11,7 @@ from tqdm import tqdm
 from ...core.activities import ActivityRepository
 from ...core.datamodel import DB, Activity, ActivityImportConfig, get_or_make_kind
 from ...core.enrichment import update_and_commit
+from ...core.import_exclusion import is_excluded, record_exclusion
 from ...importers.activity_parsers import ActivityParseError, read_fit_activity
 from .model import HammerheadAuth, get_hammerhead_auth
 
@@ -208,6 +209,8 @@ def _try_import_hammerhead(
 
 
 def _already_imported(hammerhead_id: str) -> bool:
+    if is_excluded("hammerhead", str(hammerhead_id)):
+        return True
     existing = DB.session.scalar(
         sqlalchemy.select(Activity).where(Activity.upstream_id == str(hammerhead_id))
     )
@@ -246,6 +249,7 @@ def _import_one_activity(
         logger.warning(
             f"Hammerhead activity {activity_id} has no geographic data, skipping."
         )
+        record_exclusion("hammerhead", str(activity_id), "no_geo_data")
         return
 
     activity.upstream_id = str(activity_id)

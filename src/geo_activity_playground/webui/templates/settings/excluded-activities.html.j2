@@ -1,0 +1,50 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Excluded Activities') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Excluded Activities') }}</h1>
+
+<p>{{ _('These activities are not imported: either the file could not be read, or you deleted the activity. They are remembered so that they are not retried and re-logged on every import scan. Source data is never deleted, so re-importing an activity here brings it back on the next import scan.') }}</p>
+
+{% if exclusions %}
+<form method="POST" action="{{ url_for('.excluded_activities_reimport_all') }}" class="mb-3" onsubmit="return confirm('{{ _('Are you sure you want to retry all failed imports on the next import scan?') }}');">
+    <button type="submit" class="btn btn-outline-secondary">{{ _('Retry all failed imports') }}</button>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>{{ _('Source') }}</th>
+                <th>{{ _('Activity') }}</th>
+                <th>{{ _('Reason') }}</th>
+                <th>{{ _('Details') }}</th>
+                <th>{{ _('Last attempt') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exclusion in exclusions %}
+            <tr>
+                <td>{{ exclusion.source }}</td>
+                <td><code>{{ exclusion.path or exclusion.upstream_id }}</code></td>
+                <td>{{ reasons.get(exclusion.reason, exclusion.reason) }}</td>
+                <td class="text-muted small">{{ exclusion.error_message or '' }}</td>
+                <td>{{ exclusion.last_attempt }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('.excluded_activity_reimport', id=exclusion.id) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">{{ _('Re-import') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">{{ _('No excluded activities recorded.') }}</p>
+{% endif %}
+{% endblock %}

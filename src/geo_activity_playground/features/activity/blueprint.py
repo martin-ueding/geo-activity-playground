@@ -43,6 +43,7 @@ from ...core.datamodel import (
 from ...core.enrichment import update_and_commit
 from ...core.grid import make_grid_file_geojson, make_grid_points
 from ...core.heart_rate import HeartRateZoneComputer
+from ...core.import_exclusion import record_exclusion
 from ...core.tile_visits import (
     refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
@@ -424,14 +425,30 @@ def make_activity_blueprint(
         flash(_("Activity has been re-enriched."), category="success")
         return redirect(url_for(".show", id=id))
 
-    @blueprint.route("/delete/<id>")
+    @blueprint.route("/delete/<int:id>", methods=["POST"])
     @needs_authentication(authenticator)
     def delete(id: int) -> ResponseReturnValue:
-        activity = DB.session.get_one(Activity, id)
+        activity = DB.session.get(Activity, id)
+        if activity is None:
+            abort(404)
+        source = activity.source or ("directory" if activity.path else None)
+        if source and activity.upstream_id:
+            record_exclusion(
+                source,
+                str(activity.upstream_id),
+                "deleted_by_user",
+                path=activity.path,
+            )
         activity.delete_data()
         DB.session.delete(activity)
         DB.session.commit()
         remove_activity_from_tile_state(id)
+        flash(
+            _(
+                "The activity has been deleted. Its source data is left untouched, but it will not be imported again. You can undo this from Settings → Excluded Activities."
+            ),
+            category="success",
+        )
         return redirect(url_for("index"))
 
     @blueprint.route("/download-original/<id>")

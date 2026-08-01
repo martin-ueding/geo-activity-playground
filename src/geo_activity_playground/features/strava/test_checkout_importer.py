@@ -1,15 +1,24 @@
+import pytest
+
 from geo_activity_playground.core.datamodel import ActivityImportConfig
 from geo_activity_playground.importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
 )
+from geo_activity_playground.webui.app import create_app
 
 from .checkout_importer import import_from_strava_checkout
 
 
-def test_no_geo_data_errors_are_marked_done(monkeypatch, tmp_path) -> None:
+@pytest.fixture
+def app_context(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    app = create_app(database_uri="sqlite:///:memory:", run_migrations=False)
+    with app.app_context():
+        yield
 
+
+def test_no_geo_data_errors_are_marked_done(app_context, monkeypatch, tmp_path) -> None:
     checkout_dir = tmp_path / "Strava Export"
     checkout_dir.mkdir()
     (checkout_dir / "activities.csv").write_text(
@@ -35,9 +44,7 @@ def test_no_geo_data_errors_are_marked_done(monkeypatch, tmp_path) -> None:
     assert calls == 1
 
 
-def test_other_parse_errors_are_retried(monkeypatch, tmp_path) -> None:
-    monkeypatch.chdir(tmp_path)
-
+def test_other_parse_errors_are_retried(app_context, monkeypatch, tmp_path) -> None:
     checkout_dir = tmp_path / "Strava Export"
     checkout_dir.mkdir()
     (checkout_dir / "activities.csv").write_text(

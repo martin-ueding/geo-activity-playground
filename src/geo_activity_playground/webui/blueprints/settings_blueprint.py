@@ -35,6 +35,7 @@ from ...core.datamodel import (
 )
 from ...core.enrichment import enrichment_set_timezone, update_and_commit
 from ...core.heart_rate import HeartRateZoneComputer
+from ...core.import_exclusion import ImportExclusion
 from ...core.tag_extraction import apply_tag_extraction, get_tags_with_extraction_regex
 from ...core.tile_visits import (
     _reset_tile_visits_db,
@@ -68,6 +69,16 @@ from ..flasher import Flasher, FlashTypes
 from ..i18n import SUPPORTED_LANGUAGES
 
 logger = logging.getLogger(__name__)
+
+
+def _import_exclusion_reasons() -> dict[str, str]:
+    return {
+        "no_geo_data": _("No geospatial data"),
+        "parse_error": _("Parse error"),
+        "empty_time_series": _("Empty time series"),
+        "deleted_by_user": _("Deleted by user"),
+    }
+
 
 VEGA_COLOR_SCHEMES_CONTINUOUS = [
     "lightgreyred",
@@ -196,6 +207,7 @@ def _truncate_user_content_tables() -> None:
     DB.session.execute(sqlalchemy.delete(PlotSpec))
     DB.session.execute(sqlalchemy.delete(HeatmapTileCache))
     DB.session.execute(sqlalchemy.delete(StoredSearchQuery))
+    DB.session.execute(sqlalchemy.delete(ImportExclusion))
     DB.session.commit()
 
 
@@ -230,6 +242,50 @@ def make_settings_blueprint(
     @needs_authentication(authenticator)
     def index():
         return render_template("settings/index.html.j2")
+
+    @blueprint.route("/excluded-activities")
+    @needs_authentication(authenticator)
+    def excluded_activities():
+        exclusions = DB.session.scalars(
+            sqlalchemy.select(ImportExclusion).order_by(
+                ImportExclusion.last_attempt.desc()
+            )
+        ).all()
+        return render_template(
+            "settings/excluded-activities.html.j2",
+            exclusions=exclusions,
+            reasons=_import_exclusion_reasons(),
+        )
+
+    @blueprint.route("/excluded-activities/reimport/<int:id>", methods=["POST"])
+    @needs_authentication(authenticator)
+    def excluded_activity_reimport(id: int):
+        exclusion = DB.session.get_one(ImportExclusion, id)
+        DB.session.delete(exclusion)
+        DB.session.commit()
+        flasher.flash_message(
+            _("The activity will be imported again on the next import scan."),
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".excluded_activities"))
+
+    @blueprint.route("/excluded-activities/reimport-all", methods=["POST"])
+    @needs_authentication(authenticator)
+    def excluded_activities_reimport_all():
+        count = DB.session.execute(
+            sqlalchemy.delete(ImportExclusion).where(
+                ImportExclusion.reason != "deleted_by_user"
+            )
+        ).rowcount
+        DB.session.commit()
+        flasher.flash_message(
+            _(
+                "Cleared %(count)s failed imports. They will be retried on the next import scan."
+            )
+            % {"count": count},
+            FlashTypes.SUCCESS,
+        )
+        return redirect(url_for(".excluded_activities"))
 
     @blueprint.route("/maintenance", methods=["GET", "POST"])
     @needs_authentication(authenticator)

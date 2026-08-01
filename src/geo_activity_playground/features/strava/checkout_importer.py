@@ -21,6 +21,7 @@ from ...core.datamodel import (
     get_or_make_kind,
 )
 from ...core.enrichment import update_and_commit
+from ...core.import_exclusion import is_excluded
 from ...core.paths import activity_extracted_meta_dir
 from ...core.tasks import WorkTracker, work_tracker_path
 from ...importers.activity_parsers import (
@@ -106,6 +107,7 @@ def import_from_strava_checkout(
         activity_id
         for activity_id in activities_ids_to_parse
         if not (activity_extracted_meta_dir() / f"{activity_id}.pickle").exists()
+        and not is_excluded("strava", str(activity_id))
     ]
 
     for activity_id in tqdm(activities_ids_to_parse, desc="Import from Strava export"):
@@ -145,7 +147,7 @@ def import_from_strava_checkout(
         if "latitude" not in time_series.columns:
             continue
 
-        activity.upstream_id = activity_id
+        activity.upstream_id = str(activity_id)
         activity.calories = float_with_comma_or_period(row["Calories"])
         activity.distance_km = row["Distance"]
         activity.elapsed_time = datetime.timedelta(

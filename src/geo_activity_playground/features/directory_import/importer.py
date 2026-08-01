@@ -1,4 +1,3 @@
-import datetime
 import hashlib
 import logging
 import pathlib
@@ -19,6 +18,7 @@ from ...core.datamodel import (
     get_or_make_kind,
 )
 from ...core.enrichment import update_and_commit
+from ...core.import_exclusion import clear_exclusion, is_excluded, record_exclusion
 from ...core.tile_visits import compute_tile_visits_new
 from ...importers.activity_parsers import (
     ActivityParseError,
@@ -26,7 +26,6 @@ from ...importers.activity_parsers import (
     read_activity,
 )
 from ..explorer.clustering import compute_tile_evolution
-from .model import BrokenActivityFile
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +82,7 @@ def import_from_directory(
 
             current_hash = file_sha256(activity_path)
 
-            broken = DB.session.scalar(
-                sqlalchemy.select(BrokenActivityFile).filter(
-                    BrokenActivityFile.path == str(activity_path)
-                )
-            )
-            if broken is not None and broken.file_hash == current_hash:
+            if is_excluded("directory", current_hash):
                 continue
 
             with_same_hash = DB.session.scalars(
@@ -130,12 +124,16 @@ def import_from_file(
         logger.warning(
             f"Activity with {path=} has no geospatial series data, skipping."
         )
-        _record_broken(path, file_hash, "no_geo_data", str(e))
+        record_exclusion(
+            "directory", file_hash, "no_geo_data", path=str(path), error_message=str(e)
+        )
         return
     except ActivityParseError as e:
         logger.error(f"Error while parsing file {path}:")
         traceback.print_exc()
-        _record_broken(path, file_hash, "parse_error", str(e))
+        record_exclusion(
+            "directory", file_hash, "parse_error", path=str(path), error_message=str(e)
+        )
         return
     except:
         logger.error(f"Encountered a problem with {path=}, see details below.")
@@ -143,10 +141,10 @@ def import_from_file(
 
     if len(time_series) == 0:
         logger.warning(f"Activity with {path=} has no time series data, skipping.")
-        _record_broken(path, file_hash, "empty_time_series", None)
+        record_exclusion("directory", file_hash, "empty_time_series", path=str(path))
         return
 
-    _clear_broken(path)
+    clear_exclusion("directory", file_hash)
 
     activity.path = str(path)
     activity.upstream_id = file_hash
@@ -174,32 +172,6 @@ def import_from_file(
     if len(repository) > 0 and i % 50 == 0:
         compute_tile_visits_new(repository)
         compute_tile_evolution(ui_config)
-
-
-def _record_broken(
-    path: pathlib.Path, file_hash: str, reason: str, error_message: str | None
-) -> None:
-    broken = DB.session.scalar(
-        sqlalchemy.select(BrokenActivityFile).filter(
-            BrokenActivityFile.path == str(path)
-        )
-    )
-    if broken is None:
-        broken = BrokenActivityFile(path=str(path))
-        DB.session.add(broken)
-    broken.file_hash = file_hash
-    broken.reason = reason
-    broken.error_message = error_message
-    broken.last_attempt = datetime.datetime.now(datetime.UTC)
-    DB.session.commit()
-
-
-def _clear_broken(path: pathlib.Path) -> None:
-    DB.session.execute(
-        sqlalchemy.delete(BrokenActivityFile).where(
-            BrokenActivityFile.path == str(path)
-        )
-    )
 
 
 def get_metadata_from_path(

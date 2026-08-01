@@ -15,6 +15,7 @@ from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity, get_or_make_equipment, get_or_make_kind
 from ...core.enrichment import update_and_commit
+from ...core.import_exclusion import is_excluded
 from ...core.paths import (
     activity_extracted_time_series_dir,
     strava_api_dir,
@@ -189,10 +190,16 @@ def try_import_strava(
                 logger.info(f"Reached {strava_end}, stopping.")
                 break
 
+            if is_excluded("strava", str(strava_activity.id)):
+                logger.info(
+                    f"Strava activity {strava_activity.id} is excluded from import, skipping."
+                )
+                continue
+
             if (
                 existing_activity := DB.session.scalar(
                     sqlalchemy.select(Activity).where(
-                        Activity.upstream_id == strava_activity.id
+                        Activity.upstream_id == str(strava_activity.id)
                     )
                 )
             ) is not None:
