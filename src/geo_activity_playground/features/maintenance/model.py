@@ -73,14 +73,14 @@ class RecurringTask(DB.Model):
     @property
     def next_due_date(self) -> datetime.date | None:
         last = self.last_execution
-        if self.interval_days is None or last is None:
+        if not self.interval_days or last is None:
             return None
         return last.date + datetime.timedelta(days=self.interval_days)
 
     @property
     def next_due_km(self) -> int | None:
         last = self.last_execution
-        if self.interval_km is None or last is None or last.usage_km is None:
+        if not self.interval_km or last is None or last.usage_km is None:
             return None
         return last.usage_km + self.interval_km
 
