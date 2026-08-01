@@ -143,7 +143,8 @@ def make_heatmap_blueprint(
         tile_bounds = get_sensible_zoom_level(geo_bounds, (4000, 4000))
         pixel_bounds = PixelBounds.from_tile_bounds(tile_bounds)
 
-        background = np.zeros((*pixel_bounds.shape, 3))
+        # RGBA, as produced by `_render_tile_image`.
+        background = np.zeros((*pixel_bounds.shape, 4))
         for x in range(tile_bounds.x1, tile_bounds.x2):
             for y in range(tile_bounds.y1, tile_bounds.y2):
                 i = y - tile_bounds.y1
