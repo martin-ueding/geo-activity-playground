@@ -703,6 +703,7 @@ def make_settings_blueprint(
             "birth_year": config_accessor.heart_rate().birth_year,
             "heart_rate_resting": config_accessor.heart_rate().heart_rate_resting,
             "heart_rate_maximum": config_accessor.heart_rate().heart_rate_maximum,
+            "zone_boundaries": None,
         }
 
         heart_rate_computer = HeartRateZoneComputer(config_accessor)

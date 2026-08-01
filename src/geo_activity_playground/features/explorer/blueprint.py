@@ -245,6 +245,7 @@ def make_explorer_blueprint(
             "max_cluster_size": max_cluster_size,
             "bookmarks": bookmarks,
             "mkgmap_available": mkgmap_available(),
+            "zoom_level_not_generated": None,
         }
         return render_template("explorer/server-side.html.j2", **context)
 
@@ -390,6 +391,12 @@ def make_explorer_blueprint(
             "zoom": zoom,
             "square_size": square_size,
             "is_inaccessible": is_inaccessible,
+            "num_visits": 0,
+            "this_cluster_size": 0,
+            "new_bookmark_url": None,
+            "activities_through_tile_url": None,
+            "unmark_url": None,
+            "mark_url": None,
         }
 
         # Query tile info from database
