@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Update the German and Dutch translations, adding the 172 and 174 strings that were still untranslated after the recent maintenance tracker, excluded activities, Hammerhead and technical maintenance features.
 
 ## Version 1.42.0 — 2026-08-01
 
