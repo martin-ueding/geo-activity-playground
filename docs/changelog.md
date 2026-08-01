@@ -24,7 +24,7 @@ Added:
 - Add pictures per equipment.
 - Add a maintenance cost flow chart to each equipment's detail page, showing the cost of that equipment's maintenance actions broken down by title.
 - Show a "Due maintenance tasks" box on the landing page listing overdue recurring tasks across all equipment.
-- Record activity files that fail to import (parse errors, no geospatial data, empty time series) in a new "Broken Activity Files" settings page instead of just logging a warning on every import scan. Files are only retried once their content changes, or after being retried manually from that page. ([GH-472](https://github.com/martin-ueding/geo-activity-playground/issues/472))
+- Record activities that fail to import (parse errors, no geospatial data, empty time series) in a new "Excluded Activities" settings page instead of just logging a warning on every import scan. Files are only retried once their content changes, or after being retried manually from that page. ([GH-472](https://github.com/martin-ueding/geo-activity-playground/issues/472))
 - Add a `source` column to `Activity` that records which importer created the record.
 
 Changed:
@@ -32,6 +32,8 @@ Changed:
 - Move all application settings from the `config.json` file into the database, split across domain-grouped tables (heart rate, Strava, activity import, UI, and map). Settings are seeded once from an existing `config.json` on the next start, after which the database is authoritative and the file can be deleted. Privacy zones now live in their own database table instead of the config file.
 - Unify the Strava API and checkout importers into a single `features/strava/` package, a single settings page, and a compound `StravaActivitySource` that runs the checkout import before the API import.
 - Replace the equipment overview table with Bootstrap cards showing each equipment's usage, first use and last use, linking to its new detail page.
+- Record Hammerhead activities without geographic data as excluded instead of silently skipping them, so their FIT files are no longer downloaded again on every scan.
+- Require a POST request to delete an activity, so the delete action cannot be triggered by following a link.
 
 Removed:
 
@@ -39,6 +41,9 @@ Removed:
 
 Fixed:
 
+- Deleting an activity now sticks: it is recorded as excluded from import, so the next scan does not add it back. This works for every source, keyed by the file content hash for directory imports and by the remote activity ID for Strava and Hammerhead. Source data is never deleted, so the file in `Activities/` stays where it is and the activity can be brought back from Settings → Excluded Activities. ([GH-474](https://github.com/martin-ueding/geo-activity-playground/issues/474))
+- Fix deleting an activity leaving its time series file behind in `Time Series/`. The wrong file name was used, so the parquet file was never removed.
+- Fix the Strava API importer's duplicate check, which compared a number against the text `upstream_id` column and therefore never matched. The Strava checkout importer now stores `upstream_id` as text as well, matching every other importer.
 - Fix a crash when recomputing segments after changing the time-gap threshold. The reprocessing now uses the raw time series (matching the re-enrich and repair actions) instead of the trimmed series, which caused an out-of-bounds index for trimmed activities.
 - Fix the maintenance "Cost vs. usage" plot to show one point per equipment (total cost against total distance) instead of one point per maintenance action against the odometer reading at the time, which made it hard to interpret.
 - Use a root-relative tile URL in the explorer's `style.json` instead of one built from `request.url_root`, which produced `http://` URLs behind an SSL-terminating reverse proxy and made browsers block the tiles as mixed content. ([GH-470](https://github.com/martin-ueding/geo-activity-playground/issues/470))
