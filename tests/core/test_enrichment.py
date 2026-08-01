@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from . import enrichment
-from .datamodel import Activity, ActivityImportConfig
+from geo_activity_playground.core import enrichment
+from geo_activity_playground.core.datamodel import Activity, ActivityImportConfig
 
 
 def test_update_and_commit_skips_single_track_point(monkeypatch) -> None:

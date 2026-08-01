@@ -80,6 +80,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/geo_activity_playground"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --import-mode=importlib"
+
 [tool.mypy]
 disable_error_code = "import-untyped"
 

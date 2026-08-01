@@ -3,9 +3,9 @@ import json
 import pytest
 import sqlalchemy
 
-from ..webui.app import create_app
-from .config import ConfigAccessor, import_config_json
-from .datamodel import DB, PrivacyZone
+from geo_activity_playground.core.config import ConfigAccessor, import_config_json
+from geo_activity_playground.core.datamodel import DB, PrivacyZone
+from geo_activity_playground.webui.app import create_app
 
 
 @pytest.fixture

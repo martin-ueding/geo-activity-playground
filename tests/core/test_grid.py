@@ -1,6 +1,6 @@
 from xml.etree import ElementTree as ET
 
-from .grid import make_grid_file_kml_squadrats
+from geo_activity_playground.core.grid import make_grid_file_kml_squadrats
 
 KML_NS = "{http://www.opengis.net/kml/2.2}"
 

@@ -141,7 +141,7 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
         encoding="utf-8",
     )
     (tmp_path / "Time Series" / "stale.parquet").write_text("stale", encoding="utf-8")
-    (tmp_path / "Photos").mkdir()
+    (tmp_path / "Photos").mkdir(exist_ok=True)
     (tmp_path / "Photos" / "stale.jpg").write_text("stale", encoding="utf-8")
     (tmp_path / "Strava API").mkdir()
     (tmp_path / "Strava API" / "strava_tokens.json").write_text(

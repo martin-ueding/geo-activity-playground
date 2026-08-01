@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import pytest
 
-from .stats import get_equipment_use_table
+from geo_activity_playground.features.equipment.stats import get_equipment_use_table
 
 
 @pytest.fixture

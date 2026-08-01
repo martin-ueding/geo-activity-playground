@@ -1,50 +1,96 @@
-"""
-Test fixtures for Flask web UI testing.
-"""
+"""Shared fixtures for all tests."""
 
-import os
 import pathlib
+import shutil
 
+import jinja2
 import pytest
 from flask import Flask
 
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.core.scan import scan_for_activities
 from geo_activity_playground.webui.app import create_app
+
+METADATA_EXTRACTION_REGEXES = [
+    r"(?P<kind>[^/]+)/(?P<equipment>[^/]+)/[-\d_ .]+(?P<name>[^/\.]+)(?:\.\w+)+$",
+    r"(?P<kind>[^/]+)/[-\d_ .]+(?P<name>[^/\.]+)(?:\.\w+)+$",
+]
 
 
 @pytest.fixture
-def app(tmp_path: pathlib.Path):
+def testdata_dir() -> pathlib.Path:
+    return pathlib.Path(__file__).parent.parent / "testdata"
+
+
+@pytest.fixture
+def playground(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch):
+    """A playground directory as the working directory.
+
+    The code addresses its state through relative paths, so tests have to run
+    inside a directory of their own.
     """
-    Create a Flask app with an in-memory SQLite database for testing.
+    monkeypatch.chdir(tmp_path)
+    for name in ["Cache", "Time Series", "Activities", "Photos"]:
+        (tmp_path / name).mkdir()
+    return tmp_path
 
-    Uses the same create_app factory as production, but with:
-    - In-memory SQLite database
-    - DB.create_all() instead of Alembic migrations (faster)
-    - Temporary directory for file-based state
+
+@pytest.fixture
+def app(playground: pathlib.Path):
+    """A Flask app on an in-memory database, built by the production factory.
+
+    The schema comes from ``DB.create_all()`` instead of the migrations, which
+    is much faster; ``test_schema_drift`` asserts that both agree.
     """
-    # Save original directory to restore later
-    original_cwd = os.getcwd()
+    app = create_app(
+        database_uri="sqlite:///:memory:",
+        secret_key="test-secret-key",
+        run_migrations=False,
+    )
+    app.config["TESTING"] = True
+    app.jinja_env.undefined = jinja2.StrictUndefined
+    return app
 
-    # Change to tmp_path since some code uses relative paths
-    os.chdir(tmp_path)
 
-    # Create required directories
-    (tmp_path / "Cache").mkdir()
-    (tmp_path / "Time Series").mkdir()
-    (tmp_path / "Activities").mkdir()
-
-    try:
-        app = create_app(
-            database_uri="sqlite:///:memory:",
-            secret_key="test-secret-key",
-            run_migrations=False,
-        )
-        app.config["TESTING"] = True
-        yield app
-    finally:
-        os.chdir(original_cwd)
+@pytest.fixture
+def app_context(app: Flask):
+    with app.app_context():
+        yield
 
 
 @pytest.fixture
 def client(app: Flask):
-    """Create a test client for the Flask app."""
     return app.test_client()
+
+
+@pytest.fixture
+def seeded_app(app: Flask, testdata_dir: pathlib.Path):
+    """An app whose database is filled by importing the Zeeland test corpus.
+
+    This exercises the real import pipeline, so the database contains
+    activities, time series, kinds, equipments, tile visits and clusters.
+    """
+    shutil.copytree(
+        testdata_dir / "Zeeland" / "Activities",
+        pathlib.Path("Activities"),
+        dirs_exist_ok=True,
+    )
+    with app.app_context():
+        config_accessor = ConfigAccessor()
+        config_accessor.activity_import().metadata_extraction_regexes = (
+            METADATA_EXTRACTION_REGEXES
+        )
+        config_accessor.save()
+        scan_for_activities(
+            ActivityRepository(),
+            config_accessor,
+            skip_strava=True,
+            skip_hammerhead=True,
+        )
+    return app
+
+
+@pytest.fixture
+def seeded_client(seeded_app: Flask):
+    return seeded_app.test_client()

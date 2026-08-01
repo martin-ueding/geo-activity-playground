@@ -1,6 +1,10 @@
 import pytest
 
-from .csv_parser import _parse_cell, _parse_line, parse_csv
+from geo_activity_playground.features.strava.csv_parser import (
+    _parse_cell,
+    _parse_line,
+    parse_csv,
+)
 
 
 def test_parse_csv() -> None:

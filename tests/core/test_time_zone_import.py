@@ -2,11 +2,13 @@ import datetime
 import pathlib
 import zoneinfo
 
-from ..core.datamodel import Kind
-from ..importers import activity_parsers
-from ..importers.activity_parsers import read_activity
-from ..webui import app as _app  # noqa: F401  (registers all feature models)
-from .time_conversion import sanitize_datetime
+from geo_activity_playground.core.datamodel import Kind
+from geo_activity_playground.core.time_conversion import sanitize_datetime
+from geo_activity_playground.importers import activity_parsers
+from geo_activity_playground.importers.activity_parsers import read_activity
+from geo_activity_playground.webui import (
+    app as _app,  # noqa: F401  (registers all feature models)
+)
 
 
 def test_time_zone_from_string() -> None:

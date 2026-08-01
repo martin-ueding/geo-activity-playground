@@ -1,13 +1,14 @@
 import pytest
 
 from geo_activity_playground.core.datamodel import ActivityImportConfig
+from geo_activity_playground.features.strava.checkout_importer import (
+    import_from_strava_checkout,
+)
 from geo_activity_playground.importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
 )
 from geo_activity_playground.webui.app import create_app
-
-from .checkout_importer import import_from_strava_checkout
 
 
 @pytest.fixture

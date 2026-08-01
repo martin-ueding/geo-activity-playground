@@ -1,6 +1,6 @@
 import datetime
 
-from .datamodel import Activity
+from geo_activity_playground.core.datamodel import Activity
 
 
 def test_no_duration() -> None:

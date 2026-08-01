@@ -1,32 +1,19 @@
 import pathlib
 import shutil
 
-import pytest
 import sqlalchemy
 
-from ...core.activities import ActivityRepository
-from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, Activity
-from ...core.import_exclusion import ImportExclusion, record_exclusion
-from ...webui.app import create_app
-from .importer import get_metadata_from_path, import_from_directory
-
-EXAMPLE_GPX = (
-    pathlib.Path(__file__).parents[4]
-    / "testdata"
-    / "Local Files"
-    / "Activities"
-    / "Berlin (0,9 km).gpx"
+from geo_activity_playground.core.activities import ActivityRepository
+from geo_activity_playground.core.config import ConfigAccessor
+from geo_activity_playground.core.datamodel import DB, Activity
+from geo_activity_playground.core.import_exclusion import (
+    ImportExclusion,
+    record_exclusion,
 )
-
-
-@pytest.fixture
-def app_context(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "Activities").mkdir()
-    app = create_app(database_uri="sqlite:///:memory:", run_migrations=False)
-    with app.app_context():
-        yield
+from geo_activity_playground.features.directory_import.importer import (
+    get_metadata_from_path,
+    import_from_directory,
+)
 
 
 def _scan() -> None:
@@ -39,9 +26,13 @@ def _scan() -> None:
     )
 
 
-def test_deleted_activity_is_not_imported_again(app_context) -> None:
+def test_deleted_activity_is_not_imported_again(
+    app_context, testdata_dir: pathlib.Path
+) -> None:
     path = pathlib.Path("Activities/berlin.gpx")
-    shutil.copy(EXAMPLE_GPX, path)
+    shutil.copy(
+        testdata_dir / "Local Files" / "Activities" / "Berlin (0,9 km).gpx", path
+    )
 
     _scan()
     activity = DB.session.scalar(sqlalchemy.select(Activity))

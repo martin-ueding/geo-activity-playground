@@ -1,5 +1,5 @@
-from ..core.datamodel import Kind
-from . import activity_parsers
+from geo_activity_playground.core.datamodel import Kind
+from geo_activity_playground.importers import activity_parsers
 
 
 def test_read_activity_gpx_extracts_track_name_and_type(tmp_path, monkeypatch) -> None:

@@ -1,4 +1,7 @@
-from .time_conversion import get_country_timezone, get_timezone
+from geo_activity_playground.core.time_conversion import (
+    get_country_timezone,
+    get_timezone,
+)
 
 
 def test_time_zone_from_location() -> None:

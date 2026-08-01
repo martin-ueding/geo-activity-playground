@@ -1,6 +1,6 @@
 from werkzeug.datastructures import MultiDict
 
-from .meta_search import (
+from geo_activity_playground.core.meta_search import (
     is_search_active,
     parse_search_params,
     primitives_to_jinja,

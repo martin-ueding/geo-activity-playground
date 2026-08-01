@@ -15,3 +15,10 @@ repos:
         entry: sed -i -E 's#(^|[^[])GH-([0-9]+)#\1[GH-\2](https://github.com/martin-ueding/geo-activity-playground/issues/\2)#g' docs/changelog.md
         language: system
         pass_filenames: false
+      - id: pytest
+        name: Run the test suite
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

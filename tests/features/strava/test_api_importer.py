@@ -1,6 +1,8 @@
 import datetime
 
-from .api_importer import round_to_next_quarter_hour
+from geo_activity_playground.features.strava.api_importer import (
+    round_to_next_quarter_hour,
+)
 
 
 def test_round_to_next_quarter_hour() -> None:

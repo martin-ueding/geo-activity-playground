@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .missing_values import some
+from geo_activity_playground.core.missing_values import some
 
 
 def test_none() -> None:

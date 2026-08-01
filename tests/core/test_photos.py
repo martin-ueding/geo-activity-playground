@@ -1,4 +1,4 @@
-from ..features.activity_photos.exif_handling import (
+from geo_activity_playground.features.activity_photos.exif_handling import (
     apply_ref_sign,
     get_metadata_from_image,
 )

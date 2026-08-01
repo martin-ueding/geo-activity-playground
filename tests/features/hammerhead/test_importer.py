@@ -1,4 +1,4 @@
-from .importer import _max_date
+from geo_activity_playground.features.hammerhead.importer import _max_date
 
 
 def test_max_date_picks_newer() -> None:
