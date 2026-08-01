@@ -60,3 +60,9 @@ erDiagram
 For each equipment, you can see the maintenance actions and task executions as well as the pending task executions.
 
 You can see the cost of maintenance, also grouped by equipment and grouped by year.
+
+## Currency
+
+Costs are stored as plain numbers. Which currency they are in is a single setting under _Settings → Display → Currency_, given as an ISO 4217 code like `EUR`, `USD` or `CHF`. Amounts are then formatted in the convention of your display language, and the cost axes and tooltips of the plots are labeled with the code. Leaving the setting empty shows bare numbers, which is what databases from before this setting existed do.
+
+There is deliberately no per-entry currency. Aggregating across currencies would need the exchange rate on the date of each action, and a rate that old is not something this application can look up offline. If you buy equipment abroad, convert the amount yourself before entering it. Changing the setting relabels existing amounts, it does not convert them.

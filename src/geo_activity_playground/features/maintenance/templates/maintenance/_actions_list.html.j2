@@ -17,7 +17,7 @@
                 <div class="text-body-secondary">
                     {{ action.date.isoformat() }}
                     {% if action.usage_km is not none %} &middot; {{ action.usage_km }} km{% endif %}
-                    {% if action.cost is not none %} &middot; {{ action.cost }}{% endif %}
+                    {% if action.cost is not none %} &middot; {{ action.cost | money }}{% endif %}
                 </div>
                 {% if action.description %}
                 <div class="text-body-secondary">{{ action.description | render_markdown }}</div>

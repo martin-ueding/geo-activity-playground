@@ -11,7 +11,7 @@
     <div class="col">
         <dl class="row">
             <dt class="col-sm-3">{{ _('Total cost') }}</dt>
-            <dd class="col-sm-9">{{ '%.2f' | format(total_cost) }}</dd>
+            <dd class="col-sm-9">{{ total_cost | money }}</dd>
         </dl>
     </div>
 </div>
@@ -31,7 +31,7 @@
                 <tr>
                     <td>{{ row.equipment }}</td>
                     <td>{{ row.num_actions }}</td>
-                    <td>{{ '%.2f' | format(row.total_cost) if row.total_cost is not none else '' }}</td>
+                    <td>{{ row.total_cost | money }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

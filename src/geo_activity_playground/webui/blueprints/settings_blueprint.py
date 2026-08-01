@@ -1,3 +1,4 @@
+import decimal
 import json
 import logging
 import pathlib
@@ -5,6 +6,7 @@ import re
 import shutil
 from typing import Any
 
+import babel.numbers
 import sqlalchemy
 from flask import (
     Blueprint,
@@ -19,6 +21,7 @@ from tqdm import tqdm
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
+from ...core.currency import format_money
 from ...core.datamodel import (
     DB,
     Activity,
@@ -412,6 +415,30 @@ def make_settings_blueprint(
             "settings/language.html.j2",
             available_languages=SUPPORTED_LANGUAGES,
             current_language=current_language,
+        )
+
+    @blueprint.route("/currency", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def currency():
+        if request.method == "POST":
+            code = request.form.get("currency", "").strip().upper()
+            if code and code not in babel.numbers.list_currencies():
+                flasher.flash_message(
+                    _("'%(code)s' is not a known ISO 4217 currency code.", code=code),
+                    FlashTypes.WARNING,
+                )
+            else:
+                config_accessor.ui().currency = code
+                config_accessor.save()
+                flasher.flash_message(_("Currency updated."), FlashTypes.SUCCESS)
+            return redirect(url_for(".currency"))
+
+        return render_template(
+            "settings/currency.html.j2",
+            current_currency=config_accessor.ui().currency,
+            example=format_money(
+                decimal.Decimal("1234.5"), config_accessor.ui().currency
+            ),
         )
 
     @blueprint.route("/cluster-bookmarks/new", methods=["GET", "POST"])

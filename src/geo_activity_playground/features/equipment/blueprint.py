@@ -8,6 +8,7 @@ from flask_babel import gettext as _
 
 from ...core.activities import ActivityRepository
 from ...core.config import ConfigAccessor
+from ...core.currency import money_title
 from ...core.datamodel import DB, Equipment
 from ...core.internal_pictures import delete_internal_picture, save_internal_picture
 from ...webui.authenticator import Authenticator, needs_authentication
@@ -34,10 +35,11 @@ def _stack_nodes(
 _MINIMUM_FLOW_WEIGHT = 1.0
 
 
-def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
+def _maintenance_flow_plot(links: pd.DataFrame, currency: str) -> str | None:
     if links.empty:
         return None
 
+    cost_title = money_title(_("Cost"), currency)
     links = links.copy()
     links["weight"] = links["cost"].clip(lower=_MINIMUM_FLOW_WEIGHT)
 
@@ -147,7 +149,7 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
             tooltip=[
                 alt.Tooltip("equipment:N", title=_("Equipment")),
                 alt.Tooltip("title:N", title=_("Title")),
-                alt.Tooltip("cost:Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("cost:Q", title=cost_title, format=".2f"),
             ],
         )
     )
@@ -162,7 +164,7 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
             color=alt.Color("label:N", legend=None),
             tooltip=[
                 alt.Tooltip("label:N", title=_("Equipment")),
-                alt.Tooltip("total:Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("total:Q", title=cost_title, format=".2f"),
             ],
         )
     )
@@ -176,7 +178,7 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
             y2="y1:Q",
             tooltip=[
                 alt.Tooltip("label:N", title=_("Title")),
-                alt.Tooltip("total:Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("total:Q", title=cost_title, format=".2f"),
             ],
         )
     )
@@ -396,7 +398,10 @@ def make_equipment_blueprint(
         actions = get_maintenance_actions_table()
         equipment_actions = actions.loc[actions["equipment"] == equipment.name]
         flow_plot = (
-            _maintenance_flow_plot(get_maintenance_flow_by_title(equipment_actions))
+            _maintenance_flow_plot(
+                get_maintenance_flow_by_title(equipment_actions),
+                config_accessor.ui().currency,
+            )
             if len(equipment_actions)
             else None
         )

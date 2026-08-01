@@ -7,6 +7,8 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
+from ...core.config import ConfigAccessor
+from ...core.currency import money_title
 from ...core.datamodel import DB, Equipment
 from ...core.internal_pictures import delete_internal_picture, save_internal_picture
 from ...webui.authenticator import Authenticator, needs_authentication
@@ -42,16 +44,21 @@ def _apply_uploaded_photos(action: MaintenanceAction) -> None:
         )
 
 
-def _maintenance_plots(actions: pd.DataFrame, summary: pd.DataFrame) -> dict[str, str]:
+def _maintenance_plots(
+    actions: pd.DataFrame, summary: pd.DataFrame, currency: str
+) -> dict[str, str]:
+    cost_title = money_title(_("Cost"), currency)
+    total_cost_title = money_title(_("Total cost"), currency)
+
     cost_by_equipment_plot = (
         alt.Chart(actions, height=300, title=_("Cost by equipment"))
         .mark_bar()
         .encode(
-            alt.X("sum(cost)", title=_("Cost")),
+            alt.X("sum(cost)", title=cost_title),
             alt.Y("equipment", sort="-x", title=_("Equipment")),
             tooltip=[
                 alt.Tooltip("equipment:N", title=_("Equipment")),
-                alt.Tooltip("sum(cost):Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("sum(cost):Q", title=cost_title, format=".2f"),
             ],
         )
         .to_json(format="vega")
@@ -62,12 +69,12 @@ def _maintenance_plots(actions: pd.DataFrame, summary: pd.DataFrame) -> dict[str
         .mark_bar()
         .encode(
             alt.X("year:O", title=_("Year")),
-            alt.Y("sum(cost)", title=_("Cost")),
+            alt.Y("sum(cost)", title=cost_title),
             alt.Color("equipment", title=_("Equipment")),
             tooltip=[
                 alt.Tooltip("year:O", title=_("Year")),
                 alt.Tooltip("equipment:N", title=_("Equipment")),
-                alt.Tooltip("sum(cost):Q", title=_("Cost"), format=".2f"),
+                alt.Tooltip("sum(cost):Q", title=cost_title, format=".2f"),
             ],
         )
         .to_json(format="vega")
@@ -78,12 +85,12 @@ def _maintenance_plots(actions: pd.DataFrame, summary: pd.DataFrame) -> dict[str
         .mark_point()
         .encode(
             alt.X("total_distance_km", title=_("Total usage / km")),
-            alt.Y("total_cost", title=_("Total cost")),
+            alt.Y("total_cost", title=total_cost_title),
             alt.Color("equipment", title=_("Equipment")),
             tooltip=[
                 alt.Tooltip("equipment:N", title=_("Equipment")),
                 alt.Tooltip("total_distance_km:Q", title=_("Total usage / km")),
-                alt.Tooltip("total_cost:Q", title=_("Total cost"), format=".2f"),
+                alt.Tooltip("total_cost:Q", title=total_cost_title, format=".2f"),
             ],
         )
         .interactive()
@@ -98,7 +105,7 @@ def _maintenance_plots(actions: pd.DataFrame, summary: pd.DataFrame) -> dict[str
 
 
 def make_maintenance_blueprint(
-    authenticator: Authenticator, flasher: Flasher
+    authenticator: Authenticator, flasher: Flasher, config_accessor: ConfigAccessor
 ) -> Blueprint:
     blueprint = Blueprint("maintenance", __name__, template_folder="templates")
 
@@ -116,7 +123,9 @@ def make_maintenance_blueprint(
             variables["summary"] = summary.to_dict(orient="records")
             variables["total_cost"] = float(actions["cost"].sum(skipna=True))
         if has_cost_data:
-            variables["plots"] = _maintenance_plots(actions, summary)
+            variables["plots"] = _maintenance_plots(
+                actions, summary, config_accessor.ui().currency
+            )
         return render_template("maintenance/index.html.j2", **variables)
 
     @blueprint.route(

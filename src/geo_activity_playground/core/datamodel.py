@@ -718,6 +718,9 @@ class UiConfig(DB.Model):
         MutableList.as_mutable(sa.JSON), nullable=False, default=list
     )
     preferred_language: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    currency: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="", server_default=""
+    )
 
 
 class MapConfig(DB.Model):

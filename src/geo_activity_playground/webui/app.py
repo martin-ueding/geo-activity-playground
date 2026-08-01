@@ -1,5 +1,6 @@
 import atexit
 import datetime
+import decimal
 import html
 import importlib
 import importlib.metadata
@@ -30,6 +31,7 @@ from markupsafe import Markup
 
 from ..core.activities import ActivityRepository
 from ..core.config import ConfigAccessor, import_config_json
+from ..core.currency import format_money
 from ..core.datamodel import (
     DB,
     DEFAULT_UNKNOWN_NAME,
@@ -315,6 +317,10 @@ def create_app(
         else:
             return value.strftime("%Y-%m-%d %H:%M")
 
+    @app.template_filter()
+    def money(value: decimal.Decimal | float | None):
+        return format_money(value, config_accessor.ui().currency)
+
     @app.template_global("unique_id")
     def unique_id():
         return f"id-{uuid.uuid4()}"
@@ -393,7 +399,7 @@ def create_app(
         ),
         (
             "/maintenance",
-            make_maintenance_blueprint(authenticator, flasher),
+            make_maintenance_blueprint(authenticator, flasher, config_accessor),
         ),
         ("/photo", make_photo_blueprint(config_accessor, authenticator, flasher)),
         ("/picture", make_pictures_blueprint()),
@@ -444,6 +450,7 @@ def create_app(
             "version": _try_get_version(),
             "num_activities": len(repository),
             "map_tile_attribution": config_accessor.map().map_tile_attribution,
+            "currency": config_accessor.ui().currency,
             "request_url": urllib.parse.quote_plus(request.url),
             "explorer_zoom_levels": sorted(config_accessor.ui().explorer_zoom_levels)
             or [14],

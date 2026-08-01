@@ -1,0 +1,34 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Currency') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Currency') }}</h1>
+
+<p>{{ _('Maintenance costs are stored as plain numbers. This setting says which currency those numbers are in and how they are formatted.') }}</p>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="currency" class="form-label">{{ _('Currency code') }}</label>
+        <input type="text" class="form-control" id="currency" name="currency" maxlength="3" size="3"
+            placeholder="EUR" value="{{ current_currency }}" />
+        <div class="form-text">
+            {{ _('ISO 4217 code, for instance EUR, USD, CHF, or GBP. Leave empty to show bare numbers without a currency.') }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+</form>
+
+<div class="alert alert-info mt-4">
+    <h6 class="alert-heading">{{ _('Preview') }}</h6>
+    <p class="mb-0">{{ example }}</p>
+</div>
+
+<div class="alert alert-warning mt-3">
+    <h6 class="alert-heading">{{ _('Note') }}</h6>
+    <p class="mb-0">{{ _('There is a single currency for all entries and no conversion. Changing the code relabels existing amounts, it does not convert them. If you buy equipment abroad, convert the amount yourself before entering it.') }}</p>
+</div>
+{% endblock %}
