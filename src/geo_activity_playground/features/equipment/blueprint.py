@@ -31,20 +31,28 @@ def _stack_nodes(
     return positions
 
 
+_MINIMUM_FLOW_WEIGHT = 1.0
+
+
 def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
     if links.empty:
         return None
 
-    equipment_totals = links.groupby("equipment")["cost"].sum()
-    title_totals = links.groupby("title")["cost"].sum()
-    equipment_order = list(equipment_totals.sort_values(ascending=False).index)
-    title_order = list(title_totals.sort_values(ascending=False).index)
+    links = links.copy()
+    links["weight"] = links["cost"].clip(lower=_MINIMUM_FLOW_WEIGHT)
 
-    gap = links["cost"].sum() * 0.02
+    equipment_costs = links.groupby("equipment")["cost"].sum()
+    title_costs = links.groupby("title")["cost"].sum()
+    equipment_totals = links.groupby("equipment")["weight"].sum()
+    title_totals = links.groupby("title")["weight"].sum()
+    equipment_order = list(equipment_costs.sort_values(ascending=False).index)
+    title_order = list(title_costs.sort_values(ascending=False).index)
+
+    gap = links["weight"].sum() * 0.02
     equipment_pos = _stack_nodes(equipment_order, equipment_totals, gap)
     title_pos = _stack_nodes(title_order, title_totals, gap)
 
-    links_sorted = links.copy()
+    links_sorted = links
     links_sorted["equipment"] = pd.Categorical(
         links_sorted["equipment"], categories=equipment_order, ordered=True
     )
@@ -61,18 +69,19 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
     smoothstep = 3 * t**2 - 2 * t**3
 
     curve_rows = []
-    for link_id, (equipment, title, cost) in enumerate(
+    for link_id, (equipment, title, cost, weight) in enumerate(
         zip(
             links_sorted["equipment"].astype(str),
             links_sorted["title"].astype(str),
             links_sorted["cost"],
+            links_sorted["weight"],
         )
     ):
         y0_left = left_cursor[equipment]
-        y1_left = y0_left + cost
+        y1_left = y0_left + weight
         left_cursor[equipment] = y1_left
         y0_right = right_cursor[title]
-        y1_right = y0_right + cost
+        y1_right = y0_right + weight
         right_cursor[title] = y1_right
 
         top = y0_left + (y0_right - y0_left) * smoothstep
@@ -102,7 +111,7 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
                 "y0": y0,
                 "y1": y1,
                 "label": name,
-                "total": equipment_totals[name],
+                "total": equipment_costs[name],
                 "side": "equipment",
             }
         )
@@ -115,7 +124,7 @@ def _maintenance_flow_plot(links: pd.DataFrame) -> str | None:
                 "y0": y0,
                 "y1": y1,
                 "label": name,
-                "total": title_totals[name],
+                "total": title_costs[name],
                 "side": "title",
             }
         )
