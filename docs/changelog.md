@@ -21,6 +21,10 @@ Changed:
 
 - Update the German and Dutch translations, adding the 172 and 174 strings that were still untranslated after the recent maintenance tracker, excluded activities, Hammerhead and technical maintenance features.
 
+Fixed:
+
+- Treat an interval of zero on a recurring maintenance task as “no interval” instead of “due immediately”. Tasks that only have a kilometer interval no longer stay overdue right after being marked as done.
+
 ## Version 1.42.0 — 2026-08-01
 
 Added:
