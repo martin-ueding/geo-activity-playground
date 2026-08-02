@@ -91,6 +91,10 @@ class Activity(DB.Model):
     upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     source: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
+    # Metadata as found inside the activity file, before path extraction and user edits:
+    name_from_file: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    kind_from_file: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)
     index_end: Mapped[int] = mapped_column(sa.Integer, nullable=True)

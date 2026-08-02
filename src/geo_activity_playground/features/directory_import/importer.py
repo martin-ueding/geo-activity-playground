@@ -148,6 +148,8 @@ def import_from_file(
 
     activity.path = str(path)
     activity.upstream_id = file_hash
+    activity.name_from_file = activity.name
+    activity.kind_from_file = activity.kind.name if activity.kind is not None else None
     if activity.name is None:
         activity.name = path.name.removesuffix("".join(path.suffixes))
 

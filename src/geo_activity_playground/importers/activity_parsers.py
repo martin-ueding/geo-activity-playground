@@ -204,6 +204,8 @@ def read_gpx_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
     for track in gpx.tracks:
         if activity.name is None and track.name:
             activity.name = track.name
+        if activity.description is None and track.description:
+            activity.description = track.description
         if activity.kind is None and track.type:
             activity.kind = get_or_make_kind(track.type)
         for segment in track.segments:
