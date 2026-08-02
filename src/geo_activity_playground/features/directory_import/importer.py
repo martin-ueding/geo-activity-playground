@@ -180,7 +180,7 @@ def get_metadata_from_path(
     path: pathlib.Path, metadata_extraction_regexes: list[str]
 ) -> dict[str, str]:
     for regex in metadata_extraction_regexes:
-        if m := re.search(regex, str(path.relative_to(ACTIVITY_DIR))):
+        if m := re.search(regex, path.relative_to(ACTIVITY_DIR).as_posix()):
             return m.groupdict()
     return {}
 
