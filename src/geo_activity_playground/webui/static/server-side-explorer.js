@@ -202,7 +202,7 @@ function setupDownloadLinks(map, zoom) {
  * Handle clicks on the mark/unmark inaccessible links inside the tile popup.
  *
  * The request is sent in the background, the popup is refreshed, and the
- * active explorer overlay tiles are reloaded so the new stripes appear.
+ * inaccessible tile layer is reloaded so the new stripes appear.
  */
 function setupInaccessibleLinks(map, zoom) {
     map.getContainer().addEventListener('click', async (e) => {
@@ -224,6 +224,11 @@ function setupInaccessibleLinks(map, zoom) {
                 popup.setContent(text);
             }
 
+            map.eachLayer(layer => {
+                if (layer._url?.includes('/inaccessible-tile/')) {
+                    layer.redraw();
+                }
+            });
         } catch (error) {
             console.error('Failed to toggle inaccessible mark:', error);
         }

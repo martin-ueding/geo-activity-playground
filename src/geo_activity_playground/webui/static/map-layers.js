@@ -7,7 +7,7 @@
  * @param {number[]} [config.zoomLevels] - All enabled explorer zoom levels to offer in the layer control (defaults to [zoom])
  * @param {string} config.attribution - Map tile attribution text
  * @param {string} [config.baseLayer='Grayscale'] - Default base layer name
- * @param {string|string[]|null} [config.overlay='Colorful Cluster'] - Default overlay strategy or strategies, or null for no overlay
+ * @param {string|string[]|null} [config.overlay=['Colorful Cluster', 'Inaccessible Tiles']] - Default overlay strategy or strategies, or null for no overlay
  * @param {number} [config.activityId] - Activity to highlight in the activity-highlight layer (defaults to the latest one server-side)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
  * @param {number} config.squarePlanner.x - Square X coordinate
@@ -22,7 +22,7 @@ export function add_layers_to_map(map, config) {
         zoomLevels = [zoom],
         attribution,
         baseLayer = 'Grayscale',
-        overlay = 'Colorful Cluster',
+        overlay = ['Colorful Cluster', 'Inaccessible Tiles'],
         squarePlanner = null,
         heatmapExtraArgs = null,
         historyEventIndex = null,
@@ -100,7 +100,8 @@ export function add_layers_to_map(map, config) {
         { name: "Missing", strategy: "missing" },
         { name: "New Tiles & Cluster Growth", strategy: "latest_new", activity: true },
     ];
-    const explorerNames = new Set(explorerStrategies.map(s => s.name));
+    const inaccessibleName = "Inaccessible Tiles";
+    const explorerNames = new Set([...explorerStrategies.map(s => s.name), inaccessibleName]);
 
     // Prefix with "Explorer {zoom}" when there is more than one zoom level, so that
     // the entries cluster by zoom level in the layer control.
@@ -133,6 +134,10 @@ export function add_layers_to_map(map, config) {
                 { maxZoom: 19, attribution }
             );
         }
+        overlay_maps[labelFor(inaccessibleName, z)] = L.tileLayer(
+            `/explorer/${z}/inaccessible-tile/{z}/{x}/{y}.png`,
+            { maxZoom: 19, attribution }
+        );
     }
 
     overlay_maps["Heatmap"] = L.tileLayer(heatmap_url, {

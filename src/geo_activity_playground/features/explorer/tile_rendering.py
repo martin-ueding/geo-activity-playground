@@ -5,7 +5,7 @@ import hashlib
 import itertools
 from collections.abc import Set as AbstractSet
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, NamedTuple
 
 import matplotlib
 import numpy as np
@@ -105,17 +105,6 @@ class InsetRingsPattern(TilePattern):
         if 2 * inset < min(height, width):
             rgba[inset : height - inset, inset : width - inset] = 0.0
         return rgba
-
-
-def alpha_composite(base: np.ndarray, overlay: np.ndarray) -> np.ndarray:
-    """Composite a RGBA overlay onto a RGBA base image."""
-    a = overlay[..., 3]
-    out = np.copy(base)
-    out[..., :3] = (1 - a[..., np.newaxis]) * base[..., :3] + a[
-        ..., np.newaxis
-    ] * overlay[..., :3]
-    out[..., 3] = base[..., 3] + (1 - base[..., 3]) * a
-    return out
 
 
 HATCHED_PATTERN = HatchedPattern(
@@ -536,27 +525,26 @@ def _draw_explorer_square_edges(
         ] = SQUARE_COLOR
 
 
-def _render_tile_image(
-    zoom: int,
-    z: int,
-    x: int,
-    y: int,
-    color_strategy: ColorStrategy,
-    evolution_state: SimpleNamespace,
-    inaccessible_tiles: frozenset[tuple[int, int]] | None = None,
-) -> np.ndarray:
-    if inaccessible_tiles is None:
-        inaccessible_tiles = frozenset()
-    result = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
+class _SubTile(NamedTuple):
+    tile_x: int
+    tile_y: int
+    x_start: int
+    y_start: int
+    width: int
+    draw_left: bool
+    draw_top: bool
+    draw_right: bool
+    draw_bottom: bool
 
+
+def _sub_tiles(zoom: int, z: int, x: int, y: int) -> list[_SubTile]:
+    """Explorer tiles covered by one map tile, with their pixel extents."""
     if z >= zoom:
         factor = 2 ** (z - zoom)
-        tile_x = x // factor
-        tile_y = y // factor
-        subtiles = [
-            (
-                tile_x,
-                tile_y,
+        return [
+            _SubTile(
+                x // factor,
+                y // factor,
                 0,
                 0,
                 OSM_TILE_SIZE,
@@ -566,24 +554,47 @@ def _render_tile_image(
                 (y + 1) % factor == 0,
             )
         ]
-    else:
-        factor = 2 ** (zoom - z)
-        width = OSM_TILE_SIZE // factor
-        subtiles = [
-            (
-                x * factor + xo,
-                y * factor + yo,
-                xo * width,
-                yo * width,
-                width,
-                True,
-                True,
-                True,
-                True,
-            )
-            for xo in range(factor)
-            for yo in range(factor)
-        ]
+    factor = 2 ** (zoom - z)
+    width = OSM_TILE_SIZE // factor
+    return [
+        _SubTile(
+            x * factor + xo,
+            y * factor + yo,
+            xo * width,
+            yo * width,
+            width,
+            True,
+            True,
+            True,
+            True,
+        )
+        for xo in range(factor)
+        for yo in range(factor)
+    ]
+
+
+def render_inaccessible_tile_image(
+    zoom: int, z: int, x: int, y: int, inaccessible_tiles: frozenset[tuple[int, int]]
+) -> np.ndarray:
+    result = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
+    for sub_tile in _sub_tiles(zoom, z, x, y):
+        if (sub_tile.tile_x, sub_tile.tile_y) in inaccessible_tiles:
+            result[
+                sub_tile.y_start : sub_tile.y_start + sub_tile.width,
+                sub_tile.x_start : sub_tile.x_start + sub_tile.width,
+            ] = HATCHED_PATTERN.rasterize((sub_tile.width, sub_tile.width))
+    return result
+
+
+def _render_tile_image(
+    zoom: int,
+    z: int,
+    x: int,
+    y: int,
+    color_strategy: ColorStrategy,
+    evolution_state: SimpleNamespace,
+) -> np.ndarray:
+    result = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
 
     for (
         tile_x,
@@ -595,7 +606,7 @@ def _render_tile_image(
         draw_top,
         draw_right,
         draw_bottom,
-    ) in subtiles:
+    ) in _sub_tiles(zoom, z, x, y):
         tile_xy = (tile_x, tile_y)
         pattern = color_strategy.color(tile_xy)
         if pattern is not None:
@@ -603,16 +614,6 @@ def _render_tile_image(
                 y_start : y_start + width,
                 x_start : x_start + width,
             ] = pattern.rasterize((width, width))
-
-        if tile_xy in inaccessible_tiles:
-            hatch = HATCHED_PATTERN.rasterize((width, width))
-            result[
-                y_start : y_start + width,
-                x_start : x_start + width,
-            ] = alpha_composite(
-                result[y_start : y_start + width, x_start : x_start + width],
-                hatch,
-            )
 
         _draw_grid_lines(result, x_start, y_start, width, draw_left, draw_top)
         _draw_explorer_square_edges(

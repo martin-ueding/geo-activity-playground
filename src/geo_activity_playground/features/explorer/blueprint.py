@@ -68,6 +68,7 @@ from .tile_rendering import (
     _render_tile_image,
     _resolve_color_strategy,
     _tile_bounds,
+    render_inaccessible_tile_image,
 )
 
 alt.data_transformers.enable("vegafusion")
@@ -106,6 +107,16 @@ def _grid_points_response(
         )
     else:
         abort(404)
+
+
+def _png_response(image: np.ndarray) -> ResponseReturnValue:
+    f = io.BytesIO()
+    pl.imsave(f, image, format="png")
+    return Response(
+        bytes(f.getbuffer()),
+        mimetype="image/png",
+        headers={"Cache-Control": "no-cache"},
+    )
 
 
 def make_explorer_blueprint(
@@ -273,12 +284,26 @@ def make_explorer_blueprint(
             "source": gap_source_id,
             "paint": {"raster-opacity": 0.8},
         }
+        inaccessible_source_id = f"gap-inaccessible-{zoom}"
+        inaccessible_source = {
+            "type": "raster",
+            "tiles": [f"/explorer/{zoom}/inaccessible-tile/{{z}}/{{x}}/{{y}}.png"],
+            "tileSize": 256,
+        }
+        inaccessible_layer = {
+            "id": f"gap-inaccessible-layer-{zoom}",
+            "type": "raster",
+            "source": inaccessible_source_id,
+            "paint": {"raster-opacity": 0.8},
+        }
 
         map_style_url = config_accessor.map().map_style_url
         if map_style_url:
             style = requests.get(map_style_url, timeout=10).json()
             style["sources"][gap_source_id] = gap_source
+            style["sources"][inaccessible_source_id] = inaccessible_source
             style["layers"].append(gap_layer)
+            style["layers"].append(inaccessible_layer)
         else:
             raster_tile_url = config_accessor.map().map_tile_url.replace(
                 "{zoom}", "{z}"
@@ -292,10 +317,12 @@ def make_explorer_blueprint(
                         "tileSize": 256,
                     },
                     gap_source_id: gap_source,
+                    inaccessible_source_id: inaccessible_source,
                 },
                 "layers": [
                     {"id": "base-map-layer", "type": "raster", "source": "base-map"},
                     gap_layer,
+                    inaccessible_layer,
                 ],
             }
 
@@ -325,18 +352,6 @@ def make_explorer_blueprint(
             tile_bounds.y_min,
             tile_bounds.y_max,
         )
-        inaccessible_tiles = {
-            (tile.tile_x, tile.tile_y)
-            for tile in DB.session.scalars(
-                sqlalchemy.select(InaccessibleTile).where(
-                    InaccessibleTile.zoom == zoom,
-                    InaccessibleTile.tile_x >= tile_bounds.x_min,
-                    InaccessibleTile.tile_x <= tile_bounds.x_max,
-                    InaccessibleTile.tile_y >= tile_bounds.y_min,
-                    InaccessibleTile.tile_y <= tile_bounds.y_max,
-                )
-            )
-        }
 
         color_strategy = _resolve_color_strategy(
             request,
@@ -350,22 +365,26 @@ def make_explorer_blueprint(
             config,
         )
 
-        result = _render_tile_image(
-            zoom,
-            z,
-            x,
-            y,
-            color_strategy,
-            evolution_state,
-            frozenset(inaccessible_tiles),
-        )
+        result = _render_tile_image(zoom, z, x, y, color_strategy, evolution_state)
+        return _png_response(result)
 
-        f = io.BytesIO()
-        pl.imsave(f, result, format="png")
-        return Response(
-            bytes(f.getbuffer()),
-            mimetype="image/png",
-            headers={"Cache-Control": "no-cache"},
+    @blueprint.route("/<int:zoom>/inaccessible-tile/<int:z>/<int:x>/<int:y>.png")
+    def inaccessible_tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
+        tile_bounds = _tile_bounds(zoom, z, x, y)
+        inaccessible_tiles = frozenset(
+            (tile.tile_x, tile.tile_y)
+            for tile in DB.session.scalars(
+                sqlalchemy.select(InaccessibleTile).where(
+                    InaccessibleTile.zoom == zoom,
+                    InaccessibleTile.tile_x >= tile_bounds.x_min,
+                    InaccessibleTile.tile_x <= tile_bounds.x_max,
+                    InaccessibleTile.tile_y >= tile_bounds.y_min,
+                    InaccessibleTile.tile_y <= tile_bounds.y_max,
+                )
+            )
+        )
+        return _png_response(
+            render_inaccessible_tile_image(zoom, z, x, y, inaccessible_tiles)
         )
 
     @blueprint.route(
