@@ -24,6 +24,10 @@ Changed:
 - The two new border colors can be adjusted under Settings → Display → Color Strategy.
 - Tiles marked as inaccessible are drawn in a separate “Inaccessible Tiles” map layer instead of being hatched into every explorer tile layer. That way the marks can be toggled independently of the explorer layer, and they are available as their own overlay tile URL `/explorer/{zoom}/inaccessible-tile/{z}/{x}/{y}.png`.
 
+Fixed:
+
+- Metadata extraction regexes now match on Windows as well. The relative path was handed to the regex with the platform's separator, so patterns written with `/` never matched and every activity ended up with kind and equipment “Unknown”. The path is now always normalized to forward slashes.
+
 ## Version 1.44.0 — 2026-08-02
 
 Added:
