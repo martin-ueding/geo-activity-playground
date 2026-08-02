@@ -526,70 +526,63 @@ def make_settings_blueprint(
     @blueprint.route("/color-strategy", methods=["GET", "POST"])
     @needs_authentication(authenticator)
     def color_strategy():
+        color_fields = [
+            ("color_strategy_max_cluster_color", _("Max cluster")),
+            (
+                "color_strategy_max_cluster_other_color",
+                _("Other clusters besides the maximum"),
+            ),
+            (
+                "color_strategy_visited_color",
+                _("Visited tiles that are not part of a cluster"),
+            ),
+            (
+                "color_strategy_new_tile_color",
+                _("Tiles newly discovered by an activity"),
+            ),
+            (
+                "color_strategy_new_cluster_color",
+                _("Tiles that joined a cluster with an activity"),
+            ),
+        ]
+
         if request.method == "POST":
-            print(request.form)
-            config_accessor.ui().color_strategy_max_cluster_color = _combine_color(
-                request.form["max_cluster_color"],
-                int(request.form["max_cluster_color_alpha"]),
-            )
-            config_accessor.ui().color_strategy_max_cluster_other_color = (
-                _combine_color(
-                    request.form["max_cluster_other_color"],
-                    int(request.form["max_cluster_other_color_alpha"]),
+            for field, _label in color_fields:
+                setattr(
+                    config_accessor.ui(),
+                    field,
+                    _combine_color(
+                        request.form[field], int(request.form[f"{field}_alpha"])
+                    ),
                 )
-            )
-            config_accessor.ui().color_strategy_visited_color = _combine_color(
-                request.form["visited_color"], int(request.form["visited_color_alpha"])
-            )
             config_accessor.ui().color_strategy_cmap_opacity = float(
                 request.form["cmap_opacity"]
             )
             config_accessor.save()
-            flash("Updated color strategy values.", category="success")
+            flash(_("Updated color strategy values."), category="success")
 
-        max_cluster_color, max_cluster_color_alpha = _split_hex_into_color_alpha(
-            config_accessor.ui().color_strategy_max_cluster_color
-        )
-        max_cluster_color_default, max_cluster_color_alpha_default = (
-            _split_hex_into_color_alpha(
-                _ui_config_default("color_strategy_max_cluster_color")
+        colors = []
+        for field, label in color_fields:
+            color, alpha = _split_hex_into_color_alpha(
+                getattr(config_accessor.ui(), field)
             )
-        )
-
-        max_cluster_other_color, max_cluster_other_color_alpha = (
-            _split_hex_into_color_alpha(
-                config_accessor.ui().color_strategy_max_cluster_other_color
+            color_default, alpha_default = _split_hex_into_color_alpha(
+                _ui_config_default(field)
             )
-        )
-        max_cluster_other_color_default, max_cluster_other_color_alpha_default = (
-            _split_hex_into_color_alpha(
-                _ui_config_default("color_strategy_max_cluster_other_color")
+            colors.append(
+                {
+                    "field": field,
+                    "label": label,
+                    "color": color,
+                    "alpha": alpha,
+                    "color_default": color_default,
+                    "alpha_default": alpha_default,
+                }
             )
-        )
-
-        visited_color, visited_color_alpha = _split_hex_into_color_alpha(
-            config_accessor.ui().color_strategy_visited_color
-        )
-        visited_color_default, visited_color_alpha_default = (
-            _split_hex_into_color_alpha(
-                _ui_config_default("color_strategy_visited_color")
-            )
-        )
 
         return render_template(
             "settings/color-strategy.html.j2",
-            max_cluster_color=max_cluster_color,
-            max_cluster_color_default=max_cluster_color_default,
-            max_cluster_color_alpha=max_cluster_color_alpha,
-            max_cluster_color_alpha_default=max_cluster_color_alpha_default,
-            max_cluster_other_color=max_cluster_other_color,
-            max_cluster_other_color_default=max_cluster_other_color_default,
-            max_cluster_other_color_alpha=max_cluster_other_color_alpha,
-            max_cluster_other_color_alpha_default=max_cluster_other_color_alpha_default,
-            visited_color=visited_color,
-            visited_color_default=visited_color_default,
-            visited_color_alpha=visited_color_alpha,
-            visited_color_alpha_default=visited_color_alpha_default,
+            colors=colors,
             cmap_opacity=config_accessor.ui().color_strategy_cmap_opacity,
         )
 

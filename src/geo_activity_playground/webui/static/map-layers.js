@@ -7,7 +7,8 @@
  * @param {number[]} [config.zoomLevels] - All enabled explorer zoom levels to offer in the layer control (defaults to [zoom])
  * @param {string} config.attribution - Map tile attribution text
  * @param {string} [config.baseLayer='Grayscale'] - Default base layer name
- * @param {string|null} [config.overlay='Colorful Cluster'] - Default overlay strategy, or null for no overlay
+ * @param {string|string[]|null} [config.overlay='Colorful Cluster'] - Default overlay strategy or strategies, or null for no overlay
+ * @param {number} [config.activityId] - Activity to highlight in the activity-highlight layer (defaults to the latest one server-side)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
  * @param {number} config.squarePlanner.x - Square X coordinate
  * @param {number} config.squarePlanner.y - Square Y coordinate
@@ -24,7 +25,8 @@ export function add_layers_to_map(map, config) {
         overlay = 'Colorful Cluster',
         squarePlanner = null,
         heatmapExtraArgs = null,
-        historyEventIndex = null
+        historyEventIndex = null,
+        activityId = null
     } = config;
 
     // Get map container ID for localStorage key
@@ -83,6 +85,9 @@ export function add_layers_to_map(map, config) {
     const historyParam = Number.isInteger(historyEventIndex)
         ? `&event_index=${historyEventIndex}`
         : '';
+    const activityParam = Number.isInteger(activityId)
+        ? `&activity_id=${activityId}`
+        : '';
 
     // Explorer overlay strategies. Each becomes one entry per enabled zoom level.
     const explorerStrategies = [
@@ -93,7 +98,7 @@ export function add_layers_to_map(map, config) {
         { name: "Number of Visits", strategy: "visits" },
         { name: "Visited", strategy: "visited" },
         { name: "Missing", strategy: "missing" },
-        { name: "Latest New Tiles", strategy: "latest_new" },
+        { name: "New Tiles & Cluster Growth", strategy: "latest_new", activity: true },
     ];
     const explorerNames = new Set(explorerStrategies.map(s => s.name));
 
@@ -121,8 +126,8 @@ export function add_layers_to_map(map, config) {
     };
 
     for (const z of zoomLevels) {
-        for (const { name, strategy, history } of explorerStrategies) {
-            const extra = history ? historyParam : '';
+        for (const { name, strategy, history, activity } of explorerStrategies) {
+            const extra = (history ? historyParam : '') + (activity ? activityParam : '');
             overlay_maps[labelFor(name, z)] = L.tileLayer(
                 `/explorer/${z}/tile/{z}/{x}/{y}.png?color_strategy=${strategy}${extra}`,
                 { maxZoom: 19, attribution }
@@ -135,8 +140,9 @@ export function add_layers_to_map(map, config) {
         attribution
     });
 
-    // Resolve the default overlay strategy to a concrete entry at the primary zoom.
-    let selectedOverlay = explorerNames.has(overlay) ? labelFor(overlay, zoom) : overlay;
+    // Resolve the default overlay strategies to concrete entries at the primary zoom.
+    let selectedOverlay = (overlay === null ? [] : [].concat(overlay))
+        .map(name => explorerNames.has(name) ? labelFor(name, zoom) : name);
 
     if (squarePlanner) {
         const { x, y, size } = squarePlanner;
@@ -144,7 +150,7 @@ export function add_layers_to_map(map, config) {
             `/explorer/${zoom}/tile/{z}/{x}/{y}.png?color_strategy=square_planner&x=${x}&y=${y}&size=${size}`,
             { maxZoom: 19, attribution }
         );
-        selectedOverlay = "Square Planner";
+        selectedOverlay = ["Square Planner"];
     }
 
     // Use saved preferences if valid, otherwise fall back to defaults
@@ -161,10 +167,10 @@ export function add_layers_to_map(map, config) {
 
     // In square planner mode the active overlay must be deterministic and tied to URL
     // parameters; saved overlays can otherwise hide the planner layer.
-    const defaultOverlays = selectedOverlay ? [selectedOverlay] : [];
+    const defaultOverlays = selectedOverlay.filter(name => overlay_maps[name]);
     let selectedOverlays;
     if (squarePlanner) {
-        selectedOverlays = [selectedOverlay];
+        selectedOverlays = selectedOverlay;
     } else if (saved.overlays && Array.isArray(saved.overlays)) {
         const savedOverlays = saved.overlays
             .map(resolveSavedOverlay)

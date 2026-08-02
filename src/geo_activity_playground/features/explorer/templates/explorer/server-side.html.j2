@@ -162,6 +162,10 @@
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=latest_new</pre></code>
 
+<p>{{ _('The') }} <code>latest_new</code> {{ _('strategy outlines the tiles that one activity discovered and the tiles that joined a cluster with it. It uses the most recent activity that found a tile at the given zoom level. Append') }} <code>&amp;activity_id=…</code> {{ _('to pick a specific activity instead:') }}</p>
+
+<code><pre class="tile-urls">/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=latest_new&amp;activity_id=123</pre></code>
+
 <p>{{ _('And for the heatmap, you can use this:') }}</p>
 
 <code><pre class="tile-urls">/heatmap/tile/{z}/{x}/{y}.png</pre></code>

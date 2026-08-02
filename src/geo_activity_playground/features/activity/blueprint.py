@@ -36,21 +36,22 @@ from ...core.datamodel import (
     Equipment,
     Kind,
     Tag,
-    TileVisit,
     get_or_make_equipment,
     get_or_make_kind,
 )
 from ...core.enrichment import update_and_commit
-from ...core.grid import make_grid_file_geojson, make_grid_points
+from ...core.grid import geojson_bounding_box_for_tile_collection
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.import_exclusion import record_exclusion
 from ...core.tile_visits import (
+    get_first_visits_for_activity,
     refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
 )
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.columns import TIME_SERIES_COLUMNS
 from ..directory_import.importer import get_metadata_from_path
+from ..explorer.clustering import get_cluster_tile_diff_for_activity
 
 logger = logging.getLogger(__name__)
 
@@ -162,31 +163,29 @@ def make_activity_blueprint(
         similar_activities = [row for _, row in similar_activities.iterrows()]
         similar_activities.reverse()
 
-        # Query new tiles discovered by this activity from the database
-        new_tiles_geojson = {}
+        # What this activity changed about the explorer tiles, per zoom level.
+        new_tile_stats = {}
+        new_tiles_bbox = {}
         new_tiles_per_zoom = {}
-        cluster_diff_geojson_urls = {}
         for zoom in sorted(config.explorer_zoom_levels):
-            first_visits = (
-                DB.session.query(TileVisit)
-                .filter(
-                    TileVisit.first_activity_id == activity.id,
-                    TileVisit.zoom == zoom,
-                )
-                .all()
+            new_tiles = {
+                (tile_visit.tile_x, tile_visit.tile_y)
+                for tile_visit in get_first_visits_for_activity(activity.id, zoom)
+            }
+            cluster_gained, _removed = get_cluster_tile_diff_for_activity(
+                zoom, activity.id
             )
-            if first_visits:
-                points = make_grid_points(
-                    ((fv.tile_x, fv.tile_y) for fv in first_visits),
-                    zoom,
+            new_tiles_per_zoom[zoom] = len(new_tiles)
+            affected = new_tiles | cluster_gained
+            if affected:
+                new_tile_stats[zoom] = {
+                    "new": len(new_tiles - cluster_gained),
+                    "cluster": len(cluster_gained - new_tiles),
+                    "both": len(new_tiles & cluster_gained),
+                }
+                new_tiles_bbox[zoom] = geojson_bounding_box_for_tile_collection(
+                    sorted(affected), zoom
                 )
-                new_tiles_geojson[zoom] = make_grid_file_geojson(points)
-            new_tiles_per_zoom[zoom] = len(first_visits)
-            cluster_diff_geojson_urls[zoom] = url_for(
-                "explorer.cluster_history_activity_diff",
-                zoom=zoom,
-                activity_id=activity.id,
-            )
 
         line_color_columns_avail = {
             column.name: column
@@ -208,8 +207,10 @@ def make_activity_blueprint(
             ),
             "similar_activites": similar_activities,
             "new_tiles": new_tiles_per_zoom,
-            "new_tiles_geojson": new_tiles_geojson,
-            "cluster_diff_geojson_urls": cluster_diff_geojson_urls,
+            "new_tile_stats": new_tile_stats,
+            "new_tiles_bbox": new_tiles_bbox,
+            "new_tile_color": config.color_strategy_new_tile_color,
+            "new_cluster_color": config.color_strategy_new_cluster_color,
             "show_progress_markers": config.show_progress_markers,
         }
 

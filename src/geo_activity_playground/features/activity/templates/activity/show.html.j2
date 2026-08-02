@@ -473,23 +473,51 @@
 
 <p>{{ _('Not happy with the displayed data?') }} <a href="{{ url_for('settings.sharepic') }}">{{ _('Change share picture settings') }}</a>.</p>
 
-{% if new_tiles_geojson %}
+{% if new_tile_stats %}
 <h2>{{ _('New explorer tiles') }}</h2>
-<p>{{ _('With this activity you have explored new explorer tiles. The following maps show the new tiles on the respective zoom levels.') }}</p>
+<p>{{ _('The following maps show what this activity changed on the respective zoom levels: which tiles you discovered and which tiles became part of a cluster.') }}</p>
 
 <div class="row mb-3">
-    {% for zoom, geojson in new_tiles_geojson.items() %}
+    {% for zoom, stats in new_tile_stats.items() %}
     <div class="col-md-6">
         <h3>{{ _('Zoom') }} {{ zoom }}</h3>
-        <p>{{ _('There are') }} {{ new_tiles[zoom] }} {{ _('new tiles:') }}</p>
         <div class="new-tiles-map"
              data-zoom="{{ zoom }}"
-             data-tiles-geojson='{{ geojson | safe }}'
-             data-cluster-diff-url="{{ cluster_diff_geojson_urls[zoom] }}"
+             data-bounds-geojson='{{ new_tiles_bbox[zoom] | safe }}'
              style="height: 300px; width: 100%;"></div>
+        <table class="table table-sm mt-2">
+            <tbody>
+                <tr>
+                    <td><span class="tile-swatch" style="border: 3px solid {{ new_tile_color }};"></span></td>
+                    <td>{{ _('Newly discovered') }}</td>
+                    <td class="text-end">{{ stats.new }}</td>
+                </tr>
+                <tr>
+                    <td><span class="tile-swatch" style="border: 3px solid {{ new_cluster_color }};"></span></td>
+                    <td>{{ _('Joined a cluster') }}</td>
+                    <td class="text-end">{{ stats.cluster }}</td>
+                </tr>
+                <tr>
+                    <td><span class="tile-swatch"
+                              style="border: 3px solid {{ new_tile_color }}; outline: 3px solid {{ new_cluster_color }}; outline-offset: -6px;"></span></td>
+                    <td>{{ _('Discovered and joined a cluster') }}</td>
+                    <td class="text-end">{{ stats.both }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     {% endfor %}
 </div>
+
+<style>
+    .tile-swatch {
+        display: inline-block;
+        width: 1.2em;
+        height: 1.2em;
+        vertical-align: text-bottom;
+        box-sizing: border-box;
+    }
+</style>
 
 <script type="module">
     import { add_layers_to_map } from '/static/map-layers.js';
@@ -499,15 +527,9 @@
 
     document.querySelectorAll('.new-tiles-map').forEach(container => {
         const zoom = parseInt(container.dataset.zoom, 10);
-        const tilesGeojson = JSON.parse(container.dataset.tilesGeojson);
-        const clusterDiffUrl = container.dataset.clusterDiffUrl;
+        const boundsGeojson = JSON.parse(container.dataset.boundsGeojson);
 
         const map = L.map(container, { fullscreenControl: true });
-
-        // Add new tiles layer (orange outline)
-        const tilesLayer = L.geoJSON(tilesGeojson, {
-            style: { color: "#ff7700", fillOpacity: 0.0 }
-        }).addTo(map);
 
         // Add activity track (red line)
         L.geoJSON(trackGeojson, {
@@ -517,28 +539,17 @@
             }
         }).addTo(map);
 
-        // Add explorer overlay
+        // The highlight layer is transparent apart from the tile borders, so it
+        // stacks on top of a cluster layer showing the resulting state.
         add_layers_to_map(map, {
             zoom,
             attribution,
             baseLayer: 'Color',
-            overlay: 'Visited'
+            overlay: ['Colorful Cluster', 'New Tiles & Cluster Growth'],
+            activityId: {{ activity.id }}
         });
 
-        fetch(clusterDiffUrl)
-            .then(response => response.json())
-            .then(diffGeojson => {
-                L.geoJSON(diffGeojson, {
-                    style: function (feature) {
-                        if (feature?.properties?.delta === 'added') {
-                            return { color: "#0066ff", weight: 2, fillOpacity: 0.2 };
-                        }
-                        return { color: "#cc0000", weight: 2, fillOpacity: 0.2 };
-                    }
-                }).addTo(map);
-            });
-
-        map.fitBounds(tilesLayer.getBounds());
+        map.fitBounds(L.geoJSON(boundsGeojson).getBounds());
     });
 </script>
 {% endif %}

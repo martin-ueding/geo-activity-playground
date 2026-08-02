@@ -3,6 +3,7 @@ import datetime
 import functools
 import hashlib
 import itertools
+from collections.abc import Set as AbstractSet
 from types import SimpleNamespace
 from typing import Any
 
@@ -13,9 +14,14 @@ import pandas as pd
 from ...core.coordinates import Bounds
 from ...core.datamodel import UiConfig
 from ...core.raster_map import OSM_TILE_SIZE
-from ...core.tile_visits import get_latest_new_tiles_activity_id
+from ...core.tile_visits import (
+    get_first_visits_for_activity,
+    get_latest_new_tiles_activity_id,
+)
 from .clustering import (
+    get_cluster_history_latest_event_index,
     get_cluster_membership_in_bounds,
+    get_cluster_tile_diff_for_activity,
     get_max_cluster,
 )
 
@@ -73,6 +79,31 @@ class HatchedPattern(TilePattern):
             dtype=int,
         )
         rgba[mask] = self._color
+        return rgba
+
+
+class InsetRingsPattern(TilePattern):
+    """Nested borders drawn inside the tile, outermost color first.
+
+    Staying within the tile means that borders of adjacent tiles never overlap,
+    and a tile that belongs to several categories shows one ring per category.
+    """
+
+    def __init__(self, ring_colors: list[np.ndarray]) -> None:
+        self._ring_colors = ring_colors
+
+    def rasterize(self, shape: tuple[int, int]) -> np.ndarray:
+        height, width = shape
+        rgba = np.zeros((height, width, 4), dtype=np.float32)
+        thickness = max(1, min(width // 24, 6))
+        inset = 0
+        for color in self._ring_colors:
+            if 2 * inset >= min(height, width):
+                break
+            rgba[inset : height - inset, inset : width - inset] = color
+            inset += thickness
+        if 2 * inset < min(height, width):
+            rgba[inset : height - inset, inset : width - inset] = 0.0
         return rgba
 
 
@@ -294,19 +325,30 @@ class VisitedColorStrategy(ColorStrategy):
             return None
 
 
-class LatestNewTilesColorStrategy(ColorStrategy):
-    def __init__(self, tile_visits, config: UiConfig, latest_activity_id: int | None):
-        self.tile_visits = tile_visits
+class ActivityHighlightColorStrategy(ColorStrategy):
+    """Highlight what one activity changed: new tiles and cluster growth."""
+
+    def __init__(
+        self,
+        new_tiles: AbstractSet[tuple[int, int]],
+        cluster_gained: AbstractSet[tuple[int, int]],
+        config: UiConfig,
+    ):
+        self._new_tiles = new_tiles
+        self._cluster_gained = cluster_gained
         self._config = config
-        self._latest_activity_id = latest_activity_id
 
     def color(self, tile_xy: tuple[int, int]) -> TilePattern | None:
-        info = self.tile_visits.get(tile_xy)
-        if info is not None and info["first_id"] == self._latest_activity_id:
-            return SolidColor(
-                hex_color_to_float(self._config.color_strategy_visited_color)
+        ring_colors = []
+        if tile_xy in self._new_tiles:
+            ring_colors.append(
+                hex_color_to_float(self._config.color_strategy_new_tile_color)
             )
-        return None
+        if tile_xy in self._cluster_gained:
+            ring_colors.append(
+                hex_color_to_float(self._config.color_strategy_new_cluster_color)
+            )
+        return InsetRingsPattern(ring_colors) if ring_colors else None
 
 
 class SquarePlannerColorStrategy(ColorStrategy):
@@ -340,6 +382,24 @@ class SquarePlannerColorStrategy(ColorStrategy):
             )
         else:
             return None
+
+
+@functools.lru_cache(maxsize=32)
+def _activity_highlight_tiles(
+    zoom: int, activity_id: int, history_version: int
+) -> tuple[frozenset[tuple[int, int]], frozenset[tuple[int, int]]]:
+    """New and newly clustered tiles of one activity.
+
+    Replaying the cluster history is far too expensive to repeat for every tile
+    image of a viewport, hence the cache. The history version is part of the key
+    so that added activities invalidate stale entries.
+    """
+    new_tiles = frozenset(
+        (tile_visit.tile_x, tile_visit.tile_y)
+        for tile_visit in get_first_visits_for_activity(activity_id, zoom)
+    )
+    cluster_gained, _ = get_cluster_tile_diff_for_activity(zoom, activity_id)
+    return new_tiles, frozenset(cluster_gained)
 
 
 def _tile_bounds(zoom: int, z: int, x: int, y: int) -> Bounds:
@@ -399,9 +459,15 @@ def _resolve_color_strategy(
         case "visited":
             return VisitedColorStrategy(tile_visits, config)
         case "latest_new":
-            return LatestNewTilesColorStrategy(
-                tile_visits, config, get_latest_new_tiles_activity_id(zoom)
+            activity_id = request.args.get(
+                "activity_id", type=int
+            ) or get_latest_new_tiles_activity_id(zoom)
+            if activity_id is None:
+                return ActivityHighlightColorStrategy(set(), set(), config)
+            new_tiles, cluster_gained = _activity_highlight_tiles(
+                zoom, activity_id, get_cluster_history_latest_event_index(zoom)
             )
+            return ActivityHighlightColorStrategy(new_tiles, cluster_gained, config)
         case "square_planner":
             return SquarePlannerColorStrategy(
                 tile_visits,

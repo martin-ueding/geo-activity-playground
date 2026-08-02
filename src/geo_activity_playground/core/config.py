@@ -88,6 +88,8 @@ _UI_KEYS = (
     "color_strategy_max_cluster_color",
     "color_strategy_max_cluster_other_color",
     "color_strategy_visited_color",
+    "color_strategy_new_tile_color",
+    "color_strategy_new_cluster_color",
     "color_strategy_cmap_opacity",
     "eighth_marker_min_distance_km",
     "eighth_marker_min_duration_hours",

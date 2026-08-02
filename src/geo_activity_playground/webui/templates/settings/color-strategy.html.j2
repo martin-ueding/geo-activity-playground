@@ -1,75 +1,40 @@
 {% extends "settings/base.html.j2" %}
 
 {% block breadcrumbs %}
-<li class="breadcrumb-item active" aria-current="page">Color Strategy</li>
+<li class="breadcrumb-item active" aria-current="page">{{ _('Color Strategy') }}</li>
 {% endblock %}
 
 {% block settings_content %}
-<h1 class="mb-3">Color Strategy Values</h1>
+<h1 class="mb-3">{{ _('Color Strategy Values') }}</h1>
 
 <form method="POST">
 
+    {% for color in colors %}
     <div class="row g-3">
         <div class="col-md-6">
-            <label for="max_cluster_color" class="form-label">Max cluster</label>
-            <input type="color" alpha class="form-control" id="max_cluster_color" name="max_cluster_color"
-                value="{{ max_cluster_color }}" />
+            <label for="{{ color.field }}" class="form-label">{{ color.label }}</label>
+            <input type="color" alpha class="form-control" id="{{ color.field }}" name="{{ color.field }}"
+                value="{{ color.color }}" />
         </div>
         <div class="col-md-5">
-            <label for="max_cluster_color_alpha" class="form-label">Alpha</label>
-            <input type="range" class="form-range" min="0" max="255" step="1" id="max_cluster_color_alpha"
-                name="max_cluster_color_alpha" value="{{ max_cluster_color_alpha }}">
+            <label for="{{ color.field }}_alpha" class="form-label">{{ _('Alpha') }}</label>
+            <input type="range" class="form-range" min="0" max="255" step="1" id="{{ color.field }}_alpha"
+                name="{{ color.field }}_alpha" value="{{ color.alpha }}">
         </div>
         <div class="col-md-1">
-            <label class="form-label">Reset</label>
+            <label class="form-label">{{ _('Reset') }}</label>
             <a
-                onclick="document.getElementById('max_cluster_color').value = '{{ max_cluster_color_default }}'; document.getElementById('max_cluster_color_alpha').value = '{{ max_cluster_color_alpha_default }}'">❌</a>
+                onclick="document.getElementById('{{ color.field }}').value = '{{ color.color_default }}'; document.getElementById('{{ color.field }}_alpha').value = '{{ color.alpha_default }}'">❌</a>
         </div>
     </div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label for="max_cluster_other_color" class="form-label">Other clusters besides the maximum</label>
-            <input type="color" alpha class="form-control" id="max_cluster_other_color" name="max_cluster_other_color"
-                value="{{ max_cluster_other_color }}" />
-        </div>
-        <div class="col-md-5">
-            <label for="max_cluster_other_color_alpha" class="form-label">Alpha</label>
-            <input type="range" class="form-range" min="0" max="255" step="1" id="max_cluster_other_color_alpha"
-                name="max_cluster_other_color_alpha" value="{{ max_cluster_other_color_alpha }}">
-        </div>
-        <div class="col-md-1">
-            <label class="form-label">Reset</label>
-            <a
-                onclick="document.getElementById('max_cluster_other_color').value = '{{ max_cluster_other_color_default }}'; document.getElementById('max_cluster_other_color_alpha').value = '{{ max_cluster_other_color_alpha_default }}'">❌</a>
-        </div>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label for="visited_color" class="form-label">Visited tiles that are not part of a
-                cluster</label>
-            <input type="color" alpha class="form-control" id="visited_color" name="visited_color"
-                value="{{ visited_color }}" />
-        </div>
-        <div class="col-md-5">
-            <label for="visited_color_alpha" class="form-label">Alpha</label>
-            <input type="range" class="form-range" min="0" max="255" step="1" id="visited_color_alpha"
-                name="visited_color_alpha" value="{{ visited_color_alpha }}">
-        </div>
-        <div class="col-md-1">
-            <label class="form-label">Reset</label>
-            <a
-                onclick="document.getElementById('visited_color').value = '{{ visited_color_default }}'; document.getElementById('visited_color_alpha').value = '{{ visited_color_alpha_default }}'">❌</a>
-        </div>
-    </div>
+    {% endfor %}
 
     <div class="mb-3">
-        <label for="cmap_opacity" class="form-label">Color map opacity</label>
+        <label for="cmap_opacity" class="form-label">{{ _('Color map opacity') }}</label>
         <input type="number" class="form-control" id="cmap_opacity" name="cmap_opacity" value="{{ cmap_opacity }}"
             min="0.0" max="1.0" step="0.05" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 {% endblock %}
