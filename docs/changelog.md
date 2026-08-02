@@ -17,10 +17,13 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Add an explorer tile layer that shows only the newly discovered tiles of the latest activity. It is selectable as “Latest New Tiles” in the map layer switcher and available as an overlay tile URL for external services. ([GH-476](https://github.com/martin-ueding/geo-activity-playground/issues/476))
+
 Fixed:
 
 - Honor the `X-Forwarded-Proto`, `X-Forwarded-Host`, and related headers set by a reverse proxy. Login redirects behind an HTTPS reverse proxy no longer downgrade to `http://`. ([GH-477](https://github.com/martin-ueding/geo-activity-playground/issues/477))
-
 
 ## Version 1.43.0 — 2026-08-01
 

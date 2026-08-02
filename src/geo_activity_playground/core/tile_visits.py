@@ -36,6 +36,20 @@ def get_first_visits_for_activity(
     return query.all()
 
 
+def get_latest_new_tiles_activity_id(zoom: int) -> int | None:
+    """Return the activity that most recently discovered a new tile at this zoom."""
+    row = (
+        DB.session.query(TileVisit.first_activity_id)
+        .filter(TileVisit.zoom == zoom)
+        .order_by(
+            TileVisit.first_time.desc(),
+            TileVisit.first_activity_id.desc(),
+        )
+        .first()
+    )
+    return row[0] if row else None
+
+
 def get_tile_history_df(zoom: int) -> pd.DataFrame:
     """Get tile first visits as a DataFrame, ordered chronologically.
 

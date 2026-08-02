@@ -13,6 +13,7 @@ import pandas as pd
 from ...core.coordinates import Bounds
 from ...core.datamodel import UiConfig
 from ...core.raster_map import OSM_TILE_SIZE
+from ...core.tile_visits import get_latest_new_tiles_activity_id
 from .clustering import (
     get_cluster_membership_in_bounds,
     get_max_cluster,
@@ -293,6 +294,21 @@ class VisitedColorStrategy(ColorStrategy):
             return None
 
 
+class LatestNewTilesColorStrategy(ColorStrategy):
+    def __init__(self, tile_visits, config: UiConfig, latest_activity_id: int | None):
+        self.tile_visits = tile_visits
+        self._config = config
+        self._latest_activity_id = latest_activity_id
+
+    def color(self, tile_xy: tuple[int, int]) -> TilePattern | None:
+        info = self.tile_visits.get(tile_xy)
+        if info is not None and info["first_id"] == self._latest_activity_id:
+            return SolidColor(
+                hex_color_to_float(self._config.color_strategy_visited_color)
+            )
+        return None
+
+
 class SquarePlannerColorStrategy(ColorStrategy):
     def __init__(
         self,
@@ -382,6 +398,10 @@ def _resolve_color_strategy(
             return MissingColorStrategy(tile_visits, config)
         case "visited":
             return VisitedColorStrategy(tile_visits, config)
+        case "latest_new":
+            return LatestNewTilesColorStrategy(
+                tile_visits, config, get_latest_new_tiles_activity_id(zoom)
+            )
         case "square_planner":
             return SquarePlannerColorStrategy(
                 tile_visits,

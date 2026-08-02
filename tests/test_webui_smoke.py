@@ -93,6 +93,53 @@ def test_explorer_style_json_with_color_strategy(client):
     assert "gap-explorer-14-max_cluster" in data["sources"]
 
 
+def test_explorer_latest_new_tiles_isolates_latest_activity(client, app):
+    import io
+
+    import numpy as np
+    from PIL import Image
+
+    with app.app_context():
+        DB.session.add_all([Activity(id=1, name="Old"), Activity(id=2, name="New")])
+        DB.session.add_all(
+            [
+                TileVisit(
+                    zoom=14,
+                    tile_x=100,
+                    tile_y=200,
+                    first_activity_id=1,
+                    first_time=dt.datetime(2025, 1, 1),
+                    last_activity_id=1,
+                    last_time=dt.datetime(2025, 1, 1),
+                    visit_count=1,
+                ),
+                TileVisit(
+                    zoom=14,
+                    tile_x=101,
+                    tile_y=200,
+                    first_activity_id=2,
+                    first_time=dt.datetime(2026, 8, 1),
+                    last_activity_id=2,
+                    last_time=dt.datetime(2026, 8, 1),
+                    visit_count=1,
+                ),
+            ]
+        )
+        DB.session.commit()
+
+    def center_alpha(tile_x, tile_y):
+        response = client.get(
+            f"/explorer/14/tile/14/{tile_x}/{tile_y}.png?color_strategy=latest_new"
+        )
+        assert response.status_code == 200
+        array = np.asarray(Image.open(io.BytesIO(response.data)).convert("RGBA"))
+        return int(array[128, 128, 3])
+
+    # Only the tile first explored by the latest activity (id=2) is filled.
+    assert center_alpha(101, 200) > 0
+    assert center_alpha(100, 200) == 0
+
+
 def test_cluster_history_endpoints_load(client, app):
     with app.app_context():
         activity = Activity(id=1, name="Ride")
