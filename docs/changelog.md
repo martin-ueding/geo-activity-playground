@@ -20,10 +20,17 @@ Types of changes
 Added:
 
 - Add an explorer tile layer that shows only the newly discovered tiles of the latest activity. It is selectable as “Latest New Tiles” in the map layer switcher and available as an overlay tile URL for external services. ([GH-476](https://github.com/martin-ueding/geo-activity-playground/issues/476))
+- Uploading activity files now leads to a bulk edit page that lists every imported activity with a map preview and editable name, description, kind, equipment and tags. Two buttons fill in the name and kind of all activities at once, either from the activity file or from the file name, which helps when devices are inconsistent about where they store the activity name. ([GH-473](https://github.com/martin-ueding/geo-activity-playground/issues/473))
+- Import the `<desc>` element of a GPX track as the activity description.
+
+Changed:
+
+- Uploading a file whose name is already taken no longer aborts the upload. The file is stored under the SHA-256 checksum of its content instead, and skipped entirely if that content is already present. ([GH-473](https://github.com/martin-ueding/geo-activity-playground/issues/473))
 
 Fixed:
 
 - Honor the `X-Forwarded-Proto`, `X-Forwarded-Host`, and related headers set by a reverse proxy. Login redirects behind an HTTPS reverse proxy no longer downgrade to `http://`. ([GH-477](https://github.com/martin-ueding/geo-activity-playground/issues/477))
+- Uploading several files at once no longer leaves the ones after a name collision to be imported silently at the next start.
 
 ## Version 1.43.0 — 2026-08-01
 
