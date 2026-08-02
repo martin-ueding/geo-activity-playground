@@ -50,8 +50,57 @@ from ...core.tile_visits import (
 )
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.columns import TIME_SERIES_COLUMNS
+from ..directory_import.importer import get_metadata_from_path
 
 logger = logging.getLogger(__name__)
+
+
+def apply_metadata(
+    activity: Activity,
+    name: str | None,
+    description: str | None,
+    equipment_id: str | None,
+    kind_id: str | None,
+    tag_ids: list[str],
+) -> None:
+    activity.name = name
+    activity.description = description or None
+
+    if equipment_id and equipment_id != "null":
+        activity.equipment = DB.session.get_one(Equipment, int(equipment_id))
+    else:
+        activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME)
+
+    if kind_id and kind_id != "null":
+        activity.kind = DB.session.get_one(Kind, int(kind_id))
+    else:
+        activity.kind = get_or_make_kind(DEFAULT_UNKNOWN_NAME)
+
+    activity.tags = [DB.session.get_one(Tag, int(tag_id)) for tag_id in tag_ids]
+
+
+def metadata_candidates(
+    activity: Activity, regexes: list[str]
+) -> dict[str, str | None]:
+    """Name and kind as the file states them versus as the path yields them."""
+    name_from_path = None
+    kind_from_path = None
+    if activity.path:
+        path = pathlib.Path(activity.path)
+        try:
+            from_path = get_metadata_from_path(path, regexes)
+        except ValueError:
+            from_path = {}
+        name_from_path = from_path.get(
+            "name", path.name.removesuffix("".join(path.suffixes))
+        )
+        kind_from_path = from_path.get("kind")
+    return {
+        "name_from_file": activity.name_from_file,
+        "name_from_path": name_from_path,
+        "kind_from_file": activity.kind_from_file,
+        "kind_from_path": kind_from_path,
+    }
 
 
 def make_activity_blueprint(
@@ -292,8 +341,14 @@ def make_activity_blueprint(
         tags = DB.session.scalars(sqlalchemy.select(Tag)).all()
 
         if request.method == "POST":
-            activity.name = request.form.get("name")
-            activity.description = request.form.get("description") or None
+            apply_metadata(
+                activity,
+                request.form.get("name"),
+                request.form.get("description"),
+                request.form.get("equipment"),
+                request.form.get("kind"),
+                request.form.getlist("tag"),
+            )
 
             previous_start = activity.start
             start_changed = False
@@ -311,23 +366,6 @@ def make_activity_blueprint(
                 )
                 start_changed = activity.start != previous_start
 
-            form_equipment = request.form.get("equipment")
-            if form_equipment and form_equipment != "null":
-                activity.equipment = DB.session.get_one(Equipment, int(form_equipment))
-            else:
-                activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME)
-
-            form_kind = request.form.get("kind")
-            if form_kind and form_kind != "null":
-                activity.kind = DB.session.get_one(Kind, int(form_kind))
-            else:
-                activity.kind = get_or_make_kind(DEFAULT_UNKNOWN_NAME)
-
-            form_tags = request.form.getlist("tag")
-            activity.tags = [
-                DB.session.get_one(Tag, int(tag_id_str)) for tag_id_str in form_tags
-            ]
-
             DB.session.commit()
             if start_changed:
                 refresh_tile_visits_for_activity(activity.id)
@@ -339,6 +377,42 @@ def make_activity_blueprint(
             kinds=kinds,
             equipments=equipments,
             tags=tags,
+        )
+
+    @blueprint.route("/bulk-edit", methods=["GET", "POST"])
+    @needs_authentication(authenticator)
+    def bulk_edit() -> ResponseReturnValue:
+        ids = request.args.getlist("id")
+        activities = [
+            activity
+            for activity in (DB.session.get(Activity, int(id)) for id in ids)
+            if activity is not None
+        ]
+
+        if request.method == "POST":
+            for activity in activities:
+                apply_metadata(
+                    activity,
+                    request.form.get(f"name-{activity.id}"),
+                    request.form.get(f"description-{activity.id}"),
+                    request.form.get(f"equipment-{activity.id}"),
+                    request.form.get(f"kind-{activity.id}"),
+                    request.form.getlist(f"tag-{activity.id}"),
+                )
+            DB.session.commit()
+            flash(
+                _("Updated %(count)s activities.") % {"count": len(activities)},
+                category="success",
+            )
+            return redirect(url_for(".bulk_edit", id=ids))
+
+        regexes = config_accessor.activity_import().metadata_extraction_regexes
+        return render_template(
+            "activity/bulk-edit.html.j2",
+            rows=[
+                {"activity": activity, **metadata_candidates(activity, regexes)}
+                for activity in activities
+            ],
         )
 
     @blueprint.route("/trim/<id>", methods=["GET", "POST"])

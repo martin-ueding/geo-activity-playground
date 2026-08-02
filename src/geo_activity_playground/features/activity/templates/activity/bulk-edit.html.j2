@@ -1,0 +1,129 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+
+<h1 class="mb-3">{{ _('Edit Activities') }}</h1>
+
+{% if not rows %}
+<p>{{ _('No activities selected.') }}</p>
+{% else %}
+
+{{ map_script() }}
+
+<form method="POST">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-2">{{ _('Take name and kind from') }}</h2>
+            <p class="text-body-secondary">{{ _('This fills in all rows below at once. You can still adjust individual rows afterwards. Nothing is saved until you press Save.') }}</p>
+            <button type="button" class="btn btn-outline-primary" data-metadata-source="file">{{ _('The activity file') }}</button>
+            <button type="button" class="btn btn-outline-primary" data-metadata-source="path">{{ _('The file name') }}</button>
+        </div>
+    </div>
+
+    {% for row in rows %}
+    {% set activity = row.activity %}
+    <input type="hidden" name="id" value="{{ activity.id }}" />
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    {{ fetched_map("map-" ~ activity.id, url_for('.geojson_line', id=activity.id), classes='rounded') }}
+                    <p class="mt-2 mb-0">
+                        <small class="text-body-secondary">
+                            {% if activity.start_local_tz %}{{ activity.start_local_tz|dt }} ·{% endif %}
+                            {{ '%.1f'|format(activity.distance_km or 0) }} km
+                        </small>
+                        <br />
+                        <small class="text-body-secondary">{{ activity.path or '' }}</small>
+                    </p>
+                    <a href="{{ url_for('.show', id=activity.id) }}">{{ _('Show') }}</a> ·
+                    <a href="{{ url_for('.edit', id=activity.id) }}">{{ _('All fields') }}</a>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="mb-3">
+                        <label for="name-{{ activity.id }}" class="form-label">{{ _('Name') }}</label>
+                        <input type="text" class="form-control" id="name-{{ activity.id }}" name="name-{{ activity.id }}"
+                            value="{{ activity.name or '' }}" data-name-file="{{ row.name_from_file or '' }}"
+                            data-name-path="{{ row.name_from_path or '' }}" />
+                        <div class="form-text">
+                            {{ _('From the file:') }} {{ row.name_from_file or _('nothing') }} ·
+                            {{ _('From the file name:') }} {{ row.name_from_path or _('nothing') }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description-{{ activity.id }}" class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" id="description-{{ activity.id }}"
+                            name="description-{{ activity.id }}" rows="2">{{ activity.description or '' }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="kind-{{ activity.id }}" class="form-label">{{ _('Kind') }}</label>
+                            <select class="form-select" id="kind-{{ activity.id }}" name="kind-{{ activity.id }}"
+                                data-kind-file="{{ row.kind_from_file or '' }}" data-kind-path="{{ row.kind_from_path or '' }}">
+                                {% for kind in kinds_avail %}
+                                <option value="{{ kind.id }}" {% if activity.kind==kind %} selected {% endif %}>{{ kind.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="equipment-{{ activity.id }}" class="form-label">{{ _('Equipment') }}</label>
+                            <select class="form-select" id="equipment-{{ activity.id }}" name="equipment-{{ activity.id }}">
+                                {% for equipment in equipments_avail %}
+                                <option value="{{ equipment.id }}" {% if activity.equipment==equipment %} selected {% endif %}>{{ equipment.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Tags') }}</label>
+                        <div class="form-control">
+                            {% for tag in tags_avail %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="tag-{{ activity.id }}"
+                                    value="{{ tag.id }}" id="tag-{{ activity.id }}-{{ tag.id }}" {% if tag in activity.tags %} checked {% endif %}>
+                                <label class="form-check-label" for="tag-{{ activity.id }}-{{ tag.id }}">{{ tag.tag }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary mb-3">{{ _('Save') }}</button>
+</form>
+
+<script>
+    document.querySelectorAll("[data-metadata-source]").forEach(button => {
+        button.addEventListener("click", () => {
+            const source = button.dataset.metadataSource;
+            document.querySelectorAll("input[data-name-file]").forEach(input => {
+                const candidate = input.dataset[source === "file" ? "nameFile" : "namePath"];
+                if (candidate) {
+                    input.value = candidate;
+                }
+            });
+            document.querySelectorAll("select[data-kind-file]").forEach(select => {
+                const candidate = select.dataset[source === "file" ? "kindFile" : "kindPath"];
+                if (!candidate) {
+                    return;
+                }
+                const option = [...select.options].find(option => option.text === candidate);
+                if (option) {
+                    select.value = option.value;
+                }
+            });
+        });
+    });
+</script>
+
+{% endif %}
+
+{% endblock %}

@@ -112,6 +112,7 @@ ID_SAMPLES = {
 
 # Routes that only work with a query string, which the crawl cannot guess.
 QUERY_STRINGS = {
+    "activity.bulk_edit": "?id={activity_id}",
     "export.export": "?meta_format=parquet&activity_format=",
     "settings.cluster_bookmark_new": "?zoom={zoom}&tile_x={tile_x}&tile_y={tile_y}",
 }
@@ -162,7 +163,10 @@ def test_every_get_route_renders(seeded_app: Flask, samples: dict[str, object]) 
             built = rule.build(_arguments_for(rule, samples))
         assert built is not None
         url = built[1] + QUERY_STRINGS.get(rule.endpoint, "").format(
-            zoom=ZOOM, tile_x=samples["tile_x"], tile_y=samples["tile_y"]
+            zoom=ZOOM,
+            tile_x=samples["tile_x"],
+            tile_y=samples["tile_y"],
+            activity_id=samples["activity_id"],
         )
         try:
             status = client.get(url).status_code
