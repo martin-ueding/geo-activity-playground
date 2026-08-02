@@ -18,28 +18,7 @@
 
 <p>For more information about how to use this feature see <a href="https://martin-ueding.github.io/geo-activity-playground/create-a-privacy-zone/" target="_blank">this page in the documentation</a></p>
 
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function add_map(id, geojson) {
-        let map = L.map(`map-${id}`, {
-            fullscreenControl: true
-        })
-        add_layers_to_map(map, {
-            zoom: {{ explorer_zoom_levels[0] }},
-            zoomLevels: {{ explorer_zoom_levels | tojson }},
-            attribution: '{{ map_tile_attribution|safe }}',
-            baseLayer: 'Color',
-            overlay: null
-        })
-
-        let geojson_layer = L.geoJSON(geojson).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
-        return map
-    }
-
-    window.add_map = add_map;
-</script>
+{{ map_script() }}
 
 
 
@@ -63,7 +42,7 @@
             </div>
             <div class="card-img-top" id="map-{{ loop.index }}" style="height: 300px; width: 100%;"></div>
             <script type="module">
-                let map{{ loop.index }} = add_map("{{ loop.index }}", {{ zone_geojson | safe }})
+                add_map("map-{{ loop.index }}", {{ zone_geojson | safe }})
             </script>
         </div>
         {% endfor %}

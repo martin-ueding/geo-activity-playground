@@ -32,46 +32,7 @@
     </div>
 </div>
 
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function getProgressMarkerIcon(progress, isEighth) {
-        return window.progressMarkerIcon(progress, isEighth);
-    }
-
-    function add_map(id, geojson) {
-        let map = L.map(`map-${id}`, {
-            fullscreenControl: true
-        })
-        add_layers_to_map(map, {
-            zoom: {{ explorer_zoom_levels[0] }},
-            zoomLevels: {{ explorer_zoom_levels | tojson }},
-            attribution: '{{ map_tile_attribution|safe }}',
-            baseLayer: 'Color',
-            overlay: null
-        })
-
-        let geojson_layer = L.geoJSON(geojson, {
-            style: function (feature) {
-                if (feature?.geometry?.type === "LineString") {
-                    return { color: "#3388ff", weight: 4 };
-                }
-                return {};
-            },
-            pointToLayer: function (feature, latlng) {
-                const progress = feature?.properties?.marker_progress;
-                if (Number.isFinite(progress)) {
-                    return L.marker(latlng, { icon: getProgressMarkerIcon(progress, feature?.properties?.marker_is_eighth) });
-                }
-                return L.circleMarker(latlng);
-            }
-        }).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
-        return map
-    }
-
-    window.add_map = add_map;
-</script>
+{{ map_script() }}
 <h2>{{ _('Latest activities') }}</h2>
 
 {% for date, date_data in latest_activities.items() %}
@@ -81,14 +42,7 @@
     {% for elem in activity_batch %}
     <div class="col">
         <div class="card border-primary">
-            <div class="card-img-top" id="map-{{ elem.activity.id }}" style="height: 200px; width: 100%;"></div>
-            <script>
-                fetch("/activity/{{ elem.activity.id }}/line.geojson").then(response => response.json()).then(
-                    geojson => {
-                        add_map("{{ elem.activity.id }}", geojson);
-                    }
-                )
-            </script>
+            {{ fetched_map("map-" ~ elem.activity.id, url_for('activity.geojson_line', id=elem.activity.id)) }}
             <div class="card-body">
                 <a href="{{ url_for('activity.show', id=elem.activity.id) }}">
                     <h5 class="card-title">{{ elem.activity.name }}</h5>

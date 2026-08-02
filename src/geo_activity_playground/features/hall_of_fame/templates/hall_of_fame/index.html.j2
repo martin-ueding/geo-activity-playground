@@ -8,28 +8,7 @@
     {% include "search_form.html.j2" %}
 </div>
 
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function add_map(id, geojson) {
-        let map = L.map(`map-${id}`, {
-            fullscreenControl: true
-        })
-        add_layers_to_map(map, {
-            zoom: {{ explorer_zoom_levels[0] }},
-            zoomLevels: {{ explorer_zoom_levels | tojson }},
-            attribution: '{{ map_tile_attribution|safe }}',
-            baseLayer: 'Color',
-            overlay: null
-        })
-
-        let geojson_layer = L.geoJSON(geojson).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
-        return map
-    }
-
-    window.add_map = add_map;
-</script>
+{{ map_script() }}
 
 {% for activity_batch in nominations|batch(3) %}
 <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
@@ -38,7 +17,7 @@
         <div class="card">
             <div class="card-img-top" id="map-{{ activity.id }}" style="height: 200px; width: 100%;"></div>
             <script type="module">
-                let map{{ activity.id }} = add_map("{{ activity.id }}", {{ line_geojson | safe }})
+                add_map("map-{{ activity.id }}", {{ line_geojson | safe }})
             </script>
             <div class="card-body">
                 <a href="{{ url_for('activity.show', id=activity.id) }}">

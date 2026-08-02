@@ -59,57 +59,14 @@
 </div>
 {% endif %}
 
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function add_map(id, geojson, options = {}) {
-        let map = L.map(`map-${id}`, {
-            fullscreenControl: true
-        })
-        add_layers_to_map(map, {
-            zoom: {{ explorer_zoom_levels[0] }},
-            zoomLevels: {{ explorer_zoom_levels | tojson }},
-            attribution: '{{ map_tile_attribution|safe }}',
-            baseLayer: 'Color',
-            overlay: null
-        })
-
-        let geojson_layer = L.geoJSON(geojson, {
-            style: feature => {
-                if (feature?.geometry?.type === "LineString") {
-                    return {
-                        color: feature?.properties?.color || "#3388ff",
-                        weight: options.weight || 4,
-                        opacity: options.opacity || 1
-                    };
-                }
-                return {};
-            },
-            pointToLayer: (feature, latlng) => {
-                const progress = feature?.properties?.marker_progress;
-                if (Number.isFinite(progress)) {
-                    return L.marker(latlng, {
-                        icon: window.progressMarkerIcon(progress, feature?.properties?.marker_is_eighth)
-                    });
-                }
-                return L.circleMarker(latlng);
-            }
-        }).addTo(map)
-        if (geojson_layer.getLayers().length > 0) {
-            map.fitBounds(geojson_layer.getBounds(), { padding: [10, 10] })
-        }
-        return map
-    }
-
-    window.add_map = add_map;
-</script>
+{{ map_script() }}
 
 {% if aggregate_map_count > 0 %}
 <script>
     fetch("{{ url_for('search.map_aggregate_geojson') }}?{{ base_query_str }}")
         .then(response => response.json())
         .then(geojson => {
-            add_map("aggregate", geojson, { weight: 3, opacity: 0.8 });
+            add_map("map-aggregate", geojson, { weight: 3, opacity: 0.8 });
         });
 </script>
 {% endif %}
@@ -120,14 +77,7 @@
     {% for index, activity in activity_batch %}
     <div class="col">
         <div class="card">
-            <div class="card-img-top" id="map-{{ activity['id'] }}" style="height: 200px; width: 100%;"></div>
-            <script>
-                fetch("/activity/{{ activity['id'] }}/line.geojson").then(response => response.json()).then(
-                    geojson => {
-                        add_map("{{ activity['id'] }}", geojson);
-                    }
-                )
-            </script>
+            {{ fetched_map("map-" ~ activity['id'], url_for('activity.geojson_line', id=activity['id'])) }}
             <div class="card-body">
                 <a href="{{ url_for('activity.show', id=activity['id']) }}">
                     <h5 class="card-title">{{ activity['name'] }}</h5>

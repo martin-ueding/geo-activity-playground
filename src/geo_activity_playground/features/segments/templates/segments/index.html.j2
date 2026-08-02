@@ -4,41 +4,13 @@
 <h1>{{ _('Segments') }}</h1>
 
 
-<script type="module">
-    import { add_layers_to_map } from '/static/map-layers.js';
-
-    function add_map(id, geojson) {
-        let map = L.map(id, {
-            fullscreenControl: true
-        })
-        add_layers_to_map(map, {
-            zoom: {{ explorer_zoom_levels[0] }},
-            zoomLevels: {{ explorer_zoom_levels | tojson }},
-            attribution: '{{ map_tile_attribution|safe }}',
-            baseLayer: 'Color',
-            overlay: null
-        })
-
-        let geojson_layer = L.geoJSON(geojson).addTo(map)
-        map.fitBounds(geojson_layer.getBounds())
-        return map
-    }
-
-    window.add_map = add_map;
-</script>
+{{ map_script() }}
 
 <div class="row row-cols-1 row-cols-lg-3 g-4 mb-3">
     {% for segment in segments %}
 
     <div class="card">
-        <div class="card-img-top" id="map-segment-{{ segment.id }}" style="height: 200px; width: 100%;"></div>
-        <script>
-            fetch("/segments/line/{{ segment.id }}/line.geojson").then(response => response.json()).then(
-                geojson => {
-                    add_map("map-segment-{{ segment.id }}", geojson);
-                }
-            )
-        </script>
+        {{ fetched_map("map-segment-" ~ segment.id, url_for('segments.line', id=segment.id)) }}
         <div class="card-body">
             <a href="{{ url_for('.show', id=segment.id) }}">
                 <h5 class="card-title">{{ segment.name }}</h5>
