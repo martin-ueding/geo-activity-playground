@@ -17,6 +17,11 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- The explorer tile layer for new tiles now shows what an activity changed rather than only which tiles it discovered. Newly discovered tiles get an orange border, tiles that joined a cluster get a blue one, and tiles that did both get two nested borders. The borders are drawn inside the tile, so the outlines of neighboring tiles no longer overlap. The layer is called “New Tiles & Cluster Growth” and accepts an `activity_id` parameter to pick an activity other than the latest one. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366), [GH-476](https://github.com/martin-ueding/geo-activity-playground/issues/476))
+- The maps on an activity page use that layer on top of the colorful cluster layer instead of drawing their own outlines, and list how many tiles fall into each category. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
+- The two new border colors can be adjusted under Settings → Display → Color Strategy.
 
 ## Version 1.44.0 — 2026-08-02
 
