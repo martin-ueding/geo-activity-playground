@@ -2,6 +2,7 @@ import json
 import logging
 
 from ..features.strava.model import StravaConfig
+from ..features.tile.model import TileConfig
 from .datamodel import (
     DB,
     ActivityImportConfig,
@@ -21,6 +22,7 @@ _SINGLETONS = (
     ActivityImportConfig,
     UiConfig,
     MapConfig,
+    TileConfig,
 )
 
 
@@ -54,6 +56,9 @@ class ConfigAccessor:
 
     def map(self) -> MapConfig:
         return _singleton(MapConfig)
+
+    def tile(self) -> TileConfig:
+        return _singleton(TileConfig)
 
     def save(self) -> None:
         DB.session.commit()
@@ -96,6 +101,7 @@ _UI_KEYS = (
     "preferred_language",
 )
 _MAP_KEYS = ("map_tile_url", "map_tile_attribution", "map_style_url")
+_TILE_KEYS = ("hillshade_opacity", "hillshade_blend_mode")
 
 
 def _seed(model, data: dict, keys: tuple[str, ...]):
@@ -127,6 +133,7 @@ def import_config_json(config_accessor: ConfigAccessor) -> None:
     _seed(ActivityImportConfig, data, _ACTIVITY_IMPORT_KEYS)
     _seed(UiConfig, data, _UI_KEYS)
     _seed(MapConfig, data, _MAP_KEYS)
+    _seed(TileConfig, data, _TILE_KEYS)
 
     for name, points in data.get("privacy_zones", {}).items():
         DB.session.add(PrivacyZone(name=name, points=points))

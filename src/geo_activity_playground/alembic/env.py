@@ -14,6 +14,7 @@ import geo_activity_playground.features.plot_builder.model  # noqa: F401
 import geo_activity_playground.features.segments.model  # noqa: F401
 import geo_activity_playground.features.square_planner.model  # noqa: F401
 import geo_activity_playground.features.strava.model  # noqa: F401
+import geo_activity_playground.features.tile.model  # noqa: F401
 from geo_activity_playground.core.datamodel import Base
 
 # this is the Alembic Config object, which provides

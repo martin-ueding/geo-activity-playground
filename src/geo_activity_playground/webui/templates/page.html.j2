@@ -17,6 +17,12 @@
     <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
     <script src="/static/leaflet/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-relief@1.5.0/dist/leaflet-relief.min.js"></script>
+    <script>
+        window.gapHillshade = {
+            opacity: {{ hillshade_opacity | tojson }},
+            blendMode: {{ hillshade_blend_mode | tojson }}
+        };
+    </script>
 
     <!-- Fullscreen button for Leaflet. -->
     <link href='/static/leaflet/leaflet.fullscreen.css' rel='stylesheet' />

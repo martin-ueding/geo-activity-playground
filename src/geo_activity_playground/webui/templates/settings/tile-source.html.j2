@@ -22,6 +22,24 @@
             value="{{ map_tile_attribution|e }}" />
     </div>
 
+    <h2 class="h4 mt-4">{{ _('Hillshade overlay') }}</h2>
+
+    <p>{{ _('These settings control how the Mapterhorn hillshade overlay is drawn over the base map. Lower the opacity to make it subtler. The blend mode determines how it combines with the map below: multiply darkens and suits bright base maps, whereas screen lightens and suits dark base maps.') }}</p>
+
+    <div class="mb-3">
+        <label for="hillshade_opacity" class="form-label">{{ _('Hillshade opacity') }}</label>
+        <input type="number" class="form-control" id="hillshade_opacity" name="hillshade_opacity"
+            min="0" max="1" step="0.05" value="{{ hillshade_opacity }}" />
+    </div>
+    <div class="mb-3">
+        <label for="hillshade_blend_mode" class="form-label">{{ _('Hillshade blend mode') }}</label>
+        <select class="form-select" id="hillshade_blend_mode" name="hillshade_blend_mode">
+            {% for mode in hillshade_blend_modes %}
+            <option value="{{ mode }}" {% if mode == hillshade_blend_mode %}selected{% endif %}>{{ mode }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 

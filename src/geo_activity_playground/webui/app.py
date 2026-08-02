@@ -459,6 +459,8 @@ def create_app(
             "request_url": urllib.parse.quote_plus(request.url),
             "explorer_zoom_levels": sorted(config_accessor.ui().explorer_zoom_levels)
             or [14],
+            "hillshade_opacity": config_accessor.tile().hillshade_opacity,
+            "hillshade_blend_mode": config_accessor.tile().hillshade_blend_mode,
         }
         variables["equipments_avail"] = DB.session.scalars(
             sqlalchemy.select(Equipment).order_by(Equipment.name)

@@ -73,6 +73,15 @@ from ..i18n import SUPPORTED_LANGUAGES
 
 logger = logging.getLogger(__name__)
 
+HILLSHADE_BLEND_MODES = [
+    "multiply",
+    "screen",
+    "overlay",
+    "soft-light",
+    "hard-light",
+    "normal",
+]
+
 
 def _import_exclusion_reasons() -> dict[str, str]:
     return {
@@ -954,13 +963,32 @@ def make_settings_blueprint(
             config_accessor.map().map_tile_attribution = request.form[
                 "map_tile_attribution"
             ]
+
+            try:
+                opacity = float(request.form["hillshade_opacity"])
+            except (KeyError, ValueError):
+                opacity = config_accessor.tile().hillshade_opacity
+            config_accessor.tile().hillshade_opacity = min(max(opacity, 0.0), 1.0)
+
+            blend_mode = request.form.get("hillshade_blend_mode", "multiply")
+            if blend_mode not in HILLSHADE_BLEND_MODES:
+                flasher.flash_message(
+                    _("'%(mode)s' is not a known blend mode.", mode=blend_mode),
+                    FlashTypes.WARNING,
+                )
+                blend_mode = "multiply"
+            config_accessor.tile().hillshade_blend_mode = blend_mode
+
             config_accessor.save()
-            flasher.flash_message("Tile source updated.", FlashTypes.SUCCESS)
+            flasher.flash_message(_("Tile settings updated."), FlashTypes.SUCCESS)
         return render_template(
             "settings/tile-source.html.j2",
             map_tile_url=config_accessor.map().map_tile_url,
             map_tile_attribution=config_accessor.map().map_tile_attribution,
             test_url=config_accessor.map().map_tile_url.format(zoom=14, x=8514, y=5504),
+            hillshade_opacity=config_accessor.tile().hillshade_opacity,
+            hillshade_blend_mode=config_accessor.tile().hillshade_blend_mode,
+            hillshade_blend_modes=HILLSHADE_BLEND_MODES,
         )
 
     return blueprint

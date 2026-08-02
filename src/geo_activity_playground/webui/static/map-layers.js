@@ -72,7 +72,7 @@ export function add_layers_to_map(map, config) {
     if (!map.getPane(mapterhornPaneName)) {
         const pane = map.createPane(mapterhornPaneName);
         pane.style.zIndex = "380";
-        pane.style.mixBlendMode = "multiply";
+        pane.style.mixBlendMode = window.gapHillshade?.blendMode ?? "multiply";
         pane.style.pointerEvents = "none";
     }
 
@@ -113,7 +113,7 @@ export function add_layers_to_map(map, config) {
                     const gray = Math.round(255 * intensity);
                     return [gray, gray, gray];
                 },
-                opacity: 0.5,
+                opacity: window.gapHillshade?.opacity ?? 0.5,
                 maxZoom: 17,
                 pane: mapterhornPaneName
             })
