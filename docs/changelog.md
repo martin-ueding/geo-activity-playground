@@ -22,6 +22,7 @@ Added:
 - Add an explorer tile layer that shows only the newly discovered tiles of the latest activity. It is selectable as “Latest New Tiles” in the map layer switcher and available as an overlay tile URL for external services. ([GH-476](https://github.com/martin-ueding/geo-activity-playground/issues/476))
 - Uploading activity files now leads to a bulk edit page that lists every imported activity with a map preview and editable name, description, kind, equipment and tags. Two buttons fill in the name and kind of all activities at once, either from the activity file or from the file name, which helps when devices are inconsistent about where they store the activity name. ([GH-473](https://github.com/martin-ueding/geo-activity-playground/issues/473))
 - Import the `<desc>` element of a GPX track as the activity description.
+- Make the Mapterhorn hillshade overlay's opacity and blend mode configurable under Settings → Display → Map Tile Source. The overlay was hard to see over some base maps; `multiply` darkens and suits bright maps, whereas `screen` lightens and suits dark maps. ([GH-475](https://github.com/martin-ueding/geo-activity-playground/issues/475))
 
 Changed:
 
