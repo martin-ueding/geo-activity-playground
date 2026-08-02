@@ -93,6 +93,7 @@ export function add_layers_to_map(map, config) {
         { name: "Number of Visits", strategy: "visits" },
         { name: "Visited", strategy: "visited" },
         { name: "Missing", strategy: "missing" },
+        { name: "Latest New Tiles", strategy: "latest_new" },
     ];
     const explorerNames = new Set(explorerStrategies.map(s => s.name));
 
