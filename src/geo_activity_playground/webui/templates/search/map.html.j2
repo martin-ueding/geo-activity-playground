@@ -62,7 +62,7 @@
 {{ map_script() }}
 
 {% if aggregate_map_count > 0 %}
-<script>
+<script type="module">
     fetch("{{ url_for('search.map_aggregate_geojson') }}?{{ base_query_str }}")
         .then(response => response.json())
         .then(geojson => {

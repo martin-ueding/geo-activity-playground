@@ -65,10 +65,11 @@
 </script>
 {% endmacro %}
 
-{# A map container that loads its geometry from `url`. Requires map_script() on the page. #}
+{# A map container that loads its geometry from `url`. Requires map_script() on the page.
+   The module type makes this run after map_script() has defined `add_map`. #}
 {% macro fetched_map(element_id, url, height='200px', classes='card-img-top') %}
 <div class="{{ classes }}" id="{{ element_id }}" style="height: {{ height }}; width: 100%;"></div>
-<script>
+<script type="module">
     fetch("{{ url }}").then(response => response.json()).then(
         geojson => { add_map("{{ element_id }}", geojson) }
     )

@@ -18,7 +18,7 @@
 {{ map_script() }}
 
 <div id="map-segment" class="mb-3" style=" height: 500px; width: 100%;"></div>
-<script>
+<script type="module">
     const activity_ids = {{ activity_ids }};
     fetch("{{ url_for('segments.line', id=segment.id) }}").then(response => response.json()).then(
         geojson => {
