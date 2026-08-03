@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - A combined style JSON endpoint `/explorer/style.json` for MapLibre GL clients that lets several explorer layers (different zoom levels, color strategies, and inaccessible tiles) be combined into a single style document. Without parameters it includes the `colorful_cluster` and `inaccessible` layers for every configured explorer zoom level; a `layers` parameter of comma-separated `zoom:kind` entries selects exactly which layers to combine and in which order. ([GH-484](https://github.com/martin-ueding/geo-activity-playground/issues/484))
+- The Explorer Tiles page offers the inaccessible tiles in the visible area as a GeoJSON, GPX, or KML download, alongside the existing missing and explored tile downloads. ([GH-487](https://github.com/martin-ueding/geo-activity-playground/issues/487))
 
 Fixed:
 
