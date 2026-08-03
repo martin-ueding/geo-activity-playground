@@ -8,6 +8,7 @@
  * @param {string} config.attribution - Map tile attribution text
  * @param {string} [config.baseLayer='Grayscale'] - Default base layer name
  * @param {string|string[]|null} [config.overlay=['Colorful Cluster', 'Inaccessible Tiles']] - Default overlay strategy or strategies, or null for no overlay
+ * @param {string[]} [config.ensureOverlays] - Overlays that are added once to already saved preferences, for layers introduced after the user saved them
  * @param {number} [config.activityId] - Activity to highlight in the activity-highlight layer (defaults to the latest one server-side)
  * @param {Object} [config.squarePlanner] - Square planner config (optional)
  * @param {number} config.squarePlanner.x - Square X coordinate
@@ -23,6 +24,7 @@ export function add_layers_to_map(map, config) {
         attribution,
         baseLayer = 'Grayscale',
         overlay = ['Colorful Cluster', 'Inaccessible Tiles'],
+        ensureOverlays = [],
         squarePlanner = null,
         heatmapExtraArgs = null,
         historyEventIndex = null,
@@ -173,17 +175,37 @@ export function add_layers_to_map(map, config) {
     // In square planner mode the active overlay must be deterministic and tied to URL
     // parameters; saved overlays can otherwise hide the planner layer.
     const defaultOverlays = selectedOverlay.filter(name => overlay_maps[name]);
+
+    // Overlays that were introduced after the user last saved their preferences are
+    // switched on once. Remembering which ones were already offered keeps them off
+    // again once the user turns them off deliberately.
+    const alreadyEnsured = new Set(Array.isArray(saved.ensured) ? saved.ensured : []);
+    const newlyEnsured = ensureOverlays.filter(name => !alreadyEnsured.has(name));
+
     let selectedOverlays;
     if (squarePlanner) {
         selectedOverlays = selectedOverlay;
     } else if (saved.overlays && Array.isArray(saved.overlays)) {
-        const savedOverlays = saved.overlays
+        const savedOverlays = [...new Set([...saved.overlays, ...newlyEnsured])]
             .map(resolveSavedOverlay)
             .filter(name => overlay_maps[name]);
         selectedOverlays = savedOverlays.length > 0 ? savedOverlays : defaultOverlays;
     } else {
         // Fall back to default (single overlay as array, or none)
         selectedOverlays = defaultOverlays;
+    }
+
+    if (newlyEnsured.length > 0) {
+        try {
+            const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            current.ensured = [...alreadyEnsured, ...newlyEnsured];
+            if (Array.isArray(current.overlays)) {
+                current.overlays = [...new Set([...current.overlays, ...newlyEnsured])];
+            }
+            localStorage.setItem(storageKey, JSON.stringify(current));
+        } catch (err) {
+            console.warn('Failed to save ensured overlays:', err);
+        }
     }
 
     base_maps[selectedBase].addTo(map);
