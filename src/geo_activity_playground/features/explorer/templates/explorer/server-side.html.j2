@@ -55,7 +55,10 @@
             <a href="#" data-download-suffix="missing.geojson">{{ _('Missing as GeoJSON') }}</a>,
             <a href="#" data-download-suffix="missing.gpx">{{ _('Missing as GPX') }}</a> {{ _('or') }}
             <a href="#" data-download-suffix="missing.kml">{{ _('Missing as KML') }}</a>{% if mkgmap_available %} {{ _('or') }}
-            <a href="#" data-download-suffix="missing.img">{{ _('Missing as Garmin map') }}</a>{% endif %}.
+            <a href="#" data-download-suffix="missing.img">{{ _('Missing as Garmin map') }}</a>{% endif %},
+            <a href="#" data-download-suffix="inaccessible.geojson">{{ _('Inaccessible as GeoJSON') }}</a>,
+            <a href="#" data-download-suffix="inaccessible.gpx">{{ _('Inaccessible as GPX') }}</a> {{ _('or') }}
+            <a href="#" data-download-suffix="inaccessible.kml">{{ _('Inaccessible as KML') }}</a>.
         </p>
         <p>{{ _('Export all explored tiles as a <a href="%(url)s">Squadrats-compatible KML</a> (zoom 14 and 17) for import into the Explorer Tile Helper app.', url=url_for('.download_squadrats'))|safe }}</p>
         <script type="module">

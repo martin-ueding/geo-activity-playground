@@ -255,6 +255,19 @@ def make_explorer_blueprint(
         )
         return _grid_points_response(points, suffix, "explored")
 
+    @blueprint.route(
+        "/<int:zoom>/<float(signed=True):north>/<float(signed=True):east>/<float(signed=True):south>/<float(signed=True):west>/inaccessible.<suffix>"
+    )
+    def download_inaccessible(
+        zoom: int, north: float, east: float, south: float, west: float, suffix: str
+    ) -> ResponseReturnValue:
+        x1, y1 = compute_tile(north, west, zoom)
+        x2, y2 = compute_tile(south, east, zoom)
+
+        inaccessible_tiles = get_inaccessible_tiles(zoom, x1, x2 + 2, y1, y2 + 2)
+        points = make_grid_points(inaccessible_tiles, zoom)
+        return _grid_points_response(points, suffix, "inaccessible")
+
     @blueprint.route("/squadrats.kml")
     def download_squadrats() -> ResponseReturnValue:
         explored: dict[int, list[tuple[int, int]]] = {}
