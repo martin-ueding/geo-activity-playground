@@ -26,6 +26,7 @@ Changed:
 
 Fixed:
 
+- Map previews that load their geometry over the network, like the ones on the home page, no longer stay blank at random. Their scripts ran while the page was still parsing, whereas the script defining `add_map` only ran afterwards, so every preview whose data arrived early failed. They are module scripts now and therefore run in order.
 - Metadata extraction regexes now match on Windows as well. The relative path was handed to the regex with the platform's separator, so patterns written with `/` never matched and every activity ended up with kind and equipment “Unknown”. The path is now always normalized to forward slashes.
 
 ## Version 1.44.0 — 2026-08-02
