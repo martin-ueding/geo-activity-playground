@@ -777,3 +777,14 @@ class PrivacyZone(DB.Model):
             )
         ]
         return time_series.loc[mask]
+
+
+class DatabaseMaintenanceState(DB.Model):
+    """Single row recording when the database was last vacuumed and analyzed."""
+
+    __tablename__ = "database_maintenance_state"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    last_run: Mapped[datetime.datetime | None] = mapped_column(
+        sa.DateTime, nullable=True
+    )

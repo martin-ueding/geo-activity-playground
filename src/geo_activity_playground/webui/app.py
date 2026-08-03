@@ -41,6 +41,7 @@ from ..core.datamodel import (
     Kind,
     Tag,
 )
+from ..core.db_maintenance import run_database_maintenance_if_due
 from ..core.heart_rate import HeartRateZoneComputer
 from ..core.paths import TIME_SERIES_DIR
 from ..core.raster_map import (
@@ -68,6 +69,7 @@ from ..features.hall_of_fame.blueprint import make_hall_of_fame_blueprint
 from ..features.hammerhead.model import get_hammerhead_auth
 from ..features.heatmap.blueprint import make_heatmap_blueprint
 from ..features.heatmap.cache import (
+    compress_uncompressed_heatmap_cache_blobs,
     delete_small_heatmap_cache_entries,
     import_legacy_heatmap_cache_from_filesystem,
 )
@@ -300,6 +302,7 @@ def create_app(
         delete_small_heatmap_cache_entries(
             config_accessor.ui().heatmap_cache_min_activities
         )
+        run_database_maintenance_if_due([compress_uncompressed_heatmap_cache_blobs])
         map_tile_url = config_accessor.map().map_tile_url
 
     authenticator = Authenticator(config_accessor)

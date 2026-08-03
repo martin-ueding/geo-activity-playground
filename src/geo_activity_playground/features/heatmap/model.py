@@ -17,6 +17,10 @@ class HeatmapTileCache(DB.Model):
             "tile_y",
             "search_query_id",
         ),
+        sa.Index(
+            "idx_heatmap_tile_cache_num_activities",
+            "num_activities",
+        ),
         sa.UniqueConstraint(
             "zoom",
             "tile_x",

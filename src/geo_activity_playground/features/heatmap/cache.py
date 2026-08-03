@@ -5,6 +5,7 @@ import logging
 import pathlib
 import shutil
 import threading
+import zlib
 
 import numpy as np
 import sqlalchemy
@@ -17,14 +18,18 @@ logger = logging.getLogger(__name__)
 
 _write_lock = threading.Lock()
 
+_NPY_MAGIC = b"\x93NUMPY"
+
 
 def counts_to_blob(counts: np.ndarray) -> bytes:
     payload = io.BytesIO()
     np.save(payload, counts.astype(np.int32, copy=False), allow_pickle=False)
-    return payload.getvalue()
+    return zlib.compress(payload.getvalue())
 
 
 def blob_to_counts(payload: bytes) -> np.ndarray:
+    if not payload.startswith(_NPY_MAGIC):
+        payload = zlib.decompress(payload)
     return np.load(io.BytesIO(payload), allow_pickle=False)
 
 
@@ -172,6 +177,14 @@ def import_legacy_heatmap_cache_from_filesystem() -> int:
 
 
 def delete_small_heatmap_cache_entries(min_activities: int) -> int:
+    has_candidates = DB.session.scalar(
+        sqlalchemy.select(
+            sqlalchemy.exists().where(HeatmapTileCache.num_activities < min_activities)
+        )
+    )
+    if not has_candidates:
+        return 0
+
     result = DB.session.execute(
         sqlalchemy.delete(HeatmapTileCache).where(
             HeatmapTileCache.num_activities < min_activities
@@ -186,6 +199,24 @@ def delete_small_heatmap_cache_entries(min_activities: int) -> int:
             min_activities,
         )
     return dropped
+
+
+def compress_uncompressed_heatmap_cache_blobs(batch_size: int = 100) -> int:
+    """Rewrite tiles that still hold a raw `npy` payload with a compressed one."""
+    uncompressed = sqlalchemy.select(HeatmapTileCache).where(
+        sqlalchemy.func.substr(HeatmapTileCache.counts, 1, len(_NPY_MAGIC))
+        == _NPY_MAGIC
+    )
+    compressed = 0
+    while batch := DB.session.scalars(uncompressed.limit(batch_size)).all():
+        for cache_entry in batch:
+            cache_entry.counts = zlib.compress(cache_entry.counts)
+        DB.session.commit()
+        compressed += len(batch)
+
+    if compressed:
+        logger.info("Compressed %d heatmap cache tiles.", compressed)
+    return compressed
 
 
 def _load_legacy_included_activity_ids(path: pathlib.Path) -> list[int]:
