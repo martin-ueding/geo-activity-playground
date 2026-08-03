@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- A combined style JSON endpoint `/explorer/style.json` for MapLibre GL clients that lets several explorer layers (different zoom levels, color strategies, and inaccessible tiles) be combined into a single style document. Without parameters it includes the `colorful_cluster` and `inaccessible` layers for every configured explorer zoom level; a `layers` parameter of comma-separated `zoom:kind` entries selects exactly which layers to combine and in which order. ([GH-484](https://github.com/martin-ueding/geo-activity-playground/issues/484))
+
 Fixed:
 
 - The maps on an activity page show the “New Tiles & Cluster Growth” layer even when saved layer preferences from an earlier version selected something else. Layers introduced after the user last saved their preferences are switched on once and added to the saved selection, so that turning them off afterwards keeps them off. ([GH-486](https://github.com/martin-ueding/geo-activity-playground/issues/486))
