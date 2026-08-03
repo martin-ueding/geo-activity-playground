@@ -23,6 +23,7 @@ Changed:
   - The maps on an activity page use that layer on top of the colorful cluster layer instead of drawing their own outlines, and list how many tiles fall into each category. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
   - The two new border colors can be adjusted under Settings → Display → Color Strategy.
 - Tiles marked as inaccessible are drawn in a separate “Inaccessible Tiles” map layer instead of being hatched into every explorer tile layer. That way the marks can be toggled independently of the explorer layer, and they are available as their own overlay tile URL `/explorer/{zoom}/inaccessible-tile/{z}/{x}/{y}.png`.
+- Improve database performance by compressing the heatmap cache, adding more indices and regularly vacuuming the database.
 
 Fixed:
 
