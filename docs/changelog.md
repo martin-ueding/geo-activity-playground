@@ -20,12 +20,13 @@ Types of changes
 Changed:
 
 - The explorer tile layer for new tiles now shows what an activity changed rather than only which tiles it discovered. Newly discovered tiles get an orange border, tiles that joined a cluster get a blue one, and tiles that did both get two nested borders. The borders are drawn inside the tile, so the outlines of neighboring tiles no longer overlap. The layer is called “New Tiles & Cluster Growth” and accepts an `activity_id` parameter to pick an activity other than the latest one. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366), [GH-476](https://github.com/martin-ueding/geo-activity-playground/issues/476))
-- The maps on an activity page use that layer on top of the colorful cluster layer instead of drawing their own outlines, and list how many tiles fall into each category. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
-- The two new border colors can be adjusted under Settings → Display → Color Strategy.
+  - The maps on an activity page use that layer on top of the colorful cluster layer instead of drawing their own outlines, and list how many tiles fall into each category. ([GH-366](https://github.com/martin-ueding/geo-activity-playground/issues/366))
+  - The two new border colors can be adjusted under Settings → Display → Color Strategy.
 - Tiles marked as inaccessible are drawn in a separate “Inaccessible Tiles” map layer instead of being hatched into every explorer tile layer. That way the marks can be toggled independently of the explorer layer, and they are available as their own overlay tile URL `/explorer/{zoom}/inaccessible-tile/{z}/{x}/{y}.png`.
 
 Fixed:
 
+- Tiles marked as inaccessible are left out of the downloads of missing tiles in the explorer tile map, the square planner and the `export-kml` command. ([GH-479](https://github.com/martin-ueding/geo-activity-playground/issues/479))
 - Map previews that load their geometry over the network, like the ones on the home page, no longer stay blank at random. Their scripts ran while the page was still parsing, whereas the script defining `add_map` only ran afterwards, so every preview whose data arrived early failed. They are module scripts now and therefore run in order.
 - Metadata extraction regexes now match on Windows as well. The relative path was handed to the regex with the platform's separator, so patterns written with `/` never matched and every activity ended up with kind and equipment “Unknown”. The path is now always normalized to forward slashes.
 
