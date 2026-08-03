@@ -13,12 +13,10 @@
 
 <div class="row mb-3">
     <div class="col">
-        <p>{{ _('You have') }} {{ num_tiles }} {{ _('explored tiles. There are') }} {{ num_cluster_tiles }} {{ _('cluster tiles in total. Your largest cluster consists of') }} {{ max_cluster_size }} {{ _('tiles. Your largest square has size') }}
-            {{ square_size }}².
-        </p>
-        <p>{{ _('Open the') }} <a
-                href="{{ url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) if square_x is not none and square_y is not none and square_size > 0 else url_for('square_planner.landing', zoom=zoom) }}">{{ _('Square Planner') }}</a> {{ _('to plan the next extension.') }}</p>
-        <p>{{ _('Video export is available on the dedicated') }} <a href="{{ url_for('explorer_video.video', zoom=zoom) }}">{{ _('Explorer Video Export page') }}</a>.</p>
+        {% set square_planner_url = url_for('square_planner.index', zoom=zoom, x=square_x, y=square_y, size=square_size) if square_x is not none and square_y is not none and square_size > 0 else url_for('square_planner.landing', zoom=zoom) %}
+        <p>{{ _('You have %(num_tiles)s explored tiles. There are %(num_cluster_tiles)s cluster tiles in total. Your largest cluster consists of %(max_cluster_size)s tiles. Your largest square has size %(square_size)s².', num_tiles=num_tiles, num_cluster_tiles=num_cluster_tiles, max_cluster_size=max_cluster_size, square_size=square_size) }}</p>
+        <p>{{ _('Open the <a href="%(url)s">Square Planner</a> to plan the next extension.', url=square_planner_url)|safe }}</p>
+        <p>{{ _('Video export is available on the dedicated <a href="%(url)s">Explorer Video Export page</a>.', url=url_for('explorer_video.video', zoom=zoom))|safe }}</p>
     </div>
 </div>
 
@@ -59,10 +57,7 @@
             <a href="#" data-download-suffix="missing.kml">{{ _('Missing as KML') }}</a>{% if mkgmap_available %} {{ _('or') }}
             <a href="#" data-download-suffix="missing.img">{{ _('Missing as Garmin map') }}</a>{% endif %}.
         </p>
-        <p>{{ _('Export all explored tiles as a') }}
-            <a href="{{ url_for('.download_squadrats') }}">{{ _('Squadrats-compatible KML') }}</a>
-            {{ _('(zoom 14 and 17) for import into the Explorer Tile Helper app.') }}
-        </p>
+        <p>{{ _('Export all explored tiles as a <a href="%(url)s">Squadrats-compatible KML</a> (zoom 14 and 17) for import into the Explorer Tile Helper app.', url=url_for('.download_squadrats'))|safe }}</p>
         <script type="module">
             import { initExplorerMap } from '/static/server-side-explorer.js';
             initExplorerMap({
@@ -135,9 +130,7 @@
 
 <h2 class="mb-3">{{ _('Tile URLs') }}</h2>
 
-<p>{{ _('You can use the overlay tiles with other services like') }} <a href="https://bikerouter.de/" target="_blank">Bike
-        Router</a>. {{ _('See') }} <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/"
-        target="_blank">{{ _('the documentation for this feature') }}</a>. {{ _('For your server, use the following URLs:') }}</p>
+<p>{{ _('You can use the overlay tiles with other services like <a href="https://bikerouter.de/" target="_blank">BikeRouter</a>.')|safe }} {{ _('See <a href="https://martin-ueding.github.io/geo-activity-playground/using-maps-as-overlays/" target="_blank">the documentation for this feature</a>.')|safe }} {{ _('For your server, use the following URLs:') }}</p>
 
 <code><pre class="tile-urls">/tile/grayscale/{z}/{x}/{y}.png
 /tile/pastel/{z}/{x}/{y}.png
@@ -162,7 +155,7 @@
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=missing
 /explorer/17/tile/{z}/{x}/{y}.png?color_strategy=latest_new</pre></code>
 
-<p>{{ _('The') }} <code>latest_new</code> {{ _('strategy outlines the tiles that one activity discovered and the tiles that joined a cluster with it. It uses the most recent activity that found a tile at the given zoom level. Append') }} <code>&amp;activity_id=…</code> {{ _('to pick a specific activity instead:') }}</p>
+<p>{{ _('The <code>latest_new</code> strategy outlines the tiles that one activity discovered and the tiles that joined a cluster with it. It uses the most recent activity that found a tile at the given zoom level. Append <code>&amp;activity_id=…</code> to pick a specific activity instead:')|safe }}</p>
 
 <code><pre class="tile-urls">/explorer/14/tile/{z}/{x}/{y}.png?color_strategy=latest_new&amp;activity_id=123</pre></code>
 
@@ -177,7 +170,7 @@
 
 <h2 class="mb-3">{{ _('Style JSON for MapLibre GL clients') }}</h2>
 
-<p>{{ _('Applications that consume a MapLibre GL style document rather than a plain tile URL (for example') }} <a href="https://wanderer.to/" target="_blank">Wanderer</a>) {{ _('can use this endpoint, which returns the explorer tiles injected as a raster source and layer:') }}</p>
+<p>{{ _('Applications that consume a MapLibre GL style document rather than a plain tile URL (for example <a href="https://wanderer.to/" target="_blank">Wanderer</a>) can use this endpoint, which returns the explorer tiles injected as a raster source and layer:')|safe }}</p>
 
 <code><pre class="tile-urls">/explorer/{{ zoom }}/style.json?color_strategy=colorful_cluster</pre></code>
 
