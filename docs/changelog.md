@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Fixed:
+
+- The maps on an activity page show the “New Tiles & Cluster Growth” layer even when saved layer preferences from an earlier version selected something else. Layers introduced after the user last saved their preferences are switched on once and added to the saved selection, so that turning them off afterwards keeps them off. ([GH-486](https://github.com/martin-ueding/geo-activity-playground/issues/486))
 
 ## Version 1.45.0 — 2026-08-03
 
