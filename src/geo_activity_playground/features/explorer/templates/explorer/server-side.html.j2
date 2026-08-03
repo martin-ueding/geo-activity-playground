@@ -181,7 +181,15 @@
 
 <code><pre class="tile-urls">/explorer/{{ zoom }}/style.json?color_strategy=colorful_cluster</pre></code>
 
-<p>{{ _('If') }} <code>map_style_url</code> {{ _('is set in') }} <code>config.json</code>, {{ _('that style is fetched and extended with the explorer tiles source and layer. Otherwise a minimal raster style is generated from the configured map tile URL. Both this endpoint and the explorer tile endpoints send an') }} <code>Access-Control-Allow-Origin: *</code> {{ _('header, so external browser-based map applications can fetch them directly.') }}</p>
+<p>{{ _('If <code>map_style_url</code> is set in <code>config.json</code>, that style is fetched and extended with the explorer tiles source and layer. Otherwise a minimal raster style is generated from the configured map tile URL. Both this endpoint and the explorer tile endpoints send an <code>Access-Control-Allow-Origin: *</code> header, so external browser-based map applications can fetch them directly.')|safe }}</p>
+
+<p>{{ _('To combine several explorer layers into a single style document (for example the visited tiles and the inaccessible tiles at multiple zoom levels), use the combined endpoint instead. Without a <code>layers</code> parameter it includes the <code>colorful_cluster</code> and <code>inaccessible</code> layers for every configured explorer zoom level:')|safe }}</p>
+
+<code><pre class="tile-urls">/explorer/style.json</pre></code>
+
+<p>{{ _('Pass <code>layers</code> as a comma-separated list of <code>zoom:kind</code> entries, where <code>kind</code> is either a color strategy or the literal <code>inaccessible</code>, to control exactly which layers are combined and in which order:')|safe }}</p>
+
+<code><pre class="tile-urls">/explorer/style.json?layers=14:colorful_cluster,14:inaccessible,17:colorful_cluster,17:inaccessible</pre></code>
 
 <script>
 // Prepend the current origin (protocol + host) to tile URLs

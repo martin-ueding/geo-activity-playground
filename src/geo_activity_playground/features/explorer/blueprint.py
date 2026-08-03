@@ -120,6 +120,82 @@ def _png_response(image: np.ndarray) -> ResponseReturnValue:
     )
 
 
+def _explorer_layer(zoom: int, color_strategy: str) -> tuple[str, dict, dict]:
+    source_id = f"gap-explorer-{zoom}-{color_strategy}"
+    source = {
+        "type": "raster",
+        "tiles": [
+            f"/explorer/{zoom}/tile/{{z}}/{{x}}/{{y}}.png"
+            f"?color_strategy={color_strategy}"
+        ],
+        "tileSize": 256,
+    }
+    layer = {
+        "id": f"gap-explorer-layer-{zoom}-{color_strategy}",
+        "type": "raster",
+        "source": source_id,
+        "paint": {"raster-opacity": 0.8},
+    }
+    return source_id, source, layer
+
+
+def _inaccessible_layer(zoom: int) -> tuple[str, dict, dict]:
+    source_id = f"gap-inaccessible-{zoom}"
+    source = {
+        "type": "raster",
+        "tiles": [f"/explorer/{zoom}/inaccessible-tile/{{z}}/{{x}}/{{y}}.png"],
+        "tileSize": 256,
+    }
+    layer = {
+        "id": f"gap-inaccessible-layer-{zoom}",
+        "type": "raster",
+        "source": source_id,
+        "paint": {"raster-opacity": 0.8},
+    }
+    return source_id, source, layer
+
+
+def _parse_layer_specs(raw_layers: str) -> list[tuple[int, str]]:
+    specs = []
+    for token in raw_layers.split(","):
+        token = token.strip()
+        if not token:
+            continue
+        zoom_str, _, kind = token.partition(":")
+        specs.append((int(zoom_str), kind or "colorful_cluster"))
+    return specs
+
+
+def _build_style(
+    config_accessor: ConfigAccessor,
+    sources: dict[str, Any],
+    layers: list[dict[str, Any]],
+) -> dict[str, Any]:
+    map_style_url = config_accessor.map().map_style_url
+    if map_style_url:
+        style = requests.get(map_style_url, timeout=10).json()
+        style["sources"].update(sources)
+        style["layers"].extend(layers)
+    else:
+        raster_tile_url = config_accessor.map().map_tile_url.replace("{zoom}", "{z}")
+        style = {
+            "version": 8,
+            "sources": {
+                "base-map": {
+                    "type": "raster",
+                    "tiles": [raster_tile_url],
+                    "tileSize": 256,
+                },
+                **sources,
+            },
+            "layers": [
+                {"id": "base-map-layer", "type": "raster", "source": "base-map"},
+                *layers,
+            ],
+        }
+    return style
+
+
 def make_explorer_blueprint(
     authenticator: Authenticator,
     config_accessor: ConfigAccessor,
@@ -276,64 +352,39 @@ def make_explorer_blueprint(
     @blueprint.route("/<int:zoom>/style.json")
     def style_json(zoom: int) -> ResponseReturnValue:
         color_strategy = request.args.get("color_strategy", "colorful_cluster")
-        tile_url = (
-            f"/explorer/{zoom}/tile/{{z}}/{{x}}/{{y}}.png"
-            f"?color_strategy={color_strategy}"
+        source_id, source, layer = _explorer_layer(zoom, color_strategy)
+        inaccessible_source_id, inaccessible_source, inaccessible_layer = (
+            _inaccessible_layer(zoom)
         )
-        gap_source_id = f"gap-explorer-{zoom}-{color_strategy}"
-        gap_source = {
-            "type": "raster",
-            "tiles": [tile_url],
-            "tileSize": 256,
-        }
-        gap_layer = {
-            "id": f"gap-explorer-layer-{zoom}-{color_strategy}",
-            "type": "raster",
-            "source": gap_source_id,
-            "paint": {"raster-opacity": 0.8},
-        }
-        inaccessible_source_id = f"gap-inaccessible-{zoom}"
-        inaccessible_source = {
-            "type": "raster",
-            "tiles": [f"/explorer/{zoom}/inaccessible-tile/{{z}}/{{x}}/{{y}}.png"],
-            "tileSize": 256,
-        }
-        inaccessible_layer = {
-            "id": f"gap-inaccessible-layer-{zoom}",
-            "type": "raster",
-            "source": inaccessible_source_id,
-            "paint": {"raster-opacity": 0.8},
-        }
+        style = _build_style(
+            config_accessor,
+            {source_id: source, inaccessible_source_id: inaccessible_source},
+            [layer, inaccessible_layer],
+        )
+        return Response(json.dumps(style), mimetype="application/json")
 
-        map_style_url = config_accessor.map().map_style_url
-        if map_style_url:
-            style = requests.get(map_style_url, timeout=10).json()
-            style["sources"][gap_source_id] = gap_source
-            style["sources"][inaccessible_source_id] = inaccessible_source
-            style["layers"].append(gap_layer)
-            style["layers"].append(inaccessible_layer)
+    @blueprint.route("/style.json")
+    def combined_style_json() -> ResponseReturnValue:
+        raw_layers = request.args.get("layers")
+        if raw_layers:
+            layer_specs = _parse_layer_specs(raw_layers)
         else:
-            raster_tile_url = config_accessor.map().map_tile_url.replace(
-                "{zoom}", "{z}"
-            )
-            style = {
-                "version": 8,
-                "sources": {
-                    "base-map": {
-                        "type": "raster",
-                        "tiles": [raster_tile_url],
-                        "tileSize": 256,
-                    },
-                    gap_source_id: gap_source,
-                    inaccessible_source_id: inaccessible_source,
-                },
-                "layers": [
-                    {"id": "base-map-layer", "type": "raster", "source": "base-map"},
-                    gap_layer,
-                    inaccessible_layer,
-                ],
-            }
+            zoom_levels = sorted(config_accessor.ui().explorer_zoom_levels)
+            layer_specs = [(zoom, "colorful_cluster") for zoom in zoom_levels] + [
+                (zoom, "inaccessible") for zoom in zoom_levels
+            ]
 
+        sources: dict[str, Any] = {}
+        layers: list[dict[str, Any]] = []
+        for zoom, kind in layer_specs:
+            if kind == "inaccessible":
+                source_id, source, layer = _inaccessible_layer(zoom)
+            else:
+                source_id, source, layer = _explorer_layer(zoom, kind)
+            sources[source_id] = source
+            layers.append(layer)
+
+        style = _build_style(config_accessor, sources, layers)
         return Response(json.dumps(style), mimetype="application/json")
 
     @blueprint.route("/<int:zoom>/tile/<int:z>/<int:x>/<int:y>.png")

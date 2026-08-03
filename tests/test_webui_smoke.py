@@ -95,6 +95,30 @@ def test_explorer_style_json_with_color_strategy(client):
     assert "gap-explorer-14-max_cluster" in data["sources"]
 
 
+def test_explorer_combined_style_json_default_layers(client):
+    response = client.get("/explorer/style.json")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "gap-explorer-14-colorful_cluster" in data["sources"]
+    assert "gap-explorer-17-colorful_cluster" in data["sources"]
+    assert "gap-inaccessible-14" in data["sources"]
+    assert "gap-inaccessible-17" in data["sources"]
+    assert response.headers["Access-Control-Allow-Origin"] == "*"
+
+
+def test_explorer_combined_style_json_explicit_layers(client):
+    response = client.get(
+        "/explorer/style.json?layers=14:colorful_cluster,14:inaccessible,17:missing"
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "gap-explorer-14-colorful_cluster" in data["sources"]
+    assert "gap-inaccessible-14" in data["sources"]
+    assert "gap-explorer-17-missing" in data["sources"]
+    assert "gap-inaccessible-17" not in data["sources"]
+    assert len(data["layers"]) == 1 + 3
+
+
 def test_explorer_latest_new_tiles_isolates_latest_activity(client, app):
     import io
 
