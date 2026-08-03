@@ -32,6 +32,7 @@ def main_export_kml(options: argparse.Namespace) -> None:
     from .core.tile_visits import get_tile_history_df
     from .core.tiles import compute_tile
     from .features.explorer.clustering import get_explorer_square
+    from .features.explorer.inaccessible import get_inaccessible_tiles
 
     os.chdir(options.basedir)
     database_path = pathlib.Path("database.sqlite")
@@ -75,7 +76,18 @@ def main_export_kml(options: argparse.Namespace) -> None:
                         int(tiles["tile_x"].max()) + margin + 1,
                         int(tiles["tile_y"].max()) + margin + 1,
                     )
-                points = get_border_tiles(tiles, zoom, tile_bounds)
+                points = get_border_tiles(
+                    tiles,
+                    zoom,
+                    tile_bounds,
+                    get_inaccessible_tiles(
+                        zoom,
+                        tile_bounds.x_min,
+                        tile_bounds.x_max,
+                        tile_bounds.y_min,
+                        tile_bounds.y_max,
+                    ),
+                )
             else:
                 points = make_grid_points(zip(tiles["tile_x"], tiles["tile_y"]), zoom)
             kml = make_grid_file_kml(points)

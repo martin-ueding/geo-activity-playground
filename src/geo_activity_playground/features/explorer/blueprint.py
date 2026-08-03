@@ -63,6 +63,7 @@ from .clustering import (
     get_square_history_df,
 )
 from .garmin_img import build_garmin_img, mkgmap_available
+from .inaccessible import get_inaccessible_tiles
 from .model import ExplorerTileBookmark, InaccessibleTile
 from .tile_rendering import (
     _render_tile_image,
@@ -152,7 +153,14 @@ def make_explorer_blueprint(
         tile_bounds = Bounds(x1, y1, x2 + 2, y2 + 2)
 
         tiles = get_tile_history_df(zoom)
-        points = get_border_tiles(tiles, zoom, tile_bounds)
+        excluded_tiles = get_inaccessible_tiles(
+            zoom,
+            tile_bounds.x_min,
+            tile_bounds.x_max,
+            tile_bounds.y_min,
+            tile_bounds.y_max,
+        )
+        points = get_border_tiles(tiles, zoom, tile_bounds, excluded_tiles)
         return _grid_points_response(points, suffix, "missing")
 
     @blueprint.route(
@@ -371,17 +379,12 @@ def make_explorer_blueprint(
     @blueprint.route("/<int:zoom>/inaccessible-tile/<int:z>/<int:x>/<int:y>.png")
     def inaccessible_tile(zoom: int, z: int, x: int, y: int) -> ResponseReturnValue:
         tile_bounds = _tile_bounds(zoom, z, x, y)
-        inaccessible_tiles = frozenset(
-            (tile.tile_x, tile.tile_y)
-            for tile in DB.session.scalars(
-                sqlalchemy.select(InaccessibleTile).where(
-                    InaccessibleTile.zoom == zoom,
-                    InaccessibleTile.tile_x >= tile_bounds.x_min,
-                    InaccessibleTile.tile_x <= tile_bounds.x_max,
-                    InaccessibleTile.tile_y >= tile_bounds.y_min,
-                    InaccessibleTile.tile_y <= tile_bounds.y_max,
-                )
-            )
+        inaccessible_tiles = get_inaccessible_tiles(
+            zoom,
+            tile_bounds.x_min,
+            tile_bounds.x_max,
+            tile_bounds.y_min,
+            tile_bounds.y_max,
         )
         return _png_response(
             render_inaccessible_tile_image(zoom, z, x, y, inaccessible_tiles)

@@ -15,6 +15,7 @@ from ...core.tile_visits import (
 )
 from ...core.tiles import get_tile_upper_left_lat_lon
 from ..explorer.clustering import get_explorer_square
+from ..explorer.inaccessible import get_inaccessible_tiles
 from .model import SquarePlannerBookmark
 
 
@@ -77,12 +78,14 @@ def make_square_planner_blueprint() -> Blueprint:
     @blueprint.route("/<int:zoom>/<int:x>/<int:y>/<int:size>/missing.<suffix>")
     def square_planner_missing(zoom: int, x: int, y: int, size: int, suffix: str):
         tile_visits = get_tile_visits_in_bounds(zoom, x, x + size - 1, y, y + size - 1)
+        excluded_tiles = get_inaccessible_tiles(zoom, x, x + size - 1, y, y + size - 1)
         points = make_grid_points(
             (
                 (tile_x, tile_y)
                 for tile_x in range(x, x + size)
                 for tile_y in range(y, y + size)
                 if (tile_x, tile_y) not in tile_visits
+                and (tile_x, tile_y) not in excluded_tiles
             ),
             zoom,
         )

@@ -1,6 +1,6 @@
 import json
 import logging
-from collections.abc import Iterable
+from collections.abc import Container, Iterable
 from xml.etree import ElementTree as ET
 
 import geojson
@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_border_tiles(
-    tiles: pd.DataFrame, zoom: int, tile_bounds: Bounds
+    tiles: pd.DataFrame,
+    zoom: int,
+    tile_bounds: Bounds,
+    excluded_tiles: Container[tuple[int, int]] = frozenset(),
 ) -> list[list[tuple[float, float]]]:
     logger.info("Generate border tiles …")
     tile_set = set(zip(tiles["tile_x"], tiles["tile_y"]))
@@ -22,7 +25,7 @@ def get_border_tiles(
     for tile_x in range(tile_bounds.x_min, tile_bounds.x_max):
         for tile_y in range(tile_bounds.y_min, tile_bounds.y_max):
             tile = (tile_x, tile_y)
-            if tile not in tile_set:
+            if tile not in tile_set and tile not in excluded_tiles:
                 border_tiles.add(tile)
     return make_grid_points(border_tiles, zoom)
 

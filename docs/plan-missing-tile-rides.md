@@ -22,6 +22,10 @@ Upload the GeoJSON file to [Bikerouter](https://bikerouter.de/) and it will disp
 
 Then plan a route that goes through as many tiles as possible. Download the route as GPX and use an app like OsmAnd to ride along it. To carry the missing tiles themselves along for spontaneous hunting, see [Explorer Tiles on the Go](/explorer-tiles-on-the-go).
 
+## Excluding inaccessible tiles
+
+Some missing tiles cannot be reached, say because they only contain water or restricted area. You can mark such tiles as inaccessible by clicking them on the explorer tile map. Tiles marked that way count as neither missing nor visited, so they are left out of the downloads described here as well as those of the square planner. Your routing app then doesn't suggest chasing them.
+
 ## Square planner
 
 From the explorer tile views you can open the _square planner_ which allows you to see which tiles you need to explore in order to extend the square into a particular direction. The screen will open with the largest square that you have, then you can use the buttons to extend or move your square.
