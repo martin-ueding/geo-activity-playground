@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - The emoji summary of an activity states how many tiles it discovered, with one square emoji per explorer zoom level. ([GH-497](https://github.com/martin-ueding/geo-activity-playground/issues/497))
+- Technical Maintenance has a "Compute street visits" action that matches activities onto OpenStreetMap streets and paths. ([GH-499](https://github.com/martin-ueding/geo-activity-playground/issues/499))
 
 Changed:
 
