@@ -6,10 +6,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ...core.datamodel import DB, Activity
 
-STREET_REGION_ZOOM = 12
-"""Zoom level of the coarse tile grid used to track which regions have already
-been fetched from Overpass, so that overlapping activity bounding boxes don't
-trigger repeated queries for the same area."""
+STREET_REGION_ZOOM = 14
+"""Zoom level of the tile grid used to track which regions have already been
+fetched from Overpass, so that overlapping activities don't trigger repeated
+queries for the same area.
+
+Tiles are fetched along an activity's actual path, not across its bounding
+box (a long, mostly-linear activity like a car trip or a point-to-point hike
+can have a bounding box that is mostly empty countryside). Zoom 14 -- the
+same level this app already uses for "Explorer Tiles" -- keeps each tile
+narrow (~1.5 km), so the fetched corridor along a route stays close to the
+route itself instead of sweeping up a wide strip of irrelevant land on
+either side."""
 
 CHUNK_LENGTH_M = 20.0
 """Target length of a street chunk, both the map-matching graph edge and the
@@ -19,6 +27,11 @@ SQL_IN_BATCH_SIZE = 400
 """Keep each `IN (...)` query well under SQLite's default 999 bound-parameter
 limit; a single Overpass region-tile response, or a long street run, can
 involve many thousands of ids in dense areas."""
+
+REGION_PADDING_DEG = 0.002
+"""~200 m padding applied around each track point when selecting region
+tiles and when querying the local matching graph, so streets just outside
+the recorded track are still available."""
 
 
 class StreetRegion(DB.Model):

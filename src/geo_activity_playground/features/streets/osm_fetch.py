@@ -4,13 +4,20 @@ import time
 
 import requests
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from ...core.coordinates import get_distance
 from ...core.datamodel import DB
 from ...core.raster_map import USER_AGENT, GeoBounds
-from ...core.tiles import compute_tile, get_tile_upper_left_lat_lon
+from ...core.tiles import (
+    compute_tile,
+    compute_tile_float,
+    get_tile_upper_left_lat_lon,
+    interpolate_missing_tile,
+)
 from .model import (
     CHUNK_LENGTH_M,
+    REGION_PADDING_DEG,
     SQL_IN_BATCH_SIZE,
     STREET_REGION_ZOOM,
     StreetChunk,
@@ -144,7 +151,7 @@ def subdivide_way(
     return chunks
 
 
-def _existing_osm_ids(column: sa.ColumnElement, osm_ids: list[int]) -> set[int]:
+def _existing_osm_ids(column: Mapped[int], osm_ids: list[int]) -> set[int]:
     found: set[int] = set()
     for i in range(0, len(osm_ids), SQL_IN_BATCH_SIZE):
         batch = osm_ids[i : i + SQL_IN_BATCH_SIZE]
@@ -201,12 +208,52 @@ def _store_ways(nodes: dict[int, tuple[float, float]], ways: list[dict]) -> None
         )
 
 
-def ensure_streets_for_bounds(bounds: GeoBounds) -> None:
-    """Fetch and store street data for every not-yet-fetched region tile that
-    overlaps `bounds`, querying Overpass one region tile at a time so that
-    repeated activities in the same area don't re-trigger a fetch."""
-    x_min, y_max = compute_tile(bounds.lat_min, bounds.lon_min, STREET_REGION_ZOOM)
-    x_max, y_min = compute_tile(bounds.lat_max, bounds.lon_max, STREET_REGION_ZOOM)
+def _region_tiles_for_path(
+    latitudes: list[float], longitudes: list[float]
+) -> set[tuple[int, int]]:
+    """Region tiles (at `STREET_REGION_ZOOM`) that an activity's track
+    actually passes through, with a small padding so streets just off the
+    recorded track are still covered.
+
+    Deliberately does *not* use the track's bounding box: a long, mostly
+    linear activity (a car trip, a point-to-point hike) can have a bounding
+    box that is mostly empty countryside far from the actual route, which
+    would blow up both the number of Overpass queries and the amount of
+    irrelevant street data fetched and stored.
+    """
+    tiles: set[tuple[int, int]] = set()
+    for lat, lon in zip(latitudes, longitudes):
+        for pad_lat, pad_lon in (
+            (0.0, 0.0),
+            (REGION_PADDING_DEG, 0.0),
+            (-REGION_PADDING_DEG, 0.0),
+            (0.0, REGION_PADDING_DEG),
+            (0.0, -REGION_PADDING_DEG),
+        ):
+            tiles.add(compute_tile(lat + pad_lat, lon + pad_lon, STREET_REGION_ZOOM))
+
+    # Fill in diagonal gaps between consecutive points, the same way explorer
+    # tiles do, so a fast-moving diagonal track doesn't skip a tile it passed
+    # through the corner of.
+    for (lat1, lon1), (lat2, lon2) in zip(
+        zip(latitudes, longitudes), zip(latitudes[1:], longitudes[1:])
+    ):
+        x1, y1 = compute_tile_float(lat1, lon1, STREET_REGION_ZOOM)
+        x2, y2 = compute_tile_float(lat2, lon2, STREET_REGION_ZOOM)
+        interpolated = interpolate_missing_tile(x1, y1, x2, y2)
+        if interpolated is not None:
+            tiles.add(interpolated)
+
+    return tiles
+
+
+def ensure_streets_for_path(latitudes: list[float], longitudes: list[float]) -> None:
+    """Fetch and store street data for every not-yet-fetched region tile
+    along an activity's track, querying Overpass one region tile at a time so
+    that repeated activities in the same area don't re-trigger a fetch."""
+    tiles = _region_tiles_for_path(latitudes, longitudes)
+    if not tiles:
+        return
 
     known_regions = {
         (row.tile_x, row.tile_y)
@@ -217,11 +264,8 @@ def ensure_streets_for_bounds(bounds: GeoBounds) -> None:
         )
     }
 
-    for tile_x in range(min(x_min, x_max), max(x_min, x_max) + 1):
-        for tile_y in range(min(y_min, y_max), max(y_min, y_max) + 1):
-            if (tile_x, tile_y) in known_regions:
-                continue
-            _fetch_region(tile_x, tile_y)
+    for tile_x, tile_y in sorted(tiles - known_regions):
+        _fetch_region(tile_x, tile_y)
 
 
 def _fetch_region(tile_x: int, tile_y: int) -> None:

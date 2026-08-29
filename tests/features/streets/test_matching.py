@@ -108,7 +108,7 @@ def test_match_activity_to_streets_end_to_end(app_context: None, app: Flask) -> 
     activity_id, total_length = _make_activity_along_street(app)
 
     with patch(
-        "geo_activity_playground.features.streets.matching.ensure_streets_for_bounds"
+        "geo_activity_playground.features.streets.matching.ensure_streets_for_path"
     ):
         match_activity_to_streets(activity_id)
 
@@ -131,7 +131,7 @@ def test_compute_street_visits_new_skips_already_processed_activities(
     activity_id, _total_length = _make_activity_along_street(app)
 
     with patch(
-        "geo_activity_playground.features.streets.matching.ensure_streets_for_bounds"
+        "geo_activity_playground.features.streets.matching.ensure_streets_for_path"
     ) as mocked_ensure:
         compute_street_visits_new()
         assert mocked_ensure.call_count == 1

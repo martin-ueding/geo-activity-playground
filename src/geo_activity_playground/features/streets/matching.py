@@ -16,18 +16,15 @@ from ...core.datamodel import (
 from ...core.raster_map import GeoBounds
 from ...core.tile_visits import _fallback_timestamp_for_activity
 from .model import (
+    REGION_PADDING_DEG,
     SQL_IN_BATCH_SIZE,
     ActivityStreetChunkRun,
     StreetChunk,
     StreetChunkVisit,
 )
-from .osm_fetch import ensure_streets_for_bounds
+from .osm_fetch import ensure_streets_for_path
 
 logger = logging.getLogger(__name__)
-
-BBOX_PADDING_DEG = 0.002
-"""~200 m padding around an activity's bounding box, so streets just outside
-the recorded track are still available for matching."""
 
 # Map-matching tuning: GPS noise is typically single-digit to low double-digit
 # metres, and streets close to the true path but more than ~50 m away should
@@ -37,13 +34,17 @@ _MAX_DIST_M = 50.0
 
 
 def _activity_bounds(time_series: pd.DataFrame) -> GeoBounds | None:
+    """Bounding box for querying the *local* matching graph from the DB, not
+    for fetching from Overpass -- that's `osm_fetch.ensure_streets_for_path`,
+    which follows the track instead of its bounding box so a long, linear
+    activity doesn't pull in a huge rectangle of irrelevant land."""
     if time_series.empty:
         return None
     return GeoBounds(
-        lat_min=time_series["latitude"].min() - BBOX_PADDING_DEG,
-        lon_min=time_series["longitude"].min() - BBOX_PADDING_DEG,
-        lat_max=time_series["latitude"].max() + BBOX_PADDING_DEG,
-        lon_max=time_series["longitude"].max() + BBOX_PADDING_DEG,
+        lat_min=time_series["latitude"].min() - REGION_PADDING_DEG,
+        lon_min=time_series["longitude"].min() - REGION_PADDING_DEG,
+        lat_max=time_series["latitude"].max() + REGION_PADDING_DEG,
+        lon_max=time_series["longitude"].max() + REGION_PADDING_DEG,
     )
 
 
@@ -216,7 +217,9 @@ def match_activity_to_streets(activity_id: int) -> None:
     if bounds is None:
         return
 
-    ensure_streets_for_bounds(bounds)
+    ensure_streets_for_path(
+        time_series["latitude"].tolist(), time_series["longitude"].tolist()
+    )
 
     graph, edge_lookup = _build_graph(bounds)
     chunks = _match_path_to_chunks(time_series, graph, edge_lookup)

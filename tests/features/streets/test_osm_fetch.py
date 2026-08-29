@@ -7,11 +7,17 @@ import sqlalchemy as sa
 from geo_activity_playground.core.coordinates import get_distance
 from geo_activity_playground.core.datamodel import DB
 from geo_activity_playground.core.raster_map import GeoBounds
-from geo_activity_playground.features.streets.model import StreetChunk, StreetWay
+from geo_activity_playground.core.tiles import compute_tile
+from geo_activity_playground.features.streets.model import (
+    STREET_REGION_ZOOM,
+    StreetChunk,
+    StreetWay,
+)
 from geo_activity_playground.features.streets.osm_fetch import (
     _build_overpass_query,
     _fetch_overpass,
     _parse_overpass_response,
+    _region_tiles_for_path,
     _store_ways,
     subdivide_way,
 )
@@ -192,3 +198,54 @@ def test_fetch_overpass_gives_up_after_max_retries() -> None:
             _fetch_overpass(bounds)
 
     assert mock_post.call_count == 3
+
+
+def test_region_tiles_for_path_stays_close_to_a_long_linear_route() -> None:
+    # Sankt Augustin to Oldenburg: a long, mostly-diagonal car trip whose
+    # bounding box is mostly empty countryside. Region-tile selection must
+    # follow the path, not the bounding box, or this blows up into hundreds
+    # of tiles covering irrelevant land.
+    lat1, lon1 = 50.77, 7.17
+    lat2, lon2 = 53.14, 8.21
+    n = 500
+    latitudes = [lat1 + (lat2 - lat1) * i / (n - 1) for i in range(n)]
+    longitudes = [lon1 + (lon2 - lon1) * i / (n - 1) for i in range(n)]
+
+    tiles = _region_tiles_for_path(latitudes, longitudes)
+
+    x1, y1 = compute_tile(lat1, lon1, STREET_REGION_ZOOM)
+    x2, y2 = compute_tile(lat2, lon2, STREET_REGION_ZOOM)
+    bbox_tile_count = (abs(x2 - x1) + 1) * (abs(y2 - y1) + 1)
+
+    # The straight-line distance is ~264 km; at ~1.5 km per zoom-14 tile that
+    # is on the order of ~180 tiles along the path, not the ~500x more tiles
+    # the bounding box would cover.
+    assert len(tiles) < bbox_tile_count / 10
+    assert len(tiles) < 400
+
+
+def test_region_tiles_for_path_includes_padded_neighbors() -> None:
+    lat, lon = 52.0, 13.0
+    tile = compute_tile(lat, lon, STREET_REGION_ZOOM)
+
+    tiles = _region_tiles_for_path([lat], [lon])
+
+    assert tile in tiles
+    assert len(tiles) >= 1
+
+
+def test_region_tiles_for_path_fills_diagonal_gap() -> None:
+    # Two points placed in diagonally adjacent tiles (100, 100) and
+    # (101, 99), far enough from the tile edges that padding alone would not
+    # bridge them, must still include the connecting corner tile -- mirroring
+    # how explorer tiles handle diagonal jumps (core.tiles.interpolate_missing_tile).
+    from geo_activity_playground.core.tiles import xy_to_latlon
+
+    lat1, lon1 = xy_to_latlon(100.9, 100.9, STREET_REGION_ZOOM)
+    lat2, lon2 = xy_to_latlon(101.1, 99.5, STREET_REGION_ZOOM)
+
+    tiles = _region_tiles_for_path([lat1, lat2], [lon1, lon2])
+
+    assert (100, 100) in tiles
+    assert (101, 99) in tiles
+    assert (101, 100) in tiles
