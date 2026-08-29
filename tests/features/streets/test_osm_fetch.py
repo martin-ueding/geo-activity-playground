@@ -1,10 +1,18 @@
+from unittest.mock import patch
+
 import pytest
+import requests
+import sqlalchemy as sa
 
 from geo_activity_playground.core.coordinates import get_distance
+from geo_activity_playground.core.datamodel import DB
 from geo_activity_playground.core.raster_map import GeoBounds
+from geo_activity_playground.features.streets.model import StreetChunk, StreetWay
 from geo_activity_playground.features.streets.osm_fetch import (
     _build_overpass_query,
+    _fetch_overpass,
     _parse_overpass_response,
+    _store_ways,
     subdivide_way,
 )
 
@@ -99,3 +107,88 @@ def test_parse_overpass_response_splits_nodes_and_ways() -> None:
             "node_ids": [1, 2],
         },
     ]
+
+
+def test_store_ways_chunk_boundaries_land_exactly_on_real_nodes(
+    app_context: None,
+) -> None:
+    # Each edge is long enough to require more than one ~20 m chunk, so the
+    # subdivision must cross a chunk boundary while still landing exactly on
+    # node B -- otherwise a way sharing that intersection node would not be
+    # connected to this one in the map-matching graph.
+    node_a = (52.0, 13.0)
+    node_b = (52.0, 13.0003)
+    node_c = (52.0, 13.0006)
+    nodes = {1: node_a, 2: node_b, 3: node_c}
+    ways = [
+        {"osm_id": 100, "highway": "residential", "name": None, "node_ids": [1, 2, 3]}
+    ]
+
+    _store_ways(nodes, ways)
+    DB.session.flush()
+
+    way = DB.session.scalars(sa.select(StreetWay)).one()
+    chunks = DB.session.scalars(
+        sa.select(StreetChunk)
+        .where(StreetChunk.way_id == way.id)
+        .order_by(StreetChunk.seq)
+    ).all()
+
+    endpoints = {(chunks[0].lat1, chunks[0].lon1)}
+    for chunk in chunks:
+        endpoints.add((chunk.lat2, chunk.lon2))
+
+    assert node_a in endpoints
+    assert node_b in endpoints
+    assert node_c in endpoints
+    assert len(chunks) > 2
+
+
+class _FakeResponse:
+    def __init__(self, status_code: int, payload: dict | None = None) -> None:
+        self.status_code = status_code
+        self._payload = payload or {}
+
+    def json(self) -> dict:
+        return self._payload
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise requests.exceptions.HTTPError(f"HTTP {self.status_code}")
+
+
+def test_fetch_overpass_retries_on_gateway_timeout() -> None:
+    bounds = GeoBounds(lat_min=52.0, lon_min=13.0, lat_max=52.1, lon_max=13.1)
+    responses = [
+        _FakeResponse(504),
+        _FakeResponse(200, {"elements": []}),
+    ]
+
+    with (
+        patch("time.sleep"),
+        patch(
+            "geo_activity_playground.features.streets.osm_fetch.requests.post",
+            side_effect=responses,
+        ) as mock_post,
+    ):
+        result = _fetch_overpass(bounds)
+
+    assert result == {"elements": []}
+    assert mock_post.call_count == 2
+
+
+def test_fetch_overpass_gives_up_after_max_retries() -> None:
+    bounds = GeoBounds(lat_min=52.0, lon_min=13.0, lat_max=52.1, lon_max=13.1)
+    responses = [_FakeResponse(504) for _ in range(5)]
+
+    with (
+        patch("time.sleep"),
+        patch(
+            "geo_activity_playground.features.streets.osm_fetch.requests.post",
+            side_effect=responses,
+        ) as mock_post,
+    ):
+        with pytest.raises(requests.exceptions.HTTPError):
+            _fetch_overpass(bounds)
+
+    assert mock_post.call_count == 3

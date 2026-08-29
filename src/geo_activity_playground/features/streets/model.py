@@ -15,6 +15,11 @@ CHUNK_LENGTH_M = 20.0
 """Target length of a street chunk, both the map-matching graph edge and the
 unit street coverage is tracked at."""
 
+SQL_IN_BATCH_SIZE = 400
+"""Keep each `IN (...)` query well under SQLite's default 999 bound-parameter
+limit; a single Overpass region-tile response, or a long street run, can
+involve many thousands of ids in dense areas."""
+
 
 class StreetRegion(DB.Model):
     """Marks a coarse region tile as already fetched from Overpass."""

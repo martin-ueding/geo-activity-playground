@@ -89,6 +89,8 @@ from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...features.square_planner.model import SquarePlannerBookmark
 from ...features.strava.api_importer import refresh_activity_names_from_strava
 from ...features.strava.blueprint import register_strava_settings
+from ...features.streets.matching import compute_street_visits_new
+from ...features.streets.model import ActivityStreetChunkRun, StreetChunkVisit
 from ...importers.activity_parsers import (
     ActivityParseError,
     NoGeoDataError,
@@ -240,6 +242,8 @@ def _truncate_user_content_tables() -> None:
     DB.session.execute(sqlalchemy.delete(SegmentCheck))
     DB.session.execute(sqlalchemy.delete(ActivityTile))
     DB.session.execute(sqlalchemy.delete(TileVisit))
+    DB.session.execute(sqlalchemy.delete(ActivityStreetChunkRun))
+    DB.session.execute(sqlalchemy.delete(StreetChunkVisit))
     DB.session.execute(sqlalchemy.delete(ClusterHistoryEvent))
     DB.session.execute(sqlalchemy.delete(ClusterTileActivation))
     DB.session.execute(sqlalchemy.delete(ClusterMembership))
@@ -451,6 +455,13 @@ def make_settings_blueprint(
                 compute_tile_evolution(config_accessor.ui())
                 flasher.flash_message(
                     _("Tile visit state has been reset and re-indexed."),
+                    FlashTypes.SUCCESS,
+                )
+            elif action == "compute_street_visits":
+                logger.info("User requested computation of street visits.")
+                compute_street_visits_new()
+                flasher.flash_message(
+                    _("Street visits have been computed for new activities."),
                     FlashTypes.SUCCESS,
                 )
             elif action == "clear_filtered_cluster_cache":

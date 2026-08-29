@@ -43,6 +43,23 @@
 
 <div class="card border-secondary mb-3">
     <div class="card-header bg-secondary text-white">
+        <h5 class="card-title mb-0">{{ _('Street Exploration') }}</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            {{ _('Match activities without street data yet onto real streets and paths, downloading map data from OpenStreetMap as needed. This is experimental, can take a while, and needs an internet connection.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('This will download street data from OpenStreetMap for any new areas and can take a while. Continue?') }}');">
+            <input type="hidden" name="action" value="compute_street_visits">
+            <button type="submit" class="btn btn-secondary">
+                {{ _('Compute street visits') }}
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card border-secondary mb-3">
+    <div class="card-header bg-secondary text-white">
         <h5 class="card-title mb-0">{{ _('Filtered Explorer Tile Cache') }}</h5>
     </div>
     <div class="card-body">
