@@ -43,6 +43,7 @@ dependencies = [
     "gunicorn>=23.0.0; sys_platform != 'win32'",
     "piexif>=1.1.3",
     "markdown>=3.7",
+    "leuvenmapmatching>=1.1.4",
 ]
 
 [project.scripts]
