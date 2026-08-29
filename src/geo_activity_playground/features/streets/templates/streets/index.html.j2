@@ -1,0 +1,58 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1 class="mb-3">{{ _('Streets') }}</h1>
+
+<p>
+    {{ _('Streets and paths you have matched activities onto are shown in blue; streets known but not yet visited are shown in grey. Use “Compute street visits” in Technical Maintenance to match new activities.') }}
+</p>
+
+<div class="row mb-3">
+    <div class="col">
+        <div id="streets-map" style="height: 800px;"></div>
+
+        <script type="module">
+            const map = L.map('streets-map', {
+                fullscreenControl: true,
+                center: [{{ center.latitude }}, {{ center.longitude }}],
+                zoom: 14
+            });
+
+            L.tileLayer('/tile/grayscale/{z}/{x}/{y}.png', {
+                attribution: '{{ map_tile_attribution|safe }}',
+                maxZoom: 19
+            }).addTo(map);
+
+            let streetsLayer = null;
+
+            function styleFor(feature) {
+                return feature.properties.visited
+                    ? { color: '#1f78b4', weight: 3 }
+                    : { color: '#888888', weight: 1 };
+            }
+
+            function loadStreets() {
+                const bounds = map.getBounds();
+                const params = new URLSearchParams({
+                    south: bounds.getSouth(),
+                    west: bounds.getWest(),
+                    north: bounds.getNorth(),
+                    east: bounds.getEast()
+                });
+                fetch(`/streets/geojson?${params}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (streetsLayer) {
+                            map.removeLayer(streetsLayer);
+                        }
+                        streetsLayer = L.geoJSON(data, { style: styleFor }).addTo(map);
+                    });
+            }
+
+            map.on('moveend', loadStreets);
+            loadStreets();
+        </script>
+    </div>
+</div>
+
+{% endblock %}

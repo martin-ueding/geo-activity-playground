@@ -85,6 +85,7 @@ from ..features.sharepic.blueprint import make_sharepic_blueprint
 from ..features.shutdown.blueprint import make_shutdown_blueprint
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
+from ..features.streets.blueprint import make_streets_blueprint
 from ..features.summary.blueprint import make_summary_blueprint
 from ..features.tile.blueprint import make_tile_blueprint
 from ..features.upload.blueprint import make_upload_blueprint
@@ -437,6 +438,7 @@ def create_app(
         ),
         ("/square-planner", make_square_planner_blueprint()),
         ("/search", make_search_blueprint(authenticator, config_accessor)),
+        ("/streets", make_streets_blueprint()),
         (
             "/summary",
             make_summary_blueprint(config_accessor, authenticator),

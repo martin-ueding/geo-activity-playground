@@ -64,12 +64,16 @@ def test_nothing_is_active_on_the_home_page(seeded_client: FlaskClient) -> None:
     assert not _active_hrefs(seeded_client.get("/").data.decode())
 
 
-def test_maps_collapses_to_a_plain_link_without_photos(
+def test_maps_stays_a_dropdown_without_photos(
     seeded_client: FlaskClient,
 ) -> None:
+    # Heatmap and Streets are both always visible, so the group has more than
+    # one entry even without photos and does not collapse to a plain link.
     navbar = _navbar(seeded_client.get("/").data.decode())
-    assert "Maps" not in navbar
+    assert re.search(r'class="nav-link dropdown-toggle\s*"[^>]*>\s*Maps', navbar)
     assert re.search(r'href="/heatmap/"[^>]*>\s*Heatmap', navbar)
+    assert re.search(r'href="/streets/"[^>]*>\s*Streets', navbar)
+    assert "Photo Map" not in navbar
 
 
 def test_maps_becomes_a_dropdown_once_photos_exist(seeded_app: Flask) -> None:

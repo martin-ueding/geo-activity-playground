@@ -83,6 +83,11 @@
             <dd>{{ new_tiles[17] }}</dd>
             {% endif %}
 
+            {% if new_street_length_m %}
+            <dt>{{ _('New Streets Discovered') }}</dt>
+            <dd>{{ (new_street_length_m / 1000)|round(2) }} km</dd>
+            {% endif %}
+
             <dt>{{ _('ID') }}</dt>
             <dd>{{ activity.id }}</dd>
             <dt>{{ _('Upstream ID') }}</dt>

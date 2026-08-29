@@ -99,6 +99,7 @@ QUERY_STRINGS = {
     "activity.bulk_edit": "?id={activity_id}",
     "export.export": "?meta_format=parquet&activity_format=",
     "settings.cluster_bookmark_new": "?zoom={zoom}&tile_x={tile_x}&tile_y={tile_y}",
+    "streets.chunks_geojson": "?south={south}&west={west}&north={north}&east={east}",
 }
 
 
@@ -153,6 +154,10 @@ def test_every_get_route_renders(seeded_app: Flask, samples: dict[str, object]) 
             tile_x=samples["tile_x"],
             tile_y=samples["tile_y"],
             activity_id=samples["activity_id"],
+            south=samples["south"],
+            west=samples["west"],
+            north=samples["north"],
+            east=samples["east"],
         )
         try:
             status = client.get(url).status_code

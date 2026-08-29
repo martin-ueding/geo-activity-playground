@@ -57,6 +57,7 @@ from ...webui.plot_util import to_vega
 from ..directory_import.importer import get_metadata_from_path
 from ..explorer.clustering import get_cluster_tiles_gained_by_activity
 from ..explorer.model import TileStyleName, get_tile_styles
+from ..streets.matching import get_new_street_length_m_for_activity
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +191,8 @@ def make_activity_blueprint(
                     sorted(affected), zoom
                 )
 
+        new_street_length_m = get_new_street_length_m_for_activity(activity.id)
+
         line_color_columns_avail = {
             column.name: column
             for column in TIME_SERIES_COLUMNS
@@ -211,6 +214,7 @@ def make_activity_blueprint(
             "similar_activites": similar_activities,
             "new_tiles": new_tiles_per_zoom,
             "new_tile_stats": new_tile_stats,
+            "new_street_length_m": new_street_length_m,
             "new_tiles_bbox": new_tiles_bbox,
             "new_tile_color": tile_styles[TileStyleName.NEW_TILE].border_color,
             "new_cluster_color": tile_styles[
