@@ -235,7 +235,7 @@ function setupInaccessibleLinks(map, zoom) {
             // serve from its memory cache; a fresh version parameter forces it
             // to actually fetch the changed tiles.
             map.eachLayer(layer => {
-                if (layer._url?.includes('/inaccessible-tile/')) {
+                if (layer._url !== undefined) {
                     const base = layer._url.split('?')[0];
                     layer.setUrl(`${base}?v=${Date.now()}`);
                 }
