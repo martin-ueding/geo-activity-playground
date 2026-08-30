@@ -15,6 +15,10 @@ Types of changes
 
 <!-- next version below this line -->
 
+Fixed:
+
+- Handle missing bbox which prevents clicking explorer tiles. ([GH-512](https://github.com/martin-ueding/geo-activity-playground/issues/512))
+
 ## Version 1.53.0 — 2026-08-29
 
 Added:
