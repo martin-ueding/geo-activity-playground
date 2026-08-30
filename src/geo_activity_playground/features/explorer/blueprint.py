@@ -401,7 +401,7 @@ def make_explorer_blueprint(
                         biggest_cluster_members, zoom
                     )
                     if biggest_cluster_members
-                    else {}
+                    else None
                 ),
             },
             "history_stale": is_cluster_history_stale(zoom),
