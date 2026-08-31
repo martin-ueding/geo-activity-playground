@@ -168,7 +168,7 @@ def comment_on_released_issues(version: str) -> None:
     step("Comment on released issues")
     message = (
         f"[preset message]\n\nChanges related to this issue "
-        f"have been released with version {version}."
+        f"have been released with version {version}. Please try the new version and close this issue if it is resolved."
     )
     for number in changelog_issues(version):
         comments = json.loads(
