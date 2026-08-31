@@ -5,6 +5,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 import tomllib
 import urllib.error
 import urllib.request
@@ -166,7 +167,7 @@ def changelog_issues(version: str) -> list[int]:
 def comment_on_released_issues(version: str) -> None:
     step("Comment on released issues")
     message = (
-        f"[Automated Message] Changes related to this issue "
+        f"[preset message]\n\nChanges related to this issue "
         f"have been released with version {version}."
     )
     for number in changelog_issues(version):
@@ -176,7 +177,21 @@ def comment_on_released_issues(version: str) -> None:
         if any(comment["body"].strip() == message for comment in comments):
             print(f"[skip] GH-{number} already notified")
         else:
-            run("gh", "issue", "comment", str(number), "--body", message)
+            with tempfile.NamedTemporaryFile(
+                "w", suffix=".md", delete=False
+            ) as body_file:
+                body_file.write(message)
+            try:
+                run(
+                    "gh",
+                    "issue",
+                    "comment",
+                    str(number),
+                    "--body-file",
+                    body_file.name,
+                )
+            finally:
+                os.unlink(body_file.name)
             print(f"Commented on GH-{number}")
 
 
