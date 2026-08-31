@@ -22,3 +22,18 @@ div.vega-embed {
     display: block;
     width: 100%;
 }
+
+/* Equipment pictures have arbitrary aspect ratios. Cropping them into a fixed
+   height keeps the card bodies of one row aligned. */
+.equipment-card-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.equipment-card-img-placeholder {
+    background: linear-gradient(135deg,
+            var(--bs-primary-bg-subtle),
+            var(--bs-secondary-bg),
+            var(--bs-info-bg-subtle));
+}

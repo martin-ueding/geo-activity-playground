@@ -17,7 +17,10 @@
     <div class="col-md-4 mb-3">
         <div class="card h-100">
             {% if equipment.picture_filename %}
-            <img src="{{ url_for('pictures.get', kind='internal', filename=equipment.picture_filename, size=512) }}" class="card-img-top" />
+            <img src="{{ url_for('pictures.get', kind='internal', filename=equipment.picture_filename, size=512) }}"
+                class="card-img-top equipment-card-img" alt="{{ equipment.equipment }}" />
+            {% else %}
+            <div class="card-img-top equipment-card-img equipment-card-img-placeholder"></div>
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title">
