@@ -94,6 +94,12 @@ class Activity(DB.Model):
     upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     source: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
+    # Size and modification time of the file at `path` when it was last read. A file
+    # whose stat still matches cannot have changed, which spares the scan from
+    # hashing every file on every run.
+    file_size: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    file_mtime: Mapped[float | None] = mapped_column(sa.Float, nullable=True)
+
     # Which version of the pipeline produced the current state. `ingest_version` is
     # compared against the version of the source named above, `enrichment_versions`
     # holds one entry per enrichment step. A stamp that lags behind the code makes

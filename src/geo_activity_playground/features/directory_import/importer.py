@@ -12,9 +12,11 @@ from ...core.import_exclusion import clear_exclusion, is_excluded, record_exclus
 from ...core.pipeline import (
     ACTIVITY_DIR,
     file_sha256,
+    file_stat_matches,
     get_metadata_from_path,  # noqa: F401  (re-exported, callers import it from here)
     ingest_parsed_activity,
     keep_trim_indices,
+    record_file_stat,
     relocate_activity,
     set_path_metadata,  # noqa: F401  (re-exported, callers import it from here)
 )
@@ -76,6 +78,15 @@ def import_from_directory(
         discover_activity_paths(config), desc="Importing activity files", delay=1
     ):
         with DB.session.no_autoflush:
+            at_this_path = DB.session.scalar(
+                sqlalchemy.select(Activity).filter(Activity.path == str(path))
+            )
+            # A file that still has the size and modification time it was read with
+            # cannot have moved or changed, so it need not be hashed at all. This is
+            # the case for nearly every file on nearly every scan.
+            if at_this_path is not None and file_stat_matches(at_this_path, path):
+                continue
+
             file_hash = file_sha256(path)
 
             with_same_hash = DB.session.scalars(
@@ -90,9 +101,6 @@ def import_from_directory(
                 _handle_known_content(with_same_hash[0], path, config)
                 continue
 
-            at_this_path = DB.session.scalar(
-                sqlalchemy.select(Activity).filter(Activity.path == str(path))
-            )
             if at_this_path is not None:
                 reimport_changed_file(at_this_path, path, file_hash, config)
                 continue
@@ -108,6 +116,9 @@ def _handle_known_content(
 ) -> None:
     """The content is already imported, so only a move is left to notice here."""
     if activity.path == str(path):
+        # Same content at the same place; only the modification time moved.
+        record_file_stat(activity, path)
+        DB.session.commit()
         return
     # A second file with the same content is a copy, not a move. Only treat it as a
     # move once the file that this activity points at is gone.
@@ -135,6 +146,7 @@ def reingest_activity(activity: Activity, config: ActivityImportConfig) -> bool:
     parsed_activity, time_series = parsed
 
     keep_trim_indices(activity, time_series)
+    record_file_stat(activity, path)
     ingest_parsed_activity(
         activity,
         parsed_activity,
@@ -164,6 +176,7 @@ def reimport_changed_file(
     parsed_activity, time_series = parsed
 
     keep_trim_indices(activity, time_series)
+    record_file_stat(activity, path)
     clear_exclusion("directory", file_hash)
     activity.upstream_id = file_hash
     ingest_parsed_activity(
@@ -225,5 +238,6 @@ def import_from_file(
     activity.path = str(path)
     activity.upstream_id = file_hash
     activity.source = source
+    record_file_stat(activity, path)
     ingest_parsed_activity(activity, activity, time_series, config, INGEST_VERSION)
     check_for_duplicate(activity, config)

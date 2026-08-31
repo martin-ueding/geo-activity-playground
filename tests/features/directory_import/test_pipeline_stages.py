@@ -1,3 +1,4 @@
+import os
 import pathlib
 import shutil
 
@@ -169,3 +170,36 @@ def test_a_lagging_enrichment_stamp_makes_the_step_run_again(
 def test_every_enrichment_carries_a_version(app_context) -> None:
     for enrichment in enrichments:
         assert isinstance(getattr(enrichment, "version", None), int), enrichment
+
+
+def test_unchanged_files_are_not_hashed_again(
+    app_context, testdata_dir: pathlib.Path, monkeypatch
+) -> None:
+    _place(testdata_dir, BERLIN, "Radfahrt/Rennrad/2024-01-02 Zum Bahnhof.gpx")
+    _scan()
+    activity = _only_activity()
+    assert activity.file_size is not None
+    assert activity.file_mtime is not None
+
+    from geo_activity_playground.features.directory_import import importer
+
+    def fail(path: pathlib.Path) -> str:
+        raise AssertionError(f"{path} should not be hashed again")
+
+    monkeypatch.setattr(importer, "file_sha256", fail)
+    _scan()
+
+
+def test_a_touched_file_keeps_the_activity_and_updates_the_stat(
+    app_context, testdata_dir: pathlib.Path
+) -> None:
+    path = _place(testdata_dir, BERLIN, "Radfahrt/Rennrad/2024-01-02 Zum Bahnhof.gpx")
+    _scan()
+    activity_id = _only_activity().id
+
+    os.utime(path, (0, 0))
+    _scan()
+
+    activity = _only_activity()
+    assert activity.id == activity_id
+    assert activity.file_mtime == path.stat().st_mtime

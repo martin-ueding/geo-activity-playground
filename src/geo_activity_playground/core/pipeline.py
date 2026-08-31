@@ -71,6 +71,29 @@ def set_path_metadata(
     activity.equipment_from_path = meta.get("equipment")
 
 
+def record_file_stat(activity: Activity, path: pathlib.Path) -> None:
+    """Remember the size and modification time the file had when it was read."""
+    try:
+        stat = path.stat()
+    except OSError:
+        activity.file_size = None
+        activity.file_mtime = None
+        return
+    activity.file_size = stat.st_size
+    activity.file_mtime = stat.st_mtime
+
+
+def file_stat_matches(activity: Activity, path: pathlib.Path) -> bool:
+    """Whether the file still has the size and modification time it was read with."""
+    if activity.file_size is None or activity.file_mtime is None:
+        return False
+    try:
+        stat = path.stat()
+    except OSError:
+        return False
+    return activity.file_size == stat.st_size and activity.file_mtime == stat.st_mtime
+
+
 def stage_file_metadata(activity: Activity, parsed: Activity) -> None:
     """Record what the artifact itself stated about the activity."""
     activity.name_from_file = parsed.name
@@ -140,6 +163,7 @@ def relocate_activity(
     """
     logger.info("Activity %s moved from %r to %r.", activity.id, activity.path, path)
     activity.path = str(path)
+    record_file_stat(activity, path)
     stage_path_metadata(activity, config)
     DB.session.commit()
 
