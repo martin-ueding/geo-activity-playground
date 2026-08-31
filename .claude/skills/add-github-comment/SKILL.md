@@ -23,6 +23,8 @@ Create a temporary Markdown file according to the following structure:
 ## Implementation background
 ```
 
+Do not use hard-wrap here.
+
 Then add that as a comment to the given issue using this command line template:
 
 ```bash
