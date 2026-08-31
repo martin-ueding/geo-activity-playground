@@ -21,6 +21,10 @@ Added:
 
 - Make the explorer tile grid line color and the zoom level from which it appears configurable in the tile rendering settings. ([GH-518](https://github.com/martin-ueding/geo-activity-playground/issues/518))
 
+Fixed:
+
+- Reload all explorer layers after marking a tile as inaccessible, so that the cluster and square coloring updates right away. ([GH-514](https://github.com/martin-ueding/geo-activity-playground/pull/514))
+
 ## Version 1.54.0 — 2026-08-30
 
 Added:
