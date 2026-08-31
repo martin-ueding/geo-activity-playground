@@ -2,6 +2,7 @@ import datetime
 import pathlib
 import zoneinfo
 
+import pytest
 from geo_activity_playground.core.datamodel import Kind
 from geo_activity_playground.core.time_conversion import sanitize_datetime
 from geo_activity_playground.importers import activity_parsers
@@ -91,6 +92,10 @@ def test_time_zone_from_abvio(monkeypatch) -> None:
     path = pathlib.Path(
         "/home/mu/Dokumente/Geo Activity Playground/Test-Suite/b1b9ec9b-016a-4223-9218-12b97d7019f2.gpx"
     )
+
+    if not path.exists():
+        pytest.skip(f"{path} does not exist on this machine")
+
     monkeypatch.setattr(
         activity_parsers, "get_or_make_kind", lambda name: Kind(name=name)
     )
