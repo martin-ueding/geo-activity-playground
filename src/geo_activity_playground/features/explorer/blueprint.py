@@ -559,7 +559,9 @@ def make_explorer_blueprint(
             inaccessible_tiles,
         )
 
-        result = _render_tile_image(zoom, z, x, y, color_strategy, evolution_state)
+        result = _render_tile_image(
+            zoom, z, x, y, color_strategy, evolution_state, config
+        )
         return _png_response(result)
 
     @blueprint.route("/tile-style-preview.png")

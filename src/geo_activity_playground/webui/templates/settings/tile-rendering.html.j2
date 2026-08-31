@@ -82,6 +82,30 @@
         <div class="form-text">{{ _('Color of the solid activity track line, used both for the “New Tiles Activity Track” tile layer and for the track shown on the activity page.') }}</div>
     </div>
 
+    <h2 class="h4 mt-4">{{ _('Grid lines') }}</h2>
+    <p class="text-muted">{{ _('The lines drawn between explorer tiles.') }}</p>
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label for="grid_line_color" class="form-label">{{ _('Grid line color') }}</label>
+            <input type="color" class="form-control" id="grid_line_color" name="grid_line_color"
+                value="{{ grid_line_color[0] }}" />
+            <label for="grid_line_alpha" class="form-label">{{ _('Alpha') }}</label>
+            <input type="range" class="form-range" min="0" max="255" step="1" id="grid_line_alpha"
+                name="grid_line_alpha" value="{{ grid_line_color[1] }}" />
+        </div>
+        <div class="col-md-4">
+            <label for="grid_line_min_width_px" class="form-label">{{ _('Show grid lines from this zoom level') }}</label>
+            <select class="form-select" id="grid_line_min_width_px" name="grid_line_min_width_px">
+                {% for width in grid_line_min_width_px_options %}
+                <option value="{{ width }}" {% if width==grid_line_min_width_px %}selected{% endif %}>
+                    {{ _('When an explorer tile is at least %(width)d px wide', width=width) }}
+                </option>
+                {% endfor %}
+            </select>
+            <div class="form-text">{{ _('Explorer tiles double in on-screen size with every zoom step, so a lower value shows the grid when zoomed further out.') }}</div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
 </form>
 

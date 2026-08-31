@@ -35,7 +35,6 @@ from .model import BorderStroke, TileStyle, TileStyleName, get_tile_styles
 
 SQUARE_LINE_WIDTH = 3
 SQUARE_COLOR = np.array([228, 26, 28, 255], dtype=np.float32) / 256.0
-GRID_COLOR = np.array([0.5, 0.5, 0.5, 0.5], dtype=np.float32)
 
 STRIPES_PER_TILE = 8
 DASHES_PER_TILE_EDGE = 8
@@ -656,11 +655,13 @@ def _draw_grid_lines(
     width: int,
     draw_left: bool,
     draw_top: bool,
+    grid_color: np.ndarray,
+    min_width_px: int,
 ) -> None:
-    if draw_left and width >= 64:
-        result[:, x_start, :] = GRID_COLOR
-    if draw_top and width >= 64:
-        result[y_start, :, :] = GRID_COLOR
+    if draw_left and width >= min_width_px:
+        result[:, x_start, :] = grid_color
+    if draw_top and width >= min_width_px:
+        result[y_start, :, :] = grid_color
 
 
 def _draw_explorer_square_edges(
@@ -805,8 +806,11 @@ def _render_tile_image(
     y: int,
     color_strategy: ColorStrategy,
     evolution_state: SimpleNamespace,
+    ui_config: UiConfig,
 ) -> np.ndarray:
     result = np.zeros((OSM_TILE_SIZE, OSM_TILE_SIZE, 4), dtype=np.float32)
+    grid_color = hex_color_to_float(ui_config.explorer_grid_line_color).reshape(4)
+    grid_min_width_px = ui_config.explorer_grid_line_min_width_px
 
     for (
         tile_x,
@@ -827,7 +831,16 @@ def _render_tile_image(
                 x_start : x_start + width,
             ] = pattern.rasterize((width, width))
 
-        _draw_grid_lines(result, x_start, y_start, width, draw_left, draw_top)
+        _draw_grid_lines(
+            result,
+            x_start,
+            y_start,
+            width,
+            draw_left,
+            draw_top,
+            grid_color,
+            grid_min_width_px,
+        )
         _draw_explorer_square_edges(
             result,
             x_start,

@@ -110,6 +110,13 @@ HILLSHADE_BLEND_MODES = [
     "normal",
 ]
 
+GRID_LINE_MIN_WIDTH_PX_OPTIONS = [16, 32, 64, 128, 256]
+"""Explorer tile widths, in on-screen pixels, offered for the grid line threshold.
+
+An explorer tile shrinks to half its width for each map zoom level you zoom
+out, so these are the widths at which it would appear at all displayed zoom
+levels; anything in between would never be reached exactly."""
+
 
 def _import_exclusion_reasons() -> dict[str, str]:
     return {
@@ -775,6 +782,13 @@ def make_settings_blueprint(
             config_accessor.ui().activity_line_color = request.form[
                 "activity_line_color"
             ]
+            config_accessor.ui().explorer_grid_line_color = _combine_color(
+                request.form["grid_line_color"],
+                int(request.form["grid_line_alpha"]),
+            )
+            config_accessor.ui().explorer_grid_line_min_width_px = int(
+                request.form["grid_line_min_width_px"]
+            )
             config_accessor.save()
             flash(_("Updated tile rendering."), category="success")
 
@@ -815,6 +829,11 @@ def make_settings_blueprint(
             ],
             cmap_opacity=config_accessor.ui().color_strategy_cmap_opacity,
             activity_line_color=config_accessor.ui().activity_line_color,
+            grid_line_color=_split_hex_into_color_alpha(
+                config_accessor.ui().explorer_grid_line_color
+            ),
+            grid_line_min_width_px=config_accessor.ui().explorer_grid_line_min_width_px,
+            grid_line_min_width_px_options=GRID_LINE_MIN_WIDTH_PX_OPTIONS,
         )
 
     @blueprint.route("/manage-kinds")

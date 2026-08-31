@@ -855,6 +855,15 @@ class UiConfig(DB.Model):
     apply_privacy_zones_to_heatmap: Mapped[bool] = mapped_column(
         sa.Boolean, nullable=False, default=False, server_default=sa.false()
     )
+    explorer_grid_line_color: Mapped[str] = mapped_column(
+        sa.String, nullable=False, default="#80808080", server_default="#80808080"
+    )
+    """Color of the lines between explorer tiles, as #RRGGBBAA."""
+    explorer_grid_line_min_width_px: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, default=64, server_default="64"
+    )
+    """Minimum on-screen width of an explorer tile, in pixels, before its grid
+    lines are drawn. Lower values show the grid at lower zoom levels."""
 
 
 class MapConfig(DB.Model):
