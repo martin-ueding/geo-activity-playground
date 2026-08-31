@@ -45,11 +45,13 @@ def test_delete_records_exclusion_and_removes_time_series(client, app):
         assert exclusion.path == "Activities/morning-ride.gpx"
 
 
-def test_delete_is_not_reachable_by_get(client, app):
+def test_get_asks_instead_of_deleting(client, app):
     with app.app_context():
         activity_id = _make_activity().id
 
-    assert client.get(f"/activity/delete/{activity_id}").status_code == 405
+    response = client.get(f"/activity/delete/{activity_id}")
+    assert response.status_code == 200
+    assert "Delete this activity?" in response.get_data(as_text=True)
 
     with app.app_context():
         assert DB.session.get(Activity, activity_id) is not None

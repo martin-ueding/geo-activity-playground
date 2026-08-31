@@ -7,6 +7,7 @@ from flask import Flask
 
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import DB, Activity, Kind, Tag
+from geo_activity_playground.core.import_exclusion import ImportExclusion
 
 GPX_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="test" xmlns="http://www.topografix.com/GPX/1/1">
@@ -182,3 +183,58 @@ def test_identical_upload_is_skipped_without_leaving_a_temporary_file(
             DB.session.scalar(sqlalchemy.select(sqlalchemy.func.count(Activity.id)))
             == 1
         )
+
+
+def test_uploading_a_hidden_activity_again_brings_it_back(client, app: Flask):
+    """Hiding an activity is a decision that a later upload of that file overrides."""
+    _upload(client, [(_gpx(name="Zum Bahnhof"), "ride.gpx")])
+    with app.app_context():
+        activity = DB.session.scalar(sqlalchemy.select(Activity))
+        assert activity is not None
+        activity_id = activity.id
+        source_file = pathlib.Path(activity.path)
+
+    client.post(f"/activity/delete/{activity_id}", data={"mode": "hide"})
+    with app.app_context():
+        assert DB.session.get(Activity, activity_id) is None
+        assert DB.session.scalar(sqlalchemy.select(ImportExclusion)) is not None
+        # Hiding leaves the file where it is.
+        assert source_file.exists()
+
+    _upload(client, [(_gpx(name="Zum Bahnhof"), "ride.gpx")])
+    with app.app_context():
+        assert DB.session.scalar(sqlalchemy.select(ImportExclusion)) is None
+        activity = DB.session.scalar(sqlalchemy.select(Activity))
+        assert activity is not None
+        assert activity.name == "Zum Bahnhof"
+
+
+def test_deleting_the_source_file_removes_it_from_disk(client, app: Flask):
+    _upload(client, [(_gpx(name="Zum Bahnhof"), "ride.gpx")])
+    with app.app_context():
+        activity = DB.session.scalar(sqlalchemy.select(Activity))
+        assert activity is not None
+        activity_id = activity.id
+        source_file = pathlib.Path(activity.path)
+
+    client.post(f"/activity/delete/{activity_id}", data={"mode": "delete_file"})
+    with app.app_context():
+        assert DB.session.get(Activity, activity_id) is None
+    assert not source_file.exists()
+
+
+def test_the_delete_page_offers_the_file_only_when_there_is_one(client, app: Flask):
+    _upload(client, [(_gpx(name="Zum Bahnhof"), "ride.gpx")])
+    with app.app_context():
+        activity = DB.session.scalar(sqlalchemy.select(Activity))
+        assert activity is not None
+        activity_id = activity.id
+        source_file = pathlib.Path(activity.path)
+
+    page = client.get(f"/activity/delete/{activity_id}").get_data(as_text=True)
+    assert "Delete the activity and its file" in page
+
+    source_file.unlink()
+    page = client.get(f"/activity/delete/{activity_id}").get_data(as_text=True)
+    assert "Delete the activity and its file" not in page
+    assert "no source file to delete" in page

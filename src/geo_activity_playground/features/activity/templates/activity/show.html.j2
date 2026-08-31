@@ -103,10 +103,8 @@
             title="{{ _('Read this activity again from its source data. Your edits are kept.') }}">
             <button type="submit" class="btn btn-warning btn-small">{{ _('Re-import') }}</button>
         </form>
-        <form method="POST" action="{{ url_for('.delete', id=activity.id) }}" class="d-inline"
-            onsubmit="return confirm('{{ _('Are you sure to delete this? The source data is left untouched, but the activity will not be imported again.') }}');">
-            <button type="submit" class="btn btn-small btn-danger">{{ _('Delete') }}</button>
-        </form>
+        <a href="{{ url_for('.confirm_delete', id=activity.id) }}"
+            class="btn btn-small btn-danger">{{ _('Delete') }}</a>
         {% endif %}
     </div>
     <div class="col-sm-12 col-md-8">

@@ -554,12 +554,40 @@ def make_activity_blueprint(
             )
         return redirect(url_for(".show", id=id))
 
+    def _source_file_of(activity: Activity) -> pathlib.Path | None:
+        """The file the user could have deleted along with the activity."""
+        if not activity.path:
+            return None
+        path = pathlib.Path(activity.path)
+        return path if path.is_file() else None
+
+    @blueprint.route("/delete/<int:id>", methods=["GET"])
+    @needs_authentication(authenticator)
+    def confirm_delete(id: int) -> ResponseReturnValue:
+        activity = DB.session.get(Activity, id)
+        if activity is None:
+            abort(404)
+        return render_template(
+            "activity/delete.html.j2",
+            activity=activity,
+            source_file=_source_file_of(activity),
+        )
+
     @blueprint.route("/delete/<int:id>", methods=["POST"])
     @needs_authentication(authenticator)
     def delete(id: int) -> ResponseReturnValue:
         activity = DB.session.get(Activity, id)
         if activity is None:
             abort(404)
+
+        source_file = _source_file_of(activity)
+        delete_source_file = (
+            request.form.get("mode") == "delete_file" and source_file is not None
+        )
+
+        # The exclusion is recorded either way. It is what keeps an upstream export
+        # from importing the activity again, and it is what an upload of the same
+        # file clears when the user asks for the activity back.
         source = activity.source or ("directory" if activity.path else None)
         if source and activity.upstream_id:
             record_exclusion(
@@ -572,12 +600,22 @@ def make_activity_blueprint(
         DB.session.delete(activity)
         DB.session.commit()
         remove_activity_from_tile_state(id)
-        flash(
-            _(
-                "The activity has been deleted. Its source data is left untouched, but it will not be imported again. You can undo this from Settings → Excluded Activities."
-            ),
-            category="success",
-        )
+
+        if delete_source_file:
+            assert source_file is not None
+            source_file.unlink(missing_ok=True)
+            flash(
+                _("The activity and its source file %(path)s have been deleted.")
+                % {"path": source_file},
+                category="success",
+            )
+        else:
+            flash(
+                _(
+                    "The activity has been hidden. Its source data is left untouched, but it will not be imported again. You can undo this from Settings → Excluded Activities, or by uploading the file again."
+                ),
+                category="success",
+            )
         return redirect(url_for("index"))
 
     @blueprint.route("/download-original/<id>")

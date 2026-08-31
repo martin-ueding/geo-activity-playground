@@ -1,0 +1,57 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _('Delete this activity?') }}</h1>
+        <p class="text-muted">{{ activity.name }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-warning mb-3">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">{{ _('Hide the activity') }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    {{ _('The activity is removed from this program, but its source data is left where it is. It will not be imported again, unless you ask for it back from Settings → Excluded Activities or by uploading the same file again.') }}
+                </p>
+                <form method="POST">
+                    <input type="hidden" name="mode" value="hide">
+                    <button type="submit" class="btn btn-warning">{{ _('Hide the activity') }}</button>
+                </form>
+            </div>
+        </div>
+
+        {% if source_file %}
+        <div class="card border-danger mb-3">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">{{ _('Delete the activity and its file') }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    {{ _('The activity is removed and the file it was read from is deleted from disk:') }}
+                    <code>{{ source_file }}</code>
+                </p>
+                <p class="card-text fw-bold">
+                    {{ _('This cannot be undone. Make sure you have a backup if the recording matters to you.') }}
+                </p>
+                <form method="POST"
+                    onsubmit="return confirm('{{ _('Really delete the file from disk? This cannot be undone.') }}');">
+                    <input type="hidden" name="mode" value="delete_file">
+                    <button type="submit" class="btn btn-danger">{{ _('Delete the activity and its file') }}</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-secondary">
+            {{ _('There is no source file to delete: this activity was imported from an API, or its file is already gone.') }}
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('.show', id=activity.id) }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+    </div>
+</div>
+{% endblock %}

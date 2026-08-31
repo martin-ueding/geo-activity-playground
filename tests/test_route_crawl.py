@@ -92,6 +92,7 @@ def samples(seeded_app: Flask) -> dict[str, object]:
 
 # The ``id`` of a route means a different entity in every blueprint.
 ID_SAMPLES = {
+    "activity.confirm_delete": "activity_id",
     "activity.download_original": "activity_id",
     "activity.edit": "activity_id",
     "activity.geojson_line": "activity_id",

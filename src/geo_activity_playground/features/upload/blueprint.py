@@ -14,10 +14,11 @@ from flask_babel import gettext as _
 
 from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity
+from ...core.import_exclusion import clear_exclusion, find_exclusion
+from ...core.pipeline import file_sha256
 from ...core.scan import scan_for_activities
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
-from ..directory_import.importer import file_sha256
 
 
 def _content_suffix(path: pathlib.Path) -> str:
@@ -27,21 +28,45 @@ def _content_suffix(path: pathlib.Path) -> str:
     return path.suffix
 
 
-def _store_under_content_hash(file, target_path: pathlib.Path) -> pathlib.Path | None:
+def _store_under_content_hash(
+    file, target_path: pathlib.Path
+) -> tuple[pathlib.Path, bool]:
     """Store an upload whose name is taken as `<sha256><suffix>`.
 
-    Returns `None` if a file with that content is already present, which is the
-    case when the same file gets uploaded twice.
+    Returns where the content now lives and whether it had to be written. Content
+    that is already present is not stored twice; the caller still gets the path, so
+    that uploading a file again can bring back an activity that was hidden.
     """
     temporary_path = target_path.with_name(f".upload-{uuid.uuid4()}")
     file.save(temporary_path)
     content_hash = file_sha256(temporary_path)
     hashed_path = target_path.with_name(content_hash + _content_suffix(target_path))
-    if hashed_path.exists() or file_sha256(target_path) == content_hash:
+    if hashed_path.exists():
         temporary_path.unlink()
-        return None
+        return hashed_path, False
+    if file_sha256(target_path) == content_hash:
+        temporary_path.unlink()
+        return target_path, False
     temporary_path.rename(hashed_path)
-    return hashed_path
+    return hashed_path, True
+
+
+def _unhide_uploaded_activities(paths: list[pathlib.Path]) -> list[pathlib.Path]:
+    """Let an upload undo a deletion that only hid the activity.
+
+    Deleting an activity records an exclusion so that a scan does not import it
+    again. Uploading that very file is an explicit request to have it back, and it
+    outranks the earlier decision.
+    """
+    cleared = []
+    for path in paths:
+        content_hash = file_sha256(path)
+        exclusion = find_exclusion("directory", content_hash)
+        if exclusion is not None and exclusion.reason == "deleted_by_user":
+            clear_exclusion("directory", content_hash)
+            cleared.append(path)
+    DB.session.commit()
+    return cleared
 
 
 def make_upload_blueprint(
@@ -74,7 +99,8 @@ def make_upload_blueprint(
             flasher.flash_message(_("No selected file."), FlashTypes.WARNING)
             return redirect(url_for(".index"))
 
-        saved_paths = []
+        content_paths: list[pathlib.Path] = []
+        stored_paths: list[str] = []
         for file in request.files.getlist("file"):
             filename = file.filename
             assert filename is not None
@@ -90,24 +116,42 @@ def make_upload_blueprint(
             ]
             assert target_path.is_relative_to("Activities")
             if target_path.exists():
-                target_path = _store_under_content_hash(file, target_path)
-                if target_path is None:
+                target_path, stored = _store_under_content_hash(file, target_path)
+                if stored:
+                    stored_paths.append(str(target_path))
+                if not stored:
                     flasher.flash_message(
-                        _("Skipped '%(filename)s' because that file is already there.")
-                        % {"filename": filename},
+                        _("'%(filename)s' is already there as '%(target_path)s'.")
+                        % {"filename": filename, "target_path": target_path},
                         FlashTypes.INFO,
                     )
-                    continue
-                flasher.flash_message(
-                    _(
-                        "Stored '%(filename)s' as '%(target_path)s' because that name was taken."
+                else:
+                    flasher.flash_message(
+                        _(
+                            "Stored '%(filename)s' as '%(target_path)s' because that name was taken."
+                        )
+                        % {"filename": filename, "target_path": target_path},
+                        FlashTypes.INFO,
                     )
-                    % {"filename": filename, "target_path": target_path},
-                    FlashTypes.INFO,
-                )
             else:
                 file.save(target_path)
-            saved_paths.append(str(target_path))
+                stored_paths.append(str(target_path))
+            content_paths.append(target_path)
+
+        unhidden = _unhide_uploaded_activities(content_paths)
+        if unhidden:
+            flasher.flash_message(
+                _(
+                    "%(count)s of the uploaded files had been deleted before and are imported again."
+                )
+                % {"count": len(unhidden)},
+                FlashTypes.INFO,
+            )
+
+        expected_paths = stored_paths + [str(path) for path in unhidden]
+        if not expected_paths:
+            # Everything was already there and nothing had been hidden.
+            return redirect(url_for(".index"))
 
         scan_for_activities(
             config_accessor,
@@ -117,7 +161,7 @@ def make_upload_blueprint(
 
         activity_ids = DB.session.scalars(
             sqlalchemy.select(Activity.id)
-            .filter(Activity.path.in_(saved_paths))
+            .filter(Activity.path.in_(expected_paths))
             .order_by(Activity.start)
         ).all()
 
@@ -127,10 +171,10 @@ def make_upload_blueprint(
             )
             return redirect(url_for(".index"))
 
-        if len(activity_ids) < len(saved_paths):
+        if len(activity_ids) < len(expected_paths):
             flasher.flash_message(
                 _("%(count)s of the uploaded files could not be imported.")
-                % {"count": len(saved_paths) - len(activity_ids)},
+                % {"count": len(expected_paths) - len(activity_ids)},
                 FlashTypes.WARNING,
             )
 

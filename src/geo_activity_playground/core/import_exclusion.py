@@ -61,6 +61,15 @@ def record_exclusion(
     DB.session.commit()
 
 
+def find_exclusion(source: str, upstream_id: str) -> ImportExclusion | None:
+    return DB.session.scalar(
+        sa.select(ImportExclusion).filter(
+            ImportExclusion.source == source,
+            ImportExclusion.upstream_id == upstream_id,
+        )
+    )
+
+
 def is_excluded(source: str, upstream_id: str) -> bool:
     return (
         DB.session.scalar(
