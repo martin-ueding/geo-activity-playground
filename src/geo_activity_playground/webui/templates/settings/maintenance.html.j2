@@ -120,16 +120,19 @@
 
 <div class="card border-warning mb-3">
     <div class="card-header bg-warning text-dark">
-        <h5 class="card-title mb-0">{{ _('Re-import Time Series from Activity Files') }}</h5>
+        <h5 class="card-title mb-0">{{ _('Re-parse All Activities') }}</h5>
     </div>
     <div class="card-body">
         <p class="card-text">
-            {{ _('Re-reads the raw time series data from the original activity files (GPX, FIT, TCX, …) for all activities that were imported from local files. Existing metadata (name, equipment, kind, tags) is preserved. Use this to pick up parser improvements or to recover from a corrupted parquet cache.') }}
+            {{ _('Reads every activity again from the source data that its source kept: the original file for activities imported from a directory or a Strava export, the cached download for activities from the Strava or Hammerhead API. Use this to pick up parser improvements or to recover from a corrupted time series cache.') }}
         </p>
-        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to re-import time series from activity files? This can take a while depending on the number of activities.') }}');">
-            <input type="hidden" name="action" value="reimport_time_series_from_files">
+        <p class="card-text">
+            {{ _('Names, kinds, equipment and tags that you set by hand are stored separately from what the source states and are not touched. Activities whose source data is no longer available are skipped.') }}
+        </p>
+        <form method="POST" onsubmit="return confirm('{{ _('Are you sure you want to re-parse all activities? This can take a while depending on the number of activities.') }}');">
+            <input type="hidden" name="action" value="reparse_activities">
             <button type="submit" class="btn btn-warning">
-                {{ _('Re-import time series from files') }}
+                {{ _('Re-parse all activities') }}
             </button>
         </form>
     </div>

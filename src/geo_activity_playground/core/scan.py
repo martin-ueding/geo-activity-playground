@@ -1,6 +1,7 @@
 import logging
 
 import sqlalchemy
+from tqdm import tqdm
 
 from ..features.activity_photos.importer import import_photos_from_directory
 from ..features.explorer.clustering import compute_tile_evolution
@@ -68,29 +69,49 @@ def scan_for_activities(
         find_matches(segment, config_accessor.activity_import())
 
 
-def refresh_stale_ingests(config_accessor: ConfigAccessor) -> int:
+def source_for_activity(activity: Activity) -> ActivitySource | None:
+    """The source that an activity came from, if it is still known."""
+    for activity_source in _ACTIVITY_SOURCES:
+        if activity_source.source == activity.source:
+            return activity_source
+    return None
+
+
+def refresh_stale_ingests(
+    config_accessor: ConfigAccessor, force: bool = False
+) -> tuple[int, int]:
     """Run the ingest stage again where the source's code has moved on.
 
-    Only sources that kept their artifact can do this, and they say so by returning
-    False when it is gone. A stale activity then simply stays stale rather than
-    causing a request to a remote API that the user did not ask for.
+    With `force`, every activity is re-parsed regardless of its stamp, which is what
+    the maintenance action offers. Only sources that kept their artifact can do this,
+    and they say so by returning False when it is gone. An activity that cannot be
+    re-parsed is counted as skipped rather than causing a request to a remote API
+    that the user did not ask for.
+
+    Returns the number of activities re-parsed and the number skipped.
     """
-    refreshed = 0
+    reparsed = skipped = 0
     for activity_source in _ACTIVITY_SOURCES:
-        stale = DB.session.scalars(
-            sqlalchemy.select(Activity).filter(
-                Activity.source == activity_source.source,
-                Activity.ingest_version < activity_source.ingest_version,
+        query = sqlalchemy.select(Activity).filter(
+            Activity.source == activity_source.source
+        )
+        if not force:
+            query = query.filter(
+                Activity.ingest_version < activity_source.ingest_version
             )
-        ).all()
-        if not stale:
+        candidates = DB.session.scalars(query).all()
+        if not candidates:
             continue
         logger.info(
             "Re-ingesting %d activities of source %r.",
-            len(stale),
+            len(candidates),
             activity_source.source,
         )
-        for activity in stale:
+        for activity in tqdm(
+            candidates, desc=f"Re-parsing {activity_source.source} activities", delay=1
+        ):
             if activity_source.reingest(activity, config_accessor):
-                refreshed += 1
-    return refreshed
+                reparsed += 1
+            else:
+                skipped += 1
+    return reparsed, skipped

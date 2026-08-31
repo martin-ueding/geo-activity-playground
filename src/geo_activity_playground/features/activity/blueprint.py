@@ -49,6 +49,7 @@ from ...core.enrichment import update_and_commit
 from ...core.grid import geojson_bounding_box_for_tile_collection
 from ...core.heart_rate import HeartRateZoneComputer
 from ...core.import_exclusion import record_exclusion
+from ...core.scan import source_for_activity
 from ...core.tile_visits import (
     get_first_visits_for_activity,
     refresh_tile_visits_for_activity,
@@ -527,6 +528,30 @@ def make_activity_blueprint(
             abort(404)
         update_and_commit(activity, activity.raw_time_series, config, force=True)
         flash(_("Activity has been re-enriched."), category="success")
+        return redirect(url_for(".show", id=id))
+
+    @blueprint.route("/<int:id>/reimport", methods=["POST"])
+    @needs_authentication(authenticator)
+    def reimport(id: int) -> ResponseReturnValue:
+        activity = DB.session.get(Activity, id)
+        if activity is None:
+            abort(404)
+        source = source_for_activity(activity)
+        if source is None or not source.reingest(activity, config_accessor):
+            flash(
+                _(
+                    "This activity could not be re-imported because its source data is not available."
+                ),
+                category="warning",
+            )
+        else:
+            refresh_tile_visits_for_activity(activity.id)
+            flash(
+                _(
+                    "The activity has been read again from its source data. Your edits have been kept."
+                ),
+                category="success",
+            )
         return redirect(url_for(".show", id=id))
 
     @blueprint.route("/delete/<int:id>", methods=["POST"])
