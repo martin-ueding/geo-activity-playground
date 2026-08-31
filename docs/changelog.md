@@ -19,10 +19,23 @@ Types of changes
 
 Added:
 
+- Re-import a single activity from its source data with a button on the activity page. Names, kinds, equipment and tags that you set by hand are kept. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Re-parse all activities from their source data in the maintenance settings. This replaces the re-import of time series and also refreshes the metadata. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Choose when deleting an activity whether to only hide it or to also delete its source file from disk. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
 - Make the explorer tile grid line color and the zoom level from which it appears configurable in the tile rendering settings. ([GH-518](https://github.com/martin-ueding/geo-activity-playground/issues/518))
+
+Changed:
+
+- Store name, kind and equipment separately as stated by the activity file, as extracted from its path, and as set by you. Your edits now survive every re-import. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Apply improvements to the file parsers and to the computed values to activities that are already imported, on the next scan, without asking you to do anything. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Follow activity files that you move within the `Activities` directory, so that a file sorted into a folder for its kind or equipment updates the activity. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Re-import an activity whose file changed on disk instead of ignoring it. It keeps its tags, photos and edits, and its trim is reset if the length changed. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Keep the FIT file and the summary that the Hammerhead API returns, so that these activities can also be parsed again later. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Report an upload of a file that is already present instead of only calling it skipped, and import the activity again if it had been hidden before. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
 
 Fixed:
 
+- Apply the metadata extraction regexes to existing activities again. This raised an error before and silently overwrote names that you had edited. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
 - Reload all explorer layers after marking a tile as inaccessible, so that the cluster and square coloring updates right away. ([GH-514](https://github.com/martin-ueding/geo-activity-playground/pull/514))
 - List only the kinds used with an equipment in the legend of its yearly distance plot. ([GH-516](https://github.com/martin-ueding/geo-activity-playground/issues/516))
 - Show the year in the tooltip of the yearly distance plot again, and give activities without a start time their own bar. ([GH-516](https://github.com/martin-ueding/geo-activity-playground/issues/516))
