@@ -12,7 +12,13 @@ from stravalib.exc import Fault, ObjectNotFound, RateLimitExceeded
 from tqdm import tqdm
 
 from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, Activity, materialize_metadata
+from ...core.datamodel import (
+    DB,
+    Activity,
+    ActivityImportConfig,
+    get_or_make_kind,
+    materialize_metadata,
+)
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
 from ...core.import_exclusion import is_excluded
@@ -21,6 +27,7 @@ from ...core.paths import (
     strava_api_dir,
     strava_last_activity_date_path,
 )
+from ...core.pipeline import ingest_parsed_activity, keep_trim_indices
 from ...core.tasks import get_state, set_state
 from .model import StravaConfig
 
@@ -131,6 +138,52 @@ def _refresh_activity_names_from_strava_once(config: StravaConfig) -> int:
         page += 1
 
     return updated_names
+
+
+INGEST_VERSION = 1
+
+
+def stored_summary_path(upstream_id: str) -> pathlib.Path:
+    """Where the summary that the Strava API returned for this activity is cached."""
+    return pathlib.Path("Cache") / "Strava Activity Metadata" / f"{upstream_id}.pickle"
+
+
+def reingest_strava_activity(activity: Activity, config: ActivityImportConfig) -> bool:
+    """Run the ingest stage again from the cached summary and time series.
+
+    Both are already on disk, so this needs no request to the API.
+    """
+    if not activity.upstream_id:
+        return False
+    summary_path = stored_summary_path(activity.upstream_id)
+    time_series_path = (
+        activity_extracted_time_series_dir() / f"{activity.upstream_id}.parquet"
+    )
+    if not summary_path.exists() or not time_series_path.exists():
+        logger.warning(
+            "Cannot re-ingest Strava activity %s, its cached files are gone.",
+            activity.id,
+        )
+        return False
+
+    with open(summary_path, "rb") as f:
+        strava_activity = pickle.load(f)
+    time_series = pd.read_parquet(time_series_path)
+
+    parsed = Activity()
+    parsed.name = strava_activity.name
+    parsed.kind = get_or_make_kind(str(strava_activity.type.root))
+
+    keep_trim_indices(activity, time_series)
+    ingest_parsed_activity(
+        activity,
+        parsed,
+        time_series,
+        config,
+        INGEST_VERSION,
+        force_enrichment=True,
+    )
+    return True
 
 
 def import_from_strava_api(
@@ -261,6 +314,7 @@ def try_import_strava(
                 activity.calories = detailed_activity.calories
                 activity.moving_time = detailed_activity.moving_time
                 activity.source = source
+                activity.ingest_version = INGEST_VERSION
 
                 update_and_commit(
                     activity, time_series, config_accessor.activity_import()

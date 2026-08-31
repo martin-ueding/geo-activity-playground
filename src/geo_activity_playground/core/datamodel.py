@@ -94,6 +94,15 @@ class Activity(DB.Model):
     upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     source: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
+    # Which version of the pipeline produced the current state. `ingest_version` is
+    # compared against the version of the source named above, `enrichment_versions`
+    # holds one entry per enrichment step. A stamp that lags behind the code makes
+    # that stage, and only that stage, run again on the next scan.
+    ingest_version: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+    enrichment_versions: Mapped[dict[str, int]] = mapped_column(
+        MutableDict.as_mutable(sa.JSON), nullable=False, default=dict
+    )
+
     # Metadata as found inside the activity file, before path extraction and user
     # edits. Plain strings, because they record what the source stated and must not
     # follow later renames of the kind or equipment they happen to name.

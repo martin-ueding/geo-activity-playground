@@ -54,6 +54,8 @@ _activities_file = _activity_dir / "activities.parquet"
 
 _tiles_per_time_series = _cache_dir / "Tiles" / "Tiles Per Time Series"
 
+_hammerhead_fit_dir = _cache_dir / "Hammerhead" / "FIT"
+
 _strava_api_dir = pathlib.Path("Strava API")
 _strava_dynamic_config_path = _strava_api_dir / "strava-client-id.json"
 _strava_last_activity_date_path = _cache_dir / "strava-last-activity-date.json"
@@ -71,6 +73,7 @@ activity_extracted_time_series_dir = dir_wrapper(_activity_extracted_time_series
 activity_enriched_meta_dir = dir_wrapper(_activity_enriched_meta_dir)
 activity_enriched_time_series_dir = dir_wrapper(_activity_enriched_time_series_dir)
 tiles_per_time_series = dir_wrapper(_tiles_per_time_series)
+hammerhead_fit_dir = dir_wrapper(_hammerhead_fit_dir)
 strava_api_dir = dir_wrapper(_strava_api_dir)
 activity_meta_override_dir = dir_wrapper(_activity_meta_override_dir)
 TIME_SERIES_DIR = dir_wrapper(_time_series_dir)

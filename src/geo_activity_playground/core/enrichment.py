@@ -16,6 +16,23 @@ from .time_conversion import get_timezone
 
 logger = logging.getLogger(__name__)
 
+Enrichment = Callable[[Activity, pd.DataFrame, ActivityImportConfig, bool], bool]
+
+
+def enrichment_step(version: int) -> Callable[[Enrichment], Enrichment]:
+    """Tag an enrichment with the version of the code that produces its result.
+
+    Raising the number makes the step run again for every activity on the next
+    scan, without touching the other steps and without re-reading source files:
+    enrichments work off the stored time series.
+    """
+
+    def decorate(function: Enrichment) -> Enrichment:
+        function.version = version  # type: ignore[attr-defined]
+        return function
+
+    return decorate
+
 
 def _clamp_index(index: int, length: int) -> int:
     """Keep a positional index within a series of the given length."""
@@ -24,6 +41,7 @@ def _clamp_index(index: int, length: int) -> int:
     return min(index, length - 1)
 
 
+@enrichment_step(version=1)
 def enrichment_set_timezone(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -41,6 +59,7 @@ def enrichment_set_timezone(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_normalize_time(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -106,6 +125,7 @@ def enrichment_normalize_time(
     return changed
 
 
+@enrichment_step(version=1)
 def enrichment_rename_altitude(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -119,6 +139,7 @@ def enrichment_rename_altitude(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_compute_tile_xy(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -143,6 +164,7 @@ def enrichment_compute_tile_xy(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_copernicus_elevation(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -161,6 +183,7 @@ def enrichment_copernicus_elevation(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_elevation_gain(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -195,6 +218,7 @@ def enrichment_elevation_gain(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_add_calories(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -215,6 +239,7 @@ def enrichment_add_calories(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_distance(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -294,6 +319,7 @@ def enrichment_distance(
     return changed
 
 
+@enrichment_step(version=1)
 def enrichment_moving_time(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -318,6 +344,7 @@ def enrichment_moving_time(
         return False
 
 
+@enrichment_step(version=1)
 def enrichment_copy_latlon(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -342,9 +369,7 @@ def enrichment_copy_latlon(
         return False
 
 
-enrichments: list[
-    Callable[[Activity, pd.DataFrame, ActivityImportConfig, bool], bool]
-] = [
+enrichments: list[Enrichment] = [
     enrichment_set_timezone,
     enrichment_normalize_time,
     enrichment_rename_altitude,
@@ -364,9 +389,15 @@ def apply_enrichments(
     config: ActivityImportConfig,
     force: bool,
 ) -> bool:
+    """Run every enrichment whose stamp lags behind its code, plus all of them on force."""
     was_changed = False
+    stamps = activity.enrichment_versions or {}
     for enrichment in enrichments:
-        was_changed |= enrichment(activity, time_series, config, force)
+        version = getattr(enrichment, "version", 1)
+        stale = stamps.get(enrichment.__name__) != version
+        was_changed |= enrichment(activity, time_series, config, force or stale)
+        stamps[enrichment.__name__] = version
+    activity.enrichment_versions = stamps
     return was_changed
 
 

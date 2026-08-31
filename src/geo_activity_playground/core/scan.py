@@ -1,3 +1,5 @@
+import logging
+
 import sqlalchemy
 
 from ..features.activity_photos.importer import import_photos_from_directory
@@ -8,9 +10,12 @@ from ..features.segments.matching import find_matches
 from ..features.segments.model import Segment
 from ..features.strava.source import StravaActivitySource
 from .config import ConfigAccessor
-from .datamodel import DB, count_activities
+from .datamodel import DB, Activity, count_activities
+from .pipeline import refresh_stale_enrichments
 from .sources import ActivitySource, DirectoryImportSource
 from .tile_visits import compute_tile_visits_new
+
+logger = logging.getLogger(__name__)
 
 _ACTIVITY_SOURCES: list[ActivitySource] = [
     DirectoryImportSource(),
@@ -48,6 +53,9 @@ def scan_for_activities(
 
         activity_source.import_activities(config_accessor, begin, end)
 
+    refresh_stale_ingests(config_accessor)
+    refresh_stale_enrichments(config_accessor.activity_import())
+
     import_photos_from_directory()
 
     if count_activities() > 0:
@@ -58,3 +66,31 @@ def scan_for_activities(
 
     for segment in DB.session.scalars(sqlalchemy.select(Segment)).all():
         find_matches(segment, config_accessor.activity_import())
+
+
+def refresh_stale_ingests(config_accessor: ConfigAccessor) -> int:
+    """Run the ingest stage again where the source's code has moved on.
+
+    Only sources that kept their artifact can do this, and they say so by returning
+    False when it is gone. A stale activity then simply stays stale rather than
+    causing a request to a remote API that the user did not ask for.
+    """
+    refreshed = 0
+    for activity_source in _ACTIVITY_SOURCES:
+        stale = DB.session.scalars(
+            sqlalchemy.select(Activity).filter(
+                Activity.source == activity_source.source,
+                Activity.ingest_version < activity_source.ingest_version,
+            )
+        ).all()
+        if not stale:
+            continue
+        logger.info(
+            "Re-ingesting %d activities of source %r.",
+            len(stale),
+            activity_source.source,
+        )
+        for activity in stale:
+            if activity_source.reingest(activity, config_accessor):
+                refreshed += 1
+    return refreshed

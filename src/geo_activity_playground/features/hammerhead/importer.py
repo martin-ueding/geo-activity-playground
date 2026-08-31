@@ -1,7 +1,7 @@
 import datetime
+import json
 import logging
 import pathlib
-import tempfile
 import time
 
 import requests
@@ -12,15 +12,20 @@ from ...core.datamodel import (
     DB,
     Activity,
     ActivityImportConfig,
+    get_or_make_kind,
     materialize_metadata,
 )
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
 from ...core.import_exclusion import is_excluded, record_exclusion
+from ...core.paths import atomic_open, hammerhead_fit_dir
+from ...core.pipeline import ingest_parsed_activity, keep_trim_indices
 from ...importers.activity_parsers import ActivityParseError, read_fit_activity
 from .model import HammerheadAuth, get_hammerhead_auth
 
 logger = logging.getLogger(__name__)
+
+INGEST_VERSION = 1
 
 HAMMERHEAD_API_BASE = "https://api.hammerhead.io/v1"
 HAMMERHEAD_OAUTH_SCOPE = "activity:read"
@@ -224,6 +229,60 @@ def _max_date(current: str | None, candidate: str) -> str:
     return current
 
 
+def stored_fit_path(upstream_id: str) -> pathlib.Path:
+    """Where the FIT file that the API handed out for this activity is kept."""
+    return hammerhead_fit_dir() / f"{upstream_id}.fit"
+
+
+def stored_summary_path(upstream_id: str) -> pathlib.Path:
+    """Where the API's own description of this activity is kept."""
+    return hammerhead_fit_dir() / f"{upstream_id}.json"
+
+
+def reingest_hammerhead_activity(
+    activity: Activity, config: ActivityImportConfig
+) -> bool:
+    """Run the ingest stage again from the kept FIT file and summary."""
+    if not activity.upstream_id:
+        return False
+    fit_path = stored_fit_path(activity.upstream_id)
+    summary_path = stored_summary_path(activity.upstream_id)
+    if not fit_path.exists() or not summary_path.exists():
+        logger.warning(
+            "Cannot re-ingest Hammerhead activity %s, its files are not kept.",
+            activity.id,
+        )
+        return False
+
+    with open(summary_path) as f:
+        stored = json.load(f)
+    summary = stored["summary"]
+    detailed = stored["detailed"]
+
+    try:
+        parsed, time_series = read_fit_activity(fit_path, open)
+    except ActivityParseError:
+        logger.exception("Could not parse %s.", fit_path)
+        return False
+
+    if summary.get("name"):
+        parsed.name = summary["name"]
+    activity_type = detailed.get("activityType") or summary.get("activityType")
+    if activity_type:
+        parsed.kind = get_or_make_kind(str(activity_type))
+
+    keep_trim_indices(activity, time_series)
+    ingest_parsed_activity(
+        activity,
+        parsed,
+        time_series,
+        config,
+        INGEST_VERSION,
+        force_enrichment=True,
+    )
+    return True
+
+
 def _import_one_activity(
     config: ActivityImportConfig,
     session: requests.Session,
@@ -238,13 +297,15 @@ def _import_one_activity(
     detailed = _get_detailed(session, activity_id)
     fit_bytes = _download_fit(session, activity_id)
 
-    with tempfile.NamedTemporaryFile(suffix=".fit", delete=False) as f:
+    # Keep the file. Without it the ingest stage could never run again without
+    # going back to the API, which would make improved parsers unable to reach
+    # activities that are already imported.
+    fit_path = stored_fit_path(str(activity_id))
+    with atomic_open(fit_path, "wb") as f:
         f.write(fit_bytes)
-        fit_path = pathlib.Path(f.name)
-    try:
-        activity, time_series = read_fit_activity(fit_path, open)
-    finally:
-        fit_path.unlink(missing_ok=True)
+    with atomic_open(stored_summary_path(str(activity_id)), "w") as f:
+        json.dump({"summary": summary, "detailed": detailed}, f)
+    activity, time_series = read_fit_activity(fit_path, open)
 
     if len(time_series) == 0 or "latitude" not in time_series.columns:
         logger.warning(
