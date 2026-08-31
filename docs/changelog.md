@@ -32,6 +32,7 @@ Changed:
 - Re-import an activity whose file changed on disk instead of ignoring it. It keeps its tags, photos and edits, and its trim is reset if the length changed. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
 - Keep the FIT file and the summary that the Hammerhead API returns, so that these activities can also be parsed again later. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
 - Report an upload of a file that is already present instead of only calling it skipped, and import the activity again if it had been hidden before. ([GH-515](https://github.com/martin-ueding/geo-activity-playground/issues/515))
+- Crop the equipment pictures in the overview to a common height so that the cards line up. Equipment without a picture gets a gradient placeholder. ([GH-517](https://github.com/martin-ueding/geo-activity-playground/issues/517))
 
 Fixed:
 
