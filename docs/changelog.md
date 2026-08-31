@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Make the explorer tile grid line color and the zoom level from which it appears configurable in the tile rendering settings. ([GH-518](https://github.com/martin-ueding/geo-activity-playground/issues/518))
 
 ## Version 1.54.0 — 2026-08-30
 
