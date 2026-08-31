@@ -1,5 +1,5 @@
 ---
-name: write-a-commit-message
+name: write-commit-message
 description: Style rules for writing commit messages in this project.
 ---
 

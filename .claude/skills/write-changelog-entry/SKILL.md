@@ -1,5 +1,5 @@
 ---
-name: write-a-changelog-entry
+name: write-changelog-entry
 description: Style guidelines for writing a changelog entry for this project.
 ---
 

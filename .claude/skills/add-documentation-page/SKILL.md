@@ -1,9 +1,9 @@
 ---
-name: adding-a-documentation-page
+name: add-documentation-page
 description: Instructions for adding a documentation page
 ---
 
-# Adding a Documentation Page
+# Add a Documentation Page
 
 ## When to use
 
