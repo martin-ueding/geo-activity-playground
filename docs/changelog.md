@@ -24,6 +24,8 @@ Added:
 Fixed:
 
 - Reload all explorer layers after marking a tile as inaccessible, so that the cluster and square coloring updates right away. ([GH-514](https://github.com/martin-ueding/geo-activity-playground/pull/514))
+- List only the kinds used with an equipment in the legend of its yearly distance plot. ([GH-516](https://github.com/martin-ueding/geo-activity-playground/issues/516))
+- Show the year in the tooltip of the yearly distance plot again, and give activities without a start time their own bar. ([GH-516](https://github.com/martin-ueding/geo-activity-playground/issues/516))
 
 ## Version 1.54.0 — 2026-08-30
 
