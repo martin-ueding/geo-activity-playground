@@ -209,7 +209,8 @@ function setupDownloadLinks(map, zoom) {
  * Handle clicks on the mark/unmark inaccessible links inside the tile popup.
  *
  * The request is sent in the background, the popup is refreshed, and the
- * inaccessible tile layer is reloaded so the new stripes appear.
+ * explorer layers are reloaded so the new stripes and the recomputed cluster
+ * and square appear.
  */
 function setupInaccessibleLinks(map, zoom) {
     map.getContainer().addEventListener('click', async (e) => {
@@ -231,14 +232,21 @@ function setupInaccessibleLinks(map, zoom) {
                 popup.setContent(text);
             }
 
-            // A plain redraw() re-requests the same URLs, which the browser may
+            // Marking a tile also changes the cluster and square state on the
+            // server, so every explorer layer can render differently now. A
+            // plain redraw() re-requests the same URLs, which the browser may
             // serve from its memory cache; a fresh version parameter forces it
-            // to actually fetch the changed tiles.
+            // to actually fetch the changed tiles. The color strategy and the
+            // search filter live in the query string and have to survive that.
+            const version = Date.now();
             map.eachLayer(layer => {
-                if (layer._url?.includes('/inaccessible-tile/')) {
-                    const base = layer._url.split('?')[0];
-                    layer.setUrl(`${base}?v=${Date.now()}`);
+                if (!layer._url?.includes('/explorer/')) {
+                    return;
                 }
+                const [base, query] = layer._url.split('?');
+                const params = new URLSearchParams(query);
+                params.set('v', version);
+                layer.setUrl(`${base}?${params}`);
             });
         } catch (error) {
             console.error('Failed to toggle inaccessible mark:', error);
