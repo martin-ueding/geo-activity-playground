@@ -17,8 +17,7 @@ from tqdm import tqdm
 from ...core.datamodel import (
     DEFAULT_UNKNOWN_NAME,
     ActivityImportConfig,
-    get_or_make_equipment,
-    get_or_make_kind,
+    materialize_metadata,
 )
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
@@ -154,15 +153,15 @@ def import_from_strava_checkout(
         activity.elapsed_time = datetime.timedelta(
             seconds=float_with_comma_or_period(row["Elapsed Time"])
         )
-        activity.equipment = get_or_make_equipment(
+        activity.equipment_from_file = (
             nan_as_none(row["Activity Gear"])
             or nan_as_none(row["Bike"])
             or nan_as_none(row["Gear"])
-            or DEFAULT_UNKNOWN_NAME,
         )
-        activity.kind = get_or_make_kind(row["Activity Type"])
-        activity.name = row["Activity Name"]
+        activity.kind_from_file = row["Activity Type"]
+        activity.name_from_file = row["Activity Name"]
         activity.path = str(activity_file)
+        materialize_metadata(activity)
         activity.start = start_datetime
         activity.steps = float_with_comma_or_period(row["Total Steps"])
         activity.source = source

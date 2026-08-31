@@ -12,7 +12,7 @@ from stravalib.exc import Fault, ObjectNotFound, RateLimitExceeded
 from tqdm import tqdm
 
 from ...core.config import ConfigAccessor
-from ...core.datamodel import DB, Activity, get_or_make_equipment, get_or_make_kind
+from ...core.datamodel import DB, Activity, materialize_metadata
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
 from ...core.import_exclusion import is_excluded
@@ -121,7 +121,8 @@ def _refresh_activity_names_from_strava_once(config: StravaConfig) -> int:
                         activity.name,
                         updated_name,
                     )
-                    activity.name = updated_name
+                    activity.name_from_file = updated_name
+                    materialize_metadata(activity)
                     updated_names += 1
             DB.session.commit()
 
@@ -249,15 +250,14 @@ def try_import_strava(
                 activity = Activity()
                 activity.upstream_id = str(strava_activity.id)
                 activity.distance_km = strava_activity.distance / 1000
-                activity.name = strava_activity.name
-                activity.kind = get_or_make_kind(str(strava_activity.type.root))
+                activity.name_from_file = strava_activity.name
+                activity.kind_from_file = str(strava_activity.type.root)
                 activity.start = strava_activity.start_date.astimezone(
                     zoneinfo.ZoneInfo("UTC")
                 )
                 activity.elapsed_time = strava_activity.elapsed_time
-                activity.equipment = get_or_make_equipment(
-                    gear_names[strava_activity.gear_id]
-                )
+                activity.equipment_from_file = gear_names[strava_activity.gear_id]
+                materialize_metadata(activity)
                 activity.calories = detailed_activity.calories
                 activity.moving_time = detailed_activity.moving_time
                 activity.source = source

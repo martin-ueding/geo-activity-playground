@@ -1,5 +1,4 @@
 import logging
-import pathlib
 import re
 
 import sqlalchemy
@@ -11,35 +10,35 @@ from ...core.datamodel import (
     DB,
     Activity,
     ActivityImportConfig,
-    get_or_make_equipment,
-    get_or_make_kind,
+    materialize_metadata,
 )
+from ...core.tag_extraction import apply_tag_extraction_from_database
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
-from .importer import get_metadata_from_path
+from .importer import set_path_metadata
 
 logger = logging.getLogger(__name__)
 
 
 def _apply_metadata_extraction_to_existing(config: ActivityImportConfig) -> int:
+    """Refresh the path layer of every activity and materialize the result.
+
+    User overrides are stored in their own layer and therefore survive this.
+    """
     activities = DB.session.scalars(
         sqlalchemy.select(Activity).filter(Activity.path.is_not(sqlalchemy.null()))
     ).all()
     changed = 0
     for activity in activities:
-        assert activity.path is not None
-        meta = get_metadata_from_path(
-            pathlib.Path(activity.path), config.metadata_extraction_regexes
-        )
-        if not meta:
-            continue
-        if "name" in meta:
-            activity.name = meta["name"]
-        if "kind" in meta:
-            activity.kind = get_or_make_kind(meta["kind"])
-        if "equipment" in meta:
-            activity.equipment = get_or_make_equipment(meta["equipment"], config)
-        changed += 1
+        before = (activity.name, activity.kind_id, activity.equipment_id)
+        set_path_metadata(activity, config.metadata_extraction_regexes)
+        materialize_metadata(activity)
+        # Materializing restores the name as the source states it, so destructive tag
+        # extraction has to strip the tags out of it again.
+        apply_tag_extraction_from_database(activity)
+        DB.session.flush()
+        if before != (activity.name, activity.kind_id, activity.equipment_id):
+            changed += 1
     DB.session.commit()
     return changed
 

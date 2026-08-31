@@ -9,11 +9,9 @@ from tqdm import tqdm
 
 from ...core.datamodel import (
     DB,
-    DEFAULT_UNKNOWN_NAME,
     Activity,
     ActivityImportConfig,
-    get_or_make_equipment,
-    get_or_make_kind,
+    materialize_metadata,
 )
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
@@ -139,27 +137,30 @@ def import_from_file(
     activity.upstream_id = file_hash
     activity.name_from_file = activity.name
     activity.kind_from_file = activity.kind.name if activity.kind is not None else None
-    if activity.name is None:
-        activity.name = path.name.removesuffix("".join(path.suffixes))
+    activity.equipment_from_file = (
+        activity.equipment.name if activity.equipment is not None else None
+    )
 
-    meta_from_path = get_metadata_from_path(path, config.metadata_extraction_regexes)
-    activity.name = meta_from_path.get("name", activity.name)
-    if "equipment" in meta_from_path:
-        activity.equipment = get_or_make_equipment(meta_from_path["equipment"])
-    if "kind" in meta_from_path:
-        activity.kind = get_or_make_kind(meta_from_path["kind"])
-    if activity.equipment is None:
-        activity.equipment = get_or_make_equipment(
-            meta_from_path.get("equipment", DEFAULT_UNKNOWN_NAME)
-        )
-    if activity.kind is None:
-        activity.kind = get_or_make_kind(
-            meta_from_path.get("kind", DEFAULT_UNKNOWN_NAME)
-        )
+    set_path_metadata(activity, config.metadata_extraction_regexes)
+    materialize_metadata(activity)
     activity.source = source
 
     update_and_commit(activity, time_series, config)
     check_for_duplicate(activity, config)
+
+
+def set_path_metadata(
+    activity: Activity, metadata_extraction_regexes: list[str]
+) -> None:
+    """Refresh the path layer of an activity from the configured regexes."""
+    meta = (
+        get_metadata_from_path(pathlib.Path(activity.path), metadata_extraction_regexes)
+        if activity.path
+        else {}
+    )
+    activity.name_from_path = meta.get("name")
+    activity.kind_from_path = meta.get("kind")
+    activity.equipment_from_path = meta.get("equipment")
 
 
 def get_metadata_from_path(

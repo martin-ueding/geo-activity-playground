@@ -8,7 +8,12 @@ import requests
 import sqlalchemy
 from tqdm import tqdm
 
-from ...core.datamodel import DB, Activity, ActivityImportConfig, get_or_make_kind
+from ...core.datamodel import (
+    DB,
+    Activity,
+    ActivityImportConfig,
+    materialize_metadata,
+)
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
 from ...core.import_exclusion import is_excluded, record_exclusion
@@ -250,10 +255,11 @@ def _import_one_activity(
 
     activity.upstream_id = str(activity_id)
     if summary.get("name"):
-        activity.name = summary["name"]
+        activity.name_from_file = summary["name"]
     activity_type = detailed.get("activityType") or summary.get("activityType")
     if activity_type:
-        activity.kind = get_or_make_kind(str(activity_type))
+        activity.kind_from_file = str(activity_type)
+    materialize_metadata(activity)
     if summary.get("distance") is not None:
         activity.distance_km = float(summary["distance"]) / 1000
     if summary.get("duration") is not None:

@@ -94,9 +94,19 @@ class Activity(DB.Model):
     upstream_id: Mapped[str | None] = mapped_column(sa.String, nullable=True)
     source: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
-    # Metadata as found inside the activity file, before path extraction and user edits:
+    # Metadata as found inside the activity file, before path extraction and user
+    # edits. Plain strings, because they record what the source stated and must not
+    # follow later renames of the kind or equipment they happen to name.
     name_from_file: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     kind_from_file: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    equipment_from_file: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+
+    # Metadata extracted from the file path via the configured regexes. Derived from
+    # `path` and the current configuration, stored so that a change of the regexes can
+    # be previewed as a diff instead of a rescan.
+    name_from_path: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    kind_from_path: Mapped[str | None] = mapped_column(sa.String, nullable=True)
+    equipment_from_path: Mapped[str | None] = mapped_column(sa.String, nullable=True)
 
     # Crop data:
     index_begin: Mapped[int] = mapped_column(sa.Integer, nullable=True)
@@ -133,14 +143,36 @@ class Activity(DB.Model):
     num_new_tiles_17: Mapped[int] = mapped_column(sa.Integer, nullable=True)
 
     # References to other tables:
+    # The materialized result of `materialize_metadata`, kept as a column so that every
+    # query, plot and filter can keep joining on it.
     equipment_id: Mapped[int] = mapped_column(
         ForeignKey("equipments.id", name="equipment_id"), nullable=True
     )
-    equipment: Mapped["Equipment"] = relationship(back_populates="activities")
+    equipment: Mapped["Equipment"] = relationship(
+        back_populates="activities", foreign_keys=[equipment_id]
+    )
     kind_id: Mapped[int] = mapped_column(
         ForeignKey("kinds.id", name="kind_id"), nullable=True
     )
-    kind: Mapped["Kind"] = relationship(back_populates="activities")
+    kind: Mapped["Kind"] = relationship(
+        back_populates="activities", foreign_keys=[kind_id]
+    )
+
+    # Metadata as overridden by the user. Foreign keys, because these are claims about
+    # the user's own taxonomy and have to follow renames of it.
+    name_from_user: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    equipment_from_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("equipments.id", name="equipment_from_user_id"), nullable=True
+    )
+    equipment_from_user: Mapped[Optional["Equipment"]] = relationship(
+        foreign_keys=[equipment_from_user_id]
+    )
+    kind_from_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("kinds.id", name="kind_from_user_id"), nullable=True
+    )
+    kind_from_user: Mapped[Optional["Kind"]] = relationship(
+        foreign_keys=[kind_from_user_id]
+    )
 
     tags: Mapped[list["Tag"]] = relationship(
         secondary=activity_tag_association_table, back_populates="activities"
@@ -461,7 +493,9 @@ class Equipment(DB.Model):
     picture_filename: Mapped[str | None] = mapped_column(String, nullable=True)
 
     activities: Mapped[list["Activity"]] = relationship(
-        back_populates="equipment", cascade="all, delete-orphan"
+        back_populates="equipment",
+        cascade="all, delete-orphan",
+        foreign_keys="Activity.equipment_id",
     )
     default_for_kinds: Mapped[list["Kind"]] = relationship(
         back_populates="default_equipment", cascade="all, delete-orphan"
@@ -510,7 +544,9 @@ class Kind(DB.Model):
     name: Mapped[str] = mapped_column(String)
 
     activities: Mapped[list["Activity"]] = relationship(
-        back_populates="kind", cascade="all, delete-orphan"
+        back_populates="kind",
+        cascade="all, delete-orphan",
+        foreign_keys="Activity.kind_id",
     )
     default_equipment_id: Mapped[int] = mapped_column(
         ForeignKey("equipments.id", name="default_equipment_id"), nullable=True
@@ -528,6 +564,52 @@ class Kind(DB.Model):
     )
 
     __table_args__ = (sa.UniqueConstraint("name", name="kinds_name"),)
+
+
+def stem_of_path(path: str | None) -> str | None:
+    if not path:
+        return None
+    file = pathlib.Path(path)
+    return file.name.removesuffix("".join(file.suffixes)) or None
+
+
+def resolved_name_without_user(activity: "Activity") -> str | None:
+    """The name that the file and path layers alone would yield."""
+    return (
+        activity.name_from_path
+        or activity.name_from_file
+        or stem_of_path(activity.path)
+    )
+
+
+def resolved_kind_without_user(activity: "Activity") -> Kind:
+    """The kind that the file and path layers alone would yield."""
+    for raw in (activity.kind_from_path, activity.kind_from_file):
+        if raw:
+            return get_or_make_kind(raw)
+    return get_or_make_kind(DEFAULT_UNKNOWN_NAME)
+
+
+def resolved_equipment_without_user(activity: "Activity") -> Equipment:
+    """The equipment that the file and path layers alone would yield."""
+    for raw in (activity.equipment_from_path, activity.equipment_from_file):
+        if raw:
+            return get_or_make_equipment(raw)
+    return get_or_make_equipment(DEFAULT_UNKNOWN_NAME)
+
+
+def materialize_metadata(activity: "Activity") -> None:
+    """Resolve the metadata layers into the columns that the rest of the app reads.
+
+    The user layer wins over the path layer, which wins over what the activity file
+    itself stated. Re-importing an activity refreshes the lower layers and leaves the
+    user layer alone, so no user edit can be lost by re-importing.
+    """
+    activity.name = activity.name_from_user or resolved_name_without_user(activity)
+    activity.kind = activity.kind_from_user or resolved_kind_without_user(activity)
+    activity.equipment = (
+        activity.equipment_from_user or resolved_equipment_without_user(activity)
+    )
 
 
 def get_or_make_kind(name: str) -> Kind:

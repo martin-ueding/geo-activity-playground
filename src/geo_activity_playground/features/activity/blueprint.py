@@ -30,18 +30,20 @@ from ...core.activities import (
 from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     DB,
-    DEFAULT_UNKNOWN_NAME,
     Activity,
     Equipment,
     Kind,
     Tag,
     apply_privacy_zones_to_tracks_if_enabled,
     get_activity_by_id,
-    get_or_make_equipment,
-    get_or_make_kind,
     get_time_series,
     iter_activities,
+    materialize_metadata,
     query_activity_meta,
+    resolved_equipment_without_user,
+    resolved_kind_without_user,
+    resolved_name_without_user,
+    stem_of_path,
 )
 from ...core.enrichment import update_and_commit
 from ...core.grid import geojson_bounding_box_for_tile_collection
@@ -55,7 +57,6 @@ from ...core.tile_visits import (
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.columns import TIME_SERIES_COLUMNS
 from ...webui.plot_util import to_vega
-from ..directory_import.importer import get_metadata_from_path
 from ..explorer.clustering import get_cluster_tiles_gained_by_activity
 from ..explorer.model import TileStyleName, get_tile_styles
 
@@ -70,43 +71,53 @@ def apply_metadata(
     kind_id: str | None,
     tag_ids: list[str],
 ) -> None:
-    activity.name = name
+    """Store the form values as the user layer and materialize the result.
+
+    A submitted value that merely repeats what the file and path layers already yield
+    is not recorded as an override, so that simply opening the edit form does not pin
+    an activity against future re-imports and regex changes.
+    """
     activity.description = description or None
 
-    if equipment_id and equipment_id != "null":
-        activity.equipment = DB.session.get_one(Equipment, int(equipment_id))
-    else:
-        activity.equipment = get_or_make_equipment(DEFAULT_UNKNOWN_NAME)
+    activity.name_from_user = (
+        name if name and name != resolved_name_without_user(activity) else None
+    )
 
-    if kind_id and kind_id != "null":
-        activity.kind = DB.session.get_one(Kind, int(kind_id))
-    else:
-        activity.kind = get_or_make_kind(DEFAULT_UNKNOWN_NAME)
+    equipment = (
+        DB.session.get_one(Equipment, int(equipment_id))
+        if equipment_id and equipment_id != "null"
+        else None
+    )
+    activity.equipment_from_user = (
+        equipment
+        if equipment is not None
+        and equipment.name != resolved_equipment_without_user(activity).name
+        else None
+    )
+
+    kind = (
+        DB.session.get_one(Kind, int(kind_id))
+        if kind_id and kind_id != "null"
+        else None
+    )
+    activity.kind_from_user = (
+        kind
+        if kind is not None and kind.name != resolved_kind_without_user(activity).name
+        else None
+    )
+
+    materialize_metadata(activity)
 
     activity.tags = [DB.session.get_one(Tag, int(tag_id)) for tag_id in tag_ids]
 
 
-def metadata_candidates(
-    activity: Activity, regexes: list[str]
-) -> dict[str, str | None]:
+def metadata_candidates(activity: Activity) -> dict[str, str | None]:
     """Name and kind as the file states them versus as the path yields them."""
-    name_from_path = None
-    kind_from_path = None
-    if activity.path:
-        path = pathlib.Path(activity.path)
-        try:
-            from_path = get_metadata_from_path(path, regexes)
-        except ValueError:
-            from_path = {}
-        name_from_path = from_path.get(
-            "name", path.name.removesuffix("".join(path.suffixes))
-        )
-        kind_from_path = from_path.get("kind")
     return {
         "name_from_file": activity.name_from_file,
-        "name_from_path": name_from_path,
+        "name_from_path": activity.name_from_path or stem_of_path(activity.path),
         "kind_from_file": activity.kind_from_file,
-        "kind_from_path": kind_from_path,
+        "kind_from_path": activity.kind_from_path,
     }
 
 
@@ -426,11 +437,10 @@ def make_activity_blueprint(
             )
             return redirect(url_for(".bulk_edit", id=ids))
 
-        regexes = config_accessor.activity_import().metadata_extraction_regexes
         return render_template(
             "activity/bulk-edit.html.j2",
             rows=[
-                {"activity": activity, **metadata_candidates(activity, regexes)}
+                {"activity": activity, **metadata_candidates(activity)}
                 for activity in activities
             ],
         )
