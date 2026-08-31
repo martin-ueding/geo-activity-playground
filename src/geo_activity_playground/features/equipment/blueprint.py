@@ -246,26 +246,38 @@ def _equipment_plots(config_accessor: ConfigAccessor, equipment: str) -> dict[st
         .interactive()
     )
 
+    # Activities without a start time have no year to belong to; they get their
+    # own bar instead of silently vanishing from the total.
+    yearly_distances = (
+        selection.assign(year=selection["start_local"].dt.year)
+        .groupby(["year", "kind"], as_index=False, dropna=False)["distance_km"]
+        .sum()
+    )
+    yearly_distances["year"] = [
+        _("Unknown") if pd.isna(year) else f"{year:.0f}"
+        for year in yearly_distances["year"]
+    ]
+
     yearly_distance_plot = to_vega(
         alt.Chart(
-            selection,
+            yearly_distances,
             height=300,
             title=_("Yearly distance"),
         )
         .mark_bar()
         .encode(
-            alt.X("year(start_local):O", title=_("Year")),
-            alt.Y("sum(distance_km)", title=_("Distance / km")),
+            alt.X("year:O", title=_("Year")),
+            alt.Y("distance_km:Q", title=_("Distance / km")),
             alt.Color(
                 "kind",
                 scale=make_kind_scale(meta, config_accessor.ui()),
-                title=_("Kind"),
+                legend=alt.Legend(
+                    title=_("Kind"), values=sorted(selection["kind"].unique())
+                ),
             ),
             tooltip=[
-                alt.Tooltip("year(start_local):O", title=_("Year")),
-                alt.Tooltip(
-                    "sum(distance_km):Q", title=_("Distance / km"), format=".0f"
-                ),
+                alt.Tooltip("year:N", title=_("Year")),
+                alt.Tooltip("distance_km:Q", title=_("Distance / km"), format=".0f"),
                 alt.Tooltip("kind:N", title=_("Kind")),
             ],
         )
