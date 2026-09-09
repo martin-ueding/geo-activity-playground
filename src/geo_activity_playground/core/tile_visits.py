@@ -1,9 +1,10 @@
 import collections
+import dataclasses
 import datetime
 import json
 import logging
 import zoneinfo
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from typing import NamedTuple, TypedDict
 
 import pandas as pd
@@ -203,13 +204,216 @@ class TileInfo(TypedDict):
     last_id: int
 
 
+@dataclasses.dataclass
+class _VisitAggregate:
+    """The first and last visit of one tile, folded over its visiting activities."""
+
+    first_activity_id: int
+    first_time: datetime.datetime | None
+    last_activity_id: int
+    last_time: datetime.datetime | None
+    visit_count: int
+
+    @classmethod
+    def of(cls, activity_id: int, time: datetime.datetime | None) -> "_VisitAggregate":
+        return cls(activity_id, time, activity_id, time, 1)
+
+    @classmethod
+    def read_from(cls, visit: TileVisit) -> "_VisitAggregate":
+        return cls(
+            visit.first_activity_id,
+            visit.first_time,
+            visit.last_activity_id,
+            visit.last_time,
+            visit.visit_count,
+        )
+
+    def fold(self, activity_id: int, time: datetime.datetime | None) -> None:
+        self.visit_count += 1
+        if time is None:
+            return
+        if self.first_time is None or time < self.first_time:
+            self.first_time = time
+            self.first_activity_id = activity_id
+        if self.last_time is None or time > self.last_time:
+            self.last_time = time
+            self.last_activity_id = activity_id
+
+    def write_to(self, visit: TileVisit) -> None:
+        visit.first_activity_id = self.first_activity_id
+        visit.first_time = self.first_time
+        visit.last_activity_id = self.last_activity_id
+        visit.last_time = self.last_time
+        visit.visit_count = self.visit_count
+
+    def first_visit_differs_from(self, visit: TileVisit) -> bool:
+        return (
+            visit.first_activity_id != self.first_activity_id
+            or visit.first_time != self.first_time
+        )
+
+
+class TileStateChange(NamedTuple):
+    """What a local tile visit update invalidated in the derived state.
+
+    The current cluster and square only depend on the set of visited tiles,
+    while the history additionally depends on when each tile was first visited.
+    """
+
+    tiles_changed: bool = False
+    history_changed: bool = False
+
+    def __or__(self, other: "TileStateChange") -> "TileStateChange":
+        return TileStateChange(
+            self.tiles_changed or other.tiles_changed,
+            self.history_changed or other.history_changed,
+        )
+
+
+def _chunked(
+    tiles: list[tuple[int, int]], size: int = 400
+) -> Iterator[list[tuple[int, int]]]:
+    for start in range(0, len(tiles), size):
+        yield tiles[start : start + size]
+
+
+def _activity_starts() -> dict[int, datetime.datetime | None]:
+    return {
+        row.id: row.start
+        for row in DB.session.execute(sa.select(Activity.id, Activity.start))
+    }
+
+
+def _tiles_of_activity(activity_id: int) -> dict[int, set[tuple[int, int]]]:
+    """The tiles an activity passes through, grouped by zoom level."""
+    tiles: dict[int, set[tuple[int, int]]] = collections.defaultdict(set)
+    for row in DB.session.execute(
+        sa.select(ActivityTile.zoom, ActivityTile.tile_x, ActivityTile.tile_y).where(
+            ActivityTile.activity_id == activity_id
+        )
+    ):
+        tiles[row.zoom].add((row.tile_x, row.tile_y))
+    return tiles
+
+
+def _recompute_tile_visits(
+    zoom: int,
+    tiles: Iterable[tuple[int, int]],
+    explorer_ids: set[int] | None,
+    starts: dict[int, datetime.datetime | None],
+) -> TileStateChange:
+    """Re-derive the visit aggregate of these tiles from ``ActivityTile``.
+
+    ``ActivityTile`` records every activity passing through a tile, so a tile's
+    aggregate can always be rebuilt from it alone. Only the given tiles are
+    touched; no other tile can be affected by a change to a single activity.
+    """
+    change = TileStateChange()
+    for chunk in _chunked(sorted(tiles)):
+        aggregates: dict[tuple[int, int], _VisitAggregate] = {}
+        for row in DB.session.execute(
+            sa.select(
+                ActivityTile.tile_x,
+                ActivityTile.tile_y,
+                ActivityTile.activity_id,
+                ActivityTile.time,
+            )
+            .where(
+                ActivityTile.zoom == zoom,
+                sa.tuple_(ActivityTile.tile_x, ActivityTile.tile_y).in_(chunk),
+            )
+            .order_by(ActivityTile.activity_id)
+        ):
+            if explorer_ids is not None and row.activity_id not in explorer_ids:
+                continue
+            time = row.time if row.time is not None else starts.get(row.activity_id)
+            tile = (row.tile_x, row.tile_y)
+            if tile in aggregates:
+                aggregates[tile].fold(row.activity_id, time)
+            else:
+                aggregates[tile] = _VisitAggregate.of(row.activity_id, time)
+
+        visits = {
+            (visit.tile_x, visit.tile_y): visit
+            for visit in DB.session.scalars(
+                sa.select(TileVisit).where(
+                    TileVisit.zoom == zoom,
+                    sa.tuple_(TileVisit.tile_x, TileVisit.tile_y).in_(chunk),
+                )
+            )
+        }
+
+        for tile in chunk:
+            aggregate = aggregates.get(tile)
+            visit = visits.get(tile)
+            if aggregate is None:
+                if visit is not None:
+                    DB.session.delete(visit)
+                    change = change | TileStateChange(True, True)
+                continue
+            if visit is None:
+                DB.session.add(
+                    TileVisit(
+                        zoom=zoom,
+                        tile_x=tile[0],
+                        tile_y=tile[1],
+                        **dataclasses.asdict(aggregate),
+                    )
+                )
+                change = change | TileStateChange(True, True)
+                continue
+            if aggregate.first_visit_differs_from(visit):
+                change = change | TileStateChange(False, True)
+            aggregate.write_to(visit)
+    DB.session.commit()
+    return change
+
+
+def _propagate_tile_state_changes(changes: dict[int, TileStateChange]) -> None:
+    """Update only the derived state that the changed tiles can have invalidated.
+
+    The cluster history is flagged rather than replayed here: the Explorer page
+    rebuilds a stale zoom level on demand, and a change that leaves the order of
+    first visits alone does not flag it at all.
+    """
+    from ..features.explorer.clustering import (
+        compute_current_state_for_zoom,
+        mark_cluster_history_stale,
+    )
+    from .config import ConfigAccessor
+
+    zoom_levels = set(ConfigAccessor().ui().explorer_zoom_levels)
+    for zoom, change in changes.items():
+        if zoom not in zoom_levels:
+            continue
+        if change.tiles_changed:
+            compute_current_state_for_zoom(zoom)
+        if change.history_changed:
+            mark_cluster_history_stale([zoom])
+
+
 def remove_activity_from_tile_state(activity_id: int) -> int:
+    """Take one activity out of the tile state without touching the others.
+
+    The tiles the activity passed through are the only ones whose aggregate can
+    change, and they are re-derived from the activities that remain.
+    """
+    tiles_by_zoom = _tiles_of_activity(activity_id)
     removed_references = (
         DB.session.query(ActivityTile)
         .filter(ActivityTile.activity_id == activity_id)
         .delete()
     )
     DB.session.commit()
+
+    explorer_ids = get_explorer_activity_ids()
+    starts = _activity_starts()
+    _propagate_tile_state_changes(
+        {
+            zoom: _recompute_tile_visits(zoom, tiles, explorer_ids, starts)
+            for zoom, tiles in tiles_by_zoom.items()
+        }
+    )
     return removed_references
 
 
@@ -286,125 +490,58 @@ def _reset_tile_visits_db() -> None:
     logger.info("Cleared tile_visits and activity_tile tables in database.")
 
 
-def refresh_tile_visits_for_activity(activity_id: int) -> None:
-    """Incrementally repair tile visits after an activity's start time changed.
+def shift_activity_tile_times(activity_id: int, time_shift: datetime.timedelta) -> None:
+    """Move the tile timestamps of an activity along with its start time.
 
-    Recomputes first/last visitor metadata for every tile the activity touches
-    and rebuilds the cluster history for zoom levels whose first-visit ordering
-    shifted.
+    The track itself is unchanged, so every tile keeps its offset within the
+    activity and only has to be moved by the same amount as the start.
     """
-    affected_zooms: set[int] = set()
-    # Activities that do not count for explorer tiles must not become the first
-    # or last visitor of a tile.
-    explorer_ids = get_explorer_activity_ids()
-
-    zooms = [
-        row[0]
-        for row in DB.session.execute(
-            sa.select(ActivityTile.zoom)
-            .where(ActivityTile.activity_id == activity_id)
-            .distinct()
+    for row in DB.session.scalars(
+        sa.select(ActivityTile).where(
+            ActivityTile.activity_id == activity_id,
+            ActivityTile.time.is_not(None),
         )
-    ]
+    ):
+        row.time += time_shift
+    DB.session.commit()
 
-    for zoom in zooms:
-        affected_tiles = [
-            (row.tile_x, row.tile_y)
-            for row in DB.session.execute(
-                sa.select(ActivityTile.tile_x, ActivityTile.tile_y).where(
-                    ActivityTile.zoom == zoom,
-                    ActivityTile.activity_id == activity_id,
-                )
-            )
-        ]
-        if not affected_tiles:
-            continue
 
-        for chunk_start in range(0, len(affected_tiles), 400):
-            chunk = affected_tiles[chunk_start : chunk_start + 400]
+def refresh_tile_visits_for_activity(
+    activity_id: int, time_shift: datetime.timedelta | None = None
+) -> None:
+    """Bring the tile state up to date after one activity changed.
 
-            visiting_by_tile: dict[tuple[int, int], set[int]] = collections.defaultdict(
-                set
-            )
-            for row in DB.session.execute(
-                sa.select(
-                    ActivityTile.tile_x, ActivityTile.tile_y, ActivityTile.activity_id
-                ).where(
-                    ActivityTile.zoom == zoom,
-                    sa.tuple_(ActivityTile.tile_x, ActivityTile.tile_y).in_(chunk),
-                )
-            ):
-                if explorer_ids is not None and row.activity_id not in explorer_ids:
-                    continue
-                visiting_by_tile[(row.tile_x, row.tile_y)].add(row.activity_id)
-
-            relevant_activity_ids: set[int] = set()
-            for ids in visiting_by_tile.values():
-                relevant_activity_ids.update(ids)
-            starts_by_id = {
-                row.id: row.start
-                for row in DB.session.execute(
-                    sa.select(Activity.id, Activity.start).where(
-                        Activity.id.in_(relevant_activity_ids)
-                    )
-                )
-            }
-
-            visits = {
-                (visit.tile_x, visit.tile_y): visit
-                for visit in DB.session.scalars(
-                    sa.select(TileVisit).where(
-                        TileVisit.zoom == zoom,
-                        sa.tuple_(TileVisit.tile_x, TileVisit.tile_y).in_(chunk),
-                    )
-                )
-            }
-
-            for tile in chunk:
-                visit = visits.get(tile)
-                if visit is None:
-                    continue
-                visiting_ids = visiting_by_tile.get(tile, set())
-                earliest_id: int | None = None
-                earliest_time: datetime.datetime | None = None
-                latest_id: int | None = None
-                latest_time: datetime.datetime | None = None
-                for vid in visiting_ids:
-                    start = starts_by_id.get(vid)
-                    if start is None:
-                        continue
-                    if earliest_time is None or start < earliest_time:
-                        earliest_time = start
-                        earliest_id = vid
-                    if latest_time is None or start > latest_time:
-                        latest_time = start
-                        latest_id = vid
-
-                if earliest_id is None:
-                    # No visitor has a known start; keep the existing
-                    # first/last activity ids and NULL times.
-                    continue
-
-                if (
-                    visit.first_activity_id != earliest_id
-                    or visit.first_time != earliest_time
-                ):
-                    affected_zooms.add(zoom)
-                visit.first_activity_id = earliest_id
-                visit.first_time = earliest_time
-                visit.last_activity_id = latest_id
-                visit.last_time = latest_time
-
+    With a ``time_shift`` the track is known to be the same and only its
+    timestamps move; without one the activity's tiles are derived from its time
+    series again, which also covers a re-import with different track data. Either
+    way only the tiles the activity touched before or touches now are re-derived,
+    so the rest of the tile state is left alone.
+    """
+    old_tiles = _tiles_of_activity(activity_id)
+    if time_shift is not None:
+        shift_activity_tile_times(activity_id, time_shift)
+        new_tiles = old_tiles
+    else:
+        DB.session.query(ActivityTile).filter(
+            ActivityTile.activity_id == activity_id
+        ).delete()
+        DB.session.add_all(_activity_tile_rows(activity_id))
         DB.session.commit()
+        new_tiles = _tiles_of_activity(activity_id)
 
-    from ..features.explorer.clustering import (
-        compute_current_state_for_zoom,
-        rebuild_cluster_history_for_zoom,
+    explorer_ids = get_explorer_activity_ids()
+    starts = _activity_starts()
+    _propagate_tile_state_changes(
+        {
+            zoom: _recompute_tile_visits(
+                zoom,
+                old_tiles.get(zoom, set()) | new_tiles.get(zoom, set()),
+                explorer_ids,
+                starts,
+            )
+            for zoom in old_tiles.keys() | new_tiles.keys()
+        }
     )
-
-    for zoom in affected_zooms:
-        compute_current_state_for_zoom(zoom)
-        rebuild_cluster_history_for_zoom(zoom, get_tile_history_df(zoom))
 
 
 def _processed_activity_ids() -> set[int]:
@@ -448,15 +585,12 @@ def rebuild_tile_visits_from_activity_tiles() -> None:
     re-aggregate what is already stored; the time series are not touched.
     """
     explorer_ids = get_explorer_activity_ids()
-    starts = {
-        row.id: row.start
-        for row in DB.session.execute(sa.select(Activity.id, Activity.start))
-    }
+    starts = _activity_starts()
 
     DB.session.query(TileVisit).delete()
     DB.session.commit()
 
-    aggregate: dict[tuple[int, int, int], dict] = {}
+    aggregate: dict[tuple[int, int, int], _VisitAggregate] = {}
     for row in DB.session.execute(
         sa.select(
             ActivityTile.zoom,
@@ -464,33 +598,20 @@ def rebuild_tile_visits_from_activity_tiles() -> None:
             ActivityTile.tile_y,
             ActivityTile.activity_id,
             ActivityTile.time,
-        )
+        ).order_by(ActivityTile.activity_id)
     ):
         if explorer_ids is not None and row.activity_id not in explorer_ids:
             continue
-        start = row.time if row.time is not None else starts.get(row.activity_id)
+        time = row.time if row.time is not None else starts.get(row.activity_id)
         key = (row.zoom, row.tile_x, row.tile_y)
         entry = aggregate.get(key)
         if entry is None:
-            aggregate[key] = {
-                "first_activity_id": row.activity_id,
-                "first_time": start,
-                "last_activity_id": row.activity_id,
-                "last_time": start,
-                "visit_count": 1,
-            }
-            continue
-        entry["visit_count"] += 1
-        if start is not None:
-            if entry["first_time"] is None or start < entry["first_time"]:
-                entry["first_time"] = start
-                entry["first_activity_id"] = row.activity_id
-            if entry["last_time"] is None or start > entry["last_time"]:
-                entry["last_time"] = start
-                entry["last_activity_id"] = row.activity_id
+            aggregate[key] = _VisitAggregate.of(row.activity_id, time)
+        else:
+            entry.fold(row.activity_id, time)
 
     batch = [
-        TileVisit(zoom=zoom, tile_x=tile_x, tile_y=tile_y, **entry)
+        TileVisit(zoom=zoom, tile_x=tile_x, tile_y=tile_y, **dataclasses.asdict(entry))
         for (zoom, tile_x, tile_y), entry in aggregate.items()
     ]
     for i in range(0, len(batch), 5_000):
@@ -499,12 +620,12 @@ def rebuild_tile_visits_from_activity_tiles() -> None:
     logger.info(f"Rebuilt {len(batch)} tile visits from activity tiles.")
 
 
-def _process_activity(activity_id: int, counts_for_explorer: bool = True) -> None:
-    activity = get_activity_by_id(activity_id)
+def _activity_tile_rows(activity_id: int) -> list[ActivityTile]:
+    """The tiles an activity passes through, one row per tile and zoom level."""
     time_series = get_time_series(activity_id)
-    fallback_time = _fallback_timestamp_for_activity(activity)
+    fallback_time = _fallback_timestamp_for_activity(get_activity_by_id(activity_id))
 
-    activity_tile_rows: list[ActivityTile] = []
+    rows: list[ActivityTile] = []
     activity_tiles = pd.DataFrame(
         _tiles_from_points(time_series, 19), columns=["time", "tile_x", "tile_y"]
     )
@@ -524,93 +645,84 @@ def _process_activity(activity_id: int, counts_for_explorer: bool = True) -> Non
             .head(1)
             .drop(columns="_time_missing")
         )
-        tiles = list(zip(activity_tiles["tile_x"], activity_tiles["tile_y"]))
-        existing_by_tile: dict[tuple[int, int], TileVisit] = {}
-        for i in range(0, len(tiles), 400):
-            chunk = tiles[i : i + 400]
-            if not chunk:
-                continue
-            for visit in DB.session.scalars(
-                sa.select(TileVisit).where(
-                    TileVisit.zoom == zoom,
-                    sa.tuple_(TileVisit.tile_x, TileVisit.tile_y).in_(chunk),
-                )
-            ):
-                existing_by_tile[(visit.tile_x, visit.tile_y)] = visit
-
-        for time, tile in zip(
-            activity_tiles["time"],
-            tiles,
+        for time, tile_x, tile_y in zip(
+            activity_tiles["time"], activity_tiles["tile_x"], activity_tiles["tile_y"]
         ):
             if pd.isna(time) and fallback_time is not None:
                 time = fallback_time
-            if time is not None and time.tz is None:
-                time = time.tz_localize("UTC")
-            has_time = pd.notna(time)
-            db_time = time.to_pydatetime() if has_time else None
-
-            if counts_for_explorer:
-                existing = existing_by_tile.get(tile)
-                if existing is None:
-                    existing_by_tile[tile] = TileVisit(
-                        zoom=zoom,
-                        tile_x=tile[0],
-                        tile_y=tile[1],
-                        first_activity_id=activity_id,
-                        first_time=db_time,
-                        last_activity_id=activity_id,
-                        last_time=db_time,
-                        visit_count=1,
-                    )
-                    DB.session.add(existing_by_tile[tile])
-                else:
-                    existing.visit_count += 1
-                    first_time = (
-                        pd.Timestamp(existing.first_time)
-                        if existing.first_time is not None
-                        else None
-                    )
-                    last_time = (
-                        pd.Timestamp(existing.last_time)
-                        if existing.last_time is not None
-                        else None
-                    )
-                    if first_time is not None and first_time.tz is None:
-                        first_time = first_time.tz_localize("UTC")
-                    if last_time is not None and last_time.tz is None:
-                        last_time = last_time.tz_localize("UTC")
-                    try:
-                        if has_time:
-                            if first_time is None or time < first_time:
-                                existing.first_activity_id = activity_id
-                                existing.first_time = db_time
-                            if last_time is None or time > last_time:
-                                existing.last_activity_id = activity_id
-                                existing.last_time = db_time
-                    except TypeError as e:
-                        raise TypeError(
-                            f"Mismatch in timezone awareness: {time=}, {first_time=}, {last_time=}"
-                        ) from e
-
-            activity_tile_rows.append(
+            rows.append(
                 ActivityTile(
                     zoom=zoom,
-                    tile_x=tile[0],
-                    tile_y=tile[1],
+                    tile_x=int(tile_x),
+                    tile_y=int(tile_y),
                     activity_id=activity_id,
-                    time=db_time,
+                    time=_naive_utc(time),
                 )
             )
-
-        if counts_for_explorer:
-            DB.session.commit()
 
         # Move up one layer in the quad-tree.
         activity_tiles["tile_x"] //= 2
         activity_tiles["tile_y"] //= 2
 
-    DB.session.add_all(activity_tile_rows)
+    return rows
+
+
+def _merge_activity_into_tile_visits(rows: list[ActivityTile]) -> None:
+    """Fold the tiles of a newly processed activity into the visit aggregate."""
+    by_zoom: dict[int, list[ActivityTile]] = collections.defaultdict(list)
+    for row in rows:
+        by_zoom[row.zoom].append(row)
+
+    for zoom, zoom_rows in by_zoom.items():
+        for start in range(0, len(zoom_rows), 400):
+            chunk = zoom_rows[start : start + 400]
+            visits = {
+                (visit.tile_x, visit.tile_y): visit
+                for visit in DB.session.scalars(
+                    sa.select(TileVisit).where(
+                        TileVisit.zoom == zoom,
+                        sa.tuple_(TileVisit.tile_x, TileVisit.tile_y).in_(
+                            [(row.tile_x, row.tile_y) for row in chunk]
+                        ),
+                    )
+                )
+            }
+            for row in chunk:
+                visit = visits.get((row.tile_x, row.tile_y))
+                if visit is None:
+                    DB.session.add(
+                        TileVisit(
+                            zoom=zoom,
+                            tile_x=row.tile_x,
+                            tile_y=row.tile_y,
+                            **dataclasses.asdict(
+                                _VisitAggregate.of(row.activity_id, row.time)
+                            ),
+                        )
+                    )
+                else:
+                    aggregate = _VisitAggregate.read_from(visit)
+                    aggregate.fold(row.activity_id, row.time)
+                    aggregate.write_to(visit)
+        DB.session.commit()
+
+
+def _process_activity(activity_id: int, counts_for_explorer: bool = True) -> None:
+    rows = _activity_tile_rows(activity_id)
+    DB.session.add_all(rows)
     DB.session.commit()
+    if counts_for_explorer:
+        _merge_activity_into_tile_visits(rows)
+
+
+def _naive_utc(time: pd.Timestamp | None) -> datetime.datetime | None:
+    """Tile times are stored as naive UTC, which is what reads give back."""
+    if time is None or pd.isna(time):
+        return None
+    timestamp = pd.Timestamp(time)
+    if timestamp.tz is not None:
+        timestamp = timestamp.tz_convert("UTC").tz_localize(None)
+    return timestamp.to_pydatetime()
 
 
 def _fallback_timestamp_for_activity(activity: object) -> pd.Timestamp | None:
@@ -690,10 +802,8 @@ def get_activity_ids_in_bounds(
 
 def get_activity_ids_in_tiles(zoom: int, tiles: Iterator[tuple[int, int]]) -> set[int]:
     """Activity ids passing through any of the given tiles."""
-    tile_list = list(tiles)
     result: set[int] = set()
-    for chunk_start in range(0, len(tile_list), 400):
-        chunk = tile_list[chunk_start : chunk_start + 400]
+    for chunk in _chunked(list(tiles)):
         for row in DB.session.execute(
             sa.select(ActivityTile.activity_id).where(
                 ActivityTile.zoom == zoom,

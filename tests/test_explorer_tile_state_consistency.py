@@ -21,6 +21,7 @@ from geo_activity_playground.core.datamodel import (
 )
 from geo_activity_playground.core.raster_map import OSM_TILE_SIZE
 from geo_activity_playground.core.tile_visits import (
+    _consistency_check,
     _process_activity,
     _tiles_from_points,
     get_activity_ids_in_tile,
@@ -29,6 +30,7 @@ from geo_activity_playground.core.tile_visits import (
     get_tile_visits_in_bounds,
     get_visited_tiles,
     rebuild_tile_visits_from_activity_tiles,
+    refresh_tile_visits_for_activity,
     remove_activity_from_tile_state,
 )
 from geo_activity_playground.features.explorer.clustering import (
@@ -1114,3 +1116,99 @@ def test_evolution_series_record_a_cluster_that_inaccessible_tiles_create(
 
         assert get_cluster_size_history_df(14)["max_cluster_size"].iloc[-1] == 1
         assert get_square_history_df(14)["max_square_size"].iloc[-1] == 1
+
+
+def test_deleting_an_activity_repairs_the_tile_visits_incrementally(app) -> None:
+    with app.app_context():
+        ride = Kind(name="Ride")
+        DB.session.add(ride)
+        DB.session.commit()
+
+        _add_activity_tiles(1, ride, [(0, 0), (1, 0)], dt.datetime(2026, 1, 1))
+        _add_activity_tiles(2, ride, [(1, 0), (2, 0)], dt.datetime(2026, 1, 2))
+        rebuild_tile_visits_from_activity_tiles()
+
+        DB.session.delete(DB.session.get(Activity, 2))
+        DB.session.commit()
+        remove_activity_from_tile_state(2)
+
+        assert get_visited_tiles(14) == {(0, 0), (1, 0)}
+        shared = DB.session.scalar(
+            sa.select(TileVisit).where(
+                TileVisit.zoom == 14, TileVisit.tile_x == 1, TileVisit.tile_y == 0
+            )
+        )
+        assert shared.visit_count == 1
+        assert shared.first_activity_id == 1
+        assert shared.last_activity_id == 1
+        # The state is consistent, so the next scan does not wipe and rebuild it.
+        assert _consistency_check()
+
+
+def test_deleting_a_repeat_visitor_leaves_the_cluster_history_alone(app) -> None:
+    with app.app_context():
+        ride = Kind(name="Ride")
+        DB.session.add(ride)
+        DB.session.commit()
+
+        _add_activity_tiles(1, ride, [(0, 0), (1, 0)], dt.datetime(2026, 1, 1))
+        _add_activity_tiles(2, ride, [(0, 0), (1, 0)], dt.datetime(2026, 1, 2))
+        rebuild_tile_visits_from_activity_tiles()
+        rebuild_cluster_history(14)
+        assert not is_cluster_history_stale(14)
+
+        DB.session.delete(DB.session.get(Activity, 2))
+        DB.session.commit()
+        remove_activity_from_tile_state(2)
+
+        # Nothing was first visited by that activity, so the history still holds.
+        assert not is_cluster_history_stale(14)
+        assert get_visited_tiles(14) == {(0, 0), (1, 0)}
+
+
+def test_deleting_the_first_visitor_marks_the_cluster_history_stale(app) -> None:
+    with app.app_context():
+        ride = Kind(name="Ride")
+        DB.session.add(ride)
+        DB.session.commit()
+
+        _add_activity_tiles(1, ride, [(0, 0)], dt.datetime(2026, 1, 1))
+        _add_activity_tiles(2, ride, [(0, 0)], dt.datetime(2026, 1, 2))
+        rebuild_tile_visits_from_activity_tiles()
+        rebuild_cluster_history(14)
+
+        DB.session.delete(DB.session.get(Activity, 1))
+        DB.session.commit()
+        remove_activity_from_tile_state(1)
+
+        assert is_cluster_history_stale(14)
+        visit = DB.session.scalar(sa.select(TileVisit).where(TileVisit.zoom == 14))
+        assert visit.first_activity_id == 2
+
+
+def test_shifting_a_start_reorders_first_visits_without_reprocessing(app) -> None:
+    with app.app_context():
+        ride = Kind(name="Ride")
+        DB.session.add(ride)
+        DB.session.commit()
+
+        _add_activity_tiles(1, ride, [(0, 0)], dt.datetime(2026, 1, 1))
+        _add_activity_tiles(2, ride, [(0, 0)], dt.datetime(2026, 1, 2))
+        rebuild_tile_visits_from_activity_tiles()
+        assert get_tile_history_df(14)["activity_id"].tolist() == [1]
+
+        shift = dt.timedelta(days=-3)
+        activity = DB.session.get(Activity, 2)
+        activity.start += shift
+        DB.session.commit()
+        refresh_tile_visits_for_activity(2, time_shift=shift)
+
+        visit = DB.session.scalar(sa.select(TileVisit).where(TileVisit.zoom == 14))
+        assert visit.first_activity_id == 2
+        assert visit.first_time == dt.datetime(2025, 12, 30)
+        assert visit.visit_count == 2
+        # The tile membership is untouched, only its timestamps moved.
+        assert get_activity_ids_in_tile(14, 0, 0) == {1, 2}
+        assert DB.session.scalar(
+            sa.select(ActivityTile.time).where(ActivityTile.activity_id == 2)
+        ) == dt.datetime(2025, 12, 30)

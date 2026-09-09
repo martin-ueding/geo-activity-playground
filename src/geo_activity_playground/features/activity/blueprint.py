@@ -400,7 +400,15 @@ def make_activity_blueprint(
 
             DB.session.commit()
             if start_changed:
-                refresh_tile_visits_for_activity(activity.id)
+                # The track is unchanged, so the tiles only move in time.
+                refresh_tile_visits_for_activity(
+                    activity.id,
+                    time_shift=(
+                        activity.start - previous_start
+                        if previous_start is not None
+                        else None
+                    ),
+                )
             return redirect(url_for(".show", id=activity.id))
 
         return render_template(
@@ -527,6 +535,9 @@ def make_activity_blueprint(
         if activity is None:
             abort(404)
         update_and_commit(activity, activity.raw_time_series, config, force=True)
+        # Enrichment can move the start time and the track, so the tiles of this
+        # one activity are derived again.
+        refresh_tile_visits_for_activity(activity.id)
         flash(_("Activity has been re-enriched."), category="success")
         return redirect(url_for(".show", id=id))
 
