@@ -17,6 +17,9 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Update only the affected explorer tiles when you change an activity's start time or delete an activity. The tile history is no longer rebuilt from scratch.
 
 ## Version 1.55.0 — 2026-08-31
 
