@@ -60,30 +60,6 @@ def local_date_from_utc(
     return datetime.date(year, month, day)
 
 
-def get_country_timezone(latitude: float, longitude: float) -> tuple[str, str]:
-    cache_file = USER_CACHE_DIR / "geotimezone" / f"{latitude:.5f}-{longitude:.5f}.json"
-    data = {}
-    if cache_file.exists():
-        try:
-            with open(cache_file) as f:
-                data = json.load(f)
-        except json.decoder.JSONDecodeError as e:
-            logger.warning(
-                f"'{cache_file}' could not be parsed ('{e}'). Deleting and trying again."
-            )
-            cache_file.unlink()
-
-    if not cache_file.exists():
-        url = f"https://api.geotimezone.com/public/timezone?latitude={latitude}&longitude={longitude}"
-        r = requests.get(url)
-        r.raise_for_status()
-        data = r.json()
-        cache_file.parent.mkdir(exist_ok=True, parents=True)
-        with open(cache_file, "w") as f:
-            json.dump(data, f)
-    return data["location"], data["iana_timezone"]
-
-
 def get_timezone(latitude: float, longitude: float) -> str | None:
     tf = timezonefinder.TimezoneFinder()  # reuse
     return tf.timezone_at(lng=longitude, lat=latitude)
