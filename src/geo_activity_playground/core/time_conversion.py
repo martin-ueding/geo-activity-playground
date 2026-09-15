@@ -1,15 +1,8 @@
 import datetime
-import json
-import logging
 import zoneinfo
 
 import pandas as pd
-import requests
 import timezonefinder
-
-from .paths import USER_CACHE_DIR
-
-logger = logging.getLogger(__name__)
 
 
 def sanitize_datetime(
