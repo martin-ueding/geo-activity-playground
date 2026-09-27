@@ -8,9 +8,9 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def compute_tile_float(
-    lat: float | pd.Series, lon: float | pd.Series, zoom: int
-) -> tuple[float, float]:
+def compute_tile_float[T: (float, pd.Series, np.ndarray)](
+    lat: T, lon: T, zoom: int
+) -> tuple[T, T]:
     x = np.radians(lon)
     y = np.arcsinh(np.tan(np.radians(lat)))
     x = (1 + x / np.pi) / 2

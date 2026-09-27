@@ -103,6 +103,8 @@ ID_SAMPLES = {
     "settings.kinds_edit": "kind_id",
     "settings.privacy_zones_edit": "privacy_zone_id",
     "sharepic.activity": "activity_id",
+    "sharepic.plain_activity": "activity_id",
+    "similar_routes.activity": "activity_id",
 }
 
 

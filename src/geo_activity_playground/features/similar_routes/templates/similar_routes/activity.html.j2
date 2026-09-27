@@ -1,0 +1,72 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<h1>{{ _('Similar routes') }}</h1>
+
+<p>
+    {{ _('Activities whose tracks are close to') }}
+    <a href="{{ url_for('activity.show', id=activity.id) }}">{{ activity.name }}</a>.
+    {{ _('Compared with %(num_compared)d of %(num_others)d other activities so far.', num_compared=num_compared,
+    num_others=num_others) }}
+</p>
+
+<div class="mb-2">
+    <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('Quantile') }}">
+        {% for q in quantiles %}
+        <a href="{{ url_for('.activity', id=activity.id, quantile=q, direction=direction, max_distance_m=max_distance_m) }}"
+            class="btn {% if q == quantile %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ q }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="mb-2">
+    <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('Direction') }}">
+        {% for d, label in directions.items() %}
+        <a href="{{ url_for('.activity', id=activity.id, quantile=quantile, direction=d, max_distance_m=max_distance_m) }}"
+            class="btn {% if d == direction %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<form method="get" class="row row-cols-auto g-2 align-items-center mb-3">
+    <input type="hidden" name="quantile" value="{{ quantile }}" />
+    <input type="hidden" name="direction" value="{{ direction }}" />
+    <div class="col">
+        <label for="max_distance_m" class="col-form-label">{{ _('Maximum distance / m') }}</label>
+    </div>
+    <div class="col">
+        <input type="number" min="0" step="any" class="form-control form-control-sm" id="max_distance_m"
+            name="max_distance_m" value="{{ max_distance_m }}" />
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-sm btn-primary">{{ _('Apply') }}</button>
+    </div>
+</form>
+
+{% if similar %}
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+    {% for other, distance_m in similar %}
+    <div class="col">
+        <div class="card">
+            <a href="{{ url_for('activity.show', id=other.id) }}">
+                <img class="card-img-top" loading="lazy"
+                    src="{{ url_for('sharepic.plain_activity', id=other.id) }}" />
+            </a>
+            <div class="card-body">
+                <a href="{{ url_for('activity.show', id=other.id) }}">
+                    <h5 class="card-title">{{ other.name }}</h5>
+                </a>
+                <p class="card-text">
+                    {{ other.start|dt }}
+                    <br />
+                    {{ quantile }}: {{ '%.0f'|format(distance_m) }} m
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>{{ _('No similar routes found within this distance.') }}</p>
+{% endif %}
+{% endblock %}

@@ -1,4 +1,5 @@
 import datetime
+import io
 
 from flask import Blueprint, Response
 from flask.typing import ResponseReturnValue
@@ -6,11 +7,12 @@ from flask.typing import ResponseReturnValue
 from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     apply_privacy_zones,
+    apply_privacy_zones_to_tracks_if_enabled,
     get_activity_by_id,
     get_time_series,
     query_activity_meta,
 )
-from .render import make_day_sharepic, make_sharepic
+from .render import make_day_sharepic, make_sharepic, make_sharepic_base
 
 
 def make_sharepic_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
@@ -31,6 +33,15 @@ def make_sharepic_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             ),
             mimetype="image/png",
         )
+
+    @blueprint.route("/activity/<int:id>/plain.png")
+    def plain_activity(id: int) -> ResponseReturnValue:
+        time_series = apply_privacy_zones_to_tracks_if_enabled(
+            get_time_series(id), config_accessor.ui()
+        )
+        f = io.BytesIO()
+        make_sharepic_base([time_series], config_accessor.map()).save(f, format="png")
+        return Response(f.getvalue(), mimetype="image/png")
 
     @blueprint.route("/day/<int:year>/<int:month>/<int:day>.png")
     def day(year: int, month: int, day: int) -> ResponseReturnValue:

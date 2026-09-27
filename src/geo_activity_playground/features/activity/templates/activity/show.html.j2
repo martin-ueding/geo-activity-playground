@@ -556,6 +556,9 @@
 </script>
 {% endif %}
 
+<h2>{{ _('Similar routes') }}</h2>
+<p><a href="{{ url_for('similar_routes.activity', id=activity.id) }}">{{ _('Activities along a similar route') }}</a></p>
+
 {% if similar_activites|length > 0 %}
 <div class="row mb-3">
     <div class="col">

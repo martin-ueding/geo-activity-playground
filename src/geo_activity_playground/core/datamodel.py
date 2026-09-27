@@ -205,6 +205,18 @@ class Activity(DB.Model):
         back_populates="activity", cascade="all, delete-orphan"
     )
 
+    route_distances: Mapped[list["RouteDistance"]] = relationship(  # noqa: F821
+        foreign_keys="RouteDistance.activity_id",
+        back_populates="activity",
+        cascade="all, delete-orphan",
+    )
+
+    reference_route_distances: Mapped[list["RouteDistance"]] = relationship(  # noqa: F821
+        foreign_keys="RouteDistance.reference_activity_id",
+        back_populates="reference_activity",
+        cascade="all, delete-orphan",
+    )
+
     def __str__(self) -> str:
         return f"{self.start} {self.name}"
 

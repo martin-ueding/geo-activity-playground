@@ -30,6 +30,7 @@ from flask_babel import Babel
 from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from ..core.background import start_background_tasks
 from ..core.config import ConfigAccessor, import_config_json
 from ..core.currency import format_money
 from ..core.datamodel import (
@@ -84,6 +85,9 @@ from ..features.segments.blueprint import make_segments_blueprint
 from ..features.segments.model import Segment  # noqa: F401
 from ..features.sharepic.blueprint import make_sharepic_blueprint
 from ..features.shutdown.blueprint import make_shutdown_blueprint
+from ..features.similar_routes.backfill import RouteDistanceBackfill
+from ..features.similar_routes.blueprint import make_similar_routes_blueprint
+from ..features.similar_routes.model import RouteDistance  # noqa: F401
 from ..features.square_planner.blueprint import make_square_planner_blueprint
 from ..features.square_planner.model import SquarePlannerBookmark  # noqa: F401
 from ..features.summary.blueprint import make_summary_blueprint
@@ -430,6 +434,7 @@ def create_app(
             "/sharepic",
             make_sharepic_blueprint(config_accessor),
         ),
+        ("/similar-routes", make_similar_routes_blueprint()),
         (
             "/shutdown",
             make_shutdown_blueprint(
@@ -601,6 +606,8 @@ def web_ui_main(
 
     threading.Timer(3.0, open_browser).start()
 
+    background_tasks = [RouteDistanceBackfill()]
+
     if http_server == "waitress":
         logger.info(
             "Starting Waitress server at http://%s:%d with %d threads",
@@ -609,6 +616,7 @@ def web_ui_main(
             threads,
         )
         waitress_application = _without_response_header(app, "Date")
+        start_background_tasks(app, background_tasks)
         waitress.serve(
             waitress_application,
             host=host,
@@ -626,6 +634,12 @@ def web_ui_main(
                 self.cfg.set("worker_class", "gthread")
                 self.cfg.set("threads", threads)
                 self.cfg.set("preload_app", True)
+                self.cfg.set(
+                    "post_fork",
+                    lambda _server, _worker: start_background_tasks(
+                        app, background_tasks
+                    ),
+                )
 
             def load(self) -> Any:
                 return app
@@ -640,6 +654,7 @@ def web_ui_main(
         _GunicornApp().run()
     else:
         logger.info("Starting Werkzeug development server at http://%s:%d", host, port)
+        start_background_tasks(app, background_tasks)
         app.run(host=host, port=port)
 
 
