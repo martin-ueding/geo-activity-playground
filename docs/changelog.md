@@ -17,6 +17,10 @@ Types of changes
 
 ## Unreleased
 
+Added:
+
+- Browse clusters of activities along the same route. Each cluster shows all tracks on a map and plots speed and moving time over the date. ([GH-542](https://github.com/martin-ueding/geo-activity-playground/issues/542))
+
 Changed:
 
 - Update only the affected explorer tiles when you change an activity's start time or delete an activity. The tile history is no longer rebuilt from scratch.
