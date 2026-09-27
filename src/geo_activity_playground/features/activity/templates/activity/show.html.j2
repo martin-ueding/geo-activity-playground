@@ -254,10 +254,7 @@
             }
 
             const trackLayer = L.geoJSON(trackGeojson, {
-                style: styleTrackFeature,
-                filter: function (feature) {
-                    return feature.geometry.type !== 'Point';
-                }
+                style: styleTrackFeature
             }).addTo(map);
             function makeMarkerLayer(geojson) {
                 return L.geoJSON(geojson, {
@@ -534,10 +531,7 @@
 
         // Add activity track
         L.geoJSON(trackGeojson, {
-            style: { color: "{{ activity_line_color }}" },
-            filter: function (feature) {
-                return feature.geometry.type !== 'Point';
-            }
+            style: { color: "{{ activity_line_color }}" }
         }).addTo(map);
 
         // The highlight layer is transparent apart from the tile borders, so it

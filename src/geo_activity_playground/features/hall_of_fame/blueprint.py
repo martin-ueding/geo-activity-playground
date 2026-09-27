@@ -43,8 +43,7 @@ def make_hall_of_fame_blueprint(
                     make_geojson_from_time_series(
                         apply_privacy_zones_to_tracks_if_enabled(
                             get_time_series(activity_id), config
-                        ),
-                        config.eighth_marker_min_distance_km,
+                        )
                     ),
                 )
                 for activity_id, reasons in nominations.items()

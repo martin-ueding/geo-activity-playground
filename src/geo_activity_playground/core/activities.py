@@ -57,24 +57,9 @@ def make_track_feature(
     )
 
 
-def make_geojson_from_time_series(
-    time_series: pd.DataFrame,
-    eighth_marker_min_distance_km: float,
-) -> str:
-    features = []
-    for _, group in time_series.groupby("segment_id"):
-        features.append(
-            geojson.LineString(
-                [(lon, lat) for lat, lon in zip(group["latitude"], group["longitude"])]
-            )
-        )
-
-    features.extend(
-        _make_progress_marker_features(time_series, eighth_marker_min_distance_km)
-    )
-
-    fc = geojson.FeatureCollection(features=features)
-    return geojson.dumps(fc)
+def make_geojson_from_time_series(time_series: pd.DataFrame) -> str:
+    feature = make_track_feature(time_series)
+    return geojson.dumps(geojson.FeatureCollection([feature] if feature else []))
 
 
 def inter_quartile_range(values):

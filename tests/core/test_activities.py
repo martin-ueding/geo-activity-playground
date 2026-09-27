@@ -1,7 +1,10 @@
+import json
+
 import numpy as np
 import pandas as pd
 
 from geo_activity_playground.core.activities import (
+    make_geojson_from_time_series,
     make_track_feature,
 )
 
@@ -31,3 +34,23 @@ def test_track_feature_without_drawable_line() -> None:
         make_track_feature(pd.DataFrame({"latitude": [50.0], "longitude": [7.0]}))
         is None
     )
+
+
+def test_line_geojson_has_no_points() -> None:
+    time_series = pd.DataFrame(
+        {
+            "latitude": np.linspace(50, 51, 10),
+            "longitude": np.linspace(7, 8, 10),
+            "distance_km": np.linspace(0, 100, 10),
+            "segment_id": 0,
+        }
+    )
+    collection = json.loads(make_geojson_from_time_series(time_series))
+
+    assert [f["geometry"]["type"] for f in collection["features"]] == [
+        "MultiLineString"
+    ]
+    assert json.loads(make_geojson_from_time_series(time_series.iloc[:0])) == {
+        "type": "FeatureCollection",
+        "features": [],
+    }

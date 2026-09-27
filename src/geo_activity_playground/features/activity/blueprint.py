@@ -165,9 +165,7 @@ def make_activity_blueprint(
         time_series = apply_privacy_zones_to_tracks_if_enabled(
             get_time_series(id), config
         )
-        line_json = make_geojson_from_time_series(
-            time_series, config.eighth_marker_min_distance_km
-        )
+        line_json = make_geojson_from_time_series(time_series)
 
         meta = query_activity_meta()
         similar_activities = meta.loc[
@@ -297,8 +295,7 @@ def make_activity_blueprint(
         return make_geojson_from_time_series(
             apply_privacy_zones_to_tracks_if_enabled(
                 DB.session.get_one(Activity, id).time_series, ui_config
-            ),
-            ui_config.eighth_marker_min_distance_km,
+            )
         )
 
     @blueprint.route("/name/<name>")
