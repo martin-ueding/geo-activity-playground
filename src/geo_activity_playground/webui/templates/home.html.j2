@@ -67,12 +67,9 @@
                     <span class="text-body-secondary">{{ period.label }}</span>
                     <span>
                         <strong>{{ "%.1f"|format(period.distance_km) }}</strong> km
-                        {% if period.distance_change is not none %}
-                        {% set change = (period.distance_change * 100)|round|int %}
-                        <span class="badge {{ 'text-bg-success' if change >= 0 else 'text-bg-secondary' }}">
-                            {{ '+' if change >= 0 }}{{ change }}&thinsp;%
-                        </span>
-                        {% endif %}
+                        <small class="text-body-secondary">
+                            ({{ period.previous_label }}: {{ "%.1f"|format(period.previous_distance_km) }} km)
+                        </small>
                     </span>
                 </div>
                 <p class="mb-2"><small class="text-body-secondary">

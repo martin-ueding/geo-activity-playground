@@ -12,24 +12,32 @@ class PeriodStats:
     distance_km: float
     elevation_gain: float
     hours: float
-    # Relative change in distance against the same stretch of the previous
-    # period, e.g. this month so far against last month up to the same day.
-    # None when the previous period had no activities to compare against.
-    distance_change: float | None
+    previous_label: str
+    previous_distance_km: float
 
 
 def _period_bounds(
     today: datetime.date,
-) -> list[tuple[str, datetime.date, datetime.date]]:
-    """Label, start of the current period, and start of the previous one."""
+) -> list[tuple[str, str, datetime.date, datetime.date]]:
+    """Labels, start of the current period, and start of the previous one."""
     week = today - datetime.timedelta(days=today.weekday())
     month = today.replace(day=1)
     previous_month = (month - datetime.timedelta(days=1)).replace(day=1)
     year = today.replace(month=1, day=1)
     return [
-        (str(_("This week")), week, week - datetime.timedelta(days=7)),
-        (str(_("This month")), month, previous_month),
-        (str(_("This year")), year, year.replace(year=year.year - 1)),
+        (
+            str(_("This week")),
+            str(_("Last week")),
+            week,
+            week - datetime.timedelta(days=7),
+        ),
+        (str(_("This month")), str(_("Last month")), month, previous_month),
+        (
+            str(_("This year")),
+            str(_("Last year")),
+            year,
+            year.replace(year=year.year - 1),
+        ),
     ]
 
 
@@ -49,7 +57,7 @@ def _aggregate(df: pd.DataFrame, start: datetime.date, end: datetime.date) -> pd
 
 
 def get_period_stats(df: pd.DataFrame) -> list[PeriodStats]:
-    """Totals for week, month and year so far, each against the previous period."""
+    """Totals for week, month and year so far, with the full previous period as reference."""
     if df.empty:
         return []
     today = datetime.date.today()
@@ -57,11 +65,9 @@ def get_period_stats(df: pd.DataFrame) -> list[PeriodStats]:
     df = df.loc[df["start_local"].notna()]
 
     stats = []
-    for label, start, previous_start in _period_bounds(today):
+    for label, previous_label, start, previous_start in _period_bounds(today):
         current = _aggregate(df, start, tomorrow)
-        # Compare like with like: only the elapsed part of the previous period.
-        elapsed = tomorrow - start
-        previous = _aggregate(df, previous_start, previous_start + elapsed)
+        previous = _aggregate(df, previous_start, start)
         stats.append(
             PeriodStats(
                 label=label,
@@ -69,11 +75,8 @@ def get_period_stats(df: pd.DataFrame) -> list[PeriodStats]:
                 distance_km=float(current["distance_km"]),
                 elevation_gain=float(current["elevation_gain"]),
                 hours=float(current["hours"]),
-                distance_change=(
-                    float(current["distance_km"] / previous["distance_km"] - 1)
-                    if previous["distance_km"] > 0
-                    else None
-                ),
+                previous_label=previous_label,
+                previous_distance_km=float(previous["distance_km"]),
             )
         )
     return stats
