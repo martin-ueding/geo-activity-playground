@@ -434,7 +434,7 @@ def create_app(
             "/sharepic",
             make_sharepic_blueprint(config_accessor),
         ),
-        ("/similar-routes", make_similar_routes_blueprint()),
+        ("/similar-routes", make_similar_routes_blueprint(config_accessor)),
         (
             "/shutdown",
             make_shutdown_blueprint(

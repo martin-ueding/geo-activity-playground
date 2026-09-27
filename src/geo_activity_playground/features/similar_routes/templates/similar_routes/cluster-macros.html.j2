@@ -1,0 +1,24 @@
+{% macro cluster_parameters(quantile, quantiles, max_distance_m) %}
+<form method="get" class="row row-cols-auto g-2 align-items-center mb-3">
+    <div class="col">
+        <label for="quantile" class="col-form-label">{{ _('Quantile') }}</label>
+    </div>
+    <div class="col">
+        <select class="form-select form-select-sm" id="quantile" name="quantile">
+            {% for q in quantiles %}
+            <option value="{{ q }}" {% if q == quantile %}selected{% endif %}>{{ q }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col">
+        <label for="max_distance_m" class="col-form-label">{{ _('Maximum distance / m') }}</label>
+    </div>
+    <div class="col">
+        <input type="number" min="0" step="any" class="form-control form-control-sm" id="max_distance_m"
+            name="max_distance_m" value="{{ max_distance_m }}" />
+    </div>
+    <div class="col">
+        <button type="submit" class="btn btn-sm btn-primary">{{ _('Apply') }}</button>
+    </div>
+</form>
+{% endmacro %}

@@ -1,0 +1,83 @@
+{% extends "page.html.j2" %}
+{% from "similar_routes/cluster-macros.html.j2" import cluster_parameters %}
+
+{% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('.clusters', quantile=quantile, max_distance_m=max_distance_m) }}">{{ _('Route clusters') }}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ activity.name }}</li>
+    </ol>
+</nav>
+
+<h1>{{ _('Route cluster') }}</h1>
+
+{{ cluster_parameters(quantile, quantiles, max_distance_m) }}
+
+{% if cluster %}
+<p>
+    {{ _('%(num)d activities around', num=table|length) }}
+    <a href="{{ url_for('activity.show', id=center.id) }}">{{ center.name }}</a>.
+</p>
+
+{{ map_script() }}
+<div id="map-cluster" class="mb-3" style="height: 500px; width: 100%;"></div>
+<script type="module">
+    const center_id = {{ center.id }};
+    const names = {{ names | tojson }};
+    const member_ids = Object.keys(names).map(Number);
+    const map = add_map("map-cluster", null);
+    const layers = await Promise.all(member_ids.map(id =>
+        fetch(`/activity/${id}/line.geojson`).then(response => response.json()).then(geojson =>
+            L.geoJSON(geojson, {
+                filter: feature => (feature.geometry ?? feature).type !== "Point",
+                style: id === center_id
+                    ? { color: "#d62728", weight: 4, opacity: 1.0 }
+                    : { color: "#1f77b4", weight: 3, opacity: 0.4 }
+            }).bindPopup(`<a href="/activity/${id}">${names[id]}</a>`)
+        )
+    ));
+    for (const layer of layers) {
+        layer.addTo(map);
+    }
+    layers.find((_, index) => member_ids[index] === center_id).bringToFront();
+    map.fitBounds(L.featureGroup(layers).getBounds());
+</script>
+
+{{ tabbed_vega(plots) }}
+
+<div class="table-responsive mb-3">
+    <table class="table table-sort table-arrows">
+        <thead>
+            <tr>
+                <th>{{ _('Date') }}</th>
+                <th>{{ _('Activity') }}</th>
+                <th class="numeric-sort">{{ _('Distance to center / m') }}</th>
+                <th class="numeric-sort">{{ _('Distance / km') }}</th>
+                <th>{{ _('Moving time') }}</th>
+                <th class="numeric-sort">{{ _('Avg. Speed / km/h') }}</th>
+                <th>{{ _('Kind') }}</th>
+                <th>{{ _('Equipment') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+            <tr>
+                <td>{% if row.start %}{{ row.start|dt }}{% endif %}</td>
+                <td><a href="{{ url_for('activity.show', id=row.activity_id) }}">{{ row.name }}</a></td>
+                <td>{{ '%.0f'|format(row.distance_to_center_m) }}</td>
+                <td>{% if row.distance_km is not none %}{{ row.distance_km | round(2) }}{% endif %}</td>
+                <td>{% if row.moving_time is not none %}{{ row.moving_time|td }}{% endif %}</td>
+                <td>{% if row.average_speed_kmh is not none %}{{ row.average_speed_kmh | round(1) }}{% endif %}</td>
+                <td>{{ row.kind }}</td>
+                <td>{{ row.equipment }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>{{ _('This activity is not part of a route cluster with these parameters.') }}</p>
+{% endif %}
+{% endblock %}

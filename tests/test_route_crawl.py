@@ -105,6 +105,7 @@ ID_SAMPLES = {
     "sharepic.activity": "activity_id",
     "sharepic.plain_activity": "activity_id",
     "similar_routes.activity": "activity_id",
+    "similar_routes.cluster": "activity_id",
 }
 
 

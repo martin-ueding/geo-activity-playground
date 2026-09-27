@@ -1,0 +1,42 @@
+{% extends "page.html.j2" %}
+{% from "similar_routes/cluster-macros.html.j2" import cluster_parameters %}
+
+{% block container %}
+<h1>{{ _('Route clusters') }}</h1>
+
+<p>
+    {{ _('Activities are grouped around a central activity. Every member and the center lie on each other within the maximum distance.') }}
+</p>
+
+{{ cluster_parameters(quantile, quantiles, max_distance_m) }}
+
+{% if clusters %}
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+    {% for cluster in clusters %}
+    {% set url = url_for('.cluster', id=cluster.center.id, quantile=quantile, max_distance_m=max_distance_m) %}
+    <div class="col">
+        <div class="card">
+            <a href="{{ url }}">
+                <img class="card-img-top" loading="lazy"
+                    src="{{ url_for('sharepic.plain_activity', id=cluster.center.id) }}" />
+            </a>
+            <div class="card-body">
+                <a href="{{ url }}">
+                    <h5 class="card-title">{{ cluster.name }}</h5>
+                </a>
+                <p class="card-text">
+                    {{ _('%(num)d activities', num=cluster.size) }}
+                    {% if cluster.first %}
+                    <br />
+                    {{ cluster.first|dt }} – {{ cluster.last|dt }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>{{ _('No route clusters found within this distance.') }}</p>
+{% endif %}
+{% endblock %}
