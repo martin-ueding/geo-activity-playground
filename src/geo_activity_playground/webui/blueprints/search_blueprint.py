@@ -3,13 +3,13 @@ import math
 import urllib.parse
 
 import geojson
-import pandas as pd
 import sqlalchemy
 from flask import Blueprint, Response, redirect, render_template, request
 from flask.typing import ResponseReturnValue
 from matplotlib import colormaps
 from matplotlib.colors import to_hex
 
+from ...core.activities import make_track_feature
 from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     DB,
@@ -127,31 +127,14 @@ def make_search_blueprint(
             time_series = apply_privacy_zones_to_tracks_if_enabled(
                 activity.time_series, ui_config
             )
-            if "latitude" not in time_series or "longitude" not in time_series:
-                continue
-            grouped = (
-                time_series.groupby("segment_id")
-                if "segment_id" in time_series.columns
-                else [(0, time_series)]
+            feature = make_track_feature(
+                time_series,
+                activity_id=activity.id,
+                activity_name=activity.name,
+                color=to_hex(cmap(rank[activity.id] % 8)),
             )
-            color = to_hex(cmap(rank[activity.id] % 8))
-            for _, group in grouped:
-                coordinates = [
-                    [lon, lat]
-                    for lat, lon in zip(group["latitude"], group["longitude"])
-                    if not pd.isna(lat) and not pd.isna(lon)
-                ]
-                if len(coordinates) >= 2:
-                    features.append(
-                        geojson.Feature(
-                            geometry=geojson.LineString(coordinates=coordinates),
-                            properties={
-                                "activity_id": activity.id,
-                                "activity_name": activity.name,
-                                "color": color,
-                            },
-                        )
-                    )
+            if feature:
+                features.append(feature)
         return Response(
             geojson.dumps(geojson.FeatureCollection(features=features)),
             mimetype="application/json",

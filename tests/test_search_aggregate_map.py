@@ -70,7 +70,8 @@ def test_aggregate_geojson_covers_every_activity(app: Flask) -> None:
     features = response.get_json()["features"]
 
     assert {feature["properties"]["activity_id"] for feature in features} == expected
-    assert len(features) == 60 * 3
+    assert len(features) == 60
+    assert all(len(feature["geometry"]["coordinates"]) == 3 for feature in features)
 
 
 def test_aggregate_geojson_keeps_newest_first_within_cap(app: Flask) -> None:

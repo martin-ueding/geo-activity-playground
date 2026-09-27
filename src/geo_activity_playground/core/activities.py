@@ -34,6 +34,29 @@ def make_geojson_progress_markers_time_based(
     return geojson.dumps(feature_collection)
 
 
+def make_track_feature(
+    time_series: pd.DataFrame, **properties: Any
+) -> geojson.Feature | None:
+    """One feature with a line per segment, or `None` if nothing can be drawn."""
+    if not {"latitude", "longitude"} <= set(time_series.columns):
+        return None
+    groups = (
+        time_series.groupby("segment_id")
+        if "segment_id" in time_series.columns
+        else [(0, time_series)]
+    )
+    lines = [
+        coordinates.to_numpy().tolist()
+        for _, group in groups
+        if len(coordinates := group[["longitude", "latitude"]].dropna()) >= 2
+    ]
+    if not lines:
+        return None
+    return geojson.Feature(
+        geometry=geojson.MultiLineString(lines), properties=properties
+    )
+
+
 def make_geojson_from_time_series(
     time_series: pd.DataFrame,
     eighth_marker_min_distance_km: float,

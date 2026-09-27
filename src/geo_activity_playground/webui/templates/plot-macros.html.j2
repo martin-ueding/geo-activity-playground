@@ -64,7 +64,7 @@
 
         let geojson_layer = L.geoJSON(geojson, {
             style: feature => {
-                if (feature?.geometry?.type === "LineString") {
+                if (["LineString", "MultiLineString"].includes(feature?.geometry?.type)) {
                     return {
                         color: feature?.properties?.color || "#3388ff",
                         weight: options.weight || 4,

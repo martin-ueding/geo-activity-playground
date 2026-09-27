@@ -11,6 +11,7 @@ from flask import Blueprint, redirect, render_template, url_for
 from flask.typing import ResponseReturnValue
 from flask_babel import gettext as _
 
+from ...core.activities import make_track_feature
 from ...core.config import ConfigAccessor
 from ...core.datamodel import (
     DB,
@@ -419,21 +420,13 @@ def make_calendar_blueprint(
         cmap = matplotlib.colormaps["Dark2"]
         fc = geojson.FeatureCollection(
             features=[
-                geojson.Feature(
-                    geometry=geojson.MultiLineString(
-                        coordinates=[
-                            [
-                                [lon, lat]
-                                for lat, lon in zip(
-                                    group["latitude"], group["longitude"]
-                                )
-                            ]
-                            for _, group in ts.groupby("segment_id")
-                        ]
-                    ),
-                    properties={"color": matplotlib.colors.to_hex(cmap(i % 8))},
-                )
+                feature
                 for i, ts in enumerate(time_series)
+                if (
+                    feature := make_track_feature(
+                        ts, color=matplotlib.colors.to_hex(cmap(i % 8))
+                    )
+                )
             ]
         )
 
