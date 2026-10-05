@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Fixed:
+
+- Take the step count of FIT files from the session summary instead of the last lap. Re-parse affected activities to correct their steps. ([GH-526](https://github.com/martin-ueding/geo-activity-playground/issues/526))
+
 ## Version 1.56.0 — 2026-09-27
 
 Added:
