@@ -38,7 +38,7 @@ Fixed:
 
 Added:
 
-- Browse clusters of activities along the same route. Each cluster shows all tracks on a map and plots speed and moving time over the date. ([GH-542](https://github.com/martin-ueding/geo-activity-playground/issues/542))
+- Browse clusters of activities along the same route. Each cluster shows all tracks on a map and plots speed and moving time over the date. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
 
 Changed:
 
@@ -47,7 +47,7 @@ Changed:
 
 Fixed:
 
-- Remove the broken markers from the segment maps. Preview maps of activities no longer show progress markers. ([GH-542](https://github.com/martin-ueding/geo-activity-playground/issues/542))
+- Remove the broken markers from the segment maps. Preview maps of activities no longer show progress markers. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
 
 ## Version 1.55.0 — 2026-08-31
 
