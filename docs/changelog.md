@@ -24,6 +24,7 @@ Added:
 
 Changed:
 
+- List only activities as similar routes whose tracks both lie on each other by default. Short trips no longer match every long route nearby. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
 - Treat the Strava export and the Strava API as separate sources, each with its own duplicate matching priority. ([GH-521](https://github.com/martin-ueding/geo-activity-playground/issues/521))
 
 Fixed:
