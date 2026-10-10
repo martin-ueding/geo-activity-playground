@@ -127,7 +127,24 @@
         L.popup().setLatLng(event.latlng).setContent(form.element).openOn(map);
     });
 
-    if (markers.length) {
+    // Every form redirects back to this page, which should show the same view again.
+    const viewKey = "places-edit-view";
+    document.addEventListener("submit", event => {
+        if (!event.defaultPrevented) {
+            try {
+                sessionStorage.setItem(viewKey, JSON.stringify({ center: map.getCenter(), zoom: map.getZoom() }));
+            } catch { }
+        }
+    });
+    let savedView = null;
+    try {
+        savedView = JSON.parse(sessionStorage.getItem(viewKey));
+        sessionStorage.removeItem(viewKey);
+    } catch { }
+
+    if (savedView) {
+        map.setView(savedView.center, savedView.zoom);
+    } else if (markers.length) {
         map.fitBounds(L.latLngBounds(markers.map(marker => marker.getLatLng())), { padding: [50, 50], maxZoom: 16 });
     } else {
         map.setView({{ fallback_center | tojson }}, 13);
