@@ -102,6 +102,11 @@ def stage_file_metadata(activity: Activity, parsed: Activity) -> None:
     activity.kind_from_file = parsed.kind.name if parsed.kind is not None else None
     if parsed.equipment is not None:
         activity.equipment_from_file = parsed.equipment.name
+    if parsed is not activity:
+        # The backrefs would otherwise keep the transient parse result in the
+        # collections of persistent kinds and equipments, and every flush warns.
+        parsed.kind = None
+        parsed.equipment = None
 
 
 def stage_path_metadata(activity: Activity, config: ActivityImportConfig) -> None:
