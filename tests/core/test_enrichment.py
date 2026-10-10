@@ -147,3 +147,23 @@ def test_computed_speed_keeps_stops() -> None:
     enrichment.enrichment_moving_time(activity, time_series, config, force=False)
 
     assert time_series.loc[2:3, "speed"].eq(0.0).all()
+
+
+def test_moving_time_includes_last_sample() -> None:
+    activity = Activity(name="Ride")
+    activity.index_begin = 1
+    activity.index_end = None
+    time_series = pd.DataFrame(
+        {
+            "time": pd.Timestamp("2026-01-01T00:00:00Z")
+            + pd.to_timedelta(range(4), unit="s"),
+            "speed": [15.0] * 4,
+            "segment_id": [0] * 4,
+        }
+    )
+
+    enrichment.enrichment_moving_time(
+        activity, time_series, ActivityImportConfig(), force=False
+    )
+
+    assert activity.moving_time == pd.Timedelta(seconds=2)

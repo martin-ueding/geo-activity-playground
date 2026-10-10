@@ -318,7 +318,7 @@ def enrichment_distance(
     return changed
 
 
-@enrichment_step(version=1)
+@enrichment_step(version=2)
 def enrichment_moving_time(
     activity: Activity,
     time_series: pd.DataFrame,
@@ -331,7 +331,7 @@ def enrichment_moving_time(
         return time_diff.sum()
 
     new_moving_time = (
-        time_series.iloc[activity.index_begin or 0 : activity.index_end or -1]
+        time_series.iloc[activity.index_begin or 0 : activity.index_end]
         .groupby("segment_id")
         .apply(moving_time, include_groups=False)
         .sum()
