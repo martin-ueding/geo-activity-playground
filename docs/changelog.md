@@ -31,6 +31,8 @@ Fixed:
 
 - Keep the names and kinds from the `activities.csv` of the Strava export when re-parsing. The next scan repairs affected activities. ([GH-521](https://github.com/martin-ueding/geo-activity-playground/issues/521))
 - Take the step count of FIT files from the session summary instead of the last lap. Re-parse affected activities to correct their steps. ([GH-526](https://github.com/martin-ueding/geo-activity-playground/issues/526))
+- Stop zooming share pictures and similar route previews in to street level when privacy zones leave only a short piece of the track. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
+- Center the track in the previews of similar routes. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
 - Hide the steps and the activity name on the share picture when they are switched off in the settings. ([GH-525](https://github.com/martin-ueding/geo-activity-playground/issues/525))
 - Count stops as not moving, also in activities that contain GPS spikes. The next scan re-parses all activities from files. ([GH-529](https://github.com/martin-ueding/geo-activity-playground/issues/529))
 - Keep values of 0 for speed, cadence, power and elevation from FIT files instead of dropping them. ([GH-529](https://github.com/martin-ueding/geo-activity-playground/issues/529))
