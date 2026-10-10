@@ -51,6 +51,8 @@ def file_sha256(filename: pathlib.Path) -> str:
 def get_metadata_from_path(
     path: pathlib.Path, metadata_extraction_regexes: list[str]
 ) -> dict[str, str]:
+    if not path.is_relative_to(ACTIVITY_DIR):
+        return {}
     for regex in metadata_extraction_regexes:
         if m := re.search(regex, path.relative_to(ACTIVITY_DIR).as_posix()):
             return m.groupdict()

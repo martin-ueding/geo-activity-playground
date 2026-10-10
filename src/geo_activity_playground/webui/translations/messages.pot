@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-27 18:39+0200\n"
+"POT-Creation-Date: 2026-10-05 21:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1492,13 +1492,13 @@ msgid "Explored"
 msgstr ""
 
 #: src/geo_activity_playground/features/explorer/templates/explorer/server-side.html.j2:64
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:681
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:682
 msgid "Missing"
 msgstr ""
 
 #: src/geo_activity_playground/features/explorer/templates/explorer/server-side.html.j2:65
 #: src/geo_activity_playground/features/explorer/templates/explorer/tooltip.html.j2:28
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:692
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:693
 msgid "Inaccessible"
 msgstr ""
 
@@ -2680,268 +2680,273 @@ msgid "Directory / Manual Upload"
 msgstr ""
 
 #: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:130
-msgid "Strava"
+#: src/geo_activity_playground/webui/templates/settings/base.html.j2:9
+msgid "Strava API"
 msgstr ""
 
 #: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:131
+msgid "Strava Export"
+msgstr ""
+
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:132
 msgid "Hammerhead"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:297
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:298
 msgid "The activity will be imported again on the next import scan."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:313
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:314
 #, python-format
 msgid ""
 "Cleared %(count)s failed imports. They will be retried on the next import"
 " scan."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:349
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:350
 msgid "Updated duplicate matching settings."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:404
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:405
 msgid "Invalid choice."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:408
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:409
 msgid "Merged the duplicate; the other activity has been removed."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:421
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:422
 msgid ""
 "Dismissed; these activities will not be flagged as duplicates of each "
 "other again unless re-imported."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:438
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:439
 msgid "Tile visit state has been reset and re-indexed."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:445
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:446
 #, python-format
 msgid "Cleared %(dropped)s cached filtered cluster states."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:455
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:456
 #, python-format
 msgid ""
 "Dropped %(dropped)s cached filtered cluster states (unused for six "
 "months)."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:466
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:467
 msgid "The explorer tile history has been recomputed."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:478
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:479
 msgid "All activities have been re-enriched."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:490
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:491
 msgid "Activities have been repaired and reprocessed."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:498
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:499
 msgid ""
 "Local activity state has been wiped. Equipment, kinds, and Strava API "
 "credentials were preserved."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:509
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:510
 #, python-format
 msgid ""
 "Refreshed activity names from Strava. Updated %(updated_names)s "
 "activities."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:519
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:520
 #, python-format
 msgid ""
 "Re-parsed %(reparsed)s activities from their source data, %(skipped)s "
 "skipped because their source data is not available."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:540
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:541
 msgid "Activity timezones have been fixed."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:586
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:587
 #, python-format
 msgid "'%(code)s' is not a known ISO 4217 currency code."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:592
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:593
 msgid "Currency updated."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:680
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:681
 msgid "Visited"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:682
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:683
 msgid "New in this activity"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:684
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:685
 msgid "New in this activity, joined a cluster"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:687
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:688
 msgid "Visited before, joined a cluster in this activity"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:689
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:690
 msgid "Part of max cluster"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:690
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:691
 msgid "Part of other cluster"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:691
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:692
 msgid "Part of cluster before this activity"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:696
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:697
 msgid "Tile state"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:698
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:699
 msgid ""
 "These roles mean the same thing in every color strategy that uses them: "
 "whether a tile has been visited at all, is missing, or was marked "
 "inaccessible."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:709
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:710
 msgid "Cluster layer"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:711
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:712
 msgid ""
 "Used together by the “Max Cluster” color strategy to set apart the "
 "largest cluster from the rest."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:717
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:718
 msgid "Activity highlight layer"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:719
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:720
 msgid ""
 "Used together by the “New Tiles & Cluster Growth” color strategy to show "
 "what one activity changed: newly visited tiles, tiles that newly joined a"
 " cluster, and tiles that were already part of a cluster before."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:763
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:764
 msgid "Updated tile rendering."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:797
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:798
 msgid "Solid"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:798
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:799
 msgid "Dashed"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:971
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:972
 msgid "Updated privacy zone settings."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:993
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1026
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:994
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1027
 msgid "Zone name is required."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:999
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1033
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1000
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1034
 #, python-format
 msgid "A privacy zone named '%(name)s' already exists."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1011
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1012
 #, python-format
 msgid "Privacy zone '%(name)s' added."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1046
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1047
 #, python-format
 msgid "Privacy zone '%(name)s' updated."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1064
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1065
 #, python-format
 msgid "Privacy zone '%(name)s' deleted."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1098
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1099
 msgid "Updated summary table columns."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1132
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1133
 msgid "Updated explorer zoom levels."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1136
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1137
 msgid "At least one zoom level has to be enabled."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1184
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1185
 msgid "Updated the activities counting for explorer tiles."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1205
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1206
 msgid "Updated explorer tile settings."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1221
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1222
 msgid "Updated map display preferences."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1367
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1368
 #, python-format
 msgid "The map tile URL has not been saved: %(error)s"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1387
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1388
 #, python-format
 msgid "'%(mode)s' is not a known blend mode."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1395
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1396
 msgid "Tile settings updated."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1430
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1431
 #, python-format
 msgid "Could not parse GeoJSON for %(name)s due to the following error: %(error)s"
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1441
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1442
 #, python-format
 msgid "Pasted GeoJSON for %(name)s must be of type 'FeatureCollection'."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1453
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1454
 #, python-format
 msgid ""
 "Pasted GeoJSON for %(name)s must contain exactly one feature. You cannot "
 "have multiple shapes for one privacy zone."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1465
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1466
 #, python-format
 msgid ""
 "Geometry for %(name)s is not a polygon. You need to create a polygon (or "
 "circle or rectangle)."
 msgstr ""
 
-#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1477
+#: src/geo_activity_playground/webui/blueprints/settings_blueprint.py:1478
 #, python-format
 msgid ""
 "Polygon for %(name)s consists of multiple polygons. Please supply a "
@@ -3249,10 +3254,6 @@ msgstr ""
 #: src/geo_activity_playground/webui/templates/settings/base.html.j2:7
 #: src/geo_activity_playground/webui/templates/settings/index.html.j2:17
 msgid "Data Sources"
-msgstr ""
-
-#: src/geo_activity_playground/webui/templates/settings/base.html.j2:9
-msgid "Strava API"
 msgstr ""
 
 #: src/geo_activity_playground/webui/templates/settings/base.html.j2:10

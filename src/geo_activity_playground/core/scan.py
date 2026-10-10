@@ -9,7 +9,11 @@ from ..features.explorer.filtered import delete_outdated_filtered_cluster_cache
 from ..features.hammerhead.source import HammerheadActivitySource
 from ..features.segments.matching import find_matches
 from ..features.segments.model import Segment
-from ..features.strava.source import StravaActivitySource
+from ..features.strava.source import (
+    StravaApiActivitySource,
+    StravaCheckoutActivitySource,
+)
+from ..features.strava.upstream import API_SOURCE, STRAVA_SOURCES
 from .config import ConfigAccessor
 from .datamodel import DB, Activity, count_activities
 from .pipeline import refresh_stale_enrichments
@@ -20,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 _ACTIVITY_SOURCES: list[ActivitySource] = [
     DirectoryImportSource(),
-    StravaActivitySource(),
+    StravaCheckoutActivitySource(),
+    StravaApiActivitySource(),
     HammerheadActivitySource(),
 ]
 
@@ -37,12 +42,12 @@ def scan_for_activities(
     for activity_source in _ACTIVITY_SOURCES:
         if not activity_source.is_enabled(config_accessor):
             continue
-        if activity_source.source == "strava" and skip_strava:
+        if activity_source.source in STRAVA_SOURCES and skip_strava:
             continue
         if activity_source.source == "hammerhead" and skip_hammerhead:
             continue
 
-        if activity_source.source == "strava":
+        if activity_source.source == API_SOURCE:
             begin = strava_begin
             end = strava_end
         elif activity_source.source == "hammerhead":

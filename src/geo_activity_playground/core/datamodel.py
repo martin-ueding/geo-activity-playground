@@ -876,8 +876,13 @@ class ActivityImportConfig(DB.Model):
     duplicate_source_priorities: Mapped[dict[str, int]] = mapped_column(
         MutableDict.as_mutable(sa.JSON),
         nullable=False,
-        default=lambda: {"directory": 10, "strava": 20, "hammerhead": 30},
-        server_default='{"directory": 10, "strava": 20, "hammerhead": 30}',
+        default=lambda: {
+            "directory": 10,
+            "strava": 20,
+            "strava_export": 20,
+            "hammerhead": 30,
+        },
+        server_default='{"directory": 10, "strava": 20, "strava_export": 20, "hammerhead": 30}',
     )
     """Lower number wins when a cross-source duplicate is auto-resolved.
 

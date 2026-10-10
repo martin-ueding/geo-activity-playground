@@ -21,7 +21,6 @@ from ...core.datamodel import (
 )
 from ...core.duplicate_matching import check_for_duplicate
 from ...core.enrichment import update_and_commit
-from ...core.import_exclusion import is_excluded
 from ...core.paths import (
     activity_extracted_time_series_dir,
     strava_api_dir,
@@ -30,6 +29,7 @@ from ...core.paths import (
 from ...core.pipeline import ingest_parsed_activity, keep_trim_indices
 from ...core.tasks import get_state, set_state
 from .model import StravaConfig
+from .upstream import is_strava_activity_excluded
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +240,7 @@ def try_import_strava(
                 logger.info(f"Reached {strava_end}, stopping.")
                 break
 
-            if is_excluded("strava", str(strava_activity.id)):
+            if is_strava_activity_excluded(strava_activity.id):
                 logger.info(
                     f"Strava activity {strava_activity.id} is excluded from import, skipping."
                 )

@@ -127,7 +127,8 @@ def _import_exclusion_reasons() -> dict[str, str]:
 def _activity_source_labels() -> dict[str, str]:
     return {
         "directory": _("Directory / Manual Upload"),
-        "strava": _("Strava"),
+        "strava": _("Strava API"),
+        "strava_export": _("Strava Export"),
         "hammerhead": _("Hammerhead"),
     }
 
