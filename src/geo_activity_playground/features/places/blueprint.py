@@ -40,11 +40,8 @@ def make_places_blueprint(authenticator: Authenticator, flasher: Flasher) -> Blu
                 for place in places
             },
             map_edges=[
-                {"origin": origin, "destination": destination, "count": count}
-                for (origin, destination), count in legs.items()
-                if origin is not None
-                and destination is not None
-                and origin != destination
+                {"places": list(pair), "count": count}
+                for pair, count in _undirected_edges(legs).items()
             ],
             **search_vars,
         )
@@ -141,3 +138,14 @@ def _matrix_keys(legs: collections.Counter[Leg]) -> list[PlaceId]:
         totals[origin] += count
         totals[destination] += count
     return sorted(totals, key=lambda id: (id is None, -totals[id]))
+
+
+def _undirected_edges(
+    legs: collections.Counter[Leg],
+) -> collections.Counter[tuple[int, int]]:
+    """Legs in both directions between two distinct known places."""
+    edges: collections.Counter[tuple[int, int]] = collections.Counter()
+    for (origin, destination), count in legs.items():
+        if origin is not None and destination is not None and origin != destination:
+            edges[min(origin, destination), max(origin, destination)] += count
+    return edges

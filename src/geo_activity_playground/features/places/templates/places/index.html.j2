@@ -32,35 +32,10 @@
     const map = add_map("map-places", null);
     const maxCount = Math.max(1, ...edges.map(edge => edge.count));
     for (const edge of edges) {
-        const origin = places[edge.origin];
-        const destination = places[edge.destination];
-        const a = map.project([origin.latitude, origin.longitude], 0);
-        const b = map.project([destination.latitude, destination.longitude], 0);
-        const direction = b.subtract(a);
-        // Bending to the right of the direction of travel separates A → B from B → A.
-        const control = a.add(b).divideBy(2).add(L.point(-direction.y, direction.x).multiplyBy(0.15));
-        const curve = [];
-        for (let i = 0; i <= 32; i++) {
-            const t = i / 32;
-            curve.push(map.unproject(
-                a.multiplyBy((1 - t) ** 2).add(control.multiplyBy(2 * (1 - t) * t)).add(b.multiplyBy(t ** 2)), 0));
-        }
-        const weight = 1 + 9 * edge.count / maxCount;
-        const tooltip = text(`${origin.name} → ${destination.name}: ${edge.count}`);
-        L.polyline(curve, { color: color, weight: weight, opacity: 0.7 }).bindTooltip(tooltip).addTo(map);
-
-        const size = 10 + 2 * weight;
-        const angle = Math.atan2(direction.y, direction.x) * 180 / Math.PI;
-        L.marker(map.unproject(a.add(control.multiplyBy(2)).add(b).divideBy(4), 0), {
-            interactive: false,
-            icon: L.divIcon({
-                className: "",
-                iconSize: [size, size],
-                iconAnchor: [size / 2, size / 2],
-                html: `<svg width="${size}" height="${size}" viewBox="0 0 10 10" style="transform: rotate(${angle}deg)">
-                    <path d="M 1 1 L 9 5 L 1 9 Z" fill="${color}" stroke="white" stroke-width="0.8" /></svg>`,
-            }),
-        }).addTo(map);
+        const [a, b] = edge.places.map(id => places[id]);
+        L.polyline([[a.latitude, a.longitude], [b.latitude, b.longitude]], {
+            color: color, weight: 1 + 9 * edge.count / maxCount, opacity: 0.7,
+        }).bindTooltip(text(`${a.name} – ${b.name}: ${edge.count}`)).addTo(map);
     }
 
     const markers = Object.values(places).map(place => {

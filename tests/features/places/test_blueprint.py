@@ -1,8 +1,11 @@
+import collections
+
 import sqlalchemy
 from flask import Flask
 
 from geo_activity_playground.core.datamodel import DB, Activity
 from geo_activity_playground.core.meta_search import activity_ids_for_search
+from geo_activity_playground.features.places.blueprint import _undirected_edges
 from geo_activity_playground.features.places.model import Place, Stay, StayKind
 
 
@@ -67,3 +70,11 @@ def test_place_without_name_is_rejected(seeded_app: Flask, seeded_client) -> Non
     assert response.status_code == 302
     with seeded_app.app_context():
         assert DB.session.scalar(sqlalchemy.select(Place)) is None
+
+
+def test_map_edges_combine_both_directions() -> None:
+    legs = collections.Counter(
+        {(1, 2): 3, (2, 1): 2, (1, 1): 4, (None, 1): 5, (3, None): 1, (2, 3): 1}
+    )
+
+    assert _undirected_edges(legs) == {(1, 2): 5, (2, 3): 1}
