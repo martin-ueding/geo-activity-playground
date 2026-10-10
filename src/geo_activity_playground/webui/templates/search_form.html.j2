@@ -66,6 +66,22 @@
                                         name="distance_km_max" value="{{ query.distance_km_max }}">
                                 </div>
 
+                                {% if places_avail %}
+                                {% for key, label in [('start_place', _('Start place')), ('end_place', _('End place')), ('stop_place', _('Stopped at place'))] %}
+                                <div class="col-4">
+                                    <label for="{{ key }}" class="form-label">{{ label }}</label>
+                                    <select class="form-select" id="{{ key }}" name="{{ key }}">
+                                        <option value="">{{ _('Any') }}</option>
+                                        {% for place in places_avail %}
+                                        <option value="{{ place.id }}" {% if place.id == query[key] %} selected {% endif %}>
+                                            {{ place.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+
                                 <div class="col-12">
                                     <label for="" class="form-label">{{ _('Kind') }}</label>
                                     <div class="form-control">

@@ -10,6 +10,7 @@ import geo_activity_playground.features.explorer.model  # noqa: F401
 import geo_activity_playground.features.hammerhead.model  # noqa: F401
 import geo_activity_playground.features.heatmap.model  # noqa: F401
 import geo_activity_playground.features.maintenance.model  # noqa: F401
+import geo_activity_playground.features.places.model  # noqa: F401
 import geo_activity_playground.features.plot_builder.model  # noqa: F401
 import geo_activity_playground.features.segments.model  # noqa: F401
 import geo_activity_playground.features.similar_routes.model  # noqa: F401

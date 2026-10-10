@@ -26,6 +26,7 @@ from geo_activity_playground.features.explorer.model import (
     ExplorerTileBookmark,
 )
 from geo_activity_playground.features.heatmap.model import HeatmapTileCache
+from geo_activity_playground.features.places.model import Place, Stay, StayKind
 from geo_activity_playground.features.plot_builder.model import PlotSpec
 from geo_activity_playground.features.segments.model import (
     Segment,
@@ -112,6 +113,15 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
             num_activities=1,
             last_used=datetime.datetime(2024, 1, 1),
         )
+        place = Place(name="Home", latitude=50.0, longitude=7.0)
+        stay = Stay(
+            activity=activity,
+            place=place,
+            sequence=0,
+            kind=StayKind.START,
+            latitude=50.0,
+            longitude=7.0,
+        )
 
         DB.session.add_all(
             [
@@ -129,6 +139,8 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
                 plot_spec,
                 stored_query,
                 heatmap_cache,
+                place,
+                stay,
             ]
         )
         DB.session.commit()
@@ -179,6 +191,8 @@ def test_wipe_local_state_truncates_user_tables_and_files(client, app, tmp_path)
             PlotSpec,
             StoredSearchQuery,
             HeatmapTileCache,
+            Place,
+            Stay,
         ]:
             assert (
                 DB.session.scalar(

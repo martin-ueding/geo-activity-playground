@@ -85,6 +85,7 @@ from ...features.explorer.zoom_levels import (
 from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.heatmap.blueprint import register_heatmap_settings
 from ...features.heatmap.model import HeatmapTileCache
+from ...features.places.model import Place, Stay
 from ...features.plot_builder.model import PlotSpec
 from ...features.segments.model import Segment, SegmentCheck, SegmentMatch
 from ...features.sharepic.render import SHAREPIC_FIELDS
@@ -220,7 +221,9 @@ def _truncate_user_content_tables() -> None:
     DB.session.execute(sqlalchemy.delete(ClusterMembership))
     DB.session.execute(sqlalchemy.delete(FilteredClusterCache))
     DB.session.execute(sqlalchemy.delete(Photo))
+    DB.session.execute(sqlalchemy.delete(Stay))
     DB.session.execute(sqlalchemy.delete(Activity))
+    DB.session.execute(sqlalchemy.delete(Place))
     DB.session.execute(sqlalchemy.delete(Segment))
     DB.session.execute(sqlalchemy.delete(Tag))
     DB.session.execute(sqlalchemy.delete(ExplorerTileBookmark))

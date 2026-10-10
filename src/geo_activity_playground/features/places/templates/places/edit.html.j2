@@ -1,0 +1,175 @@
+{% extends "page.html.j2" %}
+
+{% block container %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('.index') }}">{{ _('Places') }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _('Edit') }}</li>
+    </ol>
+</nav>
+
+<h1 class="mb-3">{{ _('Edit places') }}</h1>
+
+<p>
+    {{ _('Red markers are places, the circle around them shows the matching radius. Orange markers are proposals from starts, ends and stops that recur in at least three activities and lie outside of all places.') }}
+    {{ _('Nearby proposals are grouped into clusters until you zoom in.') }}
+    {{ _('Click on a marker to name, save or delete it. Drag a marker to move it. Click anywhere on the map to create a new place.') }}
+</p>
+
+{{ map_script() }}
+<div id="map-places" class="mb-3" style="height: 700px; width: 100%;"></div>
+<script type="module">
+    const places = {{ places | tojson }};
+    const proposals = {{ proposals | tojson }};
+    const radius = {{ radius_m | tojson }};
+    const newUrl = {{ url_for('.new') | tojson }};
+    const labels = {{ {
+        "name": _('Name'),
+        "save": _('Save'),
+        "create": _('Create place'),
+        "delete": _('Delete'),
+        "confirmDelete": _('Are you sure to delete this place?'),
+        "proposal": _('%(stays)s stays in %(activities)s activities', stays='{stays}', activities='{activities}'),
+    } | tojson }};
+
+    function dotIcon(color) {
+        return L.divIcon({
+            className: "",
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+            html: `<div style="width: 18px; height: 18px; border-radius: 50%; background: ${color}; border: 2px solid white; box-shadow: 0 0 3px black;"></div>`,
+        });
+    }
+
+    function placeForm(action, name, submitLabel, deleteUrl = null) {
+        const container = document.createElement("div");
+        const form = document.createElement("form");
+        form.method = "post";
+        form.action = action;
+        const nameInput = document.createElement("input");
+        Object.assign(nameInput, {
+            type: "text", name: "name", value: name, required: true,
+            placeholder: labels.name, className: "form-control form-control-sm mb-2",
+        });
+        const latitude = Object.assign(document.createElement("input"), { type: "hidden", name: "latitude" });
+        const longitude = Object.assign(document.createElement("input"), { type: "hidden", name: "longitude" });
+        const submit = Object.assign(document.createElement("button"), {
+            type: "submit", className: "btn btn-sm btn-primary", textContent: submitLabel,
+        });
+        form.append(nameInput, latitude, longitude, submit);
+        container.append(form);
+        if (deleteUrl) {
+            const deleteForm = Object.assign(document.createElement("form"), {
+                method: "post", action: deleteUrl, className: "mt-2",
+            });
+            deleteForm.addEventListener("submit", event => {
+                if (!confirm(labels.confirmDelete)) {
+                    event.preventDefault();
+                }
+            });
+            deleteForm.append(Object.assign(document.createElement("button"), {
+                type: "submit", className: "btn btn-sm btn-danger", textContent: labels.delete,
+            }));
+            container.append(deleteForm);
+        }
+        return {
+            element: container,
+            setPosition(latlng) {
+                const { lat, lng } = L.latLng(latlng);
+                latitude.value = lat;
+                longitude.value = lng;
+            },
+        };
+    }
+
+    function editableMarker(latlng, color, form, tooltip, layer, permanentRadius) {
+        const marker = L.marker(latlng, { draggable: true, icon: dotIcon(color) }).addTo(layer);
+        const circle = L.circle(latlng, { radius: radius, color: color, weight: 1, fillOpacity: 0.1, interactive: false });
+        if (permanentRadius) {
+            circle.addTo(map);
+        } else {
+            marker.on("popupopen dragstart", () => circle.setLatLng(marker.getLatLng()).addTo(map));
+            marker.on("popupclose", () => circle.remove());
+        }
+        form.setPosition(latlng);
+        marker.bindPopup(form.element);
+        if (tooltip) {
+            const span = document.createElement("span");
+            span.textContent = tooltip;
+            marker.bindTooltip(span, { direction: "right" });
+        }
+        marker.on("drag", () => circle.setLatLng(marker.getLatLng()));
+        marker.on("dragend", () => {
+            form.setPosition(marker.getLatLng());
+            marker.openPopup();
+        });
+        return marker;
+    }
+
+    const map = add_map("map-places", null);
+    const proposalLayer = L.markerClusterGroup({ disableClusteringAtZoom: 17 }).addTo(map);
+    const markers = [];
+    for (const place of places) {
+        markers.push(editableMarker([place.latitude, place.longitude], "#d62728",
+            placeForm(place.update_url, place.name, labels.save, place.delete_url), place.name, map, true));
+    }
+    for (const proposal of proposals) {
+        const tooltip = labels.proposal
+            .replace("{stays}", proposal.num_stays)
+            .replace("{activities}", proposal.num_activities);
+        markers.push(editableMarker([proposal.latitude, proposal.longitude], "#ff7f0e",
+            placeForm(newUrl, "", labels.create), tooltip, proposalLayer, false));
+    }
+
+    map.on("click", event => {
+        const form = placeForm(newUrl, "", labels.create);
+        form.setPosition(event.latlng);
+        L.popup().setLatLng(event.latlng).setContent(form.element).openOn(map);
+    });
+
+    if (markers.length) {
+        map.fitBounds(L.latLngBounds(markers.map(marker => marker.getLatLng())), { padding: [50, 50], maxZoom: 16 });
+    } else {
+        map.setView({{ fallback_center | tojson }}, 13);
+    }
+</script>
+
+{% if places %}
+<h2 class="mb-3">{{ _('Places') }}</h2>
+<div class="table-responsive mb-3">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>{{ _('Name') }}</th>
+                <th class="text-end">{{ _('Latitude') }}</th>
+                <th class="text-end">{{ _('Longitude') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for place in places %}
+            <tr>
+                <td>
+                    <form method="post" action="{{ place.update_url }}" class="d-flex gap-2">
+                        <input type="text" class="form-control form-control-sm" name="name" value="{{ place.name }}"
+                            required>
+                        <input type="hidden" name="latitude" value="{{ place.latitude }}">
+                        <input type="hidden" name="longitude" value="{{ place.longitude }}">
+                        <button type="submit" class="btn btn-sm btn-primary">{{ _('Rename') }}</button>
+                    </form>
+                </td>
+                <td class="text-end">{{ '%.5f' | format(place.latitude) }}</td>
+                <td class="text-end">{{ '%.5f' | format(place.longitude) }}</td>
+                <td>
+                    <form method="post" action="{{ place.delete_url }}">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="if(!confirm('{{ _('Are you sure to delete this place?') }}')){event.preventDefault()}">{{ _('Delete') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

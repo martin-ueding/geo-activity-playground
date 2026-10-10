@@ -7,6 +7,8 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 
+from ..features.places.matching import match_stays
+from ..features.places.stays import detect_stays
 from .coordinates import get_distance
 from .datamodel import DB, Activity, ActivityImportConfig
 from .missing_values import some
@@ -368,6 +370,22 @@ def enrichment_copy_latlon(
         return False
 
 
+@enrichment_step(version=1)
+def enrichment_detect_stays(
+    activity: Activity,
+    time_series: pd.DataFrame,
+    config: ActivityImportConfig,
+    force: bool,
+) -> bool:
+    if force:
+        stays = detect_stays(
+            time_series.iloc[activity.index_begin or 0 : activity.index_end]
+        )
+        match_stays(stays)
+        activity.stays = stays
+    return False
+
+
 enrichments: list[Enrichment] = [
     enrichment_set_timezone,
     enrichment_normalize_time,
@@ -379,6 +397,7 @@ enrichments: list[Enrichment] = [
     enrichment_distance,
     enrichment_moving_time,
     enrichment_copy_latlon,
+    enrichment_detect_stays,
 ]
 
 

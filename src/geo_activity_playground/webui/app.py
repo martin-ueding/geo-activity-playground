@@ -79,6 +79,8 @@ from ..features.heatmap.cache import (
 from ..features.heatmap.model import HeatmapTileCache  # noqa: F401
 from ..features.maintenance.blueprint import make_maintenance_blueprint
 from ..features.pictures.blueprint import make_pictures_blueprint
+from ..features.places.blueprint import make_places_blueprint
+from ..features.places.model import Place
 from ..features.plot_builder.blueprint import make_plot_builder_blueprint
 from ..features.plot_builder.model import PlotSpec  # noqa: F401
 from ..features.segments.blueprint import make_segments_blueprint
@@ -418,6 +420,7 @@ def create_app(
         ),
         ("/photo", make_photo_blueprint(config_accessor, authenticator, flasher)),
         ("/picture", make_pictures_blueprint()),
+        ("/places", make_places_blueprint(authenticator, flasher)),
         (
             "/plot-builder",
             make_plot_builder_blueprint(flasher, authenticator),
@@ -480,6 +483,9 @@ def create_app(
         ).all()
         variables["tags_avail"] = DB.session.scalars(
             sqlalchemy.select(Tag).order_by(Tag.tag)
+        ).all()
+        variables["places_avail"] = DB.session.scalars(
+            sqlalchemy.select(Place).order_by(Place.name)
         ).all()
         variables["photo_count"] = DB.session.scalar(
             sqlalchemy.select(sqlalchemy.func.count()).select_from(Photo)

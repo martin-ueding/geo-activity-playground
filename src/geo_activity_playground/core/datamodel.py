@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import pathlib
-import urllib.parse
 import zoneinfo
 from typing import Optional, TypedDict
 
@@ -215,6 +214,12 @@ class Activity(DB.Model):
         foreign_keys="RouteDistance.reference_activity_id",
         back_populates="reference_activity",
         cascade="all, delete-orphan",
+    )
+
+    stays: Mapped[list["Stay"]] = relationship(  # noqa: F821
+        back_populates="activity",
+        cascade="all, delete-orphan",
+        order_by="Stay.sequence",
     )
 
     def __str__(self) -> str:
@@ -785,37 +790,25 @@ class StoredSearchQuery(DB.Model):
         if data.get("distance_km_max"):
             bits.append(f"at most {data['distance_km_max']} km")
 
+        from ..features.places.model import Place
+
+        for key, description in [
+            ("start_place", "starts at"),
+            ("end_place", "ends at"),
+            ("stop_place", "stops at"),
+        ]:
+            if data.get(key) is not None and (
+                place := DB.session.get(Place, data[key])
+            ):
+                bits.append(f'{description} "{place.name}"')
+
         return " and ".join(bits)
 
     def to_url_str(self) -> str:
         """Convert the stored query to a URL query string."""
-        data = json.loads(self.query_json)
-        variables = []
+        from .meta_search import primitives_to_url_str
 
-        for equipment_id in data.get("equipment", []):
-            variables.append(("equipment", equipment_id))
-        for kind_id in data.get("kind", []):
-            variables.append(("kind", kind_id))
-        for tag_id in data.get("tag", []):
-            variables.append(("tag", tag_id))
-        for tag_id in data.get("tag_exclude", []):
-            variables.append(("tag_exclude", tag_id))
-        if data.get("name"):
-            variables.append(("name", data["name"]))
-        if data.get("name_case_sensitive"):
-            variables.append(("name_case_sensitive", "true"))
-        if data.get("start_begin"):
-            variables.append(("start_begin", data["start_begin"]))
-        if data.get("start_end"):
-            variables.append(("start_end", data["start_end"]))
-        if data.get("distance_km_min") is not None:
-            variables.append(("distance_km_min", data["distance_km_min"]))
-        if data.get("distance_km_max") is not None:
-            variables.append(("distance_km_max", data["distance_km_max"]))
-
-        return "&".join(
-            f"{key}={urllib.parse.quote_plus(str(value))}" for key, value in variables
-        )
+        return primitives_to_url_str(json.loads(self.query_json))
 
 
 class HeartRateConfig(DB.Model):

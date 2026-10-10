@@ -37,3 +37,9 @@ div.vega-embed {
             var(--bs-secondary-bg),
             var(--bs-info-bg-subtle));
 }
+
+/* The cluster bubbles are light in both themes, but their text inherits the
+   light body color of the dark theme. */
+.marker-cluster {
+    color: #000;
+}

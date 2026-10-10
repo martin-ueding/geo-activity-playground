@@ -7,7 +7,14 @@ import pandas as pd
 import sqlalchemy
 from werkzeug.datastructures import MultiDict
 
+from ..features.places.model import Stay, StayKind
 from .datamodel import DB, Activity, StoredSearchQuery, Tag, query_activity_meta
+
+PLACE_FILTERS = {
+    "start_place": StayKind.START,
+    "end_place": StayKind.END,
+    "stop_place": None,
+}
 
 
 def parse_search_params(args: MultiDict) -> dict:
@@ -53,6 +60,11 @@ def parse_search_params(args: MultiDict) -> dict:
     if distance_km_max is not None:
         result["distance_km_max"] = distance_km_max
 
+    for key in PLACE_FILTERS:
+        place_id = args.get(key, None, type=int)
+        if place_id is not None:
+            result[key] = place_id
+
     return result
 
 
@@ -89,6 +101,9 @@ def primitives_to_url_str(primitives: dict) -> str:
         variables.append(("distance_km_min", primitives["distance_km_min"]))
     if primitives.get("distance_km_max") is not None:
         variables.append(("distance_km_max", primitives["distance_km_max"]))
+    for key in PLACE_FILTERS:
+        if primitives.get(key) is not None:
+            variables.append((key, primitives[key]))
 
     return "&".join(
         f"{key}={urllib.parse.quote_plus(str(value))}" for key, value in variables
@@ -108,6 +123,7 @@ def primitives_to_jinja(primitives: dict) -> dict:
         "start_end": primitives.get("start_end", ""),
         "distance_km_min": primitives.get("distance_km_min"),
         "distance_km_max": primitives.get("distance_km_max"),
+        **{key: primitives.get(key) for key in PLACE_FILTERS},
         "active": bool(primitives),
     }
 
@@ -230,6 +246,13 @@ def _filter_clauses(primitives: dict) -> list:
 
     if primitives.get("distance_km_max") is not None:
         filter_clauses.append(Activity.distance_km <= primitives["distance_km_max"])
+
+    for key, kind in PLACE_FILTERS.items():
+        if primitives.get(key) is not None:
+            criterion = Stay.place_id == primitives[key]
+            if kind is not None:
+                criterion &= Stay.kind == kind
+            filter_clauses.append(Activity.stays.any(criterion))
 
     return filter_clauses
 
