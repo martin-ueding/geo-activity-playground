@@ -63,7 +63,7 @@ def normalize_header(header: Sequence[str]) -> list[str]:
     return [mapping.get(h, h) for h in header]
 
 
-INGEST_VERSION = 2
+INGEST_VERSION = 3
 
 CHECKOUT_PATH = pathlib.Path("Strava Export")
 

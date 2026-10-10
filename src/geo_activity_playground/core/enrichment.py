@@ -273,9 +273,7 @@ def enrichment_distance(
             * 3600
         )
         # Division by zero causes infinity. We replace these with NaN and interpolate the values instead.
-        time_series["speed"] = time_series["speed"].replace(
-            [0, np.inf, -np.inf], np.nan
-        )
+        time_series["speed"] = time_series["speed"].replace([np.inf, -np.inf], np.nan)
         time_series.interpolate(inplace=True)
 
         changed = True
@@ -293,8 +291,9 @@ def enrichment_distance(
         speed_fall_rate > spike_acceleration_threshold
     )
     if is_spike.any():
-        time_series.loc[is_spike, "speed"] = np.nan
-        time_series["speed"] = time_series["speed"].interpolate()
+        time_series.loc[is_spike, "speed"] = (
+            time_series["speed"].mask(is_spike).interpolate().loc[is_spike]
+        )
         changed = True
 
     if "segment_id" not in time_series.columns:

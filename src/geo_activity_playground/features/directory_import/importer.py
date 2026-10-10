@@ -29,7 +29,7 @@ from ...importers.activity_parsers import (
 
 logger = logging.getLogger(__name__)
 
-INGEST_VERSION = 1
+INGEST_VERSION = 2
 
 
 def discover_activity_paths(config: ActivityImportConfig) -> list[pathlib.Path]:

@@ -25,7 +25,7 @@ from .model import HammerheadAuth, get_hammerhead_auth
 
 logger = logging.getLogger(__name__)
 
-INGEST_VERSION = 1
+INGEST_VERSION = 2
 
 HAMMERHEAD_API_BASE = "https://api.hammerhead.io/v1"
 HAMMERHEAD_OAUTH_SCOPE = "activity:read"

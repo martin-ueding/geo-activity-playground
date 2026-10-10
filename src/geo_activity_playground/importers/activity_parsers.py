@@ -98,10 +98,14 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
             for frame in fit:
                 if frame.frame_type == fitdecode.FIT_FRAME_DATA:
                     fields = {
-                        field.name: field for field in frame.fields if field.value
+                        field.name: field
+                        for field in frame.fields
+                        if field.value is not None
                     }
                     values = {
-                        field.name: field.value for field in frame.fields if field.value
+                        field.name: field.value
+                        for field in frame.fields
+                        if field.value is not None
                     }
                     if (
                         "timestamp" in values
@@ -157,7 +161,7 @@ def read_fit_activity(path: pathlib.Path, open) -> tuple[Activity, pd.DataFrame]
                         rows.append(row)
 
                     # Additional meta data fields as documented in https://developer.garmin.com/fit/file-types/workout/.
-                    if "wkt_name" in fields:
+                    if values.get("wkt_name"):
                         activity.name = values["wkt_name"]
                     if "sport" in fields:
                         kind_name = str(values["sport"])

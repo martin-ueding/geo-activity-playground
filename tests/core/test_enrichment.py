@@ -102,3 +102,48 @@ def test_sustained_high_speed_not_filtered() -> None:
     assert time_series.loc[4, "speed"] > 70.0, (
         "Sustained high speed should not be filtered"
     )
+
+
+def test_spike_removal_keeps_stops_out_of_moving_time() -> None:
+    activity = Activity(name="Ride with stop")
+    activity.index_begin = 0
+    activity.index_end = None
+    speed = [15.0, 15.0, 75.0, 15.0, 15.0, np.nan, np.nan, np.nan, 15.0, 0.0]
+    time_series = pd.DataFrame(
+        {
+            "time": pd.Timestamp("2026-01-01T00:00:00Z")
+            + pd.to_timedelta(range(len(speed)), unit="s"),
+            "latitude": [50.0] * len(speed),
+            "longitude": [8.0] * len(speed),
+            "speed": speed,
+            "distance_km": np.nancumsum(speed) / 3600,
+        }
+    )
+    config = ActivityImportConfig(time_diff_threshold_seconds=30)
+
+    enrichment.enrichment_distance(activity, time_series, config, force=False)
+    enrichment.enrichment_moving_time(activity, time_series, config, force=False)
+
+    assert time_series.loc[2, "speed"] == 15.0
+    assert time_series.loc[5:7, "speed"].isna().all()
+    assert activity.moving_time == pd.Timedelta(seconds=5)
+
+
+def test_computed_speed_keeps_stops() -> None:
+    activity = Activity(name="GPX ride with stop")
+    activity.index_begin = 0
+    activity.index_end = None
+    time_series = pd.DataFrame(
+        {
+            "time": pd.Timestamp("2026-01-01T00:00:00Z")
+            + pd.to_timedelta(range(5), unit="s"),
+            "latitude": [50.0, 50.0001, 50.0001, 50.0001, 50.0002],
+            "longitude": [8.0] * 5,
+        }
+    )
+    config = ActivityImportConfig(time_diff_threshold_seconds=30)
+
+    enrichment.enrichment_distance(activity, time_series, config, force=False)
+    enrichment.enrichment_moving_time(activity, time_series, config, force=False)
+
+    assert time_series.loc[2:3, "speed"].eq(0.0).all()
