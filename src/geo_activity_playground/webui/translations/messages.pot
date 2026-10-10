@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-10 17:21+0200\n"
+"POT-Creation-Date: 2026-10-10 18:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,7 +112,7 @@ msgstr ""
 #: src/geo_activity_playground/features/calendar/templates/calendar/wrap-month.html.j2:50
 #: src/geo_activity_playground/features/calendar/templates/calendar/wrap-year.html.j2:44
 #: src/geo_activity_playground/features/sharepic/render.py:41
-#: src/geo_activity_playground/features/sharepic/render.py:294
+#: src/geo_activity_playground/features/sharepic/render.py:295
 #: src/geo_activity_playground/webui/columns.py:16
 #: src/geo_activity_playground/webui/columns.py:145
 #: src/geo_activity_playground/webui/templates/search/index.html.j2:55
@@ -228,9 +228,9 @@ msgstr ""
 #: src/geo_activity_playground/features/plot_builder/analysis.py:21
 #: src/geo_activity_playground/features/segments/templates/segments/show.html.j2:60
 #: src/geo_activity_playground/features/sharepic/render.py:38
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:175
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:182
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:194
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:183
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:190
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:202
 #: src/geo_activity_playground/features/similar_routes/templates/similar_routes/cluster.html.j2:53
 #: src/geo_activity_playground/webui/blueprints/entry_views.py:116
 #: src/geo_activity_playground/webui/blueprints/entry_views.py:120
@@ -341,7 +341,7 @@ msgstr ""
 #: src/geo_activity_playground/features/explorer/templates/explorer/activities_through_tile.html.j2:34
 #: src/geo_activity_playground/features/explorer/templates/explorer/server-side.html.j2:107
 #: src/geo_activity_playground/features/sharepic/render.py:37
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:174
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:182
 #: src/geo_activity_playground/features/square_planner/templates/square_planner/index.html.j2:124
 #: src/geo_activity_playground/features/square_planner/templates/square_planner/index.html.j2:125
 #: src/geo_activity_playground/features/square_planner/templates/square_planner/index.html.j2:140
@@ -385,8 +385,8 @@ msgstr ""
 #: src/geo_activity_playground/features/explorer/templates/explorer/activities_through_tile.html.j2:40
 #: src/geo_activity_playground/features/segments/templates/segments/show.html.j2:68
 #: src/geo_activity_playground/features/sharepic/render.py:39
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:188
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:200
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:196
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:208
 #: src/geo_activity_playground/features/similar_routes/templates/similar_routes/cluster.html.j2:59
 #: src/geo_activity_playground/features/summary/plots.py:25
 #: src/geo_activity_playground/features/summary/plots.py:28
@@ -530,7 +530,7 @@ msgstr ""
 
 #: src/geo_activity_playground/features/activity/templates/activity/show.html.j2:39
 #: src/geo_activity_playground/features/segments/templates/segments/show.html.j2:64
-#: src/geo_activity_playground/features/sharepic/render.py:295
+#: src/geo_activity_playground/features/sharepic/render.py:296
 #: src/geo_activity_playground/webui/columns.py:104
 msgid "Duration"
 msgstr ""
@@ -2327,39 +2327,47 @@ msgid "Avg. Power / W"
 msgstr ""
 
 #: src/geo_activity_playground/features/sharepic/render.py:44
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:192
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:200
 #: src/geo_activity_playground/features/similar_routes/templates/similar_routes/cluster.html.j2:57
 msgid "Moving time"
 msgstr ""
 
 #: src/geo_activity_playground/features/sharepic/render.py:45
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:180
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:188
 msgid "Average speed"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:50
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:56
 msgid "Either lies on the other"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:51
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:57
 msgid "Both lie on each other"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:52
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:58
 msgid "This lies on the other"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:53
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:59
 msgid "The other lies on this"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:176
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:185
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:62
+msgid "Closest first"
+msgstr ""
+
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:62
+msgid "Newest first"
+msgstr ""
+
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:184
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:193
 msgid "Average speed / km/h"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:177
-#: src/geo_activity_playground/features/similar_routes/blueprint.py:197
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:185
+#: src/geo_activity_playground/features/similar_routes/blueprint.py:205
 msgid "Moving time / min"
 msgstr ""
 
@@ -2377,17 +2385,21 @@ msgstr ""
 msgid "Quantile"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:35
+#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:32
+msgid "Sort"
+msgstr ""
+
+#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:45
 #: src/geo_activity_playground/features/similar_routes/templates/similar_routes/cluster-macros.html.j2:14
 msgid "Maximum distance / m"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:42
+#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:52
 #: src/geo_activity_playground/features/similar_routes/templates/similar_routes/cluster-macros.html.j2:21
 msgid "Apply"
 msgstr ""
 
-#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:70
+#: src/geo_activity_playground/features/similar_routes/templates/similar_routes/activity.html.j2:80
 msgid "No similar routes found within this distance."
 msgstr ""
 

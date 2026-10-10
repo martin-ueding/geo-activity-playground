@@ -89,6 +89,22 @@ def test_similar_routes_respect_direction(activities: dict[str, int]) -> None:
     assert names("backward") == ["partial"]
 
 
+def test_similar_routes_sort_by_date(activities: dict[str, int], road) -> None:
+    add_activity("later", 4, road(0, 2000, 5, north_m=30))
+    run_until_idle(RouteDistanceBackfill())
+
+    def names(sort: str) -> list[str]:
+        return [
+            activity.name
+            for activity, _ in find_similar_routes(
+                activities["full"], "p95", "min", 100, sort
+            )
+        ]
+
+    assert names("distance") == ["partial", "later"]
+    assert names("date") == ["later", "partial"]
+
+
 def test_deleting_an_activity_removes_its_distances(
     activities: dict[str, int],
 ) -> None:
@@ -105,7 +121,8 @@ def test_page_renders_with_all_options(client, activities: dict[str, int]) -> No
     run_until_idle(RouteDistanceBackfill())
 
     for direction in ["min", "max", "forward", "backward"]:
-        response = client.get(
-            f"/similar-routes/activity/{activities['full']}?quantile=p95&direction={direction}"
-        )
-        assert response.status_code == 200
+        for sort in ["distance", "date"]:
+            response = client.get(
+                f"/similar-routes/activity/{activities['full']}?quantile=p95&direction={direction}&sort={sort}"
+            )
+            assert response.status_code == 200

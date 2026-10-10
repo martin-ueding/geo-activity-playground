@@ -13,7 +13,7 @@
 <div class="mb-2">
     <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('Quantile') }}">
         {% for q in quantiles %}
-        <a href="{{ url_for('.activity', id=activity.id, quantile=q, direction=direction, max_distance_m=max_distance_m) }}"
+        <a href="{{ url_for('.activity', id=activity.id, quantile=q, direction=direction, max_distance_m=max_distance_m, sort=sort) }}"
             class="btn {% if q == quantile %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ q }}</a>
         {% endfor %}
     </div>
@@ -22,8 +22,17 @@
 <div class="mb-2">
     <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('Direction') }}">
         {% for d, label in directions.items() %}
-        <a href="{{ url_for('.activity', id=activity.id, quantile=quantile, direction=d, max_distance_m=max_distance_m) }}"
+        <a href="{{ url_for('.activity', id=activity.id, quantile=quantile, direction=d, max_distance_m=max_distance_m, sort=sort) }}"
             class="btn {% if d == direction %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="mb-2">
+    <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('Sort') }}">
+        {% for s, label in sorts.items() %}
+        <a href="{{ url_for('.activity', id=activity.id, quantile=quantile, direction=direction, max_distance_m=max_distance_m, sort=s) }}"
+            class="btn {% if s == sort %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
         {% endfor %}
     </div>
 </div>
@@ -31,6 +40,7 @@
 <form method="get" class="row row-cols-auto g-2 align-items-center mb-3">
     <input type="hidden" name="quantile" value="{{ quantile }}" />
     <input type="hidden" name="direction" value="{{ direction }}" />
+    <input type="hidden" name="sort" value="{{ sort }}" />
     <div class="col">
         <label for="max_distance_m" class="col-form-label">{{ _('Maximum distance / m') }}</label>
     </div>
