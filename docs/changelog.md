@@ -21,6 +21,7 @@ Added:
 
 - Show elevation gain, moving time and average speed on the share picture. More than four stats wrap into a second row. ([GH-525](https://github.com/martin-ueding/geo-activity-playground/issues/525))
 - Sort the similar routes of an activity by date, newest first. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
+- Add places that activities start, end or stop at. Show the legs between them as a matrix and a map, and filter activities by place. ([GH-532](https://github.com/martin-ueding/geo-activity-playground/issues/532))
 
 Changed:
 
