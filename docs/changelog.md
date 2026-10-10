@@ -20,6 +20,7 @@ Types of changes
 Added:
 
 - Show elevation gain, moving time and average speed on the share picture. More than four stats wrap into a second row. ([GH-525](https://github.com/martin-ueding/geo-activity-playground/issues/525))
+- Sort the similar routes of an activity by date, newest first. ([GH-524](https://github.com/martin-ueding/geo-activity-playground/issues/524))
 
 Changed:
 
