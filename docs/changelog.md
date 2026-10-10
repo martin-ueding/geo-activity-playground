@@ -17,8 +17,13 @@ Types of changes
 
 ## Unreleased
 
+Changed:
+
+- Treat the Strava export and the Strava API as separate sources, each with its own duplicate matching priority. ([GH-521](https://github.com/martin-ueding/geo-activity-playground/issues/521))
+
 Fixed:
 
+- Keep the names and kinds from the `activities.csv` of the Strava export when re-parsing. The next scan repairs affected activities. ([GH-521](https://github.com/martin-ueding/geo-activity-playground/issues/521))
 - Take the step count of FIT files from the session summary instead of the last lap. Re-parse affected activities to correct their steps. ([GH-526](https://github.com/martin-ueding/geo-activity-playground/issues/526))
 
 ## Version 1.56.0 — 2026-09-27
