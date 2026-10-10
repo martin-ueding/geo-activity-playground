@@ -12,7 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 from ...core.datamodel import Activity, MapConfig
 from ...core.raster_map import (
-    OSM_MAX_ZOOM,
     OSM_TILE_SIZE,
     map_image_from_tile_bounds,
     tile_bounds_around_center,
@@ -20,6 +19,7 @@ from ...core.raster_map import (
 
 _SHAREPIC_FOOTER_HEIGHT = 115
 _SHAREPIC_HEADER_HEIGHT = 50
+_SHAREPIC_MAX_ZOOM = 16
 _SHAREPIC_STAT_ROW_HEIGHT = 50
 _SHAREPIC_MAX_STATS_PER_ROW = 4
 _FONT_CANDIDATES = [
@@ -62,6 +62,7 @@ def make_sharepic_base(
     time_series_list: list[pd.DataFrame],
     config: MapConfig,
     footer_height: int = _SHAREPIC_FOOTER_HEIGHT,
+    header_height: int = _SHAREPIC_HEADER_HEIGHT,
 ):
     all_time_series = pd.concat(time_series_list)
     finite_mask = np.isfinite(all_time_series["x"]) & np.isfinite(all_time_series["y"])
@@ -69,7 +70,6 @@ def make_sharepic_base(
 
     target_width = 600
     target_height = 600
-    header_height = _SHAREPIC_HEADER_HEIGHT
     target_map_height = target_height - footer_height - header_height
 
     if len(all_time_series) == 0:
@@ -77,16 +77,12 @@ def make_sharepic_base(
 
     tile_x = all_time_series["x"]
     tile_y = all_time_series["y"]
-    tile_width = tile_x.max() - tile_x.min()
-    tile_height = tile_y.max() - tile_y.min()
-
-    zoom_candidates = [OSM_MAX_ZOOM]
-    if tile_width > 0:
-        zoom_candidates.append(np.log2(target_width / tile_width / OSM_TILE_SIZE))
-    if tile_height > 0:
-        zoom_candidates.append(np.log2(target_map_height / tile_height / OSM_TILE_SIZE))
-    zoom_float = min(zoom_candidates)
-    zoom = int(np.clip(np.floor(zoom_float), 0, OSM_MAX_ZOOM))
+    zoom = _fit_zoom(
+        tile_x.max() - tile_x.min(),
+        tile_y.max() - tile_y.min(),
+        target_width,
+        target_map_height,
+    )
 
     tile_xz = tile_x * 2**zoom
     tile_yz = tile_y * 2**zoom
@@ -127,6 +123,17 @@ def make_sharepic_base(
             draw.line(xy, fill=(220, 50, 30), width=4)
 
     return img
+
+
+def _fit_zoom(
+    tile_width: float, tile_height: float, target_width: int, target_height: int
+) -> int:
+    zoom_candidates = [_SHAREPIC_MAX_ZOOM]
+    if tile_width > 0:
+        zoom_candidates.append(np.log2(target_width / tile_width / OSM_TILE_SIZE))
+    if tile_height > 0:
+        zoom_candidates.append(np.log2(target_height / tile_height / OSM_TILE_SIZE))
+    return int(np.clip(np.floor(min(zoom_candidates)), 0, _SHAREPIC_MAX_ZOOM))
 
 
 def _stat_rows(stat_items: list[tuple[str, str]]) -> list[tuple[tuple[str, str], ...]]:

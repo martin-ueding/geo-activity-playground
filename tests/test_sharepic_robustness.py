@@ -6,6 +6,7 @@ from geo_activity_playground.core.datamodel import Activity, MapConfig
 from geo_activity_playground.features.sharepic.render import (
     SHAREPIC_FIELDS,
     _activity_stat_items,
+    _fit_zoom,
     _format_elapsed_time,
     _stat_rows,
     make_sharepic_base,
@@ -23,6 +24,13 @@ def test_make_sharepic_base_handles_missing_tile_coordinates() -> None:
 
     image = make_sharepic_base([time_series], MapConfig())
     assert image.size == (600, 600)
+
+
+def test_fit_zoom_does_not_zoom_in_on_short_tracks() -> None:
+    assert _fit_zoom(0.0, 0.0, 600, 600) == 16
+    assert _fit_zoom(1e-5, 1e-5, 600, 600) == 16
+    assert _fit_zoom(1e-3, 1e-4, 600, 600) == 11
+    assert _fit_zoom(1.0, 1.0, 600, 600) == 1
 
 
 def test_format_elapsed_time_rounds_microseconds_to_seconds() -> None:

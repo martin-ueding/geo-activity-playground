@@ -40,7 +40,9 @@ def make_sharepic_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
             get_time_series(id), config_accessor.ui()
         )
         f = io.BytesIO()
-        make_sharepic_base([time_series], config_accessor.map()).save(f, format="png")
+        make_sharepic_base(
+            [time_series], config_accessor.map(), footer_height=0, header_height=0
+        ).save(f, format="png")
         return Response(f.getvalue(), mimetype="image/png")
 
     @blueprint.route("/day/<int:year>/<int:month>/<int:day>.png")
