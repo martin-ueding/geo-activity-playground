@@ -1,3 +1,7 @@
+from types import SimpleNamespace
+
+import fitdecode
+
 from geo_activity_playground.core.datamodel import Kind
 from geo_activity_playground.importers import activity_parsers
 
@@ -56,3 +60,47 @@ def test_read_activity_gpx_without_track_metadata(tmp_path) -> None:
     assert activity.name is None
     assert activity.kind is None
     assert len(timeseries) == 1
+
+
+def _fit_frame(name: str, **values) -> SimpleNamespace:
+    return SimpleNamespace(
+        frame_type=fitdecode.FIT_FRAME_DATA,
+        name=name,
+        fields=[
+            SimpleNamespace(name=key, value=value, units=None)
+            for key, value in values.items()
+        ],
+    )
+
+
+class _FakeFitReader:
+    def __init__(self, frames: list[SimpleNamespace]) -> None:
+        self.frames = frames
+
+    def __call__(self, _file) -> "_FakeFitReader":
+        return self
+
+    def __enter__(self) -> list[SimpleNamespace]:
+        return self.frames
+
+    def __exit__(self, *args) -> None:
+        pass
+
+
+def test_read_fit_activity_takes_steps_from_session_before_laps(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "activity.fit"
+    path.write_bytes(b"")
+    frames = [
+        _fit_frame("session", total_strides=1513, total_calories=250),
+        _fit_frame("lap", total_strides=658, total_calories=110),
+        _fit_frame("lap", total_strides=655, total_calories=105),
+        _fit_frame("lap", total_strides=200, total_calories=35),
+    ]
+    monkeypatch.setattr(fitdecode, "FitReader", _FakeFitReader(frames))
+
+    activity, _ = activity_parsers.read_fit_activity(path, open)
+
+    assert activity.steps == 3026
+    assert activity.calories == 250
