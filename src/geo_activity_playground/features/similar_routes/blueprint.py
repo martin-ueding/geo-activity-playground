@@ -17,6 +17,7 @@ from .clustering import RouteCluster, cluster_routes, find_cluster, load_neighbo
 from .model import QUANTILES, RouteDistance
 
 DIRECTIONS = ["min", "max", "forward", "backward"]
+DEFAULT_DIRECTION = "max"
 SORTS = ["distance", "date"]
 MAX_RESULTS = 100
 DEFAULT_MAX_DISTANCE_M = 200.0
@@ -30,9 +31,9 @@ def make_similar_routes_blueprint(config_accessor: ConfigAccessor) -> Blueprint:
     @blueprint.route("/activity/<int:id>")
     def activity(id: int) -> ResponseReturnValue:
         quantile, max_distance_m = _distance_args("p50", DEFAULT_MAX_DISTANCE_M)
-        direction = request.args.get("direction", "min")
+        direction = request.args.get("direction", DEFAULT_DIRECTION)
         if direction not in DIRECTIONS:
-            direction = "min"
+            direction = DEFAULT_DIRECTION
         sort = request.args.get("sort", "distance")
         if sort not in SORTS:
             sort = "distance"

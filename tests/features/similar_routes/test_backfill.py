@@ -105,6 +105,20 @@ def test_similar_routes_sort_by_date(activities: dict[str, int], road) -> None:
     assert names("date") == ["later", "partial"]
 
 
+def test_page_requires_both_tracks_to_lie_on_each_other_by_default(
+    client, app_context, road
+) -> None:
+    long = add_activity("long", 1, road(0, 5000, 5))
+    short = add_activity("short", 2, road(0, 500, 5))
+    run_until_idle(RouteDistanceBackfill())
+
+    response = client.get(f"/similar-routes/activity/{long}")
+    assert response.status_code == 200
+    assert f"/activity/{short}/plain.png" not in response.text
+    response = client.get(f"/similar-routes/activity/{long}?direction=min")
+    assert f"/activity/{short}/plain.png" in response.text
+
+
 def test_deleting_an_activity_removes_its_distances(
     activities: dict[str, int],
 ) -> None:
