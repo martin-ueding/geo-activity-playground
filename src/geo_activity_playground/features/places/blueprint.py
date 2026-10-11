@@ -155,7 +155,8 @@ def _components(
 
     def find(id: PlaceId) -> PlaceId:
         while parent.setdefault(id, id) != id:
-            id = parent[id] = parent[parent[id]]
+            parent[id] = parent[parent[id]]
+            id = parent[id]
         return id
 
     for origin, destination in legs:

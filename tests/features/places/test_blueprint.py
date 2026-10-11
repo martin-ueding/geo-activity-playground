@@ -93,3 +93,11 @@ def test_components_split_at_unknown_places() -> None:
         {(3, None): 1, (3, 4): 1},
         {(None, None): 2},
     ]
+
+
+def test_components_keep_each_place_in_one_component() -> None:
+    legs = collections.Counter(
+        {(1, 2): 1, (2, 3): 1, (3, 4): 1, (4, 5): 1, (1, 5): 1, (5, 6): 1, (2, 6): 1}
+    )
+
+    assert _components(legs) == [legs]
