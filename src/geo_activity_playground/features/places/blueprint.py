@@ -1,5 +1,7 @@
 import collections
 
+import altair as alt
+import pandas as pd
 import sqlalchemy
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
@@ -24,12 +26,13 @@ def make_places_blueprint(authenticator: Authenticator, flasher: Flasher) -> Blu
         primitives, search_vars = search_context(authenticator)
         legs = count_legs(activity_ids_for_search(primitives))
         places = _load_places()
+        names = {place.id: place.name for place in places}
         return render_template(
             "places/index.html.j2",
             places=places,
-            matrix_keys=_matrix_keys(legs),
-            names={place.id: place.name for place in places},
-            legs=legs,
+            matrix_plots=[
+                _matrix_plot(component, names) for component in _components(legs)
+            ],
             map_places={
                 place.id: {
                     "name": place.name,
@@ -138,6 +141,78 @@ def _matrix_keys(legs: collections.Counter[Leg]) -> list[PlaceId]:
         totals[origin] += count
         totals[destination] += count
     return sorted(totals, key=lambda id: (id is None, -totals[id]))
+
+
+def _components(
+    legs: collections.Counter[Leg],
+) -> list[collections.Counter[Leg]]:
+    """Legs split by the connected components of the known places, largest first.
+
+    Unknown places don't connect components because they are different
+    locations. Their legs belong to the component of the known place.
+    """
+    parent: dict[PlaceId, PlaceId] = {}
+
+    def find(id: PlaceId) -> PlaceId:
+        while parent.setdefault(id, id) != id:
+            id = parent[id] = parent[parent[id]]
+        return id
+
+    for origin, destination in legs:
+        if origin is not None and destination is not None:
+            parent[find(origin)] = find(destination)
+
+    components: collections.defaultdict[PlaceId, collections.Counter[Leg]] = (
+        collections.defaultdict(collections.Counter)
+    )
+    for (origin, destination), count in legs.items():
+        components[find(origin if origin is not None else destination)][
+            origin, destination
+        ] = count
+    return sorted(components.values(), key=lambda legs: -legs.total())
+
+
+def _matrix_plot(legs: collections.Counter[Leg], names: dict[int, str]) -> str:
+    def name(id: PlaceId) -> str:
+        return _("Unknown") if id is None else names[id]
+
+    df = pd.DataFrame(
+        [
+            {"origin": name(origin), "destination": name(destination), "legs": count}
+            for (origin, destination), count in legs.items()
+        ]
+    )
+    order = [name(id) for id in _matrix_keys(legs)]
+    base = alt.Chart(df).encode(
+        alt.X(
+            "destination:N",
+            scale=alt.Scale(domain=order),
+            title=_("To"),
+            axis=alt.Axis(orient="top", labelAngle=-45),
+        ),
+        alt.Y("origin:N", scale=alt.Scale(domain=order), title=_("From")),
+    )
+    rects = base.mark_rect().encode(
+        alt.Color("legs:Q", scale=alt.Scale(scheme="blues"), title=_("Legs")),
+        tooltip=[
+            alt.Tooltip("origin:N", title=_("From")),
+            alt.Tooltip("destination:N", title=_("To")),
+            alt.Tooltip("legs:Q", title=_("Legs")),
+        ],
+    )
+    labels = base.mark_text().encode(
+        alt.Text("legs:Q"),
+        color=alt.condition(
+            alt.datum.legs > df["legs"].max() / 2,
+            alt.value("white"),
+            alt.value("black"),
+        ),
+    )
+    return (
+        (rects + labels)
+        .properties(width=alt.Step(40), height=alt.Step(40))
+        .to_json(format="vega")
+    )
 
 
 def _undirected_edges(

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-10 21:23+0200\n"
+"POT-Creation-Date: 2026-10-11 06:38+0200\n"
 "PO-Revision-Date: 2025-12-06 21:30+0100\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -352,7 +352,7 @@ msgstr "Alle Felder"
 #: src/geo_activity_playground/features/explorer/templates/explorer/activities_through_tile.html.j2:34
 #: src/geo_activity_playground/features/explorer/templates/explorer/server-side.html.j2:107
 #: src/geo_activity_playground/features/places/templates/places/edit.html.j2:27
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:143
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:160
 #: src/geo_activity_playground/features/sharepic/render.py:37
 #: src/geo_activity_playground/features/similar_routes/blueprint.py:181
 #: src/geo_activity_playground/features/square_planner/templates/square_planner/index.html.j2:124
@@ -548,7 +548,7 @@ msgstr ""
 #: src/geo_activity_playground/features/calendar/templates/calendar/wrap-month.html.j2:182
 #: src/geo_activity_playground/features/calendar/templates/calendar/wrap-year.html.j2:36
 #: src/geo_activity_playground/features/calendar/templates/calendar/wrap-year.html.j2:184
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:113
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:71
 #: src/geo_activity_playground/webui/templates/page.html.j2:55
 #: src/geo_activity_playground/webui/templates/search/index.html.j2:19
 #: src/geo_activity_playground/webui/templates/search/map.html.j2:19
@@ -661,7 +661,7 @@ msgstr "Erneut importieren"
 #: src/geo_activity_playground/features/maintenance/templates/maintenance/_tasks_list.html.j2:61
 #: src/geo_activity_playground/features/maintenance/templates/maintenance/action_edit.html.j2:56
 #: src/geo_activity_playground/features/places/templates/places/edit.html.j2:30
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:166
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:183
 #: src/geo_activity_playground/features/segments/templates/segments/index.html.j2:31
 #: src/geo_activity_playground/features/square_planner/templates/square_planner/index.html.j2:163
 #: src/geo_activity_playground/webui/templates/settings/privacy-zones.html.j2:54
@@ -927,8 +927,7 @@ msgstr "Kacheltyp"
 
 #: src/geo_activity_playground/features/calendar/blueprint.py:213
 #: src/geo_activity_playground/features/equipment/blueprint.py:257
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:86
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:93
+#: src/geo_activity_playground/features/places/blueprint.py:177
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -2129,8 +2128,23 @@ msgstr "Ort „%(name)s“ gelöscht."
 msgid "A place needs a name and a position."
 msgstr "Ein Ort braucht einen Namen und eine Position."
 
+#: src/geo_activity_playground/features/places/blueprint.py:190
+#: src/geo_activity_playground/features/places/blueprint.py:199
+msgid "To"
+msgstr "Nach"
+
+#: src/geo_activity_playground/features/places/blueprint.py:193
+#: src/geo_activity_playground/features/places/blueprint.py:198
+msgid "From"
+msgstr "Von"
+
+#: src/geo_activity_playground/features/places/blueprint.py:196
+#: src/geo_activity_playground/features/places/blueprint.py:200
+msgid "Legs"
+msgstr "Etappen"
+
 #: src/geo_activity_playground/features/places/templates/places/edit.html.j2:6
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:138
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:155
 #: src/geo_activity_playground/features/places/templates/places/index.html.j2:4
 #: src/geo_activity_playground/webui/templates/page.html.j2:65
 msgid "Places"
@@ -2170,7 +2184,7 @@ msgid "Create place"
 msgstr "Ort erstellen"
 
 #: src/geo_activity_playground/features/places/templates/places/edit.html.j2:31
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:166
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:183
 msgid "Are you sure to delete this place?"
 msgstr "Diesen Ort wirklich löschen?"
 
@@ -2179,15 +2193,15 @@ msgstr "Diesen Ort wirklich löschen?"
 msgid "%(stays)s stays in %(activities)s activities"
 msgstr "%(stays)s Aufenthalte in %(activities)s Aktivitäten"
 
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:144
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:161
 msgid "Latitude"
 msgstr "Breitengrad"
 
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:145
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:162
 msgid "Longitude"
 msgstr "Längengrad"
 
-#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:158
+#: src/geo_activity_playground/features/places/templates/places/edit.html.j2:175
 msgid "Rename"
 msgstr "Umbenennen"
 
@@ -2213,43 +2227,39 @@ msgstr "Karte"
 msgid "round trips"
 msgstr "Rundtouren"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:76
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:51
 msgid "Origin–destination matrix"
 msgstr "Start-Ziel-Matrix"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:79
-msgid "Number of legs from the place in the row to the place in the column."
-msgstr "Anzahl der Etappen vom Ort in der Zeile zum Ort in der Spalte."
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:54
+msgid ""
+"Number of legs from the place in the row to the place in the column, one "
+"matrix per group of connected places."
+msgstr ""
+"Anzahl der Etappen vom Ort in der Zeile zum Ort in der Spalte, eine "
+"Matrix je Gruppe verbundener Orte."
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:84
-msgid "From"
-msgstr "Von"
-
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:84
-msgid "To"
-msgstr "Nach"
-
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:103
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:61
 msgid "No legs found."
 msgstr "Keine Etappen gefunden."
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:107
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:65
 msgid "Activities by place"
 msgstr "Aktivitäten nach Ort"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:112
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:70
 msgid "Place"
 msgstr "Ort"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:121
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:79
 msgid "Starting here"
 msgstr "Starten hier"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:122
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:80
 msgid "Ending here"
 msgstr "Enden hier"
 
-#: src/geo_activity_playground/features/places/templates/places/index.html.j2:123
+#: src/geo_activity_playground/features/places/templates/places/index.html.j2:81
 msgid "Visiting"
 msgstr "Besuchen"
 
@@ -5608,4 +5618,7 @@ msgstr ""
 
 #~ msgid "Strava"
 #~ msgstr ""
+
+#~ msgid "Number of legs from the place in the row to the place in the column."
+#~ msgstr "Anzahl der Etappen vom Ort in der Zeile zum Ort in der Spalte."
 

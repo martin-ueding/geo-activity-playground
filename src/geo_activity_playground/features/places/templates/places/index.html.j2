@@ -50,30 +50,13 @@
 
 <h2 class="mb-3">{{ _('Origin–destination matrix') }}</h2>
 
-{% if matrix_keys %}
-<p>{{ _('Number of legs from the place in the row to the place in the column.') }}</p>
-<div class="table-responsive mb-3">
-    <table class="table table-sm table-bordered text-end">
-        <thead>
-            <tr>
-                <th class="text-start">{{ _('From') }} \ {{ _('To') }}</th>
-                {% for destination in matrix_keys %}
-                <th>{{ names.get(destination, _('Unknown')) }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for origin in matrix_keys %}
-            <tr>
-                <th class="text-start">{{ names.get(origin, _('Unknown')) }}</th>
-                {% for destination in matrix_keys %}
-                <td>{{ legs[(origin, destination)] or '' }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% if matrix_plots %}
+<p>{{ _('Number of legs from the place in the row to the place in the column, one matrix per group of connected places.') }}</p>
+{% for plot in matrix_plots %}
+<div class="overflow-auto mb-3">
+    {{ vega_direct(plot) }}
 </div>
+{% endfor %}
 {% else %}
 <p>{{ _('No legs found.') }}</p>
 {% endif %}

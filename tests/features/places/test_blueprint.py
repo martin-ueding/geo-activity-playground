@@ -5,7 +5,10 @@ from flask import Flask
 
 from geo_activity_playground.core.datamodel import DB, Activity
 from geo_activity_playground.core.meta_search import activity_ids_for_search
-from geo_activity_playground.features.places.blueprint import _undirected_edges
+from geo_activity_playground.features.places.blueprint import (
+    _components,
+    _undirected_edges,
+)
 from geo_activity_playground.features.places.model import Place, Stay, StayKind
 
 
@@ -78,3 +81,15 @@ def test_map_edges_combine_both_directions() -> None:
     )
 
     assert _undirected_edges(legs) == {(1, 2): 5, (2, 3): 1}
+
+
+def test_components_split_at_unknown_places() -> None:
+    legs = collections.Counter(
+        {(1, 2): 3, (2, 1): 2, (None, 1): 5, (3, None): 1, (3, 4): 1, (None, None): 2}
+    )
+
+    assert _components(legs) == [
+        {(1, 2): 3, (2, 1): 2, (None, 1): 5},
+        {(3, None): 1, (3, 4): 1},
+        {(None, None): 2},
+    ]
