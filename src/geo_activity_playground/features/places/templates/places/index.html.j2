@@ -42,7 +42,7 @@
         const label = place.round_trips ? `${place.name} (${place.round_trips} ${roundTripsLabel})` : place.name;
         return L.circleMarker([place.latitude, place.longitude], {
             radius: 7, color: "#d62728", fillOpacity: 0.8,
-        }).bindTooltip(text(label), { permanent: true, direction: "right" }).addTo(map);
+        }).bindTooltip(text(label), { direction: "right" }).addTo(map);
     });
     map.fitBounds(L.featureGroup(markers).getBounds(), { padding: [50, 50], maxZoom: 15 });
 </script>
