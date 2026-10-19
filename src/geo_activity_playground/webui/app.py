@@ -16,7 +16,7 @@ import urllib.parse
 import uuid
 import warnings
 import webbrowser
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import Any, Literal
 from wsgiref.types import StartResponse, WSGIApplication, WSGIEnvironment
 
@@ -55,6 +55,7 @@ from ..core.raster_map import (
     TileGetter,
 )
 from ..core.scan import scan_for_activities
+from ..core.sources import DateRange
 from ..features.activity.blueprint import make_activity_blueprint
 from ..features.activity_photos.blueprint import make_photo_blueprint
 from ..features.activity_photos.model import Photo
@@ -503,10 +504,7 @@ def web_ui_main(
     skip_reload: bool,
     host: str,
     port: int,
-    strava_begin: str | None,
-    strava_end: str | None,
-    hammerhead_begin: str | None = None,
-    hammerhead_end: str | None = None,
+    date_ranges: Mapping[str, DateRange] | None = None,
     http_server: Literal["waitress", "werkzeug", "gunicorn"] = "gunicorn",
     threads: int = 8,
     workers: int | None = None,
@@ -555,13 +553,7 @@ def web_ui_main(
 
     if not skip_reload:
         with app.app_context():
-            scan_for_activities(
-                config_accessor,
-                strava_begin=strava_begin,
-                strava_end=strava_end,
-                hammerhead_begin=hammerhead_begin,
-                hammerhead_end=hammerhead_end,
-            )
+            scan_for_activities(config_accessor, date_ranges=date_ranges)
 
     # Migrate Photos/original/ → Photos/ (flatten inbox structure)
     photos_original = pathlib.Path("Photos/original")

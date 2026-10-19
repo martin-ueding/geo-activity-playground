@@ -7,6 +7,8 @@ import sys
 import coloredlogs
 
 from .core.host_resources import default_worker_count
+from .core.scan import remote_families
+from .core.sources import DateRange
 from .features.activity_photos.cli import (
     register_main_annotate_photos,
     register_main_inspect_photo,
@@ -165,10 +167,13 @@ def main() -> None:
             options.skip_reload,
             host=options.host,
             port=options.port,
-            strava_begin=options.strava_begin,
-            strava_end=options.strava_end,
-            hammerhead_begin=options.hammerhead_begin,
-            hammerhead_end=options.hammerhead_end,
+            date_ranges={
+                family: DateRange(
+                    getattr(options, f"{family}_begin"),
+                    getattr(options, f"{family}_end"),
+                )
+                for family in remote_families()
+            },
             http_server=options.http_server,
             threads=options.threads,
             workers=options.workers,
@@ -213,20 +218,16 @@ def main() -> None:
         help="Number of worker processes, also settable via GAP_WORKERS (Gunicorn only, default: %(default)s)",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
-    subparser.add_argument(
-        "--strava-begin", help="Start date to limit Strava sync, format YYYY-MM-DD"
-    )
-    subparser.add_argument(
-        "--strava-end", help="End date to limit Strava sync, format YYYY-MM-DD"
-    )
-    subparser.add_argument(
-        "--hammerhead-begin",
-        help="Start date to limit Hammerhead sync, format YYYY-MM-DD",
-    )
-    subparser.add_argument(
-        "--hammerhead-end",
-        help="End date to limit Hammerhead sync, format YYYY-MM-DD",
-    )
+    for family in remote_families():
+        label = family.capitalize()
+        subparser.add_argument(
+            f"--{family}-begin",
+            help=f"Start date to limit {label} sync, format YYYY-MM-DD",
+        )
+        subparser.add_argument(
+            f"--{family}-end",
+            help=f"End date to limit {label} sync, format YYYY-MM-DD",
+        )
 
     subparser = subparsers.add_parser(
         "export-kml",

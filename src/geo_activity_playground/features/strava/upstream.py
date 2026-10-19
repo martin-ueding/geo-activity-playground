@@ -1,5 +1,6 @@
 from ...core.import_exclusion import is_excluded
 
+FAMILY = "strava"
 API_SOURCE = "strava"
 EXPORT_SOURCE = "strava_export"
 STRAVA_SOURCES = (API_SOURCE, EXPORT_SOURCE)

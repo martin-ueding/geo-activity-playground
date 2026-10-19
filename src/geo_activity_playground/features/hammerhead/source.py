@@ -5,6 +5,7 @@ from ...core.datamodel import DB, Activity
 from ...core.sources import ActivitySource
 from .importer import (
     INGEST_VERSION,
+    SOURCE,
     import_from_hammerhead_api,
     reingest_hammerhead_activity,
 )
@@ -14,7 +15,7 @@ from .model import HammerheadAuth
 class HammerheadActivitySource(ActivitySource):
     @property
     def source(self) -> str:
-        return "hammerhead"
+        return SOURCE
 
     @property
     def ingest_version(self) -> int:

@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Collection, Mapping
 
 import sqlalchemy
 from tqdm import tqdm
@@ -13,11 +14,10 @@ from ..features.strava.source import (
     StravaApiActivitySource,
     StravaCheckoutActivitySource,
 )
-from ..features.strava.upstream import API_SOURCE, STRAVA_SOURCES
 from .config import ConfigAccessor
 from .datamodel import DB, Activity, count_activities
 from .pipeline import refresh_stale_enrichments
-from .sources import ActivitySource, DirectoryImportSource
+from .sources import ActivitySource, DateRange, DirectoryImportSource
 from .tile_visits import compute_tile_visits_new
 
 logger = logging.getLogger(__name__)
@@ -30,34 +30,37 @@ _ACTIVITY_SOURCES: list[ActivitySource] = [
 ]
 
 
+def remote_families() -> list[str]:
+    """The families of all sources that reach out beyond the local directory."""
+    return sorted(
+        {
+            activity_source.family
+            for activity_source in _ACTIVITY_SOURCES
+            if not isinstance(activity_source, DirectoryImportSource)
+        }
+    )
+
+
 def scan_for_activities(
     config_accessor: ConfigAccessor,
-    strava_begin: str | None = None,
-    strava_end: str | None = None,
-    skip_strava: bool = False,
-    hammerhead_begin: str | None = None,
-    hammerhead_end: str | None = None,
-    skip_hammerhead: bool = False,
+    date_ranges: Mapping[str, DateRange] | None = None,
+    skip: Collection[str] = (),
 ) -> None:
+    """Import from all enabled sources.
+
+    The keys of `date_ranges` and the entries of `skip` are source families.
+    """
+    date_ranges = date_ranges or {}
     for activity_source in _ACTIVITY_SOURCES:
         if not activity_source.is_enabled(config_accessor):
             continue
-        if activity_source.source in STRAVA_SOURCES and skip_strava:
-            continue
-        if activity_source.source == "hammerhead" and skip_hammerhead:
+        if activity_source.family in skip:
             continue
 
-        if activity_source.source == API_SOURCE:
-            begin = strava_begin
-            end = strava_end
-        elif activity_source.source == "hammerhead":
-            begin = hammerhead_begin
-            end = hammerhead_end
-        else:
-            begin = None
-            end = None
-
-        activity_source.import_activities(config_accessor, begin, end)
+        date_range = date_ranges.get(activity_source.family, DateRange())
+        activity_source.import_activities(
+            config_accessor, date_range.begin, date_range.end
+        )
 
     refresh_stale_ingests(config_accessor)
     refresh_stale_enrichments(config_accessor.activity_import())

@@ -10,7 +10,7 @@ from flask import Flask
 
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import DB
-from geo_activity_playground.core.scan import scan_for_activities
+from geo_activity_playground.core.scan import remote_families, scan_for_activities
 from geo_activity_playground.webui.app import create_app
 
 METADATA_EXTRACTION_REGEXES = [
@@ -120,11 +120,7 @@ def seeded_template(tmp_path_factory: pytest.TempPathFactory) -> pathlib.Path:
                 METADATA_EXTRACTION_REGEXES
             )
             config_accessor.save()
-            scan_for_activities(
-                config_accessor,
-                skip_strava=True,
-                skip_hammerhead=True,
-            )
+            scan_for_activities(config_accessor, skip=remote_families())
             # Flush the file, so that copies of it are complete.
             DB.engine.dispose()
     finally:
