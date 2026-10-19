@@ -7,6 +7,7 @@ from tqdm import tqdm
 from ..features.activity_photos.importer import import_photos_from_directory
 from ..features.explorer.clustering import compute_tile_evolution
 from ..features.explorer.filtered import delete_outdated_filtered_cluster_cache
+from ..features.garmin.source import GarminActivitySource
 from ..features.hammerhead.source import HammerheadActivitySource
 from ..features.segments.matching import find_matches
 from ..features.segments.model import Segment
@@ -27,6 +28,7 @@ _ACTIVITY_SOURCES: list[ActivitySource] = [
     StravaCheckoutActivitySource(),
     StravaApiActivitySource(),
     HammerheadActivitySource(),
+    GarminActivitySource(),
 ]
 
 

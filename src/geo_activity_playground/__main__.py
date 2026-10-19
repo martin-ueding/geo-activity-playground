@@ -121,6 +121,28 @@ def main_export_kml(options: argparse.Namespace) -> None:
     logger.info(f"Written KML to {output}.")
 
 
+def main_garmin_login(options: argparse.Namespace) -> None:
+    import getpass
+    import os
+
+    from .features.garmin.importer import login_interactively, store_tokens
+    from .features.garmin.model import get_garmin_auth
+
+    os.chdir(options.basedir)
+    app = create_app(
+        database_uri=f"sqlite:///{pathlib.Path('database.sqlite').absolute()}",
+        run_migrations=True,
+    )
+    email = input("Garmin e-mail: ").strip()
+    password = getpass.getpass("Garmin password: ")
+    client = login_interactively(
+        email, password, lambda: input("Verification code: ").strip()
+    )
+    with app.app_context():
+        store_tokens(get_garmin_auth(), client)
+    logger.info("Connected to Garmin. The tokens are stored in the database.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Utilities to work with recorded activities."
@@ -159,6 +181,12 @@ def main() -> None:
     )
     subparser.add_argument("checkout_path", type=pathlib.Path)
     subparser.add_argument("playground_path", type=pathlib.Path)
+
+    subparser = subparsers.add_parser(
+        "garmin-login",
+        help="Log in to Garmin Connect, including the MFA code, and store the tokens.",
+    )
+    subparser.set_defaults(func=main_garmin_login)
 
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(

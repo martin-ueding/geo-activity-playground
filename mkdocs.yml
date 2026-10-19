@@ -38,6 +38,7 @@ nav:
     - activity-sources.md
     - import-activity-files.md
     - connect-strava-api.md
+    - connect-garmin.md
     - upload-activity-files.md
     - moving-from-strava.md
   - How-To Guides:

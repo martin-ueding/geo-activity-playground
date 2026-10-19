@@ -12,6 +12,7 @@ dependencies = [
     "charset-normalizer>=3.3.2",
     "coloredlogs>=15.0.1",
     "fitdecode>=0.10.0",
+    "garminconnect>=0.3.19,<0.4",
     "flask>=3.0.0",
     "geojson>=3.0.1",
     "gpxpy>=1.5.0",

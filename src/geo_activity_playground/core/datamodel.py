@@ -869,11 +869,12 @@ class ActivityImportConfig(DB.Model):
         nullable=False,
         default=lambda: {
             "directory": 10,
+            "garmin": 15,
             "strava": 20,
             "strava_export": 20,
             "hammerhead": 30,
         },
-        server_default='{"directory": 10, "strava": 20, "strava_export": 20, "hammerhead": 30}',
+        server_default='{"directory": 10, "garmin": 15, "strava": 20, "strava_export": 20, "hammerhead": 30}',
     )
     """Lower number wins when a cross-source duplicate is auto-resolved.
 

@@ -48,6 +48,7 @@ export default withMermaid({
           { text: 'Import Activity Files', link: '/import-activity-files' },
           { text: 'Upload Activity Files', link: '/upload-activity-files' },
           { text: 'Connect Strava API', link: '/connect-strava-api' },
+          { text: 'Connect Garmin', link: '/connect-garmin' },
           { text: 'Moving from Strava', link: '/moving-from-strava' },
           { text: 'Record Activities', link: '/record-activities' },
           { text: 'Rename Activity Kinds', link: '/rename-activity-kinds' },
