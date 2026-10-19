@@ -36,9 +36,12 @@ def _summary(activity_id: int, start: str, **extra) -> dict:
 class FakeGarmin:
     """Stands in for the logged-in client, answering from memory."""
 
-    def __init__(self, summaries: list[dict], fit_bytes: bytes) -> None:
+    def __init__(
+        self, summaries: list[dict], fit_bytes: bytes, suffix: str = ".fit"
+    ) -> None:
         self.summaries = summaries
         self.fit_bytes = fit_bytes
+        self.suffix = suffix
         self.downloads: list[str] = []
         self.listed_from: list[str] = []
         self.fail_download: dict[str, Exception] = {}
@@ -55,7 +58,7 @@ class FakeGarmin:
             raise self.fail_download[activity_id]
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as archive:
-            archive.writestr(f"{activity_id}_ACTIVITY.fit", self.fit_bytes)
+            archive.writestr(f"{activity_id}_ACTIVITY{self.suffix}", self.fit_bytes)
         return buffer.getvalue()
 
 
@@ -79,17 +82,46 @@ def _activities() -> list[Activity]:
     return list(DB.session.scalars(sqlalchemy.select(Activity)).all())
 
 
-def test_extract_fit_returns_the_only_fit_file(fit_bytes: bytes) -> None:
+def test_extract_activity_file_returns_the_recording(fit_bytes: bytes) -> None:
     fake = FakeGarmin([], fit_bytes)
-    assert importer.extract_fit(fake.download_activity("1")) == fit_bytes
+    assert importer.extract_activity_file(fake.download_activity("1")) == (
+        ".fit",
+        fit_bytes,
+    )
 
 
-def test_extract_fit_rejects_archives_without_a_fit_file() -> None:
+def test_extract_activity_file_accepts_uploaded_gpx() -> None:
+    fake = FakeGarmin([], b"<gpx/>", suffix=".gpx")
+    assert importer.extract_activity_file(fake.download_activity("1")) == (
+        ".gpx",
+        b"<gpx/>",
+    )
+
+
+def test_extract_activity_file_rejects_archives_without_a_recording() -> None:
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr("readme.txt", "no activity here")
     with pytest.raises(zipfile.BadZipFile):
-        importer.extract_fit(buffer.getvalue())
+        importer.extract_activity_file(buffer.getvalue())
+
+
+def test_activity_that_was_uploaded_as_gpx_is_imported(
+    run_import, testdata_dir: pathlib.Path
+) -> None:
+    gpx = testdata_dir / "Local Files" / "Activities" / "Berlin (0,9 km).gpx"
+    fake = FakeGarmin(
+        [_summary(444, "2024-05-10 17:32:04")], gpx.read_bytes(), suffix=".gpx"
+    )
+
+    run_import(fake)
+
+    (activity,) = _activities()
+    assert activity.upstream_id == "444"
+    assert activity.source == "garmin"
+    assert importer.reingest_garmin_activity(
+        activity, ConfigAccessor().activity_import()
+    )
 
 
 def test_import_adds_activity_and_moves_cursor(run_import, fit_bytes: bytes) -> None:

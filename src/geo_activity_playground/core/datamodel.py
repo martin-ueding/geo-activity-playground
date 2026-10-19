@@ -553,9 +553,11 @@ class Equipment(DB.Model):
 
 
 def get_or_make_equipment(name: str) -> Equipment:
-    equipments = DB.session.scalars(
-        sqlalchemy.select(Equipment).where(Equipment.name == name)
-    ).all()
+    # The caller may be building an activity that is not in the session yet.
+    with DB.session.no_autoflush:
+        equipments = DB.session.scalars(
+            sqlalchemy.select(Equipment).where(Equipment.name == name)
+        ).all()
     if equipments:
         assert len(equipments) == 1, (
             f"There must be only one equipment with name '{name}'."

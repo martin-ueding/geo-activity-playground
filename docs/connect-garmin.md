@@ -9,7 +9,7 @@ Garmin only offers its official API to approved business partners. Therefore thi
 - You log in once with your e-mail, password and, if you have it enabled, the verification code that Garmin sends you.
 - The password is **not** stored. Only the session tokens that Garmin hands out are kept in the database. They give access to your Garmin account, so protect your database and the password of the web interface like you would protect the password itself.
 - The tokens are refreshed automatically. You only need to log in again if Garmin revokes them.
-- For each new activity the original FIT file is downloaded and kept in `Cache/Garmin/FIT/`, next to the summary that Garmin returned. This allows to parse the activities again later without asking Garmin again.
+- For each new activity the original recording is downloaded and kept in `Cache/Garmin/FIT/`, next to the summary that Garmin returned. This is a FIT file, or a GPX or TCX file for activities that were uploaded to Garmin in that format. This allows to parse the activities again later without asking Garmin again.
 
 ⚠️ This is not an official interface. Garmin can change its login at any time, and that has broken such libraries before. Garmin also limits login attempts, and a login that fails again and again can lock your account for a while. If the login fails, wait before you try again.
 

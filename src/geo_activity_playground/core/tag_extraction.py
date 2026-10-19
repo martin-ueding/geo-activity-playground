@@ -53,14 +53,16 @@ def apply_tag_extraction(activity: Activity, tags: list[Tag]) -> bool:
 
 
 def get_tags_with_extraction_regex() -> list[Tag]:
-    return DB.session.scalars(
-        sqlalchemy.select(Tag)
-        .where(
-            Tag.extraction_regex.is_not(None),
-            Tag.extraction_regex != "",
-        )
-        .order_by(Tag.id)
-    ).all()
+    # The caller may be handing over an activity that is not in the session yet.
+    with DB.session.no_autoflush:
+        return DB.session.scalars(
+            sqlalchemy.select(Tag)
+            .where(
+                Tag.extraction_regex.is_not(None),
+                Tag.extraction_regex != "",
+            )
+            .order_by(Tag.id)
+        ).all()
 
 
 def apply_tag_extraction_from_database(activity: Activity) -> bool:

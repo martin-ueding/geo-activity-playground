@@ -1,7 +1,8 @@
-"""The steps that sources share when a remote API hands out one FIT file per activity.
+"""The steps that sources share when a remote API hands out one file per activity.
 
 The API lists activities and describes them with a summary. For each one that is new,
-the FIT file is downloaded and kept next to the summary. Keeping both is what lets
+the file (usually FIT, but GPX and TCX are possible) is downloaded and kept next to
+the summary. Keeping both is what lets
 the ingest stage run again later without going back to the API.
 """
 
@@ -15,7 +16,7 @@ from typing import Any
 
 import sqlalchemy
 
-from ..importers.activity_parsers import ActivityParseError, read_fit_activity
+from ..importers.activity_parsers import ActivityParseError, read_activity
 from .datamodel import (
     DB,
     Activity,
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass(frozen=True)
-class FitApiMetadata:
+class ApiMetadata:
     """What the API states about an activity, beyond what the FIT file contains."""
 
     name: str | None = None
@@ -59,8 +60,15 @@ def newest_date(current: str | None, candidate: str) -> str:
     return current
 
 
-def stored_fit_path(directory: pathlib.Path, upstream_id: str) -> pathlib.Path:
-    """Where the FIT file that the API handed out for this activity is kept."""
+def stored_file_path(directory: pathlib.Path, upstream_id: str) -> pathlib.Path:
+    """Where the file that the API handed out for this activity is kept.
+
+    The format is whatever the API had, so the file is found by its stem. A FIT file
+    is assumed for an activity that has no file yet.
+    """
+    for path in sorted(directory.glob(f"{upstream_id}.*")):
+        if path.suffix.lower() != ".json":
+            return path
     return directory / f"{upstream_id}.fit"
 
 
@@ -72,38 +80,37 @@ def stored_summary_path(directory: pathlib.Path, upstream_id: str) -> pathlib.Pa
 def store_artifacts(
     directory: pathlib.Path,
     upstream_id: str,
-    fit_bytes: bytes,
+    file_bytes: bytes,
     payload: dict[str, Any],
+    suffix: str = ".fit",
 ) -> None:
-    """Keep the FIT file and the API's description of the activity.
+    """Keep the file and the API's description of the activity.
 
     Without them the ingest stage could never run again without going back to the
     API, which would make improved parsers unable to reach activities that are
     already imported.
     """
-    with atomic_open(stored_fit_path(directory, upstream_id), "wb") as f:
-        f.write(fit_bytes)
+    with atomic_open(directory / f"{upstream_id}{suffix}", "wb") as f:
+        f.write(file_bytes)
     with atomic_open(stored_summary_path(directory, upstream_id), "w") as f:
         json.dump(payload, f)
 
 
-def import_stored_fit(
+def import_stored_file(
     config: ActivityImportConfig,
     *,
     source: str,
     ingest_version: int,
     directory: pathlib.Path,
     upstream_id: str,
-    metadata: FitApiMetadata,
+    metadata: ApiMetadata,
 ) -> bool:
-    """Parse the kept FIT file of a new activity and add it to the database.
+    """Parse the kept file of a new activity and add it to the database.
 
     Returns False when the activity has no geographic data, which is recorded as an
     exclusion so that it is not downloaded again.
     """
-    activity, time_series = read_fit_activity(
-        stored_fit_path(directory, upstream_id), open
-    )
+    activity, time_series = read_activity(stored_file_path(directory, upstream_id))
 
     if len(time_series) == 0 or "latitude" not in time_series.columns:
         logger.warning(
@@ -131,23 +138,23 @@ def import_stored_fit(
     return True
 
 
-def reingest_stored_fit(
+def reingest_stored_file(
     activity: Activity,
     config: ActivityImportConfig,
     *,
     directory: pathlib.Path,
     ingest_version: int,
-    read_metadata: Callable[[dict[str, Any]], FitApiMetadata],
+    read_metadata: Callable[[dict[str, Any]], ApiMetadata],
 ) -> bool:
-    """Run the ingest stage again from the kept FIT file and summary.
+    """Run the ingest stage again from the kept file and summary.
 
     Returns False when the files are not kept or cannot be parsed any more.
     """
     if not activity.upstream_id:
         return False
-    fit_path = stored_fit_path(directory, activity.upstream_id)
+    file_path = stored_file_path(directory, activity.upstream_id)
     summary_path = stored_summary_path(directory, activity.upstream_id)
-    if not fit_path.exists() or not summary_path.exists():
+    if not file_path.exists() or not summary_path.exists():
         logger.warning(
             "Cannot re-ingest %s activity %s, its files are not kept.",
             activity.source,
@@ -159,9 +166,9 @@ def reingest_stored_fit(
         metadata = read_metadata(json.load(f))
 
     try:
-        parsed, time_series = read_fit_activity(fit_path, open)
+        parsed, time_series = read_activity(file_path)
     except ActivityParseError:
-        logger.exception("Could not parse %s.", fit_path)
+        logger.exception("Could not parse %s.", file_path)
         return False
 
     if metadata.name:

@@ -7,12 +7,12 @@ import requests
 from tqdm import tqdm
 
 from ...core.datamodel import DB, Activity, ActivityImportConfig
-from ...core.fit_api_import import (
-    FitApiMetadata,
+from ...core.file_api_import import (
+    ApiMetadata,
     already_imported,
-    import_stored_fit,
+    import_stored_file,
     newest_date,
-    reingest_stored_fit,
+    reingest_stored_file,
     store_artifacts,
 )
 from ...core.paths import hammerhead_fit_dir
@@ -211,11 +211,11 @@ def _try_import_hammerhead(
     return rate_limited
 
 
-def _read_metadata(payload: dict[str, Any]) -> FitApiMetadata:
+def _read_metadata(payload: dict[str, Any]) -> ApiMetadata:
     summary = payload["summary"]
     detailed = payload["detailed"]
     activity_type = detailed.get("activityType") or summary.get("activityType")
-    return FitApiMetadata(
+    return ApiMetadata(
         name=summary.get("name"),
         kind=str(activity_type) if activity_type else None,
         distance_km=(
@@ -235,7 +235,7 @@ def reingest_hammerhead_activity(
     activity: Activity, config: ActivityImportConfig
 ) -> bool:
     """Run the ingest stage again from the kept FIT file and summary."""
-    return reingest_stored_fit(
+    return reingest_stored_file(
         activity,
         config,
         directory=hammerhead_fit_dir(),
@@ -260,7 +260,7 @@ def _import_one_activity(
 
     payload = {"summary": summary, "detailed": detailed}
     store_artifacts(hammerhead_fit_dir(), str(activity_id), fit_bytes, payload)
-    import_stored_fit(
+    import_stored_file(
         config,
         source=source,
         ingest_version=INGEST_VERSION,

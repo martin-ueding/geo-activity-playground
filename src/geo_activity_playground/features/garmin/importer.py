@@ -1,6 +1,7 @@
 import datetime
 import io
 import logging
+import pathlib
 import time
 import zipfile
 from collections.abc import Callable
@@ -14,12 +15,12 @@ from garminconnect import (
 )
 
 from ...core.datamodel import DB, Activity, ActivityImportConfig
-from ...core.fit_api_import import (
-    FitApiMetadata,
+from ...core.file_api_import import (
+    ApiMetadata,
     already_imported,
-    import_stored_fit,
+    import_stored_file,
     newest_date,
-    reingest_stored_fit,
+    reingest_stored_file,
     store_artifacts,
 )
 from ...core.import_exclusion import record_exclusion
@@ -156,12 +157,12 @@ def _import_activities(
             DB.session.commit()
 
 
-def _read_metadata(payload: dict[str, Any]) -> FitApiMetadata:
+def _read_metadata(payload: dict[str, Any]) -> ApiMetadata:
     summary = payload["summary"]
     activity_type = summary.get("activityType")
     type_key = activity_type.get("typeKey") if isinstance(activity_type, dict) else None
     seconds = summary.get("elapsedDuration") or summary.get("duration")
-    return FitApiMetadata(
+    return ApiMetadata(
         name=summary.get("activityName"),
         kind=str(type_key) if type_key else None,
         distance_km=(
@@ -177,7 +178,7 @@ def _read_metadata(payload: dict[str, Any]) -> FitApiMetadata:
 
 def reingest_garmin_activity(activity: Activity, config: ActivityImportConfig) -> bool:
     """Run the ingest stage again from the kept FIT file and summary."""
-    return reingest_stored_fit(
+    return reingest_stored_file(
         activity,
         config,
         directory=garmin_fit_dir(),
@@ -186,15 +187,27 @@ def reingest_garmin_activity(activity: Activity, config: ActivityImportConfig) -
     )
 
 
-def extract_fit(original: bytes) -> bytes:
-    """The FIT file inside the zip that Garmin hands out as the original."""
+ACTIVITY_FILE_SUFFIXES = (".fit", ".gpx", ".tcx")
+
+
+def extract_activity_file(original: bytes) -> tuple[str, bytes]:
+    """The suffix and content of the recording inside the zip that Garmin hands out.
+
+    This is a FIT file for activities that were recorded on a device. Activities
+    that were uploaded to Garmin as GPX or TCX come back in that format.
+    """
     with zipfile.ZipFile(io.BytesIO(original)) as archive:
-        names = [name for name in archive.namelist() if name.lower().endswith(".fit")]
-        if len(names) != 1:
-            raise zipfile.BadZipFile(
-                f"Expected exactly one FIT file in the archive, found {archive.namelist()}"
-            )
-        return archive.read(names[0])
+        recordings = {
+            pathlib.PurePosixPath(name).suffix.lower(): name
+            for name in archive.namelist()
+            if pathlib.PurePosixPath(name).suffix.lower() in ACTIVITY_FILE_SUFFIXES
+        }
+        for suffix in ACTIVITY_FILE_SUFFIXES:
+            if suffix in recordings:
+                return suffix, archive.read(recordings[suffix])
+        raise zipfile.BadZipFile(
+            f"Found no FIT, GPX or TCX file in the archive: {archive.namelist()}"
+        )
 
 
 def _import_one_activity(
@@ -216,10 +229,11 @@ def _import_one_activity(
     original = client.download_activity(
         activity_id, dl_fmt=Garmin.ActivityDownloadFormat.ORIGINAL
     )
+    suffix, recording = extract_activity_file(original)
     store_artifacts(
-        garmin_fit_dir(), activity_id, extract_fit(original), {"summary": summary}
+        garmin_fit_dir(), activity_id, recording, {"summary": summary}, suffix=suffix
     )
-    import_stored_fit(
+    import_stored_file(
         config,
         source=source,
         ingest_version=INGEST_VERSION,

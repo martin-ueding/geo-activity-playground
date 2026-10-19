@@ -4,14 +4,14 @@ import sqlalchemy
 
 from geo_activity_playground.core.config import ConfigAccessor
 from geo_activity_playground.core.datamodel import DB, Activity
-from geo_activity_playground.core.fit_api_import import (
-    FitApiMetadata,
+from geo_activity_playground.core.file_api_import import (
+    ApiMetadata,
     already_imported,
-    import_stored_fit,
+    import_stored_file,
     newest_date,
-    reingest_stored_fit,
+    reingest_stored_file,
     store_artifacts,
-    stored_fit_path,
+    stored_file_path,
     stored_summary_path,
 )
 from geo_activity_playground.core.import_exclusion import record_exclusion
@@ -24,8 +24,8 @@ def _fit_bytes(testdata_dir: pathlib.Path) -> bytes:
     return (testdata_dir / "Local Files" / "Activities" / FIT_NAME).read_bytes()
 
 
-def _metadata_from(payload: dict) -> FitApiMetadata:
-    return FitApiMetadata(name=payload["name"], kind=payload["kind"])
+def _metadata_from(payload: dict) -> ApiMetadata:
+    return ApiMetadata(name=payload["name"], kind=payload["kind"])
 
 
 def test_newest_date_picks_newer() -> None:
@@ -49,11 +49,11 @@ def test_store_artifacts_keeps_both_files(
 
     store_artifacts(directory, "42", fit_bytes, {"name": "Morning ride"})
 
-    assert stored_fit_path(directory, "42").read_bytes() == fit_bytes
+    assert stored_file_path(directory, "42").read_bytes() == fit_bytes
     assert '"Morning ride"' in stored_summary_path(directory, "42").read_text()
 
 
-def test_import_stored_fit_then_reingest(
+def test_import_stored_file_then_reingest(
     app_context: None, playground: pathlib.Path, testdata_dir: pathlib.Path
 ) -> None:
     directory = playground / "Cache" / "Example"
@@ -63,7 +63,7 @@ def test_import_stored_fit_then_reingest(
     store_artifacts(directory, "42", _fit_bytes(testdata_dir), payload)
 
     assert not already_imported(SOURCE, "42")
-    assert import_stored_fit(
+    assert import_stored_file(
         config,
         source=SOURCE,
         ingest_version=3,
@@ -87,7 +87,7 @@ def test_import_stored_fit_then_reingest(
         _fit_bytes(testdata_dir),
         {"name": "Renamed ride", "kind": "Ride"},
     )
-    assert reingest_stored_fit(
+    assert reingest_stored_file(
         activity,
         config,
         directory=directory,
@@ -102,7 +102,7 @@ def test_reingest_without_kept_files_reports_failure(
     app_context: None, playground: pathlib.Path
 ) -> None:
     activity = Activity(upstream_id="42", source=SOURCE)
-    assert not reingest_stored_fit(
+    assert not reingest_stored_file(
         activity,
         ConfigAccessor().activity_import(),
         directory=playground,
