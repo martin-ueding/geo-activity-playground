@@ -15,6 +15,17 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Added:
+
+- Connect to Garmin Connect and download the original FIT files of new activities. Log in on the settings page or with `garmin-login`.
+- Limit the sync of any service to a date range with `--garmin-begin` and `--garmin-end`, like for Strava and Hammerhead.
+
+Fixed:
+
+- Stamp Hammerhead activities with the ingest version when importing them, so they are no longer parsed a second time on the next scan.
+
 ## Version 1.57.0 — 2026-10-11
 
 Added:
