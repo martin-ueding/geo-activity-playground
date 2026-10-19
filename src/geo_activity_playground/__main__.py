@@ -7,6 +7,8 @@ import sys
 import coloredlogs
 
 from .core.host_resources import default_worker_count
+from .core.scan import remote_families
+from .core.sources import DateRange
 from .features.activity_photos.cli import (
     register_main_annotate_photos,
     register_main_inspect_photo,
@@ -119,6 +121,28 @@ def main_export_kml(options: argparse.Namespace) -> None:
     logger.info(f"Written KML to {output}.")
 
 
+def main_garmin_login(options: argparse.Namespace) -> None:
+    import getpass
+    import os
+
+    from .features.garmin.importer import login_interactively, store_tokens
+    from .features.garmin.model import get_garmin_auth
+
+    os.chdir(options.basedir)
+    app = create_app(
+        database_uri=f"sqlite:///{pathlib.Path('database.sqlite').absolute()}",
+        run_migrations=True,
+    )
+    email = input("Garmin e-mail: ").strip()
+    password = getpass.getpass("Garmin password: ")
+    client = login_interactively(
+        email, password, lambda: input("Verification code: ").strip()
+    )
+    with app.app_context():
+        store_tokens(get_garmin_auth(), client)
+    logger.info("Connected to Garmin. The tokens are stored in the database.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Utilities to work with recorded activities."
@@ -158,6 +182,12 @@ def main() -> None:
     subparser.add_argument("checkout_path", type=pathlib.Path)
     subparser.add_argument("playground_path", type=pathlib.Path)
 
+    subparser = subparsers.add_parser(
+        "garmin-login",
+        help="Log in to Garmin Connect, including the MFA code, and store the tokens.",
+    )
+    subparser.set_defaults(func=main_garmin_login)
+
     subparser = subparsers.add_parser("serve", help="Launch webserver")
     subparser.set_defaults(
         func=lambda options: web_ui_main(
@@ -165,10 +195,13 @@ def main() -> None:
             options.skip_reload,
             host=options.host,
             port=options.port,
-            strava_begin=options.strava_begin,
-            strava_end=options.strava_end,
-            hammerhead_begin=options.hammerhead_begin,
-            hammerhead_end=options.hammerhead_end,
+            date_ranges={
+                family: DateRange(
+                    getattr(options, f"{family}_begin"),
+                    getattr(options, f"{family}_end"),
+                )
+                for family in remote_families()
+            },
             http_server=options.http_server,
             threads=options.threads,
             workers=options.workers,
@@ -213,20 +246,16 @@ def main() -> None:
         help="Number of worker processes, also settable via GAP_WORKERS (Gunicorn only, default: %(default)s)",
     )
     subparser.add_argument("--skip-reload", action=argparse.BooleanOptionalAction)
-    subparser.add_argument(
-        "--strava-begin", help="Start date to limit Strava sync, format YYYY-MM-DD"
-    )
-    subparser.add_argument(
-        "--strava-end", help="End date to limit Strava sync, format YYYY-MM-DD"
-    )
-    subparser.add_argument(
-        "--hammerhead-begin",
-        help="Start date to limit Hammerhead sync, format YYYY-MM-DD",
-    )
-    subparser.add_argument(
-        "--hammerhead-end",
-        help="End date to limit Hammerhead sync, format YYYY-MM-DD",
-    )
+    for family in remote_families():
+        label = family.capitalize()
+        subparser.add_argument(
+            f"--{family}-begin",
+            help=f"Start date to limit {label} sync, format YYYY-MM-DD",
+        )
+        subparser.add_argument(
+            f"--{family}-end",
+            help=f"End date to limit {label} sync, format YYYY-MM-DD",
+        )
 
     subparser = subparsers.add_parser(
         "export-kml",

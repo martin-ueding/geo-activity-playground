@@ -1,0 +1,68 @@
+{% extends "settings/base.html.j2" %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Garmin API') }}</li>
+{% endblock %}
+
+{% block settings_content %}
+<h1 class="mb-3">{{ _('Garmin Connect') }}</h1>
+
+<div class="row mb-3">
+    <div class="col-lg-6">
+        <p>{{ _('You can connect to Garmin Connect so that your activities are downloaded as the original FIT files automatically.') }}</p>
+
+        <p>{{ _('This uses the unofficial python-garminconnect library, as Garmin only offers its official API to approved business partners. Garmin can change its login at any time, and a login that fails repeatedly can lock your account for a while.') }}</p>
+
+        <p>{{ _('Your password is not stored. Only the session tokens that Garmin hands out are kept in the database. They give access to your Garmin account, so keep your database and the password of this web interface safe.') }}</p>
+
+        <p>
+            {{ _('Status:') }}
+            {% if garmin_connected %}
+            <span class="badge text-bg-success">{{ _('Connected') }}</span>
+            {% else %}
+            <span class="badge text-bg-secondary">{{ _('Not connected') }}</span>
+            {% endif %}
+        </p>
+
+        {% if garmin_connected %}
+        <form action="{{ url_for('settings.garmin_disconnect') }}" method="POST"
+            onsubmit="return confirm('{{ _('Are you sure you want to disconnect from Garmin? You will need to log in again to sync activities again.') }}');">
+            <button type="submit" class="btn btn-outline-danger">{{ _('Disconnect from Garmin') }}</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-6">
+        {% if mfa_pending %}
+        <form action="{{ url_for('settings.garmin_mfa') }}" method="POST">
+            <div class="mb-3">
+                <label for="garmin_mfa_code" class="form-label">{{ _('Verification code') }}</label>
+                <input type="text" class="form-control" id="garmin_mfa_code" name="garmin_mfa_code"
+                    autocomplete="one-time-code" inputmode="numeric" required autofocus />
+                <div class="form-text">{{ _('Garmin has sent a code to you. Enter it here to finish the login.') }}</div>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ _('Finish login') }}</button>
+        </form>
+        {% else %}
+        <form action="" method="POST">
+            <div class="mb-3">
+                <label for="garmin_email" class="form-label">{{ _('E-mail') }}</label>
+                <input type="email" class="form-control" id="garmin_email" name="garmin_email"
+                    autocomplete="username" required />
+            </div>
+            <div class="mb-3">
+                <label for="garmin_password" class="form-label">{{ _('Password') }}</label>
+                <input type="password" class="form-control" id="garmin_password" name="garmin_password"
+                    autocomplete="current-password" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ _('Log in to Garmin') }}</button>
+        </form>
+        <p class="form-text mt-3">
+            {{ _('If the login with a verification code does not work here, run this on the command line instead:') }}
+            <code>geo-activity-playground garmin-login</code>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

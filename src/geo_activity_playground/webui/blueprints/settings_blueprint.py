@@ -82,6 +82,7 @@ from ...features.explorer.zoom_levels import (
     EXPLORER_ZOOM_LEVEL_NAMES,
     SELECTABLE_EXPLORER_ZOOM_LEVELS,
 )
+from ...features.garmin.blueprint import register_garmin_settings
 from ...features.hammerhead.blueprint import register_hammerhead_settings
 from ...features.heatmap.blueprint import register_heatmap_settings
 from ...features.heatmap.model import HeatmapTileCache
@@ -132,6 +133,7 @@ def _activity_source_labels() -> dict[str, str]:
         "strava": _("Strava API"),
         "strava_export": _("Strava Export"),
         "hammerhead": _("Hammerhead"),
+        "garmin": _("Garmin"),
     }
 
 
@@ -257,6 +259,7 @@ def make_settings_blueprint(
     register_directory_import_settings(
         blueprint, authenticator, flasher, config_accessor
     )
+    register_garmin_settings(blueprint, authenticator)
     register_hammerhead_settings(blueprint, authenticator)
     register_heatmap_settings(blueprint, authenticator, flasher)
     register_strava_settings(blueprint, authenticator, config_accessor, flasher)

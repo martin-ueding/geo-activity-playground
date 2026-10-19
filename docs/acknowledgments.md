@@ -98,6 +98,10 @@ Although I have recorded some of my bike rides, I only really started to record 
 
 Strava has an API, and with [stravalib](https://stravalib.readthedocs.io/en/latest/) there exists a nice Python wrapper. This makes it much easier to interface with Strava.
 
+## python-garminconnect
+
+Garmin only offers its official API to business partners. The unofficial [python-garminconnect](https://github.com/cyberjunky/python-garminconnect) library makes it possible to download the activities from Garmin Connect.
+
 ## Strava local heatmap
 
 The [Strava local heatmap](https://github.com/remisalmon/Strava-local-heatmap) project provides a script that renders heatmap files from GPX files locally. It has a gorgeous color scheme with a few nifty tricks. The heatmap in this project is inspired by this project that doesn't share the code.

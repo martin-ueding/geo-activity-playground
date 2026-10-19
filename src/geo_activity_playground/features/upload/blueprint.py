@@ -16,7 +16,7 @@ from ...core.config import ConfigAccessor
 from ...core.datamodel import DB, Activity
 from ...core.import_exclusion import clear_exclusion, find_exclusion
 from ...core.pipeline import file_sha256
-from ...core.scan import scan_for_activities
+from ...core.scan import remote_families, scan_for_activities
 from ...webui.authenticator import Authenticator, needs_authentication
 from ...webui.flasher import Flasher, FlashTypes
 
@@ -153,11 +153,7 @@ def make_upload_blueprint(
             # Everything was already there and nothing had been hidden.
             return redirect(url_for(".index"))
 
-        scan_for_activities(
-            config_accessor,
-            skip_strava=True,
-            skip_hammerhead=True,
-        )
+        scan_for_activities(config_accessor, skip=remote_families())
 
         activity_ids = DB.session.scalars(
             sqlalchemy.select(Activity.id)

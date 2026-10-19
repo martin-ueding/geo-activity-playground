@@ -1,4 +1,5 @@
 import abc
+import dataclasses
 import pathlib
 import typing
 
@@ -6,6 +7,14 @@ from .config import ConfigAccessor
 
 if typing.TYPE_CHECKING:
     from .datamodel import Activity
+
+
+@dataclasses.dataclass(frozen=True)
+class DateRange:
+    """Limits one family of sources to activities between two dates (YYYY-MM-DD)."""
+
+    begin: str | None = None
+    end: str | None = None
 
 
 class ActivitySource(abc.ABC):
@@ -16,6 +25,16 @@ class ActivitySource(abc.ABC):
     def source(self) -> str:
         """Stable, unique source name stored on imported activities."""
         ...
+
+    @property
+    def family(self) -> str:
+        """The service that this source belongs to.
+
+        Sources of one service share the options that the user gives for it, like
+        skipping it or limiting it to a date range. The Strava API and the Strava
+        export are two sources of the family `strava`.
+        """
+        return self.source
 
     @property
     def ingest_version(self) -> int:

@@ -6,13 +6,17 @@ from ...core.sources import ActivitySource
 from . import api_importer, checkout_importer
 from .api_importer import import_from_strava_api, reingest_strava_activity
 from .checkout_importer import import_from_strava_checkout, reingest_checkout_activity
-from .upstream import API_SOURCE, EXPORT_SOURCE
+from .upstream import API_SOURCE, EXPORT_SOURCE, FAMILY
 
 
 class StravaCheckoutActivitySource(ActivitySource):
     @property
     def source(self) -> str:
         return EXPORT_SOURCE
+
+    @property
+    def family(self) -> str:
+        return FAMILY
 
     @property
     def ingest_version(self) -> int:
@@ -40,6 +44,10 @@ class StravaApiActivitySource(ActivitySource):
     @property
     def source(self) -> str:
         return API_SOURCE
+
+    @property
+    def family(self) -> str:
+        return FAMILY
 
     @property
     def ingest_version(self) -> int:

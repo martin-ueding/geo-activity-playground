@@ -553,9 +553,11 @@ class Equipment(DB.Model):
 
 
 def get_or_make_equipment(name: str) -> Equipment:
-    equipments = DB.session.scalars(
-        sqlalchemy.select(Equipment).where(Equipment.name == name)
-    ).all()
+    # The caller may be building an activity that is not in the session yet.
+    with DB.session.no_autoflush:
+        equipments = DB.session.scalars(
+            sqlalchemy.select(Equipment).where(Equipment.name == name)
+        ).all()
     if equipments:
         assert len(equipments) == 1, (
             f"There must be only one equipment with name '{name}'."
@@ -869,11 +871,12 @@ class ActivityImportConfig(DB.Model):
         nullable=False,
         default=lambda: {
             "directory": 10,
+            "garmin": 15,
             "strava": 20,
             "strava_export": 20,
             "hammerhead": 30,
         },
-        server_default='{"directory": 10, "strava": 20, "strava_export": 20, "hammerhead": 30}',
+        server_default='{"directory": 10, "garmin": 15, "strava": 20, "strava_export": 20, "hammerhead": 30}',
     )
     """Lower number wins when a cross-source duplicate is auto-resolved.
 
