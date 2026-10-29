@@ -37,44 +37,76 @@ def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:
 
 
 def plot_year_cumulative(df: pd.DataFrame, column: ColumnDescription) -> str:
+    # One value per year and week, carried forward over weeks without activities.
     year_cumulative = (
-        df[["iso_year", "week", column.name]]
-        .groupby("iso_year")
-        .apply(
-            lambda group: pd.DataFrame(
-                {
-                    "week": group["week"],
-                    column.name: group[column.name].cumsum(),
-                }
-            ),
-            include_groups=False,
-        )
+        df.groupby(["week", "iso_year"])[column.name]
+        .sum()
+        .unstack("iso_year")
+        .sort_index()
+        .cumsum()
+        .ffill(limit_area="inside")
+        .stack()
+        .rename(column.name)
         .reset_index()
     )
+    years = sorted(year_cumulative["iso_year"].unique(), reverse=True)
+    value_title = f"{column.display_name} / {column.unit}"
 
-    return to_vega(
-        alt.Chart(
-            year_cumulative,
-            title=_("Cumulative %(display_name)s per Year")
-            % {"display_name": column.display_name},
-        )
-        .mark_line()
-        .encode(
-            alt.X("week", title=_("Week")),
-            alt.Y(column.name, title=f"{column.display_name} / {column.unit}"),
-            alt.Color("iso_year:O", scale=alt.Scale(scheme="viridis"), title=_("Year")),
-            [
-                alt.Tooltip("week", title=_("Week")),
-                alt.Tooltip("iso_year:O", title=_("Year")),
-                alt.Tooltip(
-                    column.name,
-                    title=f"{column.display_name} / {column.unit}",
-                    format=column.format,
-                ),
-            ],
-        )
+    # Selects the week closest to the mouse pointer, so one doesn't need to hit a line.
+    hover = alt.selection_point(
+        fields=["week"], nearest=True, on="pointerover", empty=False
+    )
+
+    base = alt.Chart(
+        year_cumulative,
+        title=_("Cumulative %(display_name)s per Year")
+        % {"display_name": column.display_name},
+    ).encode(alt.X("week", title=_("Week")))
+    series = base.encode(
+        alt.Y(column.name, title=value_title),
+        alt.Color("iso_year:O", scale=alt.Scale(scheme="viridis"), title=_("Year")),
+    )
+
+    # Clicking a year in the legend highlights only it, clicking it again shows all
+    # years. Ctrl-click (Cmd on macOS) adds or removes single years.
+    highlight = alt.selection_point(
+        name="highlight",
+        fields=["iso_year"],
+        bind="legend",
+        toggle="event.ctrlKey || event.metaKey"
+        " || (isValid(datum) && length(data('highlight_store')) == 1"
+        " && data('highlight_store')[0].values[0] === datum.value)",
+    )
+
+    lines = (
+        series.mark_line()
+        .encode(opacity=alt.condition(highlight, alt.value(1), alt.value(0.15)))
+        .add_params(highlight)
         .interactive()
     )
+    points = series.mark_point(filled=True).encode(
+        opacity=alt.condition(hover & highlight, alt.value(1), alt.value(0))
+    )
+    rule = (
+        base.transform_pivot("iso_year", value=column.name, groupby=["week"])
+        .mark_rule(color="gray")
+        .encode(
+            opacity=alt.condition(hover, alt.value(0.7), alt.value(0)),
+            tooltip=[alt.Tooltip("week", title=_("Week"))]
+            + [
+                # A purely numeric title would be sorted to the front by JavaScript.
+                alt.Tooltip(
+                    f"{year}:Q",
+                    title=f"{column.display_name} {year}",
+                    format=column.format,
+                )
+                for year in years
+            ],
+        )
+        .add_params(hover)
+    )
+
+    return to_vega(alt.layer(lines, points, rule))
 
 
 def plot_per_iso_week(df: pd.DataFrame, column: ColumnDescription) -> str:

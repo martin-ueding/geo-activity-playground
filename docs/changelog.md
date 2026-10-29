@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Changed:
+
+- Show all years of the week nearest to the pointer in the cumulative per year plot. Highlight years via the legend, Ctrl-click for several. ([GH-537](https://github.com/martin-ueding/geo-activity-playground/issues/537))
+
 ## Version 1.57.0 — 2026-10-11
 
 Added:
