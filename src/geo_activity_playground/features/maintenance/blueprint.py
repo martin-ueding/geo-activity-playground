@@ -88,7 +88,9 @@ def _maintenance_plots(
             alt.Color("equipment", title=_("Equipment")),
             tooltip=[
                 alt.Tooltip("equipment:N", title=_("Equipment")),
-                alt.Tooltip("total_distance_km:Q", title=_("Total usage / km")),
+                alt.Tooltip(
+                    "total_distance_km:Q", title=_("Total usage / km"), format=".1f"
+                ),
                 alt.Tooltip("total_cost:Q", title=total_cost_title, format=".2f"),
             ],
         )

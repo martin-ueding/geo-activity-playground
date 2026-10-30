@@ -29,6 +29,7 @@ def plot_per_year_per_kind(df: pd.DataFrame, column: ColumnDescription) -> str:
                 alt.Tooltip(
                     f"sum({column.name})",
                     title=f"{column.display_name} / {column.unit}",
+                    format=column.format,
                 ),
             ],
         )

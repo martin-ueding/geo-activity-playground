@@ -15,6 +15,12 @@ Types of changes
 
 <!-- next version below this line -->
 
+## Unreleased
+
+Fixed:
+
+- Round the tooltip values of the yearly summary plot, the plot builder and the maintenance cost vs. usage plot to one decimal place. ([GH-538](https://github.com/martin-ueding/geo-activity-playground/issues/538))
+
 ## Version 1.57.0 — 2026-10-11
 
 Added:

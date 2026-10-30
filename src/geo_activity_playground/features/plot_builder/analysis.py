@@ -142,42 +142,46 @@ def make_parametric_plot(df: pd.DataFrame, spec: PlotSpec) -> dict[str, str]:
             ),
         ]
         tooltips = [
-            alt.Tooltip(spec.x, title=str(VARIABLES_2[spec.x])),
-            alt.Tooltip(spec.y, title=str(VARIABLES_2[spec.y])),
+            _tooltip(spec.x),
+            _tooltip(spec.y),
         ]
 
         if spec.color:
             encodings.append(alt.Color(spec.color, title=str(VARIABLES_2[spec.color])))
-            tooltips.append(alt.Tooltip(spec.color, title=str(VARIABLES_2[spec.color])))
+            tooltips.append(_tooltip(spec.color))
         if spec.shape:
             encodings.append(alt.Shape(spec.shape, title=str(VARIABLES_2[spec.shape])))
-            tooltips.append(alt.Tooltip(spec.shape, title=str(VARIABLES_2[spec.shape])))
+            tooltips.append(_tooltip(spec.shape))
         if spec.size:
             encodings.append(alt.Size(spec.size, title=str(VARIABLES_2[spec.size])))
-            tooltips.append(alt.Tooltip(spec.size, title=str(VARIABLES_2[spec.size])))
+            tooltips.append(_tooltip(spec.size))
         if spec.opacity:
             encodings.append(
                 alt.Opacity(spec.opacity, title=str(VARIABLES_2[spec.opacity]))
             )
-            tooltips.append(
-                alt.Tooltip(spec.opacity, title=str(VARIABLES_2[spec.opacity]))
-            )
+            tooltips.append(_tooltip(spec.opacity))
         if spec.row:
             encodings.append(alt.Row(spec.row, title=str(VARIABLES_2[spec.row])))
-            tooltips.append(alt.Tooltip(spec.row, title=str(VARIABLES_2[spec.row])))
+            tooltips.append(_tooltip(spec.row))
         if spec.column:
             encodings.append(
                 alt.Column(spec.column, title=str(VARIABLES_2[spec.column]))
             )
-            tooltips.append(
-                alt.Tooltip(spec.column, title=str(VARIABLES_2[spec.column]))
-            )
+            tooltips.append(_tooltip(spec.column))
         if spec.facet:
             encodings.append(
                 alt.Facet(spec.facet, columns=3, title=str(VARIABLES_2[spec.facet]))
             )
-            tooltips.append(alt.Tooltip(spec.facet, title=str(VARIABLES_2[spec.facet])))
+            tooltips.append(_tooltip(spec.facet))
 
         key = str(int(key) if isinstance(key, float) else key)
         chart_groups[key] = to_vega(chart.encode(*encodings, tooltips).interactive())
     return chart_groups
+
+
+def _tooltip(variable: str) -> alt.Tooltip:
+    # Continuous values would otherwise show all floating point digits. The `~` drops
+    # the trailing zero for integer columns like the number of new tiles.
+    if variable in CONTINUOUS_VARIABLES and variable != "start_local":
+        return alt.Tooltip(variable, title=str(VARIABLES_2[variable]), format=".1~f")
+    return alt.Tooltip(variable, title=str(VARIABLES_2[variable]))
