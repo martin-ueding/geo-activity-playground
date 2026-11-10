@@ -105,7 +105,7 @@ def make_upload_blueprint(
             filename = file.filename
             assert filename is not None
             target_path = pathlib.Path(request.form["directory"]) / filename
-            assert target_path.suffix in [
+            assert target_path.suffix.lower() in [
                 ".csv",
                 ".fit",
                 ".gpx",
